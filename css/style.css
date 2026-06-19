@@ -1,0 +1,49 @@
+:root {
+  /*Master Roachi*/
+
+  --mr-black: #010e16;   /* Main dark background */
+  --mr-white: #fefbe4;   /* Main readable text */
+  --mr-blue: #01e2fd;    /* Primary accent / links / headings */
+  --mr-green: #b6ff70;   /* Tagline / highlight / progress */
+  --mr-gold: #c49966;    /* Warm accent / witness gold */
+
+
+  /*Arkitecture*/
+
+  --ark-bg: #010e16;     /* Arkitecture dark background */
+  --ark-text: #fefbe4;   /* Arkitecture readable text */
+  --ark-blue: #01e2fd;   /* Neon blueprint blue */
+  --ark-green: #b6ff70;  /* Code green */
+  --ark-gold: #fdda5d;   /* Dawn gold / rare highlight */
+
+
+  /*Questicles*/
+
+  --quest-bg: #161d23;       /* Dungeon night */
+  --quest-bg-dark: #25271c;  /* Moss black */
+  --quest-text: #f9f2e9;     /* Quest parchment */
+  --quest-gold: #c49966;     /* Treasure gold */
+  --quest-teal: #4e6c6e;     /* River steel / muted teal */
+
+
+  /*South African Sinner*/
+
+  --sas-bg: #392b45;          /* Royal violet night */
+  --sas-bg-secondary: #16404c; /* Dome teal */
+  --sas-text: #dcd8cf;        /* Ash parchment */
+  --sas-copper: #be7a22;      /* Icon copper */
+  --sas-glow: #ffff76;        /* Candle glow / rare highlight */
+}
+* {
+    box-sizing: border-box;
+}
+
+body {
+  background-color: var(--mr-black);
+  color: var(--mr-white);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 24px;
+}
