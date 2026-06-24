@@ -46,16 +46,18 @@ body {
 }
 
 .hero {
-    padding: 20px;
+    padding: 80px 20px;
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 60px;
 }
 
 .hero-text {
     display: flex;
     flex-direction: column;
-    gap: 20px
+    gap: 20px;
+    max-width: 450px;
 }
 
 .hero-text p {
@@ -134,17 +136,34 @@ body {
 
 .box {
     display: flex;
+    align-items: center;
     background-color: #f9f2e9;
     border-radius: 10px;
     padding: 50px;
+    gap: 50px;
 }
 
 .box p {
-    font-size: 18px;
+    font-size: 12px;
 }
 
 .box button {
-    width: 200px;
+    background-color: #c49966;
+    border-radius: 10px;
+    width: 120px;
+    height: 40px;
+    color: #161d23;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #161d23;
+    color: #f9f2e9;
+    height: 75px;
 }
 
 blockquote {
@@ -153,9 +172,6 @@ blockquote {
     font-weight: 300;
 }
 
-ul {
-    display: flex;
-}
 
 h1 {
     font-weight: 900;
