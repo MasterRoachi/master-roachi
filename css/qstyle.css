@@ -1,0 +1,169 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Roboto, sans-serif;
+    font-size: 18px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.section-one {
+    display: flex;
+    align-items: center;
+    background-color: #161d23;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#header-img {
+    width: 200px;
+}
+
+.links {
+    display: flex;
+    color: #c49966;
+    list-style: none;
+    gap: 10px;
+}
+
+.hero {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.hero-text {
+    display: flex;
+    flex-direction: column;
+    gap: 20px
+}
+
+.hero-text p {
+    color: #f9f2e9;
+}
+
+.hero-button {
+    background-color: #c49966;
+    padding: 12px;
+    border-radius: 10px;
+    max-width: 150px;
+    color: #161d23;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+#hero-img {
+    width: 600px;
+    height: 320px;
+    display: flex;
+}
+
+.section-two {
+        display: flex;
+    align-items: center;
+    background-color: #f9f2e9;
+    padding: 24px;
+    height: 500px;
+}
+
+.infos {
+    display: flex;
+    padding: 24px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info p {
+    color: #161d23;
+    text-align: center;
+}
+
+.info img {
+    width: 200px;
+}
+
+.section-three {
+        display: flex;
+    align-items: center;
+    background-color: #c49966;
+    padding: 24px;
+    height: 500px;
+}
+
+.quote {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.quote p {
+    text-align: end;
+}
+
+.section-four {
+    display: flex;
+    align-items: center;
+    background-color: #4e6c6e;
+    padding: 100px;
+    height: 500px;
+}
+
+.box {
+    display: flex;
+    background-color: #f9f2e9;
+    border-radius: 10px;
+    padding: 50px;
+}
+
+.box p {
+    font-size: 18px;
+}
+
+.box button {
+    width: 200px;
+}
+
+blockquote {
+    padding: 36px;
+    font-size: 36px;
+    font-weight: 300;
+}
+
+ul {
+    display: flex;
+}
+
+h1 {
+    font-weight: 900;
+    font-size: 48px;
+    color: #c49966;
+}
+
+h2 {
+    color: #161d23;
+    text-align: center;
+}

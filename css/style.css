@@ -1,49 +1,191 @@
 :root {
-  /*Master Roachi*/
+    /*Master Roachi*/
 
-  --mr-black: #010e16;   /* Main dark background */
-  --mr-white: #fefbe4;   /* Main readable text */
-  --mr-blue: #01e2fd;    /* Primary accent / links / headings */
-  --mr-green: #b6ff70;   /* Tagline / highlight / progress */
-  --mr-gold: #c49966;    /* Warm accent / witness gold */
-
-
-  /*Arkitecture*/
-
-  --ark-bg: #010e16;     /* Arkitecture dark background */
-  --ark-text: #fefbe4;   /* Arkitecture readable text */
-  --ark-blue: #01e2fd;   /* Neon blueprint blue */
-  --ark-green: #b6ff70;  /* Code green */
-  --ark-gold: #fdda5d;   /* Dawn gold / rare highlight */
+    --mr-black: #020313;
+    /* Main dark background */
+    --mr-white: #fbe6d2;
+    /* Main readable text */
+    --mr-blue: #003265;
+    /* Primary accent / links / headings */
+    --mr-purple: #621546;
+    /* Tagline / highlight / progress */
+    --mr-gold: #c49966;
+    /* Warm accent / witness gold */
 
 
-  /*Questicles*/
+    /*Arkitecture*/
 
-  --quest-bg: #161d23;       /* Dungeon night */
-  --quest-bg-dark: #25271c;  /* Moss black */
-  --quest-text: #f9f2e9;     /* Quest parchment */
-  --quest-gold: #c49966;     /* Treasure gold */
-  --quest-teal: #4e6c6e;     /* River steel / muted teal */
+    --ark-bg: #010e16;
+    /* Arkitecture dark background */
+    --ark-text: #fefbe4;
+    /* Arkitecture readable text */
+    --ark-blue: #01e2fd;
+    /* Neon blueprint blue */
+    --ark-green: #b6ff70;
+    /* Code green */
+    --ark-gold: #fdda5d;
+    /* Dawn gold / rare highlight */
 
 
-  /*South African Sinner*/
+    /*Questicles*/
 
-  --sas-bg: #392b45;          /* Royal violet night */
-  --sas-bg-secondary: #16404c; /* Dome teal */
-  --sas-text: #dcd8cf;        /* Ash parchment */
-  --sas-copper: #be7a22;      /* Icon copper */
-  --sas-glow: #ffff76;        /* Candle glow / rare highlight */
+    --quest-bg: #161d23;
+    /* Dungeon night */
+    --quest-bg-dark: #25271c;
+    /* Moss black */
+    --quest-text: #f9f2e9;
+    /* Quest parchment */
+    --quest-gold: #c49966;
+    /* Treasure gold */
+    --quest-teal: #4e6c6e;
+    /* River steel / muted teal */
+
+
+    /*South African Sinner*/
+
+    --sas-bg: #392b45;
+    /* Royal violet night */
+    --sas-bg-secondary: #16404c;
+    /* Dome teal */
+    --sas-text: #dcd8cf;
+    /* Ash parchment */
+    --sas-copper: #be7a22;
+    /* Icon copper */
+    --sas-glow: #ffff76;
+    /* Candle glow / rare highlight */
 }
+
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
+
 }
 
 body {
-  background-color: var(--mr-black);
-  color: var(--mr-white);
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.6;
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 24px;
+    background-color: var(--mr-black);
+    color: var(--mr-white);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+h1 {
+    color: var(--mr-gold);
+    font-size: 48px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+h2 {
+    color: var(--mr-gold);
+    font-size: 32px;
+}
+
+h3 {
+    color: var(--mr-gold);
+    font-size: 28px;
+}
+
+h4 {
+    color: var(--mr-gold);
+    font-size: 22px;
+}
+
+p {
+    color: var(--mr-white);
+    margin-bottom: 16px;
+}
+
+ul,
+ol {
+    padding-left: 28px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+blockquote {
+    text-align: center;
+    margin: auto;
+}
+
+.tagline {
+    color: var(--mr-gold);
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border-left: 4px solid var(--mr-gold);
+    border-right: 4px solid var(--mr-gold);
+    margin-bottom: 24px;
+}
+
+a{
+    color: var(--mr-purple);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a:visited {
+    color: var(--mr-gold);
+}
+
+a:hover {
+    color: var(--mr-blue);
+}
+
+nav {
+    padding: 10px;
+    text-align: center;
+}
+
+nav a {
+    display: inline-block;
+    color: var(--mr-purple);
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+nav p {
+    margin: 0;
+    padding: 0;   
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--mr-gold);
+}
+
+.hero-section img,
+.ark-hero img,
+.quest-hero img,
+.sasinner-page > img {
+  display: block;
+  width: 100%;
+  margin: 16px 0 24px;
+}
+.currently-playing img {
+  display: block;
+  max-width: 700px;
+  margin: 16px 0 24px;
+}
+
+.ark-home h2 a:hover {
+    color: var(--ark-blue);
+    text-decoration: underline;
+}
+.quest-home h2 a:hover {
+    color: var(--quest-gold);
+    text-decoration: underline;
+}
+.sas-home h2 a:hover {
+  text-decoration: underline;
+  color: var(--sas-copper);
 }
