@@ -51,8 +51,9 @@ written.
   discoverable via the LinkedIn link if someone wants it, not stated outright.
 
 ### Thoughts
-- Two visible tracks: Tech, Theology / Apologetics.
-- First post ideas: TBD.
+- PARKED (as of this session) — may not launch with this section at all,
+  decide later. If it does happen: two visible tracks, Tech and
+  Theology / Apologetics. No pressure to seed it with posts before launch.
 
 ### Contact
 - Dedicated section (not just footer links). Possibly doubles as a tutoring
@@ -67,7 +68,7 @@ project specifically.
 
 ## Open Items
 
-- [ ] First post topics for Thoughts (both tracks)
+- [ ] Decide whether Thoughts ships at all; if so, first post topics
 - [ ] Actual contact email/handle
 - [ ] Domain name / hosting
 - [ ] Tech stack decision
