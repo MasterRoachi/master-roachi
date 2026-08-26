@@ -114,11 +114,28 @@ Style references given (also informing this decision):
 - [ ] Actual contact email/handle
 - [ ] Domain name / hosting
 - [ ] Tech stack decision
-- [x] Full page mockups done: Home, Work, About (Contact lives on Home,
-      Thoughts is parked). Design canvas has a "Site" page (the real
-      mockups) and a "Directions" page (the earlier exploration, kept for
-      reference).
+- [x] Design settled well enough to move to real code (see "Status" below).
+- [ ] Swap the sigil mark for an Orthodox cross — noted, deliberately later.
 - [ ] Actual GitHub/LinkedIn URLs to use in Contact
+- [ ] Real contact email address
 - [ ] Still unresolved: hero tagline says "Code by trade, worlds by nature" —
       a soft nod to worldbuilding/Terrath, which is supposed to stay
       unmentioned for now. Flagged, not yet decided whether to change it.
+- [ ] Domain name / hosting
+
+
+## Status
+
+Real code has started. `package.json`, `astro.config.mjs`, `tsconfig.json`,
+`src/components/Sigil.astro`, `src/components/Divider.astro`, and
+`src/pages/index.astro` are written and committed — the homepage, built for
+real from the finalized mockup (same sigil motif, grain, glows, colors,
+copy).
+
+**To actually run it: `npm install` then `npm run dev`, from a normal
+terminal on this machine** — not through the Claude device bridge. That
+sandboxed shell has no access to the npm registry (confirmed: both `npm
+ping` and `npm install` came back 403 Forbidden), so package installation
+has to happen from a real terminal with normal internet access. Once
+`node_modules` exists, further edits can go back to happening through the
+bridge as usual.
