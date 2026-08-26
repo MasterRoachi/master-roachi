@@ -30,14 +30,13 @@ written.
 ## Content Decisions
 
 ### Work
-- The Odin Project curriculum work is ONE entry on this site, linking out to
-  the existing GitHub repo hub: github.com/MasterRoachi/odin-projects (it
-  already has its own index.html linking all 8 exercises — no need to
-  duplicate that here).
-- Call out by name: "Quartz, Parchment, Shears" (themed Rock-Paper-Scissors)
-  and "Questicles Landing Page".
-- "Shepherds We Shall Be" gets a dimmed "coming soon" teaser card. Terrath is
-  excluded entirely for now — no mention.
+- Exactly TWO cards on this page, nothing more:
+  1. "Odin Project" — one card linking out to the existing GitHub repo hub:
+     github.com/MasterRoachi/odin-projects (it already has its own index.html
+     linking all 8 exercises — no individual projects get their own card
+     here, the hub covers that).
+  2. "Shepherds We Shall Be" — dimmed "coming soon" teaser. Terrath is
+     excluded entirely for now — no mention.
 
 ### About
 - Voice: casual first-person, plain and factual — not flowery.
