@@ -12,18 +12,20 @@ anyone, no specific niche targeted.
 ## Visual Direction
 
 Dark & atmospheric base — near-black background, Cinzel (display) + Manrope
-(body), warm gold/amber accent — with personality accents pulled from a more
-eclectic direction: slight tilt/rotation on cards, small pill-shaped tag
-badges (Engineer / Writer / Debater). Explored as a design canvas before any
-real code was written.
+(body), warm gold/amber accent — with a little personality pulled from a more
+eclectic direction: slight tilt/rotation on the work cards. No tag/role pills
+under the hero (tried, cut). No "Selected Work" heading — the three cards
+speak for themselves. Explored as a design canvas before any real code was
+written.
 
 ## Site Map (multi-page)
 
-- **Home** — hero/intro
+- **Home** — hero/intro, Work cards, and Contact section. Just a nav link
+  out to Thoughts (not embedded on the homepage itself).
 - **Work** — portfolio
-- **Thoughts** — writing, two tracks: Tech, Theology / Apologetics
+- **Thoughts** — its own dedicated page, two tracks: Tech, Theology / Apologetics
 - **About** — bio
-- **Contact** — dedicated section
+- **Contact** — dedicated section (lives on the homepage for now)
 
 ## Content Decisions
 
@@ -40,11 +42,13 @@ real code was written.
 ### About
 - Voice: casual first-person, plain and factual — not flowery.
 - Approved bio draft:
-  > My name is Stephan Engelbrecht. I go by Master Roachi. I'm a junior
-  > full-stack web developer at SensusAir, and outside of that I write —
-  > mostly about code, sometimes about theology.
+  > My name is Stephan Engelbrecht. I go by Master Roachi. I'm a software
+  > engineer, and outside of that I write — mostly about code, sometimes
+  > about theology.
 - Scope: software + writing only. No mention of the game or tutoring here —
   the Work page teaser is the only hint of anything else going on.
+- Employer (SensusAir) is never named directly anywhere on the site — it's
+  discoverable via the LinkedIn link if someone wants it, not stated outright.
 
 ### Thoughts
 - Two visible tracks: Tech, Theology / Apologetics.
@@ -53,7 +57,7 @@ real code was written.
 ### Contact
 - Dedicated section (not just footer links). Possibly doubles as a tutoring
   inquiry point.
-- Actual contact method (email/handle): TBD.
+- Contact method: email, plus social links (GitHub, LinkedIn).
 
 ## Tech Stack
 
@@ -69,3 +73,4 @@ project specifically.
 - [ ] Tech stack decision
 - [ ] Full page-by-page design pass (Work, Thoughts, About, Contact) once
       content above is locked — the design canvas so far only covers Home.
+- [ ] Actual GitHub/LinkedIn URLs to use in Contact
