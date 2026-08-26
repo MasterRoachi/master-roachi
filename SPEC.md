@@ -65,6 +65,20 @@ TBD — deliberately deferred until content was settled. Default instinct is
 Nuxt/Vue/TS (what's used at SensusAir), but open to reconsidering for this
 project specifically.
 
+Style references given (also informing this decision):
+- tamalsen.dev — WordPress + Slider Revolution plugin. Sticky nav, filterable
+  project gallery, testimonials carousel. Not a relevant stack reference
+  (WordPress), but the info architecture (expertise / work / experience /
+  contact) is a useful shape reference.
+- lars-olson.com — designer/game-dev portfolio, personality-forward, playful
+  tone ("never take myself too seriously"). Stack undetermined from a fetch.
+- ryanritzenthaler.com — Next.js + Tailwind CSS. Minimalist black/white,
+  high-contrast, card/list toggle for a large work gallery.
+- bepatrickdavid.com — self-described minimal/brutalist. Black theme, premium
+  custom type (Neue Montreal, Migra, Maelstrom, Tusker Grotesk), WebGL 3D
+  model via Sketchfab. Stack undetermined from a fetch, likely a custom
+  React/JS build given the production values.
+
 ## Open Items
 
 - [ ] Decide whether Thoughts ships at all; if so, first post topics
