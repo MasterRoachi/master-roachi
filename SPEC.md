@@ -20,12 +20,17 @@ written.
 
 ## Site Map (multi-page)
 
-- **Home** — hero/intro, Work cards, and Contact section. Just a nav link
-  out to Thoughts (not embedded on the homepage itself).
-- **Work** — portfolio
-- **Thoughts** — its own dedicated page, two tracks: Tech, Theology / Apologetics
-- **About** — bio
-- **Contact** — dedicated section (lives on the homepage for now)
+**Single page.** Reversed from the earlier multi-page decision after seeing
+it mocked up — with this little content (two Work cards, a one-paragraph
+bio), three separate page-loads felt sparse; one scroll reads as complete.
+Sections, in order: Hero, Work, About, Contact. Footer.
+- Nav is now anchor-links (#work, #about, #contact), not routes.
+- No nav link to Thoughts — it's parked, and a dead link is worse than no
+  link. Add it back if/when Thoughts actually ships.
+- If Work ever grows into a real list of many projects, split it back into
+  its own page then — not a problem to solve now.
+- Thoughts, if it ever ships, would still be its own page regardless (a blog
+  needs individual post pages either way).
 
 ## Content Decisions
 
@@ -101,3 +106,6 @@ Style references given (also informing this decision):
       mockups) and a "Directions" page (the earlier exploration, kept for
       reference).
 - [ ] Actual GitHub/LinkedIn URLs to use in Contact
+- [ ] Still unresolved: hero tagline says "Code by trade, worlds by nature" —
+      a soft nod to worldbuilding/Terrath, which is supposed to stay
+      unmentioned for now. Flagged, not yet decided whether to change it.
