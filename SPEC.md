@@ -96,6 +96,8 @@ Style references given (also informing this decision):
 - [ ] Actual contact email/handle
 - [ ] Domain name / hosting
 - [ ] Tech stack decision
-- [ ] Full page-by-page design pass (Work, Thoughts, About, Contact) once
-      content above is locked — the design canvas so far only covers Home.
+- [x] Full page mockups done: Home, Work, About (Contact lives on Home,
+      Thoughts is parked). Design canvas has a "Site" page (the real
+      mockups) and a "Directions" page (the earlier exploration, kept for
+      reference).
 - [ ] Actual GitHub/LinkedIn URLs to use in Contact
