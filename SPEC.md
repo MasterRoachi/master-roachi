@@ -61,9 +61,20 @@ written.
 
 ## Tech Stack
 
-TBD — deliberately deferred until content was settled. Default instinct is
-Nuxt/Vue/TS (what's used at SensusAir), but open to reconsidering for this
-project specifically.
+**Decided: Astro, with Vue components for anything genuinely interactive.**
+
+Reasoning:
+- Content collections (typed markdown/MDX) fit future growth perfectly — a
+  devlog for Shepherds We Shall Be, Terrath lore pages, or Thoughts (if it
+  ever ships) are each just a new collection, not a restructure.
+- Ships ~zero JS by default, hydrates only the islands that need it — fast
+  by default, and choosing what's static vs. interactive is itself a signal
+  of engineering judgment worth showing on a portfolio.
+- Reuses real Vue/TypeScript knowledge from SensusAir while picking up a
+  currently-relevant tool, rather than just reaching for Nuxt out of habit.
+- Explicitly chosen over Nuxt (same result, more framework overhead than
+  this site needs) and over plain HTML/CSS/JS (would mean hand-rolling a
+  markdown pipeline whenever a blog/devlog eventually happens).
 
 Style references given (also informing this decision):
 - tamalsen.dev — WordPress + Slider Revolution plugin. Sticky nav, filterable
