@@ -12,11 +12,24 @@ anyone, no specific niche targeted.
 ## Visual Direction
 
 Dark & atmospheric base — near-black background, Cinzel (display) + Manrope
-(body), warm gold/amber accent — with a little personality pulled from a more
-eclectic direction: slight tilt/rotation on the work cards. No tag/role pills
-under the hero (tried, cut). No "Selected Work" heading — the three cards
-speak for themselves. Explored as a design canvas before any real code was
-written.
+(body), warm gold/amber accent, plus a second teal-blue accent (same
+chroma/lightness, different hue) used for "coming soon" / future things vs.
+gold for real, live work. No tag/role pills under the hero (tried, cut).
+
+v1 read as "boring" once mocked up — too flat, too dead-center-symmetric.
+v2 fixes that with:
+- A recurring sigil (a small diamond/compass mark, hand-drawn as inline SVG)
+  used in the nav, as a large faint watermark behind the hero, as small
+  corner accents on the work cards, and as a section-divider motif —
+  a consistent personal mark instead of generic dividers.
+- A subtle grain texture over the whole page, and layered, asymmetric
+  radial glows (gold + teal) at different points down the scroll, so
+  atmosphere carries through past the hero instead of stopping there.
+- Broke the dead-center symmetry: Work cards are offset/staggered, not a
+  flat even grid; About is a two-column layout (sigil + bio) instead of a
+  centered block.
+
+Explored as a design canvas before any real code was written.
 
 ## Site Map (multi-page)
 
