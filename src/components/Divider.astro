@@ -1,0 +1,29 @@
+---
+// The recurring section divider: two fading lines flanking the sigil mark,
+// instead of a plain <hr> or border between sections.
+import Sigil from './Sigil.astro';
+---
+
+<div class="divider">
+  <span class="divider__line"></span>
+  <Sigil size={14} color="var(--muted-2)" opacity={1} variant="mark" />
+  <span class="divider__line"></span>
+</div>
+
+<style>
+  .divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 0 72px;
+  }
+  .divider__line {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--muted-2));
+  }
+  .divider__line:last-child {
+    background: linear-gradient(270deg, transparent, var(--muted-2));
+  }
+</style>
