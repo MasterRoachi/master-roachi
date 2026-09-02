@@ -1,0 +1,17 @@
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-inline: var(--pad);
+}
+
+.line {
+  height: 1px;
+  flex: 0 1 100px;
+  background: linear-gradient(90deg, transparent, var(--muted-2));
+}
+
+.line:last-child {
+  background: linear-gradient(270deg, transparent, var(--muted-2));
+}

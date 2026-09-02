@@ -1,0 +1,28 @@
+---
+title: masterroachi.com
+summary: This site — Next.js and React, statically exported, with an MDX content pipeline behind the writing and the devlog.
+date: 2026-09-02
+status: live
+link: https://github.com/MasterRoachi/master-roachi
+stack: ["Next.js", "React", "TypeScript", "MDX"]
+---
+
+This site. Built with the Next.js App Router and exported as a fully static
+site, so there is no server to run and nothing to keep patched.
+
+## How it's put together
+
+Writing, project pages, and devlog entries are all MDX files on disk, read at
+build time through one small content layer. Adding a post means adding a file —
+there is no CMS and no database.
+
+Everything renders on the server at build time. The only JavaScript that
+reaches the browser is what the navigation genuinely needs, which keeps the
+pages fast on a slow connection.
+
+## Design
+
+The recurring diamond sigil, the grain, and the layered gold and teal glows all
+carry over from the original design pass. Gold marks work that is real and
+shipped; teal marks anything still ahead of it. That rule holds across the
+whole site.

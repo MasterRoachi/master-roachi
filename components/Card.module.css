@@ -1,0 +1,91 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: clamp(18px, 3vw, 30px);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(24px, 4vw, 36px);
+  padding-top: clamp(30px, 4.5vw, 44px);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  background: oklch(18% 0.016 260 / 0.5);
+  height: 100%;
+  transition:
+    border-color 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+/* Only linked cards lift on hover — a "planned" card is not clickable and
+   should not pretend to be. */
+a.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--gold);
+  box-shadow: 0 12px 40px oklch(0% 0 0 / 0.35);
+}
+
+.card[data-status='planned'],
+.card[data-status='in-progress'] {
+  border-style: dashed;
+  border-color: oklch(40% 0.03 220 / 0.7);
+}
+
+a.card[data-status='in-progress']:hover {
+  border-color: var(--teal);
+}
+
+.corner {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.label {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 0 0 10px;
+  color: var(--gold);
+}
+
+.label[data-accent='teal'] {
+  color: var(--teal);
+}
+
+.title {
+  font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+  margin: 0 0 12px;
+}
+
+.body {
+  color: var(--muted);
+  margin: 0;
+  font-size: 0.94rem;
+}
+
+.card[data-status='planned'] .title,
+.card[data-status='planned'] .body {
+  color: var(--muted-2);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.tag {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  border: 1px solid var(--line);
+  padding: 4px 9px;
+}

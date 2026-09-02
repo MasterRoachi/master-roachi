@@ -1,0 +1,52 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.filter:hover {
+  color: var(--ink);
+  border-color: var(--muted-2);
+}
+
+.filter[data-active='true'] {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.filter[data-active='true'][data-track='theology'] {
+  color: var(--teal);
+  border-color: var(--teal);
+}
+
+.count {
+  font-size: 0.68rem;
+  color: var(--muted-2);
+  font-weight: 500;
+}
+
+.empty {
+  color: var(--muted-2);
+  padding-block: 48px;
+  font-style: italic;
+}

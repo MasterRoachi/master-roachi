@@ -1,0 +1,107 @@
+/* Shared layout for a single long-form entry — a project page, a Thoughts
+   post, or a devlog entry. */
+
+.entry {
+  padding-block: clamp(32px, 6vw, 56px) clamp(64px, 10vw, 96px);
+}
+
+.back {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+.back:hover {
+  color: var(--gold);
+}
+
+.head {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: clamp(24px, 4vw, 36px);
+  margin-bottom: clamp(28px, 5vw, 44px);
+  position: relative;
+}
+
+.headMark {
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: clamp(1.85rem, 6vw, 2.75rem);
+  margin: 0 0 14px;
+  overflow-wrap: break-word;
+}
+
+.summary {
+  color: var(--muted);
+  max-width: var(--measure);
+  margin: 0;
+  font-size: clamp(1rem, 2.3vw, 1.12rem);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--muted-2);
+  margin-bottom: 16px;
+}
+
+.track {
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: var(--gold);
+}
+
+.track[data-track='theology'] {
+  color: var(--teal);
+}
+
+.draft {
+  border: 1px dashed var(--muted-2);
+  padding: 2px 7px;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+}
+
+.stack li {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  border: 1px solid var(--line);
+  padding: 4px 9px;
+}
+
+.cta {
+  display: inline-block;
+  margin-top: 22px;
+  padding: 11px 24px;
+  border: 1px solid var(--gold);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cta:hover {
+  background: oklch(75% 0.13 85 / 0.12);
+}

@@ -1,0 +1,158 @@
+/* ---------------------------------------------------------------------------
+   Design tokens. Carried over from the Astro build (SPEC.md "Visual
+   Direction"): near-black base, Cinzel display + Manrope body, gold for real
+   shipped work, teal for things that are still coming.
+--------------------------------------------------------------------------- */
+
+:root {
+  --bg: oklch(16% 0.015 260);
+  --bg-raised: oklch(19% 0.016 260);
+  --ink: oklch(92% 0.01 90);
+  --muted: oklch(65% 0.02 260);
+  --muted-2: oklch(55% 0.02 260);
+  --line: oklch(30% 0.02 260 / 0.6);
+  --gold: oklch(75% 0.13 85);
+  --gold-bright: oklch(85% 0.13 85);
+  --teal: oklch(75% 0.13 220);
+
+  /* One shared horizontal gutter. The Astro version hard-coded 72px at every
+     call site, which is what broke the layout below ~760px — the padding ate
+     the viewport. Scaling it here fixes every section at once. */
+  --pad: clamp(20px, 6vw, 72px);
+
+  /* Fluid type scale, so display sizes shrink with the viewport instead of
+     overflowing it. */
+  --step-hero: clamp(2.5rem, 11vw, 4.5rem);
+  --step-title: clamp(1.75rem, 5.5vw, 2.5rem);
+  --step-lead: clamp(1.125rem, 3vw, 1.625rem);
+  --step-body: clamp(0.95rem, 2vw, 1rem);
+
+  --measure: 68ch;
+  --shell: 1080px;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* `overflow-x` was set on body alone before, which does not stop the root
+   element from panning sideways on mobile. Both need it. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: var(--step-body);
+  line-height: 1.6;
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--gold-bright);
+}
+
+/* Visible keyboard focus. The Astro build had none. */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Shared layout primitives
+-------------------------------------------------------------------------- */
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-inline: var(--pad);
+}
+
+.section {
+  padding-block: clamp(56px, 10vw, 100px);
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+
+.eyebrow--teal {
+  color: var(--teal);
+}
+
+.section-title {
+  font-size: var(--step-title);
+  margin: 0 0 14px;
+}
+
+.section-lede {
+  color: var(--muted);
+  max-width: var(--measure);
+  margin: 0;
+}
+
+/* Skip link, hidden until focused. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-raised);
+  border: 1px solid var(--gold);
+  padding: 10px 18px;
+}
+
+.skip-link:focus {
+  left: var(--pad);
+  top: 12px;
+}

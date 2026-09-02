@@ -1,0 +1,163 @@
+.hero {
+  position: relative;
+  padding-block: clamp(64px, 13vw, 130px) clamp(48px, 9vw, 80px);
+  padding-inline: var(--pad);
+  text-align: center;
+  overflow: hidden;
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  max-width: var(--shell);
+  margin: 0 auto;
+}
+
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  /* Clamp to the viewport so the 440px mark cannot widen the page on a
+     narrow screen. */
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.watermark svg {
+  max-width: 90vw;
+  height: auto;
+}
+
+.heroTitle {
+  font-size: var(--step-hero);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 0 0 22px;
+  /* Long name, narrow screen: allow a break rather than an overflow. */
+  overflow-wrap: break-word;
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.rule span {
+  height: 1px;
+  flex: 0 1 110px;
+  background: linear-gradient(90deg, transparent, var(--muted-2));
+}
+
+.rule span:last-child {
+  background: linear-gradient(270deg, transparent, var(--muted-2));
+}
+
+.tagline {
+  color: var(--muted);
+  max-width: 56ch;
+  margin: 0 auto;
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 34px;
+}
+
+.primaryAction,
+.secondaryAction {
+  padding: 12px 26px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--gold);
+}
+
+.primaryAction:hover {
+  background: oklch(75% 0.13 85 / 0.12);
+}
+
+.secondaryAction {
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.secondaryAction:hover {
+  border-color: var(--gold);
+}
+
+.block {
+  position: relative;
+}
+
+.blockHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: clamp(26px, 4vw, 40px);
+}
+
+.more {
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
+  gap: clamp(18px, 3vw, 30px);
+}
+
+.about {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr;
+  gap: clamp(28px, 5vw, 56px);
+  align-items: center;
+}
+
+.aboutMark {
+  display: flex;
+  justify-content: center;
+}
+
+.aboutMark svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.bio {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  /* Capped well below the old flat 26px, and given a measure, so it does not
+     render two words per line on a phone. */
+  font-size: clamp(1.15rem, 2.9vw, 1.55rem);
+  line-height: 1.6;
+  margin: 0 0 22px;
+  max-width: 42ch;
+}
+
+@media (max-width: 760px) {
+  .about {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .bio {
+    margin-inline: auto;
+  }
+}

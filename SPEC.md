@@ -33,109 +33,118 @@ Explored as a design canvas before any real code was written.
 
 ## Site Map (multi-page)
 
-**Single page.** Reversed from the earlier multi-page decision after seeing
-it mocked up — with this little content (two Work cards, a one-paragraph
-bio), three separate page-loads felt sparse; one scroll reads as complete.
-Sections, in order: Hero, Work, About, Contact. Footer.
-- Nav is now anchor-links (#work, #about, #contact), not routes.
-- No nav link to Thoughts — it's parked, and a dead link is worse than no
-  link. Add it back if/when Thoughts actually ships.
-- If Work ever grows into a real list of many projects, split it back into
-  its own page then — not a problem to solve now.
-- Thoughts, if it ever ships, would still be its own page regardless (a blog
-  needs individual post pages either way).
+**Multi-page.** Reversed again — the single-page version was right for two
+Work cards and a one-paragraph bio, but the site now carries a blog with two
+tracks, per-project pages, and a game devlog. That does not fit one scroll.
+
+Routes:
+- `/` — hero, three most recent projects, bio, three most recent posts
+- `/work` — all projects; `/work/<slug>` per project
+- `/thoughts` — blog index, filterable by track; `/thoughts/<slug>` per post
+- `/shepherds` — game hub and devlog index; `/shepherds/devlog/<slug>`
+- `/about`, `/contact`
+- `/rss.xml`, `/sitemap.xml`, `/robots.txt`
+
+Nav is real routes again, not anchor links. Thoughts now has a nav entry — the
+earlier "no dead links" rule is satisfied because the section exists and
+builds; it is simply empty until there are published posts.
 
 ## Content Decisions
 
 ### Work
-- Exactly TWO cards on this page, nothing more:
-  1. "Odin Project" — one card linking out to the existing GitHub repo hub:
-     github.com/MasterRoachi/odin-projects (it already has its own index.html
-     linking all 8 exercises — no individual projects get their own card
-     here, the hub covers that).
-  2. "Shepherds We Shall Be" — dimmed "coming soon" teaser. Terrath is
-     excluded entirely for now — no mention.
+- Now a real collection rather than exactly two cards. Currently three
+  entries: the Odin Project hub, Shepherds We Shall Be (planned), and this
+  site.
+- Gold = live and shipped, teal = still ahead. A `planned` project renders as
+  a non-clickable card, since there is nothing to link to yet.
+- Terrath remains excluded entirely — no mention anywhere.
 
 ### About
 - Voice: casual first-person, plain and factual — not flowery.
-- Approved bio draft:
+- Approved bio, used verbatim on both `/` and `/about`:
   > My name is Stephan Engelbrecht. I go by Master Roachi. I'm a software
   > engineer, and outside of that I write — mostly about code, sometimes
   > about theology.
-- Scope: software + writing only. No mention of the game or tutoring here —
-  the Work page teaser is the only hint of anything else going on.
-- Employer (SensusAir) is never named directly anywhere on the site — it's
-  discoverable via the LinkedIn link if someone wants it, not stated outright.
+- Expanded with a "What I work with" list. Scope still software + writing
+  only.
+- Employer (SensusAir) is still never named anywhere on the site — verified
+  against the build output.
 
 ### Thoughts
-- PARKED (as of this session) — may not launch with this section at all,
-  decide later. If it does happen: two visible tracks, Tech and
-  Theology / Apologetics. No pressure to seed it with posts before launch.
+- **Unparked and shipped as a section.** Two tracks, Tech and Theology, with
+  client-side filtering on the index.
+- No real posts yet. The two files in `content/thoughts/` are clearly-labelled
+  scaffolding marked `draft: true`, and do not appear on the deployed site.
 
 ### Contact
-- Dedicated section (not just footer links). Possibly doubles as a tutoring
-  inquiry point.
-- Contact method: email, plus social links (GitHub, LinkedIn).
+- Its own page. Email plus social links.
+- The email address is still unset. Rather than shipping a placeholder, the
+  page renders a "coming soon" line and hides the mailto entirely until
+  `lib/site.ts` has a real address — the Astro build shipped a literal
+  `[YOUR@EMAIL]` mailto that looked live and went nowhere.
 
 ## Tech Stack
 
-**Decided: Astro, with Vue components for anything genuinely interactive.**
+**Decided: Next.js (App Router) + React, statically exported.**
 
-Reasoning:
-- Content collections (typed markdown/MDX) fit future growth perfectly — a
-  devlog for Shepherds We Shall Be, Terrath lore pages, or Thoughts (if it
-  ever ships) are each just a new collection, not a restructure.
-- Ships ~zero JS by default, hydrates only the islands that need it — fast
-  by default, and choosing what's static vs. interactive is itself a signal
-  of engineering judgment worth showing on a portfolio.
-- Reuses real Vue/TypeScript knowledge from SensusAir while picking up a
-  currently-relevant tool, rather than just reaching for Nuxt out of habit.
-- Explicitly chosen over Nuxt (same result, more framework overhead than
-  this site needs) and over plain HTML/CSS/JS (would mean hand-rolling a
-  markdown pipeline whenever a blog/devlog eventually happens).
+Superseded the earlier Astro decision. The reasoning for Astro — content
+collections, near-zero JS, judgment about what hydrates — still held, but the
+brief changed to "React, and far more comprehensive", and Next covers the same
+ground with React as the component model.
 
-Style references given (also informing this decision):
-- tamalsen.dev — WordPress + Slider Revolution plugin. Sticky nav, filterable
-  project gallery, testimonials carousel. Not a relevant stack reference
-  (WordPress), but the info architecture (expertise / work / experience /
-  contact) is a useful shape reference.
-- lars-olson.com — designer/game-dev portfolio, personality-forward, playful
-  tone ("never take myself too seriously"). Stack undetermined from a fetch.
-- ryanritzenthaler.com — Next.js + Tailwind CSS. Minimalist black/white,
-  high-contrast, card/list toggle for a large work gallery.
-- bepatrickdavid.com — self-described minimal/brutalist. Black theme, premium
-  custom type (Neue Montreal, Migra, Maelstrom, Tusker Grotesk), WebGL 3D
-  model via Sketchfab. Stack undetermined from a fetch, likely a custom
-  React/JS build given the production values.
+- Static export (`output: 'export'`) to `out/`. No server runtime, nothing to
+  patch, and it drops straight onto Cloudflare Pages.
+- Content is MDX on disk read at build time through `lib/content.ts` — same
+  shape as Astro's content collections, no CMS or database.
+- Fonts are self-hosted via `next/font`, replacing the render-blocking
+  Google Fonts stylesheet the Astro build linked.
+- The only client component is the navigation. Everything else is a server
+  component and ships no JS.
+
+Rejected: plain React SPA (weak SEO, hand-rolled markdown pipeline) and
+React Native / `react-native-web`, which was the original request — it targets
+native apps, and on the web costs SEO, bundle size, and the MDX pipeline this
+site is built around.
+
+## Visual Direction — carried over, with fixes
+
+The v2 design holds: recurring sigil, grain, layered gold/teal glows,
+Cinzel + Manrope, broken symmetry. Three defects from the Astro build were
+fixed rather than ported:
+
+- **Responsive.** The Astro version had two media queries, both only flipping
+  a grid column count. A fixed 72px gutter and unscaled display type carried
+  down to 375px, clipping "CONTACT" off the nav and rendering the bio two or
+  three words per line. Replaced with a shared `--pad` token and a fluid type
+  scale; the nav collapses to a toggle below 820px.
+- **Glow positioning.** Glows were absolutely positioned at hard-coded scroll
+  offsets, so the last one extended the document 190px past the footer into
+  dead scroll space, and the offsets only lined up at one viewport width. They
+  now live in a fixed, clipped layer that cannot affect document height.
+- **Horizontal overflow.** `overflow-x: hidden` was on `body` alone, which does
+  not stop the root element panning sideways. Now on both.
 
 ## Open Items
 
-- [ ] Decide whether Thoughts ships at all; if so, first post topics
-- [ ] Actual contact email/handle
-- [ ] Domain name / hosting
-- [ ] Tech stack decision
-- [x] Design settled well enough to move to real code (see "Status" below).
-- [ ] Swap the sigil mark for an Orthodox cross — noted, deliberately later.
-- [ ] Actual GitHub/LinkedIn URLs to use in Contact
-- [ ] Real contact email address
-- [ ] Still unresolved: hero tagline says "Code by trade, worlds by nature" —
-      a soft nod to worldbuilding/Terrath, which is supposed to stay
-      unmentioned for now. Flagged, not yet decided whether to change it.
-- [ ] Domain name / hosting
-
+- [x] Tech stack decision — Next.js + React, static export
+- [x] Domain name / hosting — masterroachi.com (registered at domains.co.za),
+      hosted on Cloudflare Pages. See DEPLOY.md.
+- [x] Whether Thoughts ships — yes, the section is built
+- [ ] **Real contact email address** — `lib/site.ts` `contactEmail` is null
+- [ ] **Real LinkedIn URL** — `lib/site.ts` `socials.linkedin` is null
+- [ ] **Actual writing.** Thoughts and the devlog have scaffolding only
+- [ ] Swap the sigil for an Orthodox cross — noted, deliberately later. Every
+      use goes through `components/Sigil.tsx`, so it is a one-file change
+- [ ] Still unresolved: the hero tagline "Code by trade, worlds by nature" is
+      a soft nod to worldbuilding/Terrath, which is meant to stay unmentioned.
+      Carried over unchanged; still flagged, still undecided
+- [ ] First post topics for each track
 
 ## Status
 
-Real code has started. `package.json`, `astro.config.mjs`, `tsconfig.json`,
-`src/components/Sigil.astro`, `src/components/Divider.astro`, and
-`src/pages/index.astro` are written and committed — the homepage, built for
-real from the finalized mockup (same sigil motif, grain, glows, colors,
-copy).
+Rewritten from Astro to Next.js. Builds clean: 17 static pages, `npm run build`
+→ `out/`. Verified at 375px and desktop; no horizontal overflow, no dead
+scroll space, nav usable on mobile.
 
-**To actually run it: `npm install` then `npm run dev`, from a normal
-terminal on this machine** — not through the Claude device bridge. That
-sandboxed shell has no access to the npm registry (confirmed: both `npm
-ping` and `npm install` came back 403 Forbidden), so package installation
-has to happen from a real terminal with normal internet access. Once
-`node_modules` exists, further edits can go back to happening through the
-bridge as usual.
+Not yet deployed — the GitHub repo has not been created and the nameservers
+have not been changed. DEPLOY.md has the steps.

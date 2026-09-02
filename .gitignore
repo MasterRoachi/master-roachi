@@ -1,5 +1,10 @@
 node_modules/
 .DS_Store
-dist/
 .env
-.astro/
+.env*.local
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
