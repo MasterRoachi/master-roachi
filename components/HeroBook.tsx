@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react';
 import {
   AmbientLight,
   BoxGeometry,
-  CanvasTexture,
   Color,
   DirectionalLight,
   DoubleSide,
@@ -16,12 +15,13 @@ import {
   PointLight,
   Scene,
   SRGBColorSpace,
+  TextureLoader,
   WebGLRenderer,
 } from 'three';
 import styles from './HeroBook.module.css';
 
-// A floating Orthodox volume, built procedurally — no model file, no textures,
-// so there is nothing to license and the whole scene is a few KB of geometry.
+// A floating Orthodox volume, built procedurally — the geometry is a few KB of
+// boxes and planes, with one texture for the icon on the first leaf.
 //
 // Scrolling opens it: the covers hinge back on the spine and the leaves turn
 // one after another, each one bowing as it crosses so it reads as paper rather
@@ -97,96 +97,44 @@ interface BookParts {
   leaves: Leaf[];
 }
 
+/** The icon shown on the first leaf. Dropped in public/ by scripts/logo.mjs. */
+const ICON_SRC = '/pantokrator.webp';
+
 /**
- * The Pantokrator marking on the first leaf, drawn to a canvas rather than
- * loaded from an image.
+ * Material for the first leaf, carrying the Pantokrator.
  *
- * Deliberately the iconography rather than a portrait: the cruciform halo and
- * the IC XC christogram are what identify the image, and they hold up at the
- * size this is actually seen. Drawing a face procedurally would only look
- * crude.
+ * The page starts as plain parchment and the icon is applied once it loads, so
+ * a missing or slow image degrades to a blank page rather than a broken one —
+ * the texture is decoration, and nothing about the book depends on it.
  *
- * To use a real icon instead, load an image into a texture here. Note that
- * while the ancient icons are long out of copyright, modern photographs of
- * them frequently are not — use a public-domain scan.
+ * No lettering is drawn: the artwork carries its own IC XC.
  */
-function makeIconTexture(): CanvasTexture {
-  const w = 512;
-  const h = 740; // matches the page aspect
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const c = canvas.getContext('2d')!;
+function makeIconMaterial(onLoaded: () => void): MeshStandardMaterial {
+  const mat = new MeshStandardMaterial({
+    color: new Color(PAGE),
+    roughness: 0.9,
+    metalness: 0.06,
+  });
 
-  c.fillStyle = '#e8e2d4';
-  c.fillRect(0, 0, w, h);
+  new TextureLoader().load(
+    ICON_SRC,
+    (tex) => {
+      tex.colorSpace = SRGBColorSpace;
+      tex.anisotropy = 4;
+      mat.map = tex;
+      // The icon is painted on gold leaf, so let the page carry it at full
+      // strength rather than tinting it with the parchment colour.
+      mat.color.set(0xffffff);
+      mat.needsUpdate = true;
+      onLoaded();
+    },
+    undefined,
+    () => {
+      // No icon present — the leaf stays parchment. Deliberately silent.
+    },
+  );
 
-  const gold = '#b8892f';
-  const cx = w / 2;
-  const cy = h * 0.36;
-  const r = w * 0.28;
-
-  c.strokeStyle = gold;
-  c.lineCap = 'round';
-
-  // Halo.
-  c.lineWidth = 5;
-  c.beginPath();
-  c.arc(cx, cy, r, 0, Math.PI * 2);
-  c.stroke();
-
-  // Cruciform nimbus: the three arms visible behind the head.
-  c.lineWidth = 12;
-  c.beginPath();
-  c.moveTo(cx, cy - r);
-  c.lineTo(cx, cy + r * 0.1);
-  c.moveTo(cx - r, cy);
-  c.lineTo(cx - r * 0.34, cy);
-  c.moveTo(cx + r * 0.34, cy);
-  c.lineTo(cx + r, cy);
-  c.stroke();
-
-  // IC XC, the christogram, flanking the halo.
-  c.fillStyle = gold;
-  c.font = `600 ${Math.round(w * 0.11)}px Georgia, serif`;
-  c.textAlign = 'center';
-  c.textBaseline = 'middle';
-  c.fillText('IC', cx - r * 1.32, cy - r * 0.5);
-  c.fillText('XC', cx + r * 1.32, cy - r * 0.5);
-
-  // Overline abbreviation marks.
-  c.lineWidth = 4;
-  for (const dx of [-r * 1.32, r * 1.32]) {
-    c.beginPath();
-    c.moveTo(cx + dx - w * 0.06, cy - r * 0.5 - w * 0.075);
-    c.lineTo(cx + dx + w * 0.06, cy - r * 0.5 - w * 0.075);
-    c.stroke();
-  }
-
-  // A rule and a line of ruled text below, so the leaf reads as a page rather
-  // than a poster.
-  c.strokeStyle = 'rgba(120, 100, 70, 0.35)';
-  c.lineWidth = 2;
-  c.beginPath();
-  c.moveTo(w * 0.2, h * 0.62);
-  c.lineTo(w * 0.8, h * 0.62);
-  c.stroke();
-
-  c.strokeStyle = 'rgba(120, 100, 70, 0.16)';
-  c.lineWidth = 6;
-  for (let i = 0; i < 7; i++) {
-    const y = h * 0.68 + i * h * 0.035;
-    const inset = i === 6 ? w * 0.3 : w * 0.16;
-    c.beginPath();
-    c.moveTo(w * 0.16, y);
-    c.lineTo(w - inset, y);
-    c.stroke();
-  }
-
-  const tex = new CanvasTexture(canvas);
-  tex.colorSpace = SRGBColorSpace;
-  tex.anisotropy = 4;
-  return tex;
+  return mat;
 }
 
 /** A pivot at the hinge with its mesh pushed out to span hinge → fore edge. */
@@ -198,7 +146,7 @@ function hinged(mesh: Mesh, z: number): Group {
   return pivot;
 }
 
-function buildBook(): BookParts {
+function buildBook(onIconLoaded: () => void): BookParts {
   const root = new Group();
 
   const coverMat = new MeshStandardMaterial({
@@ -282,11 +230,7 @@ function buildBook(): BookParts {
 
   // The first leaf carries the Pantokrator, so it is the top face of the
   // right-hand stack — the page revealed the moment the cover swings back.
-  const iconMat = new MeshStandardMaterial({
-    map: makeIconTexture(),
-    roughness: 0.95,
-    metalness: 0,
-  });
+  const iconMat = makeIconMaterial(onIconLoaded);
   const rightStack = new Mesh(stackGeo, [
     stackMat,
     stackMat,
@@ -436,7 +380,11 @@ export default function HeroBook() {
     glint.position.set(1.6, 1.4, 3.2);
     scene.add(glint);
 
-    const parts = buildBook();
+    // The icon arrives asynchronously. Under reduced motion only one frame is
+    // ever drawn, so that frame has to be redrawn once the texture is in.
+    const parts = buildBook(() => {
+      if (reduced) renderer.render(scene, camera);
+    });
     scene.add(parts.root);
 
     const resize = () => {

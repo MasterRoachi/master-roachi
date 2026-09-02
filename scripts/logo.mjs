@@ -29,3 +29,19 @@ await base
   .toFile('public/logo-mark.png');
 
 console.log('wrote public/logo.webp, logo-mark.webp, logo-mark.png');
+
+// --- Pantokrator icon for the first leaf of the hero book -------------------
+//
+//   node scripts/logo.mjs <logo.png> <pantokrator-source>
+//
+// Optional second argument. Produces public/pantokrator.webp, sized for a
+// texture rather than a print — anything past ~768px is invisible at the size
+// the page is actually seen.
+const iconSrc = process.argv[3];
+if (iconSrc) {
+  await sharp(iconSrc)
+    .resize({ width: 768, withoutEnlargement: true })
+    .webp({ quality: 86 })
+    .toFile('public/pantokrator.webp');
+  console.log('wrote public/pantokrator.webp');
+}
