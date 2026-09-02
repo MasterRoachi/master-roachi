@@ -35,6 +35,16 @@ export default function ThoughtsList({ posts }: { posts: EntrySummary[] }) {
     { key: 'theology', label: TRACK_LABEL.theology, count: counts.theology },
   ];
 
+  // With nothing published, a filter row reading "All 0 · Tech 0 · Theology 0"
+  // advertises the emptiness rather than helping. Show the empty state alone.
+  if (posts.length === 0) {
+    return (
+      <p className={styles.empty}>
+        Nothing published yet. It lands here when it does.
+      </p>
+    );
+  }
+
   return (
     <>
       <div className={styles.filters} role="group" aria-label="Filter by track">
