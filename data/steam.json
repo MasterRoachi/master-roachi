@@ -1,5 +1,47 @@
 {
-  "fetchedAt": null,
-  "current": null,
-  "recent": []
+  "fetchedAt": "2026-09-02T23:42:32.550Z",
+  "current": {
+    "appid": 431730,
+    "title": "Aseprite",
+    "minutesTwoWeeks": 2297,
+    "minutesTotal": 2297
+  },
+  "recent": [
+    {
+      "appid": 431730,
+      "title": "Aseprite",
+      "minutesTwoWeeks": 2297,
+      "minutesTotal": 2297
+    },
+    {
+      "appid": 2187290,
+      "title": "Wall World",
+      "minutesTwoWeeks": 330,
+      "minutesTotal": 335
+    },
+    {
+      "appid": 1593500,
+      "title": "God of War",
+      "minutesTwoWeeks": 36,
+      "minutesTotal": 903
+    },
+    {
+      "appid": 3017860,
+      "title": "DOOM: The Dark Ages",
+      "minutesTwoWeeks": 23,
+      "minutesTotal": 32
+    },
+    {
+      "appid": 431960,
+      "title": "Wallpaper Engine",
+      "minutesTwoWeeks": 21,
+      "minutesTotal": 406
+    },
+    {
+      "appid": 365670,
+      "title": "Blender",
+      "minutesTwoWeeks": 5,
+      "minutesTotal": 2222
+    }
+  ]
 }
