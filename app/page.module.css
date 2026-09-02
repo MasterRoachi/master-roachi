@@ -46,14 +46,26 @@
   margin-top: 0.12em;
 }
 
+/* The rule beneath the identity line, broken by the turtle shell. */
+.heroRule {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: clamp(40px, 7vw, 80px);
+}
+
+.heroRule span {
+  height: 1px;
+  flex: 1;
+  background: var(--line);
+}
+
 .heroFoot {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: clamp(24px, 5vw, 64px);
   align-items: end;
-  margin-top: clamp(40px, 7vw, 80px);
   padding-top: clamp(24px, 4vw, 40px);
-  border-top: 1px solid var(--line);
 }
 
 .heroBlurb {

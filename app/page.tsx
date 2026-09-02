@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import HeroBookMount from '@/components/HeroBookMount';
+import TurtleShell from '@/components/TurtleShell';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import { getProjects, getWriting, toSummary } from '@/lib/content';
@@ -32,14 +33,22 @@ export default function HomePage() {
             {site.tagline}
             <span className={styles.heroTail}>{site.taglineTail}</span>
           </h1>
+          {/* The rule carries the shell — the Turtle Hermit mark, sitting on
+              the line that separates the identity from everything under it. */}
+          <div className={styles.heroRule} aria-hidden="true">
+            <span />
+            <TurtleShell size={24} color="var(--muted-2)" />
+            <span />
+          </div>
+
           <div className={styles.heroFoot}>
             <p className={styles.heroBlurb}>
               I&rsquo;m {site.personName} — Master Roachi. I build games, worlds
-              and software, I play games properly, and I take Orthodoxy
-              seriously. This is the public record of all of it.
+              and software, I play games, but not when it comes to Truth, so
+              I&rsquo;m Orthodox. This is the public record of my stuff.
             </p>
             <div className={styles.heroActions}>
-              <Link href="/projects/" className="button button--accent">
+              <Link href="/projects/" className="button button--gold">
                 See the work
               </Link>
               <Link href="/about/" className="button">

@@ -224,7 +224,10 @@ function buildBook(onIconLoaded: () => void): BookParts {
   bar(0.075, 1.55, 0.05); // upright
   bar(0.42, 0.07, 0.62); // titulus
   bar(0.78, 0.08, 0.28); // main bar
-  bar(0.5, 0.07, -0.42, 0.32); // slanted footrest
+  // The footrest rises to the viewer's left — toward Christ's right hand and
+  // the repentant thief — and falls to the right. It was slanting the other
+  // way, which inverts the whole point of the bar.
+  bar(0.5, 0.07, -0.42, -0.32);
 
   const backMesh = new Mesh(new BoxGeometry(W, H, COVER_T), [
     coverMat,
