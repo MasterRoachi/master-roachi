@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import HeroBookMount from '@/components/HeroBookMount';
-import TurtleShell from '@/components/TurtleShell';
+import GoldLink from '@/components/GoldLink';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import { getProjects, getWriting, toSummary } from '@/lib/content';
@@ -33,11 +33,18 @@ export default function HomePage() {
             {site.tagline}
             <span className={styles.heroTail}>{site.taglineTail}</span>
           </h1>
-          {/* The rule carries the shell — the Turtle Hermit mark, sitting on
-              the line that separates the identity from everything under it. */}
+          {/* The rule carries the Turtle Hermit kanji, sitting on the line that
+              separates the identity from everything under it. */}
           <div className={styles.heroRule} aria-hidden="true">
             <span />
-            <TurtleShell size={24} color="var(--muted-2)" />
+            <img
+              src="/kanji.webp"
+              alt=""
+              width={26}
+              height={26}
+              className={styles.heroRuleMark}
+              decoding="async"
+            />
             <span />
           </div>
 
@@ -48,9 +55,7 @@ export default function HomePage() {
               I&rsquo;m Orthodox. This is the public record of my stuff.
             </p>
             <div className={styles.heroActions}>
-              <Link href="/projects/" className="button button--gold">
-                See the work
-              </Link>
+              <GoldLink href="/projects/">See the work</GoldLink>
               <Link href="/about/" className="button">
                 About me
               </Link>

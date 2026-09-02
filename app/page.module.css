@@ -235,3 +235,10 @@
     opacity: 0.28;
   }
 }
+
+.heroRuleMark {
+  display: block;
+  width: 26px;
+  height: auto;
+  opacity: 0.55;
+}

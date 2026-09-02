@@ -45,3 +45,19 @@ if (iconSrc) {
     .toFile('public/pantokrator.webp');
   console.log('wrote public/pantokrator.webp');
 }
+
+// --- Turtle Hermit kanji, used on the hero rule -----------------------------
+//
+//   node scripts/logo.mjs <logo> <pantokrator> <kanji>
+//
+// Optional third argument. Displayed at ~26px, so 128px covers it even on a
+// 3x display; the 1254px source would be ~580KB of invisible detail.
+const kanjiSrc = process.argv[4];
+if (kanjiSrc) {
+  await sharp(kanjiSrc)
+    .trim()
+    .resize({ width: 128 })
+    .webp({ quality: 92 })
+    .toFile('public/kanji.webp');
+  console.log('wrote public/kanji.webp');
+}
