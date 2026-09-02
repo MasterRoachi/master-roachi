@@ -84,24 +84,51 @@ The site already expects this exact address: `contactEmail` in `lib/site.ts`
 is set to `roachi@masterroachi.com`. Create it with that spelling or the
 contact page will point at a dead address.
 
-## 5. Connect the Pages project
+## 5. Connect the Cloudflare project
 
-**Workers & Pages → Create → Pages → Connect to Git**, pick the repository:
+The repo contains a `wrangler.jsonc` declaring an **assets-only Worker** — no
+server code, just the static files from `out/`. Committing that file is
+load-bearing, for a reason worth knowing.
+
+Without it, `wrangler deploy` runs its own framework detection, sees Next.js,
+assumes a server-rendered app, and hits an interactive prompt it answers on
+your behalf:
+
+```
+? Proceed with setup?
+🤖 Using fallback value in non-interactive context: yes
+```
+
+It then installs OpenNext, rewrites the project config, and fails looking for
+`.next/standalone/` — a directory that only exists for non-static builds. Those
+edits happen inside the throwaway build container, so the repository is
+unharmed, but the deploy fails every time. With `wrangler.jsonc` present the
+detection never runs.
+
+**Workers & Pages → Create → Connect to Git**, pick the repository:
 
 | Setting | Value |
 | --- | --- |
-| Framework preset | Next.js (Static HTML Export) |
 | Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
 | Build output directory | `out` |
 | Node version | 20 or newer |
 
-If Node needs pinning, add a build environment variable `NODE_VERSION` = `20`.
+The dashboard's output directory is advisory here — `wrangler.jsonc` declares
+`./out/`, and that is what governs.
 
-Deploy. The first build publishes to `<project>.pages.dev`.
+Validate any change to that config locally before pushing:
+
+```bash
+npm run build && npx wrangler deploy --dry-run
+```
+
+It should report reading files from `out` and exit without mentioning OpenNext.
+If OpenNext appears, the config is not being picked up.
 
 ## 6. Attach the custom domain
 
-Pages project → **Custom domains → Set up a custom domain** → add
+Worker project → **Settings → Domains & Routes → Add → Custom domain** → add
 `masterroachi.com`, then repeat for `www.masterroachi.com`.
 
 DNS is on Cloudflare by now, so the records are created automatically and the
@@ -110,9 +137,7 @@ the other.
 
 ## 7. Afterwards
 
-- Turn **GitHub Pages off** on the repo (Settings → Pages). It is still enabled
-  and pointed at `main`, which no longer has a root `index.html`, so it serves
-  a broken page.
+- GitHub Pages has been disabled on the repo — verified returning 404.
 - Set `site.url` in `lib/site.ts` if the canonical host ends up being `www`.
 - Confirm `/rss.xml`, `/sitemap.xml`, and `/robots.txt` resolve.
 - Send a test mail to the new address and confirm it arrives.

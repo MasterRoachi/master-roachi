@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "master-roachi",
+  "compatibility_date": "2026-09-02",
+
+  // Assets-only Worker: no "main" entry point, because there is no server-side
+  // code. `next build` produces a fully static export in out/, and Cloudflare
+  // serves those files directly.
+  //
+  // This file also exists to stop `wrangler deploy` from guessing. Without it,
+  // wrangler detects "Next.js", assumes a server-rendered app, and silently
+  // runs the OpenNext migration — which then fails looking for
+  // .next/standalone/, a directory that only exists for non-static builds.
+  "assets": {
+    "directory": "./out/",
+
+    // next.config.mjs sets trailingSlash: true, so pages are emitted as
+    // out/work/index.html and served at /work/. auto-trailing-slash is the
+    // matching behaviour.
+    "html_handling": "auto-trailing-slash",
+
+    // Serve the prerendered app/not-found.tsx page for unmatched routes.
+    "not_found_handling": "404-page"
+  }
+}
