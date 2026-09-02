@@ -1,0 +1,101 @@
+/* The border is painted by two background layers: the page colour clipped to
+   the padding box, and a metal gradient clipped to the border box — so the
+   gradient shows only in the 1px the border occupies. Nothing is filled.
+
+   --mx / --my are the cursor position in the anchor's own coordinates, written
+   by SheenLink. The defaults put a resting highlight near the top-left, so the
+   outline looks like metal before anything touches it.
+
+   Each tone supplies its own five colours; every rule below is shared. */
+
+.sheen {
+  --mx: 28%;
+  --my: 0%;
+  --pad-x: 24px;
+  --pad-y: 14px;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--pad-y) var(--pad-x);
+  border: 1px solid transparent;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    radial-gradient(
+        160px circle at var(--mx) var(--my),
+        var(--tone-hi) 0%,
+        var(--tone-mid) 26%,
+        var(--tone-lo) 62%,
+        var(--tone-dim) 100%
+      )
+      border-box;
+}
+
+/* Lettering is flat rather than a clipped gradient: painting one and clipping
+   it to the glyphs with background-clip: text does not survive the build —
+   computed clip comes back border-box, so the gradient fills the label box and
+   the transparent text disappears into it. The sheen belongs on the outline. */
+.label {
+  color: var(--tone-text);
+  transition: color 0.18s ease;
+}
+
+.sheen:hover .label {
+  color: var(--tone-text-hi);
+}
+
+/* A soft bloom under the cursor, on hover only — at rest it stays a clean
+   outline. */
+.sheen::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    110px circle at var(--mx) var(--my),
+    var(--tone-bloom),
+    transparent 70%
+  );
+}
+
+.sheen:hover::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheen::after,
+  .label {
+    transition: none;
+  }
+}
+
+/* --- tones ---------------------------------------------------------------- */
+
+.gold {
+  --tone-hi: oklch(97% 0.09 95);
+  --tone-mid: oklch(82% 0.15 87);
+  --tone-lo: oklch(58% 0.11 80);
+  --tone-dim: oklch(44% 0.07 72);
+  --tone-text: oklch(80% 0.13 86);
+  --tone-text-hi: oklch(92% 0.11 90);
+  --tone-bloom: oklch(85% 0.15 88 / 0.16);
+}
+
+/* Neutral steel — zero chroma, so it reads as polished white metal against the
+   gold rather than as a second accent competing with it. */
+.white {
+  --tone-hi: oklch(99% 0 0);
+  --tone-mid: oklch(88% 0 0);
+  --tone-lo: oklch(58% 0 0);
+  --tone-dim: oklch(38% 0 0);
+  --tone-text: oklch(88% 0 0);
+  --tone-text-hi: oklch(99% 0 0);
+  --tone-bloom: oklch(95% 0 0 / 0.13);
+}

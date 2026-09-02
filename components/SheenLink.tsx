@@ -2,22 +2,26 @@
 
 import Link from 'next/link';
 import { useRef, type PointerEvent } from 'react';
-import styles from './GoldLink.module.css';
+import styles from './SheenLink.module.css';
 
-// An outline button whose border and lettering catch light as the cursor
-// crosses them, the way the gilt on the book does. Nothing is filled — the
-// gold lives entirely in the 1px border and the text.
+// An outline button whose border catches light as the cursor crosses it, the
+// way the gilt on the book does. Nothing is filled — the metal lives entirely
+// in the 1px border and the lettering.
 //
-// The cursor position is written to CSS custom properties rather than to
-// React state: this fires on every pointermove, and re-rendering the tree at
-// that rate to move a highlight would be wasteful. Setting two variables lets
-// the compositor do the work.
+// The cursor position is written to CSS custom properties rather than to React
+// state: this fires on every pointermove, and re-rendering the tree at that
+// rate to move a highlight would be waste. Setting two variables lets the
+// compositor do the work.
 
-export default function GoldLink({
+type Tone = 'gold' | 'white';
+
+export default function SheenLink({
   href,
+  tone = 'gold',
   children,
 }: {
   href: string;
+  tone?: Tone;
   children: React.ReactNode;
 }) {
   const ref = useRef<HTMLAnchorElement>(null);
@@ -33,7 +37,7 @@ export default function GoldLink({
   const onLeave = () => {
     const el = ref.current;
     if (!el) return;
-    // Back to the resting highlight, so the button still reads as gold when
+    // Back to the resting highlight, so the outline still reads as metal when
     // nothing is pointing at it.
     el.style.removeProperty('--mx');
     el.style.removeProperty('--my');
@@ -43,7 +47,7 @@ export default function GoldLink({
     <Link
       ref={ref}
       href={href}
-      className={styles.gold}
+      className={`${styles.sheen} ${styles[tone]}`}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
     >

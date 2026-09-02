@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import HeroBookMount from '@/components/HeroBookMount';
-import GoldLink from '@/components/GoldLink';
+import SheenLink from '@/components/SheenLink';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import { getProjects, getWriting, toSummary } from '@/lib/content';
@@ -55,10 +55,10 @@ export default function HomePage() {
               I&rsquo;m Orthodox. This is the public record of my stuff.
             </p>
             <div className={styles.heroActions}>
-              <GoldLink href="/projects/">See the work</GoldLink>
-              <Link href="/about/" className="button">
+              <SheenLink href="/projects/">See the work</SheenLink>
+              <SheenLink href="/about/" tone="white">
                 About me
-              </Link>
+              </SheenLink>
             </div>
           </div>
         </div>
