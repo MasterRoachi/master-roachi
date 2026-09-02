@@ -1,49 +1,50 @@
 .post {
-  display: block;
-  padding: clamp(20px, 3.5vw, 28px) 0;
-  border-bottom: 1px solid var(--line);
-  color: var(--ink);
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: clamp(16px, 3vw, 40px);
+  padding: clamp(22px, 3vw, 30px) 0;
+  border-top: 1px solid var(--line);
+  transition: border-color 0.18s ease;
+}
+
+.post:hover {
+  border-color: var(--line-bright);
 }
 
 .post:hover .title {
-  color: var(--gold);
+  color: var(--accent);
 }
 
-.meta {
+.side {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
   font-size: 0.75rem;
   color: var(--muted-2);
-  letter-spacing: 0.04em;
-  margin-bottom: 10px;
+  padding-top: 4px;
 }
 
 .track {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-size: 0.68rem;
-  color: var(--gold);
-}
-
-.track[data-track='theology'] {
-  color: var(--teal);
+  font-size: 0.66rem;
+  color: var(--muted);
 }
 
 .draft {
-  border: 1px dashed var(--muted-2);
+  border: 1px solid var(--line-bright);
   padding: 2px 7px;
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  align-self: flex-start;
 }
 
 .title {
-  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-size: clamp(1.25rem, 2.8vw, 1.6rem);
   margin: 0 0 8px;
-  transition: color 0.2s ease;
+  transition: color 0.18s ease;
 }
 
 .summary {
@@ -51,4 +52,18 @@
   margin: 0;
   max-width: var(--measure);
   font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .post {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .side {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding-top: 0;
+  }
 }

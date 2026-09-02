@@ -1,0 +1,40 @@
+.section {
+  padding-block: clamp(40px, 6vw, 72px) 0;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list li {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+}
+
+.kind {
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  font-weight: 600;
+  flex: 0 0 auto;
+  min-width: 4.5rem;
+}
+
+.upcoming {
+  color: var(--muted);
+}
+
+.empty {
+  color: var(--muted-2);
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  margin: 0;
+  max-width: var(--measure);
+}

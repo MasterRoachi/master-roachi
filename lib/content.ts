@@ -2,25 +2,35 @@ import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
-import type { Track, EntrySummary } from './format';
+import type { Track, Status, EntrySummary } from './format';
 
 // Filesystem-backed content collections. Every entry is an .mdx file under
 // content/<collection>/, with YAML frontmatter. Read at build time only —
-// these functions are called from server components during prerender, never
-// shipped to the browser.
+// these functions run in server components during prerender and never reach
+// the browser.
 
 export interface Frontmatter {
   title: string;
   summary: string;
   date: string;
-  /** Thoughts only: which of the two tracks this post belongs to. */
+
+  // Writing only.
   track?: Track;
-  /** Work only: the live/source link, and the stack it was built with. */
+  /** Slug of a project this post belongs to, e.g. a devlog entry. */
+  project?: string;
+
+  // Projects only.
+  status?: Status;
+  /** What the thing is, in a couple of words: "Game", "Store", "World". */
+  kind?: string;
+  /** Outbound links. `link` is the primary one; `repo` is source. */
   link?: string;
+  repo?: string;
   stack?: string[];
-  /** Work only: dims the card and drops the outbound link. */
-  status?: 'live' | 'in-progress' | 'planned';
-  /** Hidden from production builds; still visible in `next dev`. */
+  /** Ordering on the projects index — higher floats to the top. */
+  weight?: number;
+
+  /** Hidden from listings and marked noindex; still visible in `next dev`. */
   draft?: boolean;
 }
 
@@ -53,8 +63,7 @@ function readCollection(collection: string): Entry[] {
 }
 
 // Drafts are authored in the repo but withheld from the deployed site, so a
-// half-written post can be committed without publishing it. `next dev` shows
-// them so they can be previewed while being written.
+// half-written post can be committed without publishing it.
 const showDrafts = process.env.NODE_ENV === 'development';
 
 function publishable(entries: Entry[]): Entry[] {
@@ -65,17 +74,30 @@ function byNewest(a: Entry, b: Entry): number {
   return Date.parse(b.frontmatter.date) - Date.parse(a.frontmatter.date);
 }
 
+/** Projects sort by explicit weight first, then by date. */
+function byWeightThenNewest(a: Entry, b: Entry): number {
+  const wa = a.frontmatter.weight ?? 0;
+  const wb = b.frontmatter.weight ?? 0;
+  if (wa !== wb) return wb - wa;
+  return byNewest(a, b);
+}
+
+export function getProjects(): Entry[] {
+  return publishable(readCollection('projects')).sort(byWeightThenNewest);
+}
+
+export function getWriting(track?: Track): Entry[] {
+  const all = publishable(readCollection('writing')).sort(byNewest);
+  return track ? all.filter((e) => e.frontmatter.track === track) : all;
+}
+
+/** Posts attached to a project — devlog entries, write-ups, postmortems. */
+export function getWritingForProject(slug: string): Entry[] {
+  return getWriting().filter((e) => e.frontmatter.project === slug);
+}
+
 export function getCollection(collection: string): Entry[] {
   return publishable(readCollection(collection)).sort(byNewest);
-}
-
-export function getEntry(collection: string, slug: string): Entry | undefined {
-  return getCollection(collection).find((e) => e.slug === slug);
-}
-
-/** Slugs for `generateStaticParams` — every route must be known at build. */
-export function getSlugs(collection: string): { slug: string }[] {
-  return getCollection(collection).map((e) => ({ slug: e.slug }));
 }
 
 /** Strip the MDX body so a list can be handed to a client component. */
@@ -87,26 +109,21 @@ export function toSummary(entry: Entry): EntrySummary {
     date: entry.frontmatter.date,
     readingMinutes: entry.readingMinutes,
     track: entry.frontmatter.track,
+    project: entry.frontmatter.project,
     draft: entry.frontmatter.draft,
   };
 }
 
 // ---------------------------------------------------------------------------
-// Draft handling
+// Route generation
 //
-// Drafts are withheld from every *listing* — index pages, the sitemap, and the
-// RSS feed all go through getCollection() above, which filters them out.
-//
-// Their pages are still generated, though, for two reasons: it gives a draft a
-// real URL to preview at, and `output: 'export'` refuses to build a dynamic
-// route whose generateStaticParams() returns an empty array. Without this, a
-// blog with nothing published yet cannot compile at all.
-//
-// Draft pages are marked noindex by the route's generateMetadata, so they stay
-// out of search results.
+// Drafts still get a page. Two reasons: it gives a draft a real URL to preview
+// at, and `output: 'export'` refuses to build a dynamic route whose
+// generateStaticParams() returns an empty array — so a section with nothing
+// published yet would otherwise break the build outright. Draft pages are
+// marked noindex by each route's generateMetadata.
 // ---------------------------------------------------------------------------
 
-/** Every entry including drafts. For route generation only, never listings. */
 export function getAllEntries(collection: string): Entry[] {
   return readCollection(collection).sort(byNewest);
 }

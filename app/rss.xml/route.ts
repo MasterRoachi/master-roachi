@@ -1,8 +1,8 @@
-import { getCollection } from '@/lib/content';
+import { getWriting } from '@/lib/content';
 import { site } from '@/lib/site';
 
-// Prerendered into out/rss.xml at build time — `output: 'export'` allows a
-// GET route handler as long as it does not read from the request.
+// Prerendered into out/rss.xml at build time — `output: 'export'` allows a GET
+// route handler as long as it does not read from the request.
 export const dynamic = 'force-static';
 
 function escapeXml(value: string): string {
@@ -15,24 +15,9 @@ function escapeXml(value: string): string {
 }
 
 export function GET() {
-  const posts = [
-    ...getCollection('thoughts').map((e) => ({
-      entry: e,
-      path: `/thoughts/${e.slug}/`,
-    })),
-    ...getCollection('devlog').map((e) => ({
-      entry: e,
-      path: `/shepherds/devlog/${e.slug}/`,
-    })),
-  ].sort(
-    (a, b) =>
-      Date.parse(b.entry.frontmatter.date) -
-      Date.parse(a.entry.frontmatter.date),
-  );
-
-  const items = posts
-    .map(({ entry, path }) => {
-      const url = `${site.url}${path}`;
+  const items = getWriting()
+    .map((entry) => {
+      const url = `${site.url}/writing/${entry.slug}/`;
       return `    <item>
       <title>${escapeXml(entry.frontmatter.title)}</title>
       <link>${url}</link>

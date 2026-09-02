@@ -1,80 +1,77 @@
-.layout {
+.header {
+  padding-block: clamp(56px, 10vw, 120px) clamp(32px, 5vw, 56px);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.title {
+  font-size: var(--step-hero);
+  margin: 0;
+  max-width: 18ch;
+}
+
+.body {
   display: grid;
-  grid-template-columns: 0.6fr 1.4fr;
-  gap: clamp(28px, 5vw, 60px);
-  align-items: start;
-}
-
-.mark {
-  display: flex;
-  justify-content: center;
-  position: sticky;
-  top: 110px;
-}
-
-.mark svg {
-  max-width: 100%;
-  height: auto;
 }
 
 .copy {
   max-width: var(--measure);
+  color: var(--muted);
+  font-size: clamp(1rem, 1.5vw, 1.0625rem);
+  line-height: 1.7;
 }
 
-.bio {
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 500;
-  font-size: clamp(1.2rem, 3vw, 1.6rem);
-  line-height: 1.6;
-  margin: 0;
-  max-width: 40ch;
+.copy p {
+  margin: 0 0 1.3em;
 }
 
-.section {
-  margin-top: clamp(36px, 6vw, 56px);
+.lead {
+  font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+  color: var(--ink);
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+.pull {
+  border-left: 2px solid var(--accent);
+  padding-left: 24px;
+  color: var(--ink);
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  line-height: 1.5;
 }
 
 .heading {
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--gold);
-  font-family: var(--font-body), system-ui, sans-serif;
+  color: var(--accent);
   font-weight: 600;
-  margin: 0 0 16px;
+  margin: 3em 0 1.2em;
 }
 
-.para {
-  color: var(--muted);
-  margin: 0;
-  line-height: 1.75;
+.copy strong {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .tools {
   list-style: none;
   padding: 0;
-  margin: 0;
-  /* Individually bordered items that wrap, rather than a bordered grid —
-     a grid leaves a visibly empty cell whenever the item count is not a
-     multiple of the column count. */
+  margin: 0 0 1.3em;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .tools li {
   border: 1px solid var(--line);
-  padding: 10px 16px;
-  font-size: 0.9rem;
-  color: var(--muted);
+  padding: 9px 16px;
+  font-size: 0.88rem;
 }
 
-@media (max-width: 760px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .mark {
-    position: static;
-  }
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 1.5em;
 }

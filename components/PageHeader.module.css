@@ -1,17 +1,8 @@
 .header {
-  padding-block: clamp(48px, 9vw, 88px) clamp(28px, 5vw, 44px);
-  border-bottom: 1px solid var(--line);
-  margin-bottom: clamp(32px, 6vw, 56px);
+  padding-block: clamp(56px, 10vw, 120px) clamp(32px, 5vw, 56px);
 }
 
 .title {
-  font-size: var(--step-title);
-  margin: 0 0 16px;
-}
-
-.lede {
-  color: var(--muted);
-  max-width: var(--measure);
-  margin: 0;
-  font-size: clamp(1rem, 2.2vw, 1.1rem);
+  font-size: var(--step-hero);
+  margin: 0 0 24px;
 }

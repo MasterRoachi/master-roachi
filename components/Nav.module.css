@@ -3,14 +3,14 @@
   top: 0;
   z-index: 20;
   border-bottom: 1px solid var(--line);
-  background: oklch(16% 0.015 260 / 0.82);
-  backdrop-filter: blur(10px);
+  background: oklch(12% 0 0 / 0.86);
+  backdrop-filter: blur(12px);
 }
 
 .inner {
   max-width: var(--shell);
   margin: 0 auto;
-  padding: 18px var(--pad);
+  padding: 16px var(--pad);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,37 +22,36 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--ink);
   flex: 0 0 auto;
 }
 
 .wordmark {
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 0.95rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
 .links {
   display: flex;
   align-items: center;
-  gap: clamp(14px, 2.4vw, 30px);
+  gap: clamp(16px, 2.2vw, 32px);
 }
 
 .link {
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 500;
   color: var(--muted);
   white-space: nowrap;
+  transition: color 0.15s ease;
 }
 
-.link:hover,
+.link:hover {
+  color: var(--ink);
+}
+
 .link[data-active='true'] {
-  color: var(--gold);
+  color: var(--ink);
 }
 
 .toggle {
@@ -63,17 +62,15 @@
   border: 1px solid var(--line);
   color: var(--muted);
   font: inherit;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
   font-weight: 600;
   padding: 8px 14px;
   cursor: pointer;
 }
 
 .toggle:hover {
-  color: var(--gold);
-  border-color: var(--gold);
+  color: var(--ink);
+  border-color: var(--line-bright);
 }
 
 .bars {
@@ -110,8 +107,8 @@
     flex-basis: 100%;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
-    padding-top: 8px;
+    gap: 0;
+    padding-top: 6px;
   }
 
   .links[data-open='true'] {
@@ -120,12 +117,8 @@
 
   .link {
     width: 100%;
-    padding: 12px 2px;
-    border-bottom: 1px solid var(--line);
-    font-size: 0.78rem;
-  }
-
-  .link:last-child {
-    border-bottom: none;
+    padding: 14px 2px;
+    border-top: 1px solid var(--line);
+    font-size: 0.95rem;
   }
 }

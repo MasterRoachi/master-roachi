@@ -1,0 +1,45 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.filter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.filter:hover {
+  color: var(--ink);
+  border-color: var(--line-bright);
+}
+
+.filter[data-active='true'] {
+  color: var(--bg);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.filter span {
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+
+.empty {
+  color: var(--muted-2);
+  padding-block: 56px;
+  border-top: 1px solid var(--line);
+}

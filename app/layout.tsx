@@ -1,31 +1,25 @@
 import type { Metadata } from 'next';
-import { Cinzel, Manrope } from 'next/font/google';
+import { Archivo } from 'next/font/google';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import Atmosphere from '@/components/Atmosphere';
 import { site } from '@/lib/site';
 import './globals.css';
 
-// Self-hosted at build time by next/font, so there is no render-blocking
-// request to fonts.googleapis.com the way the Astro build had.
-const display = Cinzel({
+// One grotesque doing all the work, per the visual direction. Archivo holds up
+// at both ends — heavy and tight at display sizes, readable at body sizes —
+// which is what lets the design drop to a single family. Self-hosted at build
+// time by next/font, so there is no request to Google at runtime.
+const sans = Archivo({
   subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const body = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-body',
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-sans',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: site.name,
+    default: `${site.name} — ${site.tagline}`,
     template: `%s — ${site.name}`,
   },
   description: site.description,
@@ -54,16 +48,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={sans.variable}>
       <body>
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <Atmosphere />
         <Nav />
-        <main id="main" style={{ position: 'relative', zIndex: 1 }}>
-          {children}
-        </main>
+        <main id="main">{children}</main>
         <Footer />
       </body>
     </html>
