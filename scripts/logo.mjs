@@ -1,0 +1,31 @@
+// Regenerates the logo variants in public/ from the master artwork.
+//
+//   node scripts/logo.mjs [path-to-source.png]
+//
+// The source is ~666KB at 1305x1206. Static export performs no image
+// optimisation, so shipping it directly would cost every visitor more than the
+// whole JS bundle. These variants are committed; the source is not.
+import sharp from 'sharp';
+
+const src = process.argv[2] ?? 'A:/Admin/masterroachi logo.png';
+const base = sharp(src).trim(); // drop the transparent margin
+
+await base
+  .clone()
+  .resize({ width: 640 })
+  .webp({ quality: 88 })
+  .toFile('public/logo.webp');
+
+await base
+  .clone()
+  .resize({ width: 128 })
+  .webp({ quality: 92 })
+  .toFile('public/logo-mark.webp');
+
+await base
+  .clone()
+  .resize({ width: 128 })
+  .png({ compressionLevel: 9, palette: true })
+  .toFile('public/logo-mark.png');
+
+console.log('wrote public/logo.webp, logo-mark.webp, logo-mark.png');

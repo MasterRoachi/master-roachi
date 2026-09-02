@@ -1,0 +1,8 @@
+.logo {
+  display: block;
+  height: auto;
+  /* The artwork is white line work on transparency; on the near-black ground
+     it needs no treatment, but a touch of contrast keeps the thin strokes from
+     dissolving at nav size. */
+  filter: contrast(1.08);
+}

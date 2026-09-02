@@ -6,10 +6,12 @@ import {
   BoxGeometry,
   Color,
   DirectionalLight,
+  DoubleSide,
   Group,
   Mesh,
   MeshStandardMaterial,
   PerspectiveCamera,
+  PlaneGeometry,
   PointLight,
   Scene,
   WebGLRenderer,
@@ -17,24 +19,68 @@ import {
 import styles from './HeroBook.module.css';
 
 // A floating Orthodox volume, built procedurally — no model file, no textures,
-// no licensing question. Scroll drives its rotation; dragging adds an offset
-// on top of that, which decays so the book never drifts permanently away.
+// so there is nothing to license and the whole scene is a few KB of geometry.
 //
-// Loaded via next/dynamic with ssr:false from HeroBookMount, so three.js is
-// only fetched after the page is already usable.
+// Scrolling opens it: the covers hinge back on the spine and the leaves turn
+// one after another, each one bowing as it crosses so it reads as paper rather
+// than a rotating plane. Dragging spins the whole book, independently.
+//
+// Loaded via next/dynamic with ssr:false from HeroBookMount, so three.js stays
+// out of the initial bundle.
 
 const GOLD = 0xd9a441;
 const COVER = 0x141414;
-const PAGES = 0xe8e2d4;
+const PAGE = 0xe8e2d4;
 
 /** Book proportions, in scene units. */
 const W = 2.1;
 const H = 3.0;
 const COVER_T = 0.09;
-const PAGE_T = 0.42;
+const BLOCK_T = 0.42;
 
-function buildBook(): Group {
-  const book = new Group();
+/** Leaves that actually turn. More is smoother and costs more per frame. */
+const LEAVES = 14;
+/** Horizontal segments per leaf — the resolution the curl is drawn at. */
+const SEG = 16;
+/** How far a turning leaf bows out of plane at the peak of its arc. */
+const CURL = 0.34;
+/** Fraction of the open sweep a single leaf takes to cross. */
+const TURN_SPAN = 0.55;
+
+/** The hinge runs down the left edge; everything pivots about it. */
+const HINGE_X = -W / 2;
+
+interface Leaf {
+  pivot: Group;
+  mesh: Mesh;
+  /** Rest position in the closed block, front-most leaf first. */
+  z0: number;
+  /** Where it lands once turned, mirrored to the other stack. */
+  z1: number;
+  /** Point in the open sweep at which this leaf starts moving. */
+  start: number;
+}
+
+interface BookParts {
+  root: Group;
+  frontCover: Group;
+  backCover: Group;
+  rightStack: Mesh;
+  leftStack: Mesh;
+  leaves: Leaf[];
+}
+
+/** A pivot at the hinge with its mesh pushed out to span hinge → fore edge. */
+function hinged(mesh: Mesh, z: number): Group {
+  const pivot = new Group();
+  pivot.position.set(HINGE_X, 0, z);
+  mesh.position.x = W / 2;
+  pivot.add(mesh);
+  return pivot;
+}
+
+function buildBook(): BookParts {
+  const root = new Group();
 
   const coverMat = new MeshStandardMaterial({
     color: new Color(COVER),
@@ -46,73 +92,133 @@ function buildBook(): Group {
     roughness: 0.22,
     metalness: 0.95,
   });
-  const pageMat = new MeshStandardMaterial({
-    color: new Color(PAGES),
+  // Leaves are seen from both sides as they cross, so they cannot be culled.
+  const leafMat = new MeshStandardMaterial({
+    color: new Color(PAGE),
+    roughness: 0.95,
+    metalness: 0,
+    side: DoubleSide,
+  });
+  const stackMat = new MeshStandardMaterial({
+    color: new Color(PAGE),
     roughness: 0.95,
     metalness: 0,
   });
 
-  const halfBlock = PAGE_T / 2;
+  const half = BLOCK_T / 2;
 
-  // Covers, front and back.
-  for (const dir of [1, -1]) {
-    const cover = new Mesh(new BoxGeometry(W, H, COVER_T), coverMat);
-    cover.position.z = dir * (halfBlock + COVER_T / 2);
-    book.add(cover);
-  }
+  // --- covers -------------------------------------------------------------
+  const frontMesh = new Mesh(new BoxGeometry(W, H, COVER_T), coverMat);
+  const frontCover = hinged(frontMesh, half + COVER_T / 2);
+  root.add(frontCover);
 
-  // The page block, inset slightly so the covers overhang like a real binding.
-  const pages = new Mesh(new BoxGeometry(W - 0.1, H - 0.1, PAGE_T), pageMat);
-  book.add(pages);
-
-  // Gilt edging on the three exposed page faces: fore edge, head, tail.
-  const giltT = 0.012;
-  const gilts: [number, number, number, number, number][] = [
-    [giltT, H - 0.1, PAGE_T, (W - 0.1) / 2, 0],
-    [W - 0.1, giltT, PAGE_T, 0, (H - 0.1) / 2],
-    [W - 0.1, giltT, PAGE_T, 0, -(H - 0.1) / 2],
-  ];
-  for (const [w, h, d, x, y] of gilts) {
-    const edge = new Mesh(new BoxGeometry(w, h, d), goldMat);
-    edge.position.set(x, y, 0);
-    book.add(edge);
-  }
-
-  // Spine, wrapping the bound edge.
-  const spineX = -(W / 2 + COVER_T / 2) + 0.02;
-  const spine = new Mesh(
-    new BoxGeometry(COVER_T, H, PAGE_T + COVER_T * 2),
-    coverMat,
-  );
-  spine.position.x = spineX;
-  book.add(spine);
-
-  // Two gold bands across the spine.
-  for (const y of [H * 0.28, -H * 0.28]) {
-    const band = new Mesh(
-      new BoxGeometry(COVER_T + 0.004, 0.05, PAGE_T + COVER_T * 2 + 0.004),
-      goldMat,
-    );
-    band.position.set(spineX, y, 0);
-    book.add(band);
-  }
-
-  // The eight-pointed Orthodox cross, inlaid on the front cover: upright, a
-  // short titulus above the main bar, and the slanted footrest below.
-  const crossZ = halfBlock + COVER_T + 0.008;
+  // The Orthodox eight-pointed cross, inlaid on the front cover so it swings
+  // with it. Bars are children of the cover mesh, in its local space.
   const bar = (w: number, h: number, y: number, rot = 0) => {
     const m = new Mesh(new BoxGeometry(w, h, 0.02), goldMat);
-    m.position.set(0, y, crossZ);
+    m.position.set(0, y, COVER_T / 2 + 0.008);
     m.rotation.z = rot;
-    book.add(m);
+    frontMesh.add(m);
   };
-
   bar(0.075, 1.55, 0.05); // upright
   bar(0.42, 0.07, 0.62); // titulus
   bar(0.78, 0.08, 0.28); // main bar
   bar(0.5, 0.07, -0.42, 0.32); // slanted footrest
 
-  return book;
+  const backMesh = new Mesh(new BoxGeometry(W, H, COVER_T), coverMat);
+  const backCover = hinged(backMesh, -half - COVER_T / 2);
+  root.add(backCover);
+
+  // --- page stacks --------------------------------------------------------
+  // Two solid blocks standing in for the leaves that are not currently
+  // turning. They shrink and grow as pages move between them, which is what
+  // sells the thickness without animating hundreds of planes.
+  const stackGeo = new BoxGeometry(W - 0.08, H - 0.08, 1);
+  const rightStack = new Mesh(stackGeo, stackMat);
+  rightStack.position.x = 0;
+  root.add(rightStack);
+
+  const leftStack = new Mesh(stackGeo.clone(), stackMat);
+  leftStack.position.x = 0;
+  root.add(leftStack);
+
+  // Gilt on the fore edge, head and tail of the closed block.
+  const giltT = 0.012;
+  const gilts: [number, number, number, number, number][] = [
+    [giltT, H - 0.08, BLOCK_T, (W - 0.08) / 2, 0],
+    [W - 0.08, giltT, BLOCK_T, 0, (H - 0.08) / 2],
+    [W - 0.08, giltT, BLOCK_T, 0, -(H - 0.08) / 2],
+  ];
+  for (const [w, h, d, x, y] of gilts) {
+    const edge = new Mesh(new BoxGeometry(w, h, d), goldMat);
+    edge.position.set(x, y, 0);
+    root.add(edge);
+  }
+
+  // --- spine --------------------------------------------------------------
+  const spineX = HINGE_X - COVER_T / 2;
+  const spine = new Mesh(
+    new BoxGeometry(COVER_T, H, BLOCK_T + COVER_T * 2),
+    coverMat,
+  );
+  spine.position.x = spineX;
+  root.add(spine);
+
+  for (const y of [H * 0.28, -H * 0.28]) {
+    const band = new Mesh(
+      new BoxGeometry(COVER_T + 0.004, 0.05, BLOCK_T + COVER_T * 2 + 0.004),
+      goldMat,
+    );
+    band.position.set(spineX, y, 0);
+    root.add(band);
+  }
+
+  // --- turning leaves -----------------------------------------------------
+  const leaves: Leaf[] = [];
+  const gap = BLOCK_T / (LEAVES + 1);
+  for (let i = 0; i < LEAVES; i++) {
+    const geo = new PlaneGeometry(W - 0.08, H - 0.08, SEG, 1);
+    const mesh = new Mesh(geo, leafMat);
+    const z0 = half - gap * (i + 1);
+    const z1 = -half + gap * (i + 1);
+    const pivot = hinged(mesh, z0);
+    pivot.visible = false;
+    root.add(pivot);
+
+    leaves.push({
+      pivot,
+      mesh,
+      z0,
+      z1,
+      // Stagger the starts so the leaves cascade instead of moving as a slab.
+      start: (i / LEAVES) * (1 - TURN_SPAN),
+    });
+  }
+
+  return { root, frontCover, backCover, rightStack, leftStack, leaves };
+}
+
+const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+/** Smoothstep — eases a leaf in and out of its turn. */
+const ease = (t: number) => t * t * (3 - 2 * t);
+
+/**
+ * Bend a leaf out of plane. `u` runs 0 at the hinge to 1 at the fore edge, and
+ * the displacement is weighted toward the free edge, which is the part of a
+ * real page that lifts. The bow peaks mid-turn and flattens at both ends.
+ */
+function curlLeaf(mesh: Mesh, turn: number) {
+  const geo = mesh.geometry as PlaneGeometry;
+  const pos = geo.attributes.position;
+  const amount = Math.sin(turn * Math.PI) * CURL;
+  const width = W - 0.08;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const u = (x + width / 2) / width;
+    pos.setZ(i, u * u * amount);
+  }
+  pos.needsUpdate = true;
+  geo.computeVertexNormals();
 }
 
 export default function HeroBook() {
@@ -131,8 +237,6 @@ export default function HeroBook() {
     camera.position.set(0, 0, 9.6);
 
     const renderer = new WebGLRenderer({ antialias: true, alpha: true });
-    // Capping DPR keeps this cheap on high-density displays, where the extra
-    // pixels buy nothing at this size.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     host.appendChild(renderer.domElement);
 
@@ -151,8 +255,8 @@ export default function HeroBook() {
     glint.position.set(1.6, 1.4, 3.2);
     scene.add(glint);
 
-    const book = buildBook();
-    scene.add(book);
+    const parts = buildBook();
+    scene.add(parts.root);
 
     const resize = () => {
       const w = host.clientWidth;
@@ -166,27 +270,26 @@ export default function HeroBook() {
     const ro = new ResizeObserver(resize);
     ro.observe(host);
 
-    // `scrollRot` is where scrolling says the book should be. `dragRot` is the
-    // offset the reader has added by dragging. They sum, so dragging never
-    // fights scrolling — it displaces it, then decays back.
-    let scrollRot = 0;
-    let dragRot = 0;
-    let dragVel = 0;
+    // Scroll opens the book. Dragging spins it. The two drive different things
+    // so they can never fight each other.
+    let openTarget = 0;
+    let open = 0;
+    let spin = 0;
+    let spinVel = 0;
     let dragging = false;
     let lastX = 0;
     let pointerX = 0;
     let pointerY = 0;
 
     const onScroll = () => {
-      const p = Math.min(window.scrollY / window.innerHeight, 1);
-      scrollRot = p * Math.PI * 1.1;
+      openTarget = clamp01(window.scrollY / (window.innerHeight * 0.85));
     };
     onScroll();
 
     const onPointerDown = (e: PointerEvent) => {
       dragging = true;
       lastX = e.clientX;
-      dragVel = 0;
+      spinVel = 0;
       host.setPointerCapture(e.pointerId);
       host.style.cursor = 'grabbing';
     };
@@ -198,8 +301,8 @@ export default function HeroBook() {
       if (!dragging) return;
       const dx = e.clientX - lastX;
       lastX = e.clientX;
-      dragVel = dx * 0.006;
-      dragRot += dragVel;
+      spinVel = dx * 0.006;
+      spin += spinVel;
     };
 
     const endDrag = (e: PointerEvent) => {
@@ -219,8 +322,43 @@ export default function HeroBook() {
     host.addEventListener('pointerleave', endDrag);
     host.style.cursor = 'grab';
 
-    // The loop only runs while the canvas is on screen and the tab is visible,
-    // so an idle background tab costs nothing.
+    /** Drive every moving part from a single 0–1 open value. */
+    function applyOpen(o: number) {
+      const { frontCover, backCover, rightStack, leftStack, leaves } = parts;
+
+      // Covers swing apart, the front doing most of the travel.
+      frontCover.rotation.y = -o * Math.PI * 0.92;
+      backCover.rotation.y = o * Math.PI * 0.06;
+
+      let turnedTotal = 0;
+      for (const leaf of leaves) {
+        const raw = clamp01((o - leaf.start) / TURN_SPAN);
+        const t = ease(raw);
+        turnedTotal += t;
+
+        // A leaf only exists while it is between the two stacks; the rest of
+        // the time the solid blocks stand in for it.
+        const moving = raw > 0.001 && raw < 0.999;
+        leaf.pivot.visible = moving;
+        if (!moving) continue;
+
+        leaf.pivot.rotation.y = -t * Math.PI;
+        leaf.pivot.position.z = leaf.z0 + (leaf.z1 - leaf.z0) * t;
+        curlLeaf(leaf.mesh, t);
+      }
+
+      // Stacks take up the slack: the right block thins as leaves leave it and
+      // the left block thickens as they arrive.
+      const gap = BLOCK_T / (LEAVES + 1);
+      const right = Math.max(0.001, BLOCK_T - turnedTotal * gap);
+      const left = Math.max(0.001, turnedTotal * gap);
+      rightStack.scale.z = right;
+      rightStack.position.z = BLOCK_T / 2 - right / 2;
+      leftStack.scale.z = left;
+      leftStack.position.z = -BLOCK_T / 2 + left / 2;
+      leftStack.visible = left > 0.004;
+    }
+
     let raf = 0;
     let visible = true;
     const start = performance.now();
@@ -229,16 +367,21 @@ export default function HeroBook() {
       raf = 0;
       const t = (performance.now() - start) / 1000;
 
+      // Ease toward the scroll target so flicking the wheel does not snap.
+      open += (openTarget - open) * 0.12;
+
       if (!dragging) {
-        dragRot += dragVel;
-        dragVel *= 0.94;
-        dragRot *= 0.985;
+        spin += spinVel;
+        spinVel *= 0.94;
+        spin *= 0.985;
       }
 
-      book.rotation.y = scrollRot + dragRot + Math.sin(t * 0.35) * 0.09;
-      book.rotation.x = -0.12 + Math.sin(t * 0.5) * 0.05 + pointerY * 0.12;
-      book.rotation.z = Math.sin(t * 0.27) * 0.035 + pointerX * 0.04;
-      book.position.y = Math.sin(t * 0.6) * 0.11;
+      applyOpen(open);
+
+      parts.root.rotation.y = spin + Math.sin(t * 0.35) * 0.09 - open * 0.32;
+      parts.root.rotation.x = -0.12 + Math.sin(t * 0.5) * 0.05 + pointerY * 0.12;
+      parts.root.rotation.z = Math.sin(t * 0.27) * 0.035 + pointerX * 0.04;
+      parts.root.position.y = Math.sin(t * 0.6) * 0.11;
 
       renderer.render(scene, camera);
       if (visible && !reduced) raf = requestAnimationFrame(tick);
@@ -264,10 +407,12 @@ export default function HeroBook() {
     document.addEventListener('visibilitychange', onVisibility);
 
     if (reduced) {
-      // One static frame, held at a flattering angle.
-      book.rotation.set(-0.12, 0.45, 0.02);
+      // One static frame, part-open so the cross and the leaves both read.
+      applyOpen(0.34);
+      parts.root.rotation.set(-0.12, -0.25, 0.02);
       renderer.render(scene, camera);
     } else {
+      applyOpen(0);
       raf = requestAnimationFrame(tick);
     }
 
@@ -283,7 +428,7 @@ export default function HeroBook() {
       host.removeEventListener('pointercancel', endDrag);
       host.removeEventListener('pointerleave', endDrag);
       // Three.js holds GPU resources that garbage collection will not reclaim.
-      book.traverse((o) => {
+      parts.root.traverse((o) => {
         if (o instanceof Mesh) {
           o.geometry.dispose();
           (o.material as MeshStandardMaterial).dispose();

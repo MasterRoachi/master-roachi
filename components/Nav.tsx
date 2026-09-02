@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Sigil from './Sigil';
+import Logo from './Logo';
 import { navLinks, site } from '@/lib/site';
 import styles from './Nav.module.css';
 
@@ -37,7 +37,7 @@ export default function Nav() {
     <header className={styles.nav}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label={`${site.name} — home`}>
-          <Sigil size={20} color="var(--gold)" />
+          <Logo size={34} />
           <span className={styles.wordmark}>Master Roachi</span>
         </Link>
 
