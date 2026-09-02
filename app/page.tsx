@@ -8,8 +8,10 @@ import styles from './page.module.css';
 
 export default function HomePage() {
   // Weight puts the active work first, so the homepage leads with what is
-  // actually being built rather than what happens to be newest.
-  const projects = getProjects().slice(0, 4);
+  // actually being built rather than what happens to be newest. The cap is
+  // high enough that nothing is hidden while the list is this short — it
+  // starts truncating once there are more than six.
+  const projects = getProjects().slice(0, 6);
   const posts = getWriting().slice(0, 3).map(toSummary);
 
   return (
