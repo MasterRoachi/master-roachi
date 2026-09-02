@@ -242,3 +242,7 @@
   height: auto;
   opacity: 0.55;
 }
+
+.nowPending {
+  color: var(--muted-2);
+}

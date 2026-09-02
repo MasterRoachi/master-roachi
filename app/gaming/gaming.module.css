@@ -130,3 +130,88 @@
   margin: 0;
   max-width: var(--measure);
 }
+
+/* Now-playing card, with Steam's own header art. */
+.current {
+  display: grid;
+  grid-template-columns: minmax(0, 300px) 1fr;
+  gap: clamp(20px, 3vw, 32px);
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  padding: clamp(18px, 2.5vw, 26px);
+}
+
+.currentArt {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+.currentBody {
+  min-width: 0;
+}
+
+/* Perfect runs — 100% completions, separated from merely finished. */
+.perfect {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.perfect li {
+  background: var(--bg);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 18px;
+}
+
+.perfect img {
+  display: block;
+  width: 92px;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+.perfectTitle {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.perfectMeta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+  margin-top: 3px;
+}
+
+.perfectBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  border: 1px solid oklch(82% 0.16 85 / 0.45);
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .current {
+    grid-template-columns: 1fr;
+  }
+  .perfect li {
+    grid-template-columns: 1fr auto;
+  }
+  .perfect img {
+    display: none;
+  }
+}

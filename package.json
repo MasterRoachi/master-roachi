@@ -9,7 +9,9 @@
     "start": "next start",
     "preview": "npx serve@latest out",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prebuild": "node scripts/steam.mjs",
+    "steam": "node scripts/steam.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

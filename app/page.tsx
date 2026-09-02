@@ -4,7 +4,8 @@ import SheenLink from '@/components/SheenLink';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import { getProjects, getWriting, toSummary } from '@/lib/content';
-import { nowPlaying } from '@/lib/pursuits';
+import { currentlyReading, currentFocus } from '@/lib/pursuits';
+import { getSteam, hoursFrom } from '@/lib/steam';
 import { site } from '@/lib/site';
 import cards from '@/components/Card.module.css';
 import styles from './page.module.css';
@@ -17,10 +18,18 @@ export default function HomePage() {
   const projects = allProjects.slice(0, 6);
   const posts = getWriting().slice(0, 3).map(toSummary);
 
-  const building = allProjects.filter(
+  const inProgress = allProjects.filter(
     (p) => (p.frontmatter.status ?? 'building') === 'building',
-  ).length;
-  const playing = nowPlaying[0];
+  );
+  const building = `${inProgress.length} project${inProgress.length === 1 ? '' : 's'}`;
+
+  // The heaviest in-progress project is the focus unless one is stated
+  // outright, which saves maintaining a line that the project weights already
+  // answer.
+  const focus =
+    currentFocus ?? inProgress[0]?.frontmatter.title ?? 'Between things';
+
+  const playing = getSteam().current;
 
   return (
     <>
@@ -64,8 +73,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* What is actually happening right now — the point of the site is the
-          record being current, not the archive being tidy. */}
+      {/* What is actually happening right now. Building comes from the project
+          files and playing comes from Steam, so neither can drift out of date
+          on its own — only the reading line is maintained by hand. */}
       <section className={styles.now}>
         <div className={`shell ${styles.nowInner}`}>
           <p className={styles.nowLabel}>Right now</p>
@@ -73,20 +83,40 @@ export default function HomePage() {
             <div className={styles.nowItem}>
               <dt>Building</dt>
               <dd>
-                {building} project{building === 1 ? '' : 's'} in progress
+                {focus}
+                <span className={styles.nowSub}>
+                  {building} in progress
+                </span>
               </dd>
             </div>
-            {playing && (
+
+            {playing ? (
               <div className={styles.nowItem}>
                 <dt>Playing</dt>
                 <dd>
                   {playing.title}
-                  {playing.achievements && (
+                  {playing.minutesTwoWeeks > 0 && (
                     <span className={styles.nowSub}>
-                      {playing.achievements.unlocked}/
-                      {playing.achievements.total} achievements
+                      {hoursFrom(playing.minutesTwoWeeks)}h this fortnight
                     </span>
                   )}
+                </dd>
+              </div>
+            ) : (
+              <div className={styles.nowItem}>
+                <dt>Playing</dt>
+                <dd className={styles.nowPending}>Nothing this fortnight</dd>
+              </div>
+            )}
+
+            {currentlyReading && (
+              <div className={styles.nowItem}>
+                <dt>Reading</dt>
+                <dd>
+                  {currentlyReading.title}
+                  <span className={styles.nowSub}>
+                    {currentlyReading.author}
+                  </span>
                 </dd>
               </div>
             )}
