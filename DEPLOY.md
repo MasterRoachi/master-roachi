@@ -73,15 +73,16 @@ Cloudflare → **Email → Email Routing → Get started**.
 
 1. Add a destination address (your existing inbox) and confirm the
    verification mail Cloudflare sends to it.
-2. Create a custom address — e.g. `hello@masterroachi.com` — forwarding there.
+2. Create the custom address `roachi@masterroachi.com`, forwarding there.
 3. Accept when Cloudflare offers to **add the required MX and SPF records
    automatically**. This is what replaces the old mail setup.
 
 Receive-only: mail arrives in your inbox, but replies come from that inbox's
 own address unless an outbound provider is added later.
 
-Then put the address in the site — `contactEmail` in `lib/site.ts`. Until it is
-set, the contact page hides the mailto link entirely.
+The site already expects this exact address: `contactEmail` in `lib/site.ts`
+is set to `roachi@masterroachi.com`. Create it with that spelling or the
+contact page will point at a dead address.
 
 ## 5. Connect the Pages project
 

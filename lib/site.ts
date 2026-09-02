@@ -1,5 +1,5 @@
 // Single source of truth for anything that appears in more than one place —
-// metadata, nav, and the contact details that still need filling in.
+// metadata, nav, and contact details.
 
 export const site = {
   name: 'Master Roachi',
@@ -8,14 +8,13 @@ export const site = {
   description:
     'Software engineer. Writes about code, sometimes about theology.',
 
-  // TODO before deploy: replace with the real address. Until this is a real
-  // address, `contactEmail` is null and the UI hides the mailto link rather
-  // than rendering a broken one.
-  contactEmail: null as string | null,
+  // Forwarded to a personal inbox by Cloudflare Email Routing — there is no
+  // mailbox behind this address. See DEPLOY.md.
+  contactEmail: 'roachi@masterroachi.com' as string | null,
 
   socials: {
     github: 'https://github.com/MasterRoachi',
-    // TODO before deploy: real LinkedIn profile URL.
+    // TODO before deploy: real LinkedIn profile URL. Null hides the link.
     linkedin: null as string | null,
   },
 } as const;

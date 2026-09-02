@@ -78,10 +78,12 @@ builds; it is simply empty until there are published posts.
 
 ### Contact
 - Its own page. Email plus social links.
-- The email address is still unset. Rather than shipping a placeholder, the
-  page renders a "coming soon" line and hides the mailto entirely until
-  `lib/site.ts` has a real address — the Astro build shipped a literal
-  `[YOUR@EMAIL]` mailto that looked live and went nowhere.
+- Address is `roachi@masterroachi.com`, forwarded to a personal inbox by
+  Cloudflare Email Routing — a forwarding address, not a mailbox.
+- The page still degrades safely: if `contactEmail` is ever set back to null it
+  hides the mailto rather than rendering a placeholder, which is what the Astro
+  build did with a literal `[YOUR@EMAIL]` link that looked live and went nowhere.
+- LinkedIn is still unset, and its link stays hidden until it is.
 
 ## Tech Stack
 
@@ -130,7 +132,9 @@ fixed rather than ported:
 - [x] Domain name / hosting — masterroachi.com (registered at domains.co.za),
       hosted on Cloudflare Pages. See DEPLOY.md.
 - [x] Whether Thoughts ships — yes, the section is built
-- [ ] **Real contact email address** — `lib/site.ts` `contactEmail` is null
+- [x] Real contact email address — roachi@masterroachi.com, forwarded to a
+      personal inbox by Cloudflare Email Routing. The old domains.co.za
+      mailboxes were stale and were abandoned rather than migrated
 - [ ] **Real LinkedIn URL** — `lib/site.ts` `socials.linkedin` is null
 - [ ] **Actual writing.** Thoughts and the devlog have scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — noted, deliberately later. Every
