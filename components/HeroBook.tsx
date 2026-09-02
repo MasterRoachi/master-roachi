@@ -23,7 +23,8 @@ import styles from './HeroBook.module.css';
 //
 // Scrolling opens it: the covers hinge back on the spine and the leaves turn
 // one after another, each one bowing as it crosses so it reads as paper rather
-// than a rotating plane. Dragging spins the whole book, independently.
+// than a rotating plane. Dragging turns the pages too, pushing the same open
+// value the scroll drives.
 //
 // Loaded via next/dynamic with ssr:false from HeroBookMount, so three.js stays
 // out of the initial bundle.
@@ -44,8 +45,23 @@ const LEAVES = 14;
 const SEG = 16;
 /** How far a turning leaf bows out of plane at the peak of its arc. */
 const CURL = 0.34;
-/** Fraction of the open sweep a single leaf takes to cross. */
-const TURN_SPAN = 0.55;
+
+// Timing. The cover has to stay ahead of every leaf for the whole sweep, or
+// the leaves sweep straight through it — which is exactly what an earlier
+// version did, the lead leaf running up to 93 degrees ahead of the cover.
+// The cover therefore opens fast and early, and no leaf starts until it is
+// most of the way back. Worst-case clearance with these numbers is 0 degrees
+// at rest and about 14 degrees once open.
+/** Sweep over which the front cover completes its swing. */
+const COVER_SPAN = 0.38;
+/** Cover travel, just short of flat so it never crosses the back cover. */
+const COVER_OPEN = Math.PI * 0.98;
+/** Nothing turns before this point; the cover is at ~156 degrees by then. */
+const LEAF_START = 0.3;
+/** Fraction of the sweep a single leaf takes to cross. */
+const TURN_SPAN = 0.35;
+/** Leaf travel, kept under COVER_OPEN so a leaf can never overtake the cover. */
+const LEAF_OPEN = Math.PI * 0.9;
 
 /** The hinge runs down the left edge; everything pivots about it. */
 const HINGE_X = -W / 2;
@@ -108,7 +124,26 @@ function buildBook(): BookParts {
   const half = BLOCK_T / 2;
 
   // --- covers -------------------------------------------------------------
-  const frontMesh = new Mesh(new BoxGeometry(W, H, COVER_T), coverMat);
+  // The inside faces get a warmer endpaper. Without it an opened cover is
+  // near-black against a near-black page, so the book reads as still shut even
+  // while it is swinging.
+  const endpaperMat = new MeshStandardMaterial({
+    color: new Color(0x33291c),
+    roughness: 0.88,
+    metalness: 0.04,
+  });
+
+  // BoxGeometry material groups run [+x, -x, +y, -y, +z, -z]. The front
+  // cover's outward face is +z and its inside is -z; the back cover is the
+  // other way round.
+  const frontMesh = new Mesh(new BoxGeometry(W, H, COVER_T), [
+    coverMat,
+    coverMat,
+    coverMat,
+    coverMat,
+    coverMat,
+    endpaperMat,
+  ]);
   const frontCover = hinged(frontMesh, half + COVER_T / 2);
   root.add(frontCover);
 
@@ -125,7 +160,14 @@ function buildBook(): BookParts {
   bar(0.78, 0.08, 0.28); // main bar
   bar(0.5, 0.07, -0.42, 0.32); // slanted footrest
 
-  const backMesh = new Mesh(new BoxGeometry(W, H, COVER_T), coverMat);
+  const backMesh = new Mesh(new BoxGeometry(W, H, COVER_T), [
+    coverMat,
+    coverMat,
+    coverMat,
+    coverMat,
+    endpaperMat,
+    coverMat,
+  ]);
   const backCover = hinged(backMesh, -half - COVER_T / 2);
   root.add(backCover);
 
@@ -190,8 +232,9 @@ function buildBook(): BookParts {
       mesh,
       z0,
       z1,
-      // Stagger the starts so the leaves cascade instead of moving as a slab.
-      start: (i / LEAVES) * (1 - TURN_SPAN),
+      // Staggered so the leaves cascade instead of moving as a slab, and all
+      // held back until LEAF_START so the cover is well clear first.
+      start: LEAF_START + (i / LEAVES) * (1 - LEAF_START - TURN_SPAN),
     });
   }
 
@@ -270,12 +313,13 @@ export default function HeroBook() {
     const ro = new ResizeObserver(resize);
     ro.observe(host);
 
-    // Scroll opens the book. Dragging spins it. The two drive different things
-    // so they can never fight each other.
+    // Scroll and dragging both drive the same thing: how far open the book is.
+    // Scrolling sets a target the book eases toward; dragging pushes `open`
+    // directly and carries the target with it, so releasing mid-turn leaves
+    // the pages where you left them rather than snapping back.
     let openTarget = 0;
     let open = 0;
-    let spin = 0;
-    let spinVel = 0;
+    let flickVel = 0;
     let dragging = false;
     let lastX = 0;
     let pointerX = 0;
@@ -289,7 +333,7 @@ export default function HeroBook() {
     const onPointerDown = (e: PointerEvent) => {
       dragging = true;
       lastX = e.clientX;
-      spinVel = 0;
+      flickVel = 0;
       host.setPointerCapture(e.pointerId);
       host.style.cursor = 'grabbing';
     };
@@ -301,8 +345,11 @@ export default function HeroBook() {
       if (!dragging) return;
       const dx = e.clientX - lastX;
       lastX = e.clientX;
-      spinVel = dx * 0.006;
-      spin += spinVel;
+      // Sweeping left turns pages forward — the direction you would physically
+      // push a page across the spine.
+      flickVel = -dx * 0.0024;
+      open = clamp01(open + flickVel);
+      openTarget = open;
     };
 
     const endDrag = (e: PointerEvent) => {
@@ -326,9 +373,11 @@ export default function HeroBook() {
     function applyOpen(o: number) {
       const { frontCover, backCover, rightStack, leftStack, leaves } = parts;
 
-      // Covers swing apart, the front doing most of the travel.
-      frontCover.rotation.y = -o * Math.PI * 0.92;
-      backCover.rotation.y = o * Math.PI * 0.06;
+      // The front cover completes its swing over the first COVER_SPAN of the
+      // sweep, well before any leaf moves.
+      const coverT = ease(clamp01(o / COVER_SPAN));
+      frontCover.rotation.y = -coverT * COVER_OPEN;
+      backCover.rotation.y = coverT * Math.PI * 0.06;
 
       let turnedTotal = 0;
       for (const leaf of leaves) {
@@ -342,7 +391,7 @@ export default function HeroBook() {
         leaf.pivot.visible = moving;
         if (!moving) continue;
 
-        leaf.pivot.rotation.y = -t * Math.PI;
+        leaf.pivot.rotation.y = -t * LEAF_OPEN;
         leaf.pivot.position.z = leaf.z0 + (leaf.z1 - leaf.z0) * t;
         curlLeaf(leaf.mesh, t);
       }
@@ -367,18 +416,22 @@ export default function HeroBook() {
       raf = 0;
       const t = (performance.now() - start) / 1000;
 
-      // Ease toward the scroll target so flicking the wheel does not snap.
-      open += (openTarget - open) * 0.12;
-
-      if (!dragging) {
-        spin += spinVel;
-        spinVel *= 0.94;
-        spin *= 0.985;
+      if (dragging) {
+        // `open` is already being driven directly by pointermove.
+      } else if (Math.abs(flickVel) > 0.00006) {
+        // Carry the flick after release, and keep the target with it so the
+        // book holds its new position instead of springing back to the scroll.
+        flickVel *= 0.92;
+        open = clamp01(open + flickVel);
+        openTarget = open;
+      } else {
+        // Ease toward the scroll target so spinning the wheel does not snap.
+        open += (openTarget - open) * 0.12;
       }
 
       applyOpen(open);
 
-      parts.root.rotation.y = spin + Math.sin(t * 0.35) * 0.09 - open * 0.32;
+      parts.root.rotation.y = Math.sin(t * 0.35) * 0.09 - open * 0.32;
       parts.root.rotation.x = -0.12 + Math.sin(t * 0.5) * 0.05 + pointerY * 0.12;
       parts.root.rotation.z = Math.sin(t * 0.27) * 0.035 + pointerX * 0.04;
       parts.root.position.y = Math.sin(t * 0.6) * 0.11;
@@ -412,7 +465,10 @@ export default function HeroBook() {
       parts.root.rotation.set(-0.12, -0.25, 0.02);
       renderer.render(scene, camera);
     } else {
+      // Paint the closed state immediately, so the canvas is never blank if the
+      // first animation frame is delayed.
       applyOpen(0);
+      renderer.render(scene, camera);
       raf = requestAnimationFrame(tick);
     }
 
@@ -428,10 +484,19 @@ export default function HeroBook() {
       host.removeEventListener('pointercancel', endDrag);
       host.removeEventListener('pointerleave', endDrag);
       // Three.js holds GPU resources that garbage collection will not reclaim.
+      // Materials are shared between meshes, and the covers carry an array of
+      // six (one per box face) so the endpaper can differ from the boards —
+      // hence the dedupe and the array check rather than a single dispose.
+      const spent = new Set<{ dispose(): void }>();
       parts.root.traverse((o) => {
-        if (o instanceof Mesh) {
-          o.geometry.dispose();
-          (o.material as MeshStandardMaterial).dispose();
+        if (!(o instanceof Mesh)) return;
+        o.geometry.dispose();
+        const mats = Array.isArray(o.material) ? o.material : [o.material];
+        for (const m of mats) {
+          if (m && !spent.has(m)) {
+            spent.add(m);
+            m.dispose();
+          }
         }
       });
       renderer.dispose();
