@@ -112,3 +112,115 @@
     align-items: start;
   }
 }
+
+/* --------------------------------------------------------------------------
+   "Right now" strip
+   Sits directly under the hero so the first thing after the identity line is
+   current activity, not an archive.
+-------------------------------------------------------------------------- */
+
+.now {
+  border-block: 1px solid var(--line);
+  background: var(--bg-raised);
+}
+
+.nowInner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(20px, 4vw, 56px);
+  align-items: center;
+  padding-block: clamp(24px, 3vw, 32px);
+}
+
+.nowLabel {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.nowList {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(20px, 4vw, 56px);
+}
+
+.nowItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nowItem dt {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  font-weight: 600;
+}
+
+.nowItem dd {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nowSub {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted-2);
+}
+
+/* --------------------------------------------------------------------------
+   Closing ethos
+-------------------------------------------------------------------------- */
+
+.ethos {
+  border-top: 1px solid var(--line);
+  padding-block: clamp(64px, 11vw, 140px);
+}
+
+.ethosText {
+  margin: 0 0 32px;
+  font-size: clamp(1.5rem, 4.5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  max-width: 20ch;
+}
+
+.ethosText span {
+  display: block;
+  color: var(--muted-2);
+  margin-top: 0.18em;
+}
+
+.ethosLink {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.ethosLink:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .nowInner {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .nowList {
+    gap: 20px 32px;
+  }
+}

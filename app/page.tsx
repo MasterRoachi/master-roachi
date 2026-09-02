@@ -2,17 +2,23 @@ import Link from 'next/link';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import { getProjects, getWriting, toSummary } from '@/lib/content';
+import { nowPlaying, streamSchedule } from '@/lib/pursuits';
 import { site } from '@/lib/site';
 import cards from '@/components/Card.module.css';
 import styles from './page.module.css';
 
 export default function HomePage() {
-  // Weight puts the active work first, so the homepage leads with what is
-  // actually being built rather than what happens to be newest. The cap is
-  // high enough that nothing is hidden while the list is this short — it
-  // starts truncating once there are more than six.
-  const projects = getProjects().slice(0, 6);
+  const allProjects = getProjects();
+  // Weight puts active work first, so the homepage leads with what is being
+  // built rather than what happens to be newest. The cap is high enough that
+  // nothing is hidden while the list is short.
+  const projects = allProjects.slice(0, 6);
   const posts = getWriting().slice(0, 3).map(toSummary);
+
+  const building = allProjects.filter(
+    (p) => (p.frontmatter.status ?? 'building') === 'building',
+  ).length;
+  const playing = nowPlaying[0];
 
   return (
     <>
@@ -40,7 +46,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      <hr className="rule" />
+      {/* What is actually happening right now — the point of the site is the
+          record being current, not the archive being tidy. */}
+      <section className={styles.now}>
+        <div className={`shell ${styles.nowInner}`}>
+          <p className={styles.nowLabel}>Right now</p>
+          <dl className={styles.nowList}>
+            <div className={styles.nowItem}>
+              <dt>Building</dt>
+              <dd>
+                {building} project{building === 1 ? '' : 's'} in progress
+              </dd>
+            </div>
+            {playing && (
+              <div className={styles.nowItem}>
+                <dt>Playing</dt>
+                <dd>
+                  {playing.title}
+                  {playing.achievements && (
+                    <span className={styles.nowSub}>
+                      {playing.achievements.unlocked}/
+                      {playing.achievements.total} achievements
+                    </span>
+                  )}
+                </dd>
+              </div>
+            )}
+            {streamSchedule.active && (
+              <div className={styles.nowItem}>
+                <dt>Streaming</dt>
+                <dd>{streamSchedule.summary}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      </section>
 
       <section className="shell section">
         <div className={styles.blockHead}>
@@ -105,6 +145,20 @@ export default function HomePage() {
           </section>
         </>
       )}
+
+      {/* The ethos closes the page. It is the best copy on the site and was
+          buried on /about, where most visitors never reach it. */}
+      <section className={styles.ethos}>
+        <div className="shell">
+          <p className={styles.ethosText}>
+            Do the work, tell the truth, improve over time, and repeat.
+            <span>Everything is public. Nothing is hidden.</span>
+          </p>
+          <Link href="/about/" className={styles.ethosLink}>
+            Why this exists →
+          </Link>
+        </div>
+      </section>
     </>
   );
 }
