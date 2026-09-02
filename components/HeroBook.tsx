@@ -121,6 +121,21 @@ function makeIconMaterial(onLoaded: () => void): MeshStandardMaterial {
     (tex) => {
       tex.colorSpace = SRGBColorSpace;
       tex.anisotropy = 4;
+
+      // A box face stretches whatever texture it is given to fill it. The icon
+      // is a different shape from the page, so scale it to cover and centre the
+      // crop instead — better to lose a little of the gold ground at the edges
+      // than to squash the face.
+      const pageAspect = (W - 0.08) / (H - 0.08);
+      const imgAspect = tex.image.width / tex.image.height;
+      if (imgAspect > pageAspect) {
+        tex.repeat.x = pageAspect / imgAspect;
+        tex.offset.x = (1 - tex.repeat.x) / 2;
+      } else {
+        tex.repeat.y = imgAspect / pageAspect;
+        tex.offset.y = (1 - tex.repeat.y) / 2;
+      }
+
       mat.map = tex;
       // The icon is painted on gold leaf, so let the page carry it at full
       // strength rather than tinting it with the parchment colour.
