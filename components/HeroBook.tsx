@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import {
   AmbientLight,
   BoxGeometry,
+  CanvasTexture,
   Color,
   DirectionalLight,
   DoubleSide,
@@ -14,6 +15,7 @@ import {
   PlaneGeometry,
   PointLight,
   Scene,
+  SRGBColorSpace,
   WebGLRenderer,
 } from 'three';
 import styles from './HeroBook.module.css';
@@ -23,8 +25,7 @@ import styles from './HeroBook.module.css';
 //
 // Scrolling opens it: the covers hinge back on the spine and the leaves turn
 // one after another, each one bowing as it crosses so it reads as paper rather
-// than a rotating plane. Dragging turns the pages too, pushing the same open
-// value the scroll drives.
+// than a rotating plane. Dragging turns the whole book on its axis.
 //
 // Loaded via next/dynamic with ssr:false from HeroBookMount, so three.js stays
 // out of the initial bundle.
@@ -43,8 +44,16 @@ const BLOCK_T = 0.42;
 const LEAVES = 14;
 /** Horizontal segments per leaf — the resolution the curl is drawn at. */
 const SEG = 16;
-/** How far a turning leaf bows out of plane at the peak of its arc. */
-const CURL = 0.34;
+/**
+ * Peak bend of a turning leaf, in radians at the free edge.
+ *
+ * The leaf is bent into an arc rather than displaced by a curve, so arc length
+ * is preserved and the whole page curves instead of only its tip lifting. An
+ * earlier version offset z by u-squared, which put 96% of the page within 15%
+ * of flat and read as a rotating rectangle. At 1.2 rad the free edge swings
+ * out by about half the page width.
+ */
+const CURL_THETA = 1.2;
 
 // Timing. The cover has to stay ahead of every leaf for the whole sweep, or
 // the leaves sweep straight through it — which is exactly what an earlier
@@ -75,6 +84,8 @@ interface Leaf {
   z1: number;
   /** Point in the open sweep at which this leaf starts moving. */
   start: number;
+  /** Flat x of every vertex, kept because bending overwrites the live values. */
+  restX: Float32Array;
 }
 
 interface BookParts {
@@ -84,6 +95,98 @@ interface BookParts {
   rightStack: Mesh;
   leftStack: Mesh;
   leaves: Leaf[];
+}
+
+/**
+ * The Pantokrator marking on the first leaf, drawn to a canvas rather than
+ * loaded from an image.
+ *
+ * Deliberately the iconography rather than a portrait: the cruciform halo and
+ * the IC XC christogram are what identify the image, and they hold up at the
+ * size this is actually seen. Drawing a face procedurally would only look
+ * crude.
+ *
+ * To use a real icon instead, load an image into a texture here. Note that
+ * while the ancient icons are long out of copyright, modern photographs of
+ * them frequently are not — use a public-domain scan.
+ */
+function makeIconTexture(): CanvasTexture {
+  const w = 512;
+  const h = 740; // matches the page aspect
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const c = canvas.getContext('2d')!;
+
+  c.fillStyle = '#e8e2d4';
+  c.fillRect(0, 0, w, h);
+
+  const gold = '#b8892f';
+  const cx = w / 2;
+  const cy = h * 0.36;
+  const r = w * 0.28;
+
+  c.strokeStyle = gold;
+  c.lineCap = 'round';
+
+  // Halo.
+  c.lineWidth = 5;
+  c.beginPath();
+  c.arc(cx, cy, r, 0, Math.PI * 2);
+  c.stroke();
+
+  // Cruciform nimbus: the three arms visible behind the head.
+  c.lineWidth = 12;
+  c.beginPath();
+  c.moveTo(cx, cy - r);
+  c.lineTo(cx, cy + r * 0.1);
+  c.moveTo(cx - r, cy);
+  c.lineTo(cx - r * 0.34, cy);
+  c.moveTo(cx + r * 0.34, cy);
+  c.lineTo(cx + r, cy);
+  c.stroke();
+
+  // IC XC, the christogram, flanking the halo.
+  c.fillStyle = gold;
+  c.font = `600 ${Math.round(w * 0.11)}px Georgia, serif`;
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  c.fillText('IC', cx - r * 1.32, cy - r * 0.5);
+  c.fillText('XC', cx + r * 1.32, cy - r * 0.5);
+
+  // Overline abbreviation marks.
+  c.lineWidth = 4;
+  for (const dx of [-r * 1.32, r * 1.32]) {
+    c.beginPath();
+    c.moveTo(cx + dx - w * 0.06, cy - r * 0.5 - w * 0.075);
+    c.lineTo(cx + dx + w * 0.06, cy - r * 0.5 - w * 0.075);
+    c.stroke();
+  }
+
+  // A rule and a line of ruled text below, so the leaf reads as a page rather
+  // than a poster.
+  c.strokeStyle = 'rgba(120, 100, 70, 0.35)';
+  c.lineWidth = 2;
+  c.beginPath();
+  c.moveTo(w * 0.2, h * 0.62);
+  c.lineTo(w * 0.8, h * 0.62);
+  c.stroke();
+
+  c.strokeStyle = 'rgba(120, 100, 70, 0.16)';
+  c.lineWidth = 6;
+  for (let i = 0; i < 7; i++) {
+    const y = h * 0.68 + i * h * 0.035;
+    const inset = i === 6 ? w * 0.3 : w * 0.16;
+    c.beginPath();
+    c.moveTo(w * 0.16, y);
+    c.lineTo(w - inset, y);
+    c.stroke();
+  }
+
+  const tex = new CanvasTexture(canvas);
+  tex.colorSpace = SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
 }
 
 /** A pivot at the hinge with its mesh pushed out to span hinge → fore edge. */
@@ -176,7 +279,22 @@ function buildBook(): BookParts {
   // turning. They shrink and grow as pages move between them, which is what
   // sells the thickness without animating hundreds of planes.
   const stackGeo = new BoxGeometry(W - 0.08, H - 0.08, 1);
-  const rightStack = new Mesh(stackGeo, stackMat);
+
+  // The first leaf carries the Pantokrator, so it is the top face of the
+  // right-hand stack — the page revealed the moment the cover swings back.
+  const iconMat = new MeshStandardMaterial({
+    map: makeIconTexture(),
+    roughness: 0.95,
+    metalness: 0,
+  });
+  const rightStack = new Mesh(stackGeo, [
+    stackMat,
+    stackMat,
+    stackMat,
+    stackMat,
+    iconMat,
+    stackMat,
+  ]);
   rightStack.position.x = 0;
   root.add(rightStack);
 
@@ -235,6 +353,7 @@ function buildBook(): BookParts {
       // Staggered so the leaves cascade instead of moving as a slab, and all
       // held back until LEAF_START so the cover is well clear first.
       start: LEAF_START + (i / LEAVES) * (1 - LEAF_START - TURN_SPAN),
+      restX: Float32Array.from(geo.attributes.position.array.filter((_, n) => n % 3 === 0)),
     });
   }
 
@@ -246,19 +365,38 @@ const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 const ease = (t: number) => t * t * (3 - 2 * t);
 
 /**
- * Bend a leaf out of plane. `u` runs 0 at the hinge to 1 at the fore edge, and
- * the displacement is weighted toward the free edge, which is the part of a
- * real page that lifts. The bow peaks mid-turn and flattens at both ends.
+ * Bend a leaf into an arc about the hinge, the way a sheet of paper actually
+ * behaves when it is pushed across. Each vertex keeps its distance along the
+ * page — arc length is preserved — while the sheet rolls away from flat, so
+ * the whole page curves rather than only the free edge lifting.
+ *
+ * The bend peaks halfway through the turn and flattens at both ends, so a leaf
+ * lies flat in each stack and is at its most curved as it crosses the spine.
  */
-function curlLeaf(mesh: Mesh, turn: number) {
-  const geo = mesh.geometry as PlaneGeometry;
+function curlLeaf(leaf: Leaf, turn: number) {
+  const geo = leaf.mesh.geometry as PlaneGeometry;
   const pos = geo.attributes.position;
-  const amount = Math.sin(turn * Math.PI) * CURL;
   const width = W - 0.08;
+  const theta = Math.sin(turn * Math.PI) * CURL_THETA;
+
+  // Straight through: below this the arc radius explodes and the maths is both
+  // pointless and numerically nasty.
+  if (theta < 1e-3) {
+    for (let i = 0; i < pos.count; i++) {
+      pos.setX(i, leaf.restX[i]);
+      pos.setZ(i, 0);
+    }
+    pos.needsUpdate = true;
+    geo.computeVertexNormals();
+    return;
+  }
+
+  const k = theta / width; // curvature: 1 / radius
   for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const u = (x + width / 2) / width;
-    pos.setZ(i, u * u * amount);
+    const s = leaf.restX[i] + width / 2; // distance from the hinge
+    const a = k * s;
+    pos.setX(i, -width / 2 + Math.sin(a) / k);
+    pos.setZ(i, (1 - Math.cos(a)) / k);
   }
   pos.needsUpdate = true;
   geo.computeVertexNormals();
@@ -313,13 +451,12 @@ export default function HeroBook() {
     const ro = new ResizeObserver(resize);
     ro.observe(host);
 
-    // Scroll and dragging both drive the same thing: how far open the book is.
-    // Scrolling sets a target the book eases toward; dragging pushes `open`
-    // directly and carries the target with it, so releasing mid-turn leaves
-    // the pages where you left them rather than snapping back.
+    // Scroll opens the book. Dragging spins it. The two drive different things
+    // so they can never fight each other.
     let openTarget = 0;
     let open = 0;
-    let flickVel = 0;
+    let spin = 0;
+    let spinVel = 0;
     let dragging = false;
     let lastX = 0;
     let pointerX = 0;
@@ -333,7 +470,7 @@ export default function HeroBook() {
     const onPointerDown = (e: PointerEvent) => {
       dragging = true;
       lastX = e.clientX;
-      flickVel = 0;
+      spinVel = 0;
       host.setPointerCapture(e.pointerId);
       host.style.cursor = 'grabbing';
     };
@@ -345,11 +482,10 @@ export default function HeroBook() {
       if (!dragging) return;
       const dx = e.clientX - lastX;
       lastX = e.clientX;
-      // Sweeping left turns pages forward — the direction you would physically
-      // push a page across the spine.
-      flickVel = -dx * 0.0024;
-      open = clamp01(open + flickVel);
-      openTarget = open;
+      // Dragging turns the whole book on its axis. Page turning is left to
+      // scrolling alone, so the two inputs stay separate.
+      spinVel = dx * 0.006;
+      spin += spinVel;
     };
 
     const endDrag = (e: PointerEvent) => {
@@ -393,7 +529,7 @@ export default function HeroBook() {
 
         leaf.pivot.rotation.y = -t * LEAF_OPEN;
         leaf.pivot.position.z = leaf.z0 + (leaf.z1 - leaf.z0) * t;
-        curlLeaf(leaf.mesh, t);
+        curlLeaf(leaf, t);
       }
 
       // Stacks take up the slack: the right block thins as leaves leave it and
@@ -416,22 +552,20 @@ export default function HeroBook() {
       raf = 0;
       const t = (performance.now() - start) / 1000;
 
-      if (dragging) {
-        // `open` is already being driven directly by pointermove.
-      } else if (Math.abs(flickVel) > 0.00006) {
-        // Carry the flick after release, and keep the target with it so the
-        // book holds its new position instead of springing back to the scroll.
-        flickVel *= 0.92;
-        open = clamp01(open + flickVel);
-        openTarget = open;
-      } else {
-        // Ease toward the scroll target so spinning the wheel does not snap.
-        open += (openTarget - open) * 0.12;
+      // Ease toward the scroll target so spinning the wheel does not snap.
+      open += (openTarget - open) * 0.12;
+
+      if (!dragging) {
+        // Inertia after release, then a slow settle so the book never ends up
+        // permanently facing away.
+        spin += spinVel;
+        spinVel *= 0.94;
+        spin *= 0.985;
       }
 
       applyOpen(open);
 
-      parts.root.rotation.y = Math.sin(t * 0.35) * 0.09 - open * 0.32;
+      parts.root.rotation.y = spin + Math.sin(t * 0.35) * 0.09 - open * 0.32;
       parts.root.rotation.x = -0.12 + Math.sin(t * 0.5) * 0.05 + pointerY * 0.12;
       parts.root.rotation.z = Math.sin(t * 0.27) * 0.035 + pointerX * 0.04;
       parts.root.position.y = Math.sin(t * 0.6) * 0.11;
@@ -493,10 +627,15 @@ export default function HeroBook() {
         o.geometry.dispose();
         const mats = Array.isArray(o.material) ? o.material : [o.material];
         for (const m of mats) {
-          if (m && !spent.has(m)) {
-            spent.add(m);
-            m.dispose();
+          if (!m || spent.has(m)) continue;
+          spent.add(m);
+          // The icon's canvas texture is a GPU resource of its own.
+          const map = (m as MeshStandardMaterial).map;
+          if (map && !spent.has(map)) {
+            spent.add(map);
+            map.dispose();
           }
+          m.dispose();
         }
       });
       renderer.dispose();
