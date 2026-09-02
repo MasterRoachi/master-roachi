@@ -1,5 +1,32 @@
 .hero {
+  position: relative;
   padding-block: clamp(72px, 14vw, 180px) clamp(56px, 9vw, 110px);
+  overflow: hidden;
+}
+
+/* The book sits on the right half, behind the type. It is decorative, so the
+   text always wins on contrast — the canvas never overlaps the copy at narrow
+   widths, where it moves behind and fades instead. */
+.heroCanvas {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(46%, 560px);
+  height: 100%;
+  z-index: 0;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Re-enable pointer events only on the things that need them, so the rest of
+   the hero stays draggable for the book underneath. */
+.heroContent a,
+.heroContent button {
+  pointer-events: auto;
 }
 
 /* The identity line, set as large and tight as the viewport allows — this is
@@ -179,41 +206,6 @@
   color: var(--muted-2);
 }
 
-/* --------------------------------------------------------------------------
-   Closing ethos
--------------------------------------------------------------------------- */
-
-.ethos {
-  border-top: 1px solid var(--line);
-  padding-block: clamp(64px, 11vw, 140px);
-}
-
-.ethosText {
-  margin: 0 0 32px;
-  font-size: clamp(1.5rem, 4.5vw, 3rem);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
-  max-width: 20ch;
-}
-
-.ethosText span {
-  display: block;
-  color: var(--muted-2);
-  margin-top: 0.18em;
-}
-
-.ethosLink {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--muted);
-  transition: color 0.15s ease;
-}
-
-.ethosLink:hover {
-  color: var(--accent);
-}
-
 @media (max-width: 760px) {
   .nowInner {
     grid-template-columns: 1fr;
@@ -222,5 +214,12 @@
 
   .nowList {
     gap: 20px 32px;
+  }
+}
+
+@media (max-width: 900px) {
+  .heroCanvas {
+    width: 100%;
+    opacity: 0.28;
   }
 }

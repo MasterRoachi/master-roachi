@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import HeroBookMount from '@/components/HeroBookMount';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import { getProjects, getWriting, toSummary } from '@/lib/content';
-import { nowPlaying, streamSchedule } from '@/lib/pursuits';
+import { nowPlaying } from '@/lib/pursuits';
 import { site } from '@/lib/site';
 import cards from '@/components/Card.module.css';
 import styles from './page.module.css';
@@ -23,7 +24,10 @@ export default function HomePage() {
   return (
     <>
       <section className={styles.hero}>
-        <div className="shell">
+        <div className={styles.heroCanvas}>
+          <HeroBookMount />
+        </div>
+        <div className={`shell ` + styles.heroContent}>
           <h1 className={styles.heroTitle}>
             {site.tagline}
             <span className={styles.heroTail}>{site.taglineTail}</span>
@@ -70,12 +74,6 @@ export default function HomePage() {
                     </span>
                   )}
                 </dd>
-              </div>
-            )}
-            {streamSchedule.active && (
-              <div className={styles.nowItem}>
-                <dt>Streaming</dt>
-                <dd>{streamSchedule.summary}</dd>
               </div>
             )}
           </dl>
@@ -145,20 +143,6 @@ export default function HomePage() {
           </section>
         </>
       )}
-
-      {/* The ethos closes the page. It is the best copy on the site and was
-          buried on /about, where most visitors never reach it. */}
-      <section className={styles.ethos}>
-        <div className="shell">
-          <p className={styles.ethosText}>
-            Do the work, tell the truth, improve over time, and repeat.
-            <span>Everything is public. Nothing is hidden.</span>
-          </p>
-          <Link href="/about/" className={styles.ethosLink}>
-            Why this exists →
-          </Link>
-        </div>
-      </section>
     </>
   );
 }
