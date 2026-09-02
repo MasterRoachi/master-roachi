@@ -16,9 +16,13 @@ Writing, project pages, and devlog entries are all MDX files on disk, read at
 build time through one small content layer. Adding a post means adding a file —
 there is no CMS and no database.
 
-Everything renders on the server at build time. The only JavaScript that
-reaches the browser is what the navigation genuinely needs, which keeps the
-pages fast on a slow connection.
+Every page is rendered at build time and served as static HTML — there is no
+server deciding anything at request time. The navigation is the only piece
+that runs as a client component.
+
+That said, the framework brings its own runtime along: around 175 KB of
+compressed JavaScript on the homepage, mostly React and the client router.
+Honest number rather than a claim of zero.
 
 ## Design
 

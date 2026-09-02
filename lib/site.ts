@@ -1,5 +1,9 @@
 // Single source of truth for anything that appears in more than one place —
 // metadata, nav, and contact details.
+//
+// The `as string | null` annotations are deliberate: the UI hides a link
+// rather than rendering a dead one when a value is null, and keeping the
+// wider type means a value can be pulled back out without a type error.
 
 export const site = {
   name: 'Master Roachi',
@@ -14,8 +18,8 @@ export const site = {
 
   socials: {
     github: 'https://github.com/MasterRoachi',
-    // TODO before deploy: real LinkedIn profile URL. Null hides the link.
-    linkedin: null as string | null,
+    linkedin:
+      'https://www.linkedin.com/in/stephanusmengelbrecht/' as string | null,
   },
 } as const;
 

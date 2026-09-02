@@ -83,7 +83,8 @@ builds; it is simply empty until there are published posts.
 - The page still degrades safely: if `contactEmail` is ever set back to null it
   hides the mailto rather than rendering a placeholder, which is what the Astro
   build did with a literal `[YOUR@EMAIL]` link that looked live and went nowhere.
-- LinkedIn is still unset, and its link stays hidden until it is.
+- LinkedIn: linkedin.com/in/stephanusmengelbrecht. The link is rendered only
+  when the value is non-null, so it degrades the same way the email does.
 
 ## Tech Stack
 
@@ -100,8 +101,17 @@ ground with React as the component model.
   shape as Astro's content collections, no CMS or database.
 - Fonts are self-hosted via `next/font`, replacing the render-blocking
   Google Fonts stylesheet the Astro build linked.
-- The only client component is the navigation. Everything else is a server
-  component and ships no JS.
+- The only client component is the navigation; everything else is a server
+  component. That is **not** the same as shipping no JS, which an earlier
+  version of this document claimed. The App Router ships its own runtime —
+  React, the client router, RSC payload handling — regardless of how few
+  client components there are. Measured against the live deployment: seven
+  chunks on the homepage, **175 KB brotli-compressed** (564 KB raw).
+
+  Unremarkable for a Next.js site, and unnoticeable on a decent connection.
+  But it is a real regression against Astro, which genuinely shipped zero
+  bytes on this same page, and it is the concrete price paid for React as the
+  component model. Worth re-measuring if the JS budget ever becomes a concern.
 
 Rejected: plain React SPA (weak SEO, hand-rolled markdown pipeline) and
 React Native / `react-native-web`, which was the original request — it targets
@@ -135,7 +145,7 @@ fixed rather than ported:
 - [x] Real contact email address — roachi@masterroachi.com, forwarded to a
       personal inbox by Cloudflare Email Routing. The old domains.co.za
       mailboxes were stale and were abandoned rather than migrated
-- [ ] **Real LinkedIn URL** — `lib/site.ts` `socials.linkedin` is null
+- [x] Real LinkedIn URL — linkedin.com/in/stephanusmengelbrecht
 - [ ] **Actual writing.** Thoughts and the devlog have scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — noted, deliberately later. Every
       use goes through `components/Sigil.tsx`, so it is a one-file change
