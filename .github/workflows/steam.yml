@@ -47,6 +47,11 @@ jobs:
           if git diff --staged --quiet; then
             echo "nothing changed — no commit, no deploy"
           else
-            git commit -m "Refresh Steam snapshot [skip ci]"
+            # Deliberately no [skip ci]: Cloudflare Workers Builds honours it,
+            # so tagging the commit that way would land the data in the repo
+            # and then tell Cloudflare not to publish it. The loop it usually
+            # guards against cannot happen here anyway — GitHub does not fire
+            # workflows for commits pushed with GITHUB_TOKEN.
+            git commit -m "Refresh Steam snapshot"
             git push
           fi
