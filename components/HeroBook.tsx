@@ -32,7 +32,10 @@ import styles from './HeroBook.module.css';
 
 const GOLD = 0xd9a441;
 const COVER = 0x141414;
-const PAGE = 0xe8e2d4;
+// Sampled from the icon's own gold ground, identical at all four corners, so
+// the leaves and the illuminated first page are the same leaf rather than a
+// gold plate sitting on cream paper.
+const PAGE = 0xa8854c;
 
 /** Book proportions, in scene units. */
 const W = 2.1;
@@ -174,17 +177,20 @@ function buildBook(onIconLoaded: () => void): BookParts {
     roughness: 0.22,
     metalness: 0.95,
   });
+  // Gold leaf rather than paper: enough metalness to catch the key light as a
+  // leaf turns, rough enough to stay leaf rather than mirror.
+  //
   // Leaves are seen from both sides as they cross, so they cannot be culled.
   const leafMat = new MeshStandardMaterial({
     color: new Color(PAGE),
-    roughness: 0.95,
-    metalness: 0,
+    roughness: 0.52,
+    metalness: 0.34,
     side: DoubleSide,
   });
   const stackMat = new MeshStandardMaterial({
     color: new Color(PAGE),
-    roughness: 0.95,
-    metalness: 0,
+    roughness: 0.52,
+    metalness: 0.34,
   });
 
   const half = BLOCK_T / 2;

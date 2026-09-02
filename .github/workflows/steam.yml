@@ -1,0 +1,52 @@
+name: Refresh Steam snapshot
+
+# The site is a static export, so what is being played is baked in at build
+# time. Without this, the "Right now" strip would only update when something
+# else happened to trigger a deploy.
+#
+# This fetches the snapshot daily and commits it if it changed. The commit is
+# what triggers the Cloudflare build — no deploy hook or Cloudflare token
+# needed, and the data stays visible and versioned in the repo rather than
+# appearing from nowhere at build time.
+#
+# Needs one repository secret: STEAM_API_KEY.
+# The SteamID is not secret and is defaulted in the script.
+
+on:
+  schedule:
+    # 05:10 UTC daily — 07:10 SAST, so an evening's play is reflected by
+    # morning. Deliberately not on the hour: GitHub's scheduler is busiest then
+    # and delays runs.
+    - cron: '10 5 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # No install step: the script uses only node built-ins and fetch.
+      - name: Fetch from Steam
+        env:
+          STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+        run: node scripts/steam.mjs
+
+      - name: Commit if it changed
+        run: |
+          git config user.name "Master Roachi"
+          git config user.email "207052285+MasterRoachi@users.noreply.github.com"
+          git add data/steam.json
+          if git diff --staged --quiet; then
+            echo "nothing changed — no commit, no deploy"
+          else
+            git commit -m "Refresh Steam snapshot [skip ci]"
+            git push
+          fi

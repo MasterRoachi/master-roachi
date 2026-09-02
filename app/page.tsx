@@ -21,7 +21,6 @@ export default function HomePage() {
   const inProgress = allProjects.filter(
     (p) => (p.frontmatter.status ?? 'building') === 'building',
   );
-  const building = `${inProgress.length} project${inProgress.length === 1 ? '' : 's'}`;
 
   // The heaviest in-progress project is the focus unless one is stated
   // outright, which saves maintaining a line that the project weights already
@@ -82,12 +81,7 @@ export default function HomePage() {
           <dl className={styles.nowList}>
             <div className={styles.nowItem}>
               <dt>Building</dt>
-              <dd>
-                {focus}
-                <span className={styles.nowSub}>
-                  {building} in progress
-                </span>
-              </dd>
+              <dd>{focus}</dd>
             </div>
 
             {playing ? (

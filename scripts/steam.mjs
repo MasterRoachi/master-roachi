@@ -26,14 +26,16 @@ import path from 'node:path';
 
 const OUT = path.join(process.cwd(), 'data', 'steam.json');
 const KEY = process.env.STEAM_API_KEY;
-const ID = process.env.STEAM_ID;
+// Not a secret: a SteamID64 is public on the profile page. Defaulting it means
+// only the API key ever needs configuring.
+const ID = process.env.STEAM_ID || '76561198116677367';
 
 function bail(why) {
   console.log(`steam: ${why} — keeping the committed data/steam.json`);
   process.exit(0);
 }
 
-if (!KEY || !ID) bail('STEAM_API_KEY or STEAM_ID not set');
+if (!KEY) bail('STEAM_API_KEY not set');
 
 async function api(iface, method, version, params = {}) {
   const url = new URL(
