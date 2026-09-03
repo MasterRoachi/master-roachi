@@ -1,172 +1,199 @@
+/* The halftone screen is positioned against this and runs the whole page. */
 .page {
-  --accent-a: var(--accent);
-  --accent-b: var(--accent);
-}
-
-.top {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border-bottom: 1px solid var(--line);
+  padding-bottom: clamp(80px, 10vw, 120px);
 }
 
-.topInner {
+/* Named, not `.page > div` — that would catch the field's own host, which is
+   absolutely positioned, and collapse the backdrop to nothing. */
+.body {
   position: relative;
   z-index: 1;
-  padding-block: clamp(56px, 10vw, 120px) clamp(48px, 8vw, 88px);
 }
 
-.title {
-  font-size: clamp(2.4rem, 8vw, 5rem);
-  margin: 0 0 22px;
-}
-
-.lede {
-  color: var(--muted);
-  max-width: var(--measure);
-  margin: 0;
-  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
-  line-height: 1.5;
-}
-
-.body {
-  padding-block: clamp(48px, 8vw, 96px);
-}
+/* --- products ----------------------------------------------------------- */
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-  gap: clamp(18px, 2.5vw, 28px);
+  gap: clamp(16px, 2vw, 26px);
+}
+
+/* One product, given the room a shop with one product actually has. */
+.solo {
+  display: grid;
+  grid-template-columns: 1fr;
+  max-width: 760px;
+}
+
+@media (min-width: 780px) {
+  .solo .product {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
 }
 
 .product {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--line);
-  background: oklch(16% 0 0 / 0.84);
+  border: 1px solid color-mix(in oklch, var(--accent-a) 20%, var(--line));
+  border-radius: 14px;
+  overflow: hidden;
+  background: oklch(15% 0.01 340 / 0.7);
+  color: inherit;
   transition:
     border-color 0.2s ease,
-    background 0.2s ease,
     transform 0.2s ease;
 }
 
 a.product:hover {
-  border-color: var(--accent-a);
-  background: oklch(18% 0 0 / 0.92);
-  transform: translateY(-3px);
+  border-color: color-mix(in oklch, var(--accent-a) 55%, var(--line));
+  transform: translateY(-2px);
 }
 
-/* Square well for the artwork, so a mixed catalogue still lines up. */
+/* --- the mockup --------------------------------------------------------- */
+
+/* The mockups are cut out at build time by scripts/store-art.mjs, so what
+   arrives here is a garment on transparency rather than one on a white sheet.
+
+   No blend mode can do that job: screen over a dark page returns the image
+   untouched, and multiply — which does drop white — takes a dark garment down
+   with it. The background has to actually be removed, and it is. */
 .art {
-  aspect-ratio: 1;
-  background: oklch(12% 0 0);
-  border-bottom: 1px solid var(--line);
+  display: block;
+  position: relative;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
+  /* Nothing behind it — the page shows through the cut-out. */
 }
 
 .art img {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
+  /* Contain, not cover: the cut-out is trimmed to the garment, so cropping it
+     would clip a sleeve. */
+  object-fit: contain;
+  padding: clamp(18px, 3vw, 40px);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+a.product:hover .art img {
+  transform: scale(1.03);
 }
 
 .noArt {
   display: block;
-  width: 100%;
   height: 100%;
   background: repeating-linear-gradient(
     45deg,
-    oklch(16% 0 0),
-    oklch(16% 0 0) 10px,
-    oklch(14% 0 0) 10px,
-    oklch(14% 0 0) 20px
+    oklch(20% 0.02 340 / 0.5) 0 10px,
+    transparent 10px 20px
   );
 }
 
+/* --- product copy ------------------------------------------------------- */
+
 .detail {
-  padding: 18px 20px;
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(18px, 2.4vw, 30px);
 }
 
 .name {
-  font-size: 1rem;
-  margin: 0 0 10px;
-  line-height: 1.3;
+  display: block;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.25;
 }
 
 .meta {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
 }
 
 .price {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: color-mix(in oklch, var(--accent-a) 72%, var(--ink));
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
 }
 
 .variants {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: var(--muted-2);
 }
 
 .buy,
 .pending {
-  display: block;
-  padding: 13px 20px;
-  border-top: 1px solid var(--line);
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 24px;
   font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  text-align: center;
-  transition: background 0.2s ease;
 }
 
 .buy {
-  color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
-}
-
-a.product:hover .buy {
-  background: color-mix(in oklch, var(--accent-a) 12%, transparent);
+  color: color-mix(in oklch, var(--accent-a) 80%, var(--ink));
 }
 
 .pending {
   color: var(--muted-2);
 }
 
-.note {
-  margin: clamp(32px, 5vw, 48px) 0 0;
-  font-size: 0.82rem;
-  color: var(--muted-2);
+/* --- sections ----------------------------------------------------------- */
+
+.section {
+  padding-block: clamp(40px, 6vw, 72px) 0;
 }
 
-.empty {
-  border: 1px dashed var(--line-bright);
-  padding: clamp(40px, 7vw, 72px);
+.prose {
   max-width: var(--measure);
-}
-
-.emptyTitle {
-  font-size: clamp(1.3rem, 3vw, 1.8rem);
-  margin: 0 0 14px;
-}
-
-.empty p {
   color: var(--muted);
-  margin: 0;
   line-height: 1.7;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .product,
-  .buy {
-    transition: none;
-  }
-  a.product:hover {
-    transform: none;
-  }
+.prose p {
+  margin: 0 0 16px;
+}
+
+.synced {
+  font-size: 0.85rem;
+  color: var(--muted-2);
+}
+
+.coming {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.coming li {
+  border: 1px dashed color-mix(in oklch, var(--accent-a) 34%, var(--line));
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.empty {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: clamp(24px, 3.5vw, 40px);
+  max-width: var(--measure);
+  color: var(--muted);
+}
+
+.emptyTitle {
+  margin: 0 0 12px;
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
 }

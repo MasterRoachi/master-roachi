@@ -11,6 +11,12 @@ export interface StoreProduct {
   externalId: string | null;
   name: string;
   thumbnail: string | null;
+  /**
+   * A local cut-out of the mockup, written by scripts/store-art.mjs with the
+   * white sheet removed. Absent when the cut failed or the mockup was never
+   * on white, in which case the remote thumbnail still serves.
+   */
+  art?: string | null;
   variantCount: number;
   from: { amount: number; currency: string } | null;
 }

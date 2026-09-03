@@ -38,6 +38,15 @@ export const site = {
      * Printful ids are in data/store.json.
      */
     paymentLinks: {} as Record<string, string>,
+
+    /**
+     * Designs still being drawn, named so the page has something true to say
+     * while the rail is nearly empty.
+     *
+     * Empty is a supported state: the section simply does not appear, rather
+     * than promising work that does not exist.
+     */
+    coming: [] as string[],
   },
 
   socials: {

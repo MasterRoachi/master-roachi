@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T11:27:45.955Z",
+  "fetchedAt": "2026-09-03T21:37:32.460Z",
   "store": null,
   "products": [
     {
@@ -11,7 +11,8 @@
       "from": {
         "amount": 16,
         "currency": "USD"
-      }
+      },
+      "art": "/store/464722916.webp"
     }
   ]
 }
