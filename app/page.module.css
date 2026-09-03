@@ -270,3 +270,20 @@
   object-fit: cover;
   border: 1px solid var(--line);
 }
+
+/* --------------------------------------------------------------------------
+   Projects, against the starfield
+-------------------------------------------------------------------------- */
+
+.build {
+  position: relative;
+  isolation: isolate;
+  /* Rules above and below so the section reads as a window cut into the page
+     rather than the background simply changing. */
+  border-block: 1px solid var(--line);
+}
+
+.buildInner {
+  position: relative;
+  z-index: 1;
+}

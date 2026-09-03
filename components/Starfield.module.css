@@ -1,0 +1,27 @@
+.host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* A deep-space wash under the stars: darker at the edges so the section
+     recedes from the page around it, with a faint warm core suggesting a
+     galactic centre rather than an even black. */
+  background:
+    radial-gradient(
+      120% 80% at 68% 38%,
+      oklch(22% 0.03 78 / 0.5) 0%,
+      oklch(15% 0.02 260 / 0.4) 38%,
+      transparent 72%
+    ),
+    radial-gradient(
+      100% 70% at 20% 80%,
+      oklch(19% 0.03 250 / 0.45) 0%,
+      transparent 65%
+    );
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

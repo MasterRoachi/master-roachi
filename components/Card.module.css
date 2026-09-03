@@ -12,7 +12,10 @@
   flex-direction: column;
   padding: clamp(24px, 3vw, 34px);
   border: 1px solid var(--line);
-  background: var(--bg-raised);
+  /* Translucent so the starfield behind the projects section shows through
+     faintly — the cards float in the depth rather than masking it. Kept high
+     enough that body copy never fights a star for contrast. */
+  background: oklch(16% 0 0 / 0.84);
   height: 100%;
   transition:
     border-color 0.18s ease,
@@ -21,7 +24,7 @@
 
 .card:hover {
   border-color: var(--line-bright);
-  background: oklch(18% 0 0);
+  background: oklch(18% 0 0 / 0.92);
 }
 
 .cardTop {

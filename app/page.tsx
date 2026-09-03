@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import HeroBookMount from '@/components/HeroBookMount';
 import SheenLink from '@/components/SheenLink';
+import Starfield from '@/components/Starfield';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import { getProjects, getWriting, toSummary } from '@/lib/content';
@@ -122,20 +123,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="shell section">
-        <div className={styles.blockHead}>
-          <div>
-            <p className="eyebrow">Projects</p>
-            <h2 className="section-title">What I&rsquo;m building</h2>
+      {/* The one section with depth behind it — the work sits in space. */}
+      <section className={styles.build}>
+        <Starfield />
+        <div className={`shell section `}>
+          <div className={styles.blockHead}>
+            <div>
+              <p className="eyebrow">Projects</p>
+              <h2 className="section-title">What I&rsquo;m building</h2>
+            </div>
+            <Link href="/projects/" className={styles.more}>
+              All projects →
+            </Link>
           </div>
-          <Link href="/projects/" className={styles.more}>
-            All projects →
-          </Link>
-        </div>
-        <div className={cards.grid}>
-          {projects.map((entry) => (
-            <ProjectCard key={entry.slug} entry={entry} />
-          ))}
+          <div className={cards.grid}>
+            {projects.map((entry) => (
+              <ProjectCard key={entry.slug} entry={entry} />
+            ))}
+          </div>
         </div>
       </section>
 
