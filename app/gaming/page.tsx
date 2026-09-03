@@ -116,17 +116,26 @@ export default function GamingPage() {
   const videos = getVideos('gaming');
   const completed = finished.filter((g: Game) => !g.perfect);
 
-  // A game cannot be queued and already playing. Wall World sat in both lists
-  // once Steam started reporting it, which read as not knowing what was going
-  // on.
+  // A game cannot be queued and currently playing. Wall World sat in both
+  // lists once Steam started reporting it, which read as not knowing what was
+  // going on.
+  //
+  // Only the fortnight counts, not the whole recent list. That list now
+  // reaches months back through the library, and a game can easily have been
+  // started once and shelved — which is exactly why it would be queued. Using
+  // all of it silently dropped BioShock 2 and Castlevania from the vote.
   const played = new Set(
-    [...steam.recent.map((g) => g.title), ...finished.map((g) => g.title)].map(
-      (t) => t.toLowerCase(),
-    ),
+    [
+      ...steam.recent.filter((g) => g.minutesTwoWeeks > 0).map((g) => g.title),
+      ...finished.map((g) => g.title),
+    ].map((t) => t.toLowerCase()),
   );
   const queue = upNext.filter((g) => !played.has(g.title.toLowerCase()));
 
-  const alsoPlayed = steam.recent.slice(1);
+  // Five behind the current one. Steam's fortnight endpoint only ever
+  // returns six games total, so scripts/steam.mjs extends the list from the
+  // library by last-played date to have this many to show.
+  const alsoPlayed = steam.recent.slice(1, 6);
 
   // Sections with nothing in them yet are gathered into one honest note rather
   // than stacked as three separate apologies.
@@ -191,7 +200,7 @@ export default function GamingPage() {
 
             {alsoPlayed.length > 0 && (
               <div className={styles.also}>
-                <p className={styles.alsoLabel}>Also this fortnight</p>
+                <p className={styles.alsoLabel}>Recent</p>
                 <ul className={styles.alsoList}>
                   {alsoPlayed.map((g) => (
                     <li key={g.appid}>

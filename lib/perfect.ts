@@ -55,12 +55,20 @@ export function getPerfectRuns(): PerfectRuns {
     unlocked: g.unlocked,
     total: g.total,
     platform: 'Steam',
-    // A shared game has no playtime on this account to report, so it says how
-    // it was played instead — which is the more interesting fact anyway.
-    note: g.shared
-      ? 'Family shared'
-      : (manualByAppid.get(g.appid)?.note ??
-        (g.minutesTotal >= 60 ? `${hoursFrom(g.minutesTotal)}h played` : null)),
+    // Every run says the same thing: hours played. A per-game note used to
+    // win here, which meant one card read "Completionist run — every
+    // achievement" while its neighbours gave a number — an inconsistency that
+    // looked like missing data rather than a deliberate remark.
+    //
+    // Shared games are the one exception, and only when Steam has no playtime
+    // to report for them: nothing on this account owns the licence, so the
+    // hours genuinely are not knowable rather than merely absent.
+    note:
+      g.minutesTotal > 0
+        ? `${hoursFrom(g.minutesTotal)}h played`
+        : g.shared
+          ? 'Family shared'
+          : null,
     href: `https://store.steampowered.com/app/${g.appid}/`,
   }));
 

@@ -125,32 +125,67 @@ async function mapLimit(items, limit, fn) {
 try {
   const prior = previous();
 
+  const owned = await api('IPlayerService', 'GetOwnedGames', 1, {
+    include_appinfo: 1,
+    include_played_free_games: 1,
+  });
+  const library = owned?.response?.games ?? [];
+
   // --- what is being played -----------------------------------------------
+  // Two sources, because neither is enough alone.
+  //
+  // GetRecentlyPlayedGames covers the last fortnight and nothing else — it
+  // returns six games in total here, three of which are tools — so it cannot
+  // fill a list of any length. It is still the only source that sees family-
+  // shared games: God of War and DOOM are played on someone else's licence
+  // and appear nowhere in the owned library.
+  //
+  // The library reaches much further back through rtime_last_played, but only
+  // for games this account owns.
+  //
+  // So the fortnight leads, in Steam's own order, and the library extends it.
   const recent = await api('IPlayerService', 'GetRecentlyPlayedGames', 1, {
-    count: 6,
+    count: 20,
   });
   const recentGames = recent?.response?.games ?? [];
 
-  const shaped = recentGames.map((g) => ({
-    appid: g.appid,
-    title: g.name,
-    // Steam returns a hash, not a URL — the icon path is assembled from it.
-    icon: g.img_icon_url || null,
-    // Steam reports playtime in minutes.
-    minutesTwoWeeks: g.playtime_2weeks ?? 0,
-    minutesTotal: g.playtime_forever ?? 0,
-  }));
+  const seen = new Set();
+  const shaped = [];
+
+  for (const g of recentGames) {
+    seen.add(g.appid);
+    shaped.push({
+      appid: g.appid,
+      title: g.name,
+      // Steam returns a hash, not a URL — the icon path is assembled from it.
+      icon: g.img_icon_url || null,
+      // Steam reports playtime in minutes.
+      minutesTwoWeeks: g.playtime_2weeks ?? 0,
+      minutesTotal: g.playtime_forever ?? 0,
+    });
+  }
+
+  for (const g of library
+    .filter((g) => g.rtime_last_played && !seen.has(g.appid))
+    .sort((a, b) => b.rtime_last_played - a.rtime_last_played)) {
+    // Generous, because the page filters tools out of this list afterwards
+    // and would otherwise run short.
+    if (shaped.length >= 16) break;
+    shaped.push({
+      appid: g.appid,
+      title: g.name,
+      icon: g.img_icon_url || null,
+      // Outside the fortnight window by definition.
+      minutesTwoWeeks: 0,
+      minutesTotal: g.playtime_forever ?? 0,
+    });
+  }
 
   // --- which games are 100% ------------------------------------------------
   // One request per game, so results are cached against playtime: a game whose
   // playtime has not moved cannot have gained achievements, and a library of a
   // few hundred titles would otherwise be re-scanned on every single deploy.
   const cache = prior.achievementCache ?? {};
-  const owned = await api('IPlayerService', 'GetOwnedGames', 1, {
-    include_appinfo: 1,
-    include_played_free_games: 1,
-  });
-  const library = owned?.response?.games ?? [];
 
   const needsCheck = library.filter((g) => {
     if ((g.playtime_forever ?? 0) === 0) return false;
@@ -190,7 +225,12 @@ try {
       }
       cache[g.appid] = {
         name: g.title,
-        minutes: 0,
+        // Steam reports no playtime for a game this account does not own, and
+        // no endpoint will give it once the game drops out of the fortnight
+        // window. An `hours` field in data/shared-games.json fills that in by
+        // hand; without one the page says "Family shared" instead of inventing
+        // a number.
+        minutes: Number.isFinite(g.hours) ? Math.round(g.hours * 60) : 0,
         icon: null,
         unlocked: got?.unlocked ?? null,
         total: got?.total ?? null,

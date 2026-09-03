@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T11:36:56.432Z",
+  "fetchedAt": "2026-09-03T12:24:45.522Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -49,6 +49,76 @@
       "icon": "48733cd333eea6e40711a1b9c6dde32ffe363ced",
       "minutesTwoWeeks": 5,
       "minutesTotal": 2222
+    },
+    {
+      "appid": 1545450,
+      "title": "Incredibox",
+      "icon": "e4085226739fcd7a5431fc415d759294778d869a",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 557
+    },
+    {
+      "appid": 570,
+      "title": "Dota 2",
+      "icon": "0bbb630d63262dd66d2fdd0f7d37e8661a410075",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 194049
+    },
+    {
+      "appid": 225260,
+      "title": "Brütal Legend",
+      "icon": "e3f25fba8538e5fb1ead751e767c2774df4fb0b4",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 144
+    },
+    {
+      "appid": 409720,
+      "title": "BioShock 2 Remastered",
+      "icon": "97527a02b36f8ac4aba21005c2d953cc908a08e1",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 262
+    },
+    {
+      "appid": 1222680,
+      "title": "Need for Speed™ Heat ",
+      "icon": "98a96955403db8eeed026bc5ff04e51e3329f1b0",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 7
+    },
+    {
+      "appid": 239250,
+      "title": "Castlevania: Lords of Shadow 2",
+      "icon": "f7dce02872c56b564d70e0440fc7e0b893ce01d6",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 10
+    },
+    {
+      "appid": 534550,
+      "title": "Guacamelee! 2",
+      "icon": "798c2959745e4bdc02df6bc801d082263f22c9cc",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 4
+    },
+    {
+      "appid": 11190,
+      "title": "Sherlock Holmes versus Jack the Ripper",
+      "icon": "a5234d01152ea92953f2a5dbf1bbcf9648f00cab",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 9
+    },
+    {
+      "appid": 1693980,
+      "title": "Dead Space",
+      "icon": "3368d467f4f60f9f07ec4c206a22184fae060be2",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 23
+    },
+    {
+      "appid": 1466860,
+      "title": "Age of Empires IV: Anniversary Edition",
+      "icon": "503acf3ef0503e24af6b5336012a1f585a2f955e",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 36
     }
   ],
   "perfect": [
@@ -69,6 +139,15 @@
       "total": 65,
       "minutesTotal": 4912,
       "shared": false
+    },
+    {
+      "appid": 2062430,
+      "title": "BALL x PIT",
+      "icon": null,
+      "unlocked": 63,
+      "total": 63,
+      "minutesTotal": 0,
+      "shared": true
     },
     {
       "appid": 629820,
@@ -2073,6 +2152,14 @@
       "icon": "8195f07ec9b553b337b7840770f1bd0e86c85677",
       "unlocked": 1,
       "total": 29
+    },
+    "2062430": {
+      "name": "BALL x PIT",
+      "minutes": 0,
+      "icon": null,
+      "unlocked": 63,
+      "total": 63,
+      "shared": true
     },
     "2134770": {
       "name": "SteamWorld Build",
