@@ -43,15 +43,39 @@ export default function SheenLink({
     el.style.removeProperty('--my');
   };
 
+  // next/link is for in-app routes. A mailto: or an off-site URL wants a plain
+  // anchor — routing them through the client router buys nothing and risks it
+  // trying to prefetch something that is not a page.
+  const external = /^(https?:|mailto:|tel:)/.test(href);
+  const className = `${styles.sheen} ${styles[tone]}`;
+  const label = <span className={styles.label}>{children}</span>;
+
+  if (external) {
+    const offsite = href.startsWith('http');
+    return (
+      <a
+        ref={ref}
+        href={href}
+        className={className}
+        target={offsite ? '_blank' : undefined}
+        rel={offsite ? 'noopener noreferrer' : undefined}
+        onPointerMove={onMove}
+        onPointerLeave={onLeave}
+      >
+        {label}
+      </a>
+    );
+  }
+
   return (
     <Link
       ref={ref}
       href={href}
-      className={`${styles.sheen} ${styles[tone]}`}
+      className={className}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
     >
-      <span className={styles.label}>{children}</span>
+      {label}
     </Link>
   );
 }

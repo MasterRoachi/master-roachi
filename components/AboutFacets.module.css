@@ -1,0 +1,111 @@
+.facets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.facet {
+  --mx: 50%;
+  --my: 50%;
+  --facet: var(--accent);
+
+  position: relative;
+  isolation: isolate;
+  background: var(--bg);
+  padding: clamp(26px, 3.5vw, 40px);
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s ease;
+}
+
+.facet:hover {
+  background: oklch(16% 0 0);
+}
+
+/* Light tracking the cursor, in the facet's own colour. */
+.facet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    240px circle at var(--mx) var(--my),
+    color-mix(in oklch, var(--facet) 16%, transparent),
+    transparent 70%
+  );
+}
+
+.facet:hover::before {
+  opacity: 1;
+}
+
+/* A rule along the top edge that fills in with the facet's colour. */
+.facet::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--facet);
+  transition: width 0.35s ease;
+}
+
+.facet:hover::after {
+  width: 100%;
+}
+
+.line {
+  margin: 0 0 14px;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted-2);
+  transition: color 0.2s ease;
+}
+
+.facet:hover .line {
+  color: color-mix(in oklch, var(--facet) 78%, var(--ink));
+}
+
+.title {
+  font-size: clamp(1.4rem, 3vw, 1.85rem);
+  margin: 0 0 14px;
+}
+
+.body {
+  color: var(--muted);
+  margin: 0 0 26px;
+  font-size: 0.94rem;
+  line-height: 1.6;
+}
+
+.go {
+  margin-top: auto;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  transition: color 0.2s ease;
+}
+
+.facet:hover .go {
+  color: color-mix(in oklch, var(--facet) 78%, var(--ink));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .facet,
+  .facet::before,
+  .facet::after,
+  .line,
+  .go {
+    transition: none;
+  }
+}
