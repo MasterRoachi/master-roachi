@@ -21,9 +21,6 @@
      the right edge, so it still reads as having more. */
   padding: 34px 4px 44px;
   scrollbar-width: none;
-  /* Perspective on the track, so the tilt is real depth rather than a skew —
-     every card measured against the same vanishing point. */
-  perspective: 1200px;
 }
 .track::-webkit-scrollbar {
   display: none;
@@ -34,10 +31,19 @@
   scroll-snap-align: center;
   /* Set per card by the scroll handler: -1 at the left edge, +1 at the right. */
   --d: 0;
-  --tilt: 0deg;
-  transform: rotateY(var(--tilt))
-    scale(calc(1 - 0.05 * max(var(--d), -1 * var(--d))));
-  transform-style: preserve-3d;
+
+  /* Perspective belongs here, per card, not on the track.
+
+     One perspective on the track meant a single vanishing point at its centre
+     and every card projected from it, so cards away from the middle came out
+     as skewed trapezoids at visibly different sizes — 414, 416 and 420 wide
+     across three that should be identical. Each card now looks straight down
+     its own axis, and only tilts when the cursor is on it.
+
+     The scroll no longer rotates anything either; it scales, which is depth
+     without distortion. */
+  perspective: 900px;
+  transform: scale(calc(1 - 0.05 * max(var(--d), -1 * var(--d))));
   transition: transform 0.12s linear;
 }
 

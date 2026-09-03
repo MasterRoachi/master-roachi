@@ -21,9 +21,6 @@ import styles from './ProjectDeck.module.css';
 // with a pointer, and a depth effect driven by each card's distance from the
 // centre.
 
-/** How far a card at the edge of the viewport tips, in degrees. */
-const TILT = 7;
-
 export default function ProjectDeck({
   projects,
 }: {
@@ -55,7 +52,6 @@ export default function ProjectDeck({
         Math.min(1, (r.left + r.width / 2 - centre) / (box.width / 2)),
       );
       el.style.setProperty('--d', d.toFixed(3));
-      el.style.setProperty('--tilt', `${(-d * TILT).toFixed(2)}deg`);
     }
 
     setAtStart(track.scrollLeft <= 2);
