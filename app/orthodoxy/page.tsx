@@ -8,7 +8,7 @@ import { getWriting, toSummary } from '@/lib/content';
 import { orthodoxWork, orthodoxReading } from '@/lib/pursuits';
 import { getVideos } from '@/lib/videos';
 import CyclingQuote from '@/components/CyclingQuote';
-import { faithQuotes } from '@/lib/quotes';
+import { quotes } from '@/lib/quotes';
 import styles from './orthodoxy.module.css';
 
 export const metadata: Metadata = {
@@ -60,7 +60,7 @@ export default function OrthodoxyPage() {
             mark={<OrthodoxCross />}
             eyebrow="Foundations"
             title="Study Well"
-            lede={<CyclingQuote quotes={faithQuotes} />}
+            lede={<CyclingQuote quotes={quotes} seed="foundations" />}
           />
         </div>
       </section>

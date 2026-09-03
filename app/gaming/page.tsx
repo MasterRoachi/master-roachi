@@ -19,7 +19,7 @@ import PlayNextVote from '@/components/PlayNextVote';
 import ControllerIcon from '@/components/ControllerIcon';
 import { getVideos } from '@/lib/videos';
 import CyclingQuote from '@/components/CyclingQuote';
-import { lifeQuotes } from '@/lib/quotes';
+import { quotes } from '@/lib/quotes';
 import styles from './gaming.module.css';
 
 export const metadata: Metadata = {
@@ -172,7 +172,7 @@ export default function GamingPage() {
             mark={<ControllerIcon />}
             eyebrow="Fun"
             title="Rest Plenty"
-            lede={<CyclingQuote quotes={lifeQuotes} />}
+            lede={<CyclingQuote quotes={quotes} seed="fun" />}
           />
         </div>
         </section>

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T22:05:26.650Z",
+  "fetchedAt": "2026-09-03T22:27:21.135Z",
   "store": null,
   "products": [
     {
@@ -12,6 +12,13 @@
         "amount": 16,
         "currency": "USD"
       },
+      "print": {
+        "src": "/store/464722916-print.webp",
+        "x": 0.6313932980599647,
+        "y": 0.2879581151832461,
+        "width": 0.2239858906525573
+      },
+      "fabric": "#232323",
       "art": "/store/464722916.webp"
     }
   ]

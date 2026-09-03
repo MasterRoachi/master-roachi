@@ -4,7 +4,7 @@ import ShirtIcon from '@/components/ShirtIcon';
 import ShirtViewerMount from '@/components/ShirtViewerMount';
 import PageHeader from '@/components/PageHeader';
 import CyclingQuote from '@/components/CyclingQuote';
-import { wearQuotes } from '@/lib/quotes';
+import { quotes } from '@/lib/quotes';
 import {
   getStore,
   buyUrl,
@@ -74,7 +74,7 @@ export default function StorePage() {
           mark={<ShirtIcon />}
           eyebrow={site.store.name}
           title="Wear the thing"
-          lede={<CyclingQuote quotes={wearQuotes} />}
+          lede={<CyclingQuote quotes={quotes} seed="store" />}
         />
 
         {lead && (
@@ -92,12 +92,11 @@ export default function StorePage() {
                   decoding="async"
                 />
               ) : null}
-              {lead.art && (
-                <ShirtViewerMount
-                  src={lead.art}
-                  alt={`${lead.name}, which can be turned`}
-                />
-              )}
+              <ShirtViewerMount
+                print={lead.print}
+                fabric={lead.fabric ?? undefined}
+                alt={`${lead.name}, which can be turned`}
+              />
             </div>
 
             <div className={styles.featureBody}>

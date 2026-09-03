@@ -85,7 +85,11 @@ export default function GlyphField() {
       // A wide spread, weighted small: most sit far back and a few come right
       // forward. The exponent is what keeps the large ones rare, rather than
       // giving an even scatter of middling sizes.
-      size: 11 + Math.random() ** 2.8 * 165,
+      //
+      // The ceiling used to be 176px, which put the biggest glyphs at roughly
+      // the size of the page heading — they stopped reading as a backdrop and
+      // started competing with the words in front of them.
+      size: 9 + Math.random() ** 2.8 * 88,
       alpha: 0.05 + Math.random() * 0.13,
       rise: 0.006 + Math.random() * 0.018,
       tilt: (Math.random() - 0.5) * 0.5,

@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import type { PrintPlacement } from './ShirtViewer';
 
 // three.js is a large dependency and only the featured product needs it, so it
 // is kept out of the initial bundle and fetched after the page renders.
@@ -11,6 +12,10 @@ const ShirtViewer = dynamic(() => import('./ShirtViewer'), {
   loading: () => null,
 });
 
-export default function ShirtViewerMount(props: { src: string; alt?: string }) {
+export default function ShirtViewerMount(props: {
+  print?: PrintPlacement | null;
+  fabric?: string;
+  alt?: string;
+}) {
   return <ShirtViewer {...props} />;
 }

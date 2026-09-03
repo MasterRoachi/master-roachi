@@ -17,6 +17,22 @@ export interface StoreProduct {
    * on white, in which case the remote thumbnail still serves.
    */
   art?: string | null;
+  /**
+   * The printed design on its own, lifted off the mockup by the same script,
+   * with where on the garment it sits. This is what the 3D viewer needs: the
+   * shirt it draws is modelled, so the only thing it wants from the photograph
+   * is the artwork.
+   */
+  print?: {
+    src: string;
+    /** Centre, as a fraction across and down the garment silhouette. */
+    x: number;
+    y: number;
+    /** Width, as a fraction of the silhouette width. */
+    width: number;
+  } | null;
+  /** The garment colour, averaged off the mockup. */
+  fabric?: string | null;
   category?: string;
   /** An invented item, shown to judge the layout. Never buyable. */
   placeholder?: boolean;

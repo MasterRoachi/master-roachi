@@ -5,7 +5,7 @@ import ProjectCard from '@/components/ProjectCard';
 import { getProjects, toProjectSummary } from '@/lib/content';
 import CyclingQuote from '@/components/CyclingQuote';
 import LaptopIcon from '@/components/LaptopIcon';
-import { workQuotes } from '@/lib/quotes';
+import { quotes } from '@/lib/quotes';
 import cards from '@/components/Card.module.css';
 import styles from './projects.module.css';
 
@@ -40,7 +40,7 @@ export default function ProjectsPage() {
           mark={<LaptopIcon />}
           eyebrow="Work"
           title="Work Hard"
-          lede={<CyclingQuote quotes={workQuotes} />}
+          lede={<CyclingQuote quotes={quotes} seed="work" />}
         />
 
         {lead && (

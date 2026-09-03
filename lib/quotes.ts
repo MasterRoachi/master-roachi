@@ -1,10 +1,24 @@
-// Quotes for the Work and Fun page headers.
+// One pool of quotes, drawn from by every page.
 //
-// Attributions are the risky part of a file like this — a misquoted line under
-// a real character's name is worse than no quote at all. These are ones widely
-// enough repeated to be safe, kept short, and each one names who said it.
-// Stephan should still read them and swap any that are not his; that is what
-// this file is for.
+// These used to be five lists, one per page, each matched to its subject. That
+// turned out to be the wrong shape: the lists were short enough that a page
+// cycled through the same five lines within a minute, and a quote that fits its
+// page exactly is a smaller pleasure than an unexpected one that lands anyway.
+//
+// So it is a single pool now, and a page takes from it at random. Which means
+// any line here can turn up under any header — worth remembering when adding
+// one.
+//
+// Attributions are the risky part of a file like this: a misquoted line under a
+// real character's name is worse than no quote at all. These are widely enough
+// repeated to be safe, kept short, and each one names who said it. Stephan
+// should still read them and swap any that are not his; that is what this file
+// is for.
+//
+// Everything here is a character in a game, a show, or a film, with one
+// deliberate exception — the saints below, who were real people, and whose
+// titles are load-bearing. Fr Seraphim Rose is not canonised, so he is Father,
+// not Saint. Titling him as one would be a real error, not a typo.
 
 export interface Quote {
   text: string;
@@ -12,12 +26,9 @@ export interface Quote {
   source: string;
 }
 
-/** For the Work page: hard work, practice, and finishing things. */
-export const workQuotes: Quote[] = [
-  {
-    text: 'Go beyond. Plus Ultra!',
-    source: 'All Might, My Hero Academia',
-  },
+export const quotes: Quote[] = [
+  // Work, practice, and finishing things.
+  { text: 'Go beyond. Plus Ultra!', source: 'All Might, My Hero Academia' },
   {
     text: 'A lesson without pain is meaningless.',
     source: 'Edward Elric, Fullmetal Alchemist',
@@ -34,15 +45,8 @@ export const workQuotes: Quote[] = [
     text: 'Hard work is worthless for those that don’t believe in themselves.',
     source: 'Naruto Uzumaki, Naruto',
   },
-];
 
-/**
- * For the store. Clothes, appearances, and being recognised — from the same
- * fictional sources as the other lists, for the same reason: a line invented
- * for a real person and published under Stephan's name is a different order of
- * mistake from misremembering a cartoon.
- */
-export const wearQuotes: Quote[] = [
+  // Clothes, appearances, and being recognised.
   { text: 'No capes!', source: 'Edna Mode, The Incredibles' },
   {
     text: 'It’s not who I am underneath, but what I do that defines me.',
@@ -52,52 +56,26 @@ export const wearQuotes: Quote[] = [
   { text: 'A man’s gotta have a code.', source: 'Omar Little, The Wire' },
   { text: 'Winter is coming.', source: 'Game of Thrones' },
 
-  // The shows the drawings actually come from. Fabled Threads is aimed at the
-  // Saturday-morning end of things, and the lede should sound like it rather
-  // than like prestige television.
+  // The Saturday-morning end of things — the shows the drawings come from.
   {
     text: 'Foolish samurai warrior wielding a magic sword!',
     source: 'Aku, Samurai Jack',
   },
   { text: 'Buttered toast!', source: 'Ed, Ed, Edd n Eddy' },
-  {
-    text: 'The things I do for love.',
-    source: 'Courage the Cowardly Dog',
-  },
-  {
-    text: 'Dee Dee! Get out of my laboratory!',
-    source: 'Dexter’s Laboratory',
-  },
+  { text: 'The things I do for love.', source: 'Courage the Cowardly Dog' },
+  { text: 'Dee Dee! Get out of my laboratory!', source: 'Dexter’s Laboratory' },
   { text: 'What’s the sitch?', source: 'Kim Possible' },
   { text: 'Azarath Metrion Zinthos.', source: 'Raven, Teen Titans' },
-  {
-    text: 'I’m gonna sing the Doom Song now!',
-    source: 'GIR, Invader Zim',
-  },
+  { text: 'I’m gonna sing the Doom Song now!', source: 'GIR, Invader Zim' },
   {
     text: 'Sharing tea with a fascinating stranger is one of life’s true delights.',
     source: 'Uncle Iroh, Avatar: The Last Airbender',
   },
   { text: 'The city of Townsville!', source: 'The Powerpuff Girls' },
-];
 
-/**
- * For Thoughts.
- *
- * Games and shows rather than the commentators Stephan first suggested. Those
- * are living people, and a line invented for one of them and published under
- * his name is a different order of mistake from misremembering a cartoon.
- * These are all widely quoted and easy to check.
- */
-export const ramblingQuotes: Quote[] = [
-  {
-    text: 'Stay awhile and listen.',
-    source: 'Deckard Cain, Diablo',
-  },
-  {
-    text: 'A man chooses. A slave obeys.',
-    source: 'Andrew Ryan, BioShock',
-  },
+  // Games, mostly the ones that get replayed.
+  { text: 'Stay awhile and listen.', source: 'Deckard Cain, Diablo' },
+  { text: 'A man chooses. A slave obeys.', source: 'Andrew Ryan, BioShock' },
   { text: 'War. War never changes.', source: 'Fallout' },
   {
     text: 'It’s dangerous to go alone! Take this.',
@@ -105,17 +83,28 @@ export const ramblingQuotes: Quote[] = [
   },
   { text: 'The truth is out there.', source: 'The X-Files' },
   { text: 'Praise the sun!', source: 'Solaire of Astora, Dark Souls' },
-];
 
-/**
- * For Foundations.
- *
- * Attribution matters more here than on the other two lists, and in a way that
- * is easy to get wrong: Seraphim Rose is not canonised, so he is Father, not
- * Saint. Titling him as one on an Orthodox page would be a real error, not a
- * typo — the kind a reader of this page would notice immediately.
- */
-export const faithQuotes: Quote[] = [
+  // Rest, play, and the point of any of it.
+  {
+    text: 'Life happens wherever you are, whether you make it or not.',
+    source: 'Uncle Iroh, Avatar: The Last Airbender',
+  },
+  {
+    text: 'Yesterday is history, tomorrow is a mystery, but today is a gift.',
+    source: 'Master Oogway, Kung Fu Panda',
+  },
+  {
+    text: 'It is important to draw wisdom from many different places.',
+    source: 'Uncle Iroh, Avatar: The Last Airbender',
+  },
+  { text: 'I want to live!', source: 'Nico Robin, One Piece' },
+  {
+    text: 'It’s not the face that makes someone a monster; it’s the choices they make with their life.',
+    source: 'Naruto Uzumaki, Naruto',
+  },
+
+  // The saints. Real people, unlike everything above — see the note at the top
+  // about their titles.
   {
     text: 'Acquire the Spirit of Peace, and a thousand souls around you will be saved.',
     source: 'St Seraphim of Sarov',
@@ -135,29 +124,5 @@ export const faithQuotes: Quote[] = [
   {
     text: 'This life has been given to you for repentance. Do not waste it on other things.',
     source: 'St Isaac the Syrian',
-  },
-];
-
-/** For the Fun page: rest, play, and the point of any of it. */
-export const lifeQuotes: Quote[] = [
-  {
-    text: 'Life happens wherever you are, whether you make it or not.',
-    source: 'Uncle Iroh, Avatar: The Last Airbender',
-  },
-  {
-    text: 'Yesterday is history, tomorrow is a mystery, but today is a gift.',
-    source: 'Master Oogway, Kung Fu Panda',
-  },
-  {
-    text: 'It is important to draw wisdom from many different places.',
-    source: 'Uncle Iroh, Avatar: The Last Airbender',
-  },
-  {
-    text: 'I want to live!',
-    source: 'Nico Robin, One Piece',
-  },
-  {
-    text: 'It’s not the face that makes someone a monster; it’s the choices they make with their life.',
-    source: 'Naruto Uzumaki, Naruto',
   },
 ];

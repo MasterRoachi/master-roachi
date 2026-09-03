@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import GlyphField from '@/components/GlyphField';
 import CyclingQuote from '@/components/CyclingQuote';
-import { ramblingQuotes } from '@/lib/quotes';
+import { quotes } from '@/lib/quotes';
 import QuillIcon from '@/components/QuillIcon';
 import PageHeader from '@/components/PageHeader';
 import PostCard from '@/components/PostCard';
@@ -50,7 +50,7 @@ export default function WritingPage() {
           mark={<QuillIcon />}
           eyebrow="Thoughts"
           title="I&rsquo;m a ramblin&rsquo; man"
-          lede={<CyclingQuote quotes={ramblingQuotes} />}
+          lede={<CyclingQuote quotes={quotes} seed="thoughts" />}
         />
 
         {!lead && (
