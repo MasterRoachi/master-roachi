@@ -97,7 +97,7 @@ export const upNext: Game[] = [
 export const tierList: Game[] = [
   { title: 'BioShock Remastered', appid: 409710, tier: 'Z' },
   { title: 'God of War', appid: 1593500, tier: 'S' },
-  { title: 'Machinarium', appid: 40700, tier: 'S' },
+  { title: 'Machinarium', appid: 40700, tier: 'A' },
   { title: 'Ratchet: Deadlocked', tier: 'Z' },
   { title: 'Darksiders Warmastered Edition', appid: 462780, tier: 'S' },
   { title: 'Maneater', appid: 629820, tier: 'B' },

@@ -134,6 +134,17 @@ export default function GamingPage() {
   );
   const queue = upNext.filter((g) => !played.has(g.title.toLowerCase()));
 
+  // Cover art for the tier list. A tier entry carries a Steam appid when it
+  // has one, but a console game has no such thing — Ratchet and Mario's
+  // Picross were the only two chips with no picture, because Steam art was
+  // the only kind the row knew how to draw. RetroAchievements already supplies
+  // a badge for both, matched here on title.
+  const retroArt = new Map(
+    retro.perfect
+      .filter((g) => g.icon)
+      .map((g) => [g.title.toLowerCase(), g.icon as string]),
+  );
+
   // Five behind the current one. Steam's fortnight endpoint only ever
   // returns six games total, so scripts/steam.mjs extends the list from the
   // library by last-played date to have this many to show.
@@ -373,7 +384,7 @@ export default function GamingPage() {
                     <div className={styles.tierGames}>
                       {games.map((g) => (
                         <span key={g.title} className={styles.tierGame}>
-                          {g.appid && (
+                          {g.appid ? (
                             <img
                               className={styles.tierArt}
                               src={steamHeader(g.appid)}
@@ -383,7 +394,20 @@ export default function GamingPage() {
                               loading="lazy"
                               decoding="async"
                             />
-                          )}
+                          ) : retroArt.has(g.title.toLowerCase()) ? (
+                            // Square, because a RetroAchievements badge is
+                            // 96x96 and forcing it into Steam's 460x215 slot
+                            // would squash it.
+                            <img
+                              className={styles.tierIcon}
+                              src={retroArt.get(g.title.toLowerCase())}
+                              alt=""
+                              width={96}
+                              height={96}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : null}
                           <span>{g.title}</span>
                         </span>
                       ))}
