@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Starfield from '@/components/Starfield';
+import ArcadeField from '@/components/ArcadeField';
 import PostCard from '@/components/PostCard';
 import { getWriting, toSummary } from '@/lib/content';
 import {
@@ -158,9 +158,7 @@ export default function GamingPage() {
       }
     >
       <section className={styles.top}>
-        <Starfield
-          tint={`radial-gradient(120% 90% at 74% 26%, color-mix(in oklch, ${ACCENT} 16%, transparent), transparent 66%), radial-gradient(90% 70% at 16% 90%, color-mix(in oklch, ${ACCENT_2} 12%, transparent), transparent 62%)`}
-        />
+        <ArcadeField />
         <div className={`shell ${styles.topInner}`}>
           {/* The mark this side of the site carries, sized to match the stack
               icons on a project page. It replaces the streaming schedule,

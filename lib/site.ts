@@ -68,11 +68,18 @@ export const site = {
 // Nav labels are deliberately not the route names. The routes stay as they
 // are — changing them would break every published link — while the labels say
 // what each section is for.
+/**
+ * The nav, each link carrying the colour its own section uses.
+ *
+ * Not decoration: Fun, Store and Work already answer in these colours on their
+ * own pages and cards, so hovering the nav previews where you are about to go.
+ * Thoughts and About had no colour of their own before this and take one here.
+ */
 export const navLinks = [
-  { href: '/projects/', label: 'Work' },
-  { href: '/gaming/', label: 'Fun' },
-  { href: '/orthodoxy/', label: 'Foundations' },
-  { href: '/store/', label: 'Store' },
-  { href: '/writing/', label: 'Thoughts' },
-  { href: '/about/', label: 'About' },
+  { href: '/projects/', label: 'Work', accent: 'oklch(97% 0 0)' },
+  { href: '/gaming/', label: 'Fun', accent: 'oklch(86% 0.20 135)' },
+  { href: '/orthodoxy/', label: 'Foundations', accent: 'oklch(84% 0.16 92)' },
+  { href: '/store/', label: 'Store', accent: 'oklch(72% 0.26 350)' },
+  { href: '/writing/', label: 'Thoughts', accent: 'oklch(74% 0.15 250)' },
+  { href: '/about/', label: 'About', accent: 'oklch(76% 0.17 55)' },
 ];

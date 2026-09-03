@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import ControllerIcon from './ControllerIcon';
+import OrthodoxCross from './OrthodoxCross';
 import { useEffect, useRef, useState } from 'react';
 import styles from './PursuitCarousel.module.css';
 
@@ -25,10 +26,11 @@ interface Pursuit {
   /** Fallback wash, and what shows behind the video while it buffers. */
   tint: string;
   /**
-   * The mark for this side of the site, beside the title. Optional: Fun has
-   * one, Orthodoxy does not yet, and an invented cross is worse than none.
+   * The mark for this side of the site, above the eyebrow.
    */
   icon?: ReactNode;
+  /** Gold for the cross, lime for the controller. */
+  iconColour?: string;
 }
 
 const PURSUITS: Pursuit[] = [
@@ -39,6 +41,8 @@ const PURSUITS: Pursuit[] = [
     href: '/orthodoxy/',
     cta: 'Go to Foundations',
     video: '/video/orthodoxy.mp4',
+    icon: <OrthodoxCross size="sm" />,
+    iconColour: 'oklch(84% 0.16 92)',
     tint: 'radial-gradient(120% 100% at 70% 30%, oklch(30% 0.07 70 / 0.55), oklch(12% 0.02 60 / 0.9) 70%)',
   },
   {
@@ -49,6 +53,7 @@ const PURSUITS: Pursuit[] = [
     cta: 'Go to Fun',
     video: '/video/gaming.mp4',
     icon: <ControllerIcon size="sm" />,
+    iconColour: 'oklch(86% 0.20 135)',
     tint: 'radial-gradient(120% 100% at 30% 70%, oklch(30% 0.08 285 / 0.55), oklch(12% 0.02 280 / 0.9) 70%)',
   },
 ];
@@ -137,13 +142,16 @@ export default function PursuitCarousel() {
       ))}
 
       <div className={styles.content}>
+        {current.icon && (
+          <span
+            className={styles.mark}
+            style={{ color: current.iconColour }}
+          >
+            {current.icon}
+          </span>
+        )}
         <p className="eyebrow">{current.eyebrow}</p>
-        <h2 className={styles.title}>
-          {current.icon && (
-            <span className={styles.titleIcon}>{current.icon}</span>
-          )}
-          {current.title}
-        </h2>
+        <h2 className={styles.title}>{current.title}</h2>
         <p className={styles.body}>{current.body}</p>
         <Link href={current.href} className={styles.cta}>
           {current.cta} →

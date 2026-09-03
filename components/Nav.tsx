@@ -81,6 +81,8 @@ export default function Nav() {
               key={link.href}
               href={link.href}
               className={styles.link}
+              // The section colour, read by the sheen gradient in the CSS.
+              style={{ '--sheen': link.accent } as React.CSSProperties}
               data-active={isActive(link.href)}
               aria-current={isActive(link.href) ? 'page' : undefined}
               onPointerMove={onLinkMove}

@@ -1,0 +1,65 @@
+.host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  /* A playfield rather than a nebula: a faint lime grid, the way a level
+     editor or a vector cabinet draws one, over a wash that lifts toward the
+     centre and falls away at the edges like a curved screen. */
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      color-mix(in oklch, oklch(86% 0.2 135) 7%, transparent) 0 1px,
+      transparent 1px 44px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      color-mix(in oklch, oklch(86% 0.2 135) 7%, transparent) 0 1px,
+      transparent 1px 44px
+    ),
+    radial-gradient(
+      120% 85% at 70% 35%,
+      oklch(26% 0.06 140 / 0.55) 0%,
+      oklch(16% 0.03 150 / 0.45) 42%,
+      transparent 74%
+    ),
+    radial-gradient(
+      110% 80% at 18% 88%,
+      oklch(20% 0.05 155 / 0.4) 0%,
+      transparent 68%
+    );
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* CRT scanlines. Kept very faint — at full strength they turn the copy over
+   the top into something you squint at, which is a worse trade than the
+   effect is worth. */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    oklch(0% 0 0 / 0.22) 0 1px,
+    transparent 1px 3px
+  );
+  /* A vignette, so the field reads as curved glass rather than a flat print. */
+  mask-image: radial-gradient(
+    130% 100% at 50% 45%,
+    oklch(0% 0 0) 55%,
+    oklch(0% 0 0 / 0.45) 100%
+  );
+}
+
+/* The lines are a texture, not information — at this size they can shimmer on
+   a low-resolution display, and there is nothing lost by dropping them. */
+@media (max-width: 560px) {
+  .scanlines {
+    display: none;
+  }
+}

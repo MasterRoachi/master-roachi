@@ -152,15 +152,9 @@
   }
 }
 
-/* The panel's mark, sitting on the title's baseline rather than above it, so
-   the heading stays one line of reading. */
-.title {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.titleIcon {
-  display: flex;
-  color: oklch(86% 0.2 135);
+/* The panel's mark, above the eyebrow. Colour is set per panel inline, since
+   it belongs to that side of the site rather than to the carousel. */
+.mark {
+  display: block;
+  margin-bottom: 14px;
 }
