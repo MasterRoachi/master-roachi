@@ -15,12 +15,21 @@ export interface StoreProduct {
   from: { amount: number; currency: string } | null;
 }
 
+export interface StoreInfo {
+  /** Printful store type: manual, etsy, shopify, woocommerce and so on. */
+  type: string | null;
+  name: string | null;
+  /** The connected shop front, when the platform reports one. */
+  website: string | null;
+}
+
 export interface StoreSnapshot {
   fetchedAt: string | null;
+  store?: StoreInfo | null;
   products: StoreProduct[];
 }
 
-const EMPTY: StoreSnapshot = { fetchedAt: null, products: [] };
+const EMPTY: StoreSnapshot = { fetchedAt: null, store: null, products: [] };
 
 export function getStore(): StoreSnapshot {
   try {

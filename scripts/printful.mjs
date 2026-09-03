@@ -60,6 +60,22 @@ function fromPrice(variants) {
 }
 
 try {
+  // What kind of store this is decides where checkout can live: a store
+  // connected to Etsy or Shopify already has a checkout, a manual one does
+  // not. Reported rather than assumed, and never fatal.
+  let store = null;
+  try {
+    const info = await api('/store');
+    const r = info?.result ?? {};
+    store = { type: r.type ?? null, name: r.name ?? null, website: r.website ?? null };
+    console.log(
+      `printful: store "${store.name ?? '?'}" type=${store.type ?? '?'}` +
+        (store.website ? ` website=${store.website}` : ''),
+    );
+  } catch (err) {
+    console.log(`printful: could not read store info (${err.message})`);
+  }
+
   const list = await api('/store/products');
   const products = (list?.result ?? []).filter((p) => !p.is_ignored);
 
@@ -87,6 +103,7 @@ try {
     // Recorded so the page can say how fresh this is rather than implying the
     // catalogue is live.
     fetchedAt: new Date().toISOString(),
+    store,
     products: shaped,
   };
 

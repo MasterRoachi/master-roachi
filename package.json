@@ -10,9 +10,9 @@
     "preview": "npx serve@latest out",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "prebuild": "node scripts/steam.mjs && node scripts/printful.mjs",
-    "steam": "node scripts/steam.mjs",
-    "store": "node scripts/printful.mjs"
+    "prebuild": "node --env-file-if-exists=.env.local scripts/steam.mjs && node --env-file-if-exists=.env.local scripts/printful.mjs",
+    "steam": "node --env-file-if-exists=.env.local scripts/steam.mjs",
+    "store": "node --env-file-if-exists=.env.local scripts/printful.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
