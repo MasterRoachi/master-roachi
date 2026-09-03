@@ -2,6 +2,7 @@ import Link from 'next/link';
 import HeroBookMount from '@/components/HeroBookMount';
 import SheenLink from '@/components/SheenLink';
 import Starfield from '@/components/Starfield';
+import PursuitCarousel from '@/components/PursuitCarousel';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import {
@@ -69,9 +70,9 @@ export default function HomePage() {
               I&rsquo;m Orthodox. This is the public record of my stuff.
             </p>
             <div className={styles.heroActions}>
-              <SheenLink href="/projects/">See the work</SheenLink>
+              <SheenLink href="/projects/">Work</SheenLink>
               <SheenLink href="/about/" tone="white">
-                About me
+                About
               </SheenLink>
             </div>
           </div>
@@ -149,29 +150,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <hr className="rule" />
-
       <section className="shell section">
-        <div className={styles.pursuits}>
-          <Link href="/gaming/" className={styles.pursuit}>
-            <p className="eyebrow">Rest Plenty</p>
-            <h2 className={styles.pursuitTitle}>Gaming</h2>
-            <p className={styles.pursuitBody}>
-              Completionist runs, achievement hunting, and analysis of the games
-              that reward it.
-            </p>
-            <span className={styles.pursuitLink}>Go to Gaming →</span>
-          </Link>
-          <Link href="/orthodoxy/" className={styles.pursuit}>
-            <p className="eyebrow">Study Well</p>
-            <h2 className={styles.pursuitTitle}>Orthodoxy</h2>
-            <p className={styles.pursuitBody}>
-              Long-form video and written argument, for anyone willing to ask
-              whether it is true.
-            </p>
-            <span className={styles.pursuitLink}>Go to Orthodoxy →</span>
-          </Link>
-        </div>
+        <PursuitCarousel />
       </section>
 
       {posts.length > 0 && (

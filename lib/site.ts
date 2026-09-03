@@ -27,10 +27,13 @@ export const site = {
   },
 } as const;
 
+// Nav labels are deliberately not the route names. The routes stay as they
+// are — changing them would break every published link — while the labels say
+// what each section is for.
 export const navLinks = [
-  { href: '/projects/', label: 'Projects' },
-  { href: '/gaming/', label: 'Gaming' },
-  { href: '/orthodoxy/', label: 'Orthodoxy' },
-  { href: '/writing/', label: 'Writing' },
+  { href: '/projects/', label: 'Work' },
+  { href: '/gaming/', label: 'Fun' },
+  { href: '/orthodoxy/', label: 'Foundations' },
+  { href: '/writing/', label: 'Thoughts' },
   { href: '/about/', label: 'About' },
 ];

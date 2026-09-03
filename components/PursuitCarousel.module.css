@@ -1,0 +1,153 @@
+.carousel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  min-height: clamp(360px, 46vw, 520px);
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Panels stack; only the active one is shown. Cross-fading rather than sliding
+   keeps the copy readable throughout the change. */
+.panel {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  z-index: 0;
+}
+
+.panel[data-active='true'] {
+  opacity: 1;
+}
+
+.tint,
+.video,
+.overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Black overlay, heaviest where the words sit. The footage is atmosphere. */
+.overlay {
+  background:
+    linear-gradient(
+      to top,
+      oklch(8% 0 0 / 0.92) 0%,
+      oklch(8% 0 0 / 0.72) 42%,
+      oklch(8% 0 0 / 0.5) 100%
+    );
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: clamp(28px, 5vw, 56px);
+  max-width: 46ch;
+}
+
+.title {
+  font-size: clamp(2rem, 5.5vw, 3.25rem);
+  margin: 0 0 16px;
+}
+
+.body {
+  color: oklch(82% 0 0);
+  margin: 0 0 28px;
+}
+
+.cta {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: oklch(85% 0.13 87);
+  transition: color 0.18s ease;
+}
+
+.cta:hover {
+  color: oklch(95% 0.1 92);
+}
+
+/* Advance control, sitting on the right edge. */
+.next {
+  position: absolute;
+  z-index: 2;
+  right: clamp(20px, 3vw, 36px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  background: oklch(10% 0 0 / 0.5);
+  border: 1px solid oklch(70% 0 0 / 0.35);
+  border-radius: 50%;
+  color: var(--ink);
+  font-size: 1.15rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.next:hover {
+  border-color: var(--accent);
+  background: oklch(14% 0.02 85 / 0.62);
+  transform: translateY(-50%) scale(1.06);
+}
+
+.dots {
+  position: absolute;
+  z-index: 2;
+  right: clamp(20px, 3vw, 36px);
+  bottom: clamp(20px, 3vw, 30px);
+  display: flex;
+  gap: 7px;
+}
+
+.dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: oklch(70% 0 0 / 0.3);
+  transition: background 0.3s ease;
+}
+
+.dots span[data-active='true'] {
+  background: var(--accent);
+}
+
+@media (max-width: 700px) {
+  .next {
+    width: 46px;
+    height: 46px;
+    top: auto;
+    bottom: clamp(20px, 3vw, 30px);
+    transform: none;
+  }
+  .next:hover {
+    transform: scale(1.06);
+  }
+  .dots {
+    left: clamp(28px, 5vw, 56px);
+    right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .next,
+  .dots span {
+    transition: none;
+  }
+}

@@ -2,9 +2,15 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom: 1px solid var(--line);
-  background: oklch(12% 0 0 / 0.86);
-  backdrop-filter: blur(12px);
+  /* Transparent, no rule: the page runs under the nav rather than being cut
+     off by it. A short scrim keeps the links legible over whatever scrolls
+     beneath without reading as a bar. */
+  background: linear-gradient(
+    to bottom,
+    oklch(12% 0 0 / 0.72) 0%,
+    oklch(12% 0 0 / 0.32) 55%,
+    transparent 100%
+  );
 }
 
 .inner {
@@ -39,19 +45,39 @@
 }
 
 .link {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
   font-size: 0.82rem;
   font-weight: 500;
   color: var(--muted);
   white-space: nowrap;
-  transition: color 0.15s ease;
+  padding: 6px 2px;
+  transition: color 0.18s ease;
 }
 
-.link:hover {
-  color: var(--ink);
-}
-
+.link:hover,
 .link[data-active='true'] {
-  color: var(--ink);
+  color: oklch(88% 0.13 87);
+}
+
+/* Tracked bloom, matching the hero buttons. */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: -6px -10px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    60px circle at var(--mx) var(--my),
+    oklch(85% 0.15 88 / 0.18),
+    transparent 70%
+  );
+}
+
+.link:hover::after {
+  opacity: 1;
 }
 
 .toggle {

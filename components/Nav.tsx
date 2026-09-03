@@ -30,6 +30,21 @@ export default function Nav() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  // The same tracked light the hero buttons use, so the nav answers the cursor
+  // the way the rest of the page does. Written to CSS custom properties rather
+  // than state — pointermove fires continuously.
+  const onLinkMove = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    el.style.setProperty('--my', `${e.clientY - r.top}px`);
+  };
+
+  const onLinkLeave = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.removeProperty('--mx');
+    e.currentTarget.style.removeProperty('--my');
+  };
+
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
 
@@ -68,6 +83,8 @@ export default function Nav() {
               className={styles.link}
               data-active={isActive(link.href)}
               aria-current={isActive(link.href) ? 'page' : undefined}
+              onPointerMove={onLinkMove}
+              onPointerLeave={onLinkLeave}
             >
               {link.label}
             </Link>
