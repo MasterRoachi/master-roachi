@@ -25,13 +25,6 @@ export type TierRank = 'Z' | 'S' | 'A' | 'B' | 'C';
  * are not really competing with the rest.
  */
 export const TIERS: TierRank[] = ['Z', 'S', 'A', 'B', 'C'];
-
-export const streamSchedule = {
-  // TODO confirm — carried over from the previous site.
-  summary: 'Daily, 20:00 – 00:00',
-  active: true,
-};
-
 /**
  * What is currently being read. Nothing derives this, so it is set by hand.
  * Set to null and the row disappears rather than showing something stale.

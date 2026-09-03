@@ -7,7 +7,6 @@ import {
   finished,
   tierList,
   TIERS,
-  streamSchedule,
   type Game,
   type TierRank,
 } from '@/lib/pursuits';
@@ -16,6 +15,7 @@ import { getPerfectRuns, type PerfectRun } from '@/lib/perfect';
 import { getRetro } from '@/lib/retro';
 import { candidateId } from '@/lib/poll';
 import PlayNextVote from '@/components/PlayNextVote';
+import ControllerIcon from '@/components/ControllerIcon';
 import { getVideos } from '@/lib/videos';
 import styles from './gaming.module.css';
 
@@ -162,19 +162,18 @@ export default function GamingPage() {
           tint={`radial-gradient(120% 90% at 74% 26%, color-mix(in oklch, ${ACCENT} 16%, transparent), transparent 66%), radial-gradient(90% 70% at 16% 90%, color-mix(in oklch, ${ACCENT_2} 12%, transparent), transparent 62%)`}
         />
         <div className={`shell ${styles.topInner}`}>
+          {/* The mark this side of the site carries, sized to match the stack
+              icons on a project page. It replaces the streaming schedule,
+              which was a hand-set string nothing kept true. */}
+          <span className={styles.mark}>
+            <ControllerIcon />
+          </span>
           <p className="eyebrow">Rest Plenty</p>
           <h1 className={styles.title}>Fun</h1>
           <p className={styles.lede}>
             Completionist runs, achievement hunting, and analysis of the games
             that reward it. One game at a time, finished honestly.
           </p>
-
-          {streamSchedule.active && (
-            <p className={styles.stream}>
-              <span className={styles.dot} aria-hidden="true" />
-              Streaming {streamSchedule.summary}
-            </p>
-          )}
         </div>
       </section>
 
@@ -293,50 +292,6 @@ export default function GamingPage() {
           </section>
         )}
 
-        {queue.length > 0 && (
-          <section className={styles.section}>
-            <PlayNextVote
-              candidates={queue.map((game) => ({
-                id: candidateId(game.title),
-                title: game.title,
-              }))}
-            />
-          </section>
-        )}
-
-        {videos.length > 0 && (
-          <section className={styles.section}>
-            <p className="eyebrow">Watch</p>
-            <h2 className="section-title">Videos</h2>
-            <ul className={styles.videos}>
-              {videos.map((video) => (
-                <li key={video.id}>
-                  <a href={video.url} target="_blank" rel="noopener noreferrer">
-                    <img
-                      className={styles.videoThumb}
-                      src={video.thumbnail}
-                      alt=""
-                      width={480}
-                      height={360}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span className={styles.videoTitle}>{video.title}</span>
-                    {video.published && (
-                      <span className={styles.videoDate}>
-                        {new Date(video.published).toLocaleDateString('en-ZA', {
-                          year: 'numeric',
-                          month: 'long',
-                        })}
-                      </span>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
         {completed.length > 0 && (
           <section className={styles.section}>
             <p className="eyebrow">Finished</p>
@@ -410,6 +365,17 @@ export default function GamingPage() {
           </section>
         )}
 
+        {queue.length > 0 && (
+          <section className={styles.section}>
+            <PlayNextVote
+              candidates={queue.map((game) => ({
+                id: candidateId(game.title),
+                title: game.title,
+              }))}
+            />
+          </section>
+        )}
+
         {posts.length > 0 && (
           <section className={styles.section}>
             <p className="eyebrow">Reviews &amp; analysis</p>
@@ -418,6 +384,39 @@ export default function GamingPage() {
                 <PostCard key={post.slug} entry={post} showTrack={false} />
               ))}
             </div>
+          </section>
+        )}
+
+        {videos.length > 0 && (
+          <section className={styles.section}>
+            <p className="eyebrow">Watch</p>
+            <h2 className="section-title">Videos</h2>
+            <ul className={styles.videos}>
+              {videos.map((video) => (
+                <li key={video.id}>
+                  <a href={video.url} target="_blank" rel="noopener noreferrer">
+                    <img
+                      className={styles.videoThumb}
+                      src={video.thumbnail}
+                      alt=""
+                      width={480}
+                      height={360}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span className={styles.videoTitle}>{video.title}</span>
+                    {video.published && (
+                      <span className={styles.videoDate}>
+                        {new Date(video.published).toLocaleDateString('en-ZA', {
+                          year: 'numeric',
+                          month: 'long',
+                        })}
+                      </span>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 

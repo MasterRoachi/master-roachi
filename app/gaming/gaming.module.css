@@ -31,23 +31,12 @@
   line-height: 1.5;
 }
 
-.stream {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin: 30px 0 0;
-  font-size: 0.85rem;
-  color: var(--muted);
-  border: 1px solid var(--line-bright);
-  padding: 9px 16px;
-  background: oklch(12% 0 0 / 0.5);
-}
-
-.dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent-a);
+/* The controller mark above the title. Tinted with the page accent so the
+   hero has a point of colour where the streaming chip used to sit. */
+.mark {
+  display: block;
+  margin-bottom: 18px;
+  color: var(--accent-a);
 }
 
 .section {

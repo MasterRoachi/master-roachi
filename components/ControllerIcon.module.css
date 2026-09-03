@@ -1,0 +1,12 @@
+/* Matched to StackIcons: 22px on a card, 26px where it is a statement. */
+.icon {
+  display: block;
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+
+.icon[data-size='sm'] {
+  width: 22px;
+  height: 22px;
+}

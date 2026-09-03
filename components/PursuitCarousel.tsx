@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import type { ReactNode } from 'react';
+import ControllerIcon from './ControllerIcon';
 import { useEffect, useRef, useState } from 'react';
 import styles from './PursuitCarousel.module.css';
 
@@ -22,6 +24,11 @@ interface Pursuit {
   video: string;
   /** Fallback wash, and what shows behind the video while it buffers. */
   tint: string;
+  /**
+   * The mark for this side of the site, beside the title. Optional: Fun has
+   * one, Orthodoxy does not yet, and an invented cross is worse than none.
+   */
+  icon?: ReactNode;
 }
 
 const PURSUITS: Pursuit[] = [
@@ -41,6 +48,7 @@ const PURSUITS: Pursuit[] = [
     href: '/gaming/',
     cta: 'Go to Fun',
     video: '/video/gaming.mp4',
+    icon: <ControllerIcon size="sm" />,
     tint: 'radial-gradient(120% 100% at 30% 70%, oklch(30% 0.08 285 / 0.55), oklch(12% 0.02 280 / 0.9) 70%)',
   },
 ];
@@ -130,7 +138,12 @@ export default function PursuitCarousel() {
 
       <div className={styles.content}>
         <p className="eyebrow">{current.eyebrow}</p>
-        <h2 className={styles.title}>{current.title}</h2>
+        <h2 className={styles.title}>
+          {current.icon && (
+            <span className={styles.titleIcon}>{current.icon}</span>
+          )}
+          {current.title}
+        </h2>
         <p className={styles.body}>{current.body}</p>
         <Link href={current.href} className={styles.cta}>
           {current.cta} →
