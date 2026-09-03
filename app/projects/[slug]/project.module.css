@@ -196,3 +196,11 @@
     text-align: left;
   }
 }
+
+.pieces {
+  padding-bottom: clamp(44px, 7vw, 80px);
+}
+
+.piecesHead {
+  margin-bottom: clamp(24px, 3.5vw, 36px);
+}

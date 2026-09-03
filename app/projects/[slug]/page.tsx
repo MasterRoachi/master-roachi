@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Mdx from '@/components/Mdx';
 import PostCard from '@/components/PostCard';
 import Starfield from '@/components/Starfield';
+import ProjectPieces from '@/components/ProjectPieces';
 import {
   getAnyEntry,
   getAllSlugs,
@@ -133,6 +134,16 @@ export default async function ProjectPage({
       <article className={`shell ${styles.body}`}>
         <Mdx source={entry.body} />
       </article>
+
+      {fm.pieces && fm.pieces.length > 0 && (
+        <section className={`shell ${styles.pieces}`}>
+          <div className={styles.piecesHead}>
+            <p className="eyebrow">In the collection</p>
+            <h2 className="section-title">All {fm.pieces.length}, live</h2>
+          </div>
+          <ProjectPieces pieces={fm.pieces} />
+        </section>
+      )}
 
       {related.length > 0 && (
         <section className={`shell ${styles.related}`}>

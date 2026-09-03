@@ -1,32 +1,77 @@
 ---
 title: The Odin Project
-summary: Eight exercises, HTML/CSS fundamentals through DOM manipulation — admin dashboards, drawing grids, and a themed Rock-Paper-Scissors game.
+summary: Eight exercises worked through the Foundations track — from static layout to apps that build their own DOM. All of them live.
 date: 2025-08-01
 status: released
-link: https://github.com/MasterRoachi/odin-projects
-stack: ["HTML", "CSS", "JavaScript"]
 kind: Exercises
 weight: 40
 accent: "oklch(84% 0.16 92)"
 accent2: "oklch(70% 0.14 80)"
+link: https://masterroachi.github.io/odin-projects/
+repo: https://github.com/MasterRoachi/odin-projects
+stack: ["HTML", "CSS", "JavaScript"]
+pieces:
+  - title: Admin Dashboard
+    summary: A static dashboard interface, built to practise complex CSS Grid layouts.
+    demo: https://masterroachi.github.io/odin-projects/admin-dashboard/
+    tags: ["CSS Grid"]
+  - title: Questicles Landing Page
+    summary: A gaming-themed landing page, built on Flexbox.
+    demo: https://masterroachi.github.io/odin-projects/landing-page/
+    tags: ["Flexbox"]
+  - title: Quartz, Parchment, Shears
+    summary: Rock Paper Scissors, rethemed. Score state and result rendering driven from JavaScript.
+    demo: https://masterroachi.github.io/odin-projects/Quartz-Parchment-Shears/
+    tags: ["DOM"]
+  - title: Etch-A-Sketch
+    summary: A drawing grid generated and regenerated at runtime, with custom sizing and drawing modes.
+    demo: https://masterroachi.github.io/odin-projects/etch-a-sketch/
+    tags: ["DOM"]
+  - title: Coolculator
+    summary: A calculator with keyboard control and chained operations — the first one where the edge cases outnumbered the happy path.
+    demo: https://masterroachi.github.io/odin-projects/calculator/
+    tags: ["Logic"]
+  - title: Tic-Tac-Toe
+    summary: Board state kept out of the DOM and rendered from it, rather than read back out of the page.
+    demo: https://masterroachi.github.io/odin-projects/tic-tac-toe/
+    tags: ["State"]
+  - title: The Ark
+    summary: A cover-first personal library. Add books, track reading status, remove them — all in vanilla JavaScript.
+    demo: https://masterroachi.github.io/odin-projects/library/
+    tags: ["State", "Objects"]
+  - title: KOI
+    summary: A restaurant page for a fictional Japanese street-food place, generated entirely in JavaScript with tabbed navigation.
+    demo: https://masterroachi.github.io/odin-projects/restaurant-page/
+    tags: ["Modules"]
 ---
 
-Eight exercises worked through The Odin Project's foundations track, from
-HTML/CSS fundamentals up to DOM manipulation and event handling.
+Eight exercises from The Odin Project's Foundations track, kept in one
+repository rather than scattered across eight of them. Every one is deployed,
+so they can be used rather than just read.
 
-The repository is its own hub — the index page links every exercise, so the
-whole collection is browsable in one place rather than scattered across
-separate repos.
+## What the progression actually shows
 
-## What's in there
+The interesting part isn't any single exercise. It's the line they draw.
 
-- Admin dashboard layouts, built to practise CSS Grid and Flexbox
-- An etch-a-sketch style drawing grid, generated and re-generated from the DOM
-- A themed Rock-Paper-Scissors game with score state and result rendering
-- Assorted smaller layout and scripting exercises from the same track
+The early ones are layout: the **Admin Dashboard** is CSS Grid pushed until it
+stops being comfortable, and the **Questicles Landing Page** is the same
+exercise for Flexbox. Nothing moves. The page is what you wrote.
 
-## Why it's here
+Then the DOM starts doing the work. **Etch-A-Sketch** builds its own grid at
+runtime and rebuilds it whenever the size changes, which is the first point
+where the markup you write and the markup that exists stop being the same
+thing. **Quartz, Parchment, Shears** adds state that outlives a click.
 
-It is foundations work and it is presented as foundations work. The interesting
-part is not any single exercise — it is the progression across all eight, from
-static markup to scripts that build and tear down the DOM at runtime.
+**Coolculator** is where it gets awkward. A calculator looks trivial until you
+try to chain operations, and then the edge cases outnumber the happy path —
+what a second operator does mid-expression, what the display shows versus what
+the machine is holding.
+
+The last three separate state from rendering properly. **Tic-Tac-Toe** keeps
+the board in JavaScript and draws it, rather than reading the page back to
+find out whose turn it is. **The Ark** does the same for a collection of
+objects. **KOI** generates its entire page from modules with no static markup
+at all.
+
+That is the whole arc of Foundations: from writing what the browser shows, to
+writing the thing that decides what the browser shows.

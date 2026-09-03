@@ -33,6 +33,19 @@ export interface Frontmatter {
   /** Per-project hover colour, and its second stop. Any CSS colour. */
   accent?: string;
   accent2?: string;
+  /**
+   * Individual pieces making up a project — the Odin exercises, and anything
+   * else that is a collection rather than a single thing.
+   */
+  pieces?: {
+    title: string;
+    summary: string;
+    /** Live demo. */
+    demo?: string;
+    /** Source, if it differs from the project's own repo. */
+    source?: string;
+    tags?: string[];
+  }[];
 
   /** Hidden from listings and marked noindex; still visible in `next dev`. */
   draft?: boolean;
