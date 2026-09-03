@@ -141,7 +141,9 @@
   padding-bottom: clamp(44px, 7vw, 80px);
 }
 
-/* Moving to the neighbouring project, in the same order the index lists them. */
+/* Moving to the neighbouring project, in the same order the index lists them.
+   Each side takes the colour of the project it leads to, so the pager previews
+   where it is going rather than being uniformly grey. */
 .pager {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -150,17 +152,51 @@
   border-top: 1px solid var(--line);
 }
 
-.pagerLink {
+.pagerLink,
+.pagerEmpty {
   background: var(--bg);
-  padding: clamp(26px, 4vw, 44px) var(--pad);
+  padding: clamp(28px, 4.5vw, 52px) var(--pad);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: background 0.2s ease;
+}
+
+.pagerLink {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: background 0.22s ease;
 }
 
 .pagerLink:hover {
   background: var(--bg-raised);
+}
+
+/* A wash of the destination's colour, growing from the outer edge. */
+.pagerLink::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  background: radial-gradient(
+    90% 140% at 0% 50%,
+    color-mix(in oklch, var(--accent-a) 16%, transparent),
+    transparent 70%
+  );
+}
+
+.pagerNext::before {
+  background: radial-gradient(
+    90% 140% at 100% 50%,
+    color-mix(in oklch, var(--accent-a) 16%, transparent),
+    transparent 70%
+  );
+}
+
+.pagerLink:hover::before {
+  opacity: 1;
 }
 
 .pagerNext {
@@ -169,22 +205,45 @@
 }
 
 .pagerLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.7rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-weight: 600;
   color: var(--muted-2);
-  transition: color 0.2s ease;
+  transition: color 0.22s ease;
 }
 
 .pagerLink:hover .pagerLabel {
-  color: var(--accent-a);
+  color: color-mix(in oklch, var(--accent-a) 74%, var(--ink));
+}
+
+.pagerArrow {
+  display: inline-block;
+  transition: transform 0.22s ease;
+}
+
+.pagerLink:hover .pagerArrow {
+  transform: translateX(-5px);
+}
+
+.pagerNext:hover .pagerArrow {
+  transform: translateX(5px);
 }
 
 .pagerTitle {
-  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem);
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+.pagerKind {
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-2);
 }
 
 @media (max-width: 640px) {

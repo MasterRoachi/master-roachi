@@ -5,6 +5,7 @@ import Mdx from '@/components/Mdx';
 import PostCard from '@/components/PostCard';
 import Starfield from '@/components/Starfield';
 import ProjectPieces from '@/components/ProjectPieces';
+import StackIcons from '@/components/StackIcons';
 import {
   getAnyEntry,
   getAllSlugs,
@@ -97,11 +98,9 @@ export default async function ProjectPage({
           <p className={styles.summary}>{fm.summary}</p>
 
           {fm.stack && fm.stack.length > 0 && (
-            <ul className={styles.stack}>
-              {fm.stack.map((tech) => (
-                <li key={tech}>{tech}</li>
-              ))}
-            </ul>
+            <div className={styles.stack}>
+              <StackIcons stack={fm.stack} />
+            </div>
           )}
 
           {(fm.link || fm.repo) && (
@@ -157,25 +156,52 @@ export default async function ProjectPage({
       {(prev || nextUp) && (
         <nav className={styles.pager} aria-label="Other projects">
           {prev ? (
-            <Link href={`/projects/${prev.slug}/`} className={styles.pagerLink}>
-              <span className={styles.pagerLabel}>← Previous</span>
+            <Link
+              href={`/projects/${prev.slug}/`}
+              className={styles.pagerLink}
+              style={
+                {
+                  '--accent-a': prev.frontmatter.accent ?? 'var(--accent)',
+                } as React.CSSProperties
+              }
+            >
+              <span className={styles.pagerLabel}>
+                <span className={styles.pagerArrow}>←</span> Previous
+              </span>
               <span className={styles.pagerTitle}>
                 {prev.frontmatter.title}
               </span>
+              {prev.frontmatter.kind && (
+                <span className={styles.pagerKind}>{prev.frontmatter.kind}</span>
+              )}
             </Link>
           ) : (
-            <span />
+            <span className={styles.pagerEmpty} />
           )}
-          {nextUp && (
+          {nextUp ? (
             <Link
               href={`/projects/${nextUp.slug}/`}
               className={`${styles.pagerLink} ${styles.pagerNext}`}
+              style={
+                {
+                  '--accent-a': nextUp.frontmatter.accent ?? 'var(--accent)',
+                } as React.CSSProperties
+              }
             >
-              <span className={styles.pagerLabel}>Next →</span>
+              <span className={styles.pagerLabel}>
+                Next <span className={styles.pagerArrow}>→</span>
+              </span>
               <span className={styles.pagerTitle}>
                 {nextUp.frontmatter.title}
               </span>
+              {nextUp.frontmatter.kind && (
+                <span className={styles.pagerKind}>
+                  {nextUp.frontmatter.kind}
+                </span>
+              )}
             </Link>
+          ) : (
+            <span className={styles.pagerEmpty} />
           )}
         </nav>
       )}

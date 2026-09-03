@@ -10,6 +10,11 @@
 }
 
 .piece {
+  --mx: 50%;
+  --my: 50%;
+
+  position: relative;
+  isolation: isolate;
   background: var(--bg);
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -23,7 +28,43 @@
   background: var(--bg-raised);
 }
 
-/* The number carries the progression, which is the point of the list. */
+/* Light tracking the cursor, in the project's colour. */
+.piece::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    320px circle at var(--mx) var(--my),
+    color-mix(in oklch, var(--accent-a) 12%, transparent),
+    transparent 70%
+  );
+}
+
+.piece:hover::before {
+  opacity: 1;
+}
+
+/* A bar that fills down the left edge as the row is entered, so the list reads
+   as a sequence being stepped through. */
+.piece::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 0;
+  background: var(--accent-a);
+  transition: height 0.3s ease;
+}
+
+.piece:hover::after {
+  height: 100%;
+}
+
 .index {
   font-size: 0.8rem;
   font-weight: 700;
@@ -43,6 +84,11 @@
 .title {
   font-size: clamp(1.05rem, 2.2vw, 1.25rem);
   margin: 0 0 6px;
+  transition: color 0.18s ease;
+}
+
+.piece:hover .title {
+  color: color-mix(in oklch, var(--accent-a) 60%, var(--ink));
 }
 
 .summary {
@@ -76,6 +122,9 @@
 }
 
 .link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -86,12 +135,23 @@
   white-space: nowrap;
   transition:
     border-color 0.18s ease,
-    color 0.18s ease;
+    color 0.18s ease,
+    background 0.18s ease;
 }
 
 .link:hover {
   border-color: var(--accent-a);
+  background: color-mix(in oklch, var(--accent-a) 10%, transparent);
   color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+
+.link:hover .arrow {
+  transform: translate(2px, -2px);
 }
 
 .linkQuiet {
@@ -105,5 +165,17 @@
   }
   .links {
     grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .piece,
+  .piece::before,
+  .piece::after,
+  .index,
+  .title,
+  .link,
+  .arrow {
+    transition: none;
   }
 }

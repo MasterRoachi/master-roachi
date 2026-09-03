@@ -1,0 +1,58 @@
+.stack {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+.item svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  /* Held back so a row of brand colours does not out-shout the copy beside
+     it; brought up when the card or page is hovered. */
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+/* Larger, and brighter at rest, on a project page where the stack is a
+   statement rather than a footnote on a card. */
+.stack[data-size='md'] svg {
+  width: 26px;
+  height: 26px;
+  opacity: 0.82;
+}
+
+.item:hover svg {
+  opacity: 1;
+}
+
+/* No brand mark exists for this one. */
+.chip {
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  border: 1px solid var(--line);
+  padding: 5px 9px;
+  white-space: nowrap;
+}
+
+.stack[data-size='md'] .chip {
+  font-size: 0.72rem;
+  padding: 7px 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item svg {
+    transition: none;
+  }
+}

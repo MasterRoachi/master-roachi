@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRef, type PointerEvent } from 'react';
 import { STATUS_LABEL } from '@/lib/format';
 import type { ProjectSummary } from '@/lib/content';
+import StackIcons from './StackIcons';
 import styles from './Card.module.css';
 
 // The cards sit in the starfield, so they behave like objects floating in it
@@ -69,11 +70,7 @@ export default function ProjectCard({ entry }: { entry: ProjectSummary }) {
       <p className={styles.body}>{entry.summary}</p>
       {entry.stack && entry.stack.length > 0 && (
         <div className={styles.meta}>
-          {entry.stack.map((tech) => (
-            <span key={tech} className={styles.tag}>
-              {tech}
-            </span>
-          ))}
+          <StackIcons stack={entry.stack} size="sm" />
         </div>
       )}
     </Link>
