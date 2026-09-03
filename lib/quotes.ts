@@ -37,6 +37,32 @@ export const workQuotes: Quote[] = [
 ];
 
 /**
+ * For Thoughts.
+ *
+ * Games and shows rather than the commentators Stephan first suggested. Those
+ * are living people, and a line invented for one of them and published under
+ * his name is a different order of mistake from misremembering a cartoon.
+ * These are all widely quoted and easy to check.
+ */
+export const ramblingQuotes: Quote[] = [
+  {
+    text: 'Stay awhile and listen.',
+    source: 'Deckard Cain, Diablo',
+  },
+  {
+    text: 'A man chooses. A slave obeys.',
+    source: 'Andrew Ryan, BioShock',
+  },
+  { text: 'War. War never changes.', source: 'Fallout' },
+  {
+    text: 'It’s dangerous to go alone! Take this.',
+    source: 'The Legend of Zelda',
+  },
+  { text: 'The truth is out there.', source: 'The X-Files' },
+  { text: 'Praise the sun!', source: 'Solaire of Astora, Dark Souls' },
+];
+
+/**
  * For Foundations.
  *
  * Attribution matters more here than on the other two lists, and in a way that

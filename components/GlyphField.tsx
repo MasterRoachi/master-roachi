@@ -31,12 +31,26 @@ interface Glyph {
 }
 
 /**
- * Marks rather than words. Mostly punctuation — the parts of writing that are
- * decisions rather than vocabulary — with a few letterforms among them.
+ * Marks and letterforms from several writing systems, because a page about
+ * words should not assume they are only ever written in one.
+ *
+ * Chosen to read as shapes rather than as a message — nothing here spells
+ * anything, and the Japanese are single characters rather than fragments of a
+ * sentence.
  */
 const CHARS = [
-  '¶', '§', '&', '"', '”', '“', ';', ':', '—', '?', '!', '*', '…',
-  'a', 'g', 'e', 'R', 'w', 'ß', 'æ', 'Q',
+  // Punctuation: the parts of writing that are decisions, not vocabulary.
+  '¶', '§', '&', '”', '“', ';', ':', '—', '?', '!', '*', '…', '·', '†',
+  // Latin
+  'a', 'g', 'e', 'R', 'w', 'ß', 'æ', 'Q', 'k', 'y',
+  // Greek
+  'α', 'β', 'γ', 'δ', 'ε', 'θ', 'λ', 'μ', 'π', 'σ', 'φ', 'ψ', 'Ω', 'Σ', 'Φ',
+  // Japanese — kana, and kanji for word, write, book, way, text, character
+  'あ', 'い', 'う', 'か', 'さ', 'ゆ', 'を', 'ん',
+  'ア', 'カ', 'サ', 'ヲ', 'ネ', 'ミ',
+  '言', '書', '本', '道', '文', '字',
+  // Cyrillic
+  'д', 'ж', 'з', 'и', 'я', 'ф', 'Ж',
 ];
 
 const COUNT = 46;
@@ -68,8 +82,10 @@ export default function GlyphField() {
       char: CHARS[Math.floor(Math.random() * CHARS.length)],
       x: Math.random(),
       y: Math.random(),
-      // Weighted small, so a few sit near and the rest recede.
-      size: 14 + Math.random() ** 2.2 * 88,
+      // A wide spread, weighted small: most sit far back and a few come right
+      // forward. The exponent is what keeps the large ones rare, rather than
+      // giving an even scatter of middling sizes.
+      size: 11 + Math.random() ** 2.8 * 165,
       alpha: 0.05 + Math.random() * 0.13,
       rise: 0.006 + Math.random() * 0.018,
       tilt: (Math.random() - 0.5) * 0.5,
@@ -163,7 +179,12 @@ export default function GlyphField() {
         ctx.rotate(g.tilt);
         ctx.globalAlpha = g.alpha;
         ctx.fillStyle = '#ffffff';
-        ctx.font = `600 ${g.size}px var(--font-sans, system-ui), system-ui, sans-serif`;
+        // A real font stack, not a CSS custom property. Canvas parses this
+        // string itself and knows nothing about var(), so an unresolvable
+        // font is discarded silently and every glyph falls back to the
+        // default 10px. The CJK families are named so those characters render
+        // as themselves rather than as tofu.
+        ctx.font = `600 ${g.size}px system-ui, "Segoe UI", "Yu Gothic UI", "Hiragino Sans", "Noto Sans JP", sans-serif`;
         ctx.fillText(g.char, 0, 0);
         ctx.restore();
       }
