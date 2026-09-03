@@ -97,6 +97,17 @@ function voteKey(candidate: string, voter: string): string {
  * drift the way a single incremented counter would: KV has no atomic
  * increment, so two simultaneous voters doing read-modify-write on one number
  * would lose a vote.
+ *
+ * `list` lags a write by roughly 10-20 seconds in production, measured on the
+ * live namespace — much longer than `get`, which reflects a write straight
+ * away. That gap is invisible to the person voting, because `yours` comes from
+ * `get` and the client applies its own change on top; it only means another
+ * visitor sees a new vote within about half a minute. Worth knowing before
+ * trusting these counts for anything that has to be immediate.
+ *
+ * Note that wrangler's local KV is strongly consistent, so this lag does not
+ * appear in `wrangler dev` at all — it was only visible against the real
+ * namespace after deploying.
  */
 async function tally(kv: KVNamespace): Promise<Record<string, number>> {
   const counts: Record<string, number> = {};
