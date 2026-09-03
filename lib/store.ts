@@ -49,10 +49,25 @@ export function buyUrl(product: StoreProduct): string | null {
     : base;
 }
 
+/**
+ * Prices are formatted for the currency they are in, not for where the site
+ * was written. Formatting USD with the en-ZA locale gives a "US$" prefix and a
+ * comma decimal separator — correct for rand, wrong for dollars.
+ */
+const CURRENCY_LOCALE: Record<string, string> = {
+  USD: 'en-US',
+  ZAR: 'en-ZA',
+  GBP: 'en-GB',
+  EUR: 'de-DE',
+  CAD: 'en-CA',
+  AUD: 'en-AU',
+};
+
 export function formatPrice(from: StoreProduct['from']): string | null {
   if (!from) return null;
+  const locale = CURRENCY_LOCALE[from.currency] ?? 'en-US';
   try {
-    return new Intl.NumberFormat('en-ZA', {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
       currency: from.currency,
       maximumFractionDigits: 2,
