@@ -1,0 +1,99 @@
+.socials {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(18px, 2.4vw, 26px) clamp(20px, 2.6vw, 30px);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 62px;
+  position: relative;
+}
+
+.item svg,
+.wordmark {
+  display: block;
+  /* Held back at rest so six brand colours against near-black read as a set
+     rather than as competing signals. */
+  opacity: 0.75;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+a.item:hover svg,
+a.item:hover .wordmark {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Stand-in where no brand mark can be used. */
+.wordmark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--line-bright);
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+a.item:hover .wordmark {
+  color: var(--ink);
+  border-color: var(--muted);
+}
+
+.name {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  color: var(--muted-2);
+  text-align: center;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+a.item:hover .name {
+  color: var(--muted);
+}
+
+/* Not set up yet: dimmed and inert, but present. */
+.item[data-pending='true'] {
+  cursor: default;
+}
+
+.item[data-pending='true'] svg {
+  opacity: 0.28;
+}
+
+.item[data-pending='true'] .name {
+  color: oklch(38% 0 0);
+}
+
+.soon {
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  border: 1px solid var(--line);
+  padding: 1px 5px;
+  margin-top: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item svg,
+  .wordmark,
+  .name {
+    transition: none;
+  }
+  a.item:hover svg,
+  a.item:hover .wordmark {
+    transform: none;
+  }
+}

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Logo from '@/components/Logo';
-import SheenLink from '@/components/SheenLink';
 import AboutFacets from '@/components/AboutFacets';
 import ToolIcons from '@/components/ToolIcons';
+import SocialLinks from '@/components/SocialLinks';
 import { site } from '@/lib/site';
 import styles from './about.module.css';
 
@@ -15,7 +15,6 @@ export const metadata: Metadata = {
 // site (preserved on the archive/html-site branch). It said what this project
 // is better than anything written since, so it is quoted rather than rewritten.
 export default function AboutPage() {
-  const { contactEmail, socials } = site;
 
   return (
     <>
@@ -93,22 +92,7 @@ export default function AboutPage() {
 
           <div>
             <p className="eyebrow">Get in touch</p>
-            <p className={styles.contactLede}>
-              Open to collaboration, or just a good argument.
-            </p>
-            <div className={styles.contact}>
-              {contactEmail && (
-                <SheenLink href={`mailto:${contactEmail}`}>Email</SheenLink>
-              )}
-              <SheenLink href={socials.github} tone="white">
-                GitHub
-              </SheenLink>
-              {socials.linkedin && (
-                <SheenLink href={socials.linkedin} tone="white">
-                  LinkedIn
-                </SheenLink>
-              )}
-            </div>
+            <SocialLinks />
           </div>
         </div>
       </section>

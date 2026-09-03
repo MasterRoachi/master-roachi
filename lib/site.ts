@@ -24,6 +24,12 @@ export const site = {
     github: 'https://github.com/MasterRoachi',
     linkedin:
       'https://www.linkedin.com/in/stephanusmengelbrecht/' as string | null,
+    facebook:
+      'https://www.facebook.com/profile.php?id=61584527721768' as string | null,
+    instagram: 'https://www.instagram.com/sidphanus/' as string | null,
+    // Not set up yet. Rendered as a dimmed, non-interactive mark rather than
+    // hidden — the site's whole line is that unfinished things are shown.
+    youtube: null as string | null,
   },
 } as const;
 
