@@ -47,11 +47,15 @@ jobs:
           if git diff --staged --quiet; then
             echo "nothing changed — no commit, no deploy"
           else
-            # Deliberately no [skip ci]: Cloudflare Workers Builds honours it,
-            # so tagging the commit that way would land the data in the repo
-            # and then tell Cloudflare not to publish it. The loop it usually
-            # guards against cannot happen here anyway — GitHub does not fire
-            # workflows for commits pushed with GITHUB_TOKEN.
+            # The commit message must not contain a CI-skip token. Cloudflare
+            # Workers Builds honours those, so tagging the commit would land
+            # the data in the repo and then suppress the build that publishes
+            # it. The loop such a tag usually guards against cannot happen
+            # here anyway: GitHub does not fire workflows for commits pushed
+            # with GITHUB_TOKEN.
+            #
+            # Cloudflare scans the whole message, body included — so mentioning
+            # the token, even to explain it, is enough to skip the build.
             git commit -m "Refresh Steam snapshot"
             git push
           fi
