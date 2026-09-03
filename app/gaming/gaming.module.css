@@ -161,18 +161,47 @@
   display: grid;
   place-items: center;
   font-weight: 800;
-  font-size: 1.25rem;
-  background: var(--bg-raised);
-  border-right: 1px solid var(--line);
+  font-size: 1.35rem;
+  /* --tier is set per row on the element. */
+  color: var(--tier, var(--ink));
+  background: color-mix(in oklch, var(--tier, var(--ink)) 16%, var(--bg-raised));
+  border-right: 1px solid color-mix(in oklch, var(--tier, var(--line)) 30%, var(--line));
 }
 
 .tierGames {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 16px;
+  padding: 14px;
+}
+
+/* Art where the game is on Steam, the title alone where it is not — a console
+   game should still be rankable without inventing a picture for it. */
+.tierGame {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 11px 4px 4px;
+  border: 1px solid var(--line);
+  font-size: 0.86rem;
   color: var(--muted);
-  font-size: 0.9rem;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+.tierGame:hover {
+  border-color: color-mix(in oklch, var(--tier, var(--accent-a)) 50%, var(--line));
+  color: var(--ink);
+}
+.tierGame:not(:has(.tierArt)) {
+  padding-left: 11px;
+}
+.tierArt {
+  display: block;
+  width: 58px;
+  height: auto;
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
 }
 
 .retro {

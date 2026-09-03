@@ -9,6 +9,7 @@ import {
   TIERS,
   streamSchedule,
   type Game,
+  type TierRank,
 } from '@/lib/pursuits';
 import { getSteam, steamHeader, steamIcon, hoursFrom } from '@/lib/steam';
 import { getPerfectRuns, type PerfectRun } from '@/lib/perfect';
@@ -22,6 +23,19 @@ export const metadata: Metadata = {
   title: 'Fun',
   description:
     'Completionist runs, achievement hunting, and analysis of the games worth thinking about.',
+};
+
+/**
+ * The conventional tier-list ramp, hot to cold. Not the page's lime, because
+ * the ranks have to be told apart from each other rather than matched to the
+ * section.
+ */
+const TIER_COLOUR: Record<TierRank, string> = {
+  S: 'oklch(70% 0.21 25)',
+  A: 'oklch(75% 0.17 55)',
+  B: 'oklch(83% 0.15 95)',
+  C: 'oklch(80% 0.16 145)',
+  D: 'oklch(70% 0.06 240)',
 };
 
 // Lime, the colour this side carries on the About page and in the nav.
@@ -332,11 +346,30 @@ export default function GamingPage() {
                 const games = tierList.filter((g) => g.tier === rank);
                 if (games.length === 0) return null;
                 return (
-                  <div key={rank} className={styles.tier}>
+                  <div
+                    key={rank}
+                    className={styles.tier}
+                    style={
+                      { '--tier': TIER_COLOUR[rank] } as React.CSSProperties
+                    }
+                  >
                     <span className={styles.tierRank}>{rank}</span>
                     <div className={styles.tierGames}>
                       {games.map((g) => (
-                        <span key={g.title}>{g.title}</span>
+                        <span key={g.title} className={styles.tierGame}>
+                          {g.appid && (
+                            <img
+                              className={styles.tierArt}
+                              src={steamHeader(g.appid)}
+                              alt=""
+                              width={460}
+                              height={215}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          )}
+                          <span>{g.title}</span>
+                        </span>
                       ))}
                     </div>
                   </div>
