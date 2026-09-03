@@ -7,6 +7,9 @@ import styles from './AboutFacets.module.css';
 // The three sides of the tagline, as three doors rather than a paragraph.
 // It is the strongest structural idea in the brand and it was buried in prose.
 //
+// Ordered to match the nav (Work, Fun, Foundations) rather than the tagline,
+// so the two ways into the same three sections agree.
+//
 // Each carries its own colour and the same tracked light the rest of the site
 // uses, written to CSS custom properties rather than React state.
 
@@ -21,24 +24,24 @@ interface Facet {
 const FACETS: Facet[] = [
   {
     line: 'Work Hard',
-    title: 'Building',
+    title: 'Work',
     body: 'Games, worlds, and the code underneath them. The long road from beginner to craftsman, in public.',
     href: '/projects/',
-    accent: 'oklch(84% 0.16 92)',
-  },
-  {
-    line: 'Study Well',
-    title: 'Orthodoxy',
-    body: 'Taken as a real question rather than an aesthetic. The aim is not to make it trendy — it is to ask whether it is true.',
-    href: '/orthodoxy/',
-    accent: 'oklch(78% 0.14 58)',
+    accent: 'oklch(76% 0.13 78)',
   },
   {
     line: 'Rest Plenty',
-    title: 'Gaming',
+    title: 'Fun',
     body: 'Played attentively enough to be worth writing about. One game at a time, finished honestly.',
     href: '/gaming/',
-    accent: 'oklch(76% 0.16 300)',
+    accent: 'oklch(86% 0.20 135)',
+  },
+  {
+    line: 'Study Well',
+    title: 'Foundations',
+    body: 'Orthodoxy taken as a real question rather than an aesthetic. The aim is not to make it trendy — it is to ask whether it is true.',
+    href: '/orthodoxy/',
+    accent: 'oklch(97% 0 0)',
   },
 ];
 

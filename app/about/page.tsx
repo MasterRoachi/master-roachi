@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Logo from '@/components/Logo';
 import SheenLink from '@/components/SheenLink';
 import AboutFacets from '@/components/AboutFacets';
+import ToolIcons from '@/components/ToolIcons';
 import { site } from '@/lib/site';
 import styles from './about.module.css';
 
@@ -61,13 +62,10 @@ export default function AboutPage() {
       <section className={`shell ${styles.section}`}>
         <div className={styles.sectionHead}>
           <p className="eyebrow">The three sides of it</p>
-          <h2 className="section-title">
-            The tagline isn&rsquo;t decoration
-          </h2>
+          <h2 className="section-title">Roshi to Roachi</h2>
           <p className="lede">
             Work Hard, Study Well, Rest Plenty. They&rsquo;re distinct, but they
-            aren&rsquo;t separate — each one is where a different part of the
-            same record gets kept.
+            aren&rsquo;t separate — all parts of one Whole.
           </p>
         </div>
         <AboutFacets />
@@ -90,13 +88,7 @@ export default function AboutPage() {
         <div className={styles.split}>
           <div>
             <p className="eyebrow">Tools</p>
-            <ul className={styles.tools}>
-              <li>TypeScript &amp; JavaScript</li>
-              <li>React &amp; Next.js</li>
-              <li>Vue</li>
-              <li>Godot &amp; GDScript</li>
-              <li>HTML &amp; CSS</li>
-            </ul>
+            <ToolIcons />
           </div>
 
           <div>

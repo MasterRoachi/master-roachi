@@ -1,0 +1,78 @@
+.tools {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(18px, 2.4vw, 28px) clamp(20px, 2.8vw, 32px);
+}
+
+/* No boxes: the marks carry themselves, with the name underneath for anyone
+   who does not recognise one. */
+.tool {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 62px;
+}
+
+.tool svg {
+  display: block;
+  /* Brand colours are loud against a near-black page. Held back at rest and
+     brought to full strength on hover, so the row reads as a set rather than
+     as eleven competing signals. */
+  opacity: 0.72;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.tool:hover svg {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Stand-in for a tool with no brand mark. */
+.wordmark {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line-bright);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  opacity: 0.72;
+  transition: opacity 0.2s ease;
+}
+
+.tool:hover .wordmark {
+  opacity: 1;
+  color: var(--ink);
+}
+
+.name {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  color: var(--muted-2);
+  text-align: center;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.tool:hover .name {
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool svg,
+  .wordmark,
+  .name {
+    transition: none;
+  }
+  .tool:hover svg {
+    transform: none;
+  }
+}
