@@ -3,16 +3,24 @@
   "name": "master-roachi",
   "compatibility_date": "2026-09-02",
 
-  // Assets-only Worker: no "main" entry point, because there is no server-side
-  // code. `next build` produces a fully static export in out/, and Cloudflare
-  // serves those files directly.
+  // `next build` produces a fully static export in out/, and Cloudflare serves
+  // those files directly. The Worker below is not a Next.js server — it exists
+  // only for /api/vote, which needs shared mutable state that a static file
+  // cannot hold. Assets are matched first, so the Worker is never invoked for
+  // a page or an image.
   //
-  // This file also exists to stop `wrangler deploy` from guessing. Without it,
-  // wrangler detects "Next.js", assumes a server-rendered app, and silently
-  // runs the OpenNext migration — which then fails looking for
-  // .next/standalone/, a directory that only exists for non-static builds.
+  // Declaring both explicitly also stops `wrangler deploy` from guessing.
+  // Without this file, wrangler detects "Next.js", assumes a server-rendered
+  // app, and silently runs the OpenNext migration — which then fails looking
+  // for .next/standalone/, a directory that only exists for non-static builds.
+  "main": "worker/index.ts",
+
   "assets": {
     "directory": "./out/",
+
+    // How the Worker reaches the static files, for anything it does not
+    // handle itself.
+    "binding": "ASSETS",
 
     // next.config.mjs sets trailingSlash: true, so pages are emitted as
     // out/work/index.html and served at /work/. auto-trailing-slash is the
@@ -40,4 +48,21 @@
     { "pattern": "masterroachi.com", "custom_domain": true },
     { "pattern": "www.masterroachi.com", "custom_domain": true }
   ]
+
+  // Where the "what should I play next" votes live. Commented out because a
+  // binding that names a namespace which does not exist fails the deploy, and
+  // the site should not be undeployable while the poll is unconfigured — with
+  // no VOTES binding, /api/vote answers `configured: false` and the page
+  // renders the queue as a plain list.
+  //
+  // To switch voting on:
+  //
+  //   npx wrangler kv namespace create VOTES
+  //
+  // then paste the id it prints below and uncomment. Optionally salt the
+  // voter hash, which is otherwise a guessable digest of an IP address:
+  //
+  //   npx wrangler secret put VOTE_SALT
+  //
+  // "kv_namespaces": [{ "binding": "VOTES", "id": "<paste the id here>" }]
 }

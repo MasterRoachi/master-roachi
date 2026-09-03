@@ -359,3 +359,18 @@
 .runGroup .retro {
   margin-top: 4px;
 }
+
+/* Finished but not perfected — a plain ledger, no art, no badge. */
+.finished {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.finished li {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}

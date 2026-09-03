@@ -1,0 +1,111 @@
+.note {
+  color: var(--muted);
+  font-size: 0.95rem;
+  max-width: 56ch;
+  margin: 10px 0 20px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  position: relative;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: border-color 0.18s ease;
+}
+.row:hover {
+  border-color: color-mix(in oklch, var(--accent-a) 40%, var(--line));
+}
+.chosen {
+  border-color: color-mix(in oklch, var(--accent-a) 58%, var(--line));
+}
+
+.button,
+.static {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  /* A button resets nothing by default; without these it arrives with the
+     browser's own font, background and centred text. */
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font: inherit;
+  text-align: left;
+}
+.button {
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+.button:hover:not(:disabled),
+.chosen .button {
+  color: var(--ink);
+}
+.button:disabled {
+  cursor: default;
+}
+.button:focus-visible {
+  outline: 2px solid var(--accent-a);
+  outline-offset: -2px;
+}
+
+/* The share of the vote, drawn behind the label rather than beside it, so a
+   row stays one line at any count. */
+.fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: color-mix(in oklch, var(--accent-a) 13%, transparent);
+  transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.chosen .fill {
+  background: color-mix(in oklch, var(--accent-a) 22%, transparent);
+}
+
+.title {
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.count {
+  position: relative;
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: color-mix(in oklch, var(--accent-a) 76%, var(--ink));
+}
+.countLabel {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.total {
+  margin: 16px 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--muted-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

@@ -13,6 +13,8 @@ import {
 import { getSteam, steamHeader, steamIcon, hoursFrom } from '@/lib/steam';
 import { getPerfectRuns, type PerfectRun } from '@/lib/perfect';
 import { getRetro } from '@/lib/retro';
+import { candidateId } from '@/lib/poll';
+import PlayNextVote from '@/components/PlayNextVote';
 import styles from './gaming.module.css';
 
 export const metadata: Metadata = {
@@ -261,12 +263,12 @@ export default function GamingPage() {
 
         {queue.length > 0 && (
           <section className={styles.section}>
-            <p className="eyebrow">Up next</p>
-            <ul className={styles.queue}>
-              {queue.map((game) => (
-                <li key={game.title}>{game.title}</li>
-              ))}
-            </ul>
+            <PlayNextVote
+              candidates={queue.map((game) => ({
+                id: candidateId(game.title),
+                title: game.title,
+              }))}
+            />
           </section>
         )}
 
