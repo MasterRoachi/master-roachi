@@ -38,9 +38,11 @@
 }
 
 .card:hover {
-  /* The project's own colour, kept well under full strength: this is a tint
-     on a dark card, not a highlighter. */
-  border-color: color-mix(in oklch, var(--accent-a) 55%, var(--line-bright));
+  /* The project's own colour. Used at full strength on the border because a
+     1px line is inherently restrained, and because mixing it toward the grey
+     erased the darker accents — Terrath's forest green came out
+     indistinguishable from the resting border. */
+  border-color: var(--accent-a);
   background: oklch(18% 0 0 / 0.92);
   box-shadow:
     0 18px 50px oklch(0% 0 0 / 0.5),
@@ -96,6 +98,14 @@
   text-transform: uppercase;
   color: var(--muted-2);
   font-weight: 600;
+  transition: color 0.18s ease;
+}
+
+/* The kind takes the project's colour on hover, lifted toward the ink so the
+   darker accents stay legible — Terrath's green at full strength would be
+   near-invisible as small uppercase text on a dark card. */
+.card:hover .kind {
+  color: color-mix(in oklch, var(--accent-a) 72%, var(--ink));
 }
 
 /* Status is greyscale except when something is actually finished — which is

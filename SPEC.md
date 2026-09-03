@@ -86,7 +86,7 @@ which is most of what there is.
 | --- | --- | --- |
 | Shepherds We Shall Be | building | 2D pixel art ARPG, solo, Godot |
 | Fabled Threads | building | Print-on-demand store — anime and early-2000s cartoon inspired illustrations |
-| Project Greenhouse | building | Reboot of Plant Tycoon. Working name |
+| Cultus Botanicus | building | Reboot of Plant Tycoon |
 | Terrath | ongoing | Worldbuilding |
 | The Odin Project | released | Eight foundations exercises |
 
@@ -202,12 +202,12 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 
 ## Open Items
 
-- [ ] **Terrath, Fabled Threads and Project Greenhouse descriptions** are
+- [ ] **Terrath, Fabled Threads and Cultus Botanicus descriptions** are
       placeholders written from one line each. Each carries a TODO comment
       marking what to replace. Terrath is the thinnest.
 - [ ] **Fabled Threads storefront URL**, and confirm whether it is actually
       building or already open
-- [ ] **Project Greenhouse engine/stack**, and the real name
+- [ ] **Cultus Botanicus engine/stack** — the name itself is now settled
 - [ ] **lib/pursuits.ts needs confirming** — seeded from July 2026 data
 - [ ] Finished games, tier list, RetroAchievements URL
 - [ ] **Actual writing.** Scaffolding only
