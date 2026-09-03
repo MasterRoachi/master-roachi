@@ -3,8 +3,20 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+
+      // Attaches to a running dev server rather than starting one, which is
+      // why there is no runtimeExecutable here.
+      //
+      // Stephan keeps `next dev` running on 3000 himself. Next.js 16 permits
+      // only one dev server per directory and refuses to start a second for
+      // X:\master-roachi, so a config that spawns its own always loses that
+      // race — even on a free port, which "autoPort" was tried and does not
+      // help with. Taking the port by killing his server would be worse.
+      //
+      // If nothing is listening on 3000, start it in a terminal first:
+      //
+      //   npm run dev
+      "url": "http://localhost:3000",
       "port": 3000
     }
   ]

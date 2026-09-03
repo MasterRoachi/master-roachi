@@ -147,7 +147,17 @@ export default {
     // Static assets are matched before the Worker runs, so in practice only
     // unmatched paths arrive here. Anything that is not the API is handed
     // back to the asset binding, which serves the 404 page.
-    if (url.pathname !== '/api/vote') return env.ASSETS.fetch(request);
+    //
+    // Both /api/vote and /api/vote/ are accepted. next.config.mjs sets
+    // trailingSlash: true, which is why every page on this site is served at a
+    // slashed path — and the dev server normalises fetches the same way, so
+    // the client's request arrives slashed there. Cloudflare's asset layer
+    // happens not to redirect this path today, so matching only the bare form
+    // works in production by luck rather than design: the moment anything
+    // added the slash, voting would fail silently and the page would fall back
+    // to a plain list with no error to explain it.
+    const route = url.pathname.replace(/\/+$/, '');
+    if (route !== '/api/vote') return env.ASSETS.fetch(request);
 
     const kv = env.VOTES;
     if (!kv) {
