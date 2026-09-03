@@ -84,7 +84,7 @@ which is most of what there is.
 
 | Project | Status | What |
 | --- | --- | --- |
-| Shepherds We Shall Be | building | 2.5D pixel art ARPG, solo, Godot |
+| Shepherds We Shall Be | building | 2D pixel art ARPG, solo, Godot |
 | Fabled Threads | building | Print-on-demand store — anime and early-2000s cartoon inspired illustrations |
 | Project Greenhouse | building | Reboot of Plant Tycoon. Working name |
 | Terrath | ongoing | Worldbuilding |
