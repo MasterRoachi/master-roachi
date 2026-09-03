@@ -13,6 +13,20 @@ export const TRACK_LABEL: Record<Track, string> = {
   devlog: 'Devlog',
 };
 
+/**
+ * Each track in its own section's colour, so a post carries the same identity
+ * on the writing index that its subject has everywhere else on the site.
+ *
+ * Devlog has no section of its own and takes the blue Thoughts answers in the
+ * nav — it belongs to the writing rather than to a pursuit.
+ */
+export const TRACK_COLOUR: Record<Track, string> = {
+  code: 'oklch(97% 0 0)',
+  gaming: 'oklch(86% 0.20 135)',
+  theology: 'oklch(84% 0.16 92)',
+  devlog: 'oklch(74% 0.15 250)',
+};
+
 // Where a project actually stands. The old live/coming-soon binary could not
 // describe a store that is open, a world being written, or a game in early
 // development — which is most of what there is.

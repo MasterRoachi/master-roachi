@@ -1,0 +1,128 @@
+/* The glyphs are positioned against this, so they run the whole page. */
+.page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+/* Named, not `.page > div` — that would catch the field's own host, which is
+   absolutely positioned, and collapse the backdrop to nothing. */
+.body {
+  position: relative;
+  z-index: 1;
+}
+
+.empty {
+  color: var(--muted-2);
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  margin: 0;
+  max-width: var(--measure);
+}
+
+/* --- the lead ----------------------------------------------------------- */
+
+/* The newest post, given a panel rather than a place in a list. Its colour is
+   its track's, so the most recent thing on the page also says which side of
+   the site it came from. */
+.lead {
+  display: block;
+  border: 1px solid color-mix(in oklch, var(--track) 26%, var(--line));
+  border-radius: 14px;
+  background: linear-gradient(
+    140deg,
+    oklch(18% 0.02 255 / 0.72),
+    oklch(13% 0.015 250 / 0.5)
+  );
+  padding: clamp(26px, 3.6vw, 46px);
+  margin-bottom: clamp(36px, 5vw, 64px);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+.lead:hover {
+  border-color: color-mix(in oklch, var(--track) 58%, var(--line));
+  transform: translateY(-2px);
+}
+
+.leadMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.leadTrack {
+  font-weight: 700;
+  color: color-mix(in oklch, var(--track) 80%, var(--ink));
+}
+
+.leadTitle {
+  font-size: clamp(1.7rem, 4vw, 2.7rem);
+  margin: 14px 0 16px;
+  max-width: 22ch;
+}
+
+.leadSummary {
+  color: var(--muted);
+  margin: 0;
+  font-size: clamp(1rem, 1.8vw, 1.12rem);
+  line-height: 1.6;
+  max-width: 56ch;
+}
+
+.leadCta {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--track) 80%, var(--ink));
+}
+
+/* --- groups ------------------------------------------------------------- */
+
+.group {
+  margin-bottom: clamp(28px, 4vw, 48px);
+}
+
+/* The track name, with a rule running off it in that track's colour, so the
+   three bodies of work are separable at a glance rather than one long feed. */
+.groupHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--track) 78%, var(--ink));
+}
+
+.groupHead::after {
+  content: '';
+  order: 2;
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    color-mix(in oklch, var(--track) 40%, transparent),
+    transparent
+  );
+}
+
+/* Takes the track's colour too. In plain grey at the far end of a rule it
+   read as a stray character rather than a count. */
+.groupCount {
+  order: 3;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: color-mix(in oklch, var(--track) 62%, var(--muted));
+}

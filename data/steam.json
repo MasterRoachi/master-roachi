@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T20:06:39.546Z",
+  "fetchedAt": "2026-09-03T20:33:23.829Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -21,13 +21,6 @@
       "icon": "e63abe2ba9116b8e92a424c5bc4fb231518557e9",
       "minutesTwoWeeks": 39,
       "minutesTotal": 335
-    },
-    {
-      "appid": 1593500,
-      "title": "God of War",
-      "icon": "8aa5e7e0e55cad682c7f2e65e075c3bc04dfc1cb",
-      "minutesTwoWeeks": 21,
-      "minutesTotal": 903
     },
     {
       "appid": 431960,
@@ -119,6 +112,13 @@
       "icon": "529d0f064196911482aeeb8f42ffcc1ff77fed67",
       "minutesTwoWeeks": 0,
       "minutesTotal": 15
+    },
+    {
+      "appid": 105600,
+      "title": "Terraria",
+      "icon": "858961e95fbf869f136e1770d586e0caefd4cfac",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 179
     }
   ],
   "perfect": [
