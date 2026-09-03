@@ -44,7 +44,7 @@ const SCROLL_SHIFT = 46;
 /** How far the cursor pulls them, in CSS px. */
 const POINTER_SHIFT = 14;
 
-export default function Starfield() {
+export default function Starfield({ tint }: { tint?: string } = {}) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -197,5 +197,14 @@ export default function Starfield() {
     };
   }, []);
 
-  return <div ref={hostRef} className={styles.host} aria-hidden="true" />;
+  // A tint lets a page colour its own depth — project pages use their own
+  // accent so the field belongs to that project rather than being generic.
+  return (
+    <div
+      ref={hostRef}
+      className={styles.host}
+      style={tint ? { background: tint } : undefined}
+      aria-hidden="true"
+    />
+  );
 }

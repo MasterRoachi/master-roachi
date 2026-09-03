@@ -1,0 +1,198 @@
+/* Each project page carries its own colour, set from frontmatter on the root
+   so every accent below reads from one place. */
+
+.page {
+  --accent-a: var(--accent);
+  --accent-b: var(--accent);
+}
+
+.top {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.topInner {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(28px, 5vw, 48px) clamp(48px, 8vw, 88px);
+}
+
+.back {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: clamp(28px, 5vw, 48px);
+  transition: color 0.18s ease;
+}
+
+.back:hover {
+  color: var(--accent-a);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.kind {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  /* Lifted toward the ink so the darker accents stay legible as small caps. */
+  color: color-mix(in oklch, var(--accent-a) 72%, var(--ink));
+}
+
+.status {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--line-bright);
+  padding: 4px 10px;
+}
+
+.status[data-status='released'] {
+  color: color-mix(in oklch, var(--accent-a) 72%, var(--ink));
+  border-color: color-mix(in oklch, var(--accent-a) 45%, transparent);
+}
+
+.title {
+  font-size: clamp(2.2rem, 7vw, 4.5rem);
+  margin: 0 0 22px;
+  max-width: 16ch;
+  overflow-wrap: break-word;
+}
+
+.summary {
+  color: var(--muted);
+  max-width: var(--measure);
+  margin: 0;
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  line-height: 1.5;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 30px 0 0;
+}
+
+.stack li {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 7px 13px;
+  background: oklch(14% 0 0 / 0.6);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 26px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--accent-a);
+  color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.action:hover {
+  background: color-mix(in oklch, var(--accent-a) 14%, transparent);
+  color: var(--ink);
+}
+
+.actionQuiet {
+  border-color: var(--line-bright);
+  color: var(--muted);
+}
+
+.actionQuiet:hover {
+  border-color: var(--accent-a);
+  color: var(--ink);
+}
+
+.body {
+  padding-block: clamp(44px, 7vw, 80px);
+}
+
+.related {
+  padding-bottom: clamp(44px, 7vw, 80px);
+}
+
+/* Moving to the neighbouring project, in the same order the index lists them. */
+.pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
+}
+
+.pagerLink {
+  background: var(--bg);
+  padding: clamp(26px, 4vw, 44px) var(--pad);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: background 0.2s ease;
+}
+
+.pagerLink:hover {
+  background: var(--bg-raised);
+}
+
+.pagerNext {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.pagerLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted-2);
+  transition: color 0.2s ease;
+}
+
+.pagerLink:hover .pagerLabel {
+  color: var(--accent-a);
+}
+
+.pagerTitle {
+  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 640px) {
+  .pager {
+    grid-template-columns: 1fr;
+  }
+  .pagerNext {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
