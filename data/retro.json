@@ -1,7 +1,41 @@
 {
-  "fetchedAt": null,
-  "user": null,
-  "profileUrl": null,
-  "gamesTracked": 0,
-  "perfect": []
+  "fetchedAt": "2026-09-03T10:45:40.065Z",
+  "user": "MasterRoachi",
+  "profileUrl": "https://retroachievements.org/user/MasterRoachi",
+  "gamesTracked": 26,
+  "perfect": [
+    {
+      "id": 2450,
+      "title": "Mario's Picross",
+      "console": "Game Boy",
+      "icon": "https://media.retroachievements.org/Images/119584.png",
+      "awarded": 89,
+      "total": 89,
+      "hardcore": true,
+      "awardKind": "mastered",
+      "awardedAt": "2025-12-05T12:55:17+00:00"
+    },
+    {
+      "id": 20532,
+      "title": "Disney's Extreme Skate Adventure",
+      "console": "PlayStation 2",
+      "icon": "https://media.retroachievements.org/Images/101559.png",
+      "awarded": 92,
+      "total": 92,
+      "hardcore": true,
+      "awardKind": "mastered",
+      "awardedAt": "2025-11-14T13:27:48+00:00"
+    },
+    {
+      "id": 10873,
+      "title": "Ratchet: Deadlocked",
+      "console": "PlayStation 2",
+      "icon": "https://media.retroachievements.org/Images/088014.png",
+      "awarded": 133,
+      "total": 133,
+      "hardcore": true,
+      "awardKind": "mastered",
+      "awardedAt": "2025-10-17T14:31:26+00:00"
+    }
+  ]
 }

@@ -36,6 +36,22 @@ if (!KEY) bail('RETRO_API_KEY not set');
  */
 const PERFECT = new Set(['mastered', 'completed']);
 
+/**
+ * Whether every achievement was earned in hardcore mode — no save states, no
+ * rewind, no speed changes.
+ *
+ * RetroAchievements does not say "hardcore" for this. Its vocabulary is
+ * `mastered` for all achievements in hardcore and `completed` for all of them
+ * in softcore, and it only spells the word out on the lesser `beaten-hardcore`
+ * award. So testing the string for "hardcore" — which is what this did at
+ * first — marks every mastery as softcore and quietly understates the harder
+ * achievement.
+ */
+function isHardcore(kind) {
+  const k = String(kind ?? '').toLowerCase();
+  return k === 'mastered' || k.includes('hardcore');
+}
+
 async function page(offset) {
   const url = new URL(
     'https://retroachievements.org/API/API_GetUserCompletionProgress.php',
@@ -82,7 +98,7 @@ try {
       icon: g.ImageIcon ? `https://media.retroachievements.org${g.ImageIcon}` : null,
       awarded: Number(g.NumAwarded) || 0,
       total: Number(g.MaxPossible) || 0,
-      hardcore: String(g.HighestAwardKind ?? '').includes('hardcore'),
+      hardcore: isHardcore(g.HighestAwardKind),
       awardKind: g.HighestAwardKind ?? null,
       awardedAt: g.HighestAwardDate ?? null,
     }))

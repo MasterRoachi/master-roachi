@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T09:44:26.664Z",
+  "fetchedAt": "2026-09-03T10:41:17.438Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -50,5 +50,2117 @@
       "minutesTwoWeeks": 5,
       "minutesTotal": 2222
     }
-  ]
+  ],
+  "perfect": [
+    {
+      "appid": 409710,
+      "title": "BioShock Remastered",
+      "icon": "eb72262cd3ccc3219dd76392be3b60a4b6cbfd38",
+      "unlocked": 65,
+      "total": 65,
+      "minutesTotal": 4912
+    },
+    {
+      "appid": 629820,
+      "title": "Maneater",
+      "icon": "8c360e45ff1ec31a3640e62780d7d1f47badc251",
+      "unlocked": 44,
+      "total": 44,
+      "minutesTotal": 2312
+    },
+    {
+      "appid": 462780,
+      "title": "Darksiders Warmastered Edition",
+      "icon": "4616a0d94eb5864f2933fd0157bb60a27b14d5fe",
+      "unlocked": 43,
+      "total": 43,
+      "minutesTotal": 3040
+    },
+    {
+      "appid": 348360,
+      "title": "Doodle God",
+      "icon": "31c2b5609aa7779e6faafeaf6d0e085386b4ccba",
+      "unlocked": 22,
+      "total": 22,
+      "minutesTotal": 1162
+    },
+    {
+      "appid": 3590,
+      "title": "Plants vs. Zombies: Game of the Year",
+      "icon": "d2a9c24de11210560f579e7fd9303960c5060155",
+      "unlocked": 21,
+      "total": 21,
+      "minutesTotal": 4811
+    },
+    {
+      "appid": 40700,
+      "title": "Machinarium",
+      "icon": "33e11d52f0a2335671d7bf73341c14ae6e596809",
+      "unlocked": 12,
+      "total": 12,
+      "minutesTotal": 596
+    },
+    {
+      "appid": 742500,
+      "title": "Nonogram - Master's Legacy",
+      "icon": "80c07a044365060609e3f5db537f186c4c22df9d",
+      "unlocked": 6,
+      "total": 6,
+      "minutesTotal": 1640
+    }
+  ],
+  "ownedCount": 370,
+  "achievementCache": {
+    "440": {
+      "name": "Team Fortress 2",
+      "minutes": 16,
+      "icon": "f568912870a4684f9ec76277a1a404dda6bab213",
+      "unlocked": 0,
+      "total": 520
+    },
+    "500": {
+      "name": "Left 4 Dead",
+      "minutes": 12,
+      "icon": "428df26bc35b09319e31b1ffb712487b20b3245c",
+      "unlocked": 0,
+      "total": 73
+    },
+    "550": {
+      "name": "Left 4 Dead 2",
+      "minutes": 13,
+      "icon": "7d5a243f9500d2f8467312822f8af2a2928777ed",
+      "unlocked": 0,
+      "total": 101
+    },
+    "570": {
+      "name": "Dota 2",
+      "minutes": 194049,
+      "icon": "0bbb630d63262dd66d2fdd0f7d37e8661a410075",
+      "unlocked": null,
+      "total": null
+    },
+    "620": {
+      "name": "Portal 2",
+      "minutes": 41,
+      "icon": "25a5a16b2423bf7487ac5340b5b0948cef48c5f8",
+      "unlocked": 3,
+      "total": 51
+    },
+    "3320": {
+      "name": "Insaniquarium! Deluxe",
+      "minutes": 142,
+      "icon": "fb45c0144e6717e18c6c4e59605b4350ffa3cfde",
+      "unlocked": null,
+      "total": null
+    },
+    "3480": {
+      "name": "Peggle Deluxe",
+      "minutes": 519,
+      "icon": "427a98a549c3813e13b4062300709000599817b0",
+      "unlocked": null,
+      "total": null
+    },
+    "3540": {
+      "name": "Peggle Nights",
+      "minutes": 4,
+      "icon": "41ec4d1b164eaea5a2520e6aef6dada128d32acc",
+      "unlocked": null,
+      "total": null
+    },
+    "3590": {
+      "name": "Plants vs. Zombies: Game of the Year",
+      "minutes": 4811,
+      "icon": "d2a9c24de11210560f579e7fd9303960c5060155",
+      "unlocked": 21,
+      "total": 21
+    },
+    "3830": {
+      "name": "Psychonauts",
+      "minutes": 694,
+      "icon": "460b6471db7d83ee6943c1a87f7a9f2898634952",
+      "unlocked": 1,
+      "total": 37
+    },
+    "7670": {
+      "name": "BioShock",
+      "minutes": 10,
+      "icon": "9a7c9f640a76e6a32592277dbbc36a0f6da05372",
+      "unlocked": null,
+      "total": null
+    },
+    "8870": {
+      "name": "BioShock Infinite",
+      "minutes": 7,
+      "icon": "4ebaf5f9ee74f50152f7ff361debef7553fa0e4e",
+      "unlocked": 0,
+      "total": 80
+    },
+    "8980": {
+      "name": "Borderlands GOTY",
+      "minutes": 1441,
+      "icon": "eb45fb32b7f4e75564a30a52aa3c35a191253ea0",
+      "unlocked": 25,
+      "total": 80
+    },
+    "11020": {
+      "name": "TrackMania Nations Forever",
+      "minutes": 86,
+      "icon": "a422db7cb704324da48741b9e0a0cc193b566eb0",
+      "unlocked": null,
+      "total": null
+    },
+    "11190": {
+      "name": "Sherlock Holmes versus Jack the Ripper",
+      "minutes": 9,
+      "icon": "a5234d01152ea92953f2a5dbf1bbcf9648f00cab",
+      "unlocked": null,
+      "total": null
+    },
+    "12770": {
+      "name": "Rise of the Argonauts",
+      "minutes": 23,
+      "icon": "73d9b642364286a510c6a1b2457064a8884634ed",
+      "unlocked": null,
+      "total": null
+    },
+    "13500": {
+      "name": "Prince of Persia: Warrior Within",
+      "minutes": 1192,
+      "icon": "7ccfe3fae3c5fc44dad734dbd0af10f041fe94e7",
+      "unlocked": null,
+      "total": null
+    },
+    "13530": {
+      "name": "Prince of Persia: The Two Thrones",
+      "minutes": 789,
+      "icon": "8ceeaa9e2d1b0eb804b1826e95e5c268703f6c37",
+      "unlocked": null,
+      "total": null
+    },
+    "13600": {
+      "name": "Prince of Persia: The Sands of Time",
+      "minutes": 810,
+      "icon": "e65c77b489a5f4e0d4cde9f09d05443b717d0690",
+      "unlocked": null,
+      "total": null
+    },
+    "15100": {
+      "name": "Assassin's Creed",
+      "minutes": 447,
+      "icon": "cd8f7a795e34e16449f7ad8d8190dce521967917",
+      "unlocked": null,
+      "total": null
+    },
+    "17450": {
+      "name": "Dragon Age: Origins",
+      "minutes": 751,
+      "icon": "8cc583d72b84ae9a4026c762e130869127dd05e4",
+      "unlocked": null,
+      "total": null
+    },
+    "17470": {
+      "name": "Dead Space (2008)",
+      "minutes": 556,
+      "icon": "45e682594687a6c92037631225340d26c783362f",
+      "unlocked": null,
+      "total": null
+    },
+    "19680": {
+      "name": "Alice: Madness Returns",
+      "minutes": 6,
+      "icon": "a9dc16a5a8293cea1c1d934bdbc08721708b1399",
+      "unlocked": null,
+      "total": null
+    },
+    "19980": {
+      "name": "Prince of Persia",
+      "minutes": 1094,
+      "icon": "2b404bd60fb97a9c1eabb9d4a573909c014a23fd",
+      "unlocked": null,
+      "total": null
+    },
+    "20900": {
+      "name": "The Witcher: Enhanced Edition",
+      "minutes": 22,
+      "icon": "746d1cd48fb2e57d579b05b6e9eccba95859e549",
+      "unlocked": null,
+      "total": null
+    },
+    "20920": {
+      "name": "The Witcher 2: Assassins of Kings Enhanced Edition",
+      "minutes": 190,
+      "icon": "62dd5c627664df1bcabc47727c7dcd7ccab353e9",
+      "unlocked": 0,
+      "total": 52
+    },
+    "21090": {
+      "name": "F.E.A.R.",
+      "minutes": 224,
+      "icon": "71f118282be5aaa34eb82506593130ecfcc6a90b",
+      "unlocked": null,
+      "total": null
+    },
+    "22370": {
+      "name": "Fallout 3 - Game of the Year Edition",
+      "minutes": 56,
+      "icon": "21d7090bdea8f6685ca730850b7b55acfdb92732",
+      "unlocked": null,
+      "total": null
+    },
+    "33320": {
+      "name": "Prince of Persia: The Forgotten Sands",
+      "minutes": 484,
+      "icon": "ae71d05f6a30478dc896f58bff7b353c0edf9959",
+      "unlocked": null,
+      "total": null
+    },
+    "35130": {
+      "name": "Lara Croft and the Guardian of Light",
+      "minutes": 5,
+      "icon": "b06fc7740d5e2e02ffd47fec3c56f7d38534f598",
+      "unlocked": 0,
+      "total": 12
+    },
+    "35700": {
+      "name": "Trine",
+      "minutes": 26,
+      "icon": "298185d8ef9d688fe96a5fa15ee8174892f1c000",
+      "unlocked": 2,
+      "total": 33
+    },
+    "39160": {
+      "name": "Dungeon Siege III",
+      "minutes": 12,
+      "icon": "c9dba11084b0a049b273819dba062ea89ecf3c05",
+      "unlocked": 0,
+      "total": 54
+    },
+    "39190": {
+      "name": "Dungeon Siege",
+      "minutes": 10,
+      "icon": "93bc26efb692cca3964ec8ba424572f5e1bf0e70",
+      "unlocked": null,
+      "total": null
+    },
+    "40700": {
+      "name": "Machinarium",
+      "minutes": 596,
+      "icon": "33e11d52f0a2335671d7bf73341c14ae6e596809",
+      "unlocked": 12,
+      "total": 12
+    },
+    "41000": {
+      "name": "Serious Sam HD: The First Encounter",
+      "minutes": 534,
+      "icon": "9aeb464ed7dba489ba5ecb5077ea577b62ca426b",
+      "unlocked": 2,
+      "total": 35
+    },
+    "41010": {
+      "name": "Serious Sam HD: The Second Encounter",
+      "minutes": 1,
+      "icon": "95beda0d8dbd3d317359fae9f0e6ca1193b2429c",
+      "unlocked": 0,
+      "total": 70
+    },
+    "41070": {
+      "name": "Serious Sam 3: BFE",
+      "minutes": 12,
+      "icon": "2e7a17d4b345ffb13ef3d9e39257c2659fe4a86b",
+      "unlocked": 0,
+      "total": 62
+    },
+    "47810": {
+      "name": "Dragon Age: Origins - Ultimate Edition",
+      "minutes": 19,
+      "icon": "e5e0b9629b314f7338f493d26227eb2bd1172e77",
+      "unlocked": null,
+      "total": null
+    },
+    "49520": {
+      "name": "Borderlands 2",
+      "minutes": 43,
+      "icon": "a3f4945226e69b6196074df4c776e342d3e5a3be",
+      "unlocked": 1,
+      "total": 75
+    },
+    "50620": {
+      "name": "Darksiders",
+      "minutes": 2043,
+      "icon": "e429cee10d864faf2aae2ea9cd75e8e1942fbe08",
+      "unlocked": 21,
+      "total": 43
+    },
+    "57900": {
+      "name": "Duke Nukem Forever",
+      "minutes": 167,
+      "icon": "abea248e21456fae958b16dae9f131a51921199d",
+      "unlocked": 6,
+      "total": 62
+    },
+    "67370": {
+      "name": "The Darkness II",
+      "minutes": 11,
+      "icon": "6ca6291fe216a8cc5c56f01b1e7f83e396a8fa81",
+      "unlocked": 0,
+      "total": 50
+    },
+    "102600": {
+      "name": "Orcs Must Die!",
+      "minutes": 439,
+      "icon": "0d14a70abb580146741de26bbad46d0ad81a67c7",
+      "unlocked": 2,
+      "total": 27
+    },
+    "105450": {
+      "name": "Age of Empires® III (2007)",
+      "minutes": 32,
+      "icon": "6fd62f99d3d245868d83af54eb60def5d1667402",
+      "unlocked": null,
+      "total": null
+    },
+    "105600": {
+      "name": "Terraria",
+      "minutes": 179,
+      "icon": "858961e95fbf869f136e1770d586e0caefd4cfac",
+      "unlocked": 17,
+      "total": 137
+    },
+    "107100": {
+      "name": "Bastion",
+      "minutes": 19,
+      "icon": "8377b4460f19465c261673f76f2656bdb3288273",
+      "unlocked": 1,
+      "total": 24
+    },
+    "109600": {
+      "name": "Neverwinter",
+      "minutes": 2607,
+      "icon": "b65eee286148b9ab29c27847ff47cbcd158788b6",
+      "unlocked": null,
+      "total": null
+    },
+    "201810": {
+      "name": "Wolfenstein: The New Order",
+      "minutes": 473,
+      "icon": "965b8943ad172d8cf0c74e86068b4aa670aba92c",
+      "unlocked": 10,
+      "total": 50
+    },
+    "203160": {
+      "name": "Tomb Raider",
+      "minutes": 42,
+      "icon": "3ee640a8aba6992678e36f4e40cba9c71c02348b",
+      "unlocked": 0,
+      "total": 50
+    },
+    "204030": {
+      "name": "Fable - The Lost Chapters",
+      "minutes": 504,
+      "icon": "98206649a850020118de687a14075d1b5081196e",
+      "unlocked": null,
+      "total": null
+    },
+    "212500": {
+      "name": "The Lord of the Rings Online™",
+      "minutes": 230,
+      "icon": "6dbff8345f6b3e5f092a834985c8f851859bfbf2",
+      "unlocked": null,
+      "total": null
+    },
+    "214770": {
+      "name": "Guacamelee! Gold Edition",
+      "minutes": 20,
+      "icon": "2542d8e59fa2a5ceb5b16f6fa052d6aa6cda7c69",
+      "unlocked": 3,
+      "total": 60
+    },
+    "218620": {
+      "name": "PAYDAY 2",
+      "minutes": 12,
+      "icon": "8fce45cbb0dee03e87cd30b96ac5e5c3d4b2c494",
+      "unlocked": 3,
+      "total": 1328
+    },
+    "219740": {
+      "name": "Don't Starve",
+      "minutes": 4,
+      "icon": "03fe647df40dccc4d19bf42a0185cd3e6b9f2953",
+      "unlocked": null,
+      "total": null
+    },
+    "222900": {
+      "name": "Dead Island: Epidemic",
+      "minutes": 367,
+      "icon": "eeca961216745840443d87373f907d1e6e4ca764",
+      "unlocked": 10,
+      "total": 54
+    },
+    "225260": {
+      "name": "Brütal Legend",
+      "minutes": 144,
+      "icon": "e3f25fba8538e5fb1ead751e767c2774df4fb0b4",
+      "unlocked": 3,
+      "total": 59
+    },
+    "230410": {
+      "name": "Warframe",
+      "minutes": 188,
+      "icon": "22064646470f4c53388ba87774c7ac10f0a91ffa",
+      "unlocked": 7,
+      "total": 193
+    },
+    "232810": {
+      "name": "Godus",
+      "minutes": 5393,
+      "icon": "4ee4e78811f8600fa39bc4377129b124b63e42a1",
+      "unlocked": null,
+      "total": null
+    },
+    "236110": {
+      "name": "Dungeon Defenders II",
+      "minutes": 112,
+      "icon": "0ce07c2568f978a01c8ae5f4d9402c3253963641",
+      "unlocked": 2,
+      "total": 18
+    },
+    "238320": {
+      "name": "Outlast",
+      "minutes": 10,
+      "icon": "46bd3df92d4693d3b2af113bf8f31c2cbdadb20a",
+      "unlocked": 0,
+      "total": 14
+    },
+    "238960": {
+      "name": "Path of Exile",
+      "minutes": 912,
+      "icon": "1110764aac57ac28d7ffd8c43071c75d5482a9c9",
+      "unlocked": 3,
+      "total": 127
+    },
+    "239250": {
+      "name": "Castlevania: Lords of Shadow 2",
+      "minutes": 10,
+      "icon": "f7dce02872c56b564d70e0440fc7e0b893ce01d6",
+      "unlocked": 0,
+      "total": 56
+    },
+    "241930": {
+      "name": "Middle-earth™: Shadow of Mordor™",
+      "minutes": 1387,
+      "icon": "161afab3c9f725f593635723cc64a7fbeb324ead",
+      "unlocked": 45,
+      "total": 74
+    },
+    "242700": {
+      "name": "Injustice: Gods Among Us Ultimate Edition",
+      "minutes": 256,
+      "icon": "4ea9f28360ca77b2ced5c8ac5545fcfc6ea8ef15",
+      "unlocked": 4,
+      "total": 50
+    },
+    "246420": {
+      "name": "Kingdom Rush",
+      "minutes": 2221,
+      "icon": "2dccbb4dbb08987e38d7efe916fd303bea8dc39a",
+      "unlocked": 71,
+      "total": 74
+    },
+    "246620": {
+      "name": "Plague Inc: Evolved",
+      "minutes": 87,
+      "icon": "9e39dcfd5a300732c16111b268853ef11a0ba4d0",
+      "unlocked": 12,
+      "total": 250
+    },
+    "249650": {
+      "name": "Blackguards",
+      "minutes": 7,
+      "icon": "2d63bd30fb43c757712705315aadcbfe6e6853ac",
+      "unlocked": 0,
+      "total": 45
+    },
+    "252410": {
+      "name": "SteamWorld Dig",
+      "minutes": 19,
+      "icon": "7757c90bbf65e312ea4871106250077e78007bc6",
+      "unlocked": 2,
+      "total": 24
+    },
+    "257420": {
+      "name": "Serious Sam 4",
+      "minutes": 3,
+      "icon": "3f9e66277464a7145cbfe504acbad29477956d69",
+      "unlocked": 1,
+      "total": 54
+    },
+    "261640": {
+      "name": "Borderlands: The Pre-Sequel",
+      "minutes": 31,
+      "icon": "af5ef05eac8b1eb618e4f57354ac7b3e918ab1bd",
+      "unlocked": 1,
+      "total": 63
+    },
+    "262830": {
+      "name": "Crimsonland",
+      "minutes": 78,
+      "icon": "1e16c0ea05ee0247fb10ae0bc4953068c205460f",
+      "unlocked": 4,
+      "total": 22
+    },
+    "264710": {
+      "name": "Subnautica",
+      "minutes": 510,
+      "icon": "8a14ceef6e230330a916d7a6324b8c52d464d569",
+      "unlocked": 4,
+      "total": 17
+    },
+    "265300": {
+      "name": "Lords Of The Fallen",
+      "minutes": 245,
+      "icon": "b01d7d060da64430dbbc5195f26225f2e75c38b0",
+      "unlocked": 7,
+      "total": 56
+    },
+    "266840": {
+      "name": "Age of Mythology: Extended Edition",
+      "minutes": 112,
+      "icon": "43e500d938e87b623c11a02d7b80f7e9018fbbd7",
+      "unlocked": 0,
+      "total": 70
+    },
+    "267530": {
+      "name": "The LEGO® Movie - Videogame",
+      "minutes": 6,
+      "icon": "74b77a8e64398e29d6d53bd10a07975f73bf1b70",
+      "unlocked": 1,
+      "total": 48
+    },
+    "268500": {
+      "name": "XCOM 2",
+      "minutes": 10,
+      "icon": "f275aeb0b1b947262810569356a199848c643754",
+      "unlocked": 0,
+      "total": 88
+    },
+    "273350": {
+      "name": "Evolve Stage 2",
+      "minutes": 1652,
+      "icon": "6b9e205c389185a4b0e079a13090c751e47375d2",
+      "unlocked": null,
+      "total": null
+    },
+    "286690": {
+      "name": "Metro 2033 Redux",
+      "minutes": 6,
+      "icon": "353ea01a045c084215bca95519808eaa7319ce0c",
+      "unlocked": 0,
+      "total": 49
+    },
+    "288470": {
+      "name": "Fable Anniversary",
+      "minutes": 2,
+      "icon": "cf33f0a1796aabd7d0ce63af3acda1d81861ce5f",
+      "unlocked": 0,
+      "total": 50
+    },
+    "290730": {
+      "name": "My Lands",
+      "minutes": 10,
+      "icon": "163dc180722040f77145200bfebc628a47b50a85",
+      "unlocked": 0,
+      "total": 36
+    },
+    "292030": {
+      "name": "The Witcher 3: Wild Hunt - Complete Edition",
+      "minutes": 12,
+      "icon": "7b52d11edee478d652ef4e7103e00644bed2c74c",
+      "unlocked": 0,
+      "total": 78
+    },
+    "292910": {
+      "name": "Deponia: The Complete Journey",
+      "minutes": 1,
+      "icon": "98e31755e9695af7d427411d55100ce834f1f102",
+      "unlocked": 0,
+      "total": 105
+    },
+    "311690": {
+      "name": "Enter the Gungeon",
+      "minutes": 123,
+      "icon": "b459d94ad4b6a5eabd71005874037b9577a4ca31",
+      "unlocked": 1,
+      "total": 54
+    },
+    "312200": {
+      "name": "Chasm",
+      "minutes": 5,
+      "icon": "3b2549ea1344ab9680c2a7d7283057c2e5890638",
+      "unlocked": 0,
+      "total": 20
+    },
+    "322190": {
+      "name": "SteamWorld Heist",
+      "minutes": 38,
+      "icon": "5838d342266d56bdf4416d59d35939df5d52b2f0",
+      "unlocked": 2,
+      "total": 47
+    },
+    "323190": {
+      "name": "Frostpunk",
+      "minutes": 938,
+      "icon": "0561084dfe24c469c905fe0681da82aa31102836",
+      "unlocked": 13,
+      "total": 115
+    },
+    "323470": {
+      "name": "DRAGON BALL XENOVERSE",
+      "minutes": 274,
+      "icon": "810b2bab6e3197b5d63d3abffcebafaac8dc6312",
+      "unlocked": 3,
+      "total": 50
+    },
+    "324800": {
+      "name": "Shadow Warrior 2",
+      "minutes": 13,
+      "icon": "e5bdde6548d967fb456b33b2674be1c8efc2d9ae",
+      "unlocked": 0,
+      "total": 64
+    },
+    "327030": {
+      "name": "Worms W.M.D",
+      "minutes": 4,
+      "icon": "9f18090e88fd50a0a85a66a1a9872bd36c856b58",
+      "unlocked": 0,
+      "total": 29
+    },
+    "330020": {
+      "name": "Children of Morta",
+      "minutes": 68,
+      "icon": "29e179c5c7ac3aa6d3fb15ca5b19fd1124af4e7b",
+      "unlocked": 1,
+      "total": 45
+    },
+    "330830": {
+      "name": "Tales from the Borderlands",
+      "minutes": 41,
+      "icon": "620dbf286a2ef353c9c93e5b7c047027b18f1475",
+      "unlocked": 1,
+      "total": 35
+    },
+    "331600": {
+      "name": "ONE PIECE PIRATE WARRIORS 3",
+      "minutes": 13,
+      "icon": "f8d8859c604acf2709a8e8de6907d4d4f91520f6",
+      "unlocked": 0,
+      "total": 40
+    },
+    "346010": {
+      "name": "Besiege",
+      "minutes": 280,
+      "icon": "16667f445723c720782314269e41f9daa8a7fb56",
+      "unlocked": 0,
+      "total": 54
+    },
+    "348360": {
+      "name": "Doodle God",
+      "minutes": 1162,
+      "icon": "31c2b5609aa7779e6faafeaf6d0e085386b4ccba",
+      "unlocked": 22,
+      "total": 22
+    },
+    "350080": {
+      "name": "Wolfenstein: The Old Blood ",
+      "minutes": 64,
+      "icon": "e45bc4d7a8233546c74f1cbba4e7d7a02bfc53a0",
+      "unlocked": 3,
+      "total": 50
+    },
+    "351870": {
+      "name": "Cultures - 8th Wonder of the World",
+      "minutes": 1,
+      "icon": "bd644f4e72094aabd775ec3767d80e9d62f077e5",
+      "unlocked": null,
+      "total": null
+    },
+    "351920": {
+      "name": "Crazy Machines 3",
+      "minutes": 39,
+      "icon": "6cf6da3763360bbc86b1b55b10ddbb7e8f363d81",
+      "unlocked": 2,
+      "total": 41
+    },
+    "356190": {
+      "name": "Middle-earth™: Shadow of War™",
+      "minutes": 511,
+      "icon": "316c479e5d51d21e15eb8f82338fce82c42c4115",
+      "unlocked": 7,
+      "total": 72
+    },
+    "365670": {
+      "name": "Blender",
+      "minutes": 2222,
+      "icon": "48733cd333eea6e40711a1b9c6dde32ffe363ced",
+      "unlocked": null,
+      "total": null
+    },
+    "377160": {
+      "name": "Fallout 4",
+      "minutes": 9,
+      "icon": "779c4356ebe32af2af7c9f0bbba595dfe872cd7f",
+      "unlocked": 0,
+      "total": 84
+    },
+    "378540": {
+      "name": "The Surge",
+      "minutes": 24,
+      "icon": "244bf4443ab17c0b7cda6fd63bc9bc0291942635",
+      "unlocked": 3,
+      "total": 67
+    },
+    "379720": {
+      "name": "DOOM",
+      "minutes": 13,
+      "icon": "b6e72ff47d1990cb644700751eeeff14e0aba6dc",
+      "unlocked": 0,
+      "total": 54
+    },
+    "383150": {
+      "name": "Dead Island Definitive Edition",
+      "minutes": 102,
+      "icon": "80d0dabca21c70909e63682512a24ce66c4f5c3b",
+      "unlocked": 0,
+      "total": 57
+    },
+    "387290": {
+      "name": "Ori and the Blind Forest: Definitive Edition",
+      "minutes": 20,
+      "icon": "a8b0c1ca89fa421e5061d4ac5c17e2fbf4f08845",
+      "unlocked": 3,
+      "total": 57
+    },
+    "388410": {
+      "name": "Darksiders II Deathinitive Edition",
+      "minutes": 213,
+      "icon": "a2d5549090144f1bfd9e00f1b460c1ad0aa9c366",
+      "unlocked": 4,
+      "total": 50
+    },
+    "391000": {
+      "name": "Farm Frenzy Collection",
+      "minutes": 4,
+      "icon": "2cfcd4d60eaea7821bc9ecd6454c4a6fe27bc23d",
+      "unlocked": null,
+      "total": null
+    },
+    "391540": {
+      "name": "Undertale",
+      "minutes": 18,
+      "icon": "2ce672b89b63ec1e70d2f12862e72eb4a33e9268",
+      "unlocked": null,
+      "total": null
+    },
+    "397540": {
+      "name": "Borderlands 3",
+      "minutes": 1089,
+      "icon": "0ac7b8d98fad581f65b0533bbce63bf953d743ac",
+      "unlocked": 11,
+      "total": 81
+    },
+    "399810": {
+      "name": "Call of Cthulhu",
+      "minutes": 60,
+      "icon": "ce6a031d27fc877bf0bab72f23eb57c4444ae3ae",
+      "unlocked": 0,
+      "total": 49
+    },
+    "409710": {
+      "name": "BioShock Remastered",
+      "minutes": 4912,
+      "icon": "eb72262cd3ccc3219dd76392be3b60a4b6cbfd38",
+      "unlocked": 65,
+      "total": 65
+    },
+    "409720": {
+      "name": "BioShock 2 Remastered",
+      "minutes": 262,
+      "icon": "97527a02b36f8ac4aba21005c2d953cc908a08e1",
+      "unlocked": 5,
+      "total": 53
+    },
+    "414340": {
+      "name": "Hellblade: Senua's Sacrifice",
+      "minutes": 40,
+      "icon": "8a5d8f2d1cb52b21eaf4f6609592c6634731c962",
+      "unlocked": 1,
+      "total": 14
+    },
+    "421020": {
+      "name": "DiRT 4",
+      "minutes": 747,
+      "icon": "db321a3271cf6a5b2983bda3a2ffa25788e3a781",
+      "unlocked": 10,
+      "total": 48
+    },
+    "422420": {
+      "name": "Godus Wars",
+      "minutes": 28,
+      "icon": "ac471f073a680049db7727078c05bc646cdaa327",
+      "unlocked": null,
+      "total": null
+    },
+    "431730": {
+      "name": "Aseprite",
+      "minutes": 2297,
+      "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
+      "unlocked": null,
+      "total": null
+    },
+    "431960": {
+      "name": "Wallpaper Engine",
+      "minutes": 406,
+      "icon": "72edaed9d748c6cf7397ffb1c83f0b837b9ebd9d",
+      "unlocked": 3,
+      "total": 17
+    },
+    "444090": {
+      "name": "Paladins",
+      "minutes": 9,
+      "icon": "1565119c17f532338a0645b98e69e1fc1df0c29e",
+      "unlocked": 0,
+      "total": 58
+    },
+    "454650": {
+      "name": "DRAGON BALL XENOVERSE 2",
+      "minutes": 16215,
+      "icon": "9855d00175f6ffb3a5b334e63a3595dd379921dc",
+      "unlocked": 37,
+      "total": 61
+    },
+    "457140": {
+      "name": "Oxygen Not Included",
+      "minutes": 44,
+      "icon": "d37534163ebac8351e0bda0bf30f8f2174c921b6",
+      "unlocked": 0,
+      "total": 51
+    },
+    "462770": {
+      "name": "Pyre",
+      "minutes": 58,
+      "icon": "75ed6f3b5fe1413ff42c21d2493a0e99c704ef2e",
+      "unlocked": 2,
+      "total": 51
+    },
+    "462780": {
+      "name": "Darksiders Warmastered Edition",
+      "minutes": 3040,
+      "icon": "4616a0d94eb5864f2933fd0157bb60a27b14d5fe",
+      "unlocked": 43,
+      "total": 43
+    },
+    "465200": {
+      "name": "Fury Unleashed",
+      "minutes": 3,
+      "icon": "537c74691750b8a0b9fad10023d64779835989b8",
+      "unlocked": 0,
+      "total": 47
+    },
+    "466560": {
+      "name": "Northgard: Definitive Edition",
+      "minutes": 395,
+      "icon": "f290db6bc98c8b40d01a13b9c99baaf705c6ac17",
+      "unlocked": 5,
+      "total": 289
+    },
+    "471550": {
+      "name": "Nine Parchments",
+      "minutes": 17,
+      "icon": "0b634db73b3ad763a837ae9fbee2038bb4a08919",
+      "unlocked": 4,
+      "total": 54
+    },
+    "475150": {
+      "name": "Titan Quest Anniversary Edition",
+      "minutes": 230,
+      "icon": "be3384e7936f548303c77ee2abc4c9026285f554",
+      "unlocked": 3,
+      "total": 115
+    },
+    "480650": {
+      "name": "Yu-Gi-Oh! Legacy of the Duelist",
+      "minutes": 1691,
+      "icon": "8fed47013fd2c24964d8ff66f8d000ce436ecd68",
+      "unlocked": 6,
+      "total": 21
+    },
+    "485510": {
+      "name": "Nioh: Complete Edition",
+      "minutes": 64,
+      "icon": "fd41da946a73390c9b4bf85e8984560b7e85a53b",
+      "unlocked": 0,
+      "total": 79
+    },
+    "493340": {
+      "name": "Planet Coaster",
+      "minutes": 6,
+      "icon": "1b2f29e743dd3048f21fefd9642d86a5f5123968",
+      "unlocked": 1,
+      "total": 32
+    },
+    "493540": {
+      "name": "Figment",
+      "minutes": 2,
+      "icon": "2715c4d5cba6b7f5a3a4b403a9723d86d8c68ea4",
+      "unlocked": 0,
+      "total": 23
+    },
+    "496300": {
+      "name": "Kingdom: New Lands",
+      "minutes": 54,
+      "icon": "d51edb8c8d40e68818adffcd3f9b40149173b2d5",
+      "unlocked": 0,
+      "total": 34
+    },
+    "501590": {
+      "name": "Bulletstorm: Full Clip Edition",
+      "minutes": 5,
+      "icon": "bc714e5714c08ae9f19b84b80b5b65c8b424527d",
+      "unlocked": 0,
+      "total": 60
+    },
+    "504230": {
+      "name": "Celeste",
+      "minutes": 8,
+      "icon": "04cb7aa0b497a3962e6b1655b7fd81a2cc95d18b",
+      "unlocked": 0,
+      "total": 32
+    },
+    "506140": {
+      "name": "Shop Heroes",
+      "minutes": 27,
+      "icon": "1469c2d49ef2f9e13e4e49cd415259a8a0af5f95",
+      "unlocked": null,
+      "total": null
+    },
+    "534550": {
+      "name": "Guacamelee! 2",
+      "minutes": 4,
+      "icon": "798c2959745e4bdc02df6bc801d082263f22c9cc",
+      "unlocked": 0,
+      "total": 49
+    },
+    "544920": {
+      "name": "Darwin Project",
+      "minutes": 17,
+      "icon": "ec8efa43138b3dd7c26d07c0e2527252fbdeeed5",
+      "unlocked": 0,
+      "total": 14
+    },
+    "566050": {
+      "name": "Zeus + Poseidon",
+      "minutes": 431,
+      "icon": "a741a4f46f1d9a02d2a6e4ce6f3d1795f1be4103",
+      "unlocked": null,
+      "total": null
+    },
+    "569480": {
+      "name": "Kingdoms and Castles",
+      "minutes": 16,
+      "icon": "0d90135b3a98192a85f90d3564f670d7bf95e2b3",
+      "unlocked": 2,
+      "total": 12
+    },
+    "571310": {
+      "name": "SteamWorld Dig 2",
+      "minutes": 232,
+      "icon": "dd93b3ef55eca4f9b30dac04450bf03fed2c31a6",
+      "unlocked": 6,
+      "total": 34
+    },
+    "571720": {
+      "name": "One Piece: Unlimited World Red - Deluxe Edition",
+      "minutes": 6,
+      "icon": "add1e1a1176ff27b6a253c898810e1847afd6f81",
+      "unlocked": 0,
+      "total": 56
+    },
+    "582160": {
+      "name": "Assassin's Creed Origins",
+      "minutes": 65,
+      "icon": "dff3a53f93d39f1e0432ec4f22d31c12aeefa36f",
+      "unlocked": 0,
+      "total": 67
+    },
+    "586030": {
+      "name": "Shardbound",
+      "minutes": 332,
+      "icon": "a28f5696fae7613f5eb7e3c5e0f8f229096a9e75",
+      "unlocked": null,
+      "total": null
+    },
+    "588430": {
+      "name": "Fallout Shelter",
+      "minutes": 4176,
+      "icon": "bb39b682fefd9a95486911cd991d8cdc5d7b57c9",
+      "unlocked": 14,
+      "total": 35
+    },
+    "589360": {
+      "name": "Ni no Kuni™ II: Revenant Kingdom",
+      "minutes": 12,
+      "icon": "d8469c3ccf71774d558cd51a1b40ba5f521f74d9",
+      "unlocked": 0,
+      "total": 63
+    },
+    "599140": {
+      "name": "Graveyard Keeper",
+      "minutes": 15,
+      "icon": "b37ef6d7eb243b4d9fc017dec7bc11b234f34cc2",
+      "unlocked": 3,
+      "total": 125
+    },
+    "601510": {
+      "name": "Yu-Gi-Oh! Duel Links",
+      "minutes": 878,
+      "icon": "cb55546652672da725a72bdcf28af81ec8f9148e",
+      "unlocked": 2,
+      "total": 20
+    },
+    "606280": {
+      "name": "Darksiders III",
+      "minutes": 57,
+      "icon": "1f2b21f809d9a409460f23d12061c1b18f6d5a74",
+      "unlocked": 2,
+      "total": 64
+    },
+    "607080": {
+      "name": "Psychonauts 2",
+      "minutes": 3,
+      "icon": "ac07e34abbee5e3bc4a3b50877effe61ee76b0d9",
+      "unlocked": 0,
+      "total": 57
+    },
+    "609320": {
+      "name": "FAR: Lone Sails",
+      "minutes": 4,
+      "icon": "3e1dc29370610797cfebed20bb202f5bffd236fe",
+      "unlocked": 0,
+      "total": 14
+    },
+    "609940": {
+      "name": "KROSMAGA",
+      "minutes": 79,
+      "icon": "42ba7ef7644e96ba26d1954fc99a3efe6360ca54",
+      "unlocked": 0,
+      "total": 43
+    },
+    "610080": {
+      "name": "Realm Grinder",
+      "minutes": 39,
+      "icon": "67df032543bc5c8b24c2e704a63e11f3b2c1e926",
+      "unlocked": 4,
+      "total": 14
+    },
+    "612470": {
+      "name": "Bio Inc. Redemption",
+      "minutes": 1,
+      "icon": "c8c379f7a87b81d412a668a9fddc66eb1faf1549",
+      "unlocked": 0,
+      "total": 41
+    },
+    "613830": {
+      "name": "CHRONO TRIGGER",
+      "minutes": 43,
+      "icon": "55a9d56a52886b6cbf197894de096eb79fe1c3ab",
+      "unlocked": 0,
+      "total": 13
+    },
+    "613880": {
+      "name": "Zoo Tycoon",
+      "minutes": 8,
+      "icon": "af50c2ba854aba216ff1176dc8dd6add6043d3b7",
+      "unlocked": 0,
+      "total": 59
+    },
+    "627690": {
+      "name": "Idle Champions of the Forgotten Realms",
+      "minutes": 218,
+      "icon": "1abb043002c041c59a7a945b3706d0bd5a223dbc",
+      "unlocked": 2,
+      "total": 860
+    },
+    "629820": {
+      "name": "Maneater",
+      "minutes": 2312,
+      "icon": "8c360e45ff1ec31a3640e62780d7d1f47badc251",
+      "unlocked": 44,
+      "total": 44
+    },
+    "631510": {
+      "name": "Devil May Cry HD Collection",
+      "minutes": 62,
+      "icon": "297594be98c289527e4234e217e1cfe6ede20400",
+      "unlocked": 0,
+      "total": 99
+    },
+    "638230": {
+      "name": "Journey",
+      "minutes": 5,
+      "icon": "8538c0cb998e844ce5c78683f322e9ca81075a34",
+      "unlocked": 0,
+      "total": 14
+    },
+    "678950": {
+      "name": "DRAGON BALL FighterZ",
+      "minutes": 110,
+      "icon": "ebac40c0f7452dcafd40d0fb0ad52c2ae10639f5",
+      "unlocked": 2,
+      "total": 35
+    },
+    "699170": {
+      "name": "Fell Seal: Arbiter's Mark",
+      "minutes": 37,
+      "icon": "2751691d1de9fda9c48819b2eb83c5ffb30b5da9",
+      "unlocked": 1,
+      "total": 53
+    },
+    "701160": {
+      "name": "Kingdom Two Crowns",
+      "minutes": 2125,
+      "icon": "7bf44c4e301a0f6fae78f697b39b5a1268223945",
+      "unlocked": 13,
+      "total": 46
+    },
+    "703080": {
+      "name": "Planet Zoo",
+      "minutes": 47,
+      "icon": "68c7a610498955f547b0ece0aff081d23f2025b5",
+      "unlocked": 6,
+      "total": 38
+    },
+    "703180": {
+      "name": "Ben 10",
+      "minutes": 6,
+      "icon": "e6b27db9763323d8978d17aefcf9c570dfb9e0dc",
+      "unlocked": 0,
+      "total": 38
+    },
+    "710920": {
+      "name": "Darksiders Genesis",
+      "minutes": 60,
+      "icon": "bc17b70c4360207b64d6d0b278d04291bafed2e3",
+      "unlocked": 0,
+      "total": 30
+    },
+    "729040": {
+      "name": "Borderlands GOTY Enhanced",
+      "minutes": 2948,
+      "icon": "aba56aae141ef1495cef3534163beb1664b417c0",
+      "unlocked": 36,
+      "total": 80
+    },
+    "730390": {
+      "name": "Raji: An Ancient Epic",
+      "minutes": 144,
+      "icon": "a1f49e7d6ddbe7a7e61d905a1db339d8a0109e69",
+      "unlocked": 4,
+      "total": 21
+    },
+    "730820": {
+      "name": "The Curse of Monkey Island",
+      "minutes": 19,
+      "icon": "a59f3ca19576b6b6c6dec09f1e9378939c135f2a",
+      "unlocked": null,
+      "total": null
+    },
+    "742500": {
+      "name": "Nonogram - Master's Legacy",
+      "minutes": 1640,
+      "icon": "80c07a044365060609e3f5db537f186c4c22df9d",
+      "unlocked": 6,
+      "total": 6
+    },
+    "748360": {
+      "name": "MY HERO ONE'S JUSTICE",
+      "minutes": 9,
+      "icon": "812c75d552a4d91cbff3663fcb64c5ef1aeed757",
+      "unlocked": 1,
+      "total": 57
+    },
+    "755500": {
+      "name": "ONE PIECE World Seeker",
+      "minutes": 5,
+      "icon": "5e7cecbf7a0285b22cc39241c63635696b3470ac",
+      "unlocked": 2,
+      "total": 63
+    },
+    "757320": {
+      "name": "Atomicrops",
+      "minutes": 8,
+      "icon": "f9e974fb456444debc2ed6ff25e4f5883015db57",
+      "unlocked": 0,
+      "total": 26
+    },
+    "759750": {
+      "name": "Doodle God: Alchemy Jam",
+      "minutes": 43,
+      "icon": "34469b3585ecda920ec70f36d298af9dd3524896",
+      "unlocked": null,
+      "total": null
+    },
+    "761890": {
+      "name": "Albion Online",
+      "minutes": 107,
+      "icon": "c58d1e42e59a9c6cc57c8da69d944b37ba45a0e2",
+      "unlocked": 8,
+      "total": 154
+    },
+    "764790": {
+      "name": "The Messenger",
+      "minutes": 7,
+      "icon": "0557eb871fd0e6c6124532bf959af2604be5aa9d",
+      "unlocked": 1,
+      "total": 48
+    },
+    "770810": {
+      "name": "Good Pizza, Great Pizza",
+      "minutes": 15,
+      "icon": "8f4fe09d2bee70f5d912abaece1f95495f67bb0b",
+      "unlocked": 0,
+      "total": 40
+    },
+    "792300": {
+      "name": "The Beast Inside",
+      "minutes": 8,
+      "icon": "72ab502b6244ac74823fa53112dc5856c6ef31dd",
+      "unlocked": 0,
+      "total": 27
+    },
+    "798460": {
+      "name": "Ni no Kuni Wrath of the White Witch™ Remastered",
+      "minutes": 48,
+      "icon": "c2ab51aa5079f5e64e6128b247057c165555ca8e",
+      "unlocked": 1,
+      "total": 33
+    },
+    "809540": {
+      "name": "Mechs V Kaijus",
+      "minutes": 10,
+      "icon": "dd6fae6123b63725516f76da0591a51685f521c4",
+      "unlocked": 4,
+      "total": 73
+    },
+    "812140": {
+      "name": "Assassin's Creed Odyssey",
+      "minutes": 43,
+      "icon": "4b6cf0715b30669411bf204bce7ed99a9c84671b",
+      "unlocked": 0,
+      "total": 93
+    },
+    "813780": {
+      "name": "Age of Empires II: Definitive Edition",
+      "minutes": 129,
+      "icon": "e2b5a7beb58136b892e517cb93ae08b36065363c",
+      "unlocked": 3,
+      "total": 370
+    },
+    "816020": {
+      "name": "JUMP FORCE",
+      "minutes": 271,
+      "icon": "5c7c0a472f9bfc71bac2f01c3b70865a5540900c",
+      "unlocked": 1,
+      "total": 50
+    },
+    "816340": {
+      "name": "Kingdom Rush Origins",
+      "minutes": 3537,
+      "icon": "e25b57417e1d0b8f5ee41959254bd4f4ec14f017",
+      "unlocked": 40,
+      "total": 83
+    },
+    "818320": {
+      "name": "LEGO® The Incredibles",
+      "minutes": 7,
+      "icon": "f216b56165ddefeeb6e6fd4a39f3c1a0b92cb923",
+      "unlocked": 0,
+      "total": 51
+    },
+    "851850": {
+      "name": "DRAGON BALL Z: KAKAROT",
+      "minutes": 135,
+      "icon": "982ea5a5c1dfbc03258671212a5d4335cc34d908",
+      "unlocked": 5,
+      "total": 42
+    },
+    "858710": {
+      "name": "Gravity Circuit",
+      "minutes": 3,
+      "icon": "6d05b74030eea68e4816c3c4ca565131c378d338",
+      "unlocked": 0,
+      "total": 53
+    },
+    "870780": {
+      "name": "Control Ultimate Edition",
+      "minutes": 6,
+      "icon": "3438e3a03c82194349d66f99ee642ba59cbcc3dc",
+      "unlocked": 0,
+      "total": 67
+    },
+    "871420": {
+      "name": "Lovecraft's Untold Stories",
+      "minutes": 7,
+      "icon": "f776d8b37946395b06d1c9d4bdc76aba3d3f8f0a",
+      "unlocked": 0,
+      "total": 35
+    },
+    "872200": {
+      "name": "Rogue Company",
+      "minutes": 36,
+      "icon": "ec36ff029402b9cf4e1f7829f293fd12a71e6ce1",
+      "unlocked": 5,
+      "total": 20
+    },
+    "872570": {
+      "name": "Romans: Age of Caesar",
+      "minutes": 9,
+      "icon": "8bdbf917dc4b3104ce7574ff05becdfb9dd6fc42",
+      "unlocked": null,
+      "total": null
+    },
+    "911400": {
+      "name": "Assassin's Creed III Remastered",
+      "minutes": 3,
+      "icon": "68e5640754e5ddf29aadff49062fa68cc8c8f4a5",
+      "unlocked": 0,
+      "total": 84
+    },
+    "914320": {
+      "name": "Swarm Simulator: Evolution",
+      "minutes": 418,
+      "icon": "074cc02b3396e2b43cadeaf499c12ac001078f8a",
+      "unlocked": null,
+      "total": null
+    },
+    "933110": {
+      "name": "Age of Empires III: Definitive Edition",
+      "minutes": 310,
+      "icon": "145e4d6278f545ea3300d777e2dc3c56ddbbcc5c",
+      "unlocked": 4,
+      "total": 121
+    },
+    "934700": {
+      "name": "Dead Island 2",
+      "minutes": 17,
+      "icon": "07025c2a5e629a7a8200d7b2f736f2529c6d1b17",
+      "unlocked": 0,
+      "total": 59
+    },
+    "953490": {
+      "name": "CARRION",
+      "minutes": 9,
+      "icon": "e6f76f606f82cdadbdac5cc829410eac3ab029ac",
+      "unlocked": 2,
+      "total": 21
+    },
+    "960090": {
+      "name": "Bloons TD 6",
+      "minutes": 6286,
+      "icon": "c5f0b67c8beeb6be99abe2ad8db2cada5d5ccff0",
+      "unlocked": 41,
+      "total": 156
+    },
+    "972660": {
+      "name": "Spiritfarer®: Farewell Edition",
+      "minutes": 2232,
+      "icon": "21c6c86b51df38e9480231792acf0cfc30f51820",
+      "unlocked": 18,
+      "total": 39
+    },
+    "976310": {
+      "name": "Mortal Kombat 11",
+      "minutes": 1407,
+      "icon": "315c46ce25bcb6afa47473588b5fd8edeb3afdfa",
+      "unlocked": 7,
+      "total": 58
+    },
+    "977880": {
+      "name": "Eastward",
+      "minutes": 32,
+      "icon": "2b6ec2b769d10c0d289aa943ea26501dfa28a9cb",
+      "unlocked": 0,
+      "total": 30
+    },
+    "979060": {
+      "name": "Bloons Adventure Time TD",
+      "minutes": 24,
+      "icon": "fd366c5199457e1db9e839d515e1af68e879d472",
+      "unlocked": 0,
+      "total": 71
+    },
+    "987400": {
+      "name": "Disney's Hercules",
+      "minutes": 6,
+      "icon": "de1272afd5c1e184f2d48c26f1018975a1d8297b",
+      "unlocked": null,
+      "total": null
+    },
+    "991560": {
+      "name": "ONE PUNCH MAN: A HERO NOBODY KNOWS ",
+      "minutes": 985,
+      "icon": "56c512303bc32f74bc2244a16a0888a44a4c14f2",
+      "unlocked": 24,
+      "total": 47
+    },
+    "996580": {
+      "name": "Spyro™ Reignited Trilogy",
+      "minutes": 44,
+      "icon": "58d9d5bb243382cdb00259733d71e7621f502a2d",
+      "unlocked": 1,
+      "total": 105
+    },
+    "1005240": {
+      "name": "Pixel Puzzles Illustrations & Anime Jigsaw Puzzles",
+      "minutes": 679,
+      "icon": "3d1fefd97fdf17917ab0dd16d2f802266a3d536c",
+      "unlocked": 8,
+      "total": 566
+    },
+    "1017900": {
+      "name": "Age of Empires: Definitive Edition",
+      "minutes": 2229,
+      "icon": "e8623421f060fd7e3a5f79a5c003701702acec42",
+      "unlocked": 8,
+      "total": 44
+    },
+    "1042490": {
+      "name": "Call of the Sea",
+      "minutes": 8,
+      "icon": "ec91d394beed7123356920cc1ad1bd7700540ff0",
+      "unlocked": 0,
+      "total": 34
+    },
+    "1045180": {
+      "name": "Shattered - Tale of the Forgotten King",
+      "minutes": 32,
+      "icon": "49fb56e04ccb7a8994e78b4131f50d37c6f06ebe",
+      "unlocked": 0,
+      "total": 34
+    },
+    "1046030": {
+      "name": "ISLANDERS",
+      "minutes": 7,
+      "icon": "59b7cab8ac00df39ca5857f4a4fcdc922ad94f06",
+      "unlocked": 1,
+      "total": 38
+    },
+    "1055430": {
+      "name": "Swords and Sandals Classic Collection",
+      "minutes": 26,
+      "icon": "0bfe973813cd900dc49c6ef3c79300a24c52c01f",
+      "unlocked": 2,
+      "total": 74
+    },
+    "1058450": {
+      "name": "MY HERO ONE'S JUSTICE 2",
+      "minutes": 10,
+      "icon": "dc684f960bc1a101e50fd712025cfa09dfa5ecce",
+      "unlocked": 1,
+      "total": 57
+    },
+    "1069740": {
+      "name": "Seen",
+      "minutes": 4,
+      "icon": "8da40e9bfb62086931281abf32e294ea91253099",
+      "unlocked": 4,
+      "total": 210
+    },
+    "1087760": {
+      "name": "The Gunk",
+      "minutes": 161,
+      "icon": "049bdf3e32632a92e31da4357a053e4b839b8ae8",
+      "unlocked": 1,
+      "total": 17
+    },
+    "1092790": {
+      "name": "Inscryption",
+      "minutes": 31,
+      "icon": "25c02dcbabe97febe787797195099325a4d47935",
+      "unlocked": 0,
+      "total": 40
+    },
+    "1097200": {
+      "name": "Twelve Minutes",
+      "minutes": 356,
+      "icon": "8b32ecd85e11294527e301146edb4f276e11ddb0",
+      "unlocked": 2,
+      "total": 12
+    },
+    "1105670": {
+      "name": "The Last Spell",
+      "minutes": 19,
+      "icon": "a82120eaca50dcdcd92474144cd0a51173e7e141",
+      "unlocked": 0,
+      "total": 94
+    },
+    "1108590": {
+      "name": "Eldest Souls",
+      "minutes": 4,
+      "icon": "415972b4704c3a976ad04e502ecedc0fad54fbb7",
+      "unlocked": 3,
+      "total": 50
+    },
+    "1123770": {
+      "name": "Curse of the Dead Gods",
+      "minutes": 69,
+      "icon": "74439a263f77dc8e5d6dff12da3458b46ce2726b",
+      "unlocked": 2,
+      "total": 30
+    },
+    "1139980": {
+      "name": "Travellers Rest",
+      "minutes": 19,
+      "icon": "5eef3460cd2cc088baf4ecf64e8531cf9ac88631",
+      "unlocked": 2,
+      "total": 55
+    },
+    "1140170": {
+      "name": "Arietta of Spirits",
+      "minutes": 123,
+      "icon": "6c866576376b56197ae3c2f435bfac795a3524f7",
+      "unlocked": 3,
+      "total": 30
+    },
+    "1140890": {
+      "name": "Morbid: The Seven Acolytes",
+      "minutes": 9,
+      "icon": "c0fe6b707ad9c8d689ec4ab9694ba4c9adc50351",
+      "unlocked": 1,
+      "total": 25
+    },
+    "1145360": {
+      "name": "Hades",
+      "minutes": 41,
+      "icon": "8a3fca36a00883e8066263ad35dd15d77a1f9abc",
+      "unlocked": 0,
+      "total": 49
+    },
+    "1165470": {
+      "name": "TombStar",
+      "minutes": 22,
+      "icon": "22055f209bb285e5b1059f83733357afe3b156f2",
+      "unlocked": 1,
+      "total": 33
+    },
+    "1172380": {
+      "name": "STAR WARS Jedi: Fallen Order™ ",
+      "minutes": 36,
+      "icon": "0ea1d285a8ee6fbeef0e8f7f3b2d7fa4cbcb423b",
+      "unlocked": 2,
+      "total": 39
+    },
+    "1172620": {
+      "name": "Sea of Thieves",
+      "minutes": 51,
+      "icon": "f95f362708fc326511c5d86566c447ee625bf776",
+      "unlocked": 4,
+      "total": 293
+    },
+    "1210320": {
+      "name": "Potion Craft: Alchemist Simulator",
+      "minutes": 19,
+      "icon": "e0a089daf3bfb668d42375e2e3d1f9c1184bb80f",
+      "unlocked": 0,
+      "total": 29
+    },
+    "1217060": {
+      "name": "Gunfire Reborn",
+      "minutes": 9,
+      "icon": "446d10e4c62466203a4c60e3416d4307048710b8",
+      "unlocked": 0,
+      "total": 134
+    },
+    "1218210": {
+      "name": "Coromon",
+      "minutes": 29,
+      "icon": "c4e8ca1f42851fe7cdc278e0fecd7386ca2108a5",
+      "unlocked": 1,
+      "total": 80
+    },
+    "1222670": {
+      "name": "The Sims™ 4",
+      "minutes": 4,
+      "icon": "ca6bc8b2411bce4a2cd325ab75f0204bc3a4ad98",
+      "unlocked": null,
+      "total": null
+    },
+    "1222680": {
+      "name": "Need for Speed™ Heat ",
+      "minutes": 7,
+      "icon": "98a96955403db8eeed026bc5ff04e51e3329f1b0",
+      "unlocked": 0,
+      "total": 42
+    },
+    "1233260": {
+      "name": "FAIRY TAIL",
+      "minutes": 10,
+      "icon": "defc25cf140048d3bc8e61a797afe9f6c3058d11",
+      "unlocked": 0,
+      "total": 44
+    },
+    "1233570": {
+      "name": "Mirror's Edge™ Catalyst",
+      "minutes": 33,
+      "icon": "a5583fa5e07defaeb3a3ade0b4936767265dd660",
+      "unlocked": 1,
+      "total": 49
+    },
+    "1244090": {
+      "name": "Sea of Stars: Sunset Edition",
+      "minutes": 15,
+      "icon": "529d0f064196911482aeeb8f42ffcc1ff77fed67",
+      "unlocked": 0,
+      "total": 54
+    },
+    "1275350": {
+      "name": "Ninja Kiwi Archive",
+      "minutes": 24,
+      "icon": "4d7f75cfdf614baab330c2e63559d6e600b273e9",
+      "unlocked": null,
+      "total": null
+    },
+    "1284410": {
+      "name": "GWENT: The Witcher Card Game",
+      "minutes": 146,
+      "icon": "3e089897714dfc658a5e62246c342e2826a708e1",
+      "unlocked": 0,
+      "total": 46
+    },
+    "1296360": {
+      "name": "Archvale",
+      "minutes": 197,
+      "icon": "8c1c699e38ac5b989b01664efcdd98e633200bb7",
+      "unlocked": 10,
+      "total": 40
+    },
+    "1311070": {
+      "name": "Greak: Memories of Azur",
+      "minutes": 11,
+      "icon": "2a7d7b98b015f0d76924d0a8c2c9154bb6610830",
+      "unlocked": 1,
+      "total": 24
+    },
+    "1324340": {
+      "name": "Made in Abyss: Binary Star Falling into Darkness",
+      "minutes": 6,
+      "icon": "07652d13411430212d290539c29f6f99aee4b022",
+      "unlocked": 0,
+      "total": 32
+    },
+    "1328670": {
+      "name": "Mass Effect™ Legendary Edition",
+      "minutes": 2,
+      "icon": "443ed7dba43882ef4298f8ed15bf67f323461e14",
+      "unlocked": 0,
+      "total": 127
+    },
+    "1328840": {
+      "name": "Lost in Play",
+      "minutes": 23,
+      "icon": "c6c9f705ce5488a75b985c39e6825b3da83f554b",
+      "unlocked": 1,
+      "total": 19
+    },
+    "1337760": {
+      "name": "Potion Permit",
+      "minutes": 54,
+      "icon": "09e8280dd43ba892b854986aca03f6f68c7d2a56",
+      "unlocked": 2,
+      "total": 38
+    },
+    "1347420": {
+      "name": "One Way: The Elevator",
+      "minutes": 89,
+      "icon": "48169711d00c5bf4424ba70191b23dca69ddf712",
+      "unlocked": 1,
+      "total": 18
+    },
+    "1351080": {
+      "name": "Pharaoh: A New Era",
+      "minutes": 19,
+      "icon": "63562e85ac4a46e5644a062f7748fc17c56f8941",
+      "unlocked": 0,
+      "total": 47
+    },
+    "1367550": {
+      "name": "Kingdom Rush Vengeance",
+      "minutes": 42,
+      "icon": "f6eda841719d02a0b0248b5043f36dfd1fdec335",
+      "unlocked": 2,
+      "total": 90
+    },
+    "1368820": {
+      "name": "RollerCoaster Tycoon® 3: Complete Edition",
+      "minutes": 4,
+      "icon": "62024e8d88c800cd794add3f4e5d7aa4f1f24a09",
+      "unlocked": null,
+      "total": null
+    },
+    "1375750": {
+      "name": "Regions of Ruin: Runegate",
+      "minutes": 6,
+      "icon": "3b39df15252731b6757f9474d70c497d4ed314b8",
+      "unlocked": 0,
+      "total": 48
+    },
+    "1385100": {
+      "name": "Insurmountable",
+      "minutes": 7,
+      "icon": "bd20762ebb2eb52cdd6ce73ba820d8014367536f",
+      "unlocked": 1,
+      "total": 29
+    },
+    "1390350": {
+      "name": "Webbed",
+      "minutes": 4,
+      "icon": "9e694623b3cdb92eb4cfc1fa41e2199ccb4a32ed",
+      "unlocked": 1,
+      "total": 19
+    },
+    "1393750": {
+      "name": "Ocean's Heart",
+      "minutes": 11,
+      "icon": "e77f486070b53c97e6e5b6fd56f8c8b9d6fd8919",
+      "unlocked": 0,
+      "total": 21
+    },
+    "1411740": {
+      "name": "Urbek City Builder",
+      "minutes": 18,
+      "icon": "e154018d350eefe123d71ce192827ad0f97a3122",
+      "unlocked": 0,
+      "total": 103
+    },
+    "1419170": {
+      "name": "My Singing Monsters",
+      "minutes": 190,
+      "icon": "0064c43daf4610bc7db9ed31a940da2ea8dcf331",
+      "unlocked": null,
+      "total": null
+    },
+    "1426210": {
+      "name": "It Takes Two",
+      "minutes": 1669,
+      "icon": "6b15f6d81c4fc52056f4928b363b7fac591a945b",
+      "unlocked": 12,
+      "total": 20
+    },
+    "1432050": {
+      "name": "Nobody Saves the World",
+      "minutes": 11,
+      "icon": "405a56b24a1417a807914366a4e4871fdaf23590",
+      "unlocked": 0,
+      "total": 41
+    },
+    "1455840": {
+      "name": "Dorfromantik",
+      "minutes": 15,
+      "icon": "c7f24bc1facf1af3378ad655eed2dee7acc5c7b2",
+      "unlocked": 1,
+      "total": 85
+    },
+    "1462570": {
+      "name": "Lost in Random™",
+      "minutes": 13,
+      "icon": "187de0271c2e057bce6c74c39ad4676b9f1673b9",
+      "unlocked": 1,
+      "total": 40
+    },
+    "1466860": {
+      "name": "Age of Empires IV: Anniversary Edition",
+      "minutes": 36,
+      "icon": "503acf3ef0503e24af6b5336012a1f585a2f955e",
+      "unlocked": 3,
+      "total": 175
+    },
+    "1468260": {
+      "name": "Leaf Blower Revolution - Idle Game",
+      "minutes": 896,
+      "icon": "2d4f99c08afe2e11673db964da768953e752a0fc",
+      "unlocked": 16,
+      "total": 24
+    },
+    "1510460": {
+      "name": "Chicken Invaders Universe",
+      "minutes": 30,
+      "icon": "94b6d0cd6104e7a8ef3afee6d0abbb924cabeba2",
+      "unlocked": 3,
+      "total": 38
+    },
+    "1522820": {
+      "name": "Orcs Must Die! 3",
+      "minutes": 90,
+      "icon": "e637d019db32c830fe82c663644f8d3a46072c15",
+      "unlocked": 2,
+      "total": 38
+    },
+    "1545450": {
+      "name": "Incredibox",
+      "minutes": 557,
+      "icon": "e4085226739fcd7a5431fc415d759294778d869a",
+      "unlocked": null,
+      "total": null
+    },
+    "1549250": {
+      "name": "Undecember",
+      "minutes": 59,
+      "icon": "64ffefc9555782f5f455f329c983b0572eb6282a",
+      "unlocked": null,
+      "total": null
+    },
+    "1583230": {
+      "name": "High On Life",
+      "minutes": 382,
+      "icon": "edf77785498d06effc5d8c4db72c0d364978b66f",
+      "unlocked": 10,
+      "total": 44
+    },
+    "1592670": {
+      "name": "Soda Crisis",
+      "minutes": 61,
+      "icon": "b1f43f72ef59397518ce7cef8de5e25b7ef96ccd",
+      "unlocked": 10,
+      "total": 49
+    },
+    "1607250": {
+      "name": "MY HERO ULTRA RUMBLE",
+      "minutes": 16,
+      "icon": "8aa264968affcf28f31ad39362bd00a16d8c5039",
+      "unlocked": 2,
+      "total": 15
+    },
+    "1637320": {
+      "name": "Dome Keeper",
+      "minutes": 18,
+      "icon": "4ecf3a011cf5eeb37d0072a1a182b7ea5140e3e2",
+      "unlocked": 0,
+      "total": 47
+    },
+    "1654660": {
+      "name": "En Garde!",
+      "minutes": 36,
+      "icon": "25014abf9f8b1b146ac0bb4a4ce4a16513a3e2e9",
+      "unlocked": 2,
+      "total": 30
+    },
+    "1674820": {
+      "name": "TFC: The Fertile Crescent",
+      "minutes": 103,
+      "icon": "4d3234e64982e644aef2509d84fa10d328f4e02a",
+      "unlocked": 2,
+      "total": 14
+    },
+    "1693980": {
+      "name": "Dead Space",
+      "minutes": 23,
+      "icon": "3368d467f4f60f9f07ec4c206a22184fae060be2",
+      "unlocked": 0,
+      "total": 47
+    },
+    "1707650": {
+      "name": "Swords and Sandals Immortals",
+      "minutes": 10,
+      "icon": "8e4333e783cbfbe5fc6119569d8a667eb5d3d14f",
+      "unlocked": 3,
+      "total": 54
+    },
+    "1715130": {
+      "name": "Crysis Remastered",
+      "minutes": 91,
+      "icon": "c94e91cdf9ec7a73fde8090d96a8674386a1a0e3",
+      "unlocked": 2,
+      "total": 40
+    },
+    "1740680": {
+      "name": "Voodoo Detective",
+      "minutes": 25,
+      "icon": "4eb8effabf8fc5ecb7183702a3dcdd180a1c8056",
+      "unlocked": null,
+      "total": null
+    },
+    "1794680": {
+      "name": "Vampire Survivors",
+      "minutes": 1305,
+      "icon": "3677cf1be3be1f4ea42261c62ce10519715ade58",
+      "unlocked": 101,
+      "total": 243
+    },
+    "1801110": {
+      "name": "BOKURA",
+      "minutes": 2,
+      "icon": "6ecb6896b5d9f190e70b256bf05ebb464d70fed7",
+      "unlocked": 0,
+      "total": 14
+    },
+    "1896880": {
+      "name": "Dungeons of Dreadrock",
+      "minutes": 401,
+      "icon": "7a08439e336d8da2d5fcb965afd2aa8de7eef4eb",
+      "unlocked": 0,
+      "total": 10
+    },
+    "1920490": {
+      "name": "The Outer Worlds: Spacer's Choice Edition",
+      "minutes": 15,
+      "icon": "74b001635a01a0f2e504ec0a842ec53171906a1b",
+      "unlocked": 1,
+      "total": 68
+    },
+    "1931010": {
+      "name": "Spirittea",
+      "minutes": 16,
+      "icon": "5e885628c2d10054792c3a2250eea4b641d31705",
+      "unlocked": 0,
+      "total": 16
+    },
+    "1941410": {
+      "name": "The Cub",
+      "minutes": 36,
+      "icon": "a5f80b74a0fc7caa8ffd68427dfe49589eac5986",
+      "unlocked": 2,
+      "total": 19
+    },
+    "1956040": {
+      "name": "Kingdom Eighties",
+      "minutes": 9,
+      "icon": "de695ee35439b9d5706ca3ed5f01a95ec1e80d89",
+      "unlocked": 0,
+      "total": 31
+    },
+    "1974050": {
+      "name": "Torchlight: Infinite",
+      "minutes": 77,
+      "icon": "77ce83c970c9f04b29a7381302fb35b152786c74",
+      "unlocked": 0,
+      "total": 43
+    },
+    "2009860": {
+      "name": "Tower Escape",
+      "minutes": 3,
+      "icon": "8195f07ec9b553b337b7840770f1bd0e86c85677",
+      "unlocked": 1,
+      "total": 29
+    },
+    "2134770": {
+      "name": "SteamWorld Build",
+      "minutes": 212,
+      "icon": "2483c1606319af690e2e1d1001a3f8f78f9ca11d",
+      "unlocked": 4,
+      "total": 28
+    },
+    "2187290": {
+      "name": "Wall World",
+      "minutes": 335,
+      "icon": "e63abe2ba9116b8e92a424c5bc4fb231518557e9",
+      "unlocked": 5,
+      "total": 24
+    },
+    "2225070": {
+      "name": "Trackmania",
+      "minutes": 7,
+      "icon": "4b0f99cb45eef02df25bee27eb3d52052e8f8b55",
+      "unlocked": null,
+      "total": null
+    },
+    "2269320": {
+      "name": "Natti",
+      "minutes": 8,
+      "icon": "000fe63e11b9e574cfecc8b8508da97a479749fe",
+      "unlocked": 1,
+      "total": 35
+    },
+    "2305500": {
+      "name": "FAIRY TAIL: DUNGEONS",
+      "minutes": 82,
+      "icon": "a97cb056a9bef56201531b9de10f8198ec35eb4d",
+      "unlocked": 1,
+      "total": 24
+    },
+    "2334730": {
+      "name": "Death Must Die",
+      "minutes": 3309,
+      "icon": "8bb324e3520441323adf02215b66f5c0c685d6c8",
+      "unlocked": 42,
+      "total": 59
+    },
+    "2636420": {
+      "name": "Graveyard Shift",
+      "minutes": 260,
+      "icon": "8c3e598a75c4b207adf1a0959793ccd996ee112c",
+      "unlocked": 0,
+      "total": 5
+    },
+    "2779570": {
+      "name": "Archons",
+      "minutes": 13,
+      "icon": "b36e8dcf54d66af167d6596a5fac1f4a38326ea1",
+      "unlocked": 0,
+      "total": 18
+    },
+    "2820820": {
+      "name": "Jotunnslayer: Hordes of Hel",
+      "minutes": 23,
+      "icon": "4284a0918a75873e83b52089b12534967f60cbe6",
+      "unlocked": 2,
+      "total": 38
+    },
+    "2934220": {
+      "name": "Monsters are Coming!",
+      "minutes": 53,
+      "icon": "ea408f7db8fb905390ce10b0b0a932c69837306a",
+      "unlocked": 0,
+      "total": 62
+    },
+    "2996040": {
+      "name": "Teenage Mutant Ninja Turtles: Splintered Fate",
+      "minutes": 11,
+      "icon": "52873169f648846aadf836fefa8b6a4305c8dab9",
+      "unlocked": 1,
+      "total": 82
+    },
+    "3177970": {
+      "name": "Bioweaver",
+      "minutes": 17,
+      "icon": "38f338e095b074e0e30ef4fe76c30621abaa8cfc",
+      "unlocked": 0,
+      "total": 37
+    },
+    "3587610": {
+      "name": "The Dark Queen of Mortholme",
+      "minutes": 141,
+      "icon": "bebc430887fe4a8e32bfa860ad3e5b0cc25c89c1",
+      "unlocked": 7,
+      "total": 8
+    },
+    "3679080": {
+      "name": "The Seven Deadly Sins: Origin",
+      "minutes": 21,
+      "icon": "9ed1afdc89ab932c3060fbcdd48e0a38bb8996a4",
+      "unlocked": null,
+      "total": null
+    },
+    "4139720": {
+      "name": "Chop Chains",
+      "minutes": 35,
+      "icon": "87e6c32a8a14ff2e37f62fcdf4863f1cfddc56d9",
+      "unlocked": 15,
+      "total": 81
+    },
+    "4249150": {
+      "name": "Breath of Fire IV",
+      "minutes": 2,
+      "icon": "22bb3e54bb9de7af0f572db89e19d2fb0a923cfc",
+      "unlocked": null,
+      "total": null
+    }
+  }
 }
