@@ -32,11 +32,13 @@ import styles from './ShirtViewer.module.css';
 // squashing toward the middle.
 
 /** How far the plane bends across its width, in radians. */
-const CURL = 0.55;
+const CURL = 1.05;
+/** How much it also bows toward the viewer down its length. */
+const BOW = 0.16;
 /** The furthest it will ever turn from face-on, in radians. */
-const LIMIT = 0.62;
+const LIMIT = 0.72;
 /** How far the idle drift swings. */
-const DRIFT = 0.26;
+const DRIFT = 0.34;
 
 export default function ShirtViewer({
   src,
@@ -67,41 +69,59 @@ export default function ShirtViewer({
     renderer.domElement.className = styles.canvas;
 
     const scene = new Scene();
-    const camera = new PerspectiveCamera(34, 1, 0.1, 100);
-    camera.position.set(0, 0, 7.4);
+    // Wider and closer than before. A long lens flattens depth — the whole
+    // point here is to keep some.
+    const camera = new PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0, 6.1);
 
-    scene.add(new AmbientLight(0xffffff, 1.5));
+    // Ambient is deliberately low. It was the reason the garment looked flat:
+    // at 1.5 it swamped both directional lights, every facet came back equally
+    // lit, and a curved surface with no gradient across it is a postcard.
+    // Shape only shows where light falls off.
+    scene.add(new AmbientLight(0xffffff, 0.62));
     // Two lights, off to either side, so turning the garment moves a highlight
     // across it. One light and the curve would be invisible.
-    const key = new DirectionalLight(0xfff0f6, 2.1);
-    key.position.set(-3, 2.5, 4);
+    const key = new DirectionalLight(0xfff0f6, 1.75);
+    key.position.set(-3.2, 2.5, 3.4);
     scene.add(key);
-    const rim = new DirectionalLight(0xbfe4ff, 1.5);
-    rim.position.set(4, -1, 2.5);
+    const rim = new DirectionalLight(0xbfe4ff, 1.05);
+    rim.position.set(4, -1, 2.2);
     scene.add(rim);
 
     // Enough segments across the width to bend smoothly; the height needs
     // almost none, since the curve runs one way only.
-    const geometry = new PlaneGeometry(3.4, 4.4, 60, 2);
+    const WIDTH = 3.4;
+    const HEIGHT = 4.4;
+    const geometry = new PlaneGeometry(WIDTH, HEIGHT, 60, 40);
     const pos = geometry.attributes.position;
-    const width = 3.4;
-    const k = CURL / width;
+    const k = CURL / WIDTH;
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
+      const y = pos.getY(i);
       // Arc length is preserved: the flat distance from centre becomes the
       // angle swept, so the garment does not narrow as it bends.
       const a = x * k;
+      // A second, gentler bow down the length. A pure cylinder is uniform top
+      // to bottom, which is what a banner does; cloth on a body is widest at
+      // the chest and falls away at the shoulder and the hem. This is the
+      // cheapest version of that — enough to break the extrusion.
+      const t = (y / HEIGHT) * 2;
+      const bow = (1 - t * t) * BOW;
       pos.setX(i, Math.sin(a) / k);
-      pos.setZ(i, (Math.cos(a) - 1) / k);
+      pos.setZ(i, (Math.cos(a) - 1) / k + bow);
     }
     geometry.computeVertexNormals();
 
     const material = new MeshStandardMaterial({
       transparent: true,
-      roughness: 0.86,
+      // Lower than it was, so the light actually rolls off the curve instead
+      // of sitting on it evenly.
+      roughness: 0.62,
       metalness: 0,
       // Kills the fringe that bilinear filtering leaves around a cut-out.
-      alphaTest: 0.06,
+      // scripts/store-art.mjs now clears colour along with alpha, so what
+      // little bleeds is dark rather than white, and this can stay gentle.
+      alphaTest: 0.12,
     });
     const mesh = new Mesh(geometry, material);
     scene.add(mesh);
@@ -179,7 +199,10 @@ export default function ShirtViewer({
       const wanted = held ? target : target + Math.sin(elapsed * 0.5) * DRIFT;
       current += (wanted - current) * Math.min(1, dt * 4);
       mesh.rotation.y = current;
-      mesh.rotation.z = current * 0.05;
+      mesh.rotation.z = current * 0.07;
+      // A little nose-down as it turns, so the shoulders lead and the hem
+      // trails rather than the whole thing pivoting like a sign.
+      mesh.rotation.x = Math.abs(current) * 0.06;
 
       renderer.render(scene, camera);
       if (visible && !reduced) raf = requestAnimationFrame(frame);

@@ -86,7 +86,18 @@ function clearBackground(data, width, height) {
   let cleared = 0;
   while (stack.length) {
     const p = stack.pop();
-    data[p * 4 + 3] = 0;
+    const i = p * 4;
+    data[i + 3] = 0;
+    // The colour goes too, not just the alpha.
+    //
+    // A transparent pixel still holds an RGB value, and anything that filters
+    // the texture — three.js sampling it onto a mesh, most obviously — blends
+    // that colour across the edge. Leaving it white painted a white rim around
+    // the garment in 3D while the flat image looked perfect, because a browser
+    // compositing an <img> never samples the cleared side.
+    data[i] = 0;
+    data[i + 1] = 0;
+    data[i + 2] = 0;
     cleared++;
     const x = p % width;
     const y = (p - x) / width;
@@ -120,7 +131,14 @@ function clearBackground(data, width, height) {
       const lightest = Math.max(data[i], data[i + 1], data[i + 2]);
       // 255 is the sheet itself, 200 and below is the garment's own edge.
       const towardWhite = Math.max(0, Math.min(1, (lightest - 200) / 55));
-      data[i + 3] = Math.round(data[i + 3] * (1 - towardWhite));
+      const keep = 1 - towardWhite;
+      data[i + 3] = Math.round(data[i + 3] * keep);
+      // Darkened by the same amount it is faded, for the reason above: a rim
+      // pixel that is now mostly transparent still hands its white to anything
+      // that samples across the edge unless the colour goes with the alpha.
+      data[i] = Math.round(data[i] * keep);
+      data[i + 1] = Math.round(data[i + 1] * keep);
+      data[i + 2] = Math.round(data[i + 2] * keep);
     }
   }
 

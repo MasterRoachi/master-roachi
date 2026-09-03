@@ -51,6 +51,34 @@ export const wearQuotes: Quote[] = [
   { text: 'I am the one who knocks.', source: 'Walter White, Breaking Bad' },
   { text: 'A man’s gotta have a code.', source: 'Omar Little, The Wire' },
   { text: 'Winter is coming.', source: 'Game of Thrones' },
+
+  // The shows the drawings actually come from. Fabled Threads is aimed at the
+  // Saturday-morning end of things, and the lede should sound like it rather
+  // than like prestige television.
+  {
+    text: 'Foolish samurai warrior wielding a magic sword!',
+    source: 'Aku, Samurai Jack',
+  },
+  { text: 'Buttered toast!', source: 'Ed, Ed, Edd n Eddy' },
+  {
+    text: 'The things I do for love.',
+    source: 'Courage the Cowardly Dog',
+  },
+  {
+    text: 'Dee Dee! Get out of my laboratory!',
+    source: 'Dexter’s Laboratory',
+  },
+  { text: 'What’s the sitch?', source: 'Kim Possible' },
+  { text: 'Azarath Metrion Zinthos.', source: 'Raven, Teen Titans' },
+  {
+    text: 'I’m gonna sing the Doom Song now!',
+    source: 'GIR, Invader Zim',
+  },
+  {
+    text: 'Sharing tea with a fascinating stranger is one of life’s true delights.',
+    source: 'Uncle Iroh, Avatar: The Last Airbender',
+  },
+  { text: 'The city of Townsville!', source: 'The Powerpuff Girls' },
 ];
 
 /**
