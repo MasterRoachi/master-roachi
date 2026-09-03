@@ -20,8 +20,9 @@
   z-index: 1;
 }
 
+/* No rule under the hero. The candlelight already runs from here to the foot
+   of the page, and a line across it cut the room in half. */
 .top {
-  border-bottom: 1px solid var(--line);
   margin-bottom: clamp(24px, 4vw, 48px);
 }
 
