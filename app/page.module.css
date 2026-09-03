@@ -247,11 +247,19 @@
   color: var(--muted-2);
 }
 
-/* Game art beside the title in the "Right now" strip. */
-.nowWithArt {
+/* Game art beside the title in the "Right now" strip.
+
+   Qualified with the element selector to outrank `.nowItem dd`, which sets
+   align-items: baseline for the two-line rows. Baseline pins the image's
+   bottom edge to the text baseline, which lifted the icon 9px above the
+   text's centre. */
+.nowItem dd.nowWithArt {
   display: flex;
   align-items: center;
   gap: 10px;
+  /* Collapse the leading so the flex centring lands on the glyphs rather
+     than on a line box with descender space below them. */
+  line-height: 1;
 }
 
 .nowArt {

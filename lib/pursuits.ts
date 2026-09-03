@@ -36,7 +36,10 @@ export const currentlyReading: {
   title: string;
   author: string;
   note?: string;
-} | null = null; // TODO: fill in.
+} | null = {
+  title: 'The Iliad',
+  author: 'Homer',
+};
 
 /**
  * The current focus, in a few words. Falls back to the heaviest in-progress
