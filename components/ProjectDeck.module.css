@@ -64,6 +64,24 @@
   --cx: 0deg;
   --cy: 0deg;
 
+  /* The foil is mixed from the project's own two colours rather than a fixed
+     rainbow. A spectrum looked like foil and like nothing else on the card —
+     Terrath's forest green and Fabled Threads' pink came out identically.
+     Each stop is lifted toward white by a different amount, which is what
+     keeps a sweep visible even when the accent is dark. */
+  --foil-a: color-mix(in oklch, var(--accent-a, var(--accent)) 62%, transparent);
+  --foil-b: color-mix(
+    in oklch,
+    var(--accent-b, var(--accent-a, var(--accent))) 62%,
+    transparent
+  );
+  --foil-lift: color-mix(
+    in oklch,
+    color-mix(in oklch, var(--accent-a, var(--accent)) 45%, white) 72%,
+    transparent
+  );
+  --foil-glint: oklch(97% 0.02 90 / 0.55);
+
   position: relative;
   display: flex;
   flex-direction: column;
@@ -116,20 +134,38 @@
     ),
     conic-gradient(
       from calc(var(--cy) * 6) at var(--mx) var(--my),
-      oklch(78% 0.19 20 / 0.42),
-      oklch(82% 0.17 90 / 0.42),
-      oklch(80% 0.18 150 / 0.42),
-      oklch(76% 0.19 220 / 0.42),
-      oklch(74% 0.2 300 / 0.42),
-      oklch(78% 0.19 20 / 0.42)
+      var(--foil-lift),
+      var(--foil-b),
+      var(--foil-glint),
+      var(--foil-a),
+      var(--foil-b),
+      var(--foil-lift)
     );
-  mix-blend-mode: color-dodge;
+  /* Screen, not color-dodge. Dodge needs luminance to bite, so it blew out
+     the saturated rainbow it was written for and then all but vanished once
+     the stops became the projects' own, quieter colours. Screen lifts
+     predictably whatever colour it is given. */
+  mix-blend-mode: screen;
+
+  /* Strong across the art, almost nothing across the copy — which is how a
+     real foil card is made, and the only way to have a sheen worth looking at
+     without the title and summary swimming underneath it. Turning the whole
+     layer down to keep the text legible had made the foil invisible. */
+  /* White, not black. A mask gradient can be read as luminance rather than
+     alpha, and black luminance is zero — so a black-to-transparent mask hid
+     the whole layer instead of fading it. White works under either reading. */
+  mask-image: linear-gradient(
+    to bottom,
+    oklch(100% 0 0) 0%,
+    oklch(100% 0 0) 46%,
+    oklch(100% 0 0 / 0.22) 60%,
+    oklch(100% 0 0 / 0.12) 100%
+  );
 }
 
-/* Enough to read as foil, not so much that the copy underneath goes. At
-   full strength the spectrum swallowed the title and the summary. */
+/* Enough to read as foil, not so much that the copy underneath goes. */
 .card:hover .foil {
-  opacity: 0.34;
+  opacity: 0.85;
 }
 
 /* --- the face ----------------------------------------------------------- */
