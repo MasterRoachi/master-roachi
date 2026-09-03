@@ -39,6 +39,14 @@ jobs:
           STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
         run: node scripts/steam.mjs
 
+      - name: Fetch from RetroAchievements
+        env:
+          RETRO_API_KEY: ${{ secrets.RETRO_API_KEY }}
+          # Not a secret — a repository variable, so the profile is readable
+          # here rather than hidden behind a mask.
+          RETRO_USER: ${{ vars.RETRO_USER }}
+        run: node scripts/retro.mjs
+
       - name: Commit if it changed
         run: |
           git config user.name "Master Roachi"
