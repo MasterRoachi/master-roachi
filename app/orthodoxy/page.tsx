@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import CandleField from '@/components/CandleField';
 import OrthodoxCross from '@/components/OrthodoxCross';
 import PageHeader from '@/components/PageHeader';
+import Link from 'next/link';
 import PostCard from '@/components/PostCard';
 import { getWriting, toSummary } from '@/lib/content';
 import { orthodoxWork, orthodoxReading } from '@/lib/pursuits';
@@ -48,8 +49,12 @@ export default function OrthodoxyPage() {
         { '--accent-a': ACCENT, '--accent-b': ACCENT_2 } as React.CSSProperties
       }
     >
+      {/* Behind everything rather than the hero alone. Stopping it under the
+          header left four fifths of the page flat black, which is most of why
+          it read as lifeless. */}
+      <CandleField />
+
       <section className={styles.top}>
-        <CandleField />
         <div className={`shell ${styles.topInner}`}>
           <PageHeader
             mark={<OrthodoxCross />}
@@ -60,14 +65,18 @@ export default function OrthodoxyPage() {
         </div>
       </section>
 
-      <div className="shell">
+      <div className={`shell ${styles.body}`}>
         {roadIn && (
           <section className={styles.section}>
-            {/* No section heading: the card underneath already carries the
-                title in full, and the two together said "The road in" twice
-                in a row. */}
-            <p className="eyebrow">Start here</p>
-            <PostCard entry={roadIn} showTrack={false} />
+            {/* Not a PostCard. This is the piece a stranger should read first,
+                and rendered as the same small row as everything else it was
+                the easiest thing on the page to skim past. */}
+            <Link href={`/writing/${roadIn.slug}/`} className={styles.feature}>
+              <p className="eyebrow">Start here</p>
+              <h2 className={styles.featureTitle}>{roadIn.title}</h2>
+              <p className={styles.featureBody}>{roadIn.summary}</p>
+              <span className={styles.featureCta}>Read it →</span>
+            </Link>
           </section>
         )}
 
@@ -134,21 +143,33 @@ export default function OrthodoxyPage() {
           <section className={styles.section}>
             <p className="eyebrow">Study</p>
             <h2 className="section-title">Reading</h2>
-            <ul className={styles.reading}>
+            <ul className={styles.shelf}>
               {reading.map((item) => (
                 <li key={item.title} data-status={item.status}>
-                  <span className={styles.readingStatus}>
-                    {item.status === 'reading' ? 'Open' : 'Next'}
-                  </span>
-                  <span className={styles.readingBody}>
-                    <span className={styles.readingTitle}>{item.title}</span>
-                    {item.author && (
-                      <span className={styles.readingMeta}>{item.author}</span>
+                  <span className={styles.spine}>
+                    {item.cover ? (
+                      <img
+                        src={item.cover}
+                        alt=""
+                        width={400}
+                        height={600}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      /* No cover exists for this one anywhere. A plate with
+                         the title on it is honest and looks deliberate; a
+                         stock book graphic would be neither. */
+                      <span className={styles.plate}>{item.title}</span>
                     )}
                   </span>
-                  {item.note && (
-                    <span className={styles.readingNote}>{item.note}</span>
+                  <span className={styles.bookTitle}>{item.title}</span>
+                  {item.author && (
+                    <span className={styles.bookAuthor}>{item.author}</span>
                   )}
+                  <span className={styles.bookStatus}>
+                    {item.status === 'reading' ? 'Open' : 'Next'}
+                  </span>
                 </li>
               ))}
             </ul>

@@ -54,7 +54,11 @@ export default function CyclingQuote({
       {/* Keyed on the index so React replaces the node rather than editing it,
           which is what lets the fade run again on every change. */}
       <blockquote key={index} className={styles.quote}>
-        {quote.text}
+        {/* The words are wrapped so the quotation marks can hang off them.
+            On the blockquote itself, ::after came after the attribution —
+            which is inside it — and left a closing mark stranded on its own
+            line below the name. */}
+        <span className={styles.words}>{quote.text}</span>
         <footer className={styles.source}>{quote.source}</footer>
       </blockquote>
     </figure>

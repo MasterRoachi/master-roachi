@@ -109,21 +109,39 @@ export const tierList: Game[] = [
 export interface ReadingItem {
   title: string;
   author?: string;
+  /**
+   * Cover art under public/books/. Sourced from Open Library and served from
+   * here rather than hotlinked: they are a nonprofit, and three small files
+   * cost them nothing if we host them ourselves. Absent is fine — the shelf
+   * draws a plate with the title instead of a broken image.
+   */
+  cover?: string;
   /** Where he is with it, or why it is on the list. */
   note?: string;
   status: 'reading' | 'next' | 'finished';
 }
 
 export const orthodoxReading: ReadingItem[] = [
-  { title: 'On the Incarnation', author: 'Athanasius', status: 'reading' },
-  { title: 'The Iliad', author: 'Homer', status: 'reading' },
+  {
+    title: 'On the Incarnation',
+    author: 'Athanasius',
+    cover: '/books/on-the-incarnation.webp',
+    status: 'reading',
+  },
+  {
+    title: 'The Iliad',
+    author: 'Homer',
+    cover: '/books/the-iliad.webp',
+    status: 'reading',
+  },
   {
     title: "The Hitchhiker's Guide to the Galaxy",
     author: 'Douglas Adams',
+    cover: '/books/hitchhikers-guide.webp',
     status: 'reading',
   },
-  { title: 'The God Kings and the Titans', author: 'James Bailey', status: 'reading' },
-  { title: 'Change in South Africa', author: 'DJ van Vuuren', status: 'reading' },
+  { title: 'The God Kings and the Titans', author: 'James R. Bailey', status: 'reading' },
+  { title: 'Change in South Africa', author: 'D. J. van Vuuren', status: 'reading' },
 ];
 
 export interface VideoOrArticle {
