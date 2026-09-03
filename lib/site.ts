@@ -20,6 +20,14 @@ export const site = {
   // mailbox behind this address. See DEPLOY.md.
   contactEmail: 'roachi@masterroachi.com' as string | null,
 
+  store: {
+    name: 'Fabled Threads',
+    // The hosted storefront that actually takes the money. Until this is set,
+    // the store page shows the catalogue without Buy buttons rather than
+    // linking nowhere.
+    storefrontUrl: null as string | null,
+  },
+
   socials: {
     github: 'https://github.com/MasterRoachi',
     linkedin:
@@ -40,6 +48,7 @@ export const navLinks = [
   { href: '/projects/', label: 'Work' },
   { href: '/gaming/', label: 'Fun' },
   { href: '/orthodoxy/', label: 'Foundations' },
+  { href: '/store/', label: 'Store' },
   { href: '/writing/', label: 'Thoughts' },
   { href: '/about/', label: 'About' },
 ];

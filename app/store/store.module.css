@@ -1,0 +1,172 @@
+.page {
+  --accent-a: var(--accent);
+  --accent-b: var(--accent);
+}
+
+.top {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.topInner {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(56px, 10vw, 120px) clamp(48px, 8vw, 88px);
+}
+
+.title {
+  font-size: clamp(2.4rem, 8vw, 5rem);
+  margin: 0 0 22px;
+}
+
+.lede {
+  color: var(--muted);
+  max-width: var(--measure);
+  margin: 0;
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  line-height: 1.5;
+}
+
+.body {
+  padding-block: clamp(48px, 8vw, 96px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: clamp(18px, 2.5vw, 28px);
+}
+
+.product {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.84);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+a.product:hover {
+  border-color: var(--accent-a);
+  background: oklch(18% 0 0 / 0.92);
+  transform: translateY(-3px);
+}
+
+/* Square well for the artwork, so a mixed catalogue still lines up. */
+.art {
+  aspect-ratio: 1;
+  background: oklch(12% 0 0);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.noArt {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    oklch(16% 0 0),
+    oklch(16% 0 0) 10px,
+    oklch(14% 0 0) 10px,
+    oklch(14% 0 0) 20px
+  );
+}
+
+.detail {
+  padding: 18px 20px;
+  flex: 1;
+}
+
+.name {
+  font-size: 1rem;
+  margin: 0 0 10px;
+  line-height: 1.3;
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.price {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: color-mix(in oklch, var(--accent-a) 72%, var(--ink));
+}
+
+.variants {
+  font-size: 0.72rem;
+  color: var(--muted-2);
+}
+
+.buy,
+.pending {
+  display: block;
+  padding: 13px 20px;
+  border-top: 1px solid var(--line);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  transition: background 0.2s ease;
+}
+
+.buy {
+  color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
+}
+
+a.product:hover .buy {
+  background: color-mix(in oklch, var(--accent-a) 12%, transparent);
+}
+
+.pending {
+  color: var(--muted-2);
+}
+
+.note {
+  margin: clamp(32px, 5vw, 48px) 0 0;
+  font-size: 0.82rem;
+  color: var(--muted-2);
+}
+
+.empty {
+  border: 1px dashed var(--line-bright);
+  padding: clamp(40px, 7vw, 72px);
+  max-width: var(--measure);
+}
+
+.emptyTitle {
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  margin: 0 0 14px;
+}
+
+.empty p {
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product,
+  .buy {
+    transition: none;
+  }
+  a.product:hover {
+    transform: none;
+  }
+}

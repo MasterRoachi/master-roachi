@@ -10,8 +10,9 @@
     "preview": "npx serve@latest out",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "prebuild": "node scripts/steam.mjs",
-    "steam": "node scripts/steam.mjs"
+    "prebuild": "node scripts/steam.mjs && node scripts/printful.mjs",
+    "steam": "node scripts/steam.mjs",
+    "store": "node scripts/printful.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
