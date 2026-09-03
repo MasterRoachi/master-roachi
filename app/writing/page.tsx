@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import GlyphField from '@/components/GlyphField';
-import PenNibIcon from '@/components/PenNibIcon';
+import QuillIcon from '@/components/QuillIcon';
 import PageHeader from '@/components/PageHeader';
 import PostCard from '@/components/PostCard';
 import { getWriting, toSummary } from '@/lib/content';
@@ -45,9 +45,9 @@ export default function WritingPage() {
 
       <div className={`shell ${styles.body}`}>
         <PageHeader
-          mark={<PenNibIcon />}
+          mark={<QuillIcon />}
           eyebrow="Thoughts"
-          title="Words"
+          title="I&rsquo;m a ramblin&rsquo; man"
           lede="Code, games, and Orthodoxy. Devlogs where a project earns one."
         />
 
@@ -61,14 +61,29 @@ export default function WritingPage() {
           <Link
             href={`/writing/${lead.slug}/`}
             className={styles.lead}
-            style={
-              {
-                '--track': TRACK_COLOUR[lead.track ?? 'code'],
-              } as React.CSSProperties
-            }
           >
+            {lead.cover && (
+              <span className={styles.leadArt}>
+                <img
+                  src={lead.cover}
+                  alt={lead.coverAlt ?? ''}
+                  width={920}
+                  height={430}
+                  loading="eager"
+                  decoding="async"
+                />
+              </span>
+            )}
+            <span className={styles.leadBody}>
             <span className={styles.leadMeta}>
-              <span className={styles.leadTrack}>
+              <span
+                className={styles.leadTrack}
+                style={
+                  {
+                    '--track': TRACK_COLOUR[lead.track ?? 'code'],
+                  } as React.CSSProperties
+                }
+              >
                 {TRACK_LABEL[lead.track ?? 'code']}
               </span>
               <time dateTime={lead.date}>{formatDate(lead.date)}</time>
@@ -77,6 +92,7 @@ export default function WritingPage() {
             <h2 className={styles.leadTitle}>{lead.title}</h2>
             <p className={styles.leadSummary}>{lead.summary}</p>
             <span className={styles.leadCta}>Read it →</span>
+            </span>
           </Link>
         )}
 

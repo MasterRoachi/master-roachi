@@ -26,24 +26,58 @@
 /* The newest post, given a panel rather than a place in a list. Its colour is
    its track's, so the most recent thing on the page also says which side of
    the site it came from. */
+/* The panel takes the page's own colour rather than the post's track — the
+   track still speaks on the meta line, where it says which side of the site
+   the piece came from. */
 .lead {
   display: block;
-  border: 1px solid color-mix(in oklch, var(--track) 26%, var(--line));
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--accent-a) 26%, var(--line));
   border-radius: 14px;
   background: linear-gradient(
     140deg,
     oklch(18% 0.02 255 / 0.72),
     oklch(13% 0.015 250 / 0.5)
   );
-  padding: clamp(26px, 3.6vw, 46px);
   margin-bottom: clamp(36px, 5vw, 64px);
   transition:
     border-color 0.2s ease,
     transform 0.2s ease;
 }
 .lead:hover {
-  border-color: color-mix(in oklch, var(--track) 58%, var(--line));
+  border-color: color-mix(in oklch, var(--accent-a) 58%, var(--line));
   transform: translateY(-2px);
+}
+
+/* Art across the top, bled to the panel's edges. Tinted toward the page blue
+   and lifted on hover, so a piece of someone else's key art still belongs to
+   this page rather than sitting on it. */
+.leadArt {
+  display: block;
+  overflow: hidden;
+  border-bottom: 1px solid color-mix(in oklch, var(--accent-a) 20%, var(--line));
+}
+
+.leadArt img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 92 / 43;
+  object-fit: cover;
+  opacity: 0.78;
+  filter: saturate(0.85);
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lead:hover .leadArt img {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+.leadBody {
+  display: block;
+  padding: clamp(26px, 3.6vw, 46px);
 }
 
 .leadMeta {
@@ -83,7 +117,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: color-mix(in oklch, var(--track) 80%, var(--ink));
+  color: color-mix(in oklch, var(--accent-a) 80%, var(--ink));
 }
 
 /* --- groups ------------------------------------------------------------- */

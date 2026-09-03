@@ -18,7 +18,11 @@ export const metadata: Metadata = {
 export default function AboutPage() {
 
   return (
-    <>
+    <div
+      /* Orange, the colour About answers in the nav — picked up by the
+         eyebrow and anything else keyed to the page accent. */
+      style={{ '--accent-a': 'oklch(76% 0.17 55)' } as React.CSSProperties}
+    >
       {/* The field runs behind the opening, the way it does behind the work
           on the homepage. */}
       <section className={styles.top}>
@@ -104,6 +108,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

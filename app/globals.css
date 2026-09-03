@@ -118,11 +118,15 @@ h4 {
 }
 
 /* A label above a heading. Small, spaced, accented. */
+/* Takes whatever colour the page is answering in — every section sets
+   --accent-a on its own root — and falls back to the site gold where none is
+   set. It was gold everywhere, which meant a lime page and a blue page had an
+   identical label on them. */
 .eyebrow {
   font-size: 0.7rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--accent-a, var(--accent));
   font-weight: 600;
   margin: 0 0 20px;
 }

@@ -141,6 +141,8 @@ export function toSummary(entry: Entry): EntrySummary {
     track: entry.frontmatter.track,
     project: entry.frontmatter.project,
     draft: entry.frontmatter.draft,
+    cover: entry.frontmatter.cover,
+    coverAlt: entry.frontmatter.coverAlt,
   };
 }
 

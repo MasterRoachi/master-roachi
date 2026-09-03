@@ -64,4 +64,7 @@ export interface EntrySummary {
   track?: Track;
   project?: string;
   draft?: boolean;
+  /** Cover art, for a post given a panel rather than a row. */
+  cover?: string;
+  coverAlt?: string;
 }
