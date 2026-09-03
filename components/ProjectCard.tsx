@@ -18,7 +18,14 @@ import styles from './Card.module.css';
 /** Maximum tilt in degrees. Past about six it stops reading as depth. */
 const TILT = 5;
 
-export default function ProjectCard({ entry }: { entry: ProjectSummary }) {
+export default function ProjectCard({
+  entry,
+  featured = false,
+}: {
+  entry: ProjectSummary;
+  /** The lead project, given a wide card at the top of the page. */
+  featured?: boolean;
+}) {
   const ref = useRef<HTMLAnchorElement>(null);
 
   const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
@@ -48,6 +55,7 @@ export default function ProjectCard({ entry }: { entry: ProjectSummary }) {
       ref={ref}
       href={`/projects/${entry.slug}/`}
       className={styles.card}
+      data-featured={featured || undefined}
       data-status={entry.status}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
@@ -60,6 +68,19 @@ export default function ProjectCard({ entry }: { entry: ProjectSummary }) {
         } as React.CSSProperties
       }
     >
+      {entry.cover && (
+        <span className={styles.cover}>
+          <img
+            src={entry.cover}
+            alt={entry.coverAlt ?? ''}
+            width={1600}
+            height={900}
+            loading={featured ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+        </span>
+      )}
+      <span className={styles.cardBody}>
       <div className={styles.cardTop}>
         {entry.kind && <span className={styles.kind}>{entry.kind}</span>}
         <span className={styles.status} data-status={entry.status}>
@@ -73,6 +94,7 @@ export default function ProjectCard({ entry }: { entry: ProjectSummary }) {
           <StackIcons stack={entry.stack} size="sm" />
         </div>
       )}
+      </span>
     </Link>
   );
 }

@@ -34,6 +34,14 @@ export interface Frontmatter {
   accent?: string;
   accent2?: string;
   /**
+   * Cover art, as a path under public/ — screenshot, key art, a map. Absent
+   * is a supported state: the card simply has no picture rather than a broken
+   * one or a placeholder standing in for work that does not exist yet.
+   */
+  cover?: string;
+  /** What the cover shows, for anyone who cannot see it. */
+  coverAlt?: string;
+  /**
    * Individual pieces making up a project — the Odin exercises, and anything
    * else that is a collection rather than a single thing.
    */
@@ -170,6 +178,8 @@ export interface ProjectSummary {
   stack?: string[];
   accent?: string;
   accent2?: string;
+  cover?: string;
+  coverAlt?: string;
 }
 
 export function toProjectSummary(entry: Entry): ProjectSummary {
@@ -182,5 +192,7 @@ export function toProjectSummary(entry: Entry): ProjectSummary {
     stack: entry.frontmatter.stack,
     accent: entry.frontmatter.accent,
     accent2: entry.frontmatter.accent2,
+    cover: entry.frontmatter.cover,
+    coverAlt: entry.frontmatter.coverAlt,
   };
 }

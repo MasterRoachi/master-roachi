@@ -1,28 +1,52 @@
 import type { Metadata } from 'next';
+import Starfield from '@/components/Starfield';
 import PageHeader from '@/components/PageHeader';
 import ProjectCard from '@/components/ProjectCard';
 import { getProjects, toProjectSummary } from '@/lib/content';
 import cards from '@/components/Card.module.css';
+import styles from './projects.module.css';
 
 export const metadata: Metadata = {
-  title: 'Projects',
-  description: 'Games, worlds, stores and code — finished, building, and still an idea.',
+  title: 'Work',
+  description:
+    'Games, worlds, stores and code — finished, building, and still an idea.',
 };
 
 export default function ProjectsPage() {
   const projects = getProjects().map(toProjectSummary);
 
+  // Highest weight leads. Everything else keeps its order beneath, so adding a
+  // project changes the page by adding to it rather than rearranging it.
+  const [lead, ...rest] = projects;
+
   return (
-    <div className="shell">
-      <PageHeader
-        eyebrow="Projects"
-        title="What I'm building"
-        lede="Everything public, nothing hidden — including the parts that aren't finished."
-      />
-      <div className={cards.grid} style={{ paddingBottom: '120px' }}>
-        {projects.map((entry) => (
-          <ProjectCard key={entry.slug} entry={entry} />
-        ))}
+    <div className={styles.page}>
+      {/* Every other main page has this behind it, and ProjectCard is written
+          for it — the cards are translucent and tilt so they read as objects
+          floating in the depth. Without it they were flat tiles on black, and
+          the one page they were designed for was the one page missing it. */}
+      <Starfield />
+
+      <div className="shell">
+        <PageHeader
+          eyebrow="Work"
+          title="Work Hard"
+          lede="Everything public, nothing hidden — including the parts that aren't finished."
+        />
+
+        {lead && (
+          <div className={styles.lead}>
+            <ProjectCard entry={lead} featured />
+          </div>
+        )}
+
+        {rest.length > 0 && (
+          <div className={cards.grid}>
+            {rest.map((entry) => (
+              <ProjectCard key={entry.slug} entry={entry} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

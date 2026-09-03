@@ -150,3 +150,95 @@
   margin-top: auto;
   padding-top: 28px;
 }
+
+/* --- cover art ---------------------------------------------------------- */
+
+/* The card is padded, so the picture is pulled back out to the edges — art
+   inset by 34px reads as an illustration in a document rather than as the
+   face of the thing. */
+.cover {
+  display: block;
+  margin: calc(-1 * clamp(24px, 3vw, 34px));
+  margin-bottom: clamp(20px, 2.4vw, 26px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: oklch(12% 0 0);
+}
+
+.cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+  opacity: 0.86;
+}
+
+.card:hover .cover img {
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+/* Wraps everything under the picture, so the flex column that pushes the
+   stack row to the bottom still works with an image above it. */
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* --- the lead project --------------------------------------------------- */
+
+/* Wide, with the art beside the copy rather than above it. The tilt is
+   dropped: it reads as depth on a small card and as a wobble on one this
+   size. */
+.card[data-featured] {
+  transform: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+.card[data-featured] .cover {
+  margin: 0;
+  border-bottom: 0;
+}
+
+.card[data-featured] .cover img {
+  aspect-ratio: 16 / 10;
+  height: 100%;
+}
+
+.card[data-featured] .cardBody {
+  padding: clamp(28px, 3.4vw, 44px);
+}
+
+.card[data-featured] .title {
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+}
+
+.card[data-featured] .body {
+  font-size: 1.02rem;
+  max-width: 52ch;
+}
+
+@media (min-width: 860px) {
+  .card[data-featured] {
+    display: grid;
+    /* Art leads, but not so far that the copy is squeezed. */
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  /* Nothing to sit beside when there is no art yet, so the copy takes it all
+     rather than leaving half the card empty. */
+  .card[data-featured]:not(:has(.cover)) {
+    grid-template-columns: 1fr;
+  }
+
+  .card[data-featured] .cover {
+    border-right: 1px solid var(--line);
+  }
+}

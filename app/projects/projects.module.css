@@ -1,0 +1,10 @@
+/* The starfield is positioned against this, and the trailing space keeps the
+   last row of cards off the footer. */
+.page {
+  position: relative;
+  padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+.lead {
+  margin-bottom: clamp(16px, 2vw, 24px);
+}
