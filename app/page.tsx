@@ -5,7 +5,7 @@ import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
 import { getProjects, getWriting, toSummary } from '@/lib/content';
 import { currentlyReading, currentFocus } from '@/lib/pursuits';
-import { getSteam, hoursFrom } from '@/lib/steam';
+import { getSteam, steamIcon } from '@/lib/steam';
 import { site } from '@/lib/site';
 import cards from '@/components/Card.module.css';
 import styles from './page.module.css';
@@ -87,13 +87,17 @@ export default function HomePage() {
             {playing ? (
               <div className={styles.nowItem}>
                 <dt>Playing</dt>
-                <dd>
+                <dd className={styles.nowWithArt}>
+                  <img
+                    src={steamIcon(playing)}
+                    alt=""
+                    width={28}
+                    height={28}
+                    className={styles.nowArt}
+                    loading="lazy"
+                    decoding="async"
+                  />
                   {playing.title}
-                  {playing.minutesTwoWeeks > 0 && (
-                    <span className={styles.nowSub}>
-                      {hoursFrom(playing.minutesTwoWeeks)}h this fortnight
-                    </span>
-                  )}
                 </dd>
               </div>
             ) : (

@@ -65,6 +65,8 @@ try {
   const shaped = games.map((g) => ({
     appid: g.appid,
     title: g.name,
+    // Steam returns a hash, not a URL — the icon path is assembled from it.
+    icon: g.img_icon_url || null,
     // Steam reports playtime in minutes.
     minutesTwoWeeks: g.playtime_2weeks ?? 0,
     minutesTotal: g.playtime_forever ?? 0,

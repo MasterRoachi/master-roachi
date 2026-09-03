@@ -246,3 +246,19 @@
 .nowPending {
   color: var(--muted-2);
 }
+
+/* Game art beside the title in the "Right now" strip. */
+.nowWithArt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nowArt {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  /* Square-crops the wide header when a snapshot predates the icon hash. */
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
