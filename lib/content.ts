@@ -30,6 +30,9 @@ export interface Frontmatter {
   stack?: string[];
   /** Ordering on the projects index — higher floats to the top. */
   weight?: number;
+  /** Per-project hover colour, and its second stop. Any CSS colour. */
+  accent?: string;
+  accent2?: string;
 
   /** Hidden from listings and marked noindex; still visible in `next dev`. */
   draft?: boolean;
@@ -152,6 +155,8 @@ export interface ProjectSummary {
   status: Status;
   kind?: string;
   stack?: string[];
+  accent?: string;
+  accent2?: string;
 }
 
 export function toProjectSummary(entry: Entry): ProjectSummary {
@@ -162,5 +167,7 @@ export function toProjectSummary(entry: Entry): ProjectSummary {
     status: entry.frontmatter.status ?? 'building',
     kind: entry.frontmatter.kind,
     stack: entry.frontmatter.stack,
+    accent: entry.frontmatter.accent,
+    accent2: entry.frontmatter.accent2,
   };
 }

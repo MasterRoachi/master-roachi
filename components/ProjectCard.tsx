@@ -50,6 +50,14 @@ export default function ProjectCard({ entry }: { entry: ProjectSummary }) {
       data-status={entry.status}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
+      /* Each project carries its own hover colour, set from frontmatter so it
+         lives with the project rather than in a lookup table in here. */
+      style={
+        {
+          ...(entry.accent ? { '--accent-a': entry.accent } : {}),
+          ...(entry.accent2 ? { '--accent-b': entry.accent2 } : {}),
+        } as React.CSSProperties
+      }
     >
       <div className={styles.cardTop}>
         {entry.kind && <span className={styles.kind}>{entry.kind}</span>}

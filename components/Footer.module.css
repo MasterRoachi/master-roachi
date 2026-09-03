@@ -1,31 +1,58 @@
 .footer {
-  border-top: 1px solid var(--line);
   margin-top: auto;
+  position: relative;
+}
+
+/* Marked rule, matching the one under the hero's identity line. */
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding-inline: var(--pad);
+}
+
+.rule span {
+  height: 1px;
+  flex: 1;
+  background: var(--line);
+}
+
+.ruleMark {
+  display: block;
+  width: 22px;
+  height: auto;
+  opacity: 0.5;
 }
 
 .inner {
   max-width: var(--shell);
   margin: 0 auto;
-  padding: clamp(48px, 7vw, 80px) var(--pad) 40px;
+  padding: clamp(44px, 7vw, 76px) var(--pad) clamp(32px, 5vw, 48px);
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: 1.5fr 1fr;
   gap: clamp(32px, 6vw, 80px);
 }
 
 .identity {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
   align-items: flex-start;
+}
+
+.mark {
+  opacity: 0.9;
 }
 
 .tagline {
   margin: 0;
-  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-  max-width: 22ch;
+  font-size: clamp(1.15rem, 2.6vw, 1.65rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  max-width: 20ch;
 }
 
 .tagline span {
@@ -41,12 +68,12 @@
 .column {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
   align-items: flex-start;
 }
 
 .columnHead {
-  margin: 0 0 4px;
+  margin: 0 0 10px;
   font-size: 0.68rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -54,20 +81,48 @@
   font-weight: 600;
 }
 
+/* The lettering carries the light, matching the nav.
+
+   background-image, not the background shorthand — the build hoists the
+   shorthand after the longhands, and `background` resets background-clip to
+   border-box. Guarded by @supports because the text is transparent: without
+   the clip it would be invisible rather than merely unstyled. */
 .link {
+  --mx: 50%;
+  --my: 50%;
+  position: relative;
   font-size: 0.88rem;
   color: var(--muted);
-  transition: color 0.15s ease;
+  padding: 5px 2px;
+  transition: color 0.18s ease;
 }
 
 .link:hover {
-  color: var(--accent);
+  color: oklch(88% 0.13 87);
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .link {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(var(--muted), var(--muted));
+  }
+
+  .link:hover {
+    background-image: radial-gradient(
+      90px circle at var(--mx) var(--my),
+      oklch(98% 0.07 96) 0%,
+      oklch(84% 0.14 88) 45%,
+      oklch(62% 0.11 82) 100%
+    );
+  }
 }
 
 .base {
   max-width: var(--shell);
   margin: 0 auto;
-  padding: 20px var(--pad) 28px;
+  padding: 20px var(--pad) 30px;
   display: flex;
   justify-content: space-between;
   gap: 16px;

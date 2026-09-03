@@ -1,16 +1,74 @@
+'use client';
+
 import Link from 'next/link';
-import Sigil from './Sigil';
+import type { PointerEvent } from 'react';
+import Logo from './Logo';
 import { navLinks, site } from '@/lib/site';
 import styles from './Footer.module.css';
+
+// Closes the page the way the hero opens it: the kanji sitting on a rule, the
+// mark, and the tagline set large. Links carry the same tracked light as the
+// nav, so the bottom of the page behaves like the top.
 
 export default function Footer() {
   const { contactEmail, socials } = site;
 
+  const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    el.style.setProperty('--my', `${e.clientY - r.top}px`);
+  };
+
+  const onLeave = (e: PointerEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.removeProperty('--mx');
+    e.currentTarget.style.removeProperty('--my');
+  };
+
+  const link = (href: string, label: string, external = false) =>
+    external ? (
+      <a
+        key={href}
+        className={styles.link}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onPointerMove={onMove}
+        onPointerLeave={onLeave}
+      >
+        {label}
+      </a>
+    ) : (
+      <Link
+        key={href}
+        href={href}
+        className={styles.link}
+        onPointerMove={onMove}
+        onPointerLeave={onLeave}
+      >
+        {label}
+      </Link>
+    );
+
   return (
     <footer className={styles.footer}>
+      {/* The same marked rule that divides the hero, closing the page. */}
+      <div className={styles.rule} aria-hidden="true">
+        <span />
+        <img
+          src="/kanji.webp"
+          alt=""
+          width={22}
+          height={22}
+          className={styles.ruleMark}
+          decoding="async"
+        />
+        <span />
+      </div>
+
       <div className={styles.inner}>
         <div className={styles.identity}>
-          <Sigil size={18} color="var(--accent)" />
+          <Logo size={64} className={styles.mark} />
           <p className={styles.tagline}>
             {site.tagline} <span>{site.taglineTail}</span>
           </p>
@@ -19,41 +77,15 @@ export default function Footer() {
         <div className={styles.columns}>
           <nav className={styles.column} aria-label="Footer">
             <p className={styles.columnHead}>Site</p>
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className={styles.link}>
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((l) => link(l.href, l.label))}
           </nav>
 
           <div className={styles.column}>
             <p className={styles.columnHead}>Elsewhere</p>
-            {contactEmail && (
-              <a className={styles.link} href={`mailto:${contactEmail}`}>
-                Email
-              </a>
-            )}
-            <a
-              className={styles.link}
-              href={socials.github}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
-            </a>
-            {socials.linkedin && (
-              <a
-                className={styles.link}
-                href={socials.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                LinkedIn
-              </a>
-            )}
-            <a className={styles.link} href="/rss.xml">
-              RSS
-            </a>
+            {contactEmail && link(`mailto:${contactEmail}`, 'Email', true)}
+            {link(socials.github, 'GitHub', true)}
+            {socials.linkedin && link(socials.linkedin, 'LinkedIn', true)}
+            {link('/rss.xml', 'RSS', true)}
           </div>
         </div>
       </div>

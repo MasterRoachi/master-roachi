@@ -12,6 +12,9 @@
   --my: 50%;
   --rx: 0deg;
   --ry: 0deg;
+  /* Overridden per project from frontmatter; gold is the fallback. */
+  --accent-a: var(--accent);
+  --accent-b: var(--accent);
 
   position: relative;
   display: flex;
@@ -35,11 +38,13 @@
 }
 
 .card:hover {
-  border-color: var(--line-bright);
+  /* The project's own colour, kept well under full strength: this is a tint
+     on a dark card, not a highlighter. */
+  border-color: color-mix(in oklch, var(--accent-a) 55%, var(--line-bright));
   background: oklch(18% 0 0 / 0.92);
   box-shadow:
     0 18px 50px oklch(0% 0 0 / 0.5),
-    0 0 0 1px oklch(82% 0.16 85 / 0.14);
+    0 0 0 1px color-mix(in oklch, var(--accent-a) 22%, transparent);
 }
 
 /* Light tracking the cursor across the card face. */
@@ -51,9 +56,10 @@
   opacity: 0;
   transition: opacity 0.25s ease;
   background: radial-gradient(
-    260px circle at var(--mx) var(--my),
-    oklch(82% 0.16 85 / 0.1),
-    transparent 68%
+    280px circle at var(--mx) var(--my),
+    color-mix(in oklch, var(--accent-a) 14%, transparent) 0%,
+    color-mix(in oklch, var(--accent-b) 8%, transparent) 45%,
+    transparent 70%
   );
 }
 

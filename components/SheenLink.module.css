@@ -36,10 +36,15 @@
       border-box;
 }
 
-/* Lettering is flat rather than a clipped gradient: painting one and clipping
-   it to the glyphs with background-clip: text does not survive the build —
-   computed clip comes back border-box, so the gradient fills the label box and
-   the transparent text disappears into it. The sheen belongs on the outline. */
+/* The lettering carries the light too.
+
+   Painted with background-image, not the background shorthand: the build
+   hoists the shorthand after the longhands and `background` resets
+   background-clip to border-box, which is why an earlier attempt at this
+   produced a filled slab with invisible text.
+
+   Offset by the padding so the bright spot lines up with the one on the
+   border rather than trailing it. */
 .label {
   color: var(--tone-text);
   transition: color 0.18s ease;
@@ -47,6 +52,25 @@
 
 .sheen:hover .label {
   color: var(--tone-text-hi);
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .label {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(var(--tone-text), var(--tone-text));
+  }
+
+  .sheen:hover .label {
+    color: transparent;
+    background-image: radial-gradient(
+      120px circle at calc(var(--mx) - var(--pad-x)) calc(var(--my) - var(--pad-y)),
+      var(--tone-hi) 0%,
+      var(--tone-mid) 45%,
+      var(--tone-text) 100%
+    );
+  }
 }
 
 /* A soft bloom under the cursor, on hover only — at rest it stays a clean

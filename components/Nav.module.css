@@ -56,29 +56,40 @@
   transition: color 0.18s ease;
 }
 
+/* Fallback where the clip is unsupported. */
 .link:hover,
 .link[data-active='true'] {
   color: oklch(88% 0.13 87);
 }
 
-/* Tracked bloom, matching the hero buttons. */
-.link::after {
-  content: '';
-  position: absolute;
-  inset: -6px -10px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  background: radial-gradient(
-    60px circle at var(--mx) var(--my),
-    oklch(85% 0.15 88 / 0.18),
-    transparent 70%
-  );
+/* The light is in the lettering itself, not behind it.
+
+   Painted with background-image rather than the background shorthand: the
+   build pipeline hoists the shorthand after the longhands, and `background`
+   resets background-clip to border-box, which silently killed an earlier
+   attempt at this. background-image has no such reset.
+
+   Guarded by @supports because the text is transparent — without the clip it
+   would be invisible rather than merely unstyled. */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .link {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image: linear-gradient(var(--muted), var(--muted));
+  }
+
+  .link:hover,
+  .link[data-active='true'] {
+    background-image: radial-gradient(
+      90px circle at var(--mx) var(--my),
+      oklch(98% 0.07 96) 0%,
+      oklch(84% 0.14 88) 45%,
+      oklch(62% 0.11 82) 100%
+    );
+  }
 }
 
-.link:hover::after {
-  opacity: 1;
-}
 
 .toggle {
   display: none;
