@@ -32,33 +32,6 @@
   z-index: 1;
 }
 
-.topInner {
-  position: relative;
-  z-index: 1;
-  padding-block: clamp(56px, 10vw, 120px) clamp(40px, 7vw, 76px);
-}
-
-.title {
-  font-size: clamp(2.4rem, 8vw, 5rem);
-  margin: 0 0 22px;
-}
-
-.lede {
-  color: var(--muted);
-  max-width: var(--measure);
-  margin: 0;
-  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
-  line-height: 1.5;
-}
-
-/* The controller mark above the title. Tinted with the page accent so the
-   hero has a point of colour where the streaming chip used to sit. */
-.mark {
-  display: block;
-  margin-bottom: 18px;
-  color: var(--accent-a);
-}
-
 .section {
   padding-block: clamp(28px, 4.5vw, 44px);
 }

@@ -61,8 +61,10 @@ export default function OrthodoxyPage() {
       <div className="shell">
         {roadIn && (
           <section className={styles.section}>
+            {/* No section heading: the card underneath already carries the
+                title in full, and the two together said "The road in" twice
+                in a row. */}
             <p className="eyebrow">Start here</p>
-            <h2 className="section-title">The road in</h2>
             <PostCard entry={roadIn} showTrack={false} />
           </section>
         )}
@@ -165,7 +167,11 @@ export default function OrthodoxyPage() {
 
         {upcoming.length > 0 && (
           <section className={styles.section}>
-            <p className="eyebrow eyebrow--muted">In the works</p>
+            {/* A full heading rather than a muted line. Demoting it to a
+                small label buried it: on a page with little else published,
+                what is coming is the news. */}
+            <p className="eyebrow">Soon</p>
+            <h2 className="section-title">In the works</h2>
             <ul className={styles.list}>
               {upcoming.map((item) => (
                 <li key={item.title} className={styles.upcoming}>

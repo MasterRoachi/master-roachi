@@ -114,9 +114,19 @@ export interface ReadingItem {
   status: 'reading' | 'next' | 'finished';
 }
 
-// TODO: Stephan to fill in. Empty means the Reading section stays hidden
-// rather than showing invented books under his name.
-export const orthodoxReading: ReadingItem[] = [];
+export const orthodoxReading: ReadingItem[] = [
+  { title: 'On the Incarnation', author: 'Athanasius', status: 'reading' },
+  { title: 'The Iliad', author: 'Homer', status: 'reading' },
+  {
+    title: "The Hitchhiker's Guide to the Galaxy",
+    author: 'Douglas Adams',
+    status: 'reading',
+  },
+  // Authors left off these two deliberately: guessing one wrong is worse than
+  // leaving the field empty, and the field is optional for that reason.
+  { title: 'The God Kings and the Titans', status: 'reading' },
+  { title: 'Change in South Africa', status: 'reading' },
+];
 
 export interface VideoOrArticle {
   title: string;

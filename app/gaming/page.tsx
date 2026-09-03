@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import ArcadeField from '@/components/ArcadeField';
+import PageHeader from '@/components/PageHeader';
 import PostCard from '@/components/PostCard';
 import { getWriting, toSummary } from '@/lib/content';
 import {
@@ -163,16 +164,16 @@ export default function GamingPage() {
         <ArcadeField />
 
         <section className={styles.top}>
-        <div className={`shell ${styles.topInner}`}>
-          {/* The mark this side of the site carries, sized to match the stack
-              icons on a project page. It replaces the streaming schedule,
-              which was a hand-set string nothing kept true. */}
-          <span className={styles.mark}>
-            <ControllerIcon />
-          </span>
-          <p className="eyebrow">Fun</p>
-          <h1 className={styles.title}>Rest Plenty</h1>
-          <CyclingQuote quotes={lifeQuotes} className={styles.lede} />
+        {/* PageHeader rather than a hand-built heading, so this page's title
+            is the same size and sits on the same rhythm as Work's and
+            Foundations'. It was its own markup before, and drifted. */}
+        <div className="shell">
+          <PageHeader
+            mark={<ControllerIcon />}
+            eyebrow="Fun"
+            title="Rest Plenty"
+            lede={<CyclingQuote quotes={lifeQuotes} />}
+          />
         </div>
         </section>
 

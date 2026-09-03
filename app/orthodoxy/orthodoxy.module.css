@@ -11,10 +11,12 @@
   margin-bottom: clamp(24px, 4vw, 48px);
 }
 
+/* No padding of its own: PageHeader already sets the header rhythm, and adding
+   to it here stacked the two, pushing this page's title further down than the
+   same title on Work. */
 .topInner {
   position: relative;
   z-index: 1;
-  padding-block: clamp(40px, 7vw, 84px) clamp(32px, 5vw, 60px);
 }
 
 .section {
