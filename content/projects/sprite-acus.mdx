@@ -1,0 +1,48 @@
+---
+title: Sprite-acus
+summary: A deterministic bridge from a generated render to palette-constrained, indexed sprite sheets ready for Aseprite. Extracted from the Shepherds pipeline and made project-agnostic.
+date: 2026-09-02
+status: released
+kind: Tool
+weight: 75
+accent: "oklch(72% 0.17 290)"
+accent2: "oklch(58% 0.14 285)"
+repo: https://github.com/MasterRoachi/sprite-acus
+stack: ["Python"]
+---
+
+Sprite-acus takes one sheet of frames, a profile describing a project's
+conventions, and a destination, and turns the first into palette-constrained
+indexed PNGs that are ready for a short cleanup in Aseprite. It ships as both a
+command — `sprite-convert` — and a small local window.
+
+It was extracted from the sprite-conversion tool inside **Shepherds We Shall
+Be** and made project-agnostic. The tool it came from is still in service there,
+unchanged.
+
+## What it will not do
+
+It does not generate the source image, make artistic decisions, clean pixel
+clusters, produce the final master, or import anything into an engine. A
+successful conversion means mechanically valid, never artistically approved —
+which is a distinction worth keeping, because the alternative is a tool that
+quietly decides things an artist should.
+
+## All or nothing
+
+If one frame of a sixteen-frame sheet fails, nothing appears at the
+destination at all, and the failure names the frame and its cell. A half
+published animation is worse than none, because it looks finished.
+
+Everything it writes is then independently re-derived and checked against what
+it meant to write, and every input and output hash goes into one report.
+
+## Its colours are not its own
+
+The window's surfaces and accents are *found* in whatever master palette the
+loaded profile points at, using the same nearest-colour search the converter
+uses on a sprite. Load the Shepherds profile and the window comes up in
+Terrath's own colours; load another project's and it wears theirs. There is
+deliberately no theme section in a profile — a palette already says what a
+project's colours are, and asking it to say so twice is how two copies drift
+apart.

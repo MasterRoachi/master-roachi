@@ -42,6 +42,11 @@ export interface Frontmatter {
   /** What the cover shows, for anyone who cannot see it. */
   coverAlt?: string;
   /**
+   * Where this card goes, when the project already lives on another page.
+   * Fabled Threads is the Store, so it has no second home under /projects/.
+   */
+  href?: string;
+  /**
    * Individual pieces making up a project — the Odin exercises, and anything
    * else that is a collection rather than a single thing.
    */
@@ -161,7 +166,14 @@ export function getAnyEntry(
 }
 
 export function getAllSlugs(collection: string): { slug: string }[] {
-  return getAllEntries(collection).map((e) => ({ slug: e.slug }));
+  return (
+    getAllEntries(collection)
+      // An entry whose card points elsewhere has no page of its own. Fabled
+      // Threads lives on the Store page; generating a second, unlinked copy of
+      // it under /projects/ would be a page nothing points to.
+      .filter((e) => !e.frontmatter.href)
+      .map((e) => ({ slug: e.slug }))
+  );
 }
 
 /**
@@ -180,6 +192,7 @@ export interface ProjectSummary {
   accent2?: string;
   cover?: string;
   coverAlt?: string;
+  href?: string;
 }
 
 export function toProjectSummary(entry: Entry): ProjectSummary {
@@ -194,5 +207,6 @@ export function toProjectSummary(entry: Entry): ProjectSummary {
     accent2: entry.frontmatter.accent2,
     cover: entry.frontmatter.cover,
     coverAlt: entry.frontmatter.coverAlt,
+    href: entry.frontmatter.href,
   };
 }

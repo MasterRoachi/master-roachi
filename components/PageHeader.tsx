@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import styles from './PageHeader.module.css';
 
 export default function PageHeader({
@@ -7,13 +8,14 @@ export default function PageHeader({
 }: {
   eyebrow: string;
   title: string;
-  lede?: string;
+  /** A string, or anything that renders — the Work page passes a quote. */
+  lede?: ReactNode;
 }) {
   return (
     <header className={styles.header}>
       <p className="eyebrow">{eyebrow}</p>
       <h1 className={styles.title}>{title}</h1>
-      {lede && <p className="lede">{lede}</p>}
+      {typeof lede === 'string' ? <p className="lede">{lede}</p> : lede}
     </header>
   );
 }

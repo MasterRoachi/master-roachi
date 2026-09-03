@@ -53,7 +53,8 @@ export default function ProjectCard({
   return (
     <Link
       ref={ref}
-      href={`/projects/${entry.slug}/`}
+      // A project whose home is another page sends the card there instead.
+      href={entry.href ?? `/projects/${entry.slug}/`}
       className={styles.card}
       data-featured={featured || undefined}
       data-status={entry.status}

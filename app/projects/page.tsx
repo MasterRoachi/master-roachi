@@ -3,6 +3,8 @@ import Starfield from '@/components/Starfield';
 import PageHeader from '@/components/PageHeader';
 import ProjectCard from '@/components/ProjectCard';
 import { getProjects, toProjectSummary } from '@/lib/content';
+import CyclingQuote from '@/components/CyclingQuote';
+import { workQuotes } from '@/lib/quotes';
 import cards from '@/components/Card.module.css';
 import styles from './projects.module.css';
 
@@ -31,7 +33,7 @@ export default function ProjectsPage() {
         <PageHeader
           eyebrow="Work"
           title="Work Hard"
-          lede="Everything public, nothing hidden — including the parts that aren't finished."
+          lede={<CyclingQuote quotes={workQuotes} />}
         />
 
         {lead && (

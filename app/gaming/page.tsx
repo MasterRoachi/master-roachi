@@ -17,6 +17,8 @@ import { candidateId } from '@/lib/poll';
 import PlayNextVote from '@/components/PlayNextVote';
 import ControllerIcon from '@/components/ControllerIcon';
 import { getVideos } from '@/lib/videos';
+import CyclingQuote from '@/components/CyclingQuote';
+import { lifeQuotes } from '@/lib/quotes';
 import styles from './gaming.module.css';
 
 export const metadata: Metadata = {
@@ -157,8 +159,10 @@ export default function GamingPage() {
         { '--accent-a': ACCENT, '--accent-b': ACCENT_2 } as React.CSSProperties
       }
     >
-      <section className={styles.top}>
+      <div className={styles.field}>
         <ArcadeField />
+
+        <section className={styles.top}>
         <div className={`shell ${styles.topInner}`}>
           {/* The mark this side of the site carries, sized to match the stack
               icons on a project page. It replaces the streaming schedule,
@@ -166,16 +170,13 @@ export default function GamingPage() {
           <span className={styles.mark}>
             <ControllerIcon />
           </span>
-          <p className="eyebrow">Rest Plenty</p>
-          <h1 className={styles.title}>Fun</h1>
-          <p className={styles.lede}>
-            Completionist runs, achievement hunting, and analysis of the games
-            that reward it. One game at a time, finished honestly.
-          </p>
+          <p className="eyebrow">Fun</p>
+          <h1 className={styles.title}>Rest Plenty</h1>
+          <CyclingQuote quotes={lifeQuotes} className={styles.lede} />
         </div>
-      </section>
+        </section>
 
-      <div className="shell">
+        <div className={`shell ${styles.fieldContent}`}>
         {steam.current && (
           <section className={styles.section}>
             <p className="eyebrow">Now playing</p>
@@ -226,11 +227,14 @@ export default function GamingPage() {
             )}
           </section>
         )}
+        </div>
+      </div>
 
+      <div className="shell">
         {runs.total > 0 && (
           <section className={styles.section}>
-            <p className="eyebrow">Perfect runs</p>
-            <h2 className="section-title">Every achievement</h2>
+            <p className="eyebrow">100%</p>
+            <h2 className="section-title">Perfect runs</h2>
             <p className={styles.sectionNote}>
               {runs.total} {runs.total === 1 ? 'game' : 'games'} taken to 100%
               {runs.synced

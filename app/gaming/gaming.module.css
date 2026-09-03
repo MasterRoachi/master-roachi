@@ -4,12 +4,32 @@
   padding-bottom: clamp(56px, 9vw, 110px);
 }
 
-.top {
+/* The arcade field is positioned against this, so it runs behind the hero
+   and the current game together and stops where the record begins. Grouping
+   them says they are the same thing: what is happening right now. */
+.field {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   border-bottom: 1px solid var(--line);
   margin-bottom: clamp(40px, 6vw, 72px);
+  padding-bottom: clamp(32px, 5vw, 56px);
+}
+
+/* Content sits above the field.
+
+   Named explicitly rather than selecting every child of .field. That also
+   caught ArcadeField's own host, which is absolutely positioned, and forcing
+   it to relative turned the backdrop into a block that pushed the hero down
+   the page instead of sitting behind it. */
+.fieldContent {
+  position: relative;
+  z-index: 1;
+}
+
+.top {
+  position: relative;
+  z-index: 1;
 }
 
 .topInner {
