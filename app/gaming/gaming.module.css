@@ -1,29 +1,79 @@
+.page {
+  --accent-a: var(--accent);
+  --accent-b: var(--accent);
+  padding-bottom: clamp(56px, 9vw, 110px);
+}
+
+.top {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.topInner {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(56px, 10vw, 120px) clamp(40px, 7vw, 76px);
+}
+
+.title {
+  font-size: clamp(2.4rem, 8vw, 5rem);
+  margin: 0 0 22px;
+}
+
+.lede {
+  color: var(--muted);
+  max-width: var(--measure);
+  margin: 0;
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  line-height: 1.5;
+}
+
 .stream {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 24px;
+  margin: 30px 0 0;
   font-size: 0.85rem;
   color: var(--muted);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-bright);
   padding: 9px 16px;
+  background: oklch(12% 0 0 / 0.5);
 }
 
 .dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-a);
 }
 
 .section {
-  padding-block: clamp(40px, 6vw, 72px) 0;
+  padding-block: clamp(28px, 4.5vw, 44px);
 }
 
+/* Now playing, with Steam's own header art. */
 .current {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) 1fr;
+  gap: clamp(20px, 3vw, 36px);
+  align-items: center;
   border: 1px solid var(--line);
   background: var(--bg-raised);
-  padding: clamp(24px, 3.5vw, 36px);
+  padding: clamp(18px, 2.5vw, 26px);
+}
+
+.currentArt {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+.currentBody {
+  min-width: 0;
 }
 
 .currentTitle {
@@ -37,26 +87,115 @@
   font-size: 0.92rem;
 }
 
-.progress {
-  margin-top: 24px;
+/* Says where the number came from, so it reads as a fact rather than a boast. */
+.live {
+  margin: 14px 0 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: color-mix(in oklch, var(--accent-a) 68%, var(--ink));
 }
 
-.bar {
-  height: 3px;
-  background: var(--line);
-  overflow: hidden;
+.also {
+  margin-top: 22px;
 }
 
-.bar span {
+.alsoLabel {
+  margin: 0 0 12px;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted-2);
+}
+
+.alsoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.alsoList li {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--line);
+  padding: 7px 13px 7px 8px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.alsoList img {
   display: block;
-  height: 100%;
-  background: var(--accent);
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
 }
 
-.progressLabel {
-  margin: 10px 0 0;
+.alsoHours {
+  font-size: 0.72rem;
+  color: var(--muted-2);
+}
+
+/* Perfect runs — 100% completions, kept apart from merely finished. */
+.perfect {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.perfect li {
+  background: var(--bg);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 18px;
+  transition: background 0.18s ease;
+}
+
+.perfect li:hover {
+  background: var(--bg-raised);
+}
+
+.perfect img {
+  display: block;
+  width: 96px;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+.perfectTitle {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.perfectMeta {
+  display: block;
   font-size: 0.8rem;
   color: var(--muted-2);
+  margin-top: 3px;
+}
+
+.perfectBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--accent-a) 74%, var(--ink));
+  border: 1px solid color-mix(in oklch, var(--accent-a) 40%, transparent);
+  padding: 6px 11px;
+  white-space: nowrap;
 }
 
 .queue {
@@ -123,88 +262,39 @@
   font-size: 0.9rem;
 }
 
-.empty {
-  color: var(--muted-2);
-  border-top: 1px solid var(--line);
-  padding-top: 24px;
-  margin: 0;
+.retro {
+  display: inline-block;
+  border: 1px solid var(--line-bright);
+  padding: 13px 24px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.retro:hover {
+  border-color: var(--accent-a);
+  color: var(--ink);
+}
+
+/* One honest note instead of three empty sections in a row. */
+.pending {
+  border: 1px dashed var(--line-bright);
+  padding: clamp(24px, 3.5vw, 36px);
   max-width: var(--measure);
 }
 
-/* Now-playing card, with Steam's own header art. */
-.current {
-  display: grid;
-  grid-template-columns: minmax(0, 300px) 1fr;
-  gap: clamp(20px, 3vw, 32px);
-  align-items: center;
-  border: 1px solid var(--line);
-  background: var(--bg-raised);
-  padding: clamp(18px, 2.5vw, 26px);
-}
-
-.currentArt {
-  display: block;
-  width: 100%;
-  height: auto;
-  border: 1px solid var(--line);
-}
-
-.currentBody {
-  min-width: 0;
-}
-
-/* Perfect runs — 100% completions, separated from merely finished. */
-.perfect {
-  list-style: none;
-  padding: 0;
+.pendingText {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
+  color: var(--muted);
+  line-height: 1.7;
 }
 
-.perfect li {
-  background: var(--bg);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 20px;
-  padding: 14px 18px;
-}
-
-.perfect img {
-  display: block;
-  width: 92px;
-  height: auto;
-  border: 1px solid var(--line);
-}
-
-.perfectTitle {
-  display: block;
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.perfectMeta {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--muted-2);
-  margin-top: 3px;
-}
-
-.perfectBadge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  border: 1px solid oklch(82% 0.16 85 / 0.45);
-  padding: 5px 10px;
-  white-space: nowrap;
-}
-
-@media (max-width: 640px) {
+@media (max-width: 700px) {
   .current {
     grid-template-columns: 1fr;
   }
