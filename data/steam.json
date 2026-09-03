@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T11:27:43.938Z",
+  "fetchedAt": "2026-09-03T11:36:56.432Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -52,6 +52,15 @@
     }
   ],
   "perfect": [
+    {
+      "appid": 1817070,
+      "title": "Marvel's Spider-Man Remastered",
+      "icon": null,
+      "unlocked": 78,
+      "total": 78,
+      "minutesTotal": 0,
+      "shared": true
+    },
     {
       "appid": 409710,
       "title": "BioShock Remastered",
@@ -2007,6 +2016,14 @@
       "icon": "6ecb6896b5d9f190e70b256bf05ebb464d70fed7",
       "unlocked": 0,
       "total": 14
+    },
+    "1817070": {
+      "name": "Marvel's Spider-Man Remastered",
+      "minutes": 0,
+      "icon": null,
+      "unlocked": 78,
+      "total": 78,
+      "shared": true
     },
     "1896880": {
       "name": "Dungeons of Dreadrock",

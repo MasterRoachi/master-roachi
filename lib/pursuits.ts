@@ -105,8 +105,6 @@ export const tierList: Game[] = [
   { title: 'Doodle God', appid: 348360, tier: 'C' },
 ];
 
-/** Set to false once the rankings above are actually his. */
-export const tierListProvisional = true;
 
 export interface VideoOrArticle {
   title: string;

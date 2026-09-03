@@ -108,10 +108,21 @@ export default function PlayNextVote({
               )}
               <span className={styles.title}>{candidate.title}</span>
               {open && (
-                <span className={styles.count}>
-                  {count}
-                  <span className={styles.countLabel}>
-                    {count === 1 ? 'vote' : 'votes'}
+                <span className={styles.right}>
+                  {/* Said outright rather than left to a border tint. With one
+                      vote among six options the winning row is already the
+                      only filled one, so a shift in shade reads as decoration
+                      rather than as "this is the one you chose". */}
+                  {mine && (
+                    <span className={styles.yours}>
+                      <span aria-hidden="true">✓</span> Your pick
+                    </span>
+                  )}
+                  <span className={styles.count}>
+                    {count}
+                    <span className={styles.countLabel}>
+                      {count === 1 ? 'vote' : 'votes'}
+                    </span>
                   </span>
                 </span>
               )}

@@ -6,7 +6,6 @@ import {
   upNext,
   finished,
   tierList,
-  tierListProvisional,
   TIERS,
   streamSchedule,
   type Game,
@@ -344,12 +343,7 @@ export default function GamingPage() {
         {tierList.length > 0 && (
           <section className={styles.section}>
             <p className="eyebrow">Tier list</p>
-            {tierListProvisional && (
-              <p className={styles.sectionNote}>
-                Placeholder ordering while the real one gets written — these
-                are games off the shelf, not a considered ranking yet.
-              </p>
-            )}
+            <h2 className="section-title">My Rankings</h2>
             <div className={styles.tiers}>
               {TIERS.map((rank) => {
                 const games = tierList.filter((g) => g.tier === rank);

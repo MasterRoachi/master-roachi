@@ -109,3 +109,39 @@
     transition: none;
   }
 }
+
+/* Keeps "Your pick" and the count together on the right, so the row still
+   reads as one line when the marker appears and disappears. */
+.right {
+  position: relative;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.yours {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent-a);
+  padding: 4px 9px;
+}
+
+/* A solid edge on the chosen row, readable before any colour is compared. */
+.chosen::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent-a);
+  z-index: 2;
+}
