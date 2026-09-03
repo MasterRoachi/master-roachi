@@ -18,6 +18,11 @@ export interface SteamPerfect {
   appid: number;
   title: string;
   icon: string | null;
+  /**
+   * The store's own header URL. Preferred over the guessable one, which is
+   * simply absent for some games — see storeHeader() in scripts/steam.mjs.
+   */
+  header?: string | null;
   unlocked: number;
   total: number;
   minutesTotal: number;

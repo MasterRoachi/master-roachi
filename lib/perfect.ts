@@ -50,7 +50,7 @@ export function getPerfectRuns(): PerfectRuns {
   const steam: PerfectRun[] = steamData.perfect.map((g) => ({
     key: `steam-${g.appid}`,
     title: g.title,
-    art: steamHeader(g.appid),
+    art: g.header ?? steamHeader(g.appid),
     icon: null,
     unlocked: g.unlocked,
     total: g.total,

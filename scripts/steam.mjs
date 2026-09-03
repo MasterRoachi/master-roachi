@@ -109,6 +109,32 @@ async function achievements(appid) {
   }
 }
 
+/**
+ * The real header image for a game, from the store.
+ *
+ * The predictable URL — cdn.../steam/apps/<appid>/header.jpg — is right for
+ * most games and wrong for some. BALL x PIT answers 404 there: Steam has moved
+ * newer titles to content-hashed store_item_assets paths, and games with
+ * seasonal "alt assets" no longer have anything at the old address at all.
+ * Guessing the URL therefore produces a dead image with no warning.
+ *
+ * Only asked for games that turn out to be perfect, which is a handful rather
+ * than a library, and cached so a second build does not ask again.
+ */
+async function storeHeader(appid) {
+  try {
+    const res = await fetch(
+      `https://store.steampowered.com/api/appdetails?appids=${appid}&filters=basic`,
+      { signal: AbortSignal.timeout(20000) },
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.[appid]?.data?.header_image ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function mapLimit(items, limit, fn) {
   const out = [];
   let i = 0;
@@ -239,9 +265,26 @@ try {
     });
   }
 
+  // Header art for the perfect runs, which are the only ones that get a
+  // picture. Fetched one at a time and only when not already known — this is
+  // the public store API, not the keyed one, and there are single figures of
+  // them.
+  const perfectIds = Object.entries(cache)
+    .filter(([, v]) => v.total && v.unlocked === v.total)
+    .map(([appid]) => appid);
+
+  for (const appid of perfectIds) {
+    if (cache[appid].header !== undefined) continue;
+    cache[appid].header = await storeHeader(appid);
+    if (!cache[appid].header) {
+      console.log(`steam:   no store header for ${cache[appid].name} (${appid})`);
+    }
+  }
+
   const perfect = Object.entries(cache)
     .filter(([, v]) => v.total && v.unlocked === v.total)
     .map(([appid, v]) => ({
+      header: v.header ?? null,
       appid: Number(appid),
       title: v.name,
       icon: v.icon ?? null,

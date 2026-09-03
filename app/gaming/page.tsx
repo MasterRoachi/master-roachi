@@ -150,15 +150,6 @@ export default function GamingPage() {
   // library by last-played date to have this many to show.
   const alsoPlayed = steam.recent.slice(1, 6);
 
-  // Sections with nothing in them yet are gathered into one honest note rather
-  // than stacked as three separate apologies.
-  const pending = [
-    completed.length === 0 && 'verdicts on finished games',
-    tierList.length === 0 && 'a tier list',
-    videos.length === 0 && 'videos',
-    posts.length === 0 && 'reviews and analysis',
-  ].filter(Boolean) as string[];
-
   return (
     <div
       className={styles.page}
@@ -430,17 +421,6 @@ export default function GamingPage() {
           </section>
         )}
 
-        {pending.length > 0 && (
-          <section className={styles.section}>
-            <div className={styles.pending}>
-              <p className="eyebrow eyebrow--muted">Not here yet</p>
-              <p className={styles.pendingText}>
-                Still to come: {pending.join(', ')}. Nothing published yet
-                rather than something padded out.
-              </p>
-            </div>
-          </section>
-        )}
       </div>
     </div>
   );

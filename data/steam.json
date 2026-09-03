@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T12:42:48.195Z",
+  "fetchedAt": "2026-09-03T12:49:10.442Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -123,6 +123,7 @@
   ],
   "perfect": [
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/header.jpg?t=1787838689",
       "appid": 1817070,
       "title": "Marvel's Spider-Man Remastered",
       "icon": null,
@@ -132,6 +133,7 @@
       "shared": true
     },
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/409710/header.jpg?t=1740443728",
       "appid": 409710,
       "title": "BioShock Remastered",
       "icon": "eb72262cd3ccc3219dd76392be3b60a4b6cbfd38",
@@ -141,6 +143,7 @@
       "shared": false
     },
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2062430/5e7885a3802fe7d38b92fdeb44888b4828a842ba/header_alt_assets_2.jpg?t=1786035856",
       "appid": 2062430,
       "title": "BALL x PIT",
       "icon": null,
@@ -150,6 +153,7 @@
       "shared": true
     },
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/629820/header.jpg?t=1774541534",
       "appid": 629820,
       "title": "Maneater",
       "icon": "8c360e45ff1ec31a3640e62780d7d1f47badc251",
@@ -159,6 +163,7 @@
       "shared": false
     },
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/462780/header.jpg?t=1754079044",
       "appid": 462780,
       "title": "Darksiders Warmastered Edition",
       "icon": "4616a0d94eb5864f2933fd0157bb60a27b14d5fe",
@@ -168,6 +173,7 @@
       "shared": false
     },
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/348360/header.jpg?t=1738058626",
       "appid": 348360,
       "title": "Doodle God",
       "icon": "31c2b5609aa7779e6faafeaf6d0e085386b4ccba",
@@ -177,6 +183,7 @@
       "shared": false
     },
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3590/header.jpg?t=1777394124",
       "appid": 3590,
       "title": "Plants vs. Zombies: Game of the Year",
       "icon": "d2a9c24de11210560f579e7fd9303960c5060155",
@@ -186,6 +193,7 @@
       "shared": false
     },
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/40700/header.jpg?t=1779498950",
       "appid": 40700,
       "title": "Machinarium",
       "icon": "33e11d52f0a2335671d7bf73341c14ae6e596809",
@@ -195,6 +203,7 @@
       "shared": false
     },
     {
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/742500/header.jpg?t=1646329060",
       "appid": 742500,
       "title": "Nonogram - Master's Legacy",
       "icon": "80c07a044365060609e3f5db537f186c4c22df9d",
@@ -267,7 +276,8 @@
       "minutes": 4811,
       "icon": "d2a9c24de11210560f579e7fd9303960c5060155",
       "unlocked": 21,
-      "total": 21
+      "total": 21,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3590/header.jpg?t=1777394124"
     },
     "3830": {
       "name": "Psychonauts",
@@ -442,7 +452,8 @@
       "minutes": 596,
       "icon": "33e11d52f0a2335671d7bf73341c14ae6e596809",
       "unlocked": 12,
-      "total": 12
+      "total": 12,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/40700/header.jpg?t=1779498950"
     },
     "41000": {
       "name": "Serious Sam HD: The First Encounter",
@@ -862,7 +873,8 @@
       "minutes": 1162,
       "icon": "31c2b5609aa7779e6faafeaf6d0e085386b4ccba",
       "unlocked": 22,
-      "total": 22
+      "total": 22,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/348360/header.jpg?t=1738058626"
     },
     "350080": {
       "name": "Wolfenstein: The Old Blood ",
@@ -974,7 +986,8 @@
       "minutes": 4912,
       "icon": "eb72262cd3ccc3219dd76392be3b60a4b6cbfd38",
       "unlocked": 65,
-      "total": 65
+      "total": 65,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/409710/header.jpg?t=1740443728"
     },
     "409720": {
       "name": "BioShock 2 Remastered",
@@ -1051,7 +1064,8 @@
       "minutes": 3040,
       "icon": "4616a0d94eb5864f2933fd0157bb60a27b14d5fe",
       "unlocked": 43,
-      "total": 43
+      "total": 43,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/462780/header.jpg?t=1754079044"
     },
     "465200": {
       "name": "Fury Unleashed",
@@ -1289,7 +1303,8 @@
       "minutes": 2312,
       "icon": "8c360e45ff1ec31a3640e62780d7d1f47badc251",
       "unlocked": 44,
-      "total": 44
+      "total": 44,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/629820/header.jpg?t=1774541534"
     },
     "631510": {
       "name": "Devil May Cry HD Collection",
@@ -1373,7 +1388,8 @@
       "minutes": 1640,
       "icon": "80c07a044365060609e3f5db537f186c4c22df9d",
       "unlocked": 6,
-      "total": 6
+      "total": 6,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/742500/header.jpg?t=1646329060"
     },
     "748360": {
       "name": "MY HERO ONE'S JUSTICE",
@@ -2102,7 +2118,8 @@
       "icon": null,
       "unlocked": 78,
       "total": 78,
-      "shared": true
+      "shared": true,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1817070/header.jpg?t=1787838689"
     },
     "1896880": {
       "name": "Dungeons of Dreadrock",
@@ -2159,7 +2176,8 @@
       "icon": null,
       "unlocked": 63,
       "total": 63,
-      "shared": true
+      "shared": true,
+      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2062430/5e7885a3802fe7d38b92fdeb44888b4828a842ba/header_alt_assets_2.jpg?t=1786035856"
     },
     "2134770": {
       "name": "SteamWorld Build",
