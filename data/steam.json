@@ -1,25 +1,25 @@
 {
-  "fetchedAt": "2026-09-03T17:18:40.984Z",
+  "fetchedAt": "2026-09-03T19:19:39.260Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
     "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-    "minutesTwoWeeks": 2297,
-    "minutesTotal": 2297
+    "minutesTwoWeeks": 2307,
+    "minutesTotal": 2307
   },
   "recent": [
     {
       "appid": 431730,
       "title": "Aseprite",
       "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-      "minutesTwoWeeks": 2297,
-      "minutesTotal": 2297
+      "minutesTwoWeeks": 2307,
+      "minutesTotal": 2307
     },
     {
       "appid": 2187290,
       "title": "Wall World",
       "icon": "e63abe2ba9116b8e92a424c5bc4fb231518557e9",
-      "minutesTwoWeeks": 191,
+      "minutesTwoWeeks": 70,
       "minutesTotal": 335
     },
     {
@@ -1019,7 +1019,7 @@
     },
     "431730": {
       "name": "Aseprite",
-      "minutes": 2297,
+      "minutes": 2307,
       "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
       "unlocked": null,
       "total": null
