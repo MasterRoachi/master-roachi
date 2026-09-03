@@ -122,10 +122,8 @@ export const orthodoxReading: ReadingItem[] = [
     author: 'Douglas Adams',
     status: 'reading',
   },
-  // Authors left off these two deliberately: guessing one wrong is worse than
-  // leaving the field empty, and the field is optional for that reason.
-  { title: 'The God Kings and the Titans', status: 'reading' },
-  { title: 'Change in South Africa', status: 'reading' },
+  { title: 'The God Kings and the Titans', author: 'James Bailey', status: 'reading' },
+  { title: 'Change in South Africa', author: 'DJ van Vuuren', status: 'reading' },
 ];
 
 export interface VideoOrArticle {

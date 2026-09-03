@@ -90,13 +90,26 @@ export default function CandleField() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
-    const ro = new ResizeObserver(resize);
+    const ro = new ResizeObserver(() => {
+      resize();
+      // The one guaranteed paint happens at the end of this effect, which can
+      // land before the host has been laid out — drawing into a zero-sized
+      // canvas, so nothing appears. Whenever no loop is running to correct
+      // that later (reduced motion, or a browser granting no animation
+      // frames), repaint here so the field still arrives.
+      if (!raf) draw();
+    });
     ro.observe(host);
 
     let pointerX = 0;
     let pointerY = 0;
     const onPointer = (e: PointerEvent) => {
       const r = host.getBoundingClientRect();
+      // A zero-sized box divides to Infinity, and every coordinate derived
+      // from it afterwards is NaN. Canvas arc() ignores that silently, so it
+      // only ever showed up as a field that quietly stopped drawing;
+      // createRadialGradient throws outright, which is how it was found.
+      if (!r.width || !r.height) return;
       pointerX = ((e.clientX - r.left) / r.width) * 2 - 1;
       pointerY = ((e.clientY - r.top) / r.height) * 2 - 1;
     };
@@ -147,6 +160,12 @@ export default function CandleField() {
         const px = f.x * w + offX;
         const py = ny * h + offY;
         const r = f.size * breath;
+
+        // A backstop, not the fix — the pointer guard above is that. But
+        // createRadialGradient throws on a non-finite argument, and a
+        // decorative backdrop should never be able to take a page down. A
+        // skipped flame is invisible; an exception is not.
+        if (!Number.isFinite(px) || !Number.isFinite(py) || !(r > 0)) continue;
 
         const g = ctx.createRadialGradient(px, py, 0, px, py, r);
         g.addColorStop(0, `rgba(255, 214, 140, ${f.alpha * breath})`);

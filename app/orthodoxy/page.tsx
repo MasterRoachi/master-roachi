@@ -6,6 +6,8 @@ import PostCard from '@/components/PostCard';
 import { getWriting, toSummary } from '@/lib/content';
 import { orthodoxWork, orthodoxReading } from '@/lib/pursuits';
 import { getVideos } from '@/lib/videos';
+import CyclingQuote from '@/components/CyclingQuote';
+import { faithQuotes } from '@/lib/quotes';
 import styles from './orthodoxy.module.css';
 
 export const metadata: Metadata = {
@@ -53,7 +55,7 @@ export default function OrthodoxyPage() {
             mark={<OrthodoxCross />}
             eyebrow="Foundations"
             title="Study Well"
-            lede="Long-form video, written argument, and questions taken seriously. The aim is not to make Orthodoxy trendy — it is to ask whether it is true."
+            lede={<CyclingQuote quotes={faithQuotes} />}
           />
         </div>
       </section>

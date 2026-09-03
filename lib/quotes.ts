@@ -36,6 +36,37 @@ export const workQuotes: Quote[] = [
   },
 ];
 
+/**
+ * For Foundations.
+ *
+ * Attribution matters more here than on the other two lists, and in a way that
+ * is easy to get wrong: Seraphim Rose is not canonised, so he is Father, not
+ * Saint. Titling him as one on an Orthodox page would be a real error, not a
+ * typo — the kind a reader of this page would notice immediately.
+ */
+export const faithQuotes: Quote[] = [
+  {
+    text: 'Acquire the Spirit of Peace, and a thousand souls around you will be saved.',
+    source: 'St Seraphim of Sarov',
+  },
+  {
+    text: 'Keep your mind in hell, and despair not.',
+    source: 'St Silouan the Athonite',
+  },
+  {
+    text: 'He became man that we might become god.',
+    source: 'St Athanasius, On the Incarnation',
+  },
+  {
+    text: 'It is later than you think. Hasten, therefore, to do the work of God.',
+    source: 'Fr Seraphim Rose',
+  },
+  {
+    text: 'This life has been given to you for repentance. Do not waste it on other things.',
+    source: 'St Isaac the Syrian',
+  },
+];
+
 /** For the Fun page: rest, play, and the point of any of it. */
 export const lifeQuotes: Quote[] = [
   {
