@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T11:14:03.473Z",
+  "fetchedAt": "2026-09-03T11:27:43.938Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -58,7 +58,8 @@
       "icon": "eb72262cd3ccc3219dd76392be3b60a4b6cbfd38",
       "unlocked": 65,
       "total": 65,
-      "minutesTotal": 4912
+      "minutesTotal": 4912,
+      "shared": false
     },
     {
       "appid": 629820,
@@ -66,7 +67,8 @@
       "icon": "8c360e45ff1ec31a3640e62780d7d1f47badc251",
       "unlocked": 44,
       "total": 44,
-      "minutesTotal": 2312
+      "minutesTotal": 2312,
+      "shared": false
     },
     {
       "appid": 462780,
@@ -74,7 +76,8 @@
       "icon": "4616a0d94eb5864f2933fd0157bb60a27b14d5fe",
       "unlocked": 43,
       "total": 43,
-      "minutesTotal": 3040
+      "minutesTotal": 3040,
+      "shared": false
     },
     {
       "appid": 348360,
@@ -82,7 +85,8 @@
       "icon": "31c2b5609aa7779e6faafeaf6d0e085386b4ccba",
       "unlocked": 22,
       "total": 22,
-      "minutesTotal": 1162
+      "minutesTotal": 1162,
+      "shared": false
     },
     {
       "appid": 3590,
@@ -90,7 +94,8 @@
       "icon": "d2a9c24de11210560f579e7fd9303960c5060155",
       "unlocked": 21,
       "total": 21,
-      "minutesTotal": 4811
+      "minutesTotal": 4811,
+      "shared": false
     },
     {
       "appid": 40700,
@@ -98,7 +103,8 @@
       "icon": "33e11d52f0a2335671d7bf73341c14ae6e596809",
       "unlocked": 12,
       "total": 12,
-      "minutesTotal": 596
+      "minutesTotal": 596,
+      "shared": false
     },
     {
       "appid": 742500,
@@ -106,7 +112,8 @@
       "icon": "80c07a044365060609e3f5db537f186c4c22df9d",
       "unlocked": 6,
       "total": 6,
-      "minutesTotal": 1640
+      "minutesTotal": 1640,
+      "shared": false
     }
   ],
   "ownedCount": 370,

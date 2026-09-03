@@ -50,6 +50,29 @@ function previous() {
   }
 }
 
+/**
+ * Games played through Steam Family Sharing, listed by hand in
+ * data/shared-games.json.
+ *
+ * They have to be listed, because no Steam Web API endpoint will report them:
+ * GetOwnedGames returns games this account owns, and a shared game is played
+ * on someone else's licence. The family endpoints exist but want a logged-in
+ * session token rather than a Web API key.
+ *
+ * Only the names are manual. GetPlayerAchievements does not check ownership —
+ * only that the profile is public — so the achievement counts still come from
+ * Steam and a 100% claim here is as verified as any other.
+ */
+function sharedGames() {
+  try {
+    const file = path.join(process.cwd(), 'data', 'shared-games.json');
+    const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return Array.isArray(parsed.games) ? parsed.games : [];
+  } catch {
+    return [];
+  }
+}
+
 async function api(iface, method, version, params = {}) {
   const url = new URL(
     `https://api.steampowered.com/${iface}/${method}/v${version}/`,
@@ -151,6 +174,31 @@ try {
     };
   });
 
+  // Family-shared games, always re-checked rather than cached against
+  // playtime: Steam reports no playtime for a game this account does not own,
+  // so there is nothing to compare against. The list is short by nature.
+  const shared = sharedGames();
+  if (shared.length > 0) {
+    console.log(`steam: checking ${shared.length} family-shared games`);
+    await mapLimit(shared, CONCURRENCY, async (g) => {
+      const got = await achievements(g.appid);
+      if (!got) {
+        // Either the game has no achievements, or it has never actually been
+        // played on this account. Said plainly, because a shared game silently
+        // missing from the page is the confusing outcome.
+        console.log(`steam:   ${g.title} (${g.appid}) — no achievement data`);
+      }
+      cache[g.appid] = {
+        name: g.title,
+        minutes: 0,
+        icon: null,
+        unlocked: got?.unlocked ?? null,
+        total: got?.total ?? null,
+        shared: true,
+      };
+    });
+  }
+
   const perfect = Object.entries(cache)
     .filter(([, v]) => v.total && v.unlocked === v.total)
     .map(([appid, v]) => ({
@@ -160,6 +208,7 @@ try {
       unlocked: v.unlocked,
       total: v.total,
       minutesTotal: v.minutes,
+      shared: v.shared === true,
     }))
     .sort((a, b) => b.total - a.total);
 

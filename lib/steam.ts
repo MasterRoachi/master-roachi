@@ -21,6 +21,8 @@ export interface SteamPerfect {
   unlocked: number;
   total: number;
   minutesTotal: number;
+  /** Played on someone else's licence through Steam Family Sharing. */
+  shared?: boolean;
 }
 
 export interface SteamSnapshot {

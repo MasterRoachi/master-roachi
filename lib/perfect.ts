@@ -55,9 +55,12 @@ export function getPerfectRuns(): PerfectRuns {
     unlocked: g.unlocked,
     total: g.total,
     platform: 'Steam',
-    note:
-      manualByAppid.get(g.appid)?.note ??
-      (g.minutesTotal >= 60 ? `${hoursFrom(g.minutesTotal)}h played` : null),
+    // A shared game has no playtime on this account to report, so it says how
+    // it was played instead — which is the more interesting fact anyway.
+    note: g.shared
+      ? 'Family shared'
+      : (manualByAppid.get(g.appid)?.note ??
+        (g.minutesTotal >= 60 ? `${hoursFrom(g.minutesTotal)}h played` : null)),
     href: `https://store.steampowered.com/app/${g.appid}/`,
   }));
 

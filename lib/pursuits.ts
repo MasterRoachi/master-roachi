@@ -18,9 +18,13 @@ export interface Game {
   tier?: TierRank;
 }
 
-export type TierRank = 'S' | 'A' | 'B' | 'C' | 'D';
+export type TierRank = 'Z' | 'S' | 'A' | 'B' | 'C';
 
-export const TIERS: TierRank[] = ['S', 'A', 'B', 'C', 'D'];
+/**
+ * Ordered best first. Z sits above S — the reserved shelf, for the few that
+ * are not really competing with the rest.
+ */
+export const TIERS: TierRank[] = ['Z', 'S', 'A', 'B', 'C'];
 
 export const streamSchedule = {
   // TODO confirm — carried over from the previous site.
@@ -66,14 +70,43 @@ export const finished: Game[] = [
   },
 ];
 
-/** Queued next. */
+/**
+ * Queued next, and the options in the "what should I play next" vote.
+ *
+ * Titles are load-bearing: lib/poll.ts slugs them into the key each vote is
+ * stored under, so retitling an entry restarts its count from zero. Fix a
+ * spelling before the poll runs, not after.
+ */
 export const upNext: Game[] = [
-  { title: 'Wall World' },
   { title: 'Sea of Stars' },
+  { title: 'Castlevania: Lords of Shadow 2' },
+  { title: 'Beast of Reincarnation' },
+  { title: 'Clair Obscur: Expedition 33' },
+  { title: 'Guacamelee!' },
+  { title: 'BioShock 2 Remastered' },
 ];
 
-// TODO: fill in. The tier list — assign `tier` per game.
-export const tierList: Game[] = [];
+/**
+ * TODO: PLACEHOLDER RANKINGS — not Stephan's opinion.
+ *
+ * They exist so the section can be seen working, and they use games actually
+ * in the library rather than invented ones, but the order is a guess. Replace
+ * the whole array rather than tidying it. `tierListProvisional` puts a visible
+ * note on the page saying so; clear it at the same time.
+ */
+export const tierList: Game[] = [
+  { title: 'BioShock Remastered', appid: 409710, tier: 'Z' },
+  { title: 'God of War', appid: 1593500, tier: 'S' },
+  { title: 'Machinarium', appid: 40700, tier: 'S' },
+  { title: 'Ratchet: Deadlocked', tier: 'A' },
+  { title: 'Darksiders Warmastered Edition', appid: 462780, tier: 'A' },
+  { title: 'Maneater', appid: 629820, tier: 'B' },
+  { title: "Mario's Picross", tier: 'B' },
+  { title: 'Doodle God', appid: 348360, tier: 'C' },
+];
+
+/** Set to false once the rankings above are actually his. */
+export const tierListProvisional = true;
 
 export interface VideoOrArticle {
   title: string;

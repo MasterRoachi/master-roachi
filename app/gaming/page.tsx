@@ -6,6 +6,7 @@ import {
   upNext,
   finished,
   tierList,
+  tierListProvisional,
   TIERS,
   streamSchedule,
   type Game,
@@ -31,11 +32,13 @@ export const metadata: Metadata = {
  * section.
  */
 const TIER_COLOUR: Record<TierRank, string> = {
+  // Z is off the ramp on purpose. It sits above S, so giving it a hotter red
+  // would read as merely more of the same; violet reads as a different shelf.
+  Z: 'oklch(72% 0.22 330)',
   S: 'oklch(70% 0.21 25)',
   A: 'oklch(75% 0.17 55)',
   B: 'oklch(83% 0.15 95)',
   C: 'oklch(80% 0.16 145)',
-  D: 'oklch(70% 0.06 240)',
 };
 
 // Lime, the colour this side carries on the About page and in the nav.
@@ -341,6 +344,12 @@ export default function GamingPage() {
         {tierList.length > 0 && (
           <section className={styles.section}>
             <p className="eyebrow">Tier list</p>
+            {tierListProvisional && (
+              <p className={styles.sectionNote}>
+                Placeholder ordering while the real one gets written — these
+                are games off the shelf, not a considered ranking yet.
+              </p>
+            )}
             <div className={styles.tiers}>
               {TIERS.map((rank) => {
                 const games = tierList.filter((g) => g.tier === rank);
