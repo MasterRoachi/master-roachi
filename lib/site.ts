@@ -26,6 +26,11 @@ export const site = {
     // the store page shows the catalogue without Buy buttons rather than
     // linking nowhere.
     storefrontUrl: null as string | null,
+    // How the storefront addresses one product, with {id} standing in for the
+    // external id Printful records. Big Cartel uses '/product/{id}', Shopify
+    // '/products/{id}'. Left null until a real product URL has been seen —
+    // guessing produces confident links to nothing.
+    productUrlPattern: null as string | null,
   },
 
   socials: {

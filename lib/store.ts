@@ -52,10 +52,18 @@ export function getStore(): StoreSnapshot {
 export function buyUrl(product: StoreProduct): string | null {
   const base = site.store.storefrontUrl;
   if (!base) return null;
-  // Most platforms address a product by the external id Printful records.
-  return product.externalId
-    ? `${base.replace(/\/$/, '')}/products/${product.externalId}`
-    : base;
+  const root = base.replace(/\/$/, '');
+
+  const pattern = site.store.productUrlPattern;
+  if (!pattern || !product.externalId) return root;
+
+  // Every platform addresses products differently — Big Cartel uses
+  // /product/<permalink>, Shopify /products/<handle>, Etsy /listing/<id>. An
+  // earlier version hard-coded one shape, which would have produced confident
+  // links straight to 404s. The pattern is set once the real URL shape is
+  // known; until then every product links to the shop front, which is always
+  // correct even when it is not deep.
+  return root + pattern.replace('{id}', encodeURIComponent(product.externalId));
 }
 
 /**
