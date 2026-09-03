@@ -135,6 +135,30 @@ export default function ProjectDeck({
     };
   }, []);
 
+  /**
+   * Where the cursor is on a card, as a fraction of it, written to custom
+   * properties. The foil sheen and the tilt are both CSS reading these — the
+   * alternative is re-rendering a card on every pointermove to move a
+   * highlight, which is a lot of React for a reflection.
+   */
+  const onCardMove = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    el.style.setProperty('--mx', `${(px * 100).toFixed(1)}%`);
+    el.style.setProperty('--my', `${(py * 100).toFixed(1)}%`);
+    // Toward the cursor horizontally, away from it vertically — which is what
+    // makes a surface feel pushed rather than steered.
+    el.style.setProperty('--cy', `${((px - 0.5) * 14).toFixed(2)}deg`);
+    el.style.setProperty('--cx', `${((0.5 - py) * 12).toFixed(2)}deg`);
+  };
+
+  const onCardLeave = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    const el = e.currentTarget;
+    for (const p of ['--mx', '--my', '--cx', '--cy']) el.style.removeProperty(p);
+  };
+
   const page = (dir: -1 | 1) => {
     const track = trackRef.current;
     if (!track) return;
@@ -145,12 +169,24 @@ export default function ProjectDeck({
 
   return (
     <div className={styles.deck}>
+      <button
+        type="button"
+        className={`${styles.arrow} ${styles.arrowLeft}`}
+        onClick={() => page(-1)}
+        disabled={atStart}
+        aria-label="Previous projects"
+      >
+        ←
+      </button>
+
       <ul ref={trackRef} className={styles.track}>
         {projects.map((entry) => (
           <li key={entry.slug} className={styles.slide}>
             <Link
               href={entry.href ?? `/projects/${entry.slug}/`}
               className={styles.card}
+              onPointerMove={onCardMove}
+              onPointerLeave={onCardLeave}
               style={
                 {
                   ...(entry.accent ? { '--accent-a': entry.accent } : {}),
@@ -181,6 +217,11 @@ export default function ProjectDeck({
                 </span>
               </span>
 
+              {/* The sheen, over everything. Its own element rather than a
+                  pseudo-element so it can blend against the card without the
+                  copy inheriting the blend mode. */}
+              <span className={styles.foil} aria-hidden="true" />
+
               <span className={styles.body}>
                 {entry.kind && <span className={styles.kind}>{entry.kind}</span>}
                 <span className={styles.title}>{entry.title}</span>
@@ -196,26 +237,15 @@ export default function ProjectDeck({
         ))}
       </ul>
 
-      <div className={styles.controls}>
-        <button
-          type="button"
-          className={styles.arrow}
-          onClick={() => page(-1)}
-          disabled={atStart}
-          aria-label="Previous projects"
-        >
-          ←
-        </button>
-        <button
-          type="button"
-          className={styles.arrow}
-          onClick={() => page(1)}
-          disabled={atEnd}
-          aria-label="More projects"
-        >
-          →
-        </button>
-      </div>
+      <button
+        type="button"
+        className={`${styles.arrow} ${styles.arrowRight}`}
+        onClick={() => page(1)}
+        disabled={atEnd}
+        aria-label="More projects"
+      >
+        →
+      </button>
     </div>
   );
 }

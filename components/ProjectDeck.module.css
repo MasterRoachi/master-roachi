@@ -1,5 +1,7 @@
+/* Room down the sides for the arrows to sit against the cards. */
 .deck {
   position: relative;
+  padding-inline: 0;
 }
 
 /* Native scroll-snap does the swiping: touch, trackpad and momentum all come
@@ -8,29 +10,33 @@
   list-style: none;
   margin: 0;
   display: flex;
-  gap: 20px;
+  gap: 26px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  /* Bleeds to the shell's edges so a card can sit against them, with the
-     padding put back inside. */
-  padding: 8px var(--pad) 30px;
-  margin-inline: calc(-1 * var(--pad));
+  /* Generous vertical room: the cards lift and tilt, and a tight box would
+     clip the shadow they throw. */
+  /* No bleed past the container. The track used to run the full width via a
+     negative margin, which meant an arrow placed against this element's edge
+     landed on top of a card instead of beside it. Cards are still clipped at
+     the right edge, so it still reads as having more. */
+  padding: 34px 4px 44px;
   scrollbar-width: none;
-  /* Perspective on the track, so the tilt below is real depth rather than a
-     skew — every card is measured against the same vanishing point. */
-  perspective: 1400px;
+  /* Perspective on the track, so the tilt is real depth rather than a skew —
+     every card measured against the same vanishing point. */
+  perspective: 1200px;
 }
 .track::-webkit-scrollbar {
   display: none;
 }
 
 .slide {
-  flex: 0 0 clamp(260px, 30vw, 380px);
+  flex: 0 0 clamp(280px, 34vw, 420px);
   scroll-snap-align: center;
   /* Set per card by the scroll handler: -1 at the left edge, +1 at the right. */
   --d: 0;
   --tilt: 0deg;
-  transform: rotateY(var(--tilt)) scale(calc(1 - 0.06 * max(var(--d), -1 * var(--d))));
+  transform: rotateY(var(--tilt))
+    scale(calc(1 - 0.05 * max(var(--d), -1 * var(--d))));
   transform-style: preserve-3d;
   transition: transform 0.12s linear;
 }
@@ -44,23 +50,80 @@
   pointer-events: none;
 }
 
+/* --- the card ----------------------------------------------------------- */
+
 .card {
+  --mx: 50%;
+  --my: 50%;
+  --cx: 0deg;
+  --cy: 0deg;
+
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: 1px solid var(--line);
-  background: oklch(16% 0 0 / 0.86);
+  /* Foil trading cards, so: rounded, and lifted off the page rather than
+     printed on it. */
+  border-radius: 18px;
+  border: 1px solid color-mix(in oklch, var(--accent-a, var(--accent)) 18%, var(--line));
+  background: oklch(15% 0 0 / 0.9);
   overflow: hidden;
   color: inherit;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.25s ease;
-}
-.card:hover {
-  border-color: var(--accent-a, var(--accent));
+  transform-style: preserve-3d;
+  transform: rotateX(var(--cx)) rotateY(var(--cy)) translateZ(0);
   box-shadow:
-    0 20px 50px oklch(0% 0 0 / 0.5),
-    0 0 0 1px color-mix(in oklch, var(--accent-a, var(--accent)) 22%, transparent);
+    0 22px 46px oklch(0% 0 0 / 0.55),
+    0 2px 0 oklch(100% 0 0 / 0.04) inset;
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.card:hover {
+  border-color: color-mix(in oklch, var(--accent-a, var(--accent)) 55%, var(--line));
+  box-shadow:
+    0 34px 70px oklch(0% 0 0 / 0.62),
+    0 0 0 1px color-mix(in oklch, var(--accent-a, var(--accent)) 26%, transparent),
+    0 2px 0 oklch(100% 0 0 / 0.06) inset;
+}
+
+/* --- the foil ----------------------------------------------------------- */
+
+/* Two layers doing different jobs: a spectrum that shifts as the card turns,
+   and a specular highlight that sits under the cursor. Blended rather than
+   drawn over, so it reads as the surface catching light instead of a coloured
+   sheet laid on top. */
+.foil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background-image:
+    radial-gradient(
+      circle at var(--mx) var(--my),
+      oklch(100% 0 0 / 0.42) 0%,
+      oklch(100% 0 0 / 0.1) 22%,
+      transparent 45%
+    ),
+    conic-gradient(
+      from calc(var(--cy) * 6) at var(--mx) var(--my),
+      oklch(78% 0.19 20 / 0.42),
+      oklch(82% 0.17 90 / 0.42),
+      oklch(80% 0.18 150 / 0.42),
+      oklch(76% 0.19 220 / 0.42),
+      oklch(74% 0.2 300 / 0.42),
+      oklch(78% 0.19 20 / 0.42)
+    );
+  mix-blend-mode: color-dodge;
+}
+
+/* Enough to read as foil, not so much that the copy underneath goes. At
+   full strength the spectrum swallowed the title and the summary. */
+.card:hover .foil {
+  opacity: 0.34;
 }
 
 /* --- the face ----------------------------------------------------------- */
@@ -68,9 +131,8 @@
 .face {
   display: block;
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 5 / 4;
   overflow: hidden;
-  border-bottom: 1px solid var(--line);
 }
 
 .face img {
@@ -81,7 +143,7 @@
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card:hover .face img {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 /* Stands in until there is art: the project's own two colours, with its
@@ -91,19 +153,19 @@
   display: grid;
   place-items: center;
   height: 100%;
-  font-size: clamp(4rem, 9vw, 7rem);
+  font-size: clamp(5rem, 11vw, 9rem);
   font-weight: 800;
   line-height: 1;
-  color: color-mix(in oklch, var(--accent-a, var(--accent)) 30%, transparent);
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 32%, transparent);
   background:
     radial-gradient(
       120% 100% at 25% 15%,
-      color-mix(in oklch, var(--accent-a, var(--accent)) 22%, transparent),
+      color-mix(in oklch, var(--accent-a, var(--accent)) 24%, transparent),
       transparent 70%
     ),
     radial-gradient(
       100% 90% at 85% 90%,
-      color-mix(in oklch, var(--accent-b, var(--accent)) 18%, transparent),
+      color-mix(in oklch, var(--accent-b, var(--accent)) 20%, transparent),
       transparent 65%
     ),
     oklch(13% 0 0);
@@ -111,17 +173,18 @@
 
 .status {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 700;
-  padding: 5px 9px;
+  padding: 5px 10px;
+  border-radius: 999px;
   color: var(--ink);
   background: oklch(10% 0 0 / 0.72);
   backdrop-filter: blur(6px);
-  border: 1px solid var(--line);
+  border: 1px solid oklch(100% 0 0 / 0.14);
 }
 .status[data-status='released'] {
   color: var(--accent);
@@ -131,10 +194,11 @@
 /* --- the copy ----------------------------------------------------------- */
 
 .body {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: clamp(18px, 2.2vw, 24px);
+  padding: clamp(20px, 2.4vw, 28px);
 }
 
 .kind {
@@ -151,8 +215,8 @@
 
 .title {
   display: block;
-  margin: 8px 0 8px;
-  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  margin: 8px 0;
+  font-size: clamp(1.2rem, 2.1vw, 1.5rem);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -167,51 +231,74 @@
 .stack {
   display: block;
   margin-top: auto;
-  padding-top: 20px;
+  padding-top: 22px;
 }
 
-/* --- controls ----------------------------------------------------------- */
+/* --- arrows ------------------------------------------------------------- */
 
-.controls {
-  display: flex;
-  gap: 10px;
-  margin-top: 4px;
-}
-
+/* Beside the cards rather than under them, floating over the field the same
+   way the cards do. */
 .arrow {
-  width: 44px;
-  height: 44px;
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--line);
-  background: none;
+  border-radius: 999px;
+  border: 1px solid oklch(100% 0 0 / 0.16);
+  background: oklch(12% 0 0 / 0.72);
+  backdrop-filter: blur(8px);
   color: var(--muted);
   font: inherit;
-  font-size: 1rem;
+  font-size: 1.05rem;
   cursor: pointer;
+  box-shadow: 0 10px 26px oklch(0% 0 0 / 0.5);
+  transform: translateY(-50%);
   transition:
     border-color 0.18s ease,
     color 0.18s ease,
-    opacity 0.18s ease;
+    opacity 0.18s ease,
+    background 0.18s ease;
 }
+
+/* In the shell's own gutter, clear of the cards on either side. */
+.arrowLeft {
+  left: -60px;
+}
+.arrowRight {
+  right: -60px;
+}
+
 .arrow:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--ink);
+  background: oklch(16% 0 0 / 0.85);
 }
 .arrow:disabled {
-  opacity: 0.3;
-  cursor: default;
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* The tilt is depth, and depth is exactly what motion sensitivity dislikes.
-   The deck still scrolls and snaps — only the per-card movement stops. */
+/* Below this the gutter is too narrow to hold them clear of the cards, and
+   the swipe is the control anyway. */
+@media (max-width: 900px) {
+  .arrow {
+    display: none;
+  }
+}
+
+/* Depth is exactly what motion sensitivity dislikes. The deck still scrolls
+   and snaps; only the movement stops. */
 @media (prefers-reduced-motion: reduce) {
-  .slide {
+  .slide,
+  .card {
     transform: none;
     transition: none;
   }
   .face img,
-  .card {
+  .foil {
     transition: none;
   }
 }

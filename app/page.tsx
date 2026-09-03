@@ -156,7 +156,7 @@ export default function HomePage() {
             <div className={styles.blockHead}>
               <div>
                 <p className="eyebrow">Writing</p>
-                <h2 className="section-title">Recent words</h2>
+                <h2 className="section-title">Recent thoughts</h2>
               </div>
               <Link href="/writing/" className={styles.more}>
                 All writing →

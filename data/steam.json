@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T19:24:43.371Z",
+  "fetchedAt": "2026-09-03T19:54:40.268Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -19,14 +19,14 @@
       "appid": 2187290,
       "title": "Wall World",
       "icon": "e63abe2ba9116b8e92a424c5bc4fb231518557e9",
-      "minutesTwoWeeks": 65,
+      "minutesTwoWeeks": 39,
       "minutesTotal": 335
     },
     {
       "appid": 1593500,
       "title": "God of War",
       "icon": "8aa5e7e0e55cad682c7f2e65e075c3bc04dfc1cb",
-      "minutesTwoWeeks": 36,
+      "minutesTwoWeeks": 33,
       "minutesTotal": 903
     },
     {
