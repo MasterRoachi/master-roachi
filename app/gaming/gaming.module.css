@@ -142,93 +142,6 @@
 }
 
 /* Perfect runs — 100% completions, kept apart from merely finished. */
-.perfect {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-
-.perfect li {
-  background: var(--bg);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 20px;
-  padding: 14px 18px;
-  transition: background 0.18s ease;
-}
-
-.perfect li:hover {
-  background: var(--bg-raised);
-}
-
-.perfect img {
-  display: block;
-  width: 96px;
-  height: auto;
-  border: 1px solid var(--line);
-}
-
-.perfectTitle {
-  display: block;
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.perfectMeta {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--muted-2);
-  margin-top: 3px;
-}
-
-.perfectBadge {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--accent-a) 74%, var(--ink));
-  border: 1px solid color-mix(in oklch, var(--accent-a) 40%, transparent);
-  padding: 6px 11px;
-  white-space: nowrap;
-}
-
-.queue {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.queue li {
-  border: 1px solid var(--line);
-  padding: 10px 18px;
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
-.finished {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.finished li {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-  padding: 16px 0;
-  border-top: 1px solid var(--line);
-}
-
 .tiers {
   display: flex;
   flex-direction: column;
@@ -298,10 +211,151 @@
   .current {
     grid-template-columns: 1fr;
   }
-  .perfect li {
-    grid-template-columns: 1fr auto;
-  }
-  .perfect img {
-    display: none;
-  }
+}
+
+/* --- perfect runs ------------------------------------------------------ */
+
+.sectionNote {
+  color: var(--muted);
+  font-size: 0.95rem;
+  max-width: 56ch;
+  margin: 10px 0 0;
+}
+
+.runGroup {
+  margin-top: 26px;
+}
+
+/* The platform and its count, so the split reads without studying the art. */
+.runGroupLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+.runGroupLabel span {
+  /* Pushed past the rule below so the count sits at the far right. */
+  order: 3;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
+}
+.runGroupLabel::after {
+  content: '';
+  order: 2;
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.runGrid,
+.retroGrid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+.runGrid {
+  grid-template-columns: repeat(auto-fill, minmax(218px, 1fr));
+}
+.retroGrid {
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+}
+
+.run,
+.runCompact {
+  border: 1px solid var(--line);
+  background: var(--bg);
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+.run:hover,
+.runCompact:hover {
+  border-color: color-mix(in oklch, var(--accent-a) 52%, var(--line));
+  background: var(--bg-raised);
+  transform: translateY(-2px);
+}
+
+.run > a,
+.run > div {
+  display: block;
+  position: relative;
+  color: inherit;
+}
+.runCompact > a,
+.runCompact > div {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  color: inherit;
+}
+
+.runArt {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Steam's own header ratio, so nothing is cropped or stretched. */
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
+  border-bottom: 1px solid var(--line);
+}
+.runIcon {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  /* Retro badges are small pixel art; smoothing them turns them to mush. */
+  image-rendering: pixelated;
+}
+
+.runBody {
+  display: block;
+  min-width: 0;
+}
+.run .runBody {
+  padding: 11px 13px;
+}
+.runTitle {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.runNote {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--muted-2);
+  margin-top: 4px;
+}
+
+.runBadge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: color-mix(in oklch, var(--accent-a) 74%, var(--ink));
+  border: 1px solid color-mix(in oklch, var(--accent-a) 40%, transparent);
+  padding: 4px 8px;
+}
+/* On wide cards the badge sits over the art, where there is room for it. */
+.run .runBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: color-mix(in oklch, var(--bg) 78%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.runGroup .retro {
+  margin-top: 4px;
 }

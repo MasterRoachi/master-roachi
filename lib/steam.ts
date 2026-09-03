@@ -14,13 +14,29 @@ export interface SteamGame {
   minutesTotal: number;
 }
 
+export interface SteamPerfect {
+  appid: number;
+  title: string;
+  icon: string | null;
+  unlocked: number;
+  total: number;
+  minutesTotal: number;
+}
+
 export interface SteamSnapshot {
   fetchedAt: string | null;
   current: SteamGame | null;
   recent: SteamGame[];
+  perfect: SteamPerfect[];
+  ownedCount?: number;
 }
 
-const EMPTY: SteamSnapshot = { fetchedAt: null, current: null, recent: [] };
+const EMPTY: SteamSnapshot = {
+  fetchedAt: null,
+  current: null,
+  recent: [],
+  perfect: [],
+};
 
 /**
  * Tools that live on Steam and report playtime like games do. Aseprite hours
@@ -47,6 +63,8 @@ export function getSteam(): SteamSnapshot {
 
     return {
       fetchedAt: raw.fetchedAt,
+      perfect: (raw.perfect ?? []).filter((g) => !NOT_GAMES.has(g.appid)),
+      ownedCount: raw.ownedCount,
       // `current` is recomputed rather than trusted: the stored one is
       // whatever Steam ranked first, which may be a tool.
       current: games[0] ?? null,

@@ -1,4 +1,17 @@
 {
-  "fetchedAt": null,
-  "products": []
+  "fetchedAt": "2026-09-03T09:45:14.126Z",
+  "store": null,
+  "products": [
+    {
+      "id": 464722916,
+      "externalId": "6a993d1c71c041",
+      "name": "Roachi Shirt",
+      "thumbnail": "https://files.cdn.printful.com/files/264/264af3c70166c98158dc7477d5a909d1_preview.png",
+      "variantCount": 9,
+      "from": {
+        "amount": 16,
+        "currency": "USD"
+      }
+    }
+  ]
 }

@@ -48,7 +48,11 @@ export const currentlyReading: {
 export const currentFocus: string | null = null;
 
 /**
- * Completed runs. `perfect: true` means every achievement unlocked — the
+ * Runs no API can see: a console game, an emulator outside RetroAchievements,
+ * anything finished before a platform started tracking it. Steam and
+ * RetroAchievements masteries are synced (see lib/perfect.ts) and must not be
+ * duplicated here — a Steam entry is absorbed by the sync once it lands, so
+ * only add one to bridge the gap until then. `perfect: true` means every achievement unlocked — the
  * Gaming page groups these separately, since a 100% run is the thing being
  * claimed rather than merely having finished.
  */
@@ -70,11 +74,6 @@ export const upNext: Game[] = [
 
 // TODO: fill in. The tier list — assign `tier` per game.
 export const tierList: Game[] = [];
-
-/** RetroAchievements profile, if you want it linked. */
-export const retroAchievements = {
-  url: null as string | null,
-};
 
 export interface VideoOrArticle {
   title: string;

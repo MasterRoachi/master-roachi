@@ -8,10 +8,11 @@ import {
   tierList,
   TIERS,
   streamSchedule,
-  retroAchievements,
   type Game,
 } from '@/lib/pursuits';
 import { getSteam, steamHeader, steamIcon, hoursFrom } from '@/lib/steam';
+import { getPerfectRuns, type PerfectRun } from '@/lib/perfect';
+import { getRetro } from '@/lib/retro';
 import styles from './gaming.module.css';
 
 export const metadata: Metadata = {
@@ -24,11 +25,75 @@ export const metadata: Metadata = {
 const ACCENT = 'oklch(86% 0.20 135)';
 const ACCENT_2 = 'oklch(72% 0.16 145)';
 
+/**
+ * One 100% run. Steam has wide header art; RetroAchievements only serves a
+ * square badge, so the two are laid out differently rather than forcing one
+ * platform's art into the other's shape and stretching it.
+ */
+function RunCard({ run, compact }: { run: PerfectRun; compact?: boolean }) {
+  const meta = [
+    run.hardcore ? 'Hardcore' : null,
+    // Redundant inside a group already labelled with the platform.
+    run.platform === 'Steam' ? null : run.platform,
+    run.note,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const inner = (
+    <>
+      {run.art ? (
+        <img
+          className={styles.runArt}
+          src={run.art}
+          alt=""
+          width={460}
+          height={215}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : run.icon ? (
+        <img
+          className={styles.runIcon}
+          src={run.icon}
+          alt=""
+          width={64}
+          height={64}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : null}
+      <span className={styles.runBody}>
+        <span className={styles.runTitle}>{run.title}</span>
+        {meta && <span className={styles.runNote}>{meta}</span>}
+      </span>
+      {run.total ? (
+        <span className={styles.runBadge}>
+          {run.unlocked}/{run.total}
+        </span>
+      ) : null}
+    </>
+  );
+
+  return (
+    <li className={compact ? styles.runCompact : styles.run}>
+      {run.href ? (
+        <a href={run.href} target="_blank" rel="noopener noreferrer">
+          {inner}
+        </a>
+      ) : (
+        <div>{inner}</div>
+      )}
+    </li>
+  );
+}
+
 export default function GamingPage() {
   const posts = getWriting('gaming').map(toSummary);
   const steam = getSteam();
 
-  const perfect = finished.filter((g: Game) => g.perfect);
+  const retro = getRetro();
+  const runs = getPerfectRuns();
   const completed = finished.filter((g: Game) => !g.perfect);
 
   // A game cannot be queued and already playing. Wall World sat in both lists
@@ -131,37 +196,66 @@ export default function GamingPage() {
           </section>
         )}
 
-        {perfect.length > 0 && (
+        {runs.total > 0 && (
           <section className={styles.section}>
             <p className="eyebrow">Perfect runs</p>
             <h2 className="section-title">Every achievement</h2>
-            <ul className={styles.perfect}>
-              {perfect.map((game) => (
-                <li key={game.title}>
-                  {game.appid && (
-                    <img
-                      src={steamHeader(game.appid)}
-                      alt=""
-                      width={184}
-                      height={86}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                  <div>
-                    <span className={styles.perfectTitle}>{game.title}</span>
-                    {game.note && (
-                      <span className={styles.perfectMeta}>{game.note}</span>
-                    )}
-                  </div>
-                  {game.achievements && (
-                    <span className={styles.perfectBadge}>
-                      {game.achievements.unlocked}/{game.achievements.total}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <p className={styles.sectionNote}>
+              {runs.total} {runs.total === 1 ? 'game' : 'games'} taken to 100%
+              {runs.synced
+                ? ' — read from the platforms that track them, not typed out here.'
+                : '.'}
+            </p>
+
+            {runs.steam.length > 0 && (
+              <div className={styles.runGroup}>
+                <p className={styles.runGroupLabel}>
+                  Steam <span>{runs.steam.length}</span>
+                </p>
+                <ul className={styles.runGrid}>
+                  {runs.steam.map((run) => (
+                    <RunCard key={run.key} run={run} />
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {runs.retro.length > 0 && (
+              <div className={styles.runGroup}>
+                <p className={styles.runGroupLabel}>
+                  RetroAchievements <span>{runs.retro.length}</span>
+                </p>
+                <ul className={styles.retroGrid}>
+                  {runs.retro.map((run) => (
+                    <RunCard key={run.key} run={run} compact />
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {runs.other.length > 0 && (
+              <div className={styles.runGroup}>
+                <p className={styles.runGroupLabel}>
+                  Also <span>{runs.other.length}</span>
+                </p>
+                <ul className={styles.runGrid}>
+                  {runs.other.map((run) => (
+                    <RunCard key={run.key} run={run} />
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {retro.profileUrl && (
+              <a
+                className={styles.retro}
+                href={retro.profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {retro.gamesTracked} games tracked on RetroAchievements ↗
+              </a>
+            )}
           </section>
         )}
 
@@ -222,20 +316,6 @@ export default function GamingPage() {
                 <PostCard key={post.slug} entry={post} showTrack={false} />
               ))}
             </div>
-          </section>
-        )}
-
-        {retroAchievements.url && (
-          <section className={styles.section}>
-            <p className="eyebrow">Retro</p>
-            <a
-              className={styles.retro}
-              href={retroAchievements.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              RetroAchievements profile ↗
-            </a>
           </section>
         )}
 
