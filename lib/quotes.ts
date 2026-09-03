@@ -1,13 +1,18 @@
-// One pool of quotes, drawn from by every page.
+// Quotes for the page headers: one shared pool, and one list kept apart.
 //
 // These used to be five lists, one per page, each matched to its subject. That
 // turned out to be the wrong shape: the lists were short enough that a page
 // cycled through the same five lines within a minute, and a quote that fits its
 // page exactly is a smaller pleasure than an unexpected one that lands anyway.
 //
-// So it is a single pool now, and a page takes from it at random. Which means
-// any line here can turn up under any header — worth remembering when adding
-// one.
+// So most of them are one pool now, and a page takes from it at random. Any
+// line in `quotes` can turn up under any header that uses it — worth
+// remembering when adding one.
+//
+// Foundations is the exception, in both directions. It draws only from
+// `saintQuotes`, and nothing from `saintQuotes` appears anywhere else. Sharing
+// across that line went one absurd step too far: a cartoon under a candlelit
+// Orthodox header, and a desert father over the merch.
 //
 // Attributions are the risky part of a file like this: a misquoted line under a
 // real character's name is worse than no quote at all. These are widely enough
@@ -15,10 +20,10 @@
 // should still read them and swap any that are not his; that is what this file
 // is for.
 //
-// Everything here is a character in a game, a show, or a film, with one
-// deliberate exception — the saints below, who were real people, and whose
-// titles are load-bearing. Fr Seraphim Rose is not canonised, so he is Father,
-// not Saint. Titling him as one would be a real error, not a typo.
+// Everything in the shared pool is a character in a game, a show, or a film.
+// The saints are real people, and their titles are load-bearing: Fr Seraphim
+// Rose is not canonised, so he is Father, not Saint. Titling him as one would
+// be a real error, not a typo.
 
 export interface Quote {
   text: string;
@@ -26,6 +31,7 @@ export interface Quote {
   source: string;
 }
 
+/** The shared pool. Every page but Foundations draws from this. */
 export const quotes: Quote[] = [
   // Work, practice, and finishing things.
   { text: 'Go beyond. Plus Ultra!', source: 'All Might, My Hero Academia' },
@@ -102,9 +108,16 @@ export const quotes: Quote[] = [
     text: 'It’s not the face that makes someone a monster; it’s the choices they make with their life.',
     source: 'Naruto Uzumaki, Naruto',
   },
+];
 
-  // The saints. Real people, unlike everything above — see the note at the top
-  // about their titles.
+/**
+ * Foundations only, and Foundations draws from nothing else.
+ *
+ * See the note at the top about the titles here — they are the one place in
+ * this file where getting an attribution wrong would be a real error rather
+ * than a misremembered cartoon.
+ */
+export const saintQuotes: Quote[] = [
   {
     text: 'Acquire the Spirit of Peace, and a thousand souls around you will be saved.',
     source: 'St Seraphim of Sarov',
