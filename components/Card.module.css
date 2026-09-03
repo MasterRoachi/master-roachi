@@ -150,11 +150,3 @@
   margin-top: auto;
   padding-top: 28px;
 }
-
-.tag {
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  color: var(--muted-2);
-  border: 1px solid var(--line);
-  padding: 4px 9px;
-}

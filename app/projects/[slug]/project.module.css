@@ -78,22 +78,11 @@
   line-height: 1.5;
 }
 
+/* Wrapper only. The marks style themselves — an earlier bordered-chip rule
+   here was still matching StackIcons' list items and drawing a box round every
+   logo. */
 .stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  list-style: none;
-  padding: 0;
-  margin: 30px 0 0;
-}
-
-.stack li {
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-  border: 1px solid var(--line);
-  padding: 7px 13px;
-  background: oklch(14% 0 0 / 0.6);
+  margin-top: 30px;
 }
 
 .actions {
