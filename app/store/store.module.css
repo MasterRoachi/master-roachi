@@ -77,6 +77,23 @@
   color: var(--muted-2);
 }
 
+/* The model's licence requires the credit to travel with it wherever it is
+   shown, so this is small but not hidden. */
+.credit {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--muted-2);
+}
+.credit a {
+  color: color-mix(in oklch, var(--accent-a) 60%, var(--ink));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.credit a:hover {
+  color: var(--ink);
+}
+
 .buyButton {
   display: inline-block;
   margin-top: 26px;

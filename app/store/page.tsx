@@ -113,6 +113,35 @@ export default function StorePage() {
                 )}
               </div>
               <p className={styles.turn}>Drag it to turn it.</p>
+              {/* Required by the model's licence, not optional politeness.
+                  CC BY 4.0 — see public/store/tshirt-license.txt. */}
+              <p className={styles.credit}>
+                Shirt model{' '}
+                <a
+                  href="https://sketchfab.com/3d-models/tshirt-5a21282b2e454d1696547148f617d3d0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Tshirt
+                </a>{' '}
+                by{' '}
+                <a
+                  href="https://sketchfab.com/Tabbuso"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Tabbuso
+                </a>
+                , licensed{' '}
+                <a
+                  href="http://creativecommons.org/licenses/by/4.0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  CC BY 4.0
+                </a>
+                .
+              </p>
               {buyUrl(lead) ? (
                 <a
                   className={styles.buyButton}

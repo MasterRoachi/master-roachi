@@ -12,3 +12,9 @@ next-env.d.ts
 # Wrangler
 .wrangler/
 .dev.vars
+
+# The source model for public/store/tshirt.glb — 22MB of Sketchfab
+# download. The optimised copy that the site actually serves is committed;
+# these originals are not, so re-optimising needs the download again.
+# Credit and licence live in public/store/tshirt-license.txt.
+/3d/
