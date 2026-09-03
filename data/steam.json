@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T14:17:25.110Z",
+  "fetchedAt": "2026-09-03T14:42:02.996Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -30,18 +30,18 @@
       "minutesTotal": 903
     },
     {
-      "appid": 3017860,
-      "title": "DOOM: The Dark Ages",
-      "icon": "f0d79db78568f80f3532151fed5d9633191d0ebe",
-      "minutesTwoWeeks": 23,
-      "minutesTotal": 32
-    },
-    {
       "appid": 431960,
       "title": "Wallpaper Engine",
       "icon": "72edaed9d748c6cf7397ffb1c83f0b837b9ebd9d",
       "minutesTwoWeeks": 21,
       "minutesTotal": 406
+    },
+    {
+      "appid": 3017860,
+      "title": "DOOM: The Dark Ages",
+      "icon": "f0d79db78568f80f3532151fed5d9633191d0ebe",
+      "minutesTwoWeeks": 6,
+      "minutesTotal": 32
     },
     {
       "appid": 365670,

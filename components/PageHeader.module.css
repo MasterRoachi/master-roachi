@@ -6,3 +6,11 @@
   font-size: var(--step-hero);
   margin: 0 0 24px;
 }
+
+/* The section's symbol, above the eyebrow — matching the Fun hero, where the
+   controller sits in the same place. Colour comes from the page. */
+.mark {
+  display: block;
+  margin-bottom: 18px;
+  color: var(--accent-a, var(--accent));
+}

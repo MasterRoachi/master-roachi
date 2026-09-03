@@ -63,16 +63,84 @@ function lookup(slug) {
   return icon;
 }
 
+/**
+ * Marks that are really two colours, and which simple-icons flattens to one.
+ *
+ * Python is the whole reason this exists: its logo is a blue snake and a
+ * yellow one, and the set carries a single blue path holding both. The path is
+ * four subpaths — body, eye, body, eye — so it splits cleanly down the middle.
+ *
+ * The catch is that subpaths after the first move *relatively*, from wherever
+ * the previous one ended. Each of these closes with `z`, which returns the
+ * point to that subpath's own start, so the absolute origin of any subpath is
+ * just the running sum of the offsets before it. The second half is re-anchored
+ * to that absolute point; without it the yellow snake lands somewhere else
+ * entirely.
+ */
+const SPLITS = {
+  python: { at: 2, colors: ['#3776AB', '#FFD43B'] },
+};
+
+/** SVG packs numbers together: "14.25.18" is two of them, not one. */
+const NUM = /-?(?:\d+(?:\.\d+)?|\.\d+)/g;
+
+function splitPath(path, at) {
+  const parts = path.split(/(?=[Mm])/).filter(Boolean);
+
+  let x = 0;
+  let y = 0;
+  const origins = [];
+  for (const part of parts) {
+    NUM.lastIndex = 0;
+    const a = NUM.exec(part);
+    const b = NUM.exec(part);
+    const dx = parseFloat(a[0]);
+    const dy = parseFloat(b[0]);
+    if (part[0] === 'M') {
+      x = dx;
+      y = dy;
+    } else {
+      x += dx;
+      y += dy;
+    }
+    origins.push({ x, y, headLength: NUM.lastIndex });
+  }
+
+  const first = parts.slice(0, at).join('');
+  const o = origins[at];
+  const second =
+    `M${+o.x.toFixed(4)} ${+o.y.toFixed(4)}` +
+    parts[at].slice(o.headLength) +
+    parts.slice(at + 1).join('');
+
+  return [first, second];
+}
+
 function toolRow([slug, label]) {
   const icon = lookup(slug);
   const color = needsLightening(icon.hex) ? 'FFFFFF' : icon.hex;
+  const split = SPLITS[slug];
+
   const lines = [
     '  {',
     `    label: ${JSON.stringify(label)},`,
     `    color: '#${color}',`,
     `    path: ${JSON.stringify(icon.path)},`,
-    '  },',
   ];
+
+  if (split) {
+    const halves = splitPath(icon.path, split.at);
+    lines.push('    layers: [');
+    halves.forEach((d, i) => {
+      lines.push('      {');
+      lines.push(`        color: '${split.colors[i]}',`);
+      lines.push(`        path: ${JSON.stringify(d)},`);
+      lines.push('      },');
+    });
+    lines.push('    ],');
+  }
+
+  lines.push('  },');
   return lines.join('\n');
 }
 
@@ -101,6 +169,12 @@ const out = [
   '  color: string;',
   '  /** SVG path data, on a 24x24 viewBox. */',
   '  path: string;',
+  '  /**',
+  '   * Set where the real mark is more than one colour. Drawn in order, over',
+  '   * the flat `path` rather than instead of it, so anything that does not',
+  '   * know about layers still renders something correct.',
+  '   */',
+  '  layers?: { color: string; path: string }[];',
   '}',
   '',
   'export const TOOL_ICONS: ToolIcon[] = [',

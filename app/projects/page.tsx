@@ -4,6 +4,7 @@ import PageHeader from '@/components/PageHeader';
 import ProjectCard from '@/components/ProjectCard';
 import { getProjects, toProjectSummary } from '@/lib/content';
 import CyclingQuote from '@/components/CyclingQuote';
+import LaptopIcon from '@/components/LaptopIcon';
 import { workQuotes } from '@/lib/quotes';
 import cards from '@/components/Card.module.css';
 import styles from './projects.module.css';
@@ -22,7 +23,12 @@ export default function ProjectsPage() {
   const [lead, ...rest] = projects;
 
   return (
-    <div className={styles.page}>
+    <div
+      className={styles.page}
+      // White, the colour Work answers in the nav — so the laptop matches its
+      // section the way Fun's controller matches lime.
+      style={{ '--accent-a': 'oklch(97% 0 0)' } as React.CSSProperties}
+    >
       {/* Every other main page has this behind it, and ProjectCard is written
           for it — the cards are translucent and tilt so they read as objects
           floating in the depth. Without it they were flat tiles on black, and
@@ -31,6 +37,7 @@ export default function ProjectsPage() {
 
       <div className="shell">
         <PageHeader
+          mark={<LaptopIcon />}
           eyebrow="Work"
           title="Work Hard"
           lede={<CyclingQuote quotes={workQuotes} />}

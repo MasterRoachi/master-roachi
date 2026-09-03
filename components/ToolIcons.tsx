@@ -18,12 +18,18 @@ export default function ToolIcons() {
             viewBox="0 0 24 24"
             width="26"
             height="26"
-            fill={tool.color}
             role="img"
             aria-label={tool.label}
           >
             <title>{tool.label}</title>
-            <path d={tool.path} />
+            {/* Two-toned where the real mark is, flat everywhere else. */}
+            {tool.layers ? (
+              tool.layers.map((layer) => (
+                <path key={layer.color} d={layer.path} fill={layer.color} />
+              ))
+            ) : (
+              <path d={tool.path} fill={tool.color} />
+            )}
           </svg>
           <span className={styles.name}>{tool.label}</span>
         </li>

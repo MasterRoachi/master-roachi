@@ -39,14 +39,16 @@ export default function StackIcons({
         return (
           <li key={label} className={styles.item} title={label}>
             {icon ? (
-              <svg
-                viewBox="0 0 24 24"
-                fill={icon.color}
-                role="img"
-                aria-label={label}
-              >
+              <svg viewBox="0 0 24 24" role="img" aria-label={label}>
                 <title>{label}</title>
-                <path d={icon.path} />
+                {/* Two-toned where the real mark is, flat everywhere else. */}
+                {icon.layers ? (
+                  icon.layers.map((layer) => (
+                    <path key={layer.color} d={layer.path} fill={layer.color} />
+                  ))
+                ) : (
+                  <path d={icon.path} fill={icon.color} />
+                )}
               </svg>
             ) : (
               <span className={styles.chip}>{label}</span>
