@@ -15,6 +15,7 @@ import { getPerfectRuns, type PerfectRun } from '@/lib/perfect';
 import { getRetro } from '@/lib/retro';
 import { candidateId } from '@/lib/poll';
 import PlayNextVote from '@/components/PlayNextVote';
+import { getVideos } from '@/lib/videos';
 import styles from './gaming.module.css';
 
 export const metadata: Metadata = {
@@ -96,6 +97,7 @@ export default function GamingPage() {
 
   const retro = getRetro();
   const runs = getPerfectRuns();
+  const videos = getVideos('gaming');
   const completed = finished.filter((g: Game) => !g.perfect);
 
   // A game cannot be queued and already playing. Wall World sat in both lists
@@ -115,6 +117,7 @@ export default function GamingPage() {
   const pending = [
     completed.length === 0 && 'verdicts on finished games',
     tierList.length === 0 && 'a tier list',
+    videos.length === 0 && 'videos',
     posts.length === 0 && 'reviews and analysis',
   ].filter(Boolean) as string[];
 
@@ -269,6 +272,39 @@ export default function GamingPage() {
                 title: game.title,
               }))}
             />
+          </section>
+        )}
+
+        {videos.length > 0 && (
+          <section className={styles.section}>
+            <p className="eyebrow">Watch</p>
+            <h2 className="section-title">Videos</h2>
+            <ul className={styles.videos}>
+              {videos.map((video) => (
+                <li key={video.id}>
+                  <a href={video.url} target="_blank" rel="noopener noreferrer">
+                    <img
+                      className={styles.videoThumb}
+                      src={video.thumbnail}
+                      alt=""
+                      width={480}
+                      height={360}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span className={styles.videoTitle}>{video.title}</span>
+                    {video.published && (
+                      <span className={styles.videoDate}>
+                        {new Date(video.published).toLocaleDateString('en-ZA', {
+                          year: 'numeric',
+                          month: 'long',
+                        })}
+                      </span>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 

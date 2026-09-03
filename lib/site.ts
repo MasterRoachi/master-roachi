@@ -44,6 +44,25 @@ export const site = {
     // hidden — the site's whole line is that unfinished things are shown.
     youtube: null as string | null,
   },
+
+  /**
+   * Which YouTube playlist feeds each section pulls from.
+   *
+   * A playlist per track rather than the channel feed, so which videos belong
+   * to Fun and which to Foundations is a decision made once on YouTube rather
+   * than guessed here on every build. The id is the string after `list=` in a
+   * playlist URL, and starts with PL.
+   *
+   * Nothing is fetched while these are null, and the video sections stay
+   * hidden. scripts/youtube.mjs reads this file directly, so the shape below
+   * matters: `key: 'value'` pairs inside a `playlists: { }` block.
+   */
+  youtube: {
+    playlists: {
+      // gaming: 'PL...',
+      // orthodoxy: 'PL...',
+    },
+  },
 } as const;
 
 // Nav labels are deliberately not the route names. The routes stay as they

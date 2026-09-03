@@ -374,3 +374,51 @@
   padding: 16px 0;
   border-top: 1px solid var(--line);
 }
+
+/* --- videos ------------------------------------------------------------- */
+
+.videos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+.videos a {
+  display: block;
+  color: inherit;
+}
+.videoThumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* YouTube serves 4:3 thumbnails with the 16:9 frame letterboxed inside, so
+     the bars are cropped off rather than shown. */
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+.videos a:hover .videoThumb {
+  border-color: color-mix(in oklch, var(--accent-a) 55%, var(--line));
+  transform: translateY(-2px);
+}
+.videoTitle {
+  display: block;
+  margin-top: 11px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.videos a:hover .videoTitle {
+  color: color-mix(in oklch, var(--accent-a) 70%, var(--ink));
+}
+.videoDate {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.74rem;
+  color: var(--muted-2);
+}
