@@ -1,8 +1,9 @@
 {
-  "fetchedAt": "2026-09-02T23:42:58.101Z",
+  "fetchedAt": "2026-09-03T09:44:26.664Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
+    "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
     "minutesTwoWeeks": 2297,
     "minutesTotal": 2297
   },
@@ -10,36 +11,42 @@
     {
       "appid": 431730,
       "title": "Aseprite",
+      "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
       "minutesTwoWeeks": 2297,
       "minutesTotal": 2297
     },
     {
       "appid": 2187290,
       "title": "Wall World",
+      "icon": "e63abe2ba9116b8e92a424c5bc4fb231518557e9",
       "minutesTwoWeeks": 330,
       "minutesTotal": 335
     },
     {
       "appid": 1593500,
       "title": "God of War",
+      "icon": "8aa5e7e0e55cad682c7f2e65e075c3bc04dfc1cb",
       "minutesTwoWeeks": 36,
       "minutesTotal": 903
     },
     {
       "appid": 3017860,
       "title": "DOOM: The Dark Ages",
+      "icon": "f0d79db78568f80f3532151fed5d9633191d0ebe",
       "minutesTwoWeeks": 23,
       "minutesTotal": 32
     },
     {
       "appid": 431960,
       "title": "Wallpaper Engine",
+      "icon": "72edaed9d748c6cf7397ffb1c83f0b837b9ebd9d",
       "minutesTwoWeeks": 21,
       "minutesTotal": 406
     },
     {
       "appid": 365670,
       "title": "Blender",
+      "icon": "48733cd333eea6e40711a1b9c6dde32ffe363ced",
       "minutesTwoWeeks": 5,
       "minutesTotal": 2222
     }
