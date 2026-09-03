@@ -3,6 +3,7 @@ import path from 'node:path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
 import type { Track, Status, EntrySummary } from './format';
+export type { Status };
 
 // Filesystem-backed content collections. Every entry is an .mdx file under
 // content/<collection>/, with YAML frontmatter. Read at build time only —
@@ -137,4 +138,29 @@ export function getAnyEntry(
 
 export function getAllSlugs(collection: string): { slug: string }[] {
   return getAllEntries(collection).map((e) => ({ slug: e.slug }));
+}
+
+/**
+ * A project reduced to what a card renders. The card is interactive, so it is
+ * a client component — passing whole entries would serialise every MDX body
+ * into the payload for text no card ever shows.
+ */
+export interface ProjectSummary {
+  slug: string;
+  title: string;
+  summary: string;
+  status: Status;
+  kind?: string;
+  stack?: string[];
+}
+
+export function toProjectSummary(entry: Entry): ProjectSummary {
+  return {
+    slug: entry.slug,
+    title: entry.frontmatter.title,
+    summary: entry.frontmatter.summary,
+    status: entry.frontmatter.status ?? 'building',
+    kind: entry.frontmatter.kind,
+    stack: entry.frontmatter.stack,
+  };
 }

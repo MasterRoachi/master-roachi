@@ -8,6 +8,12 @@
 }
 
 .card {
+  --mx: 50%;
+  --my: 50%;
+  --rx: 0deg;
+  --ry: 0deg;
+
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: clamp(24px, 3vw, 34px);
@@ -17,14 +23,57 @@
      enough that body copy never fights a star for contrast. */
   background: oklch(16% 0 0 / 0.84);
   height: 100%;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+  /* Short enough to track the cursor without lag, long enough to smooth the
+     jitter between pointer events. */
   transition:
+    transform 0.12s ease-out,
     border-color 0.18s ease,
-    background 0.18s ease;
+    background 0.18s ease,
+    box-shadow 0.25s ease;
 }
 
 .card:hover {
   border-color: var(--line-bright);
   background: oklch(18% 0 0 / 0.92);
+  box-shadow:
+    0 18px 50px oklch(0% 0 0 / 0.5),
+    0 0 0 1px oklch(82% 0.16 85 / 0.14);
+}
+
+/* Light tracking the cursor across the card face. */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(
+    260px circle at var(--mx) var(--my),
+    oklch(82% 0.16 85 / 0.1),
+    transparent 68%
+  );
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Content sits above the tracking light. */
+.card > * {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transform: none;
+    transition: border-color 0.18s ease, background 0.18s ease;
+  }
+  .card::before {
+    transition: none;
+  }
 }
 
 .cardTop {

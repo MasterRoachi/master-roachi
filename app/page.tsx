@@ -4,7 +4,12 @@ import SheenLink from '@/components/SheenLink';
 import Starfield from '@/components/Starfield';
 import ProjectCard from '@/components/ProjectCard';
 import PostCard from '@/components/PostCard';
-import { getProjects, getWriting, toSummary } from '@/lib/content';
+import {
+  getProjects,
+  getWriting,
+  toSummary,
+  toProjectSummary,
+} from '@/lib/content';
 import { currentlyReading, currentFocus } from '@/lib/pursuits';
 import { getSteam, steamIcon } from '@/lib/steam';
 import { site } from '@/lib/site';
@@ -16,7 +21,7 @@ export default function HomePage() {
   // Weight puts active work first, so the homepage leads with what is being
   // built rather than what happens to be newest. The cap is high enough that
   // nothing is hidden while the list is short.
-  const projects = allProjects.slice(0, 6);
+  const projects = allProjects.slice(0, 6).map(toProjectSummary);
   const posts = getWriting().slice(0, 3).map(toSummary);
 
   const inProgress = allProjects.filter(

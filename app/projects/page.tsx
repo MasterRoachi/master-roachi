@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import PageHeader from '@/components/PageHeader';
 import ProjectCard from '@/components/ProjectCard';
-import { getProjects } from '@/lib/content';
+import { getProjects, toProjectSummary } from '@/lib/content';
 import cards from '@/components/Card.module.css';
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default function ProjectsPage() {
-  const projects = getProjects();
+  const projects = getProjects().map(toProjectSummary);
 
   return (
     <div className="shell">
