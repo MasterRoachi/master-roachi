@@ -25,6 +25,7 @@ export type TierRank = 'Z' | 'S' | 'A' | 'B' | 'C';
  * are not really competing with the rest.
  */
 export const TIERS: TierRank[] = ['Z', 'S', 'A', 'B', 'C'];
+
 /**
  * What is currently being read. Nothing derives this, so it is set by hand.
  * Set to null and the row disappears rather than showing something stale.
@@ -49,9 +50,11 @@ export const currentFocus: string | null = null;
  * anything finished before a platform started tracking it. Steam and
  * RetroAchievements masteries are synced (see lib/perfect.ts) and must not be
  * duplicated here — a Steam entry is absorbed by the sync once it lands, so
- * only add one to bridge the gap until then. `perfect: true` means every achievement unlocked — the
- * Gaming page groups these separately, since a 100% run is the thing being
- * claimed rather than merely having finished.
+ * only add one to bridge the gap until then.
+ *
+ * `perfect: true` means every achievement unlocked, which the Gaming page
+ * groups separately — a 100% run is the thing being claimed, rather than
+ * merely having finished.
  */
 export const finished: Game[] = [
   {
@@ -98,6 +101,22 @@ export const tierList: Game[] = [
   { title: 'Doodle God', appid: 348360, tier: 'C' },
 ];
 
+/**
+ * What is being read on the Orthodox side, which no API knows. Kept separate
+ * from `currentlyReading` on the homepage: that is whatever book is open, this
+ * is the study.
+ */
+export interface ReadingItem {
+  title: string;
+  author?: string;
+  /** Where he is with it, or why it is on the list. */
+  note?: string;
+  status: 'reading' | 'next' | 'finished';
+}
+
+// TODO: Stephan to fill in. Empty means the Reading section stays hidden
+// rather than showing invented books under his name.
+export const orthodoxReading: ReadingItem[] = [];
 
 export interface VideoOrArticle {
   title: string;

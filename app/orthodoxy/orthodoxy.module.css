@@ -1,3 +1,22 @@
+.page {
+  padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+/* The candles are positioned against this, and the hero sits above them. */
+.top {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: clamp(24px, 4vw, 48px);
+}
+
+.topInner {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(40px, 7vw, 84px) clamp(32px, 5vw, 60px);
+}
+
 .section {
   padding-block: clamp(40px, 6vw, 72px) 0;
 }
@@ -31,10 +50,120 @@
   color: var(--muted);
 }
 
-.empty {
-  color: var(--muted-2);
-  border-top: 1px solid var(--line);
-  padding-top: 24px;
+
+/* --- reading ------------------------------------------------------------ */
+
+.reading {
+  list-style: none;
+  padding: 0;
   margin: 0;
-  max-width: var(--measure);
+}
+
+.reading li {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr auto;
+  align-items: baseline;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+/* Open books take the section's gold; queued ones stay grey, so what is
+   actually in hand is distinguishable at a glance from what is intended. */
+.readingStatus {
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted-2);
+}
+
+.reading li[data-status='reading'] .readingStatus {
+  color: color-mix(in oklch, var(--accent-a) 76%, var(--ink));
+}
+
+.readingBody {
+  min-width: 0;
+}
+
+.readingTitle {
+  display: block;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+}
+
+.readingMeta {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+}
+
+.readingNote {
+  font-size: 0.8rem;
+  color: var(--muted-2);
+  text-align: right;
+  max-width: 28ch;
+}
+
+@media (max-width: 640px) {
+  .reading li {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .readingNote {
+    text-align: left;
+  }
+}
+
+/* --- videos ------------------------------------------------------------- */
+
+.videos {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.videos a {
+  display: block;
+  color: inherit;
+}
+
+.videoThumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* YouTube serves 4:3 with the 16:9 frame letterboxed inside it. */
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.videos a:hover .videoThumb {
+  border-color: color-mix(in oklch, var(--accent-a) 55%, var(--line));
+  transform: translateY(-2px);
+}
+
+.videoTitle {
+  display: block;
+  margin-top: 11px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.videos a:hover .videoTitle {
+  color: color-mix(in oklch, var(--accent-a) 70%, var(--ink));
+}
+
+.videoDate {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.74rem;
+  color: var(--muted-2);
 }

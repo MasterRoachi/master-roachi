@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T14:42:02.996Z",
+  "fetchedAt": "2026-09-03T15:15:16.652Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
@@ -19,7 +19,7 @@
       "appid": 2187290,
       "title": "Wall World",
       "icon": "e63abe2ba9116b8e92a424c5bc4fb231518557e9",
-      "minutesTwoWeeks": 330,
+      "minutesTwoWeeks": 315,
       "minutesTotal": 335
     },
     {
@@ -35,13 +35,6 @@
       "icon": "72edaed9d748c6cf7397ffb1c83f0b837b9ebd9d",
       "minutesTwoWeeks": 21,
       "minutesTotal": 406
-    },
-    {
-      "appid": 3017860,
-      "title": "DOOM: The Dark Ages",
-      "icon": "f0d79db78568f80f3532151fed5d9633191d0ebe",
-      "minutesTwoWeeks": 6,
-      "minutesTotal": 32
     },
     {
       "appid": 365670,
@@ -119,6 +112,13 @@
       "icon": "503acf3ef0503e24af6b5336012a1f585a2f955e",
       "minutesTwoWeeks": 0,
       "minutesTotal": 36
+    },
+    {
+      "appid": 1244090,
+      "title": "Sea of Stars: Sunset Edition",
+      "icon": "529d0f064196911482aeeb8f42ffcc1ff77fed67",
+      "minutesTwoWeeks": 0,
+      "minutesTotal": 15
     }
   ],
   "perfect": [
