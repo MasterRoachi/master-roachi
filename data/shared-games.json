@@ -1,7 +1,7 @@
 {
-  "note": "Games played through Steam Family Sharing. No Steam Web API endpoint lists these — GetOwnedGames only reports games this account owns — so titles and appids are set by hand. The achievement counts are still fetched from Steam by scripts/steam.mjs, so a 100% run listed here is verified, not asserted. The appid is the number in a game's store URL: store.steampowered.com/app/<appid>/ . Optional: add \"hours\" to a game to show playtime, which Steam will not report for a licence this account does not own.",
+  "note": "Games played through Steam Family Sharing. No Steam Web API endpoint lists these — GetOwnedGames only reports games this account owns — so titles and appids are set by hand. The achievement counts are still fetched from Steam by scripts/steam.mjs, so a 100% run listed here is verified, not asserted. The appid is the number in a game's store URL: store.steampowered.com/app/<appid>/ . \"hours\" is optional and hand-entered, because Steam reports no playtime for a licence this account does not own.",
   "games": [
-    { "title": "Marvel's Spider-Man Remastered", "appid": 1817070 },
-    { "title": "BALL x PIT", "appid": 2062430 }
+    { "title": "Marvel's Spider-Man Remastered", "appid": 1817070, "hours": 69 },
+    { "title": "BALL x PIT", "appid": 2062430, "hours": 39 }
   ]
 }

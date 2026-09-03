@@ -50,8 +50,10 @@ const ACCENT_2 = 'oklch(72% 0.16 145)';
  * platform's art into the other's shape and stretching it.
  */
 function RunCard({ run, compact }: { run: PerfectRun; compact?: boolean }) {
+  // run.hardcore is deliberately not shown. Every mastery on the profile is
+  // hardcore, so the word appeared on all of them and distinguished nothing.
+  // The data is still carried in case that stops being true.
   const meta = [
-    run.hardcore ? 'Hardcore' : null,
     // Redundant inside a group already labelled with the platform.
     run.platform === 'Steam' ? null : run.platform,
     run.note,
@@ -356,7 +358,9 @@ export default function GamingPage() {
             <div className={styles.tiers}>
               {TIERS.map((rank) => {
                 const games = tierList.filter((g) => g.tier === rank);
-                if (games.length === 0) return null;
+                // Empty ranks are still drawn. A tier list is a scale, and
+                // skipping the empty ones leaves Z S B C — which reads as a
+                // row having gone missing rather than as nothing being in it.
                 return (
                   <div
                     key={rank}

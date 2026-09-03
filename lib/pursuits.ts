@@ -87,19 +87,19 @@ export const upNext: Game[] = [
 ];
 
 /**
- * TODO: PLACEHOLDER RANKINGS — not Stephan's opinion.
+ * The rankings, confirmed by Stephan. Ratchet: Deadlocked is listed under that
+ * name rather than Ratchet: Gladiator, its European title, so it matches the
+ * card in Perfect runs — RetroAchievements records it as Deadlocked.
  *
- * They exist so the section can be seen working, and they use games actually
- * in the library rather than invented ones, but the order is a guess. Replace
- * the whole array rather than tidying it. `tierListProvisional` puts a visible
- * note on the page saying so; clear it at the same time.
+ * A tier is deliberately empty. The page renders every rank regardless, so the
+ * scale stays readable rather than looking like a row went missing.
  */
 export const tierList: Game[] = [
   { title: 'BioShock Remastered', appid: 409710, tier: 'Z' },
   { title: 'God of War', appid: 1593500, tier: 'S' },
   { title: 'Machinarium', appid: 40700, tier: 'S' },
-  { title: 'Ratchet: Deadlocked', tier: 'A' },
-  { title: 'Darksiders Warmastered Edition', appid: 462780, tier: 'A' },
+  { title: 'Ratchet: Deadlocked', tier: 'Z' },
+  { title: 'Darksiders Warmastered Edition', appid: 462780, tier: 'S' },
   { title: 'Maneater', appid: 629820, tier: 'B' },
   { title: "Mario's Picross", tier: 'B' },
   { title: 'Doodle God', appid: 348360, tier: 'C' },

@@ -451,3 +451,8 @@
   font-size: 0.74rem;
   color: var(--muted-2);
 }
+
+/* An empty rank still occupies a row, so the scale reads top to bottom. */
+.tierGames:empty {
+  min-height: 58px;
+}
