@@ -45,25 +45,15 @@ export function getStore(): StoreSnapshot {
 /**
  * Where a product's Buy button points.
  *
- * Checkout is deliberately not on this site: a static export cannot take a
- * payment, and hosting one would mean owning refunds, tax by jurisdiction and
- * card data. The storefront handles all of that.
+ * A payment link, set by hand per product in lib/site.ts. Checkout is
+ * deliberately not on this site: a static export cannot take a payment, and
+ * hosting one would mean owning refunds, tax by jurisdiction and card data.
+ *
+ * Null is the normal state for a product with no link yet, and the page shows
+ * no button rather than one that goes nowhere.
  */
 export function buyUrl(product: StoreProduct): string | null {
-  const base = site.store.storefrontUrl;
-  if (!base) return null;
-  const root = base.replace(/\/$/, '');
-
-  const pattern = site.store.productUrlPattern;
-  if (!pattern || !product.externalId) return root;
-
-  // Every platform addresses products differently — Big Cartel uses
-  // /product/<permalink>, Shopify /products/<handle>, Etsy /listing/<id>. An
-  // earlier version hard-coded one shape, which would have produced confident
-  // links straight to 404s. The pattern is set once the real URL shape is
-  // known; until then every product links to the shop front, which is always
-  // correct even when it is not deep.
-  return root + pattern.replace('{id}', encodeURIComponent(product.externalId));
+  return site.store.paymentLinks[String(product.id)] ?? null;
 }
 
 /**

@@ -22,15 +22,22 @@ export const site = {
 
   store: {
     name: 'Fabled Threads',
-    // The hosted storefront that actually takes the money. Until this is set,
-    // the store page shows the catalogue without Buy buttons rather than
-    // linking nowhere.
-    storefrontUrl: null as string | null,
-    // How the storefront addresses one product, with {id} standing in for the
-    // external id Printful records. Big Cartel uses '/product/{id}', Shopify
-    // '/products/{id}'. Left null until a real product URL has been seen —
-    // guessing produces confident links to nothing.
-    productUrlPattern: null as string | null,
+    /**
+     * A payment link per product, keyed by its Printful id.
+     *
+     * There is no storefront platform. Etsy's verification never went
+     * through, and every alternative charges a monthly fee for automated
+     * fulfilment that one product does not yet justify — worse in South
+     * Africa, where Shopify Payments does not operate and a gateway plus
+     * Shopify's own surcharge reaches about 5% a transaction.
+     *
+     * So: a Yoco or PayFast link takes the money, and the Printful order is
+     * raised by hand. A product with no link here shows no Buy button rather
+     * than a dead one, which is why the map is allowed to be empty.
+     *
+     * Printful ids are in data/store.json.
+     */
+    paymentLinks: {} as Record<string, string>,
   },
 
   socials: {

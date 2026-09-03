@@ -3,7 +3,7 @@ import HeroBookMount from '@/components/HeroBookMount';
 import SheenLink from '@/components/SheenLink';
 import Starfield from '@/components/Starfield';
 import PursuitCarousel from '@/components/PursuitCarousel';
-import ProjectCard from '@/components/ProjectCard';
+import ProjectDeck from '@/components/ProjectDeck';
 import PostCard from '@/components/PostCard';
 import {
   getProjects,
@@ -14,7 +14,6 @@ import {
 import { currentlyReading, currentFocus } from '@/lib/pursuits';
 import { getSteam, steamIcon } from '@/lib/steam';
 import { site } from '@/lib/site';
-import cards from '@/components/Card.module.css';
 import styles from './page.module.css';
 
 export default function HomePage() {
@@ -142,11 +141,7 @@ export default function HomePage() {
               All projects →
             </Link>
           </div>
-          <div className={cards.grid}>
-            {projects.map((entry) => (
-              <ProjectCard key={entry.slug} entry={entry} />
-            ))}
-          </div>
+          <ProjectDeck projects={projects} />
         </div>
       </section>
 

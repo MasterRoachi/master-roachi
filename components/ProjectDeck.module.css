@@ -1,0 +1,217 @@
+.deck {
+  position: relative;
+}
+
+/* Native scroll-snap does the swiping: touch, trackpad and momentum all come
+   free, and the browser keeps its own keyboard and accessibility behaviour. */
+.track {
+  list-style: none;
+  margin: 0;
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  /* Bleeds to the shell's edges so a card can sit against them, with the
+     padding put back inside. */
+  padding: 8px var(--pad) 30px;
+  margin-inline: calc(-1 * var(--pad));
+  scrollbar-width: none;
+  /* Perspective on the track, so the tilt below is real depth rather than a
+     skew — every card is measured against the same vanishing point. */
+  perspective: 1400px;
+}
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  flex: 0 0 clamp(260px, 30vw, 380px);
+  scroll-snap-align: center;
+  /* Set per card by the scroll handler: -1 at the left edge, +1 at the right. */
+  --d: 0;
+  --tilt: 0deg;
+  transform: rotateY(var(--tilt)) scale(calc(1 - 0.06 * max(var(--d), -1 * var(--d))));
+  transform-style: preserve-3d;
+  transition: transform 0.12s linear;
+}
+
+/* A drag is a drag, not a click: this swallows the click that ends one so it
+   does not open whichever project was under the cursor. */
+.track[data-dragging] {
+  cursor: grabbing;
+}
+.track[data-dragging] .card {
+  pointer-events: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.86);
+  overflow: hidden;
+  color: inherit;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.25s ease;
+}
+.card:hover {
+  border-color: var(--accent-a, var(--accent));
+  box-shadow:
+    0 20px 50px oklch(0% 0 0 / 0.5),
+    0 0 0 1px color-mix(in oklch, var(--accent-a, var(--accent)) 22%, transparent);
+}
+
+/* --- the face ----------------------------------------------------------- */
+
+.face {
+  display: block;
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.face img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card:hover .face img {
+  transform: scale(1.04);
+}
+
+/* Stands in until there is art: the project's own two colours, with its
+   initial cut large. Deliberately not a grey placeholder box — this reads as
+   a decision rather than as something missing. */
+.blank {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-size: clamp(4rem, 9vw, 7rem);
+  font-weight: 800;
+  line-height: 1;
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 30%, transparent);
+  background:
+    radial-gradient(
+      120% 100% at 25% 15%,
+      color-mix(in oklch, var(--accent-a, var(--accent)) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      100% 90% at 85% 90%,
+      color-mix(in oklch, var(--accent-b, var(--accent)) 18%, transparent),
+      transparent 65%
+    ),
+    oklch(13% 0 0);
+}
+
+.status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 5px 9px;
+  color: var(--ink);
+  background: oklch(10% 0 0 / 0.72);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--line);
+}
+.status[data-status='released'] {
+  color: var(--accent);
+  border-color: oklch(82% 0.16 85 / 0.5);
+}
+
+/* --- the copy ----------------------------------------------------------- */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: clamp(18px, 2.2vw, 24px);
+}
+
+.kind {
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted-2);
+  transition: color 0.18s ease;
+}
+.card:hover .kind {
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 72%, var(--ink));
+}
+
+.title {
+  display: block;
+  margin: 8px 0 8px;
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.summary {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.stack {
+  display: block;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+/* --- controls ----------------------------------------------------------- */
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.arrow {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease;
+}
+.arrow:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* The tilt is depth, and depth is exactly what motion sensitivity dislikes.
+   The deck still scrolls and snaps — only the per-card movement stops. */
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    transform: none;
+    transition: none;
+  }
+  .face img,
+  .card {
+    transition: none;
+  }
+}
