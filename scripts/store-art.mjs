@@ -95,6 +95,35 @@ function clearBackground(data, width, height) {
     push(x, y + 1);
     push(x, y - 1);
   }
+
+  // The fill stops at the first pixel too dark to count as background, which
+  // leaves the anti-aliased rim of the garment behind — a bright white outline
+  // once the sheet around it is gone.
+  //
+  // So the boundary is faded rather than cut: any pixel still opaque but
+  // touching a transparent one has its alpha scaled by how far from white it
+  // is. A rim pixel that is nine-tenths sheet nearly disappears; the garment
+  // proper is untouched, because it is nowhere near white.
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const p = y * width + x;
+      const i = p * 4;
+      if (data[i + 3] === 0) continue;
+
+      const touchesHole =
+        (x > 0 && data[(p - 1) * 4 + 3] === 0) ||
+        (x < width - 1 && data[(p + 1) * 4 + 3] === 0) ||
+        (y > 0 && data[(p - width) * 4 + 3] === 0) ||
+        (y < height - 1 && data[(p + width) * 4 + 3] === 0);
+      if (!touchesHole) continue;
+
+      const lightest = Math.max(data[i], data[i + 1], data[i + 2]);
+      // 255 is the sheet itself, 200 and below is the garment's own edge.
+      const towardWhite = Math.max(0, Math.min(1, (lightest - 200) / 55));
+      data[i + 3] = Math.round(data[i + 3] * (1 - towardWhite));
+    }
+  }
+
   return cleared;
 }
 

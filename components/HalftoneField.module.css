@@ -4,19 +4,27 @@
   pointer-events: none;
   overflow: hidden;
 
-  /* Ink under the screen: the store's pink into its second blue, so the dots
-     sit on the shop's own colours rather than a neutral ground. */
+  /* Both of the shop's inks, weighted evenly. It was pink across the sheet
+     with one blue corner, which read as a pink page rather than as two
+     colours meeting. Each now owns a diagonal half and they cross in the
+     middle. */
   background-image:
     radial-gradient(
-      115% 80% at 68% 18%,
-      oklch(26% 0.09 350 / 0.42) 0%,
-      oklch(17% 0.05 340 / 0.36) 46%,
-      transparent 74%
+      105% 75% at 82% 8%,
+      oklch(27% 0.10 350 / 0.44) 0%,
+      oklch(19% 0.06 345 / 0.3) 44%,
+      transparent 70%
     ),
     radial-gradient(
-      95% 75% at 15% 90%,
-      oklch(22% 0.06 235 / 0.34) 0%,
-      transparent 66%
+      105% 80% at 12% 78%,
+      oklch(26% 0.09 235 / 0.44) 0%,
+      oklch(19% 0.055 240 / 0.3) 46%,
+      transparent 72%
+    ),
+    radial-gradient(
+      80% 60% at 48% 45%,
+      oklch(22% 0.05 300 / 0.3) 0%,
+      transparent 70%
     );
 }
 

@@ -1,8 +1,17 @@
 import type { Metadata } from 'next';
 import HalftoneField from '@/components/HalftoneField';
 import ShirtIcon from '@/components/ShirtIcon';
+import ShirtViewerMount from '@/components/ShirtViewerMount';
 import PageHeader from '@/components/PageHeader';
-import { getStore, buyUrl, formatPrice } from '@/lib/store';
+import CyclingQuote from '@/components/CyclingQuote';
+import { wearQuotes } from '@/lib/quotes';
+import {
+  getStore,
+  buyUrl,
+  formatPrice,
+  categoryOf,
+  type StoreProduct,
+} from '@/lib/store';
 import { site } from '@/lib/site';
 import styles from './store.module.css';
 
@@ -17,13 +26,36 @@ const ACCENT = 'oklch(72% 0.26 350)';
 const ACCENT_2 = 'oklch(80% 0.14 230)';
 
 export default function StorePage() {
-  const { products, fetchedAt } = getStore();
+  const { products } = getStore();
 
-  // One product gets a panel; several get a grid. A single card marooned in a
-  // six-column grid reads as a shop that failed to load rather than one that
-  // is starting.
-  const solo = products.length === 1;
-  const coming = site.store.coming;
+  /**
+   * Invented items alongside the real ones, so the grid can be judged before
+   * there is a catalogue to judge. They carry no price link and are marked, and
+   * they disappear the moment `placeholders` in lib/site.ts is emptied.
+   */
+  const invented: StoreProduct[] = site.store.placeholders.map((p, i) => ({
+    id: -1 - i,
+    externalId: null,
+    name: p.name,
+    thumbnail: null,
+    variantCount: p.options,
+    from: { amount: p.from, currency: 'USD' },
+    category: p.category,
+    placeholder: true,
+  }));
+
+  const all = [...products, ...invented];
+
+  // The newest real product leads. Everything else falls onto its shelf.
+  const lead = products[0] ?? null;
+  const rest = all.filter((p) => p.id !== lead?.id);
+
+  const shelves = site.store.categories
+    .map((category) => ({
+      category,
+      items: rest.filter((p) => categoryOf(p) === category),
+    }))
+    .filter((s) => s.items.length > 0);
 
   return (
     <div
@@ -42,10 +74,63 @@ export default function StorePage() {
           mark={<ShirtIcon />}
           eyebrow={site.store.name}
           title="Wear the thing"
-          lede="Print-on-demand merch built around original illustrations — the Saturday-morning end of anime and early-2000s cartoons, not the prestige end."
+          lede={<CyclingQuote quotes={wearQuotes} />}
         />
 
-        {products.length === 0 ? (
+        {lead && (
+          <div className={styles.feature}>
+            <div className={styles.stage}>
+              {/* The flat cut-out is the floor: it is what shows before
+                  three.js arrives, where WebGL is unavailable, and under
+                  reduced motion. The viewer fades in over it. */}
+              {lead.art || lead.thumbnail ? (
+                <img
+                  className={styles.stageFlat}
+                  src={lead.art ?? lead.thumbnail ?? undefined}
+                  alt=""
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : null}
+              {lead.art && (
+                <ShirtViewerMount
+                  src={lead.art}
+                  alt={`${lead.name}, which can be turned`}
+                />
+              )}
+            </div>
+
+            <div className={styles.featureBody}>
+              <p className="eyebrow">Latest</p>
+              <h2 className={styles.featureName}>{lead.name}</h2>
+              <div className={styles.meta}>
+                {formatPrice(lead.from) && (
+                  <span className={styles.price}>{formatPrice(lead.from)}</span>
+                )}
+                {lead.variantCount > 1 && (
+                  <span className={styles.variants}>
+                    {lead.variantCount} options
+                  </span>
+                )}
+              </div>
+              <p className={styles.turn}>Drag it to turn it.</p>
+              {buyUrl(lead) ? (
+                <a
+                  className={styles.buyButton}
+                  href={buyUrl(lead) as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Buy ↗
+                </a>
+              ) : (
+                <span className={styles.pending}>Not on sale yet</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {products.length === 0 && invented.length === 0 && (
           <div className={styles.empty}>
             <h2 className={styles.emptyTitle}>Nothing on the rail yet</h2>
             <p>
@@ -54,63 +139,77 @@ export default function StorePage() {
               then on.
             </p>
           </div>
-        ) : (
-          <div className={solo ? styles.solo : styles.grid}>
-            {products.map((product) => {
-              const href = buyUrl(product);
-              const price = formatPrice(product.from);
+        )}
 
-              const inner = (
-                <>
-                  <span className={styles.art}>
-                    {product.art || product.thumbnail ? (
-                      <img
-                        src={product.art ?? product.thumbnail ?? undefined}
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <span className={styles.noArt} aria-hidden="true" />
-                    )}
-                  </span>
-                  <span className={styles.detail}>
-                    <span className={styles.name}>{product.name}</span>
-                    <span className={styles.meta}>
-                      {price && <span className={styles.price}>{price}</span>}
-                      {product.variantCount > 1 && (
-                        <span className={styles.variants}>
-                          {product.variantCount} options
-                        </span>
+        {shelves.map(({ category, items }) => (
+          <section key={category} className={styles.shelf}>
+            <h2 className={styles.shelfHead}>
+              <span>{category}</span>
+              <span className={styles.shelfCount}>{items.length}</span>
+            </h2>
+            <div className={styles.grid}>
+              {items.map((product) => {
+                const href = buyUrl(product);
+                const price = formatPrice(product.from);
+
+                const inner = (
+                  <>
+                    <span className={styles.art}>
+                      {product.art || product.thumbnail ? (
+                        <img
+                          src={product.art ?? product.thumbnail ?? undefined}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <span className={styles.noArt} aria-hidden="true" />
                       )}
                     </span>
-                    {href ? (
-                      <span className={styles.buy}>Buy ↗</span>
-                    ) : (
-                      <span className={styles.pending}>Not on sale yet</span>
-                    )}
-                  </span>
-                </>
-              );
+                    <span className={styles.detail}>
+                      <span className={styles.name}>{product.name}</span>
+                      <span className={styles.meta}>
+                        {price && <span className={styles.price}>{price}</span>}
+                        {product.variantCount > 1 && (
+                          <span className={styles.variants}>
+                            {product.variantCount} options
+                          </span>
+                        )}
+                      </span>
+                      {product.placeholder ? (
+                        <span className={styles.placeholder}>Placeholder</span>
+                      ) : href ? (
+                        <span className={styles.buy}>Buy ↗</span>
+                      ) : (
+                        <span className={styles.pending}>Not on sale yet</span>
+                      )}
+                    </span>
+                  </>
+                );
 
-              return href ? (
-                <a
-                  key={product.id}
-                  className={styles.product}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {inner}
-                </a>
-              ) : (
-                <div key={product.id} className={styles.product}>
-                  {inner}
-                </div>
-              );
-            })}
-          </div>
-        )}
+                return href && !product.placeholder ? (
+                  <a
+                    key={product.id}
+                    className={styles.product}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <div
+                    key={product.id}
+                    className={styles.product}
+                    data-placeholder={product.placeholder || undefined}
+                  >
+                    {inner}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ))}
 
         <section className={styles.section}>
           <p className="eyebrow">The idea</p>
@@ -130,47 +229,17 @@ export default function StorePage() {
           </div>
         </section>
 
-        {coming.length > 0 && (
+        {site.store.coming.length > 0 && (
           <section className={styles.section}>
             <p className="eyebrow">Soon</p>
             <h2 className="section-title">Still being drawn</h2>
             <ul className={styles.coming}>
-              {coming.map((name) => (
+              {site.store.coming.map((name) => (
                 <li key={name}>{name}</li>
               ))}
             </ul>
           </section>
         )}
-
-        <section className={styles.section}>
-          <p className="eyebrow">Ordering</p>
-          <h2 className="section-title">How buying works</h2>
-          <div className={styles.prose}>
-            <p>
-              Each design has its own payment link. Paying opens it — this site
-              never takes a card number, and there is no basket to abandon.
-            </p>
-            <p>
-              Nothing is printed until it is bought. The order goes to a
-              print-on-demand shop, is made for you, and ships from wherever is
-              nearest. That is why a design can exist without a warehouse full
-              of it, and why an unsold one costs nothing to keep listed.
-            </p>
-            {fetchedAt && (
-              <p className={styles.synced}>
-                Catalogue read straight from the print shop, last synced{' '}
-                <time dateTime={fetchedAt}>
-                  {new Date(fetchedAt).toLocaleDateString('en-ZA', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </time>
-                .
-              </p>
-            )}
-          </div>
-        </section>
       </div>
     </div>
   );

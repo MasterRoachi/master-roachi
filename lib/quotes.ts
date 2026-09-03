@@ -37,6 +37,23 @@ export const workQuotes: Quote[] = [
 ];
 
 /**
+ * For the store. Clothes, appearances, and being recognised — from the same
+ * fictional sources as the other lists, for the same reason: a line invented
+ * for a real person and published under Stephan's name is a different order of
+ * mistake from misremembering a cartoon.
+ */
+export const wearQuotes: Quote[] = [
+  { text: 'No capes!', source: 'Edna Mode, The Incredibles' },
+  {
+    text: 'It’s not who I am underneath, but what I do that defines me.',
+    source: 'Batman Begins',
+  },
+  { text: 'I am the one who knocks.', source: 'Walter White, Breaking Bad' },
+  { text: 'A man’s gotta have a code.', source: 'Omar Little, The Wire' },
+  { text: 'Winter is coming.', source: 'Game of Thrones' },
+];
+
+/**
  * For Thoughts.
  *
  * Games and shows rather than the commentators Stephan first suggested. Those

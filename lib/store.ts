@@ -17,6 +17,9 @@ export interface StoreProduct {
    * on white, in which case the remote thumbnail still serves.
    */
   art?: string | null;
+  category?: string;
+  /** An invented item, shown to judge the layout. Never buyable. */
+  placeholder?: boolean;
   variantCount: number;
   from: { amount: number; currency: string } | null;
 }
@@ -36,6 +39,21 @@ export interface StoreSnapshot {
 }
 
 const EMPTY: StoreSnapshot = { fetchedAt: null, store: null, products: [] };
+
+/**
+ * Which shelf a product belongs on.
+ *
+ * Printful does not tell us, so it is read off the product name. Crude, and
+ * good enough while the catalogue is small — a real category field on the
+ * product is the fix once there are enough of them for this to be wrong.
+ */
+export function categoryOf(product: StoreProduct): string {
+  if (product.category) return product.category;
+  const n = product.name.toLowerCase();
+  if (/hoodie|sweat|crewneck/.test(n)) return 'Hoodies';
+  if (/print|poster|canvas|sticker/.test(n)) return 'Prints';
+  return site.store.categories[0];
+}
 
 export function getStore(): StoreSnapshot {
   try {

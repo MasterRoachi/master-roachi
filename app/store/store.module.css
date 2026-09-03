@@ -21,19 +21,112 @@
   gap: clamp(16px, 2vw, 26px);
 }
 
-/* One product, given the room a shop with one product actually has. */
-.solo {
+/* --- the featured garment ---------------------------------------------- */
+
+.feature {
   display: grid;
-  grid-template-columns: 1fr;
-  max-width: 760px;
+  gap: clamp(20px, 3vw, 44px);
+  align-items: center;
+  margin-bottom: clamp(40px, 6vw, 76px);
 }
 
-@media (min-width: 780px) {
-  .solo .product {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: stretch;
+@media (min-width: 820px) {
+  .feature {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   }
+}
+
+/* Holds the flat image and the canvas on top of each other, so one can fade
+   in over the other without the layout moving. */
+.stage {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  max-height: 560px;
+}
+
+.stageFlat {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.4s ease;
+}
+
+/* Once the viewer has its texture it marks itself ready, and the flat image
+   underneath gets out of the way. Leaving it visible showed the garment twice
+   — once square-on and once turned — which read as a rendering fault. */
+.stage:has([data-ready]) .stageFlat {
+  opacity: 0;
+}
+
+.featureBody {
+  min-width: 0;
+}
+
+.featureName {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  margin: 0 0 14px;
+}
+
+/* Only worth saying where there is something to drag. */
+.turn {
+  margin: 18px 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.buyButton {
+  display: inline-block;
+  margin-top: 26px;
+  border: 1px solid color-mix(in oklch, var(--accent-a) 55%, var(--line));
+  border-radius: 999px;
+  padding: 13px 28px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--accent-a) 82%, var(--ink));
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+.buyButton:hover {
+  border-color: var(--accent-a);
+  color: var(--ink);
+}
+
+/* --- shelves ------------------------------------------------------------ */
+
+.shelf {
+  margin-bottom: clamp(30px, 4.5vw, 56px);
+}
+
+.shelfHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 18px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
+}
+.shelfHead::after {
+  content: '';
+  order: 2;
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    color-mix(in oklch, var(--accent-a) 40%, transparent),
+    transparent
+  );
+}
+.shelfCount {
+  order: 3;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-2);
 }
 
 .product {
@@ -147,6 +240,23 @@ a.product:hover .art img {
   color: var(--muted-2);
 }
 
+.placeholder {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 24px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+/* Dashed and dimmed, so an invented item never passes for stock. */
+.product[data-placeholder] {
+  border-style: dashed;
+  opacity: 0.72;
+}
+
 /* --- sections ----------------------------------------------------------- */
 
 .section {
@@ -163,10 +273,6 @@ a.product:hover .art img {
   margin: 0 0 16px;
 }
 
-.synced {
-  font-size: 0.85rem;
-  color: var(--muted-2);
-}
 
 .coming {
   list-style: none;

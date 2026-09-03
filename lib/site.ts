@@ -47,6 +47,33 @@ export const site = {
      * than promising work that does not exist.
      */
     coming: [] as string[],
+
+    /**
+     * The order categories appear in. A product with no category of its own
+     * falls into the first.
+     */
+    categories: ['Tees', 'Hoodies', 'Prints'] as string[],
+
+    /**
+     * TEMPORARY — invented items, so the grid can be judged before there is a
+     * catalogue to judge. None of these exist and none can be bought: they
+     * carry no price link and are marked on the page as placeholders.
+     *
+     * Delete this array and the page shows only what Printful actually
+     * returns. Nothing else depends on it.
+     */
+    placeholders: [
+      { name: 'Turtle Hermit', category: 'Tees', from: 16, options: 9 },
+      { name: 'Saturday Morning', category: 'Tees', from: 16, options: 9 },
+      { name: 'Kame House Crest', category: 'Tees', from: 18, options: 7 },
+      { name: 'Late Night Rerun', category: 'Tees', from: 16, options: 9 },
+      { name: 'Study Well', category: 'Hoodies', from: 38, options: 6 },
+      { name: 'Coal Black Heavyweight', category: 'Hoodies', from: 42, options: 5 },
+      { name: 'Rest Plenty', category: 'Hoodies', from: 38, options: 6 },
+      { name: 'Terrath, Mapped', category: 'Prints', from: 24, options: 3 },
+      { name: 'The Twelve', category: 'Prints', from: 28, options: 3 },
+      { name: 'Shepherds Key Art', category: 'Prints', from: 24, options: 3 },
+    ] as { name: string; category: string; from: number; options: number }[],
   },
 
   socials: {
