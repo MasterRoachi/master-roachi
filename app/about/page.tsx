@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Logo from '@/components/Logo';
+import Starfield from '@/components/Starfield';
 import AboutFacets from '@/components/AboutFacets';
 import ToolIcons from '@/components/ToolIcons';
 import SocialLinks from '@/components/SocialLinks';
@@ -18,12 +19,17 @@ export default function AboutPage() {
 
   return (
     <>
-      <header className={`shell ${styles.head}`}>
+      {/* The field runs behind the opening, the way it does behind the work
+          on the homepage. */}
+      <section className={styles.top}>
+        <Starfield />
+        <div className={styles.topInner}>
+          <header className={`shell ${styles.head}`}>
         <p className="eyebrow">About</p>
         <h1 className={styles.title}>
-          Master Roachi is a work in progress — both the man and the website.
-        </h1>
-      </header>
+            Master Roachi is a work in progress — both the man and the website.
+          </h1>
+          </header>
 
       <div className={`shell ${styles.intro}`}>
         <div className={styles.portrait}>
@@ -43,7 +49,9 @@ export default function AboutPage() {
             seriously, and leave a clear trail of progress.
           </p>
         </div>
-      </div>
+          </div>
+        </div>
+      </section>
 
       {/* The ethos, given the weight it deserves. */}
       <section className={styles.ethos}>

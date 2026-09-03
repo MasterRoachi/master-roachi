@@ -125,3 +125,19 @@
     max-width: 160px;
   }
 }
+
+/* --------------------------------------------------------------------------
+   The opening, over the starfield
+-------------------------------------------------------------------------- */
+
+.top {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.topInner {
+  position: relative;
+  z-index: 1;
+}
