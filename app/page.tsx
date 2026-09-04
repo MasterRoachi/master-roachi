@@ -13,7 +13,7 @@ import {
 } from '@/lib/content';
 import { currentlyReading, currentFocus } from '@/lib/pursuits';
 import { getSteam, steamIcon } from '@/lib/steam';
-import { site } from '@/lib/site';
+import { site, navLinks } from '@/lib/site';
 import styles from './page.module.css';
 
 export default function HomePage() {
@@ -35,6 +35,13 @@ export default function HomePage() {
     currentFocus ?? inProgress[0]?.frontmatter.title ?? 'Between things';
 
   const playing = getSteam().current;
+
+  // Each line of "Right now" belongs to one of the pursuits, so it answers in
+  // that pursuit's colour and links to its page. Taken from lib/site.ts rather
+  // than written out again — About had a second hardcoded copy of these that
+  // had drifted out of step with the nav.
+  const accentOf = (label: string) =>
+    navLinks.find((l) => l.label === label)?.accent ?? 'var(--accent)';
 
   return (
     <>
@@ -65,8 +72,8 @@ export default function HomePage() {
           <div className={styles.heroFoot}>
             <p className={styles.heroBlurb}>
               I&rsquo;m {site.personName} — Master Roachi. I build games, worlds
-              and software, I play games, but not when it comes to Truth, so
-              I&rsquo;m Orthodox. This is the public record of my stuff.
+              and software, play games, and I&rsquo;m Orthodox. This is the
+              public record of my stuff.
             </p>
             <div className={styles.heroActions}>
               <SheenLink href="/projects/">Work</SheenLink>
@@ -85,42 +92,63 @@ export default function HomePage() {
         <div className={`shell ${styles.nowInner}`}>
           <p className={styles.nowLabel}>Right now</p>
           <dl className={styles.nowList}>
-            <div className={styles.nowItem}>
+            <div
+              className={styles.nowItem}
+              style={{ '--now': accentOf('Work') } as React.CSSProperties}
+            >
               <dt>Building</dt>
-              <dd>{focus}</dd>
+              <dd>
+                <Link href="/projects/" className={styles.nowValue}>
+                  {focus}
+                </Link>
+              </dd>
             </div>
 
-            {playing ? (
-              <div className={styles.nowItem}>
-                <dt>Playing</dt>
-                <dd className={styles.nowWithArt}>
-                  <img
-                    src={steamIcon(playing)}
-                    alt=""
-                    width={28}
-                    height={28}
-                    className={styles.nowArt}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  {playing.title}
-                </dd>
-              </div>
-            ) : (
-              <div className={styles.nowItem}>
-                <dt>Playing</dt>
-                <dd className={styles.nowPending}>Nothing this fortnight</dd>
-              </div>
-            )}
+            <div
+              className={styles.nowItem}
+              style={{ '--now': accentOf('Fun') } as React.CSSProperties}
+            >
+              <dt>Playing</dt>
+              <dd>
+                {playing ? (
+                  <Link
+                    href="/gaming/"
+                    className={`${styles.nowValue} ${styles.nowWithArt}`}
+                  >
+                    <img
+                      src={steamIcon(playing)}
+                      alt=""
+                      width={44}
+                      height={44}
+                      className={styles.nowArt}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    {playing.title}
+                  </Link>
+                ) : (
+                  <span className={styles.nowPending}>
+                    Nothing this fortnight
+                  </span>
+                )}
+              </dd>
+            </div>
 
             {currentlyReading && (
-              <div className={styles.nowItem}>
+              <div
+                className={styles.nowItem}
+                style={
+                  { '--now': accentOf('Foundations') } as React.CSSProperties
+                }
+              >
                 <dt>Reading</dt>
                 <dd>
-                  {currentlyReading.title}
-                  <span className={styles.nowSub}>
-                    {currentlyReading.author}
-                  </span>
+                  <Link href="/orthodoxy/" className={styles.nowValue}>
+                    {currentlyReading.title}
+                    <span className={styles.nowSub}>
+                      {currentlyReading.author}
+                    </span>
+                  </Link>
                 </dd>
               </div>
             )}
