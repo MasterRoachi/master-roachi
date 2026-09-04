@@ -1,6 +1,6 @@
 ---
 title: Sprite-acus
-summary: A sprite generation app. Generate a character with AI, get a game-ready animated pixel art sprite back. Built because I cannot draw.
+summary: Generate a character however you like, hand it over, get back an animated pixel art sprite a game engine will take. Built because I cannot draw.
 date: 2026-09-02
 status: building
 kind: Tool
@@ -14,12 +14,27 @@ cover: /projects/sprite-acus.webp
 
 I cannot draw. Sprite-acus is how there are sprites.
 
-The idea is that you generate a picture of any character you can imagine, and a
-click or two later you have a high-quality animated pixel art sprite that a
-game engine will actually take. No pixel art skill in the middle.
+The workflow is: generate a character however you like — I use AI — then hand
+the render to Sprite-acus, and what comes back is an animated pixel art sprite
+a game engine will actually take.
 
-It is for anyone in the same position — generating art and needing it to come
-out the other side as a usable game sprite.
+Generating the picture is the easy half. The half that used to eat an evening
+is everything after it: slicing the page into frames on an exact grid rather
+than a guessed one, cropping and scaling each figure the same way, pulling
+every colour onto the project's palette, and writing it all out indexed, with
+the kind of transparency an engine expects rather than the kind an image editor
+produces.
+
+## What you get back
+
+For one page — one character, one action, one direction — you get numbered PNG
+frames, a contact sheet to actually look at, an editable Aseprite file to do
+the cleanup in, and a report recording every input and output.
+
+It works with or without a master palette. Given one, every sprite is pulled
+onto it, which is what a project with locked colours needs and what this was
+built for. Given none, it takes the colours from the page itself and lets you
+say how many.
 
 ## Where it honestly is
 
@@ -28,14 +43,20 @@ Super alpha. It works, and it is what the sprites in
 is doing real work rather than sitting in a repo being a good idea.
 
 But it still hands you something that needs a pass in Aseprite before it is
-finished. Closing that gap — getting from generated image to done, without the
-manual cleanup — is what is being built next. Until then, "click or two of a
-button" is the goal rather than the current state, and it would be dishonest to
-describe it any other way.
+finished — that is what the editable file is for. Closing that gap, so a
+generated image comes out done rather than nearly done, is what is being built
+next. Until then, "a click or two" is the goal rather than the current state,
+and it would be dishonest to describe it any other way.
 
 ## What it will not do
 
-It does not make artistic decisions, produce the final master, or import
-anything into an engine. A successful conversion means mechanically valid,
-never artistically approved — a distinction worth keeping, because the
-alternative is a tool that quietly decides things an artist should.
+It does not generate the source image. That is on you and whatever you generate
+with — Sprite-acus starts where that finishes.
+
+It also will not clean pixel clusters, make artistic decisions, produce the
+final authoritative master, or import anything into an engine. A successful
+conversion means mechanically valid, never artistically approved.
+
+That distinction is deliberate rather than a shortfall. A tool that quietly
+decided which pixels an artist meant would be worse than one that hands over a
+scaffold and gets out of the way.

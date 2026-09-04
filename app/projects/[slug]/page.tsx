@@ -131,6 +131,23 @@ export default async function ProjectPage({
         </div>
       </section>
 
+      {fm.cover && (
+        /* The project cards have carried cover art for a while; the pages they
+           lead to had none, so following a card landed you on a wall of text.
+           Placeholder art for now — scripts/covers.mjs generates it — and
+           dropping a real screenshot at the same path replaces it. */
+        <figure className={`shell ${styles.hero}`}>
+          <img
+            src={fm.cover}
+            alt={fm.coverAlt ?? ''}
+            width={1600}
+            height={900}
+            loading="eager"
+            decoding="async"
+          />
+        </figure>
+      )}
+
       <article className={`shell ${styles.body}`}>
         <Mdx source={entry.body} />
       </article>
