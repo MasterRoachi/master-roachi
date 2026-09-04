@@ -62,7 +62,10 @@ export default function AboutFacets({ facets }: { facets: Facet[] }) {
             <span className={styles.number}>{f.count}</span>
             <span className={styles.unit}>{f.unit}</span>
           </p>
-          <h3 className={styles.title}>{f.title}</h3>
+          {/* h2, not h3: with the section headings gone these are the only
+              headings under the page title, and skipping a level makes the
+              page harder to navigate by screen reader. */}
+          <h2 className={styles.title}>{f.title}</h2>
           <p className={styles.body}>{f.body}</p>
           <span className={styles.go}>Go →</span>
         </Link>

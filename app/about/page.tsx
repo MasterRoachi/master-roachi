@@ -156,21 +156,6 @@ export default function AboutPage() {
           <AboutFacets facets={facets} />
         </section>
 
-        {/* Two statements and nothing else. Every line of prose that used to
-            sit under these was explaining a thing that did not need it. */}
-        <section className={styles.section}>
-          <div className={styles.turn}>
-            <div>
-              <p className="eyebrow">What changed</p>
-              <h2 className="section-title">My son was born</h2>
-            </div>
-            <div>
-              <p className="eyebrow">Why any of it</p>
-              <h2 className="section-title">I never thought I would</h2>
-            </div>
-          </div>
-        </section>
-
         <div className={`divider ${styles.rule}`} aria-hidden="true">
           <span />
           <img

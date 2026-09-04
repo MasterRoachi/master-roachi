@@ -85,17 +85,6 @@
   padding-block: clamp(30px, 5vw, 60px) 0;
 }
 
-.turn {
-  display: grid;
-  gap: clamp(24px, 4vw, 56px);
-}
-
-@media (min-width: 820px) {
-  .turn {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 /* --- the divider --------------------------------------------------------- */
 
 /* Spacing only — the line and its mark are the shared .divider in globals.css. */
