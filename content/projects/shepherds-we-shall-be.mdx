@@ -1,6 +1,6 @@
 ---
 title: Shepherds We Shall Be
-summary: A 2D pixel art ARPG, built solo in Godot. Still early — details land here once there's something worth showing.
+summary: A 2D pixel-art action RPG, built solo in Godot. A four-hero party you switch between mid-fight, in a world three generations past the end of it.
 date: 2025-09-01
 status: building
 stack: ["Godot", "Python"]
@@ -11,6 +11,66 @@ accent2: "oklch(78% 0 0)"
 cover: /projects/shepherds-we-shall-be.webp
 ---
 
-A 2D pixel art action RPG, built solo in Godot.
+Three generations after a supposed zombie disease ended civilisation, a young
+Shepherd named Eli wakes a dormant AI orb and follows a signal that should not
+exist. He is not the last of anything. The world moved on, settled into
+something smaller, and decided it already knew what had happened to it.
 
-Still early. Details land here once there is something worth showing.
+It is a top-down 2D pixel-art action RPG, built solo in Godot with GDScript,
+set in [Terrath](/projects/terrath/) — the same world as
+[Cultus Botanicus](/projects/cultus-botanicus/), which sits about a century and
+a half away from it.
+
+## How it plays
+
+Four heroes are active at once and **all four are directly playable**. You hold
+one and switch freely mid-fight; the other three run on authored AI with
+priorities and builds you set beforehand, and you push them around with party
+commands and player-triggered Unity combinations rather than by micromanaging
+them.
+
+The intent is that positioning, defence and timing decide a fight — not input
+speed, and not enemies with inflated health bars. A companion is a character
+who fights alongside you, not a second cursor.
+
+## Where it actually is
+
+Two tracks, running in parallel and deliberately not blocking each other.
+
+**The engine** has cleared R0, the whole Foundation Lab, and P0 through P2 —
+P1 and P2 both approved by playtest on 3 September 2026. P3 is next. Every
+milestone has to remain playable before the following one starts, which is
+slower than it sounds and the reason there is no date attached to any of this.
+
+**The art** pipeline is accepted end to end: generated page, automatic
+conversion, human approval, then into Aseprite. The first asset's Southeast
+shamble is approved and the next action page is the open item. The engine work
+runs on placeholder art until real sprites arrive, so neither track waits on
+the other.
+
+## The part worth admitting
+
+In August 2026 the combat prototype and the A.P.E.-3 vertical slice were
+**cancelled** — eleven phases of prototype and six of vertical slice, retired
+as the production line of work.
+
+Not deleted. They are kept as a reference implementation and a mechanics
+laboratory, because what they taught was real and the code still answers
+questions. But they were not a foundation, and continuing to build on them
+would have meant carrying every early decision forward on the grounds that it
+already existed. The campaign, the recruitment order, the locations, the
+bosses and the narrative all survived the reboot unchanged. Only the
+implementation went.
+
+That is the single most useful thing that has happened to this project, and it
+looks like a step backwards on any chart you could draw of it.
+
+## The constraint that shapes everything
+
+Roughly five hours a week, one person, PC only, keyboard and mouse. Progress is
+gated on quality rather than dates, and a complete smaller release beats an
+unfinished large one every time. Twenty hours of game is a long-term
+aspiration, not a commitment anybody has made.
+
+Screenshots go here once the real sprites are in and there is something worth
+looking at rather than something worth explaining.
