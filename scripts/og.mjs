@@ -105,3 +105,63 @@ await sharp({
 
 const kb = (fs.statSync('public/og.png').size / 1024).toFixed(0);
 console.log(`og: wrote public/og.png (${OG_W}x${OG_H}, ${kb}KB)`);
+
+// --- favicon.ico -----------------------------------------------------------
+//
+// app/icon.png gets Next to emit <link rel="icon">, which is what a browser
+// reads off the page — but nothing serves /favicon.ico, and that bare path is
+// still probed directly by browsers on a cold tab, by crawlers, and by every
+// link-preview scraper. It was returning 404 on every request.
+//
+// An .ico is a container: a 6-byte header, one 16-byte directory entry per
+// size, then the images. Since Vista those images may be PNGs rather than
+// bitmaps, so this packs the PNGs sharp already produces instead of pulling in
+// an encoder.
+const icoSizes = [16, 32, 48];
+const icoImages = [];
+for (const size of icoSizes) {
+  const inner = Math.round(size * 0.82);
+  const mark = await sharp(MARK)
+    .resize(inner, inner, { fit: 'inside' })
+    .toBuffer();
+  icoImages.push(
+    await sharp({
+      create: { width: size, height: size, channels: 4, background: GROUND },
+    })
+      .composite([{ input: mark, gravity: 'center' }])
+      .png()
+      .toBuffer(),
+  );
+}
+
+const header = Buffer.alloc(6);
+header.writeUInt16LE(0, 0); // reserved
+header.writeUInt16LE(1, 2); // 1 = icon
+header.writeUInt16LE(icoSizes.length, 4);
+
+const entries = [];
+let offset = 6 + icoSizes.length * 16;
+icoSizes.forEach((size, i) => {
+  const e = Buffer.alloc(16);
+  // 0 means 256 in this field; every size here is smaller, so it is literal.
+  e.writeUInt8(size, 0);
+  e.writeUInt8(size, 1);
+  e.writeUInt8(0, 2); // palette size, 0 for truecolour
+  e.writeUInt8(0, 3); // reserved
+  e.writeUInt16LE(1, 4); // colour planes
+  e.writeUInt16LE(32, 6); // bits per pixel
+  e.writeUInt32LE(icoImages[i].length, 8);
+  e.writeUInt32LE(offset, 12);
+  offset += icoImages[i].length;
+  entries.push(e);
+});
+
+fs.writeFileSync(
+  path.join('app', 'favicon.ico'),
+  Buffer.concat([header, ...entries, ...icoImages]),
+);
+console.log(
+  `og: wrote app/favicon.ico (${icoSizes.join(', ')}px, ${(
+    fs.statSync('app/favicon.ico').size / 1024
+  ).toFixed(1)}KB)`,
+);
