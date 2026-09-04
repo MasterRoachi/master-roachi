@@ -22,13 +22,25 @@ await base
   .webp({ quality: 92 })
   .toFile('public/logo-mark.webp');
 
+// The same mark at a size that survives being shown large. 128px is right for
+// the nav and the footer, and was being stretched more than three times over
+// on the About portrait, where it showed badly. Which of the two a browser
+// fetches is settled by the srcset in components/Logo.tsx.
+await base
+  .clone()
+  .resize({ width: 448 })
+  .webp({ quality: 90 })
+  .toFile('public/logo-mark-lg.webp');
+
 await base
   .clone()
   .resize({ width: 128 })
   .png({ compressionLevel: 9, palette: true })
   .toFile('public/logo-mark.png');
 
-console.log('wrote public/logo.webp, logo-mark.webp, logo-mark.png');
+console.log(
+  'wrote public/logo.webp, logo-mark.webp, logo-mark-lg.webp, logo-mark.png',
+);
 
 // --- Pantokrator icon for the first leaf of the hero book -------------------
 //

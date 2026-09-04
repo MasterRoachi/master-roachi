@@ -50,9 +50,14 @@
   margin: 0 0 16px;
 }
 
+/* Sized for a statement rather than a sentence. It used to open with two
+   lines of prose; three words at that size just looked lost. */
 .lead {
-  font-size: clamp(1.15rem, 2.2vw, 1.5rem);
-  line-height: 1.5;
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  margin-bottom: clamp(18px, 2.4vw, 26px);
   color: var(--ink);
 }
 
@@ -94,13 +99,33 @@
 
 /* --- tools and contact --------------------------------------------------- */
 
-.split {
+/* One panel rather than two loose columns, matching the cards above it so the
+   page closes on something with edges. */
+.close {
   display: grid;
-  gap: clamp(28px, 4vw, 56px);
+  gap: clamp(28px, 4vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: oklch(15% 0 0 / 0.8);
+  padding: clamp(26px, 3.4vw, 40px);
 }
 
-@media (min-width: 720px) {
-  .split {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+@media (min-width: 760px) {
+  .close {
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: clamp(32px, 4vw, 56px);
   }
+
+  /* A hairline between the two halves, in the page accent like every other
+     rule on the site. */
+  .closeCol + .closeCol {
+    padding-left: clamp(32px, 4vw, 56px);
+    border-left: 1px solid
+      color-mix(in oklch, var(--accent-a) 22%, var(--line));
+  }
+}
+
+.closeCol > .eyebrow,
+.closeCol > p:first-child {
+  margin-bottom: clamp(18px, 2.2vw, 26px);
 }

@@ -126,18 +126,22 @@ export default function AboutPage() {
           </div>
           <div className={styles.nameCopy}>
             <p className="eyebrow">Master Roachi</p>
-            <p className={styles.lead}>
-              My grandpa was my best friend. He taught me Diablo&nbsp;2, DBZ
-              and PCs.
+            <p className={styles.lead}>Master of None.</p>
+            <p>
+              Really, I&rsquo;m {site.personName}. But Master Roachi is good
+              too. I build games, worlds and software, play games, and
+              I&rsquo;m Orthodox.
             </p>
             <p>
-              Goku was raised by his grandpa. When that ended, Master Roshi
-              took over — so Roshi became the new grandpa. The other half of
-              the name came from a habit I have since dropped.
+              I do so many things because while some say it&rsquo;s bad to be a
+              Jack of all trades and a Master of None, I still deem it better
+              than being generally useless, but a Master of One.
             </p>
             <p>
-              I&rsquo;m {site.personName}. I build games, worlds and software,
-              and I&rsquo;m Orthodox.
+              My grandpa was my best friend — he taught me Diablo&nbsp;2, DBZ
+              and PCs. Goku was raised by his grandpa too, and when that ended
+              Master Roshi took over. So Roshi became the new grandpa. The
+              other half of the name came from a habit I have since dropped.
             </p>
           </div>
         </section>
@@ -169,14 +173,16 @@ export default function AboutPage() {
           <span />
         </div>
 
+        {/* Boxed, because loose rows of small marks at the foot of a short
+            page read as leftovers rather than as an ending. */}
         <section className={styles.section}>
-          <div className={styles.split}>
-            <div>
+          <div className={styles.close}>
+            <div className={styles.closeCol}>
               <p className="eyebrow">Tools</p>
               <ToolIcons />
             </div>
 
-            <div>
+            <div className={styles.closeCol}>
               <p className="eyebrow">Get in touch</p>
               <SocialLinks />
             </div>

@@ -1,10 +1,13 @@
+/* A grid rather than a wrapping flex row. Flex packed as many as fit and left
+   whatever was over stranded on its own line — thirteen tools came out six,
+   six and one. */
 .tools {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(18px, 2.4vw, 28px) clamp(20px, 2.8vw, 32px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: clamp(18px, 2.4vw, 26px) 10px;
 }
 
 /* No boxes: the marks carry themselves, with the name underneath for anyone
@@ -14,7 +17,6 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: 62px;
 }
 
 .tool svg {
