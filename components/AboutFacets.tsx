@@ -31,13 +31,20 @@ export default function AboutFacets({ facets }: { facets: Facet[] }) {
   const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
     const el = e.currentTarget;
     const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
     el.style.setProperty('--mx', `${e.clientX - r.left}px`);
     el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    // Toward the cursor horizontally, away from it vertically — the same
+    // arithmetic the homepage deck uses, which is what makes a surface feel
+    // pushed rather than steered.
+    el.style.setProperty('--cy', `${((px - 0.5) * 14).toFixed(2)}deg`);
+    el.style.setProperty('--cx', `${((0.5 - py) * 12).toFixed(2)}deg`);
   };
 
   const onLeave = (e: PointerEvent<HTMLAnchorElement>) => {
-    e.currentTarget.style.removeProperty('--mx');
-    e.currentTarget.style.removeProperty('--my');
+    const el = e.currentTarget;
+    for (const p of ['--mx', '--my', '--cx', '--cy']) el.style.removeProperty(p);
   };
 
   return (

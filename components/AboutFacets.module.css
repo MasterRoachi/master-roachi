@@ -4,9 +4,7 @@
 .facets {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
+  gap: clamp(12px, 1.4vw, 18px);
 }
 
 @media (min-width: 620px) {
@@ -22,6 +20,9 @@
   .facets {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
+  .facet {
+    padding: clamp(18px, 1.4vw, 24px);
+  }
   .facet:last-child {
     grid-column: auto;
   }
@@ -30,15 +31,43 @@
 .facet {
   --mx: 50%;
   --my: 50%;
+  --cx: 0deg;
+  --cy: 0deg;
   --facet: var(--accent);
 
   position: relative;
   isolation: isolate;
-  background: var(--bg);
-  padding: clamp(26px, 3.5vw, 40px);
+  border-radius: 16px;
+  border: 1px solid color-mix(in oklch, var(--facet) 16%, var(--line));
+  background: oklch(15% 0 0 / 0.9);
+  padding: clamp(22px, 2.6vw, 30px);
   display: flex;
   flex-direction: column;
-  transition: background 0.2s ease;
+  /* Clips the hover glow and the top rule to the rounded corners; both are
+     inset:0 pseudo-elements and squared off without it. */
+  overflow: hidden;
+
+  /* perspective() as a transform function rather than a perspective property
+     on the grid: one perspective on the container would give all five cards a
+     single shared vanishing point, and the ones off to the side would shear.
+     That is the exact bug the homepage deck had. This way each card is viewed
+     head-on from its own position. */
+  transform: perspective(900px) rotateX(var(--cx)) rotateY(var(--cy));
+  box-shadow:
+    0 16px 34px oklch(0% 0 0 / 0.5),
+    0 2px 0 oklch(100% 0 0 / 0.04) inset;
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.facet:hover {
+  border-color: color-mix(in oklch, var(--facet) 52%, var(--line));
+  box-shadow:
+    0 28px 58px oklch(0% 0 0 / 0.6),
+    0 0 0 1px color-mix(in oklch, var(--facet) 24%, transparent),
+    0 2px 0 oklch(100% 0 0 / 0.06) inset;
 }
 
 .facet:hover {
@@ -140,6 +169,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .facet {
+    transform: none;
+  }
+
   .facet,
   .facet::before,
   .facet::after,

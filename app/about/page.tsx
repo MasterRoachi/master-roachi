@@ -125,21 +125,19 @@ export default function AboutPage() {
             <Logo size={200} className={styles.mark} />
           </div>
           <div className={styles.nameCopy}>
-            <p className="eyebrow">The name</p>
+            <p className="eyebrow">Master Roachi</p>
             <p className={styles.lead}>
-              My grandpa was my best friend. He taught me Diablo&nbsp;2, DBZ,
+              My grandpa was my best friend. He taught me Diablo&nbsp;2, DBZ
               and PCs.
             </p>
             <p>
-              Goku was raised by his grandpa too, and when that ended Master
-              Roshi took over. So Roshi became the new grandpa. The other half
-              of the name came from a habit I have since put down. It fit at
-              the time, and it stuck.
+              Goku was raised by his grandpa. When that ended, Master Roshi
+              took over — so Roshi became the new grandpa. The other half of
+              the name came from a habit I have since dropped.
             </p>
             <p>
               I&rsquo;m {site.personName}. I build games, worlds and software,
-              I play games, but not when it comes to Truth, so I&rsquo;m
-              Orthodox.
+              and I&rsquo;m Orthodox.
             </p>
           </div>
         </section>
@@ -152,39 +150,25 @@ export default function AboutPage() {
           </p>
         </section>
 
+        {/* No heading over these. The cards say what they are, and the
+            tagline above already said where everything is. */}
         <section className={styles.section}>
-          <div className={styles.sectionHead}>
-            <p className="eyebrow">Where everything is</p>
-            <h2 className="section-title">Five doors</h2>
-            <p className="lede">
-              The tagline is the site map. Work Hard is Work, Study Well is
-              Foundations and Thoughts, Eat and Sleep Plenty is Fun.
-            </p>
-          </div>
           <AboutFacets facets={facets} />
         </section>
 
+        {/* Two statements and nothing else. Every line of prose that used to
+            sit under these was explaining a thing that did not need it. */}
         <section className={styles.section}>
           <div className={styles.turn}>
             <div>
               <p className="eyebrow">What changed</p>
               <h2 className="section-title">My son was born</h2>
-              <p className={styles.turnBody}>
-                Most of why the site looks like this.
-              </p>
             </div>
             <div>
               <p className="eyebrow">Why any of it</p>
               <h2 className="section-title">I never thought I would</h2>
-              <p className={styles.turnBody}>
-                Coffee, late nights, mechanics tweaked until they feel right.
-                I&rsquo;d do it with nobody watching.
-              </p>
             </div>
           </div>
-          <p className={styles.closing}>
-            Everything here is public — the unfinished projects included.
-          </p>
         </section>
 
         <div className={`divider ${styles.rule}`} aria-hidden="true">

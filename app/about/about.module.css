@@ -85,10 +85,6 @@
   padding-block: clamp(30px, 5vw, 60px) 0;
 }
 
-.sectionHead {
-  margin-bottom: clamp(20px, 3vw, 34px);
-}
-
 .turn {
   display: grid;
   gap: clamp(24px, 4vw, 56px);
@@ -98,19 +94,6 @@
   .turn {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
-
-.closing {
-  margin: clamp(28px, 4vw, 44px) 0 0;
-  font-size: 0.95rem;
-  color: var(--muted-2);
-}
-
-.turnBody {
-  margin: 0 0 16px;
-  max-width: var(--measure);
-  color: var(--muted);
-  line-height: 1.75;
 }
 
 /* --- the divider --------------------------------------------------------- */
