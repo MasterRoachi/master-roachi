@@ -137,12 +137,6 @@ export default function AboutPage() {
               Jack of all trades and a Master of None, I still deem it better
               than being generally useless, but a Master of One.
             </p>
-            <p>
-              My grandpa was my best friend — he taught me Diablo&nbsp;2, DBZ
-              and PCs. Goku was raised by his grandpa too, and when that ended
-              Master Roshi took over. So Roshi became the new grandpa. The
-              other half of the name came from a habit I have since dropped.
-            </p>
           </div>
         </section>
 
