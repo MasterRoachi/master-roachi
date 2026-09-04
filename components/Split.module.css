@@ -1,0 +1,50 @@
+.split {
+  display: grid;
+  gap: clamp(20px, 3vw, 40px);
+  align-items: center;
+  margin-block: clamp(30px, 4.5vw, 56px);
+}
+
+@media (min-width: 760px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  /* The image is first in the DOM, which is the order a narrow screen wants.
+     Reordering rather than reversing the markup keeps that order intact for a
+     screen reader and for anyone who never reaches this breakpoint. */
+  .split[data-side='right'] .art {
+    order: 2;
+  }
+}
+
+.art {
+  margin: 0;
+  padding: 0;
+}
+
+.art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid
+    color-mix(in oklch, var(--accent-a, var(--accent)) 18%, var(--line));
+}
+
+.body {
+  min-width: 0;
+}
+
+/* The prose wrapper sets margins on its own paragraphs; inside a split the
+   first and last should sit flush with the image rather than pushing the
+   column out of alignment. */
+.body > :first-child {
+  margin-top: 0;
+}
+
+.body > :last-child {
+  margin-bottom: 0;
+}

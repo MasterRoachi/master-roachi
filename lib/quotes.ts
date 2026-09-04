@@ -88,7 +88,6 @@ export const quotes: Quote[] = [
     source: 'The Legend of Zelda',
   },
   { text: 'The truth is out there.', source: 'The X-Files' },
-  { text: 'Praise the sun!', source: 'Solaire of Astora, Dark Souls' },
 
   // Rest, play, and the point of any of it.
   {

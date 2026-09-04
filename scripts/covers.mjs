@@ -211,9 +211,11 @@ for (const file of files) {
   const b = oklchToHex(field('accent2') ?? field('accent') ?? 'oklch(70% 0.14 80)', 0.56);
   const kind = field('kind') ?? 'Game';
   const motif = MOTIF[kind] ?? MOTIF.Game;
-  const rnd = rngFor(slug);
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  // Built as a function of the seed so the cover and the inline variants share
+  // everything except which shapes fell where.
+  const compose = (seed, width, height) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice">
   <defs>
     <radialGradient id="a" cx="72%" cy="24%" r="78%">
       <stop offset="0%" stop-color="${a}" stop-opacity="0.30"/>
@@ -231,15 +233,28 @@ for (const file of files) {
   <rect width="${W}" height="${H}" fill="#0a0a0b"/>
   <rect width="${W}" height="${H}" fill="url(#a)"/>
   <rect width="${W}" height="${H}" fill="url(#b)"/>
-  ${motif(rnd, a, b)}
+  ${motif(rngFor(seed), a, b)}
   <rect width="${W}" height="${H}" fill="url(#v)"/>
 </svg>`;
 
   const out = path.join(DIR, `${slug}.webp`);
-  await sharp(Buffer.from(svg)).webp({ quality: 82 }).toFile(out);
-  const kb = (fs.statSync(out).size / 1024).toFixed(0);
-  console.log(`covers: ${slug} — ${kind}, ${a}/${b}, ${kb}KB`);
+  await sharp(Buffer.from(compose(slug, W, H))).webp({ quality: 82 }).toFile(out);
   wrote++;
+
+  // Inline variants, for the images that sit beside text in a body. Same
+  // motif and the same colours, so a page reads as one set; different seeds,
+  // so it is not the same picture three times; 4:3, because a body column is
+  // narrower than a card.
+  for (const suffix of ['a', 'b']) {
+    const file = path.join(DIR, `${slug}-${suffix}.webp`);
+    await sharp(Buffer.from(compose(`${slug}-${suffix}`, 1200, 900)))
+      .webp({ quality: 82 })
+      .toFile(file);
+    wrote++;
+  }
+
+  const kb = (fs.statSync(out).size / 1024).toFixed(0);
+  console.log(`covers: ${slug} — ${kind}, ${a}/${b}, cover ${kb}KB + 2 inline`);
 }
 
 console.log(`covers: wrote ${wrote} covers to ${DIR}/`);
