@@ -1,8 +1,8 @@
 ---
 title: Sprite-acus
-summary: A deterministic bridge from a generated render to palette-constrained, indexed sprite sheets ready for Aseprite. Extracted from the Shepherds pipeline and made project-agnostic.
+summary: A sprite generation app. Generate a character with AI, get a game-ready animated pixel art sprite back. Built because I cannot draw.
 date: 2026-09-02
-status: released
+status: building
 kind: Tool
 weight: 75
 accent: "oklch(72% 0.17 290)"
@@ -12,38 +12,49 @@ stack: ["Python"]
 cover: /projects/sprite-acus.webp
 ---
 
-Sprite-acus takes one sheet of frames, a profile describing a project's
-conventions, and a destination, and turns the first into palette-constrained
-indexed PNGs that are ready for a short cleanup in Aseprite. It ships as both a
-command — `sprite-convert` — and a small local window.
+I cannot draw. Sprite-acus is how there are sprites.
 
-It was extracted from the sprite-conversion tool inside **Shepherds We Shall
-Be** and made project-agnostic. The tool it came from is still in service there,
-unchanged.
+The idea is that you generate a picture of any character you can imagine, and a
+click or two later you have a high-quality animated pixel art sprite that a
+game engine will actually take. No pixel art skill in the middle.
+
+It is for anyone in the same position — generating art and needing it to come
+out the other side as a usable game sprite.
+
+## Where it honestly is
+
+Super alpha. It works, and it is what the sprites in
+[Shepherds We Shall Be](/projects/shepherds-we-shall-be/) are made with, so it
+is doing real work rather than sitting in a repo being a good idea.
+
+But it still hands you something that needs a pass in Aseprite before it is
+finished. Closing that gap — getting from generated image to done, without the
+manual cleanup — is what is being built next. Until then, "click or two of a
+button" is the goal rather than the current state, and it would be dishonest to
+describe it any other way.
 
 ## What it will not do
 
-It does not generate the source image, make artistic decisions, clean pixel
-clusters, produce the final master, or import anything into an engine. A
-successful conversion means mechanically valid, never artistically approved —
-which is a distinction worth keeping, because the alternative is a tool that
-quietly decides things an artist should.
+It does not make artistic decisions, produce the final master, or import
+anything into an engine. A successful conversion means mechanically valid,
+never artistically approved — a distinction worth keeping, because the
+alternative is a tool that quietly decides things an artist should.
 
 ## All or nothing
 
-If one frame of a sixteen-frame sheet fails, nothing appears at the
-destination at all, and the failure names the frame and its cell. A half
-published animation is worse than none, because it looks finished.
+If one frame of a sixteen-frame sheet fails, nothing appears at the destination
+at all, and the failure names the frame and the cell it came from. A
+half-published animation is worse than none, because it looks finished.
 
-Everything it writes is then independently re-derived and checked against what
-it meant to write, and every input and output hash goes into one report.
+Everything it writes is then re-derived independently and checked against what
+it meant to write.
 
 ## Its colours are not its own
 
 The window's surfaces and accents are *found* in whatever master palette the
-loaded profile points at, using the same nearest-colour search the converter
-uses on a sprite. Load the Shepherds profile and the window comes up in
-Terrath's own colours; load another project's and it wears theirs. There is
-deliberately no theme section in a profile — a palette already says what a
-project's colours are, and asking it to say so twice is how two copies drift
-apart.
+loaded project points at, using the same nearest-colour search the converter
+runs on a sprite. Load the Shepherds palette and the app comes up in Terrath's
+colours; load another project's and it wears theirs.
+
+There is deliberately no theme setting. A palette already says what a project's
+colours are, and asking it to say so twice is how two copies drift apart.
