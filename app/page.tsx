@@ -49,14 +49,14 @@ export default function HomePage() {
           </h1>
           {/* The rule carries the Turtle Hermit kanji, sitting on the line that
               separates the identity from everything under it. */}
-          <div className={styles.heroRule} aria-hidden="true">
+          <div className={`divider ${styles.heroRule}`} aria-hidden="true">
             <span />
             <img
               src="/kanji.webp"
               alt=""
               width={26}
               height={26}
-              className={styles.heroRuleMark}
+              className="divider-mark"
               decoding="async"
             />
             <span />

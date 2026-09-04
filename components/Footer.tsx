@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import type { PointerEvent } from 'react';
 import Logo from './Logo';
 import { navLinks, site } from '@/lib/site';
@@ -12,6 +13,15 @@ import styles from './Footer.module.css';
 
 export default function Footer() {
   const { contactEmail, socials } = site;
+  const pathname = usePathname();
+
+  // The footer sits outside every page's own wrapper, so it cannot inherit the
+  // accent those wrappers set. It works it out from the route instead, which
+  // is what lets the closing rule match the page it is closing. The longest
+  // matching href wins, so /projects/terrath/ still answers as Work.
+  const accent = navLinks
+    .filter((l) => pathname === l.href || pathname.startsWith(l.href))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.accent;
 
   const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
     const el = e.currentTarget;
@@ -51,16 +61,21 @@ export default function Footer() {
     );
 
   return (
-    <footer className={styles.footer}>
-      {/* The same marked rule that divides the hero, closing the page. */}
-      <div className={styles.rule} aria-hidden="true">
+    <footer
+      className={styles.footer}
+      style={accent ? ({ '--accent-a': accent } as React.CSSProperties) : undefined}
+    >
+      {/* The same marked rule that divides the hero, closing the page — and
+          in the same colour, since the footer now knows which page it is
+          under. */}
+      <div className={`divider ${styles.rule}`} aria-hidden="true">
         <span />
         <img
           src="/kanji.webp"
           alt=""
           width={22}
           height={22}
-          className={styles.ruleMark}
+          className="divider-mark"
           decoding="async"
         />
         <span />

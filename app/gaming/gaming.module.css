@@ -256,7 +256,11 @@
   order: 2;
   flex: 1;
   height: 1px;
-  background: var(--line);
+  background: linear-gradient(
+    to right,
+    color-mix(in oklch, var(--accent-a) 40%, transparent),
+    transparent
+  );
 }
 
 .runGrid,

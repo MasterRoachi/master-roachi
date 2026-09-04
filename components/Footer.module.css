@@ -4,26 +4,11 @@
 }
 
 /* Marked rule, matching the one under the hero's identity line. */
+/* Width only — the line and mark are the shared .divider in globals.css. */
 .rule {
-  display: flex;
-  align-items: center;
-  gap: 20px;
   max-width: var(--shell);
   margin: 0 auto;
   padding-inline: var(--pad);
-}
-
-.rule span {
-  height: 1px;
-  flex: 1;
-  background: var(--line);
-}
-
-.ruleMark {
-  display: block;
-  width: 22px;
-  height: auto;
-  opacity: 0.5;
 }
 
 .inner {

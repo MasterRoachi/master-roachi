@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Logo from '@/components/Logo';
+import Starfield from '@/components/Starfield';
 import PageHeader from '@/components/PageHeader';
 import CyclingQuote from '@/components/CyclingQuote';
 import AboutFacets, { type Facet } from '@/components/AboutFacets';
@@ -30,62 +31,86 @@ export const metadata: Metadata = {
 const accentOf = (label: string) =>
   navLinks.find((l) => l.label === label)?.accent ?? 'oklch(97% 0 0)';
 
+/** Orange, the colour About answers in the nav. */
+const ACCENT = accentOf('About');
+
 export default function AboutPage() {
   const perfect = getPerfectRuns();
   const runs = perfect.steam.length + perfect.retro.length;
 
   // Every number here comes off the page it points at, so a door cannot claim
   // work that is no longer there.
+  //
+  // Bodies are one short line each and units are a word or two. Longer ones
+  // broke the row: "finished 100%" wrapped and shoved the Fun card a line below
+  // the rest, while Foundations ran to five lines against Store at three.
+  const plural = (n: number, one: string, many: string) =>
+    n === 1 ? one : many;
+
+  const projects = getProjects().length;
+  const written = getWriting().length;
+  const books = orthodoxReading.length;
+  const rail = getStore().products.length;
+
   const facets: Facet[] = [
     {
       title: 'Work',
-      body: 'Games, worlds, and the code underneath them. The long road from beginner to craftsman, in public.',
+      body: 'Games, worlds, and the code underneath them.',
       href: '/projects/',
       accent: accentOf('Work'),
-      count: String(getProjects().length),
-      unit: 'projects',
+      count: String(projects),
+      unit: plural(projects, 'project', 'projects'),
     },
     {
       title: 'Fun',
-      body: 'Played attentively enough to be worth writing about. One game at a time, finished honestly.',
+      body: 'One at a time, finished properly.',
       href: '/gaming/',
       accent: accentOf('Fun'),
       count: String(runs),
-      unit: 'finished 100%',
+      unit: 'at 100%',
     },
     {
       title: 'Foundations',
-      body: 'Orthodoxy taken as a real question rather than an aesthetic. The aim is not to make it trendy — it is to ask whether it is true.',
+      body: 'Orthodoxy as a question, not an aesthetic.',
       href: '/orthodoxy/',
       accent: accentOf('Foundations'),
-      count: String(orthodoxReading.length),
-      unit: 'on the shelf',
+      count: String(books),
+      unit: plural(books, 'book', 'books'),
     },
     {
       title: 'Thoughts',
-      body: 'Walkthroughs, breakdowns and whatever else will not leave me alone at one in the morning.',
+      body: 'Walkthroughs, breakdowns, the occasional rant.',
       href: '/writing/',
       accent: accentOf('Thoughts'),
-      count: String(getWriting().length),
-      unit: 'written',
+      count: String(written),
+      unit: plural(written, 'post', 'posts'),
     },
     {
       title: 'Store',
-      body: 'Fabled Threads. Original line work from the Saturday-morning end of anime and cartoons, printed on things you can wear.',
+      body: 'Fabled Threads. Line work you can wear.',
       href: '/store/',
       accent: accentOf('Store'),
-      count: String(getStore().products.length),
-      unit: 'in the rail',
+      count: String(rail),
+      unit: plural(rail, 'design', 'designs'),
     },
   ];
 
   return (
     <div
       className={styles.page}
-      /* Orange, the colour About answers in the nav. */
-      style={{ '--accent-a': accentOf('About') } as React.CSSProperties}
+      style={{ '--accent-a': ACCENT } as React.CSSProperties}
     >
-      <div className="shell">
+      {/* Turned right down: a quarter of the usual star count, and the wash
+          two soft pools rather than a flat colour — `tint` is a whole
+          background value, not a colour, and handing it one paints the page.
+          About should still read as the still room, but unbroken black behind
+          it was starker than the rest of the site. */}
+      <Starfield
+        density={0.25}
+        tint={`radial-gradient(110% 80% at 72% 22%, color-mix(in oklch, ${ACCENT} 11%, transparent), transparent 66%), radial-gradient(90% 70% at 14% 88%, color-mix(in oklch, ${ACCENT} 7%, transparent), transparent 60%)`}
+      />
+
+      <div className={`shell ${styles.body}`}>
         <PageHeader
           mark={<Logo size={30} />}
           eyebrow="About"
@@ -132,10 +157,8 @@ export default function AboutPage() {
             <p className="eyebrow">Where everything is</p>
             <h2 className="section-title">Five doors</h2>
             <p className="lede">
-              The tagline is not decoration — it is the site map. Work Hard is
-              the Work page. Study Well is Foundations and Thoughts. Eat and
-              Sleep Plenty is Fun. They are distinct, but they aren&rsquo;t
-              separate.
+              The tagline is the site map. Work Hard is Work, Study Well is
+              Foundations and Thoughts, Eat and Sleep Plenty is Fun.
             </p>
           </div>
           <AboutFacets facets={facets} />
@@ -147,39 +170,31 @@ export default function AboutPage() {
               <p className="eyebrow">What changed</p>
               <h2 className="section-title">My son was born</h2>
               <p className={styles.turnBody}>
-                That is the hinge, and it is most of why this site looks the way
-                it does. A page about the Church sitting next to a tier list and
-                a shirt is not a contradiction I am trying to resolve. It is
-                the actual shape of a life, and I would rather show it whole
-                than pick the half that photographs better.
+                Most of why the site looks like this.
               </p>
             </div>
             <div>
               <p className="eyebrow">Why any of it</p>
               <h2 className="section-title">I never thought I would</h2>
               <p className={styles.turnBody}>
-                Coding, late-night coffee, writing stories, tweaking mechanics
-                until they feel right — I would be doing this with nobody
-                watching. That is the honest test, and it is the only reason
-                this is a website rather than a folder on a hard drive.
-              </p>
-              <p className={styles.turnBody}>
-                Everything here is public. Nothing is hidden — the weaknesses,
-                the learning, the unfinished projects included. Do the work,
-                tell the truth, improve over time, and repeat.
+                Coffee, late nights, mechanics tweaked until they feel right.
+                I&rsquo;d do it with nobody watching.
               </p>
             </div>
           </div>
+          <p className={styles.closing}>
+            Everything here is public — the unfinished projects included.
+          </p>
         </section>
 
-        <div className={styles.rule} aria-hidden="true">
+        <div className={`divider ${styles.rule}`} aria-hidden="true">
           <span />
           <img
             src="/kanji.webp"
             alt=""
             width={22}
             height={22}
-            className={styles.ruleMark}
+            className="divider-mark"
             decoding="async"
           />
           <span />

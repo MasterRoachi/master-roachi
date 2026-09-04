@@ -157,6 +157,38 @@ h4 {
   margin: 0;
 }
 
+/* The full-width divider with the kanji sitting in it — the hero, the footer
+   and the section breaks all use this one.
+
+   It fades out to either side and takes its colour from whatever page it is
+   on, falling back to the site gold where no page accent is set. It used to be
+   three separate copies in three modules, all of them a flat grey line except
+   About, which is the one that looked good. */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.divider > span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in oklch, var(--accent-a, var(--accent)) 34%, var(--line)),
+    transparent
+  );
+}
+
+.divider-mark {
+  display: block;
+  flex: 0 0 auto;
+  width: 22px;
+  height: auto;
+  opacity: 0.7;
+}
+
 /* Inline text link, for prose and anywhere a link must look like one. */
 .link {
   color: var(--accent);

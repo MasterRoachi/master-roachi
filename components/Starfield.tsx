@@ -44,7 +44,18 @@ const SCROLL_SHIFT = 46;
 /** How far the cursor pulls them, in CSS px. */
 const POINTER_SHIFT = 14;
 
-export default function Starfield({ tint }: { tint?: string } = {}) {
+export default function Starfield({
+  tint,
+  density = 1,
+}: {
+  tint?: string;
+  /**
+   * Scales the star count. Below 1 thins the field without changing how it
+   * moves, for pages that want the black broken rather than filled — About
+   * runs at a quarter.
+   */
+  density?: number;
+} = {}) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -67,7 +78,9 @@ export default function Starfield({ tint }: { tint?: string } = {}) {
     // A fixed seed would be nicer for reproducibility, but the field is
     // decorative and never compared between loads.
     const layers: Layer[] = LAYERS.map((spec, i) => {
-      const n = COUNTS[i];
+      // At least a couple per layer, so a very low density thins the field
+      // rather than emptying a layer and losing its parallax entirely.
+      const n = Math.max(2, Math.round(COUNTS[i] * density));
       const x = new Float32Array(n);
       const y = new Float32Array(n);
       const warm = new Uint8Array(n);
@@ -208,7 +221,7 @@ export default function Starfield({ tint }: { tint?: string } = {}) {
       document.removeEventListener('visibilitychange', onVisibility);
       if (canvas.parentNode === host) host.removeChild(canvas);
     };
-  }, []);
+  }, [density]);
 
   // A tint lets a page colour its own depth — project pages use their own
   // accent so the field belongs to that project rather than being generic.

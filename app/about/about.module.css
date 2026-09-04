@@ -2,7 +2,17 @@
    moving field; this one is deliberately still, so it reads as the room that
    is not performing. */
 .page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+/* Named rather than `.page > div`, which would also catch the field's own
+   host and flatten the backdrop. */
+.body {
+  position: relative;
+  z-index: 1;
 }
 
 /* --- the name ----------------------------------------------------------- */
@@ -90,6 +100,12 @@
   }
 }
 
+.closing {
+  margin: clamp(28px, 4vw, 44px) 0 0;
+  font-size: 0.95rem;
+  color: var(--muted-2);
+}
+
 .turnBody {
   margin: 0 0 16px;
   max-width: var(--measure);
@@ -99,27 +115,9 @@
 
 /* --- the divider --------------------------------------------------------- */
 
+/* Spacing only — the line and its mark are the shared .divider in globals.css. */
 .rule {
-  display: flex;
-  align-items: center;
-  gap: 18px;
   margin-block: clamp(46px, 7vw, 86px);
-}
-
-.rule span {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    color-mix(in oklch, var(--accent-a) 34%, var(--line)),
-    transparent
-  );
-}
-
-.ruleMark {
-  flex: 0 0 auto;
-  opacity: 0.75;
 }
 
 /* --- tools and contact --------------------------------------------------- */
