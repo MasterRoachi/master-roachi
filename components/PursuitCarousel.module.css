@@ -23,19 +23,12 @@
 }
 
 .tint,
-.video,
 .overlay {
   position: absolute;
   inset: 0;
 }
 
-.video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Black overlay, heaviest where the words sit. The footage is atmosphere. */
+/* Black overlay, heaviest where the words sit. The field is atmosphere. */
 .overlay {
   background:
     linear-gradient(
