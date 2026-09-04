@@ -20,6 +20,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 
 const W = 1600;
 const H = 900;
@@ -197,7 +198,61 @@ if (files.length === 0) {
 }
 
 fs.mkdirSync(DIR, { recursive: true });
+
+/**
+ * A hash of every file this script wrote, so it can recognise its own work.
+ *
+ * It runs on every build, from `prebuild`. Without this it would overwrite a
+ * real screenshot dropped in at one of these paths — silently, on some later
+ * unrelated build, with nothing in the output to say where the artwork went.
+ *
+ * Names alone are not enough to tell placeholder from real, because a real
+ * screenshot arrives at exactly the path the placeholder already had. So what
+ * is recorded is the content: if the file on disk still hashes to what this
+ * script last wrote there, it is a placeholder and may be replaced. If it does
+ * not, somebody put something else there and it is left alone.
+ */
+const MANIFEST = path.join(DIR, '.generated.json');
+const previous = (() => {
+  try {
+    return JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
+  } catch {
+    // First run, or the manifest was deleted. Everything already on disk is
+    // then treated as real, which is the safe way round to be wrong — delete
+    // the images too if you want them rebuilt.
+    return {};
+  }
+})();
+
+const hashOf = (buf) => createHash('sha256').update(buf).digest('hex');
+
+const generated = {};
 let wrote = 0;
+let kept = 0;
+
+/** Writes one image, unless the path holds something this script did not write. */
+async function emit(file, svg) {
+  const rel = path.basename(file);
+
+  if (fs.existsSync(file)) {
+    const onDisk = hashOf(fs.readFileSync(file));
+    if (previous[rel] !== onDisk) {
+      console.log(`covers: ${rel} is not ours — left alone`);
+      // Deliberately records nothing for it. Writing the file's own hash here
+      // would make it match on the very next run and be overwritten then
+      // instead — the failure this whole mechanism exists to prevent, delayed
+      // by one build. With no entry, the comparison above keeps failing and
+      // the file keeps being left alone.
+      kept++;
+      return;
+    }
+  }
+
+  const buf = await sharp(Buffer.from(svg)).webp({ quality: 82 }).toBuffer();
+  fs.writeFileSync(file, buf);
+  generated[rel] = hashOf(buf);
+  wrote++;
+}
 
 for (const file of files) {
   const slug = file.replace(/\.mdx$/, '');
@@ -237,24 +292,28 @@ for (const file of files) {
   <rect width="${W}" height="${H}" fill="url(#v)"/>
 </svg>`;
 
-  const out = path.join(DIR, `${slug}.webp`);
-  await sharp(Buffer.from(compose(slug, W, H))).webp({ quality: 82 }).toFile(out);
-  wrote++;
+  await emit(path.join(DIR, `${slug}.webp`), compose(slug, W, H));
 
   // Inline variants, for the images that sit beside text in a body. Same
   // motif and the same colours, so a page reads as one set; different seeds,
   // so it is not the same picture three times; 4:3, because a body column is
   // narrower than a card.
   for (const suffix of ['a', 'b']) {
-    const file = path.join(DIR, `${slug}-${suffix}.webp`);
-    await sharp(Buffer.from(compose(`${slug}-${suffix}`, 1200, 900)))
-      .webp({ quality: 82 })
-      .toFile(file);
-    wrote++;
+    await emit(
+      path.join(DIR, `${slug}-${suffix}.webp`),
+      compose(`${slug}-${suffix}`, 1200, 900),
+    );
   }
 
-  const kb = (fs.statSync(out).size / 1024).toFixed(0);
-  console.log(`covers: ${slug} — ${kind}, ${a}/${b}, cover ${kb}KB + 2 inline`);
+  console.log(`covers: ${slug} — ${kind}, ${a}/${b}`);
 }
 
-console.log(`covers: wrote ${wrote} covers to ${DIR}/`);
+// Record what belongs to this script, so the next run knows what it may
+// replace and what it must not touch.
+fs.writeFileSync(MANIFEST, JSON.stringify(generated, null, 2) + '\n');
+
+console.log(
+  `covers: wrote ${wrote} image(s)` +
+    (kept ? `, left ${kept} real one(s) alone` : "") +
+    ` in ${DIR}/`,
+);
