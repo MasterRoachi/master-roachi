@@ -1,0 +1,96 @@
+.banner {
+  --edge: color-mix(in oklch, var(--accent-a, var(--accent)) 46%, var(--line));
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-block: clamp(34px, 5vw, 60px);
+  border: 1px solid var(--edge);
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      120% 160% at 12% 0%,
+      color-mix(in oklch, var(--accent-a, var(--accent)) 16%, transparent),
+      transparent 62%
+    ),
+    oklch(14% 0 0 / 0.85);
+  padding: clamp(26px, 4vw, 40px) clamp(24px, 4vw, 44px);
+}
+
+/* Hazard stripes down the right edge — enough to read as a notice without
+   turning the whole panel into roadworks. */
+.stripes {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: clamp(60px, 12%, 130px);
+  z-index: -2;
+  opacity: 0.16;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--accent-a, var(--accent)) 0 8px,
+    transparent 8px 20px
+  );
+  mask-image: linear-gradient(to right, transparent, #000 70%);
+}
+
+/* A slow pass of light. Decorative, and the first thing to go under reduced
+   motion — an element that moves forever beside text is a nuisance to anyone
+   who did not want it. */
+.sheen {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklch, var(--accent-a, var(--accent)) 12%, transparent) 48%,
+    transparent 66%
+  );
+  transform: translateX(-40%);
+  animation: sweep 7s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  0%,
+  100% {
+    transform: translateX(-40%);
+  }
+  50% {
+    transform: translateX(40%);
+  }
+}
+
+.inner {
+  position: relative;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.4rem, 3.4vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 72%, var(--ink));
+}
+
+.body {
+  margin-top: 12px;
+  max-width: var(--measure);
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.body > :first-child {
+  margin-top: 0;
+}
+
+.body > :last-child {
+  margin-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheen {
+    animation: none;
+    opacity: 0.5;
+  }
+}
