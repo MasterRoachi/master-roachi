@@ -1,8 +1,8 @@
 ---
 title: The Odin Project
-summary: Eight exercises worked through the Foundations track — from static layout to apps that build their own DOM. All of them live.
+summary: Twenty-four exercises worked through the curriculum so far — from static layout to React, data structures, a database and a server written on the raw http module. Almost all of them live.
 date: 2025-08-01
-status: released
+status: ongoing
 kind: Exercises
 weight: 40
 accent: "oklch(84% 0.16 92)"
@@ -10,16 +10,20 @@ accent2: "oklch(70% 0.14 80)"
 link: https://masterroachi.github.io/odin-projects/
 repo: https://github.com/MasterRoachi/odin-projects
 cover: /projects/odin-projects.webp
-stack: ["HTML", "CSS", "JavaScript", "React"]
+stack: ["HTML", "CSS", "JavaScript", "React", "Node.js", "SQLite"]
 pieces:
+  - title: Odin Recipes
+    summary: A three-page recipe site, built to practise structural HTML.
+    demo: https://masterroachi.github.io/odin-projects/odin-recipes/
+    tags: ["HTML"]
+  - title: Landing Page
+    summary: A personal landing page built from the Odin design brief.
+    demo: https://masterroachi.github.io/odin-projects/landing-page/
+    tags: ["Flexbox"]
   - title: Admin Dashboard
     summary: A static dashboard interface, built to practise complex CSS Grid layouts.
     demo: https://masterroachi.github.io/odin-projects/admin-dashboard/admin-dashboard.html
     tags: ["CSS Grid"]
-  - title: Questicles Landing Page
-    summary: A gaming-themed landing page, built on Flexbox.
-    demo: https://masterroachi.github.io/odin-projects/landing-page/qlanding.html
-    tags: ["Flexbox"]
   - title: Quartz, Parchment, Shears
     summary: Rock Paper Scissors, rethemed. Score state and result rendering driven from JavaScript.
     demo: https://masterroachi.github.io/odin-projects/Quartz-Parchment-Shears/
@@ -32,23 +36,80 @@ pieces:
     summary: A calculator with keyboard control and chained operations — the first one where the edge cases outnumbered the happy path.
     demo: https://masterroachi.github.io/odin-projects/calculator/
     tags: ["Logic"]
+  - title: Quarry Sign-up Form
+    summary: A sign-up form with live validation, for an invented service.
+    demo: https://masterroachi.github.io/odin-projects/sign-up-form/
+    tags: ["Forms"]
   - title: Tic-Tac-Toe
-    summary: Board state kept out of the DOM and rendered from it, rather than read back out of the page.
+    summary: Three in a row, built on factories and closures with nothing global.
     demo: https://masterroachi.github.io/odin-projects/tic-tac-toe/
     tags: ["State"]
   - title: The Ark
-    summary: A cover-first personal library. Add books, track reading status, remove them — all in vanilla JavaScript.
+    summary: A personal library kept as spines on a shelf.
     demo: https://masterroachi.github.io/odin-projects/library/
     tags: ["State", "Objects"]
   - title: KOI
     summary: A restaurant page for a fictional Japanese street-food place, generated entirely in JavaScript with tabbed navigation.
     demo: https://masterroachi.github.io/odin-projects/restaurant-page/dist/
     tags: ["Modules"]
+  - title: Things to do
+    summary: A todo list with projects, dates, checklists and keyboard control.
+    demo: https://masterroachi.github.io/odin-projects/todo-list/dist/
+    tags: ["Modules", "State"]
+  - title: Weather
+    summary: A forecast that takes its colour from the conditions and the local time.
+    demo: https://masterroachi.github.io/odin-projects/weather-app/dist/
+    tags: ["Async", "API"]
+  - title: Testing Practice
+    summary: Five functions and 58 tests, verified by breaking the code on purpose.
+    demo: https://masterroachi.github.io/odin-projects/testing-practice/
+    tags: ["Testing"]
+  - title: Battleship
+    summary: Battleship on squared paper, written test-first, against a hunting AI.
+    demo: https://masterroachi.github.io/odin-projects/battleship/
+    tags: ["Testing", "TDD"]
+  - title: Recursion
+    summary: Fibonacci and merge sort, recursively. Command line only.
+    tags: ["Algorithms"]
+  - title: Linked Lists
+    summary: A singly linked list with head, tail and size kept in step.
+    tags: ["Data structures"]
+  - title: HashMap
+    summary: A hash map with linked-list buckets, and a page to watch it grow.
+    demo: https://masterroachi.github.io/odin-projects/hash-map/
+    tags: ["Data structures"]
+  - title: Binary Search Trees
+    summary: A balanced BST, raced against a degenerate one holding the same values.
+    demo: https://masterroachi.github.io/odin-projects/binary-search-trees/
+    tags: ["Data structures"]
+  - title: Knight’s Travails
+    summary: The shortest path a knight can take, found breadth-first on a board.
+    demo: https://masterroachi.github.io/odin-projects/knights-travails/
+    tags: ["Algorithms"]
+  - title: CV Builder
+    summary: A CV with a live preview, built in React. Prints to a clean page.
+    demo: https://masterroachi.github.io/odin-projects/cv-builder/dist/
+    tags: ["React"]
+  - title: Don’t Click Twice
+    summary: A memory game in React. Reshuffles every pick, and the board grows.
+    demo: https://masterroachi.github.io/odin-projects/memory-card/dist/
+    tags: ["React"]
+  - title: Almgren
+    summary: A shop and basket in React — Router, Context, and 46 tests.
+    demo: https://masterroachi.github.io/odin-projects/shopping-cart/dist/
+    tags: ["React", "Testing"]
+  - title: portfolio=#
+    summary: This portfolio as a real SQLite database, queried from a terminal.
+    demo: https://masterroachi.github.io/odin-projects/portfolio-db/dist/
+    tags: ["SQL", "SQLite"]
+  - title: A server, by hand
+    summary: Four pages on the raw http module. No Express, no dependencies.
+    tags: ["Node.js"]
 ---
 
-Eight exercises from The Odin Project's Foundations track, kept in one
-repository rather than scattered across eight of them. Every one is deployed,
-so they can be used rather than just read.
+Twenty-four exercises from The Odin Project, kept in one repository rather
+than scattered across twenty-four of them. Almost every one is deployed, so
+they can be used rather than just read.
 
 ## What the progression actually shows
 
@@ -56,27 +117,53 @@ The interesting part isn't any single exercise. It's the line they draw.
 
 <Split src="/projects/odin-projects-a.webp" side="left">
 
-The early ones are layout: the **Admin Dashboard** is CSS Grid pushed until it
-stops being comfortable, and the **Questicles Landing Page** is the same
-exercise for Flexbox. Nothing moves. The page is what you wrote.
+The early ones are layout. **Odin Recipes** is structural HTML and nothing
+else. The **Admin Dashboard** is CSS Grid pushed until it stops being
+comfortable, and the **Landing Page** is the same exercise for Flexbox.
+Nothing moves. The page is what you wrote.
 
 </Split>
 
 Then the DOM starts doing the work. **Etch-A-Sketch** builds its own grid at
 runtime and rebuilds it whenever the size changes, which is the first point
 where the markup you write and the markup that exists stop being the same
-thing. **Quartz, Parchment, Shears** adds state that outlives a click.
+thing. **Coolculator** is where it gets awkward — a calculator looks trivial
+until you try to chain operations, and then the edge cases outnumber the happy
+path.
 
-**Coolculator** is where it gets awkward. A calculator looks trivial until you
-try to chain operations, and then the edge cases outnumber the happy path —
-what a second operator does mid-expression, what the display shows versus what
-the machine is holding.
+**Tic-Tac-Toe**, **The Ark** and **KOI** separate state from rendering
+properly: the board lives in JavaScript and gets drawn, rather than the page
+being read back to find out whose turn it is. KOI generates its entire page
+from modules with no static markup at all.
 
-The last three separate state from rendering properly. **Tic-Tac-Toe** keeps
-the board in JavaScript and draws it, rather than reading the page back to
-find out whose turn it is. **The Ark** does the same for a collection of
-objects. **KOI** generates its entire page from modules with no static markup
-at all.
+## Where it stops being exercises
 
-That is the whole arc of Foundations: from writing what the browser shows, to
-writing the thing that decides what the browser shows.
+**Testing Practice** is 58 tests over five functions, verified by deliberately
+breaking the code to check the tests actually catch it — which is the only way
+to know a green suite means anything. **Battleship** was then written
+test-first, against an AI that hunts rather than guesses.
+
+<Split src="/projects/odin-projects-b.webp" side="right">
+
+Then the computer science: **linked lists**, a **hash map** with linked-list
+buckets and a page to watch it grow, a balanced **binary search tree** raced
+against a degenerate one holding the same values, and **Knight's Travails**
+solved breadth-first.
+
+Racing the balanced tree against the unbalanced one is the good bit. It is one
+thing to be told what happens when a BST degenerates and another to watch the
+same values take an order of magnitude longer.
+
+</Split>
+
+**React** arrives with a CV builder that previews live and prints clean, a
+memory game that reshuffles on every pick, and a shop with Router, Context and
+46 tests.
+
+And then it leaves the browser. **portfolio=#** is this portfolio as an actual
+SQLite database you query from a terminal. **A server, by hand** is four pages
+on Node's raw `http` module — no Express, no dependencies, just the thing
+underneath the thing everyone uses.
+
+That is the arc: from writing what the browser shows, to writing the thing that
+decides what the browser shows, to writing the thing the browser is talking to.
