@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import ArcadeField from '@/components/ArcadeField';
 import PageHeader from '@/components/PageHeader';
 import PostCard from '@/components/PostCard';
@@ -22,11 +23,12 @@ import CyclingQuote from '@/components/CyclingQuote';
 import { quotes } from '@/lib/quotes';
 import styles from './gaming.module.css';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: '/gaming/',
   title: 'Fun',
   description:
     'Completionist runs, achievement hunting, and analysis of the games worth thinking about.',
-};
+});
 
 /**
  * The conventional tier-list ramp, hot to cold. Not the page's lime, because

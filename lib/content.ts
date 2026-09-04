@@ -168,14 +168,30 @@ export function getAnyEntry(
 }
 
 export function getAllSlugs(collection: string): { slug: string }[] {
-  return (
-    getAllEntries(collection)
-      // An entry whose card points elsewhere has no page of its own. Fabled
-      // Threads lives on the Store page; generating a second, unlinked copy of
-      // it under /projects/ would be a page nothing points to.
-      .filter((e) => !e.frontmatter.href)
-      .map((e) => ({ slug: e.slug }))
-  );
+  return hasOwnPage(getAllEntries(collection)).map((e) => ({ slug: e.slug }));
+}
+
+/**
+ * Entries that actually get a page generated for them.
+ *
+ * An entry whose card points elsewhere has no page of its own — Fabled Threads
+ * sets `href: /store/` because the catalogue and the checkout already live
+ * there, so generating a second, unlinked copy under /projects/ would be a page
+ * nothing points to.
+ *
+ * This is exported because generateStaticParams was not the only place that
+ * needed to know. The sitemap listed /projects/fabled-threads/ and the pager on
+ * the neighbouring project linked to it, both from the unfiltered list, so the
+ * site advertised and linked a URL that had deliberately never been built. One
+ * function now, used by all three.
+ */
+export function hasOwnPage(entries: Entry[]): Entry[] {
+  return entries.filter((e) => !e.frontmatter.href);
+}
+
+/** Projects with a page of their own, in the order the index shows them. */
+export function getProjectPages(): Entry[] {
+  return hasOwnPage(getProjects());
 }
 
 /**

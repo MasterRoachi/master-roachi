@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import Link from 'next/link';
 import GlyphField from '@/components/GlyphField';
 import CyclingQuote from '@/components/CyclingQuote';
@@ -15,10 +16,11 @@ import {
 } from '@/lib/format';
 import styles from './writing.module.css';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: '/writing/',
   title: 'Thoughts',
   description: 'Posts on code, games, and Orthodoxy.',
-};
+});
 
 /** Blue, the colour Thoughts carries in the nav. */
 const ACCENT = 'oklch(74% 0.15 250)';

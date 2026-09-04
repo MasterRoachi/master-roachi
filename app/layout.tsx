@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Archivo } from 'next/font/google';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import StructuredData from '@/components/StructuredData';
 import { site } from '@/lib/site';
 import './globals.css';
 
@@ -23,21 +24,17 @@ export const metadata: Metadata = {
     template: `%s — ${site.name}`,
   },
   description: site.description,
-  openGraph: {
-    type: 'website',
-    siteName: site.name,
-    title: site.name,
-    description: site.description,
-    url: site.url,
-    locale: 'en_ZA',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: site.name,
-    description: site.description,
-  },
+  // Deliberately no openGraph, twitter or canonical here.
+  //
+  // Next inherits root metadata into every page, so a canonical set here was
+  // set everywhere — and it said '/'. Every page on the site therefore told
+  // search engines it was a duplicate of the homepage. The Open Graph block
+  // did the same quietly: og:url, og:title and og:description were the
+  // homepage's on every page, so sharing any page showed the homepage.
+  //
+  // Each page builds its own with pageMeta() in lib/seo.ts. Only the RSS
+  // alternate, which really is site-wide, stays here.
   alternates: {
-    canonical: '/',
     types: { 'application/rss+xml': `${site.url}/rss.xml` },
   },
 };
@@ -50,6 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={sans.variable}>
       <body>
+        <StructuredData />
         <a className="skip-link" href="#main">
           Skip to content
         </a>

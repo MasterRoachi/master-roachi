@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import CandleField from '@/components/CandleField';
 import OrthodoxCross from '@/components/OrthodoxCross';
 import PageHeader from '@/components/PageHeader';
@@ -11,11 +12,12 @@ import CyclingQuote from '@/components/CyclingQuote';
 import { saintQuotes } from '@/lib/quotes';
 import styles from './orthodoxy.module.css';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: '/orthodoxy/',
   title: 'Foundations',
   description:
     'Articles and videos on Eastern Orthodoxy — aimed at people willing to ask whether it is true.',
-};
+});
 
 /** Gold, the colour this side of the site carries in the nav and on the cross. */
 const ACCENT = 'oklch(84% 0.16 92)';

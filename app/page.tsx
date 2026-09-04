@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import HeroBookMount from '@/components/HeroBookMount';
 import SheenLink from '@/components/SheenLink';
@@ -14,7 +15,16 @@ import {
 import { currentlyReading, currentFocus } from '@/lib/pursuits';
 import { getSteam, steamIcon } from '@/lib/steam';
 import { site, navLinks } from '@/lib/site';
+import { pageMeta } from '@/lib/seo';
 import styles from './page.module.css';
+
+// The homepage had no metadata of its own and inherited the root's, which was
+// the only page for which that was ever correct. It states it now, so the
+// canonical is deliberate rather than a default that happened to be right.
+export const metadata: Metadata = pageMeta({
+  path: '/',
+  description: site.description,
+});
 
 export default function HomePage() {
   const allProjects = getProjects();

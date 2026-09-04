@@ -23,3 +23,15 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
+  # A year, and subdomains, but deliberately NOT preload. max-age is reversible
+  # by serving max-age=0 and waiting it out; the preload list is not, and this
+  # site does not need to be on it.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # Nothing here needs a camera, a microphone or a location.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  # Everything is first-party and self-hosted: next/font inlines the woff2
+  # files under _next/static/media, there is no analytics, and no third-party
+  # script or frame. The two exceptions are unavoidable — Next injects inline
+  # bootstrap scripts and CSS-in-JS style tags, hence 'unsafe-inline' on both,
+  # and Steam and Printful serve the game and product art over https.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests

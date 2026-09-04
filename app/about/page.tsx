@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import Logo from '@/components/Logo';
 import Starfield from '@/components/Starfield';
 import PageHeader from '@/components/PageHeader';
@@ -14,10 +15,12 @@ import { getStore } from '@/lib/store';
 import { site, navLinks } from '@/lib/site';
 import styles from './about.module.css';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: '/about/',
   title: 'About',
-  description: site.description,
-};
+  description:
+    'Master of None. Stephan Engelbrecht — games, worlds, software, playing, and Orthodoxy.',
+});
 
 // The one page on the site with no subject of its own, so it is where the other
 // five meet.

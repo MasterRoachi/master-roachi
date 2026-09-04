@@ -9,11 +9,12 @@ import StackIcons from '@/components/StackIcons';
 import {
   getAnyEntry,
   getAllSlugs,
-  getProjects,
+  getProjectPages,
   getWritingForProject,
   toSummary,
 } from '@/lib/content';
 import { STATUS_LABEL, type Status } from '@/lib/format';
+import { pageMeta } from '@/lib/seo';
 import styles from './project.module.css';
 
 export function generateStaticParams() {
@@ -28,18 +29,16 @@ export async function generateMetadata({
   const { slug } = await params;
   const entry = getAnyEntry('projects', slug);
   if (!entry) return {};
-  return {
-    robots: entry.frontmatter.draft
-      ? { index: false, follow: false }
-      : undefined,
+  // Its own canonical and og:url. Without these it inherited the root's, and
+  // every project page declared itself a duplicate of the homepage.
+  return pageMeta({
+    path: `/projects/${slug}/`,
     title: entry.frontmatter.title,
     description: entry.frontmatter.summary,
-    openGraph: {
-      title: entry.frontmatter.title,
-      description: entry.frontmatter.summary,
-      type: 'article',
-    },
-  };
+    image: entry.frontmatter.cover ?? undefined,
+    type: 'article',
+    noIndex: entry.frontmatter.draft,
+  });
 }
 
 export default async function ProjectPage({
@@ -56,8 +55,10 @@ export default async function ProjectPage({
   const related = getWritingForProject(slug).map(toSummary);
 
   // Neighbours in the same order the projects index uses, so moving between
-  // pages matches the order they were browsed in.
-  const all = getProjects();
+  // pages matches the order they were browsed in — but only those that have a
+  // page to move to. Fabled Threads sits in that order and has no page, so the
+  // unfiltered list sent "next project" from Shepherds straight to a 404.
+  const all = getProjectPages();
   const i = all.findIndex((p) => p.slug === slug);
   const prev = i > 0 ? all[i - 1] : null;
   const nextUp = i >= 0 && i < all.length - 1 ? all[i + 1] : null;

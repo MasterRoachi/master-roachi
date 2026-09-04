@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import Starfield from '@/components/Starfield';
 import PageHeader from '@/components/PageHeader';
 import ProjectCard from '@/components/ProjectCard';
@@ -9,11 +10,12 @@ import { quotes } from '@/lib/quotes';
 import cards from '@/components/Card.module.css';
 import styles from './projects.module.css';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: '/projects/',
   title: 'Work',
   description:
     'Games, worlds, stores and code — finished, building, and still an idea.',
-};
+});
 
 export default function ProjectsPage() {
   const projects = getProjects().map(toProjectSummary);

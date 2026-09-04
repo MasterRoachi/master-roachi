@@ -1,5 +1,8 @@
 import { POLL_ID, pollCandidates } from '../lib/poll';
 
+/** The one hostname the site answers on; www redirects here. */
+const APEX = 'masterroachi.com';
+
 // The only server-side code on the site.
 //
 // Everything else is a static export served straight from out/. This Worker
@@ -143,6 +146,22 @@ async function currentChoice(
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    // One address for the site.
+    //
+    // www.masterroachi.com is a custom domain on this same Worker (see
+    // wrangler.jsonc) and was serving every page at 200 alongside the apex,
+    // so the whole site existed twice as far as a crawler is concerned. 301
+    // rather than 302: this is permanent, and only a permanent redirect
+    // consolidates ranking signals onto the surviving URL.
+    //
+    // The path and query are carried across, so a shared www link lands on the
+    // page it named rather than the homepage.
+    if (url.hostname === `www.${APEX}`) {
+      url.hostname = APEX;
+      url.protocol = 'https:';
+      return Response.redirect(url.toString(), 301);
+    }
 
     // Static assets are matched before the Worker runs, so in practice only
     // unmatched paths arrive here. Anything that is not the API is handed

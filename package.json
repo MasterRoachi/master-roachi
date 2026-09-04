@@ -10,12 +10,13 @@
     "preview": "npx serve@latest out",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "prebuild": "node --env-file-if-exists=.env.local scripts/steam.mjs && node --env-file-if-exists=.env.local scripts/retro.mjs && node --env-file-if-exists=.env.local scripts/youtube.mjs && node --env-file-if-exists=.env.local scripts/printful.mjs && node scripts/store-art.mjs",
+    "prebuild": "node --env-file-if-exists=.env.local scripts/steam.mjs && node --env-file-if-exists=.env.local scripts/retro.mjs && node --env-file-if-exists=.env.local scripts/youtube.mjs && node --env-file-if-exists=.env.local scripts/printful.mjs && node scripts/store-art.mjs && node scripts/og.mjs",
     "steam": "node --env-file-if-exists=.env.local scripts/steam.mjs",
     "store": "node --env-file-if-exists=.env.local scripts/printful.mjs",
     "retro": "node --env-file-if-exists=.env.local scripts/retro.mjs",
     "youtube": "node scripts/youtube.mjs",
-    "store-art": "node scripts/store-art.mjs"
+    "store-art": "node scripts/store-art.mjs",
+    "og": "node scripts/og.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

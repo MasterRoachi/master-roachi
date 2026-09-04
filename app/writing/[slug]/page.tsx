@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Mdx from '@/components/Mdx';
@@ -18,13 +19,22 @@ export async function generateMetadata({
   const { slug } = await params;
   const entry = getAnyEntry('writing', slug);
   if (!entry) return {};
-  return {
-    robots: entry.frontmatter.draft ? { index: false, follow: false } : undefined,
+  const meta = pageMeta({
+    path: `/writing/${slug}/`,
     title: entry.frontmatter.title,
     description: entry.frontmatter.summary,
+    image: entry.frontmatter.cover ?? undefined,
+    type: 'article',
+    noIndex: entry.frontmatter.draft,
+  });
+  // The publication date is the one thing pageMeta has no opinion about,
+  // since only articles have one.
+  return {
+    ...meta,
     openGraph: {
-      title: entry.frontmatter.title,
-      description: entry.frontmatter.summary,
+      ...meta.openGraph,
+      // Restated so the OpenGraph union narrows to the article variant, which
+      // is the only one that admits publishedTime.
       type: 'article',
       publishedTime: entry.frontmatter.date,
     },

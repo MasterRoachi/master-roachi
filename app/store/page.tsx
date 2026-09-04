@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import HalftoneField from '@/components/HalftoneField';
 import ShirtIcon from '@/components/ShirtIcon';
 import ShirtViewerMount from '@/components/ShirtViewerMount';
@@ -15,11 +16,12 @@ import {
 import { site } from '@/lib/site';
 import styles from './store.module.css';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  path: '/store/',
   title: 'Store',
   description:
     'Fabled Threads — print-on-demand merch built around anime and early-2000s cartoon inspired illustrations.',
-};
+});
 
 // Fabled Threads keeps its own colour here, the one its project card carried.
 const ACCENT = 'oklch(72% 0.26 350)';

@@ -88,7 +88,11 @@ export default function ProjectCard({
           {STATUS_LABEL[entry.status]}
         </span>
       </div>
-      <h3 className={styles.title}>{entry.title}</h3>
+      {/* h2, not h3. The projects index is the only page that renders these
+          and it has no other headings, so h3 skipped a level straight from the
+          page title — which makes the list awkward to navigate by screen
+          reader. */}
+      <h2 className={styles.title}>{entry.title}</h2>
       <p className={styles.body}>{entry.summary}</p>
       {entry.stack && entry.stack.length > 0 && (
         <div className={styles.meta}>
