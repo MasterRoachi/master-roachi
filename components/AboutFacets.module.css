@@ -1,9 +1,30 @@
+/* Five is an awkward number for auto-fit, which left one door stranded beside
+   a hole three columns wide. So the count is stated rather than inferred: one
+   up, then two with the last spanning the row, then five across. */
 .facets {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
+}
+
+@media (min-width: 620px) {
+  .facets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .facet:last-child {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 1040px) {
+  .facets {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .facet:last-child {
+    grid-column: auto;
+  }
 }
 
 .facet {
@@ -60,18 +81,30 @@
   width: 100%;
 }
 
-.line {
+/* The number off that door's own page. It leads, because it is the one thing
+   on this page that is not an opinion. */
+.count {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
   margin: 0 0 14px;
-  font-size: 0.68rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: var(--muted-2);
+}
+
+.number {
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--facet);
   transition: color 0.2s ease;
 }
 
-.facet:hover .line {
-  color: color-mix(in oklch, var(--facet) 78%, var(--ink));
+.unit {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted-2);
 }
 
 .title {
@@ -104,7 +137,7 @@
   .facet,
   .facet::before,
   .facet::after,
-  .line,
+  .number,
   .go {
     transition: none;
   }

@@ -4,48 +4,30 @@ import Link from 'next/link';
 import type { PointerEvent } from 'react';
 import styles from './AboutFacets.module.css';
 
-// The three sides of the tagline, as three doors rather than a paragraph.
-// It is the strongest structural idea in the brand and it was buried in prose.
+// The five sections of the site, as doors rather than a paragraph.
 //
-// Ordered to match the nav (Work, Fun, Foundations) rather than the tagline,
-// so the two ways into the same three sections agree.
+// About is the one page that does not have a subject of its own — it is where
+// the other five meet. So instead of describing them it shows them, each in its
+// own colour with a number off its own page. The counts are passed in from the
+// server rather than hardcoded, so a door is never boasting about work that is
+// no longer there.
 //
-// Each carries its own colour and the same tracked light the rest of the site
-// uses, written to CSS custom properties rather than React state.
+// This used to be three doors carrying the three halves of the tagline, with
+// accents that had drifted out of step with the nav — Work was amber here and
+// white there, Foundations the reverse. They come from lib/site.ts now, so
+// there is one place to change a page's colour.
 
-interface Facet {
-  line: string;
+export interface Facet {
   title: string;
   body: string;
   href: string;
   accent: string;
+  /** The number off that page, and what it counts. */
+  count: string;
+  unit: string;
 }
 
-const FACETS: Facet[] = [
-  {
-    line: 'Work Hard',
-    title: 'Work',
-    body: 'Games, worlds, and the code underneath them. The long road from beginner to craftsman, in public.',
-    href: '/projects/',
-    accent: 'oklch(76% 0.13 78)',
-  },
-  {
-    line: 'Rest Plenty',
-    title: 'Fun',
-    body: 'Played attentively enough to be worth writing about. One game at a time, finished honestly.',
-    href: '/gaming/',
-    accent: 'oklch(86% 0.20 135)',
-  },
-  {
-    line: 'Study Well',
-    title: 'Foundations',
-    body: 'Orthodoxy taken as a real question rather than an aesthetic. The aim is not to make it trendy — it is to ask whether it is true.',
-    href: '/orthodoxy/',
-    accent: 'oklch(97% 0 0)',
-  },
-];
-
-export default function AboutFacets() {
+export default function AboutFacets({ facets }: { facets: Facet[] }) {
   const onMove = (e: PointerEvent<HTMLAnchorElement>) => {
     const el = e.currentTarget;
     const r = el.getBoundingClientRect();
@@ -60,7 +42,7 @@ export default function AboutFacets() {
 
   return (
     <div className={styles.facets}>
-      {FACETS.map((f) => (
+      {facets.map((f) => (
         <Link
           key={f.title}
           href={f.href}
@@ -69,7 +51,10 @@ export default function AboutFacets() {
           onPointerMove={onMove}
           onPointerLeave={onLeave}
         >
-          <p className={styles.line}>{f.line}</p>
+          <p className={styles.count}>
+            <span className={styles.number}>{f.count}</span>
+            <span className={styles.unit}>{f.unit}</span>
+          </p>
           <h3 className={styles.title}>{f.title}</h3>
           <p className={styles.body}>{f.body}</p>
           <span className={styles.go}>Go →</span>
