@@ -28,19 +28,24 @@
 }
 
 .card {
+  --piece: var(--accent-a, var(--accent));
+
   position: absolute;
   inset: 0 0 auto 0;
   height: var(--card-h);
   display: flex;
   flex-direction: column;
   border-radius: 18px;
-  border: 1px solid
-    color-mix(in oklch, var(--accent-a, var(--accent)) 22%, var(--line));
-  background: oklch(15% 0 0 / 0.94);
+  border: 1px solid color-mix(in oklch, var(--piece) 22%, var(--line));
+  /* Fully opaque. At 94% the cards behind showed through the front one — the
+     summary sat over another card's heading, and the stack read as a printing
+     fault rather than as depth. */
+  background: oklch(14.5% 0 0);
   padding: clamp(24px, 3.4vw, 38px);
   box-shadow:
     0 24px 50px oklch(0% 0 0 / 0.55),
     0 2px 0 oklch(100% 0 0 / 0.04) inset;
+  cursor: pointer;
 
   /* Pushed back in real depth rather than faked with scale, so the shrinking
      and the softening come from the perspective above and stay consistent.
@@ -72,6 +77,48 @@
   opacity: 1;
 }
 
+/* The whole front card is the link.
+ *
+ * Done by stretching the Open link across it rather than wrapping the card in
+ * an anchor, because an anchor around this content would swallow the Source
+ * link inside it — nesting interactive elements is invalid and behaves
+ * differently in every browser. Source sits above the stretched area instead.
+ */
+.card[data-state='front'] .link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.linkQuiet,
+.tags {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hovering anywhere on it lights the card in its own colour. */
+.card[data-state='front']:hover {
+  border-color: color-mix(in oklch, var(--piece) 62%, var(--line));
+  box-shadow:
+    0 30px 62px oklch(0% 0 0 / 0.6),
+    0 0 0 1px color-mix(in oklch, var(--piece) 30%, transparent),
+    0 0 46px -12px var(--piece),
+    0 2px 0 oklch(100% 0 0 / 0.06) inset;
+}
+
+.card[data-state='front']:hover .index,
+.card[data-state='front']:hover .mark {
+  color: var(--piece);
+  /* The glow, on the two things small enough to carry one without the card
+     turning into a lamp. */
+  filter: drop-shadow(0 0 9px color-mix(in oklch, var(--piece) 65%, transparent));
+}
+
+.card[data-state='front']:hover .link {
+  color: var(--piece);
+}
+
 /* The card that has just left: rotated out of the plane and thrown aside in
    whichever direction the move went, rather than sliding flat. */
 .card[data-state='gone'] {
@@ -81,15 +128,34 @@
   pointer-events: none;
 }
 
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.index,
+.mark {
+  color: color-mix(in oklch, var(--piece) 70%, var(--ink));
+  transition:
+    color 0.22s ease,
+    filter 0.22s ease;
+}
+
 .index {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.18em;
-  color: color-mix(in oklch, var(--accent-a, var(--accent)) 70%, var(--ink));
+}
+
+.mark {
+  display: grid;
+  place-items: center;
 }
 
 .title {
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   font-size: clamp(1.5rem, 3.4vw, 2.1rem);
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -132,7 +198,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: color-mix(in oklch, var(--accent-a, var(--accent)) 80%, var(--ink));
+  color: color-mix(in oklch, var(--piece) 80%, var(--ink));
   transition: color 0.18s ease;
 }
 

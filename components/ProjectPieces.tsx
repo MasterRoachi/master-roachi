@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Frontmatter } from '@/lib/content';
+import PieceIcon, { kindFor } from './PieceIcon';
 import styles from './ProjectPieces.module.css';
 
 // The pieces of a project that is a collection rather than one thing — the
@@ -107,13 +108,19 @@ export default function ProjectPieces({ pieces }: { pieces: Piece[] }) {
                 {
                   '--depth': offset,
                   '--dir': dir,
+                  '--piece': kindFor(piece.tags).colour,
                   zIndex: total - offset,
                 } as React.CSSProperties
               }
             >
-              <span className={styles.index} aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
-              </span>
+              <div className={styles.head}>
+                <span className={styles.index} aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className={styles.mark} aria-hidden="true">
+                  <PieceIcon tags={piece.tags} />
+                </span>
+              </div>
 
               <h3 className={styles.title}>{piece.title}</h3>
               <p className={styles.summary}>{piece.summary}</p>
@@ -137,6 +144,8 @@ export default function ProjectPieces({ pieces }: { pieces: Piece[] }) {
                     // decoration and must not be tab stops.
                     tabIndex={offset === 0 ? 0 : -1}
                   >
+                    {/* Stretched over the whole card by the CSS, so anywhere
+                        on it opens the demo. */}
                     Open <span className={styles.arrow}>↗</span>
                   </a>
                 ) : (

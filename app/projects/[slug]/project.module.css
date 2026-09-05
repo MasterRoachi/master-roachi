@@ -245,7 +245,10 @@
   }
 }
 
+/* The deck leads the page now, so it needs the space the prose used to give
+   it — it was sitting hard against the header. */
 .pieces {
+  padding-top: clamp(44px, 6vw, 80px);
   padding-bottom: clamp(44px, 7vw, 80px);
 }
 
