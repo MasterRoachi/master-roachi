@@ -21,6 +21,8 @@ const TOOLS = [
   ['nuxt', 'Nuxt'],
   ['godotengine', 'Godot'],
   ['python', 'Python'],
+  ['nodedotjs', 'Node.js'],
+  ['sqlite', 'SQLite'],
   ['html5', 'HTML'],
   ['css', 'CSS'],
   ['claude', 'Claude'],
@@ -54,6 +56,63 @@ function needsLightening(hex) {
   const max = Math.max(r, g, b);
   const saturation = max === 0 ? 0 : (max - Math.min(r, g, b)) / max;
   return luminance < 0.22 && saturation < 0.25;
+}
+
+/**
+ * Lifts a dark but colourful mark until it is visible, keeping its hue.
+ *
+ * `needsLightening` above handles the other case — a mark that is dark *and*
+ * grey, like a black wordmark, which is flattened to white because there is no
+ * colour in it to preserve. A dark saturated mark cannot be treated that way:
+ * SQLite's #003B57 is a navy at 19% luminance and fully saturated, so it fails
+ * that test, stays as it is, and disappears entirely against a near-black page.
+ * Turning it white would lose the blue that makes it recognisable.
+ *
+ * So the hue and saturation are kept and only the lightness is raised. It is
+ * the same trick scripts/covers.mjs uses on Terrath's accent, for the same
+ * reason.
+ */
+function liftDarkColour(hex, below = 0.28, to = 0.5) {
+  const n = parseInt(hex, 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  // Only marks that are genuinely too dark to see. A floor applied to every
+  // colour shifted Nuxt, Python and CSS as well, which were perfectly legible
+  // and are not this function's business.
+  if (l >= below) return hex;
+
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+
+  // Back out of HSL at the raised lightness.
+  const c = (1 - Math.abs(2 * to - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = to - c / 2;
+  const [r2, g2, b2] =
+    h < 60 ? [c, x, 0]
+    : h < 120 ? [x, c, 0]
+    : h < 180 ? [0, c, x]
+    : h < 240 ? [0, x, c]
+    : h < 300 ? [x, 0, c]
+    : [c, 0, x];
+
+  return [r2, g2, b2]
+    .map((v) => Math.round((v + m) * 255).toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase();
 }
 
 function lookup(slug) {
@@ -118,7 +177,10 @@ function splitPath(path, at) {
 
 function toolRow([slug, label]) {
   const icon = lookup(slug);
-  const color = needsLightening(icon.hex) ? 'FFFFFF' : icon.hex;
+  // Dark and grey goes white; dark and colourful keeps its hue and is lifted.
+  const color = needsLightening(icon.hex)
+    ? 'FFFFFF'
+    : liftDarkColour(icon.hex);
   const split = SPLITS[slug];
 
   const lines = [
