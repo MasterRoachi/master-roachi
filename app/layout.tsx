@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Archivo } from 'next/font/google';
+import { Archivo, Reggae_One } from 'next/font/google';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import StructuredData from '@/components/StructuredData';
@@ -14,6 +14,22 @@ const sans = Archivo({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
   variable: '--font-sans',
+  display: 'swap',
+});
+
+// The wordmark, and only the wordmark.
+//
+// Midorima was the first choice and is licensed for personal use only, which a
+// site with a shop on it cannot honour — least of all on its own name. Reggae
+// One is SIL Open Font License, so commercial use is permitted, and unusually
+// for a display face it holds up at the 0.95rem the nav runs at.
+//
+// Self-hosted by next/font at build time, like Archivo: no request leaves for
+// Google when somebody loads the site.
+const display = Reggae_One({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -45,7 +61,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={sans.variable}>
+    <html lang="en" className={`${sans.variable} ${display.variable}`}>
       <body>
         <StructuredData />
         <a className="skip-link" href="#main">

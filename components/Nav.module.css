@@ -38,9 +38,13 @@
 }
 
 .wordmark {
-  font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: -0.02em;
+  /* The one place the display face is used. Reggae One has a single weight
+     and its own built-in spacing, so the 800 and the negative tracking that
+     Archivo needed here would both fight it. */
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-weight: 400;
+  font-size: 1.05rem;
+  letter-spacing: 0;
   white-space: nowrap;
 }
 
