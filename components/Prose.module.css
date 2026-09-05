@@ -111,3 +111,151 @@
   color: var(--ink);
   font-weight: 600;
 }
+
+/* --- liveliness ----------------------------------------------------------
+ *
+ * The body was correct and completely flat: grey text, plain headings, a
+ * blockquote with a line beside it. Everything below is about giving a long
+ * read some shape to hold on to.
+ */
+
+/* The opening paragraph sets in, with a raised first letter. Only the first —
+ * a drop cap on every section is a ransom note. Scoped so it never lands on a
+ * paragraph inside a callout or a split.
+ */
+.prose > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.82;
+  font-weight: 800;
+  margin: 0.06em 0.1em 0 0;
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 82%, var(--ink));
+}
+
+/* Headings get a short rule in the page's own colour, so scanning for a
+   section has something to catch on besides size. */
+.prose h2 {
+  position: relative;
+  padding-top: 0.55em;
+}
+
+.prose h2::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42px;
+  height: 2px;
+  background: var(--accent-a, var(--accent));
+}
+
+/* Quotes read as quotes rather than as indented paragraphs. */
+.prose blockquote {
+  position: relative;
+  border-left: 2px solid var(--accent-a, var(--accent));
+  padding: 4px 0 4px 26px;
+  font-size: 1.06em;
+  line-height: 1.6;
+}
+
+/* Ordered lists get their numbers in the accent, which is most of what makes
+   a numbered route feel like a route. */
+.prose ol {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: step;
+}
+
+.prose ol > li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.4em;
+}
+
+.prose ol > li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.06em;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 74%, var(--ink));
+}
+
+.prose ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose ul > li {
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.prose ul > li::before {
+  content: '';
+  position: absolute;
+  left: 0.15em;
+  top: 0.72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--accent-a, var(--accent)) 60%, transparent);
+}
+
+/* Links pick up the page colour rather than staying site-gold on every post. */
+.prose a {
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 82%, var(--ink));
+  text-decoration-color: color-mix(
+    in oklch,
+    var(--accent-a, var(--accent)) 45%,
+    transparent
+  );
+}
+
+.prose a:hover {
+  text-decoration-color: var(--accent-a, var(--accent));
+}
+
+/* Tables that look built rather than defaulted. */
+.prose table {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.prose th {
+  background: oklch(17% 0 0);
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 70%, var(--ink));
+  border-color: var(--line);
+}
+
+.prose td {
+  border-color: var(--line);
+}
+
+.prose tbody tr:nth-child(even) td {
+  background: oklch(14% 0 0 / 0.6);
+}
+
+/* The rule between sections, matching the divider used everywhere else. */
+.prose hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in oklch, var(--accent-a, var(--accent)) 34%, var(--line)),
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prose a {
+    transition: none;
+  }
+}

@@ -1,0 +1,33 @@
+.callout {
+  --kind: var(--accent-a, var(--accent));
+
+  position: relative;
+  border: 1px solid color-mix(in oklch, var(--kind) 34%, var(--line));
+  border-left-width: 3px;
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--kind) 7%, oklch(13% 0 0));
+  padding: clamp(18px, 2.4vw, 26px) clamp(20px, 2.6vw, 30px);
+  margin-block: 1.8em;
+}
+
+.label {
+  margin: 0 0 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--kind) 78%, var(--ink));
+}
+
+.body {
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+.body > :first-child {
+  margin-top: 0;
+}
+
+.body > :last-child {
+  margin-bottom: 0;
+}

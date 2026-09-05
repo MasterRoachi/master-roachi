@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Mdx from '@/components/Mdx';
 import { getAnyEntry, getAllSlugs, getProjects } from '@/lib/content';
-import { formatDate, TRACK_LABEL } from '@/lib/format';
+import { formatDate, TRACK_LABEL, TRACK_COLOUR } from '@/lib/format';
+import GlyphField from '@/components/GlyphField';
+import ReadingProgress from '@/components/ReadingProgress';
 import styles from '../../entry.module.css';
 
 export function generateStaticParams() {
@@ -56,11 +58,24 @@ export default async function PostPage({
     ? getProjects().find((p) => p.slug === fm.project)
     : undefined;
 
+  // The post takes its track's colour, so a piece about Orthodoxy reads in
+  // Foundations gold and one about a game in Fun's green — the same identity
+  // the section it belongs to has everywhere else on the site. Posts were the
+  // only pages on the site with no accent at all.
   return (
-    <article className={`shell ${styles.entry}`}>
-      <Link href="/writing/" className={styles.back}>
-        ← Writing
-      </Link>
+    <div
+      className={styles.page}
+      style={{ '--accent-a': TRACK_COLOUR[track] } as React.CSSProperties}
+    >
+      <ReadingProgress />
+      {/* The same field Thoughts runs, so a post looks like it came from the
+          page that lists it rather than from a plain document template. */}
+      <GlyphField />
+
+      <article className={`shell ${styles.entry} ${styles.body}`}>
+        <Link href="/writing/" className={styles.back}>
+          ← Writing
+        </Link>
 
       <header className={styles.head}>
         <div className={styles.meta}>
@@ -86,7 +101,21 @@ export default async function PostPage({
         )}
       </header>
 
-      <Mdx source={entry.body} />
-    </article>
+      {fm.cover && (
+        <figure className={styles.cover}>
+          <img
+            src={fm.cover}
+            alt={fm.coverAlt ?? ''}
+            width={1600}
+            height={900}
+            loading="eager"
+            decoding="async"
+          />
+        </figure>
+      )}
+
+        <Mdx source={entry.body} />
+      </article>
+    </div>
   );
 }

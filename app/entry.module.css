@@ -111,3 +111,49 @@
   padding-top: clamp(32px, 5vw, 48px);
   border-top: 1px solid var(--line);
 }
+
+/* Form rather than subject — "Walkthrough", "Achievement guide". Distinct from
+   the track chip beside it, which is the subject and is coloured. */
+.tag {
+  border: 1px solid color-mix(in oklch, var(--accent-a, var(--accent)) 30%, var(--line));
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* --- a post, given the treatment every other page already had ------------ */
+
+.page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* Named rather than `.page > *`, which would also catch the field's own host
+   and flatten the backdrop. */
+.body {
+  position: relative;
+  z-index: 1;
+}
+
+/* The track colour, on the chip that names it. */
+.track {
+  color: color-mix(in oklch, var(--accent-a, var(--accent)) 78%, var(--ink));
+}
+
+.cover {
+  margin: 0 0 clamp(32px, 5vw, 52px);
+}
+
+.cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid
+    color-mix(in oklch, var(--accent-a, var(--accent)) 18%, var(--line));
+}

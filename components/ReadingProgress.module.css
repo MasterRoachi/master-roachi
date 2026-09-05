@@ -1,0 +1,21 @@
+.bar {
+  --read: 0;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 30;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--read));
+  background: linear-gradient(
+    to right,
+    color-mix(in oklch, var(--accent-a, var(--accent)) 40%, transparent),
+    var(--accent-a, var(--accent))
+  );
+}
+
+/* No transition: it is driven directly from the scroll position, and easing it
+   would make it lag behind the thing it is reporting. */
