@@ -18,7 +18,9 @@
     "store-art": "node scripts/store-art.mjs",
     "og": "node scripts/og.mjs",
     "covers": "node scripts/covers.mjs",
-    "achievements": "node --env-file-if-exists=.env.local scripts/achievements.mjs"
+    "achievements": "node --env-file-if-exists=.env.local scripts/achievements.mjs",
+    "logo": "node scripts/logo.mjs",
+    "tool-icons": "node scripts/tool-icons.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

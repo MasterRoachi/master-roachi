@@ -157,8 +157,21 @@ export default {
     //
     // The path and query are carried across, so a shared www link lands on the
     // page it named rather than the homepage.
-    if (url.hostname === `www.${APEX}`) {
-      url.hostname = APEX;
+    // One scheme, too.
+    //
+    // Cloudflare's "Always Use HTTPS" is the usual home for this, and it is
+    // switched on — but the apex still answered plain HTTP with a 200, and a
+    // dashboard setting that does not visibly take is not something to hang
+    // the canonical URL on. Doing it here works regardless: if the edge
+    // redirects first the Worker never sees the request, and if it does not,
+    // this catches it. Cloudflare reports the visitor's original scheme in
+    // CF-Visitor, since by the time it reaches the Worker the URL says https
+    // either way.
+    const scheme = request.headers.get('cf-visitor');
+    const overHttp = scheme ? scheme.includes('"scheme":"http"') : false;
+
+    if (url.hostname === `www.${APEX}` || overHttp) {
+      url.hostname = url.hostname === `www.${APEX}` ? APEX : url.hostname;
       url.protocol = 'https:';
       return Response.redirect(url.toString(), 301);
     }
