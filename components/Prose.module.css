@@ -1,10 +1,29 @@
 /* Long-form body copy for MDX content. */
 
+/* Wider than the 66ch default, and centred rather than sitting left inside a
+   1180px shell — which is what made it read as a narrow column pushed to one
+   side of an otherwise empty page. */
 .prose {
-  max-width: var(--measure);
+  max-width: var(--post-measure, 92ch);
+  margin-inline: auto;
   font-size: clamp(1rem, 1.5vw, 1.0625rem);
   line-height: 1.75;
   color: var(--muted);
+}
+
+/* Justified, with hyphenation.
+ *
+ * Justification without hyphens is the version everyone regrets: the browser
+ * can only stretch word spaces, so a long word pushes a line into rivers of
+ * white. Hyphenation needs the lang attribute, which the root element already
+ * sets.
+ *
+ * Direct children only. Paragraphs inside a Split or a Callout sit in a much
+ * narrower column, and justifying those makes the gaps worse, not better. */
+.prose > p {
+  text-align: justify;
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 .prose > * + * {

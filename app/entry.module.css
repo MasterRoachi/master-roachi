@@ -1,6 +1,9 @@
 /* Shared layout for a single long-form entry — a project page or a post. */
 
 .entry {
+  /* Wider than the site shell. A post is one column of text and does not
+     want the same 1180px cap a three-column index does. */
+  max-width: 1320px;
   padding-block: clamp(32px, 5vw, 56px) clamp(72px, 11vw, 130px);
 }
 
@@ -160,4 +163,16 @@
   border-radius: 14px;
   border: 1px solid
     color-mix(in oklch, var(--accent-a, var(--accent)) 18%, var(--line));
+}
+
+/* The header and the cover share the body's column, so the post reads as one
+   centred measure rather than a wide header above a narrow article. */
+.head,
+.cover {
+  max-width: var(--post-measure, 92ch);
+  margin-inline: auto;
+}
+
+.head {
+  margin-bottom: clamp(32px, 5vw, 56px);
 }
