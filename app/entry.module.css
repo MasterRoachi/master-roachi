@@ -147,12 +147,16 @@
   margin: 0 0 clamp(32px, 5vw, 52px);
 }
 
+/* No forced ratio.
+ *
+ * A 16/9 box with object-fit: cover cropped the top and bottom off a store
+ * banner that is 3.1:1, and stretched a 460px image across a 700px column
+ * while it was at it. Cover art comes in whatever shape it comes in; the page
+ * should show it rather than trim it to a shape the page preferred. */
 .cover img {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
   border-radius: 14px;
   border: 1px solid
     color-mix(in oklch, var(--accent-a, var(--accent)) 18%, var(--line));

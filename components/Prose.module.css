@@ -160,19 +160,25 @@
 
 /* Ordered lists get their numbers in the accent, which is most of what makes
    a numbered route feel like a route. */
-.prose ol {
+/* Scoped to lists the MDX itself produced.
+ *
+ * A component rendering a <ul> inside a post body was picking these up — the
+ * achievement grid came out with a bullet beside every tile. MDX emits bare
+ * elements, components carry a CSS-module class, so the absence of a class is
+ * exactly the distinction wanted. */
+.prose ol:not([class]) {
   list-style: none;
   padding-left: 0;
   counter-reset: step;
 }
 
-.prose ol > li {
+.prose ol:not([class]) > li {
   counter-increment: step;
   position: relative;
   padding-left: 2.4em;
 }
 
-.prose ol > li::before {
+.prose ol:not([class]) > li::before {
   content: counter(step, decimal-leading-zero);
   position: absolute;
   left: 0;
@@ -183,17 +189,17 @@
   color: color-mix(in oklch, var(--accent-a, var(--accent)) 74%, var(--ink));
 }
 
-.prose ul {
+.prose ul:not([class]) {
   list-style: none;
   padding-left: 0;
 }
 
-.prose ul > li {
+.prose ul:not([class]) > li {
   position: relative;
   padding-left: 1.5em;
 }
 
-.prose ul > li::before {
+.prose ul:not([class]) > li::before {
   content: '';
   position: absolute;
   left: 0.15em;

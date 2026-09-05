@@ -2,44 +2,13 @@
   margin: clamp(30px, 4vw, 48px) 0;
 }
 
-.head {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.count {
-  margin: 0;
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  font-variant-numeric: tabular-nums;
-}
-
-.got {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: color-mix(in oklch, var(--accent-a, var(--accent)) 80%, var(--ink));
-}
-
-.of {
-  font-size: 0.85rem;
-  color: var(--muted-2);
-}
-
-.caption {
-  font-size: 0.82rem;
-  color: var(--muted-2);
-}
-
 .grid {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 10px;
 }
 
 /* The anchor for each tile's panel. */
@@ -49,8 +18,8 @@
   padding: 0;
 }
 
-.cell::before {
-  content: none;
+.cell {
+  list-style: none;
 }
 
 .tile {

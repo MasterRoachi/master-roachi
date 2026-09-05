@@ -24,24 +24,13 @@ export interface Achievement {
 
 export default function Achievements({
   achievements,
-  caption,
 }: {
   achievements: Achievement[];
-  caption?: string;
 }) {
   const [open, setOpen] = useState<string | null>(null);
-  const got = achievements.filter((a) => a.unlocked).length;
 
   return (
     <figure className={styles.wrap}>
-      <div className={styles.head}>
-        <p className={styles.count}>
-          <span className={styles.got}>{got}</span>
-          <span className={styles.of}>/ {achievements.length}</span>
-        </p>
-        {caption && <figcaption className={styles.caption}>{caption}</figcaption>}
-      </div>
-
       <ul className={styles.grid}>
         {achievements.map((a) => (
           <li key={a.key} className={styles.cell}>
