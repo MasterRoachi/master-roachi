@@ -68,6 +68,11 @@ export default async function PostPage({
           <time dateTime={fm.date}>{formatDate(fm.date)}</time>
           <span>{entry.readingMinutes} min read</span>
           {fm.draft && <span className={styles.draft}>Draft</span>}
+          {fm.tags?.map((tag) => (
+            <span key={tag} className={styles.tag}>
+              {tag}
+            </span>
+          ))}
         </div>
         <h1 className={styles.title}>{fm.title}</h1>
         <p className="lede">{fm.summary}</p>

@@ -17,6 +17,15 @@ export interface Frontmatter {
 
   // Writing only.
   track?: Track;
+  /**
+   * What kind of post it is, beyond which track it sits in.
+   *
+   * `track` answers the subject — Gaming, Orthodoxy, Code — and a post has
+   * exactly one. These answer the form, and a post can have several: a
+   * BioShock piece is a Walkthrough and an Achievement guide at once, and
+   * neither of those is a subject.
+   */
+  tags?: string[];
   /** Slug of a project this post belongs to, e.g. a devlog entry. */
   project?: string;
 
@@ -139,6 +148,7 @@ export function toSummary(entry: Entry): EntrySummary {
     date: entry.frontmatter.date,
     readingMinutes: entry.readingMinutes,
     track: entry.frontmatter.track,
+    tags: entry.frontmatter.tags,
     project: entry.frontmatter.project,
     draft: entry.frontmatter.draft,
     cover: entry.frontmatter.cover,

@@ -62,6 +62,8 @@ export interface EntrySummary {
   date: string;
   readingMinutes: number;
   track?: Track;
+  /** Form rather than subject — "Walkthrough", "Achievement guide". */
+  tags?: string[];
   project?: string;
   draft?: boolean;
   /** Cover art, for a post given a panel rather than a row. */
