@@ -131,19 +131,29 @@ export default async function ProjectPage({
         </div>
       </section>
 
-      <article className={`shell ${styles.body}`}>
-        <Mdx source={entry.body} />
-      </article>
-
       {fm.pieces && fm.pieces.length > 0 && (
         <section className={`shell ${styles.pieces}`}>
           <div className={styles.piecesHead}>
             <p className="eyebrow">In the collection</p>
-            <h2 className="section-title">All {fm.pieces.length}, live</h2>
+            {/* Counts the ones that actually have a demo. "All 24, live" was
+                true when every piece had one and stopped being true the moment
+                three command-line exercises joined the list. */}
+            <h2 className="section-title">
+              {(() => {
+                const live = fm.pieces.filter((p) => p.demo).length;
+                return live === fm.pieces.length
+                  ? `All ${live}, live`
+                  : `${fm.pieces.length}, ${live} of them live`;
+              })()}
+            </h2>
           </div>
           <ProjectPieces pieces={fm.pieces} />
         </section>
       )}
+
+      <article className={`shell ${styles.body}`}>
+        <Mdx source={entry.body} />
+      </article>
 
       {related.length > 0 && (
         <section className={`shell ${styles.related}`}>

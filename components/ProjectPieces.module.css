@@ -8,7 +8,9 @@
    separate objects each needing its own. */
 .stage {
   position: relative;
-  height: var(--card-h);
+  /* Room under the front card for the pile to show through. */
+  height: calc(var(--card-h) + 78px);
+  padding-bottom: 78px;
   perspective: 1400px;
   perspective-origin: 50% 40%;
   touch-action: pan-y;
@@ -27,7 +29,8 @@
 
 .card {
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto 0;
+  height: var(--card-h);
   display: flex;
   flex-direction: column;
   border-radius: 18px;
@@ -40,8 +43,16 @@
     0 2px 0 oklch(100% 0 0 / 0.04) inset;
 
   /* Pushed back in real depth rather than faked with scale, so the shrinking
-     and the softening come from the perspective above and stay consistent. */
-  transform: translate3d(0, calc(var(--depth) * 10px), calc(var(--depth) * -80px));
+     and the softening come from the perspective above and stay consistent.
+     Each card behind also drops, shifts and turns a little, which is what
+     makes it read as a pile someone put down rather than a single card with a
+     shadow — the offsets are what let you see the edges of the ones under it. */
+  transform: translate3d(
+      calc(var(--depth) * 9px),
+      calc(var(--depth) * 20px),
+      calc(var(--depth) * -70px)
+    )
+    rotateZ(calc(var(--depth) * -1.15deg));
   transform-origin: 50% 120%;
   transition:
     transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
