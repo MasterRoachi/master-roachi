@@ -242,16 +242,30 @@
   background: oklch(14% 0 0 / 0.6);
 }
 
-/* The rule between sections, matching the divider used everywhere else. */
+/* The rule between sections, carrying the same kanji the hero, the footer and
+   every other divider on the site carry — in the page's own colour.
+
+   The mark is a mask rather than an <img>, which is what lets it be tinted: a
+   PNG cannot take a colour, but a shape punched out of a coloured box can. */
 .prose hr {
   border: 0;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    color-mix(in oklch, var(--accent-a, var(--accent)) 34%, var(--line)),
-    transparent
-  );
+  height: 26px;
+  background:
+    linear-gradient(
+        to right,
+        transparent,
+        color-mix(in oklch, var(--accent-a, var(--accent)) 40%, var(--line)),
+        transparent
+      )
+      0 50% / 100% 1px no-repeat,
+    linear-gradient(var(--accent-a, var(--accent)), var(--accent-a, var(--accent)))
+      50% 50% / 22px 22px no-repeat;
+  -webkit-mask:
+    linear-gradient(#000, #000) 0 50% / 100% 1px no-repeat,
+    url('/kanji.webp') 50% 50% / 22px 22px no-repeat;
+  mask:
+    linear-gradient(#000, #000) 0 50% / 100% 1px no-repeat,
+    url('/kanji.webp') 50% 50% / 22px 22px no-repeat;
 }
 
 @media (prefers-reduced-motion: reduce) {

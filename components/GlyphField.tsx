@@ -60,7 +60,19 @@ const SCROLL_SHIFT = 44;
 /** How far the cursor pulls it, in CSS px. */
 const POINTER_SHIFT = 18;
 
-export default function GlyphField() {
+export default function GlyphField({
+  tint,
+}: {
+  /**
+   * Colour for the glyphs. Any canvas-parseable colour — not a CSS custom
+   * property, which canvas knows nothing about.
+   *
+   * Left off, they are white, which is what the Thoughts index wants. A single
+   * post passes its own track's colour instead, so an Orthodoxy piece drifts in
+   * Foundations gold and a games piece in Fun's green.
+   */
+  tint?: string;
+} = {}) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,6 +82,10 @@ export default function GlyphField() {
     const reduced = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
+
+    // Resolved once. Canvas cannot read a CSS custom property, so the colour
+    // arrives as a literal from the caller or falls back to white.
+    const ink = tint ?? '#ffffff';
 
     const canvas = document.createElement('canvas');
     canvas.className = styles.canvas;
@@ -182,7 +198,7 @@ export default function GlyphField() {
         ctx.translate(px, py);
         ctx.rotate(g.tilt);
         ctx.globalAlpha = g.alpha;
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = ink;
         // A real font stack, not a CSS custom property. Canvas parses this
         // string itself and knows nothing about var(), so an unresolvable
         // font is discarded silently and every glyph falls back to the
@@ -232,7 +248,7 @@ export default function GlyphField() {
       document.removeEventListener('visibilitychange', onVisibility);
       if (canvas.parentNode === host) host.removeChild(canvas);
     };
-  }, []);
+  }, [tint]);
 
   return <div ref={hostRef} className={styles.host} aria-hidden="true" />;
 }

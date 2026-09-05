@@ -70,7 +70,7 @@ export default async function PostPage({
       <ReadingProgress />
       {/* The same field Thoughts runs, so a post looks like it came from the
           page that lists it rather than from a plain document template. */}
-      <GlyphField />
+      <GlyphField tint={TRACK_COLOUR[track]} />
 
       <article className={`shell ${styles.entry} ${styles.body}`}>
         <Link href="/writing/" className={styles.back}>

@@ -1,0 +1,527 @@
+{
+  "appid": 409710,
+  "slug": "bioshock-remastered",
+  "fetchedAt": "2026-09-05T01:31:53.673Z",
+  "achievements": [
+    {
+      "key": "ACHIEVEMENT_7",
+      "title": "Completed Welcome to Rapture",
+      "description": "Successfully complete the Welcome To Rapture Level",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_7.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_20",
+      "title": "Defeated Dr. Steinman",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_20.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_22",
+      "title": "Defeated Peach Wilkins",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_22.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_55",
+      "title": "Defeated Atlas",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_55.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_24",
+      "title": "Restored the Forest",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_24.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_26",
+      "title": "Completed Cohen's Masterpiece",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_26.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_28",
+      "title": "Defeated Andrew Ryan",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_28.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_103",
+      "title": "Weapon Specialist",
+      "description": "Acquire all upgrades for all weapons",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_103.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_97",
+      "title": "Upgraded a Weapon",
+      "description": "Acquire at least one weapon upgrade",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_97.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_111",
+      "title": "Fully Researched a Bouncer",
+      "description": "Fully research the Bouncer",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_111.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_114",
+      "title": "Prolific Photographer",
+      "description": "Take at least one photo in every research group",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_114.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_118",
+      "title": "One Successful Hack",
+      "description": "Perform at least one successful hack",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_118.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_104",
+      "title": "Fully Researched a Thuggish Splicer",
+      "description": "Fully research the Thuggish Splicer",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_104.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_106",
+      "title": "Fully Researched a Spider Splicer",
+      "description": "Fully research the Spider Splicer",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_106.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_107",
+      "title": "Fully Researched a Houdini Splicer",
+      "description": "Fully research the Houdini Splicer",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_107.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_105",
+      "title": "Fully Researched a Leadhead Splicer",
+      "description": "Fully research the Leadhead Splicer",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_105.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_108",
+      "title": "Fully Researched a Nitro Splicer",
+      "description": "Fully research the Nitro Splicer",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_108.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_110",
+      "title": "Fully Researched a Rosie",
+      "description": "Fully research the Rosie",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_110.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_113",
+      "title": "Fully Researched a Little Sister",
+      "description": "Fully research the Little Sister",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_113.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_116",
+      "title": "Quality Research Photo",
+      "description": "Take a Research Photo of the highest grade",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_116.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_119",
+      "title": "Hacked a Security Bot",
+      "description": "Successfully hack a security bot",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_119.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_121",
+      "title": "Hacked a Turret",
+      "description": "Successfully hack a Turret",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_121.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_120",
+      "title": "Hacked a Security Camera",
+      "description": "Successfully hack a Security Camera",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_120.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_122",
+      "title": "Hacked a Vending Machine",
+      "description": "Successfully hack a Vending Machine",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_122.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_123",
+      "title": "Hacked a Safe",
+      "description": "Successfully hack a safe",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_123.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_129",
+      "title": "Ammo Inventor",
+      "description": "Invent all possible ammunication types",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_129.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_133",
+      "title": "Seriously Good at This",
+      "description": "Complete the game on the hardest difficulty setting",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_133.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_125",
+      "title": "Basic Inventer",
+      "description": "Invent at least one item",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_125.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_30",
+      "title": "Broke Fontaine's Mind Control",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_30.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_96",
+      "title": "Bought One Slot",
+      "description": "Purchase a Plasmid Slot or Tonic Slot in any track",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_96.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_117",
+      "title": "Researched a Splicer",
+      "description": "Take at least one Research Photo of a Splicer",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_117.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_134",
+      "title": "Dealt with every Little Sister",
+      "description": "Either Harvest or Rescue every Little Sister in the game",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_134.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_72",
+      "title": "Maxed One Track",
+      "description": "Purchased every slot in one of the Plasmid or Tonic tracks",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_72.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_94",
+      "title": "Maxed All Tracks",
+      "description": "Purchase every slot in all four Plasmid and Tonic tracks",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_94.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_98",
+      "title": "One Fully Upgraded Weapon",
+      "description": "Fully upgrade one weapon",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_98.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_99",
+      "title": "Two Fully Upgraded Weapons",
+      "description": "Fully upgrade two weapons",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_99.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_100",
+      "title": "Three Fully Upgraded Weapons",
+      "description": "Fully upgrade three weapons",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_100.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_101",
+      "title": "Four Fully Upgraded Weapons",
+      "description": "Fully upgrade four weapons",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_101.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_102",
+      "title": "Five Fully Upgraded Weapons",
+      "description": "Fully upgrade five weapons",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_102.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_135",
+      "title": "Became a Big Daddy",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_135.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_136",
+      "title": "Lucky Winner",
+      "description": "Hit the jackpot at a slot machine",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_136.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_137",
+      "title": "Irony",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_137.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_138",
+      "title": "Found Cohen's Room",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_138.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_139",
+      "title": "Toaster in the Tub",
+      "description": "Shock an enemy in the water",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_139.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_132",
+      "title": "Historian",
+      "description": "Find every audio diary",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_132.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_124",
+      "title": "Skilled Hacker",
+      "description": "Successfully complete 50 hacks",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_124.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_130",
+      "title": "Little Sister Savior",
+      "description": "Complete the game without harvesting any Little Sisters",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_130.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_128",
+      "title": "Avid Inventor",
+      "description": "Successfully invent at least 100 items",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_128.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_131",
+      "title": "Tonic Collector",
+      "description": "Collect or Invent 53 Tonics in the Physical, Engineering and Combat tracks",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_131.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_115",
+      "title": "Research PhD",
+      "description": "Max out all possible research",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_115.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_141",
+      "title": "Brass Balls",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_141.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_142",
+      "title": "I Chose the Impossible",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_142.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_143",
+      "title": "“The ‘I’ in Team” - Rescuer",
+      "description": "Rescued the Little Sister in “The ‘I’ in Team”",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_143.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_144",
+      "title": "“The ‘I’ in Team” – Expert",
+      "description": "Rescued the Little Sister in “The ‘I’ in Team” in under 3:00",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_144.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_145",
+      "title": "“The ‘I’ in Team” – Collector",
+      "description": "Found all collectable Roses in “The ‘I’ in Team”",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_145.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_146",
+      "title": "“The ‘I’ in Team” – Pacifist",
+      "description": "Rescued the Little Sister in “The ‘I’ in Team” without destroying any Machine Gun Turrets",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_146.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_147",
+      "title": "\"A Shocking Turn of Events\" - Rescuer",
+      "description": "Rescued the Little Sister in “A Shocking Turn of Events”",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_147.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_148",
+      "title": "“A Shocking Turn of Events” – Expert",
+      "description": "The player has rescued the Little Sister in “A Shocking Turn of Events” in under 4:00",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_148.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_149",
+      "title": "“A Shocking Turn of Events” – Collector",
+      "description": "Found all collectable Roses in “A Shocking Turn of Events”",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_149.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_150",
+      "title": "“A Shocking Turn of Events” – Master Electrician",
+      "description": "Charged up the Ferris Wheel 9 different times in “A Shocking Turn of Events”",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_150.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_151",
+      "title": "“Worlds of Hurt” - Rescuer",
+      "description": "Rescued the Little Sister in “Worlds of Hurt”",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_151.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_152",
+      "title": "“Worlds of Hurt” – Expert",
+      "description": "Rescued the Little Sister in “Worlds of Hurt” in under 15:00, on Medium or higher difficulty",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_152.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_153",
+      "title": "“Worlds of Hurt” – Collector",
+      "description": "Found all collectable Roses in “Worlds of Hurt”",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_153.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_154",
+      "title": "“Worlds of Hurt” – Tough Guy",
+      "description": "Rescued the Little Sister in “Worlds of Hurt” using only plasmids, tonics, the wrench, and the research camera, on Medium or higher difficulty",
+      "hidden": false,
+      "icon": "/achievements/409710/ACHIEVEMENT_154.jpg",
+      "unlocked": true
+    },
+    {
+      "key": "ACHIEVEMENT_200",
+      "title": "A Man Chooses",
+      "description": null,
+      "hidden": true,
+      "icon": "/achievements/409710/ACHIEVEMENT_200.jpg",
+      "unlocked": true
+    }
+  ]
+}
