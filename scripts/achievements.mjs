@@ -20,6 +20,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { writeSnapshot } from './snapshot.mjs';
 
 /** Games with an achievement grid on the site. */
 const APPS = [
@@ -101,14 +102,12 @@ for (const { appid, slug } of APPS) {
       });
     }
 
-    fs.writeFileSync(
-      path.join(OUT, `${slug}.json`),
-      JSON.stringify(
-        { appid, slug, fetchedAt: new Date().toISOString(), achievements: out },
-        null,
-        2,
-      ) + '\n',
-    );
+    writeSnapshot(path.join(OUT, `${slug}.json`), {
+      appid,
+      slug,
+      fetchedAt: new Date().toISOString(),
+      achievements: out,
+    });
 
     const got = out.filter((a) => a.unlocked).length;
     console.log(

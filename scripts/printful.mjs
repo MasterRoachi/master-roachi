@@ -19,8 +19,8 @@
 // A missing token, an unreachable API or an empty store all leave the
 // committed data/store.json alone and let the build continue.
 
-import fs from 'node:fs';
 import path from 'node:path';
+import { writeSnapshot } from './snapshot.mjs';
 
 const OUT = path.join(process.cwd(), 'data', 'store.json');
 const TOKEN = process.env.PRINTFUL_TOKEN;
@@ -107,9 +107,30 @@ try {
     products: shaped,
   };
 
-  fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(OUT, JSON.stringify(payload, null, 2) + '\n');
-  console.log(`printful: wrote ${shaped.length} products`);
+  // store-art.mjs runs straight after this and enriches the very same file,
+  // hanging `art`, `print` and `fabric` off each product. None of that comes
+  // from Printful, so comparing the whole object means the catalogue never
+  // matches what is on disk and this rewrites on every single build.
+  //
+  // Rather than name store-art's fields here and have this quietly start
+  // churning again the day it adds a fourth, each product is compared only on
+  // the keys this script sets — which are fixed just above, so a value that
+  // genuinely moves is still caught.
+  const ours = Object.keys(shaped[0] ?? {});
+  const wrote = writeSnapshot(OUT, payload, {
+    compare: (snap) => ({
+      ...snap,
+      products: snap.products?.map((p) =>
+        Object.fromEntries(ours.map((k) => [k, p[k]])),
+      ),
+    }),
+  });
+
+  console.log(
+    wrote
+      ? `printful: wrote ${shaped.length} products`
+      : `printful: ${shaped.length} products, unchanged since the last run`,
+  );
 } catch (err) {
   bail(`fetch failed (${err.message})`);
 }

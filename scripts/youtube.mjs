@@ -21,6 +21,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { writeSnapshot } from './snapshot.mjs';
 
 const OUT = path.join(process.cwd(), 'data', 'videos.json');
 
@@ -146,12 +147,10 @@ try {
     bail('every playlist came back empty');
   }
 
-  fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(
-    OUT,
-    JSON.stringify({ fetchedAt: new Date().toISOString(), tracks: byTrack }, null, 2) +
-      '\n',
-  );
+  writeSnapshot(OUT, {
+    fetchedAt: new Date().toISOString(),
+    tracks: byTrack,
+  });
   console.log(`youtube: wrote ${tracks.length} playlists`);
 } catch (err) {
   bail(`fetch failed (${err.message})`);

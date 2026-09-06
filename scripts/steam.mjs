@@ -24,6 +24,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { writeSnapshot } from './snapshot.mjs';
 
 const OUT = path.join(process.cwd(), 'data', 'steam.json');
 const KEY = process.env.STEAM_API_KEY;
@@ -306,8 +307,9 @@ try {
     achievementCache: cache,
   };
 
-  fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(OUT, JSON.stringify(payload, null, 2) + '\n');
+  if (!writeSnapshot(OUT, payload)) {
+    console.log('steam: unchanged since the last run');
+  }
   console.log(
     `steam: current = ${shaped[0]?.title ?? 'nothing'}, ${perfect.length} perfect runs`,
   );

@@ -14,8 +14,8 @@
 // A missing key, an unreachable API or an empty profile all leave the
 // committed data/retro.json alone and let the build continue.
 
-import fs from 'node:fs';
 import path from 'node:path';
+import { writeSnapshot } from './snapshot.mjs';
 
 const OUT = path.join(process.cwd(), 'data', 'retro.json');
 const KEY = process.env.RETRO_API_KEY;
@@ -113,8 +113,9 @@ try {
     perfect,
   };
 
-  fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(OUT, JSON.stringify(payload, null, 2) + '\n');
+  if (!writeSnapshot(OUT, payload)) {
+    console.log('retro: unchanged since the last run');
+  }
   console.log(
     `retro: ${all.length} games tracked, ${perfect.length} perfect`,
   );
