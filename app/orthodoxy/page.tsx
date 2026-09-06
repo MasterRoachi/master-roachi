@@ -9,6 +9,7 @@ import { getWriting, toSummary } from '@/lib/content';
 import { orthodoxWork, orthodoxReading } from '@/lib/pursuits';
 import { getVideos } from '@/lib/videos';
 import CyclingQuote from '@/components/CyclingQuote';
+import ComingSoon from '@/components/ComingSoon';
 import { saintQuotes } from '@/lib/quotes';
 import styles from './orthodoxy.module.css';
 
@@ -68,7 +69,7 @@ export default function OrthodoxyPage() {
       </section>
 
       <div className={`shell ${styles.body}`}>
-        {roadIn && (
+        {roadIn ? (
           <section className={styles.section}>
             {/* Not a PostCard. This is the piece a stranger should read first,
                 and rendered as the same small row as everything else it was
@@ -79,6 +80,24 @@ export default function OrthodoxyPage() {
               <p className={styles.featureBody}>{roadIn.summary}</p>
               <span className={styles.featureCta}>Read it →</span>
             </Link>
+          </section>
+        ) : (
+          /* The lead is a draft, and drafts are filtered out of production —
+             so this page lost its opening entirely and said nothing about why.
+             A page that is waiting should say it is waiting; the alternative
+             is one that looks abandoned. */
+          <section className={styles.section}>
+            <ComingSoon title="The writing is still being written">
+              <p>
+                The account of how I got here, why the four doctrines that
+                broke first broke in that order, and what it cost. Written and
+                not published — it is the piece I least want to get wrong.
+              </p>
+              <p>
+                In the meantime the shelf below is what I am actually reading,
+                and it is the honest version of this page.
+              </p>
+            </ComingSoon>
           </section>
         )}
 
