@@ -228,14 +228,28 @@ a.product:hover .art img {
   transform: scale(1.03);
 }
 
+/* A card with no mockup does not reserve a square for one. The 1:1 box was
+   sized for a garment photograph; with nothing in it, it was a screenful of
+   almost-invisible stripes on a phone. */
+.art:has(.noArt) {
+  aspect-ratio: 16 / 9;
+}
+
 .noArt {
-  display: block;
+  display: grid;
+  place-items: center;
   height: 100%;
   background: repeating-linear-gradient(
     45deg,
     oklch(20% 0.02 340 / 0.5) 0 10px,
     transparent 10px 20px
   );
+}
+
+.noArt img {
+  width: 64px;
+  height: auto;
+  opacity: 0.3;
 }
 
 /* --- product copy ------------------------------------------------------- */

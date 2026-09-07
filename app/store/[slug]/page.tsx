@@ -18,6 +18,8 @@ import {
   isSoldOut,
   garmentLabel,
   blurbOf,
+  showsShirtModel,
+  hasArtwork,
   type StoreProduct,
 } from '@/lib/store';
 import { site } from '@/lib/site';
@@ -89,6 +91,7 @@ export default async function ProductPage({
   const href = buyUrl(product);
   const spec = product.garment?.spec ?? [];
   const blurb = blurbOf(product);
+  const turnable = showsShirtModel(product);
 
   return (
     <div
@@ -107,13 +110,17 @@ export default async function ProductPage({
           ← {site.store.name}
         </Link>
 
-        <div className={styles.top}>
+        {/* With no mockup and no model there is nothing to put in the stage,
+            and an empty 4:5 box beside the copy looks like a failed image
+            rather than a product without a photograph yet. */}
+        <div className={styles.top} data-bare={!hasArtwork(product) || undefined}>
+          {hasArtwork(product) && (
           <div className={styles.stageCol}>
             <div className={styles.stage}>
-              {/* Same arrangement as the index feature: the flat cut-out is
-                  the floor, and the turnable one fades in over it where WebGL
-                  is available and motion is allowed. */}
-              {product.art || product.thumbnail ? (
+              {/* Same arrangement as the index feature: the flat mockup is the
+                  floor, and the turnable one fades in over it where WebGL is
+                  available and motion is allowed. */}
+              {hasArtwork(product) ? (
                 <img
                   className={styles.stageFlat}
                   src={product.art ?? product.thumbnail ?? undefined}
@@ -122,16 +129,21 @@ export default async function ProductPage({
                   decoding="async"
                 />
               ) : null}
-              <ShirtViewerMount
-                print={product.print}
-                fabric={product.fabric ?? undefined}
-                alt={`${product.name}, which can be turned`}
-              />
+              {/* Only where the model is this product. A poster is not a
+                  t-shirt and should not be shown as one. */}
+              {turnable && (
+                <ShirtViewerMount
+                  print={product.print}
+                  fabric={product.fabric ?? undefined}
+                  alt={`${product.name}, which can be turned`}
+                />
+              )}
             </div>
             {/* Below the garment, not over it — the shirt fills its stage to
                 the edges and an overlaid caption lands on the hem. */}
-            <p className={styles.turn}>Drag it to turn it.</p>
+            {turnable && <p className={styles.turn}>Drag it to turn it.</p>}
           </div>
+          )}
 
           <div className={styles.detail}>
             <p className="eyebrow">{site.store.name}</p>
@@ -182,8 +194,9 @@ export default async function ProductPage({
                 {/* The store has no checkout. Saying so here is better than a
                     button that goes nowhere, and better than silence. */}
                 <p className={styles.notYetWhy}>
-                  Payment is still being set up. The design is finished and the
-                  shirt is real — there is just nowhere to take your money yet.
+                  Payment is still being set up. The design is finished and
+                  this is a real product — there is just nowhere to take your
+                  money yet.
                 </p>
               </div>
             )}
@@ -239,21 +252,24 @@ export default async function ProductPage({
           <h2 className="section-title">Printed when you order it</h2>
           <div className={styles.prose}>
             <p>
-              Nothing here sits in a box in a garage. Each shirt is printed and
+              Nothing here sits in a box in a garage. Each one is printed and
               shipped by Printful when it is ordered, which is why there is no
               stock to run out of and no minimum order to hit before a design
               is worth making.
             </p>
             <p>
-              It also means a shirt takes longer to arrive than one already on a
-              shelf somewhere, and that returns are handled case by case rather
-              than by a policy page written for a warehouse.
+              It also means it takes longer to arrive than something already on
+              a shelf somewhere, and that returns are handled case by case
+              rather than by a policy page written for a warehouse.
             </p>
           </div>
         </section>
 
-        {/* Required by the model's licence, not optional politeness.
+        {/* Required by the model's licence, not optional politeness — and
+            only where the model is actually shown. Crediting it on a poster's
+            page was crediting work the page did not use.
             CC BY 4.0 — see public/store/tshirt-license.txt. */}
+        {turnable && (
         <p className={styles.credit}>
           Shirt model{' '}
           <a
@@ -281,6 +297,7 @@ export default async function ProductPage({
           </a>
           .
         </p>
+        )}
       </div>
     </div>
   );

@@ -162,35 +162,63 @@ if (fs.existsSync(STORE)) {
     // from. Falls back to nothing rather than fetching the remote thumbnail:
     // a build should not need the network to produce a card.
     const art = product.art ? path.join('public', product.art) : null;
-    if (!art || !fs.existsSync(art)) {
-      console.log(`og: ${slug} has no local mockup — card skipped`);
-      continue;
-    }
+    const hasArt = Boolean(art && fs.existsSync(art));
 
-    const garment = await sharp(art)
-      .resize({ height: 500, fit: 'inside' })
-      .toBuffer();
+    // A product with no cut-out still gets a card. Skipping it left the page
+    // pointing og:image at a file that was never written, so the preview was
+    // a 404 rather than a fallback — and a poster, or a product synced before
+    // store-art has run, has no mockup to cut.
+    const garment = hasArt
+      ? await sharp(art).resize({ height: 500, fit: 'inside' }).toBuffer()
+      : await sharp(MARK).resize(130, 130, { fit: 'inside' }).toBuffer();
     const { width: gw } = await sharp(garment).metadata();
 
     const price = priceRange(product);
-    const left = 120 + (gw ?? 0) + 80;
+    const left = hasArt ? 120 + (gw ?? 0) + 80 : 120;
+
+    // Names wrap and step down. "Kame House Crest — Turtle Hermit Training
+    // Academy Heavyweight Tee" is a plausible product name and at a fixed 76px
+    // on one line it ran clean off the card.
+    const room = OG_W - left - 80;
+    const nameSize = product.name.length <= 22 ? 74 : product.name.length <= 44 ? 58 : 46;
+    const nameLines = wrap(product.name, Math.floor(room / (nameSize * 0.52)), 3);
+    const nameLead = Math.round(nameSize * 1.14);
+    // Grown downward from a fixed top, so the block stays beside the garment
+    // whether it is one line or three.
+    const nameTop = 300;
 
     const label = Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}">
   <style>
     .eyebrow { font: 700 26px system-ui, -apple-system, "Segoe UI", sans-serif;
                fill: #e0509f; letter-spacing: 4px; }
-    .name { font: 800 76px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .name { font: 800 ${nameSize}px system-ui, -apple-system, "Segoe UI", sans-serif;
             fill: #f7f7f5; letter-spacing: -2px; }
     .price { font: 700 40px system-ui, -apple-system, "Segoe UI", sans-serif;
              fill: #e0509f; }
     .foot { font: 600 26px system-ui, -apple-system, "Segoe UI", sans-serif;
             fill: #8b8b8f; }
   </style>
-  <text class="eyebrow" x="${left}" y="248">FABLED THREADS</text>
-  <text class="name" x="${left}" y="336">${esc(product.name)}</text>
-  ${price ? `<text class="price" x="${left}" y="404">${esc(price)}</text>` : ''}
-  <text class="foot" x="${left}" y="470">masterroachi.com</text>
+  <!-- Cleared by more than the eyebrow's own height: the title's cap top sits
+       about 0.72 of its size above its baseline, so 52px put them on top of
+       each other at 74px. -->
+  <text class="eyebrow" x="${left}" y="${nameTop - Math.round(nameSize * 0.72) - 26}">FABLED THREADS</text>
+  ${nameLines
+    .map(
+      (l, i) =>
+        `<text class="name" x="${left}" y="${nameTop + i * nameLead}">${esc(l)}</text>`,
+    )
+    .join('\n  ')}
+  ${
+    price
+      ? `<text class="price" x="${left}" y="${
+          nameTop + (nameLines.length - 1) * nameLead + 66
+        }">${esc(price)}</text>`
+      : ''
+  }
+  <text class="foot" x="${left}" y="${
+    nameTop + (nameLines.length - 1) * nameLead + (price ? 128 : 66)
+  }">masterroachi.com</text>
 </svg>`);
 
     const out = path.join(OG_DIR, `${slug}.png`);
@@ -198,7 +226,11 @@ if (fs.existsSync(STORE)) {
       create: { width: OG_W, height: OG_H, channels: 4, background: GROUND },
     })
       .composite([
-        { input: garment, left: 120, top: Math.round((OG_H - 500) / 2) },
+        hasArt
+          ? { input: garment, left: 120, top: Math.round((OG_H - 500) / 2) }
+          : // No mockup: the mark sits above the text rather than beside it,
+            // since there is nothing to stand next to.
+            { input: garment, left: 120, top: 66 },
         { input: label, left: 0, top: 0 },
       ])
       .png()

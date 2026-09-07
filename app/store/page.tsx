@@ -14,6 +14,7 @@ import {
   formatPrice,
   categoryOf,
   productPath,
+  showsShirtModel,
   money,
   sizesOf,
   sizeRun,
@@ -104,11 +105,15 @@ export default function StorePage() {
                   decoding="async"
                 />
               ) : null}
-              <ShirtViewerMount
-                print={lead.print}
-                fabric={lead.fabric ?? undefined}
-                alt={`${lead.name}, which can be turned`}
-              />
+              {/* Only when the model is this product — the newest thing on the
+                  rail will not always be a t-shirt. */}
+              {showsShirtModel(lead) && (
+                <ShirtViewerMount
+                  print={lead.print}
+                  fabric={lead.fabric ?? undefined}
+                  alt={`${lead.name}, which can be turned`}
+                />
+              )}
             </div>
 
             <div className={styles.featureBody}>
@@ -139,9 +144,13 @@ export default function StorePage() {
                 <p className={styles.garment}>{garmentLabel(lead)}</p>
               )}
 
-              <p className={styles.turn}>Drag it to turn it.</p>
-              {/* Required by the model's licence, not optional politeness.
-                  CC BY 4.0 — see public/store/tshirt-license.txt. */}
+              {showsShirtModel(lead) && (
+                <p className={styles.turn}>Drag it to turn it.</p>
+              )}
+              {/* Required by the model's licence, not optional politeness —
+                  and only where the model is shown. CC BY 4.0, see
+                  public/store/tshirt-license.txt. */}
+              {showsShirtModel(lead) && (
               <p className={styles.credit}>
                 Shirt model{' '}
                 <a
@@ -169,12 +178,15 @@ export default function StorePage() {
                 </a>
                 .
               </p>
+              )}
               <div className={styles.actions}>
                 {/* The product page is where the detail lives — size guide,
                     what the blank actually is, why it cannot be bought yet —
                     so it is offered whether or not there is a Buy link. */}
                 <Link href={productPath(lead)} className={styles.buyButton}>
-                  See the shirt →
+                  {/* Not "see the shirt" — the newest thing on the rail is
+                      whatever was made last, and it will not always be one. */}
+                  See it →
                 </Link>
                 {isSoldOut(lead) ? (
                   <span className={styles.pending}>Sold out</span>
@@ -236,7 +248,14 @@ export default function StorePage() {
                           decoding="async"
                         />
                       ) : (
-                        <span className={styles.noArt} aria-hidden="true" />
+                        /* No mockup cut for this one yet. A shorter band with
+                           the mark in it, rather than a square of near-black
+                           diagonal stripes — which is what the invented
+                           placeholders used to look like, and read as a
+                           product that had failed to load. */
+                        <span className={styles.noArt} aria-hidden="true">
+                          <img src="/logo-mark-lg.webp" alt="" loading="lazy" />
+                        </span>
                       )}
                     </span>
                     <span className={styles.detail}>
