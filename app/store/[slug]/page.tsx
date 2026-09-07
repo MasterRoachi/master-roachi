@@ -6,6 +6,7 @@ import HalftoneField from '@/components/HalftoneField';
 import ShirtViewerMount from '@/components/ShirtViewerMount';
 import Swatches from '@/components/Swatches';
 import SizeTable from '@/components/SizeTable';
+import ModelCredit from '@/components/ModelCredit';
 import {
   getStoreProducts,
   findProduct,
@@ -18,10 +19,10 @@ import {
   isSoldOut,
   garmentLabel,
   blurbOf,
-  showsShirtModel,
   hasArtwork,
   type StoreProduct,
 } from '@/lib/store';
+import { modelFor } from '@/lib/models';
 import { site } from '@/lib/site';
 import styles from './product.module.css';
 
@@ -91,7 +92,8 @@ export default async function ProductPage({
   const href = buyUrl(product);
   const spec = product.garment?.spec ?? [];
   const blurb = blurbOf(product);
-  const turnable = showsShirtModel(product);
+  // Which 3D garment stands for this product, if any.
+  const model = modelFor(product);
 
   return (
     <div
@@ -131,8 +133,9 @@ export default async function ProductPage({
               ) : null}
               {/* Only where the model is this product. A poster is not a
                   t-shirt and should not be shown as one. */}
-              {turnable && (
+              {model && (
                 <ShirtViewerMount
+                  model={model.src}
                   print={product.print}
                   fabric={product.fabric ?? undefined}
                   alt={`${product.name}, which can be turned`}
@@ -141,7 +144,7 @@ export default async function ProductPage({
             </div>
             {/* Below the garment, not over it — the shirt fills its stage to
                 the edges and an overlaid caption lands on the hem. */}
-            {turnable && <p className={styles.turn}>Drag it to turn it.</p>}
+            {model && <p className={styles.turn}>Drag it to turn it.</p>}
           </div>
           )}
 
@@ -269,35 +272,7 @@ export default async function ProductPage({
             only where the model is actually shown. Crediting it on a poster's
             page was crediting work the page did not use.
             CC BY 4.0 — see public/store/tshirt-license.txt. */}
-        {turnable && (
-        <p className={styles.credit}>
-          Shirt model{' '}
-          <a
-            href="https://sketchfab.com/3d-models/tshirt-5a21282b2e454d1696547148f617d3d0"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Tshirt
-          </a>{' '}
-          by{' '}
-          <a
-            href="https://sketchfab.com/Tabbuso"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Tabbuso
-          </a>
-          , licensed{' '}
-          <a
-            href="http://creativecommons.org/licenses/by/4.0/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            CC BY 4.0
-          </a>
-          .
-        </p>
-        )}
+        {model && <ModelCredit model={model} className={styles.credit} />}
       </div>
     </div>
   );

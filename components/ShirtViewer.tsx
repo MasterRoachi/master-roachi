@@ -61,7 +61,13 @@ const LIMIT = Math.PI;
 /** How far the idle drift swings. */
 const DRIFT = 0.34;
 
-const MODEL_SRC = '/store/tshirt.glb';
+/**
+ * The garment, when the caller does not name one.
+ *
+ * Kept as a default rather than required so an existing call site cannot end
+ * up rendering nothing; which model a product gets is decided in lib/models.ts.
+ */
+const DEFAULT_MODEL = '/store/tshirt.glb';
 
 export interface PrintPlacement {
   src: string;
@@ -76,11 +82,14 @@ export default function ShirtViewer({
   print,
   fabric = '#2f2f2f',
   alt,
+  model = DEFAULT_MODEL,
 }: {
   print?: PrintPlacement | null;
   /** The garment colour, measured off the mockup. */
   fabric?: string;
   alt?: string;
+  /** Which .glb to draw. See lib/models.ts. */
+  model?: string;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
 
@@ -145,7 +154,7 @@ export default function ShirtViewer({
     };
 
     new GLTFLoader().load(
-      MODEL_SRC,
+      model,
       (gltf) => {
         if (disposed) return;
 

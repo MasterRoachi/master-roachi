@@ -7,6 +7,7 @@ import ShirtViewerMount from '@/components/ShirtViewerMount';
 import PageHeader from '@/components/PageHeader';
 import CyclingQuote from '@/components/CyclingQuote';
 import Swatches from '@/components/Swatches';
+import ModelCredit from '@/components/ModelCredit';
 import { quotes } from '@/lib/quotes';
 import {
   getStore,
@@ -14,7 +15,6 @@ import {
   formatPrice,
   categoryOf,
   productPath,
-  showsShirtModel,
   money,
   sizesOf,
   sizeRun,
@@ -23,6 +23,7 @@ import {
   garmentLabel,
   type StoreProduct,
 } from '@/lib/store';
+import { modelFor } from '@/lib/models';
 import { site } from '@/lib/site';
 import styles from './store.module.css';
 
@@ -53,6 +54,8 @@ export default function StorePage() {
 
   // The newest real product leads. Everything else falls onto its shelf.
   const lead = products[0] ?? null;
+  // The newest thing on the rail will not always be a t-shirt.
+  const leadModel = lead ? modelFor(lead) : null;
   const rest = products.filter((p) => p.id !== lead?.id);
 
   const shelves = site.store.categories
@@ -107,8 +110,9 @@ export default function StorePage() {
               ) : null}
               {/* Only when the model is this product — the newest thing on the
                   rail will not always be a t-shirt. */}
-              {showsShirtModel(lead) && (
+              {leadModel && (
                 <ShirtViewerMount
+                  model={leadModel.src}
                   print={lead.print}
                   fabric={lead.fabric ?? undefined}
                   alt={`${lead.name}, which can be turned`}
@@ -144,41 +148,11 @@ export default function StorePage() {
                 <p className={styles.garment}>{garmentLabel(lead)}</p>
               )}
 
-              {showsShirtModel(lead) && (
-                <p className={styles.turn}>Drag it to turn it.</p>
-              )}
+              {leadModel && <p className={styles.turn}>Drag it to turn it.</p>}
               {/* Required by the model's licence, not optional politeness —
                   and only where the model is shown. CC BY 4.0, see
                   public/store/tshirt-license.txt. */}
-              {showsShirtModel(lead) && (
-              <p className={styles.credit}>
-                Shirt model{' '}
-                <a
-                  href="https://sketchfab.com/3d-models/tshirt-5a21282b2e454d1696547148f617d3d0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Tshirt
-                </a>{' '}
-                by{' '}
-                <a
-                  href="https://sketchfab.com/Tabbuso"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Tabbuso
-                </a>
-                , licensed{' '}
-                <a
-                  href="http://creativecommons.org/licenses/by/4.0/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  CC BY 4.0
-                </a>
-                .
-              </p>
-              )}
+              {leadModel && <ModelCredit model={leadModel} className={styles.credit} />}
               <div className={styles.actions}>
                 {/* The product page is where the detail lives — size guide,
                     what the blank actually is, why it cannot be bought yet —

@@ -247,24 +247,6 @@ export function blurbOf(product: StoreProduct): string[] {
   return site.store.blurbs[String(product.id)] ?? [];
 }
 
-/**
- * Whether the turnable 3D garment actually stands for this product.
- *
- * The model is a t-shirt. Built with one product in the catalogue it was drawn
- * for everything, so a giclée print and a heavy blend hoodie both rendered as
- * a rotating tee — carrying, on a poster's page, the CC BY credit for a shirt
- * model the page was not using.
- *
- * Decided from Printful's own description of the blank rather than from the
- * product's name, which is ours to get wrong: "Unisex Staple T-Shirt" is a
- * tee, "Heavy Blend Hoodie" is not. A product with no catalogue entry does not
- * get the model, because nothing here knows what it is.
- */
-export function showsShirtModel(product: StoreProduct): boolean {
-  const title = product.garment?.title ?? '';
-  return Boolean(product.print) && /t-?\s?shirt|\btee\b/i.test(title);
-}
-
 /** Something to show in the stage, turnable or not. */
 export function hasArtwork(product: StoreProduct): boolean {
   return Boolean(product.art || product.thumbnail);
