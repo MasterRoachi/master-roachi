@@ -75,6 +75,70 @@ function fromPrice(variants) {
  */
 const catalogue = new Map();
 
+/**
+ * The spec bullets out of Printful's blurb.
+ *
+ * The description opens with marketing — "This t-shirt is everything you've
+ * dreamed of and more" — and then lists the things a buyer actually needs:
+ * fibre, weight, construction, where the blank is made. The bullets are kept
+ * and the sales pitch is not, because a page that says a shirt is everything
+ * you have dreamed of has told you nothing and reads like every other store.
+ *
+ * The disclaimer is pulled out separately. It warns that this fabric is
+ * slightly sheer, which is exactly the sort of thing a store is tempted to
+ * bury and a buyer would rather know before ordering.
+ */
+function readSpec(description) {
+  const text = String(description ?? '');
+  const spec = [];
+  let disclaimer = null;
+
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (line.startsWith('•')) {
+      spec.push(line.replace(/^•\s*/, '').trim());
+    } else if (/^disclaimer:/i.test(line)) {
+      disclaimer = line.replace(/^disclaimer:\s*/i, '').trim();
+    }
+  }
+
+  return { spec, disclaimer };
+}
+
+/**
+ * Garment measurements per size, laid flat.
+ *
+ * Printful publishes two tables: "measure_yourself" (measure a body) and
+ * "product_measure" (measure the garment). The second is the one that settles
+ * an argument about whether a size will fit something the buyer already owns,
+ * so it is the one kept.
+ *
+ * Stored in centimetres only. Inches are 2.54 of them and converting at render
+ * costs nothing, whereas fetching and shipping both tables doubles the data
+ * for arithmetic.
+ */
+function readSizeGuide(result) {
+  const table = (result?.size_tables ?? []).find(
+    (t) => t.type === 'product_measure',
+  );
+  if (!table) return null;
+
+  const measurements = (table.measurements ?? [])
+    .map((m) => ({
+      label: m.type_label ?? null,
+      values: (m.values ?? []).map((v) => ({
+        size: v.size,
+        // A single figure for length, a range for anything measured around.
+        value: v.value != null ? Number.parseFloat(v.value) : null,
+        min: v.min_value != null ? Number.parseFloat(v.min_value) : null,
+        max: v.max_value != null ? Number.parseFloat(v.max_value) : null,
+      })),
+    }))
+    .filter((m) => m.label && m.values.length > 0);
+
+  return measurements.length > 0 ? { unit: 'cm', measurements } : null;
+}
+
 async function blank(productId) {
   if (productId == null) return null;
   if (catalogue.has(productId)) return catalogue.get(productId);
@@ -83,12 +147,27 @@ async function blank(productId) {
   try {
     const res = await api(`/products/${productId}`);
     const r = res?.result ?? {};
+    const { spec, disclaimer } = readSpec(r.product?.description);
+
+    // The size guide is a second request and a nice-to-have, so it fails on
+    // its own without costing the rest of the catalogue entry.
+    let sizeGuide = null;
+    try {
+      const sizes = await api(`/products/${productId}/sizes?unit=cm`);
+      sizeGuide = readSizeGuide(sizes?.result);
+    } catch (err) {
+      console.log(`printful: no size guide for ${productId} (${err.message})`);
+    }
+
     info = {
       brand: r.product?.brand ?? null,
       model: r.product?.model ?? null,
       // "Unisex Staple T-Shirt | Bella + Canvas 3001" — the brand is repeated
       // after the pipe, and it is already its own field.
       title: (r.product?.title ?? '').split('|')[0].trim() || null,
+      spec,
+      disclaimer,
+      sizeGuide,
       colors: new Map(
         (r.variants ?? [])
           .filter((v) => v.color && v.color_code)
@@ -101,6 +180,28 @@ async function blank(productId) {
 
   catalogue.set(productId, info);
   return info;
+}
+
+/**
+ * The product's own address on this site.
+ *
+ * Built from the name rather than the Printful id, because /store/roachi-shirt/
+ * is a link someone can read and the id is not. Renaming a product therefore
+ * moves its page — acceptable for a catalogue this size, and the payment link
+ * map stays keyed on the id, which never changes.
+ */
+function slugify(name, taken) {
+  const base =
+    String(name)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'product';
+  if (!taken.has(base)) return base;
+  // Two products with the same name is not a reason to serve one of them at a
+  // path that silently belongs to the other.
+  let n = 2;
+  while (taken.has(`${base}-${n}`)) n += 1;
+  return `${base}-${n}`;
 }
 
 try {
@@ -126,6 +227,8 @@ try {
   if (products.length === 0) bail('store has no synced products yet');
 
   const shaped = [];
+  /** Slugs already handed out, so two products cannot claim one URL. */
+  const slugs = new Set();
   for (const p of products) {
     // Prices live on the variants, so each product needs its own request.
     const detail = await api(`/store/products/${p.id}`);
@@ -162,16 +265,25 @@ try {
       // The connected platform's own id, which is what a product URL is built
       // from when the storefront is Etsy, Shopify and so on.
       externalId: p.external_id ?? null,
+      slug: slugify(p.name, slugs),
       name: p.name,
       thumbnail: p.thumbnail_url ?? null,
       variantCount: p.variants ?? variants.length,
       from: fromPrice(variants),
       garment: base
-        ? { brand: base.brand, model: base.model, title: base.title }
+        ? {
+            brand: base.brand,
+            model: base.model,
+            title: base.title,
+            spec: base.spec ?? [],
+            disclaimer: base.disclaimer ?? null,
+          }
         : null,
+      sizeGuide: base?.sizeGuide ?? null,
       colors,
       variants: shapedVariants,
     });
+    slugs.add(shaped[shaped.length - 1].slug);
   }
 
   const payload = {

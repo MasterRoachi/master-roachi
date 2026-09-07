@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
 import HalftoneField from '@/components/HalftoneField';
 import ShirtIcon from '@/components/ShirtIcon';
@@ -12,6 +13,7 @@ import {
   buyUrl,
   formatPrice,
   categoryOf,
+  productPath,
   money,
   sizesOf,
   sizeRun,
@@ -167,20 +169,28 @@ export default function StorePage() {
                 </a>
                 .
               </p>
-              {isSoldOut(lead) ? (
-                <span className={styles.pending}>Sold out</span>
-              ) : buyUrl(lead) ? (
-                <a
-                  className={styles.buyButton}
-                  href={buyUrl(lead) as string}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Buy ↗
-                </a>
-              ) : (
-                <span className={styles.pending}>Not on sale yet</span>
-              )}
+              <div className={styles.actions}>
+                {/* The product page is where the detail lives — size guide,
+                    what the blank actually is, why it cannot be bought yet —
+                    so it is offered whether or not there is a Buy link. */}
+                <Link href={productPath(lead)} className={styles.buyButton}>
+                  See the shirt →
+                </Link>
+                {isSoldOut(lead) ? (
+                  <span className={styles.pending}>Sold out</span>
+                ) : buyUrl(lead) ? (
+                  <a
+                    className={styles.secondary}
+                    href={buyUrl(lead) as string}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Buy ↗
+                  </a>
+                ) : (
+                  <span className={styles.pending}>Not on sale yet</span>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -204,12 +214,19 @@ export default function StorePage() {
             </h2>
             <div className={styles.grid}>
               {items.map((product) => {
-                const href = buyUrl(product);
                 const sizes = sizesOf(product);
                 const soldOut = isSoldOut(product);
 
-                const inner = (
-                  <>
+                // Always the product page, never straight out to a payment
+                // link: a card is a thing to look at, and sending someone
+                // from a thumbnail to a checkout skips every question they
+                // have not asked yet.
+                return (
+                  <Link
+                    key={product.id}
+                    className={styles.product}
+                    href={productPath(product)}
+                  >
                     <span className={styles.art}>
                       {product.art || product.thumbnail ? (
                         <img
@@ -239,29 +256,11 @@ export default function StorePage() {
                       <Swatches colors={product.colors ?? []} compact />
                       {soldOut ? (
                         <span className={styles.pending}>Sold out</span>
-                      ) : href ? (
-                        <span className={styles.buy}>Buy ↗</span>
                       ) : (
-                        <span className={styles.pending}>Not on sale yet</span>
+                        <span className={styles.buy}>See it →</span>
                       )}
                     </span>
-                  </>
-                );
-
-                return href && !soldOut ? (
-                  <a
-                    key={product.id}
-                    className={styles.product}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {inner}
-                  </a>
-                ) : (
-                  <div key={product.id} className={styles.product}>
-                    {inner}
-                  </div>
+                  </Link>
                 );
               })}
             </div>

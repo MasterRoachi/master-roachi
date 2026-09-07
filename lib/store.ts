@@ -11,6 +11,26 @@ export interface Garment {
   brand: string | null;
   model: string | null;
   title: string | null;
+  /** Fibre, weight, construction — the bullets, without the sales pitch. */
+  spec?: string[];
+  /** Printful's own warning about the blank, kept rather than buried. */
+  disclaimer?: string | null;
+}
+
+/** One measured dimension across every size, in the guide's unit. */
+export interface Measurement {
+  label: string;
+  values: {
+    size: string;
+    value: number | null;
+    min: number | null;
+    max: number | null;
+  }[];
+}
+
+export interface SizeGuide {
+  unit: string;
+  measurements: Measurement[];
 }
 
 export interface ProductColor {
@@ -30,10 +50,14 @@ export interface ProductVariant {
 export interface StoreProduct {
   id: number;
   externalId: string | null;
+  /** This product's path segment on the site: /store/<slug>/. */
+  slug?: string;
   name: string;
   thumbnail: string | null;
   /** What it is printed on. Null when the catalogue lookup failed. */
   garment?: Garment | null;
+  /** Garment measurements per size, laid flat. */
+  sizeGuide?: SizeGuide | null;
   /** Distinct colourways, in the order they were synced. */
   colors?: ProductColor[];
   /** Every variant actually for sale. */
@@ -219,6 +243,28 @@ export function sizeRun(sizes: string[]): string {
 export function isSoldOut(product: StoreProduct): boolean {
   const variants = product.variants ?? [];
   return variants.length > 0 && variants.every((v) => !v.available);
+}
+
+/**
+ * A product's page on this site.
+ *
+ * Falls back to the Printful id for anything synced before slugs existed, so
+ * a stale data/store.json still routes rather than sending every product to
+ * /store/undefined/.
+ */
+export function productPath(product: StoreProduct): string {
+  return `/store/${product.slug ?? product.id}/`;
+}
+
+/** Every product that should have a page built for it. */
+export function getStoreProducts(): StoreProduct[] {
+  return getStore().products;
+}
+
+export function findProduct(slug: string): StoreProduct | null {
+  return (
+    getStoreProducts().find((p) => (p.slug ?? String(p.id)) === slug) ?? null
+  );
 }
 
 /** "Bella + Canvas 3001 · Unisex Staple T-Shirt", skipping whatever is absent. */

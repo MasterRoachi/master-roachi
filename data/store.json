@@ -1,10 +1,11 @@
 {
-  "fetchedAt": "2026-09-07T09:51:31.400Z",
+  "fetchedAt": "2026-09-07T10:08:21.766Z",
   "store": null,
   "products": [
     {
       "id": 464722916,
       "externalId": "6a993d1c71c041",
+      "slug": "roachi-shirt",
       "name": "Roachi Shirt",
       "thumbnail": "https://files.cdn.printful.com/files/264/264af3c70166c98158dc7477d5a909d1_preview.png",
       "variantCount": 9,
@@ -15,7 +16,139 @@
       "garment": {
         "brand": "Bella + Canvas",
         "model": "3001",
-        "title": "Unisex Staple T-Shirt"
+        "title": "Unisex Staple T-Shirt",
+        "spec": [
+          "100% combed and ring-spun cotton (Heather colors contain polyester)",
+          "Fabric weight: 4.2 oz./yd.² (142 g/m²)",
+          "Pre-shrunk fabric",
+          "Side-seamed construction",
+          "Shoulder-to-shoulder taping",
+          "Blank product sourced from Nicaragua, Mexico, Honduras, or the US"
+        ],
+        "disclaimer": "The fabric is slightly sheer and may appear see-through, especially in lighter colors or under certain lighting conditions."
+      },
+      "sizeGuide": {
+        "unit": "cm",
+        "measurements": [
+          {
+            "label": "Length",
+            "values": [
+              {
+                "size": "XS",
+                "value": 68.58,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "S",
+                "value": 71.12,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "M",
+                "value": 73.66,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "L",
+                "value": 76.2,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "XL",
+                "value": 78.74,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "2XL",
+                "value": 81.28,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "3XL",
+                "value": 83.82,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "4XL",
+                "value": 86.36,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "5XL",
+                "value": 88.9,
+                "min": null,
+                "max": null
+              }
+            ]
+          },
+          {
+            "label": "Width",
+            "values": [
+              {
+                "size": "XS",
+                "value": 41.91,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "S",
+                "value": 45.72,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "M",
+                "value": 50.8,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "L",
+                "value": 55.88,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "XL",
+                "value": 60.96,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "2XL",
+                "value": 66.04,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "3XL",
+                "value": 71.12,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "4XL",
+                "value": 76.2,
+                "min": null,
+                "max": null
+              },
+              {
+                "size": "5XL",
+                "value": 81.28,
+                "min": null,
+                "max": null
+              }
+            ]
+          }
+        ]
       },
       "colors": [
         {

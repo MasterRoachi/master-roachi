@@ -94,6 +94,39 @@
   color: var(--ink);
 }
 
+/* The product page link and the Buy link, side by side. They wrap rather than
+   shrink, because a pill with its label clipped reads as broken. */
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-top: 26px;
+}
+
+.actions .buyButton {
+  margin-top: 0;
+}
+
+.actions .pending {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Second action: present, but not competing with the primary pill. */
+.secondary {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--accent-a) 80%, var(--ink));
+  transition: color 0.18s ease;
+}
+
+.secondary:hover {
+  color: var(--ink);
+}
+
 .buyButton {
   display: inline-block;
   margin-top: 26px;

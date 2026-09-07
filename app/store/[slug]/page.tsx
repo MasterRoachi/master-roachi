@@ -1,0 +1,267 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { pageMeta } from '@/lib/seo';
+import HalftoneField from '@/components/HalftoneField';
+import ShirtViewerMount from '@/components/ShirtViewerMount';
+import Swatches from '@/components/Swatches';
+import SizeTable from '@/components/SizeTable';
+import {
+  getStoreProducts,
+  findProduct,
+  buyUrl,
+  formatPrice,
+  money,
+  sizesOf,
+  sizeRun,
+  priceLadder,
+  isSoldOut,
+  garmentLabel,
+  type StoreProduct,
+} from '@/lib/store';
+import { site } from '@/lib/site';
+import styles from './product.module.css';
+
+// The store's own colour, the same one the index and the project card carry.
+const ACCENT = 'oklch(72% 0.26 350)';
+const ACCENT_2 = 'oklch(80% 0.14 230)';
+
+export function generateStaticParams() {
+  return getStoreProducts().map((p) => ({ slug: p.slug ?? String(p.id) }));
+}
+
+function priceSummary(product: StoreProduct): string | null {
+  const bands = priceLadder(product);
+  if (bands.length === 0) return formatPrice(product.from);
+  const low = bands[0];
+  const high = bands[bands.length - 1];
+  return low.amount === high.amount
+    ? money(low.amount, low.currency)
+    : `${money(low.amount, low.currency)} – ${money(high.amount, high.currency)}`;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = findProduct(slug);
+  if (!product) return {};
+
+  const price = priceSummary(product);
+  const garment = garmentLabel(product);
+
+  return pageMeta({
+    path: `/store/${slug}/`,
+    title: product.name,
+    description: [
+      `${product.name} from ${site.store.name}.`,
+      garment,
+      price && `${price}.`,
+    ]
+      .filter(Boolean)
+      .join(' '),
+    // The cut-out mockup, which is a picture of the actual product rather
+    // than the site's default card.
+    image: product.art ?? product.thumbnail ?? undefined,
+  });
+}
+
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const product = findProduct(slug);
+  if (!product) notFound();
+
+  const sizes = sizesOf(product);
+  const ladder = priceLadder(product);
+  const soldOut = isSoldOut(product);
+  const href = buyUrl(product);
+  const spec = product.garment?.spec ?? [];
+
+  return (
+    <div
+      className={styles.page}
+      style={
+        {
+          '--accent-a': ACCENT,
+          '--accent-b': ACCENT_2,
+        } as React.CSSProperties
+      }
+    >
+      <HalftoneField />
+
+      <div className={`shell ${styles.body}`}>
+        <Link href="/store/" className={styles.back}>
+          ← {site.store.name}
+        </Link>
+
+        <div className={styles.top}>
+          <div className={styles.stageCol}>
+            <div className={styles.stage}>
+              {/* Same arrangement as the index feature: the flat cut-out is
+                  the floor, and the turnable one fades in over it where WebGL
+                  is available and motion is allowed. */}
+              {product.art || product.thumbnail ? (
+                <img
+                  className={styles.stageFlat}
+                  src={product.art ?? product.thumbnail ?? undefined}
+                  alt={product.name}
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : null}
+              <ShirtViewerMount
+                print={product.print}
+                fabric={product.fabric ?? undefined}
+                alt={`${product.name}, which can be turned`}
+              />
+            </div>
+            {/* Below the garment, not over it — the shirt fills its stage to
+                the edges and an overlaid caption lands on the hem. */}
+            <p className={styles.turn}>Drag it to turn it.</p>
+          </div>
+
+          <div className={styles.detail}>
+            <p className="eyebrow">{site.store.name}</p>
+            <h1 className={styles.name}>{product.name}</h1>
+
+            {priceSummary(product) && (
+              <p className={styles.priceLine}>{priceSummary(product)}</p>
+            )}
+
+            <Swatches colors={product.colors ?? []} />
+
+            {sizes.length > 0 && (
+              <p className={styles.sizes}>
+                <span className={styles.sizesLabel}>Sizes</span>
+                {sizes.map((s) => (
+                  <span key={s} className={styles.size}>
+                    {s}
+                  </span>
+                ))}
+              </p>
+            )}
+
+            {ladder.length > 1 && (
+              <dl className={styles.ladder}>
+                {ladder.map((band) => (
+                  <div key={band.sizes.join()} className={styles.band}>
+                    <dt>{sizeRun(band.sizes)}</dt>
+                    <dd>{money(band.amount, band.currency)}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            {soldOut ? (
+              <p className={styles.pending}>Sold out</p>
+            ) : href ? (
+              <a
+                className={styles.buyButton}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Buy ↗
+              </a>
+            ) : (
+              <div className={styles.notYet}>
+                <p className={styles.pending}>Not on sale yet</p>
+                {/* The store has no checkout. Saying so here is better than a
+                    button that goes nowhere, and better than silence. */}
+                <p className={styles.notYetWhy}>
+                  Payment is still being set up. The design is finished and the
+                  shirt is real — there is just nowhere to take your money yet.
+                </p>
+              </div>
+            )}
+
+            {garmentLabel(product) && (
+              <p className={styles.garment}>
+                Printed on {garmentLabel(product)}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {spec.length > 0 && (
+          <section className={styles.section}>
+            <p className="eyebrow">The blank</p>
+            <h2 className="section-title">What it is printed on</h2>
+            <ul className={styles.spec}>
+              {spec.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+            {product.garment?.disclaimer && (
+              <p className={styles.disclaimer}>
+                {product.garment.disclaimer}
+              </p>
+            )}
+          </section>
+        )}
+
+        {product.sizeGuide && sizes.length > 0 && (
+          <section className={styles.section}>
+            <p className="eyebrow">Fit</p>
+            <h2 className="section-title">Size guide</h2>
+            <SizeTable guide={product.sizeGuide} sizes={sizes} />
+          </section>
+        )}
+
+        <section className={styles.section}>
+          <p className="eyebrow">How this works</p>
+          <h2 className="section-title">Printed when you order it</h2>
+          <div className={styles.prose}>
+            <p>
+              Nothing here sits in a box in a garage. Each shirt is printed and
+              shipped by Printful when it is ordered, which is why there is no
+              stock to run out of and no minimum order to hit before a design
+              is worth making.
+            </p>
+            <p>
+              It also means a shirt takes longer to arrive than one already on a
+              shelf somewhere, and that returns are handled case by case rather
+              than by a policy page written for a warehouse.
+            </p>
+          </div>
+        </section>
+
+        {/* Required by the model's licence, not optional politeness.
+            CC BY 4.0 — see public/store/tshirt-license.txt. */}
+        <p className={styles.credit}>
+          Shirt model{' '}
+          <a
+            href="https://sketchfab.com/3d-models/tshirt-5a21282b2e454d1696547148f617d3d0"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Tshirt
+          </a>{' '}
+          by{' '}
+          <a
+            href="https://sketchfab.com/Tabbuso"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Tabbuso
+          </a>
+          , licensed{' '}
+          <a
+            href="http://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            CC BY 4.0
+          </a>
+          .
+        </p>
+      </div>
+    </div>
+  );
+}
