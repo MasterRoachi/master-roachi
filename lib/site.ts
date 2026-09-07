@@ -40,40 +40,38 @@ export const site = {
     paymentLinks: {} as Record<string, string>,
 
     /**
-     * Designs still being drawn, named so the page has something true to say
-     * while the rail is nearly empty.
-     *
-     * Empty is a supported state: the section simply does not appear, rather
-     * than promising work that does not exist.
-     */
-    coming: [] as string[],
-
-    /**
      * The order categories appear in. A product with no category of its own
      * falls into the first.
      */
     categories: ['Tees', 'Hoodies', 'Prints'] as string[],
 
     /**
-     * TEMPORARY — invented items, so the grid can be judged before there is a
-     * catalogue to judge. None of these exist and none can be bought: they
-     * carry no price link and are marked on the page as placeholders.
+     * Designs that exist as a plan rather than a product.
      *
-     * Delete this array and the page shows only what Printful actually
-     * returns. Nothing else depends on it.
+     * These used to be rendered as full product cards with invented prices and
+     * option counts, marked "Placeholder". Ten of them made up roughly three
+     * quarters of the page on a phone — each one a tall empty box of nearly
+     * invisible diagonal stripes — so a store with one real shirt read as a
+     * store where ten things had failed to load.
+     *
+     * Now they are a list, which is what they are. No price, because there is
+     * no price: quoting one for a design that does not exist is the sort of
+     * small lie the rest of this site is written to avoid.
+     *
+     * Empty is a supported state — the section simply does not appear.
      */
-    placeholders: [
-      { name: 'Turtle Hermit', category: 'Tees', from: 16, options: 9 },
-      { name: 'Saturday Morning', category: 'Tees', from: 16, options: 9 },
-      { name: 'Kame House Crest', category: 'Tees', from: 18, options: 7 },
-      { name: 'Late Night Rerun', category: 'Tees', from: 16, options: 9 },
-      { name: 'Study Well', category: 'Hoodies', from: 38, options: 6 },
-      { name: 'Coal Black Heavyweight', category: 'Hoodies', from: 42, options: 5 },
-      { name: 'Rest Plenty', category: 'Hoodies', from: 38, options: 6 },
-      { name: 'Terrath, Mapped', category: 'Prints', from: 24, options: 3 },
-      { name: 'The Twelve', category: 'Prints', from: 28, options: 3 },
-      { name: 'Shepherds Key Art', category: 'Prints', from: 24, options: 3 },
-    ] as { name: string; category: string; from: number; options: number }[],
+    planned: [
+      { name: 'Turtle Hermit', category: 'Tees' },
+      { name: 'Saturday Morning', category: 'Tees' },
+      { name: 'Kame House Crest', category: 'Tees' },
+      { name: 'Late Night Rerun', category: 'Tees' },
+      { name: 'Study Well', category: 'Hoodies' },
+      { name: 'Coal Black Heavyweight', category: 'Hoodies' },
+      { name: 'Rest Plenty', category: 'Hoodies' },
+      { name: 'Terrath, Mapped', category: 'Prints' },
+      { name: 'The Twelve', category: 'Prints' },
+      { name: 'Shepherds Key Art', category: 'Prints' },
+    ] as { name: string; category: string }[],
   },
 
   socials: {

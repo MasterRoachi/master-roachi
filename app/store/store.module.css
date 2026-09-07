@@ -257,21 +257,47 @@ a.product:hover .art img {
   color: var(--muted-2);
 }
 
-.placeholder {
-  display: inline-block;
-  margin-top: auto;
-  padding-top: 24px;
-  font-size: 0.68rem;
+/* --- the featured garment's real numbers -------------------------------- */
+
+.priceLine {
+  margin: 14px 0 0;
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted-2);
+  color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
 }
 
-/* Dashed and dimmed, so an invented item never passes for stock. */
-.product[data-placeholder] {
-  border-style: dashed;
-  opacity: 0.72;
+/* Sizes grouped by price. A table would be heavier furniture than five rows
+   deserve, and a definition list already means "term, value". */
+.ladder {
+  margin: 16px 0 0;
+  display: grid;
+  /* The size run column takes what it needs and no more, so the prices line
+     up against it rather than floating in the middle of the panel. */
+  grid-template-columns: auto auto;
+  justify-content: start;
+  gap: 4px 20px;
+  font-size: 0.88rem;
+}
+
+.band {
+  display: contents;
+}
+
+.band dt {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.band dd {
+  margin: 0;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.garment {
+  margin: 16px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted-2);
 }
 
 /* --- sections ----------------------------------------------------------- */
@@ -291,7 +317,28 @@ a.product:hover .art img {
 }
 
 
-.coming {
+/* --- designs that are still only a plan ---------------------------------- */
+
+.plannedGroups {
+  display: grid;
+  /* 260px, not 220: below that the pills are wider than their own column and
+     each name takes a line to itself, which reads as a stack of buttons
+     rather than a list. One full-width column wraps them properly. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: clamp(20px, 3vw, 40px);
+  margin-top: 24px;
+}
+
+.plannedHead {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--accent-a) 70%, var(--muted));
+}
+
+.planned {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -300,7 +347,7 @@ a.product:hover .art img {
   gap: 10px;
 }
 
-.coming li {
+.planned li {
   border: 1px dashed color-mix(in oklch, var(--accent-a) 34%, var(--line));
   border-radius: 999px;
   padding: 9px 18px;

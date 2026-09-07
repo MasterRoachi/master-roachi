@@ -6,11 +6,38 @@ import { site } from './site';
 // Nothing here runs at request time — the site is a static export, so the
 // products are baked into the HTML and refresh on the next deploy.
 
+/** The blank a design is printed on, from Printful's catalogue. */
+export interface Garment {
+  brand: string | null;
+  model: string | null;
+  title: string | null;
+}
+
+export interface ProductColor {
+  name: string;
+  /** Printful's own swatch, when the catalogue had one. */
+  hex: string | null;
+}
+
+export interface ProductVariant {
+  size: string | null;
+  color: string | null;
+  amount: number;
+  currency: string;
+  available: boolean;
+}
+
 export interface StoreProduct {
   id: number;
   externalId: string | null;
   name: string;
   thumbnail: string | null;
+  /** What it is printed on. Null when the catalogue lookup failed. */
+  garment?: Garment | null;
+  /** Distinct colourways, in the order they were synced. */
+  colors?: ProductColor[];
+  /** Every variant actually for sale. */
+  variants?: ProductVariant[];
   /**
    * A local cut-out of the mockup, written by scripts/store-art.mjs with the
    * white sheet removed. Absent when the cut failed or the mockup was never
@@ -34,8 +61,6 @@ export interface StoreProduct {
   /** The garment colour, averaged off the mockup. */
   fabric?: string | null;
   category?: string;
-  /** An invented item, shown to judge the layout. Never buyable. */
-  placeholder?: boolean;
   variantCount: number;
   from: { amount: number; currency: string } | null;
 }
@@ -110,16 +135,96 @@ const CURRENCY_LOCALE: Record<string, string> = {
   AUD: 'en-AU',
 };
 
-export function formatPrice(from: StoreProduct['from']): string | null {
-  if (!from) return null;
-  const locale = CURRENCY_LOCALE[from.currency] ?? 'en-US';
+export function money(amount: number, currency: string): string {
+  const locale = CURRENCY_LOCALE[currency] ?? 'en-US';
   try {
     return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: from.currency,
+      currency,
       maximumFractionDigits: 2,
-    }).format(from.amount);
+    }).format(amount);
   } catch {
-    return `${from.currency} ${from.amount.toFixed(2)}`;
+    return `${currency} ${amount.toFixed(2)}`;
   }
+}
+
+export function formatPrice(from: StoreProduct['from']): string | null {
+  if (!from) return null;
+  return money(from.amount, from.currency);
+}
+
+/**
+ * Sizes in the order a human expects them.
+ *
+ * Printful returns variants in sync order, which is usually right and is not
+ * guaranteed to be — and a size list that runs S, XS, M is worse than no size
+ * list. Anything unrecognised (waist measurements, one-size, kids' ages) keeps
+ * its relative position after the known run rather than being dropped.
+ */
+const SIZE_ORDER = [
+  'XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL',
+];
+
+function sizeRank(size: string): number {
+  const i = SIZE_ORDER.indexOf(size.toUpperCase());
+  return i === -1 ? SIZE_ORDER.length : i;
+}
+
+export function sizesOf(product: StoreProduct): string[] {
+  const seen: string[] = [];
+  for (const v of product.variants ?? []) {
+    if (v.size && !seen.includes(v.size)) seen.push(v.size);
+  }
+  return seen.sort((a, b) => sizeRank(a) - sizeRank(b));
+}
+
+/**
+ * Sizes grouped by what they cost.
+ *
+ * A single "from $16.00" is true and misleading in the same breath: this shirt
+ * runs to $26.00 by 5XL, and someone who wears a 5XL should not find that out
+ * at checkout. Grouping keeps it short — five sizes at one price is one row,
+ * not five.
+ */
+export interface PriceBand {
+  sizes: string[];
+  amount: number;
+  currency: string;
+}
+
+export function priceLadder(product: StoreProduct): PriceBand[] {
+  const bands: PriceBand[] = [];
+  for (const size of sizesOf(product)) {
+    const v = (product.variants ?? []).find((x) => x.size === size);
+    if (!v || !Number.isFinite(v.amount)) continue;
+    const last = bands[bands.length - 1];
+    if (last && last.amount === v.amount && last.currency === v.currency) {
+      last.sizes.push(size);
+    } else {
+      bands.push({ sizes: [size], amount: v.amount, currency: v.currency });
+    }
+  }
+  return bands;
+}
+
+/** "XS–XL" for a run, "XS, 3XL" for two, the single size for one. */
+export function sizeRun(sizes: string[]): string {
+  if (sizes.length === 0) return '';
+  if (sizes.length === 1) return sizes[0];
+  if (sizes.length === 2) return sizes.join(', ');
+  return `${sizes[0]}–${sizes[sizes.length - 1]}`;
+}
+
+/** Nothing left in stock, as opposed to nothing ever synced. */
+export function isSoldOut(product: StoreProduct): boolean {
+  const variants = product.variants ?? [];
+  return variants.length > 0 && variants.every((v) => !v.available);
+}
+
+/** "Bella + Canvas 3001 · Unisex Staple T-Shirt", skipping whatever is absent. */
+export function garmentLabel(product: StoreProduct): string | null {
+  const g = product.garment;
+  if (!g) return null;
+  const make = [g.brand, g.model].filter(Boolean).join(' ');
+  return [make, g.title].filter(Boolean).join(' · ') || null;
 }

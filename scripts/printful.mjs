@@ -59,6 +59,50 @@ function fromPrice(variants) {
   };
 }
 
+/**
+ * The blank a design is printed on, from Printful's own catalogue.
+ *
+ * A synced variant knows its product_id but describes itself as "Bella +
+ * Canvas 3001 Unisex Short Sleeve Jersey T-Shirt with Tear Away Label (Black
+ * Heather / XS)" — the garment, the colour and the size run together in one
+ * string, which is no use as a label. The catalogue splits them properly and
+ * carries a hex code per colour, which is the only place a swatch can come
+ * from.
+ *
+ * One request per distinct blank, cached, because a store with twelve designs
+ * on the same tee should not ask twelve times. Best effort throughout: a
+ * failure here costs a garment label and some swatches, not the catalogue.
+ */
+const catalogue = new Map();
+
+async function blank(productId) {
+  if (productId == null) return null;
+  if (catalogue.has(productId)) return catalogue.get(productId);
+
+  let info = null;
+  try {
+    const res = await api(`/products/${productId}`);
+    const r = res?.result ?? {};
+    info = {
+      brand: r.product?.brand ?? null,
+      model: r.product?.model ?? null,
+      // "Unisex Staple T-Shirt | Bella + Canvas 3001" — the brand is repeated
+      // after the pipe, and it is already its own field.
+      title: (r.product?.title ?? '').split('|')[0].trim() || null,
+      colors: new Map(
+        (r.variants ?? [])
+          .filter((v) => v.color && v.color_code)
+          .map((v) => [v.color, v.color_code]),
+      ),
+    };
+  } catch (err) {
+    console.log(`printful: no catalogue for blank ${productId} (${err.message})`);
+  }
+
+  catalogue.set(productId, info);
+  return info;
+}
+
 try {
   // What kind of store this is decides where checkout can live: a store
   // connected to Etsy or Shopify already has a checkout, a manual one does
@@ -87,6 +131,32 @@ try {
     const detail = await api(`/store/products/${p.id}`);
     const variants = detail?.result?.sync_variants ?? [];
 
+    // Every synced variant of one product sits on the same blank, so the first
+    // one decides which catalogue entry to look up.
+    const base = await blank(variants[0]?.product?.product_id);
+
+    // What is actually for sale, kept rather than counted. The page was
+    // reporting "9 options" for nine sizes of a single colour, which reads as
+    // nine colourways — and hiding that the price nearly doubles from XS to
+    // 5XL behind a single "from" figure.
+    const shapedVariants = variants.map((v) => ({
+      size: v.size ?? null,
+      color: v.color ?? null,
+      amount: Number.parseFloat(v.retail_price),
+      currency: v.currency ?? 'USD',
+      // Printful reports per-variant stock; a discontinued colourway should
+      // not sit on the page looking buyable.
+      available: v.availability_status === 'active',
+    }));
+
+    // Distinct colours, in the order Printful synced them, with the swatch
+    // from the catalogue where there is one.
+    const colors = [];
+    for (const v of shapedVariants) {
+      if (!v.color || colors.some((c) => c.name === v.color)) continue;
+      colors.push({ name: v.color, hex: base?.colors?.get(v.color) ?? null });
+    }
+
     shaped.push({
       id: p.id,
       // The connected platform's own id, which is what a product URL is built
@@ -96,6 +166,11 @@ try {
       thumbnail: p.thumbnail_url ?? null,
       variantCount: p.variants ?? variants.length,
       from: fromPrice(variants),
+      garment: base
+        ? { brand: base.brand, model: base.model, title: base.title }
+        : null,
+      colors,
+      variants: shapedVariants,
     });
   }
 

@@ -1,0 +1,66 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.dots {
+  display: inline-flex;
+  align-items: center;
+  /* Overlapped, so a long colour run stays a compact cluster. */
+  gap: 0;
+}
+
+.dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  /* A light hairline around the outside, not inside.
+     These garments are mostly dark — Black Heather is #0b0b0b — so a swatch
+     drawn on a near-black page needs the page held off it to read as a filled
+     disc at all. An inner ring instead makes a black dot look like an empty
+     one, which is the state that means "no colour code". */
+  box-shadow: 0 0 0 1px oklch(100% 0 0 / 0.45);
+  background: oklch(50% 0 0);
+}
+
+.dot + .dot {
+  /* Overlapped, but each still separated from the one beneath it. */
+  margin-left: -5px;
+}
+
+/* No hex from the catalogue. A dashed ring, so it cannot be mistaken for a
+   dark colour that does have one. */
+.dot[data-empty] {
+  background: transparent;
+  box-shadow: none;
+  border: 1px dashed oklch(100% 0 0 / 0.45);
+}
+
+.label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- inside a grid card ------------------------------------------------- */
+
+.row[data-compact] {
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.row[data-compact] .dot {
+  width: 13px;
+  height: 13px;
+}
+
+.row[data-compact] .label {
+  font-size: 0.78rem;
+}

@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-06T00:55:16.881Z",
+  "fetchedAt": "2026-09-07T09:51:31.400Z",
   "store": null,
   "products": [
     {
@@ -12,6 +12,82 @@
         "amount": 16,
         "currency": "USD"
       },
+      "garment": {
+        "brand": "Bella + Canvas",
+        "model": "3001",
+        "title": "Unisex Staple T-Shirt"
+      },
+      "colors": [
+        {
+          "name": "Black Heather",
+          "hex": "#0b0b0b"
+        }
+      ],
+      "variants": [
+        {
+          "size": "XS",
+          "color": "Black Heather",
+          "amount": 16,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "S",
+          "color": "Black Heather",
+          "amount": 16,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "M",
+          "color": "Black Heather",
+          "amount": 16,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "L",
+          "color": "Black Heather",
+          "amount": 16,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "XL",
+          "color": "Black Heather",
+          "amount": 16,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "2XL",
+          "color": "Black Heather",
+          "amount": 18.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "3XL",
+          "color": "Black Heather",
+          "amount": 21,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "4XL",
+          "color": "Black Heather",
+          "amount": 23.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "5XL",
+          "color": "Black Heather",
+          "amount": 26,
+          "currency": "USD",
+          "available": true
+        }
+      ],
       "print": {
         "src": "/store/464722916-print.webp",
         "x": 0.6313932980599647,
