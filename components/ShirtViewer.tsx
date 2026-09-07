@@ -44,8 +44,20 @@ import styles from './ShirtViewer.module.css';
 // across directly — a ray is fired at the model from where the print sits in
 // the photograph, and the decal is laid on wherever it lands.
 
-/** The furthest it will ever turn from face-on, in radians. */
-const LIMIT = 0.85;
+/**
+ * The furthest it will ever turn from face-on, in radians.
+ *
+ * A half turn, so the back of the garment can be brought square to the
+ * camera. It used to stop at 0.85 — about 49° — which showed the shoulder and
+ * never the back, and a shirt you cannot turn round is a photograph with extra
+ * steps. Nothing is hidden back there: the decal is projected shallow enough
+ * not to print through, so the reverse is plain cloth, which is what it is.
+ *
+ * Still a limit rather than a free spin. Past a half turn the garment is
+ * coming round to the front again and the drag has become a turntable, which
+ * is a different thing from examining something.
+ */
+const LIMIT = Math.PI;
 /** How far the idle drift swings. */
 const DRIFT = 0.34;
 
@@ -271,6 +283,17 @@ export default function ShirtViewer({
       () => {},
     );
 
+    /**
+     * Radians turned per pixel dragged.
+     *
+     * Measured against the viewer's own width rather than fixed, so one drag
+     * across it turns the garment half way round and the back is one gesture
+     * away on a phone as well as a desktop. A constant here meant the same
+     * swipe did a quarter as much on a narrow screen, which with a half-turn
+     * limit is the difference between turning a shirt round and giving up.
+     */
+    let perPixel = 0.006;
+
     const resize = () => {
       const r = host.getBoundingClientRect();
       if (!r.width || !r.height) return;
@@ -278,6 +301,7 @@ export default function ShirtViewer({
       renderer.setSize(r.width, r.height, false);
       camera.aspect = r.width / r.height;
       camera.updateProjectionMatrix();
+      perPixel = LIMIT / (r.width * 0.9);
       fitCamera();
     };
     resize();
@@ -298,9 +322,12 @@ export default function ShirtViewer({
       if (!held) return;
       turn = Math.max(
         -LIMIT,
-        Math.min(LIMIT, turn + (e.clientX - lastX) * 0.006),
+        Math.min(LIMIT, turn + (e.clientX - lastX) * perPixel),
       );
       lastX = e.clientX;
+      // Under reduced motion nothing is looping, so a drag has to ask for the
+      // frame that shows its result. frame() will not schedule another.
+      if (reduced && !raf) raf = requestAnimationFrame(frame);
     };
     const up = (e: PointerEvent) => {
       held = false;
@@ -326,7 +353,13 @@ export default function ShirtViewer({
       if (!reduced) elapsed += dt;
 
       const wanted = held ? turn : turn + Math.sin(elapsed * 0.5) * DRIFT;
-      current += (wanted - current) * Math.min(1, dt * 4);
+      // Reduced motion stops the idle drift and the easing, not the ability to
+      // turn the garment: the setting asks for no unrequested movement, and a
+      // drag is requested. Snapping straight to the angle renders one frame
+      // and stops, so the back is still reachable without anything moving on
+      // its own.
+      if (reduced) current = wanted;
+      else current += (wanted - current) * Math.min(1, dt * 4);
       pivot.rotation.y = current;
       // A shallow sway, so it hangs rather than spins on a spindle.
       pivot.rotation.z = Math.sin(elapsed * 0.37) * 0.02 + current * 0.04;
