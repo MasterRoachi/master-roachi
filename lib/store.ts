@@ -239,6 +239,14 @@ export function sizeRun(sizes: string[]): string {
   return `${sizes[0]}–${sizes[sizes.length - 1]}`;
 }
 
+/**
+ * What the design is, in his own words — the one part of a product page that
+ * does not come out of an API. Empty is the normal state for a new product.
+ */
+export function blurbOf(product: StoreProduct): string[] {
+  return site.store.blurbs[String(product.id)] ?? [];
+}
+
 /** Nothing left in stock, as opposed to nothing ever synced. */
 export function isSoldOut(product: StoreProduct): boolean {
   const variants = product.variants ?? [];

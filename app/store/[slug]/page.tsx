@@ -17,6 +17,7 @@ import {
   priceLadder,
   isSoldOut,
   garmentLabel,
+  blurbOf,
   type StoreProduct,
 } from '@/lib/store';
 import { site } from '@/lib/site';
@@ -82,6 +83,7 @@ export default async function ProductPage({
   const soldOut = isSoldOut(product);
   const href = buyUrl(product);
   const spec = product.garment?.spec ?? [];
+  const blurb = blurbOf(product);
 
   return (
     <div
@@ -188,6 +190,19 @@ export default async function ProductPage({
             )}
           </div>
         </div>
+
+        {blurb.length > 0 && (
+          /* No heading. It is four sentences about a drawing, and titling it
+             "About this design" would be more furniture than the words. */
+          <section className={styles.section}>
+            <p className="eyebrow">The design</p>
+            <div className={styles.blurb}>
+              {blurb.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          </section>
+        )}
 
         {spec.length > 0 && (
           <section className={styles.section}>

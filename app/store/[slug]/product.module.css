@@ -208,6 +208,29 @@
   padding-block: clamp(34px, 5vw, 60px) 0;
 }
 
+/* Set larger than the body copy below it. This is the one part of the page
+   somebody wrote, so it should not read at the same weight as a spec sheet. */
+.blurb {
+  max-width: var(--measure);
+  margin-top: 14px;
+  font-size: clamp(1.05rem, 1.6vw, 1.22rem);
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.blurb p {
+  margin: 0 0 14px;
+}
+
+.blurb p:last-child {
+  margin-bottom: 0;
+  /* The closing line is the practical one — chest print, plain back — and it
+     is not part of the joke above it. */
+  font-size: 0.9rem;
+  color: var(--muted-2);
+  margin-top: 20px;
+}
+
 .spec {
   list-style: none;
   padding: 0;

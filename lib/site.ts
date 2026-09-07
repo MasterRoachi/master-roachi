@@ -40,6 +40,28 @@ export const site = {
     paymentLinks: {} as Record<string, string>,
 
     /**
+     * What the design is, in Stephan's words, per product.
+     *
+     * Keyed by Printful id like the payment links, and for the same reason:
+     * the id survives a rename and the slug does not. One string per
+     * paragraph. A product with nothing here shows no section rather than a
+     * heading over an empty space.
+     *
+     * Everything else on a product page is a number from Printful. This is
+     * the only part that is his, so it goes above the spec rather than under
+     * it.
+     */
+    blurbs: {
+      // Roachi Shirt.
+      '464722916': [
+        'That’s my face.',
+        'It went first because it’s the one I finished first — there was no plan. Wear it if you think it looks cool, which is the entire qualification.',
+        'And if you really love me, you’d wear this.',
+        'Chest print only; the back is a plain shirt.',
+      ],
+    } as Record<string, string[]>,
+
+    /**
      * The order categories appear in. A product with no category of its own
      * falls into the first.
      */
