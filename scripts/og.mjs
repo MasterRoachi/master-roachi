@@ -208,6 +208,172 @@ if (fs.existsSync(STORE)) {
   }
 }
 
+// --- a share card per writing entry and project -----------------------------
+//
+// These pages pointed og:image straight at their cover, which is a WebP —
+// X and LinkedIn will not render one, so a shared post previewed as a bare
+// title on a grey rectangle. The covers are also every aspect ratio going
+// (1440x465, 1440x810, 1600x900) against the 1.91:1 a card is cropped to.
+//
+// So the cover becomes the background of a real card instead of being the
+// card: cropped to 1200x630, darkened, with the title over it. A post with no
+// cover gets the mark and its title on the site's ground, which still beats
+// the generic site card because it at least says what the page is.
+const CARD_DIR = 'public/og';
+
+/** The site's gold, as used on the default card's tagline. */
+const GOLD = '#d9a441';
+
+/**
+ * Break a title across lines that will fit.
+ *
+ * SVG has no text wrapping, so this measures the only way available without
+ * loading a font: an average glyph is about 0.52 of the point size in the
+ * sans-serif this draws with. It is an estimate, which is why the box it
+ * targets is narrower than the space actually available — a title that wraps
+ * one word early looks intentional, one that overruns the card does not.
+ */
+function wrap(text, perLine, maxLines = 3) {
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let line = '';
+  for (const word of words) {
+    const next = line ? `${line} ${word}` : word;
+    if (next.length > perLine && line) {
+      lines.push(line);
+      line = word;
+      if (lines.length === maxLines) break;
+    } else {
+      line = next;
+    }
+  }
+  if (lines.length < maxLines && line) lines.push(line);
+  // A title too long for the box is cut rather than allowed to run off it.
+  if (lines.length === maxLines && words.join(' ').length > perLine * maxLines) {
+    lines[maxLines - 1] = `${lines[maxLines - 1].replace(/[,;:.\s]+$/, '')}…`;
+  }
+  return lines;
+}
+
+async function entryCard({ title, eyebrow, cover, out }) {
+  const layers = [];
+
+  if (cover && fs.existsSync(cover)) {
+    // How dark to take it, measured rather than fixed.
+    //
+    // A flat dim was wrong for everything here: these covers already run from
+    // luma 15 to 46 out of 255, and taking all of them down by the same amount
+    // turned the dark ones into black rectangles with a title on top. The
+    // scrim below is what makes the text readable, so this only pulls down a
+    // cover bright enough to fight it, and never lifts one.
+    const stats = await sharp(cover).stats();
+    const [r, g, b] = stats.channels;
+    const luma = r.mean * 0.2126 + g.mean * 0.7152 + b.mean * 0.0722;
+    const brightness = Math.max(0.5, Math.min(1, 40 / Math.max(luma, 1)));
+
+    // Cover, not contain: the card is a fixed shape and letterboxing a cover
+    // inside it would put the site's ground in two bands around someone's
+    // artwork.
+    const art = await sharp(cover)
+      .resize(OG_W, OG_H, { fit: 'cover', position: 'attention' })
+      .modulate({ brightness })
+      .toBuffer();
+    layers.push({ input: art, left: 0, top: 0 });
+
+    // A scrim under the text only. Darkening the whole cover enough to read
+    // white type over any of it would have flattened the picture.
+    const scrim = Buffer.from(`
+<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}">
+  <defs>
+    <linearGradient id="s" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0.35" stop-color="#0a0a0b" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0a0a0b" stop-opacity="0.93"/>
+    </linearGradient>
+  </defs>
+  <rect width="${OG_W}" height="${OG_H}" fill="url(#s)"/>
+</svg>`);
+    layers.push({ input: scrim, left: 0, top: 0 });
+  } else {
+    // No cover. The mark stands in, small and top-left, so the card still
+    // belongs to this site rather than being type on a black field.
+    const small = await sharp(MARK).resize(120, 120, { fit: 'inside' }).toBuffer();
+    layers.push({ input: small, left: 80, top: 74 });
+  }
+
+  // Long titles step down rather than wrapping to four lines.
+  const size = title.length <= 34 ? 68 : title.length <= 66 ? 56 : 46;
+  const perLine = Math.floor((OG_W - 160) / (size * 0.52));
+  const lines = wrap(title, perLine);
+  // Anchored to the bottom, so one line and three lines share a baseline
+  // instead of drifting up and down the card.
+  const lastBaseline = OG_H - 96;
+  const lead = Math.round(size * 1.16);
+
+  const text = Buffer.from(`
+<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}">
+  <style>
+    .eyebrow { font: 700 25px system-ui, -apple-system, "Segoe UI", sans-serif;
+               fill: ${GOLD}; letter-spacing: 4px; }
+    .t { font: 800 ${size}px system-ui, -apple-system, "Segoe UI", sans-serif;
+         fill: #f7f7f5; letter-spacing: -1.5px; }
+  </style>
+  <text class="eyebrow" x="80" y="${lastBaseline - lines.length * lead - 26}">${esc(
+    eyebrow.toUpperCase(),
+  )}</text>
+  ${lines
+    .map(
+      (l, i) =>
+        `<text class="t" x="80" y="${
+          lastBaseline - (lines.length - 1 - i) * lead
+        }">${esc(l)}</text>`,
+    )
+    .join('\n  ')}
+</svg>`);
+  layers.push({ input: text, left: 0, top: 0 });
+
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  await sharp({
+    create: { width: OG_W, height: OG_H, channels: 4, background: GROUND },
+  })
+    .composite(layers)
+    .png()
+    .toFile(out);
+}
+
+{
+  const { default: matter } = await import('gray-matter');
+
+  for (const [dir, kind] of [
+    ['content/writing', 'writing'],
+    ['content/projects', 'projects'],
+  ]) {
+    if (!fs.existsSync(dir)) continue;
+
+    for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.mdx'))) {
+      const slug = file.replace(/\.mdx$/, '');
+      const { data } = matter(fs.readFileSync(path.join(dir, file), 'utf8'));
+      if (!data.title) continue;
+      // A project with an href points somewhere else — Fabled Threads sends
+      // people to /store/ — so no page is generated for it and a card would
+      // belong to a URL that 404s.
+      if (data.href) continue;
+
+      await entryCard({
+        title: data.title,
+        // Writing is filed by track, projects by what the thing is.
+        eyebrow: kind === 'writing' ? (data.track ?? 'writing') : (data.kind ?? 'project'),
+        cover: data.cover ? path.join('public', data.cover) : null,
+        out: path.join(CARD_DIR, kind, `${slug}.png`),
+      });
+    }
+
+    const n = fs.existsSync(path.join(CARD_DIR, kind))
+      ? fs.readdirSync(path.join(CARD_DIR, kind)).length
+      : 0;
+    console.log(`og: wrote ${n} ${kind} card(s) to ${CARD_DIR}/${kind}/`);
+  }
+}
+
 // --- favicon.ico -----------------------------------------------------------
 //
 // app/icon.png gets Next to emit <link rel="icon">, which is what a browser

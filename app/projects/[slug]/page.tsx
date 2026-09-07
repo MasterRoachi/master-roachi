@@ -35,7 +35,10 @@ export async function generateMetadata({
     path: `/projects/${slug}/`,
     title: entry.frontmatter.title,
     description: entry.frontmatter.summary,
-    image: entry.frontmatter.cover ?? undefined,
+    // The generated card rather than the cover — see the writing page for why.
+    image: `/og/projects/${slug}.png`,
+    imageSize: { width: 1200, height: 630 },
+    imageAlt: entry.frontmatter.title,
     type: 'article',
     noIndex: entry.frontmatter.draft,
   });

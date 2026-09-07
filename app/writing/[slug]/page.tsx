@@ -25,7 +25,12 @@ export async function generateMetadata({
     path: `/writing/${slug}/`,
     title: entry.frontmatter.title,
     description: entry.frontmatter.summary,
-    image: entry.frontmatter.cover ?? undefined,
+    // The card scripts/og.mjs builds for this post, not the cover itself.
+    // Covers are WebP and every aspect ratio going; a card is a PNG at the
+    // 1200x630 these are cropped to, with the title drawn on it.
+    image: `/og/writing/${slug}.png`,
+    imageSize: { width: 1200, height: 630 },
+    imageAlt: entry.frontmatter.title,
     type: 'article',
     noIndex: entry.frontmatter.draft,
   });
