@@ -63,9 +63,14 @@ export async function generateMetadata({
     ]
       .filter(Boolean)
       .join(' '),
-    // The cut-out mockup, which is a picture of the actual product rather
-    // than the site's default card.
-    image: product.art ?? product.thumbnail ?? undefined,
+    // A card built for this product by scripts/og.mjs — the garment on the
+    // site's ground with its name and price, at the 1200x630 every platform
+    // crops to. Pointing this at the cut-out mockup instead, as it first did,
+    // sent a portrait WebP on transparency to services that mostly cannot
+    // render one.
+    image: `/store/og/${slug}.png`,
+    imageSize: { width: 1200, height: 630 },
+    imageAlt: `${product.name} — ${site.store.name}`,
   });
 }
 

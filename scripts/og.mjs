@@ -106,6 +106,108 @@ await sharp({
 const kb = (fs.statSync('public/og.png').size / 1024).toFixed(0);
 console.log(`og: wrote public/og.png (${OG_W}x${OG_H}, ${kb}KB)`);
 
+// --- a share card per product ----------------------------------------------
+//
+// Product pages were pointing og:image at the cut-out mockup itself. Three
+// things were wrong with that at once: it is a WebP, which X and LinkedIn do
+// not render; it is 567x765 portrait while the page declared the 1200x630 that
+// every card is cropped to; and it is a garment on transparency, so whatever
+// the platform paints behind it decides what the card looks like. A shared
+// product link previewed as a blank rectangle.
+//
+// So each product gets a real card: its own garment on the site's ground, with
+// the name and price beside it. Runs last in prebuild, after printful.mjs has
+// written the catalogue and store-art.mjs has cut the mockups out, so both are
+// on disk by the time this reads them.
+const STORE = 'data/store.json';
+const OG_DIR = 'public/store/og';
+
+function priceRange(product) {
+  const amounts = (product.variants ?? [])
+    .map((v) => v.amount)
+    .filter((n) => Number.isFinite(n));
+  if (amounts.length === 0) return null;
+  const currency = product.variants?.[0]?.currency ?? 'USD';
+  const sign = currency === 'USD' ? '$' : `${currency} `;
+  const low = Math.min(...amounts);
+  const high = Math.max(...amounts);
+  const f = (n) => `${sign}${n.toFixed(2)}`;
+  return low === high ? f(low) : `${f(low)} – ${f(high)}`;
+}
+
+/** XML-safe, because a product name is not ours to trust inside markup. */
+function esc(s) {
+  return String(s).replace(
+    /[<>&'"]/g,
+    (c) =>
+      ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[
+        c
+      ],
+  );
+}
+
+if (fs.existsSync(STORE)) {
+  let products = [];
+  try {
+    products = JSON.parse(fs.readFileSync(STORE, 'utf8')).products ?? [];
+  } catch {
+    console.log('og: data/store.json is unreadable — no product cards');
+  }
+
+  if (products.length > 0) fs.mkdirSync(OG_DIR, { recursive: true });
+
+  for (const product of products) {
+    const slug = product.slug ?? String(product.id);
+    // The cut-out, which lives under public/ at the path the site serves it
+    // from. Falls back to nothing rather than fetching the remote thumbnail:
+    // a build should not need the network to produce a card.
+    const art = product.art ? path.join('public', product.art) : null;
+    if (!art || !fs.existsSync(art)) {
+      console.log(`og: ${slug} has no local mockup — card skipped`);
+      continue;
+    }
+
+    const garment = await sharp(art)
+      .resize({ height: 500, fit: 'inside' })
+      .toBuffer();
+    const { width: gw } = await sharp(garment).metadata();
+
+    const price = priceRange(product);
+    const left = 120 + (gw ?? 0) + 80;
+
+    const label = Buffer.from(`
+<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}">
+  <style>
+    .eyebrow { font: 700 26px system-ui, -apple-system, "Segoe UI", sans-serif;
+               fill: #e0509f; letter-spacing: 4px; }
+    .name { font: 800 76px system-ui, -apple-system, "Segoe UI", sans-serif;
+            fill: #f7f7f5; letter-spacing: -2px; }
+    .price { font: 700 40px system-ui, -apple-system, "Segoe UI", sans-serif;
+             fill: #e0509f; }
+    .foot { font: 600 26px system-ui, -apple-system, "Segoe UI", sans-serif;
+            fill: #8b8b8f; }
+  </style>
+  <text class="eyebrow" x="${left}" y="248">FABLED THREADS</text>
+  <text class="name" x="${left}" y="336">${esc(product.name)}</text>
+  ${price ? `<text class="price" x="${left}" y="404">${esc(price)}</text>` : ''}
+  <text class="foot" x="${left}" y="470">masterroachi.com</text>
+</svg>`);
+
+    const out = path.join(OG_DIR, `${slug}.png`);
+    await sharp({
+      create: { width: OG_W, height: OG_H, channels: 4, background: GROUND },
+    })
+      .composite([
+        { input: garment, left: 120, top: Math.round((OG_H - 500) / 2) },
+        { input: label, left: 0, top: 0 },
+      ])
+      .png()
+      .toFile(out);
+
+    console.log(`og: wrote ${out} (${OG_W}x${OG_H})`);
+  }
+}
+
 // --- favicon.ico -----------------------------------------------------------
 //
 // app/icon.png gets Next to emit <link rel="icon">, which is what a browser
