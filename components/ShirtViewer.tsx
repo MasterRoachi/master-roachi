@@ -83,6 +83,7 @@ export default function ShirtViewer({
   fabric = '#2f2f2f',
   alt,
   model = DEFAULT_MODEL,
+  printBand,
 }: {
   print?: PrintPlacement | null;
   /** The garment colour, measured off the mockup. */
@@ -90,6 +91,8 @@ export default function ShirtViewer({
   alt?: string;
   /** Which .glb to draw. See lib/models.ts. */
   model?: string;
+  /** Where the printable front of that model is. See lib/models.ts. */
+  printBand?: { top: number; bottom: number };
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
 
@@ -214,9 +217,15 @@ export default function ShirtViewer({
 
             // Fire a ray at the chest from exactly where the print sits in the
             // photograph, and put the decal wherever it lands.
+            // The mockup's vertical fraction, mapped into the part of this
+            // model that can actually be printed on. Without the band a
+            // hood-up model takes a chest print somewhere inside its hood.
+            const band = printBand ?? { top: 0, bottom: 1 };
+            const down = band.top + print.y * (band.bottom - band.top);
+
             const from = new Vector3(
               bounds.min.x + print.x * (bounds.max.x - bounds.min.x),
-              bounds.max.y - print.y * (bounds.max.y - bounds.min.y),
+              bounds.max.y - down * (bounds.max.y - bounds.min.y),
               bounds.max.z + Math.max(1, size.z),
             );
             const ray = new Raycaster(from, new Vector3(0, 0, -1));

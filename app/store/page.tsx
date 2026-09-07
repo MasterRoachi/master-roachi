@@ -113,6 +113,7 @@ export default function StorePage() {
               {leadModel && (
                 <ShirtViewerMount
                   model={leadModel.src}
+                  printBand={leadModel.printBand}
                   print={lead.print}
                   fabric={lead.fabric ?? undefined}
                   alt={`${lead.name}, which can be turned`}

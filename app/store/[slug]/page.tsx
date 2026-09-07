@@ -136,6 +136,7 @@ export default async function ProductPage({
               {model && (
                 <ShirtViewerMount
                   model={model.src}
+                  printBand={model.printBand}
                   print={product.print}
                   fabric={product.fabric ?? undefined}
                   alt={`${product.name}, which can be turned`}

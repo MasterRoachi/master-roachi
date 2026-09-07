@@ -17,6 +17,7 @@ export default function ShirtViewerMount(props: {
   fabric?: string;
   alt?: string;
   model?: string;
+  printBand?: { top: number; bottom: number };
 }) {
   return <ShirtViewer {...props} />;
 }

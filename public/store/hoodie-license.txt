@@ -1,0 +1,15 @@
+Model Information:
+* title:	HOODIE
+* source:	https://sketchfab.com/3d-models/hoodie-ab78848ab3404a2e877929d5f8774c54
+* author:	Obridje (https://sketchfab.com/Obridje)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "HOODIE" (https://sketchfab.com/3d-models/hoodie-ab78848ab3404a2e877929d5f8774c54) by Obridje (https://sketchfab.com/Obridje) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+
+Recovered from the .glb's own asset.extras block rather than the download
+zip, which was not kept. The values are the ones Sketchfab embedded at
+export time and match the model page.

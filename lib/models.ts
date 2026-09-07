@@ -21,6 +21,20 @@ export interface GarmentModel {
    * the product's name, which is ours to get wrong.
    */
   match: RegExp;
+  /**
+   * Where this model's printable front actually is, as fractions of its own
+   * height from the top.
+   *
+   * The print's position comes from the Printful mockup as a fraction of that
+   * photograph's silhouette, and carries across only when the model is shaped
+   * like the mockup. The tee is, so it needs nothing. The hoodie model has its
+   * hood UP and a mockup does not: rays fired at the top third pass through
+   * the hood opening and strike the inside of the back, which is where the
+   * chest print landed — measured at z = -49.9, well behind the garment.
+   *
+   * Omit for a model whose silhouette matches its mockup.
+   */
+  printBand?: { top: number; bottom: number };
   /** Attribution. Required by the licence, so it is not optional here. */
   credit: {
     title: string;
@@ -46,10 +60,25 @@ export const GARMENT_MODELS: GarmentModel[] = [
       licenseUrl: 'http://creativecommons.org/licenses/by/4.0/',
     },
   },
-  // A hoodie goes here once the .glb is in public/store/. Its `match` wants to
-  // be /hoodie|sweatshirt|crewneck/i — Printful calls the Gildan blank a
-  // "Heavy Blend Hoodie" — and its credit block must be filled in from the
-  // model's own licence file before it is switched on.
+  {
+    src: '/store/hoodie.glb',
+    // Measured by casting rays down the centre line: the front-most surface
+    // is behind the mid-plane until 0.30 — that is the hood opening — and
+    // only becomes chest from 0.33 down.
+    printBand: { top: 0.33, bottom: 1 },
+    // Printful calls the Gildan blank a "Heavy Blend Hoodie"; crewnecks and
+    // sweatshirts are near enough the same silhouette to borrow it.
+    match: /hoodie|sweatshirt|crewneck/i,
+    credit: {
+      title: 'HOODIE',
+      modelUrl:
+        'https://sketchfab.com/3d-models/hoodie-ab78848ab3404a2e877929d5f8774c54',
+      author: 'Obridje',
+      authorUrl: 'https://sketchfab.com/Obridje',
+      license: 'CC BY 4.0',
+      licenseUrl: 'http://creativecommons.org/licenses/by/4.0/',
+    },
+  },
 ];
 
 /**
