@@ -39,11 +39,28 @@
     );
 }
 
-.content {
+/* All the copy, stacked in one cell. The tallest panel sets the height, so
+   cycling no longer resizes the section under the reader's cursor. */
+.contents {
   position: relative;
   z-index: 1;
+  display: grid;
+}
+
+.content {
+  grid-area: 1 / 1;
   padding: clamp(28px, 5vw, 56px);
   max-width: 46ch;
+  transition: opacity 0.32s ease;
+}
+
+/* Hidden, but still in the document — the point of rendering all of them.
+   `inert` on the element takes care of focus and the accessibility tree;
+   this only has to take care of the eyes. */
+.content[data-active='false'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .title {

@@ -96,21 +96,39 @@ export default function PursuitCarousel() {
         </div>
       ))}
 
-      <div className={styles.content}>
-        {current.icon && (
-          <span
-            className={styles.mark}
-            style={{ color: current.iconColour }}
+      {/* Every panel's copy is rendered, not just the visible one.
+          Only the current pursuit used to reach the HTML, so half this
+          section — the Gaming description and its link — did not exist as far
+          as a crawler, a reader with JavaScript off, or a page translator was
+          concerned.
+
+          Hidden with visibility rather than by not rendering: the text stays
+          in the document, and `inert` keeps the hidden link out of the tab
+          order and off the accessibility tree, so nobody tabs into a panel
+          they cannot see. Stacked in one grid cell, which also stops the
+          carousel changing height as it cycles. */}
+      <div className={styles.contents}>
+        {PURSUITS.map((p, i) => (
+          <div
+            key={p.title}
+            className={styles.content}
+            data-active={i === index}
+            aria-hidden={i !== index}
+            inert={i !== index}
           >
-            {current.icon}
-          </span>
-        )}
-        <p className="eyebrow">{current.eyebrow}</p>
-        <h2 className={styles.title}>{current.title}</h2>
-        <p className={styles.body}>{current.body}</p>
-        <Link href={current.href} className={styles.cta}>
-          {current.cta} →
-        </Link>
+            {p.icon && (
+              <span className={styles.mark} style={{ color: p.iconColour }}>
+                {p.icon}
+              </span>
+            )}
+            <p className="eyebrow">{p.eyebrow}</p>
+            <h2 className={styles.title}>{p.title}</h2>
+            <p className={styles.body}>{p.body}</p>
+            <Link href={p.href} className={styles.cta}>
+              {p.cta} →
+            </Link>
+          </div>
+        ))}
       </div>
 
       <button
