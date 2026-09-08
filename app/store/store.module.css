@@ -414,3 +414,11 @@ a.product:hover .art img {
   margin: 0 0 12px;
   font-size: clamp(1.2rem, 2.4vw, 1.6rem);
 }
+
+/* Sits directly under the price. Small and muted — it is a reassurance, not
+   a claim competing with the number above it. */
+.shipping {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+}

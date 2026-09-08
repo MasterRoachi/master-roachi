@@ -126,7 +126,10 @@ export default function StorePage() {
               <h2 className={styles.featureName}>{lead.name}</h2>
 
               {priceSummary(lead) && (
-                <p className={styles.priceLine}>{priceSummary(lead)}</p>
+                <>
+                  <p className={styles.priceLine}>{priceSummary(lead)}</p>
+                  <p className={styles.shipping}>Worldwide delivery included</p>
+                </>
               )}
 
               <Swatches colors={lead.colors ?? []} />

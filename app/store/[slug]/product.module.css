@@ -307,3 +307,11 @@
 .credit a:hover {
   color: var(--ink);
 }
+
+/* Sits directly under the price. Small and muted — it is a reassurance, not
+   a claim competing with the number above it. */
+.shipping {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted-2);
+}

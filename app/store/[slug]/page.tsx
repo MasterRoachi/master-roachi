@@ -154,7 +154,13 @@ export default async function ProductPage({
             <h1 className={styles.name}>{product.name}</h1>
 
             {priceSummary(product) && (
-              <p className={styles.priceLine}>{priceSummary(product)}</p>
+              <>
+                <p className={styles.priceLine}>{priceSummary(product)}</p>
+                {/* Said next to the number rather than in the policy alone.
+                    A price that turns out to exclude postage is the single
+                    most common way an online store feels like a trick. */}
+                <p className={styles.shipping}>Worldwide delivery included</p>
+              </>
             )}
 
             <Swatches colors={product.colors ?? []} />

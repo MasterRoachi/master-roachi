@@ -126,9 +126,10 @@ export default function PoliciesPage() {
             <h3>Prices</h3>
             <p>
               Prices are shown per size on each product page, in the currency
-              displayed there. The price that applies is the one shown when the
-              order is placed. Delivery is shown or confirmed before payment;
-              nothing is charged afterwards.
+              displayed there, and they <strong>include worldwide delivery</strong>.
+              The figure on the product page is the figure you pay. There is no
+              shipping added at checkout, no handling fee, and no surcharge for
+              being far away.
             </p>
             <p>
               Import duties and taxes on international orders are set by the
@@ -200,8 +201,14 @@ export default function PoliciesPage() {
 
             <h3>Cost</h3>
             <p>
-              Delivery is shown or confirmed before you pay. There is no
-              surcharge afterwards.
+              Included in the price of the item, everywhere. Shipping a shirt
+              costs between about five and thirteen US dollars depending on
+              where it is going — least to the United Kingdom and Europe, most
+              to South Africa — and rather than make the customer work that out
+              at checkout, the worst case is built into the price and the same
+              number is charged to everyone. Buyers in cheap-to-reach countries
+              are subsidising buyers in expensive ones, which is the trade for
+              a price that does not change when you enter your address.
             </p>
 
             <h3>Tracking</h3>
