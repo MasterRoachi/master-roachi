@@ -46,7 +46,11 @@ const PURSUITS: Pursuit[] = [
   {
     eyebrow: 'Study Well',
     title: 'Orthodoxy',
-    body: 'Long-form video and written argument, for anyone willing to ask whether it is true.',
+    // Said "Long-form video and written argument", and there is neither: the
+    // channel has no public videos and Foundations has no published writing
+    // yet. Describing the shelf and the work in progress is true today and
+    // stays true after the first piece goes up, which a promise would not.
+    body: 'What I am reading, and the argument as I write it — for anyone willing to ask whether it is true.',
     href: '/orthodoxy/',
     cta: 'Go to Foundations',
     Field: CandleField,
