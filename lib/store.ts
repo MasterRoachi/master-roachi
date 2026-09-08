@@ -162,12 +162,24 @@ const CURRENCY_LOCALE: Record<string, string> = {
 
 export function money(amount: number, currency: string): string {
   const locale = CURRENCY_LOCALE[currency] ?? 'en-US';
+  // Prices here round to whole rands, and "R 500,00" reads as an accounting
+  // entry rather than a price tag. Cents are shown only when there are any.
+  const whole = Number.isInteger(amount);
   try {
-    return new Intl.NumberFormat(locale, {
+    const formatted = new Intl.NumberFormat(locale, {
       style: 'currency',
       currency,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: whole ? 0 : 2,
     }).format(amount);
+    // en-ZA puts a space between the symbol and the number — correct by the
+    // standard, and not how any South African shop writes a price. Only that
+    // one space goes: the thousands separator is also a space, and R1 250 is
+    // right where R1250 is not. Split at the first digit rather than matching
+    // the separator, which is a non-breaking space in some locales and a
+    // narrow one in others.
+    const firstDigit = formatted.search(/[0-9]/);
+    if (firstDigit <= 0) return formatted;
+    return formatted.slice(0, firstDigit).trimEnd() + formatted.slice(firstDigit);
   } catch {
     return `${currency} ${amount.toFixed(2)}`;
   }

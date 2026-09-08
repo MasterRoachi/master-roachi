@@ -147,15 +147,27 @@ function priceRange(product) {
   // says nothing rather than inventing a figure.
   if (amounts.length === 0) return null;
 
+  // Same shaping as lib/store.ts money(): whole rands lose the cents, and the
+  // space between symbol and number goes, but the thousands separator stays.
   const f = (n) =>
     new Intl.NumberFormat('en-ZA', {
       style: 'currency',
       currency: pricing.currency,
-      maximumFractionDigits: 2,
-    }).format(n);
+      maximumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    })
+      .format(n);
+  // Same trim as lib/store.ts money(): drop the space after the symbol, keep
+  // the one between thousands. Split at the first digit rather than matching
+  // the separator, which differs by locale.
+  const tidy = (s) => {
+    const i = s.search(/[0-9]/);
+    return i <= 0 ? s : s.slice(0, i).trimEnd() + s.slice(i);
+  };
   const low = Math.min(...amounts);
   const high = Math.max(...amounts);
-  return low === high ? f(low) : `${f(low)} – ${f(high)}`;
+  return low === high
+    ? tidy(f(low))
+    : `${tidy(f(low))} – ${tidy(f(high))}`;
 }
 
 /** XML-safe, because a product name is not ours to trust inside markup. */

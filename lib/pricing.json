@@ -35,7 +35,7 @@
     "This file is hand-edited and committed. Nothing generates it."
   ],
   "currency": "ZAR",
-  "usdToZar": null,
+  "usdToZar": 17.5,
   "deliveryUsd": 12.5,
   "roundUpTo": 10,
   "overrides": {}
