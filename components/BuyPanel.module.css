@@ -1,0 +1,131 @@
+.panel {
+  margin-top: 26px;
+}
+
+.label {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Real buttons now, so they need a real pressed state and a real focus ring —
+   the previous chips were spans and neither mattered. */
+.size {
+  appearance: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.size:hover:not(:disabled) {
+  border-color: color-mix(in oklch, var(--accent-a) 50%, var(--line));
+  color: var(--ink);
+}
+
+.size[aria-pressed='true'] {
+  border-color: color-mix(in oklch, var(--accent-a) 70%, var(--line));
+  background: color-mix(in oklch, var(--accent-a) 18%, transparent);
+  color: var(--ink);
+}
+
+.size:focus-visible {
+  outline: 2px solid var(--accent-a);
+  outline-offset: 2px;
+}
+
+/* A size the manufacturer has stopped making. Shown rather than hidden, so the
+   run still reads XS to 5XL and the gap is visibly a gap. */
+.size:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.chosen {
+  margin: 14px 0 0;
+  min-height: 1.4em;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* --- the button ---------------------------------------------------------- */
+
+.buy {
+  display: inline-block;
+  margin-top: 16px;
+  border: 1px solid color-mix(in oklch, var(--accent-a) 55%, var(--line));
+  border-radius: 999px;
+  padding: 13px 28px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--accent-a) 82%, var(--ink));
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+a.buy:hover {
+  border-color: var(--accent-a);
+  color: var(--ink);
+}
+
+.buy[data-disabled] {
+  border-style: dashed;
+  border-color: var(--line);
+  color: var(--muted-2);
+  cursor: not-allowed;
+}
+
+/* --- states -------------------------------------------------------------- */
+
+.pending {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.notYet {
+  margin-top: 16px;
+  border: 1px dashed color-mix(in oklch, var(--accent-a) 30%, var(--line));
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.notYetWhy {
+  margin: 8px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.note {
+  margin: 16px 0 0;
+  max-width: 46ch;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--muted-2);
+}

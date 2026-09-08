@@ -7,10 +7,11 @@ import ShirtViewerMount from '@/components/ShirtViewerMount';
 import Swatches from '@/components/Swatches';
 import SizeTable from '@/components/SizeTable';
 import ModelCredit from '@/components/ModelCredit';
+import BuyPanel from '@/components/BuyPanel';
 import {
   getStoreProducts,
   findProduct,
-  buyUrl,
+  buyOptions,
   money,
   sizesOf,
   sizeRun,
@@ -79,7 +80,7 @@ export default async function ProductPage({
   const sizes = sizesOf(product);
   const ladder = priceLadder(product);
   const soldOut = isSoldOut(product);
-  const href = buyUrl(product);
+  const options = buyOptions(product);
   const spec = product.garment?.spec ?? [];
   const blurb = blurbOf(product);
   // Which 3D garment stands for this product, if any.
@@ -155,17 +156,6 @@ export default async function ProductPage({
 
             <Swatches colors={product.colors ?? []} />
 
-            {sizes.length > 0 && (
-              <p className={styles.sizes}>
-                <span className={styles.sizesLabel}>Sizes</span>
-                {sizes.map((s) => (
-                  <span key={s} className={styles.size}>
-                    {s}
-                  </span>
-                ))}
-              </p>
-            )}
-
             {ladder.length > 1 && (
               <dl className={styles.ladder}>
                 {ladder.map((band) => (
@@ -177,29 +167,10 @@ export default async function ProductPage({
               </dl>
             )}
 
-            {soldOut ? (
-              <p className={styles.pending}>Sold out</p>
-            ) : href ? (
-              <a
-                className={styles.buyButton}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Buy ↗
-              </a>
-            ) : (
-              <div className={styles.notYet}>
-                <p className={styles.pending}>Not on sale yet</p>
-                {/* The store has no checkout. Saying so here is better than a
-                    button that goes nowhere, and better than silence. */}
-                <p className={styles.notYetWhy}>
-                  Payment is still being set up. The design is finished and
-                  this is a real product — there is just nowhere to take your
-                  money yet.
-                </p>
-              </div>
-            )}
+            {/* Sizes, price and the button are one thing now: a payment link
+                is a fixed sum, so which size is chosen decides where Buy
+                goes. */}
+            <BuyPanel options={options} soldOut={soldOut} />
 
             {garmentLabel(product) && (
               <p className={styles.garment}>

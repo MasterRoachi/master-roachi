@@ -142,8 +142,48 @@ export function getStore(): StoreSnapshot {
  * Null is the normal state for a product with no link yet, and the page shows
  * no button rather than one that goes nowhere.
  */
-export function buyUrl(product: StoreProduct): string | null {
-  return site.store.paymentLinks[String(product.id)] ?? null;
+export function buyUrl(product: StoreProduct, size: string): string | null {
+  const price = sellingPrice(product, size);
+  if (!price) return null;
+  const forProduct = site.store.paymentLinks[String(product.id)];
+  return forProduct?.[String(price.amount)] ?? null;
+}
+
+/** Whether any size of this can actually be paid for. */
+export function isBuyable(product: StoreProduct): boolean {
+  return sizesOf(product).some((size) => buyUrl(product, size) !== null);
+}
+
+/** One row of the buy panel: a size, its price, and where paying for it goes. */
+export interface BuyOption {
+  size: string;
+  amount: number;
+  currency: string;
+  label: string;
+  href: string | null;
+  available: boolean;
+}
+
+/**
+ * Every size a customer can choose, priced, with its payment link.
+ *
+ * Built on the server so the client component holds no pricing logic — it
+ * selects a row and follows a link, which is all a fixed-amount payment link
+ * can support until there is a real cart.
+ */
+export function buyOptions(product: StoreProduct): BuyOption[] {
+  return sizesOf(product).map((size) => {
+    const price = sellingPrice(product, size);
+    const variant = (product.variants ?? []).find((v) => v.size === size);
+    return {
+      size,
+      amount: price?.amount ?? 0,
+      currency: price?.currency ?? 'ZAR',
+      label: price ? money(price.amount, price.currency) : '',
+      href: buyUrl(product, size),
+      available: variant?.available ?? true,
+    };
+  });
 }
 
 /**

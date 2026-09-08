@@ -11,7 +11,7 @@ import ModelCredit from '@/components/ModelCredit';
 import { quotes } from '@/lib/quotes';
 import {
   getStore,
-  buyUrl,
+  isBuyable,
   categoryOf,
   productPath,
   money,
@@ -155,18 +155,11 @@ export default function StorePage() {
                       whatever was made last, and it will not always be one. */}
                   See it →
                 </Link>
+                {/* No Buy link here any more: buying needs a size, and the
+                    size is chosen on the product page. */}
                 {isSoldOut(lead) ? (
                   <span className={styles.pending}>Sold out</span>
-                ) : buyUrl(lead) ? (
-                  <a
-                    className={styles.secondary}
-                    href={buyUrl(lead) as string}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Buy ↗
-                  </a>
-                ) : (
+                ) : isBuyable(lead) ? null : (
                   <span className={styles.pending}>Not on sale yet</span>
                 )}
               </div>
