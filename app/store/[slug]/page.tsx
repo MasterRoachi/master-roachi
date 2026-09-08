@@ -170,7 +170,7 @@ export default async function ProductPage({
             {/* Sizes, price and the button are one thing now: a payment link
                 is a fixed sum, so which size is chosen decides where Buy
                 goes. */}
-            <BuyPanel options={options} soldOut={soldOut} />
+            <BuyPanel options={options} soldOut={soldOut} name={product.name} />
 
             {garmentLabel(product) && (
               <p className={styles.garment}>

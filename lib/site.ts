@@ -86,12 +86,18 @@ export const site = {
      * The key is the rand figure as it appears on the page, with no decimals:
      * '500', not 'R500' or '500.00'. Printful ids are in data/store.json.
      *
-     *   '464722916': {
-     *     '500': 'https://payf.st/xxxxx',
-     *     '550': 'https://payf.st/yyyyy',
-     *   },
+     *   '464722916': { '500': 'https://payf.st/xxxxx' },
      */
-    paymentLinks: {} as Record<string, Record<string, string>>,
+    paymentLinks: {
+      // Roachi Shirt. One link per price; R500 covers XS to XL.
+      '464722916': {
+        '500': 'https://payf.st/vmis8',
+        '550': 'https://payf.st/mfakb',
+        '590': 'https://payf.st/7oa4g',
+        '630': 'https://payf.st/dzs3x',
+        '680': 'https://payf.st/8t2o3',
+      },
+    } as Record<string, Record<string, string>>,
 
     /**
      * What the design is, in Stephan's words, per product.

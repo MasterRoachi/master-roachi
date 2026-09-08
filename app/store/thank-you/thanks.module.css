@@ -120,3 +120,10 @@
 .back a:hover {
   color: var(--ink);
 }
+
+/* Sits between the address box and the timeline, so the numbered list reads as
+   the answer to a question rather than starting mid-air. */
+.thenWhat {
+  margin: clamp(40px, 6vw, 64px) 0 0;
+  font-size: 1.15rem;
+}

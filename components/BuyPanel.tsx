@@ -19,12 +19,47 @@ import styles from './BuyPanel.module.css';
  * the next thing to build — but a page that can take one order beats a page
  * that can take none.
  */
+/** Where the thank-you page looks for what was just bought. */
+export const LAST_ORDER_KEY = 'fabled-threads:last-order';
+
+/**
+ * Note the choice on the way out to PayFast.
+ *
+ * A shareable payment link carries nothing back and cannot collect a delivery
+ * address, so what arrives is a sum of money with no name on it — and R500
+ * covers XS, S, M, L and XL, so the amount does not even identify the size.
+ * The one moment the size is known is this click, on this device, and PayFast
+ * returns to this same browser afterwards. So it is written down here and read
+ * on the way back.
+ *
+ * Best effort by design: private windows and blocked storage both throw, and
+ * the thank-you page asks for the details in full when nothing comes back.
+ */
+function remember(product: string, option: BuyOption) {
+  try {
+    window.localStorage.setItem(
+      LAST_ORDER_KEY,
+      JSON.stringify({
+        product,
+        size: option.size,
+        price: option.label,
+        at: Date.now(),
+      }),
+    );
+  } catch {
+    // No storage. The thank-you page has a path for that.
+  }
+}
+
 export default function BuyPanel({
   options,
   soldOut,
+  name,
 }: {
   options: BuyOption[];
   soldOut: boolean;
+  /** The product's name, carried into the order note. */
+  name: string;
 }) {
   // Nothing preselected. A size chosen for someone is a size they did not
   // choose, and this is the one decision on the page that must be theirs.
@@ -80,6 +115,7 @@ export default function BuyPanel({
           href={chosen.href}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => remember(name, chosen)}
         >
           Buy {chosen.label} ↗
         </a>
@@ -91,9 +127,14 @@ export default function BuyPanel({
         </span>
       )}
 
+      {/* Said before they leave, not only after they pay. PayFast's shareable
+          links take the money without asking where to send anything, so the
+          address has to come by email — and someone who learns that only on
+          the way back has been surprised by it. */}
       <p className={styles.note}>
-        Payment is taken by PayFast, who ask for your delivery address as part
-        of it. Card details never touch this site.
+        Payment is taken by PayFast; card details never touch this site. They
+        do not collect a delivery address, so you will be asked for it on the
+        page you land on afterwards — one email and it is done.
       </p>
     </div>
   );

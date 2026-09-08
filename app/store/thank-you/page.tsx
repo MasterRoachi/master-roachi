@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
 import HalftoneField from '@/components/HalftoneField';
 import PageHeader from '@/components/PageHeader';
+import OrderDetails from '@/components/OrderDetails';
 import { site } from '@/lib/site';
 import styles from './thanks.module.css';
 
@@ -44,9 +45,14 @@ export default function ThankYouPage() {
         <PageHeader
           eyebrow={site.store.name}
           title="Thank you — that worked"
-          lede="Your payment went through. Here is exactly what happens now."
+          lede="Your payment went through. There is one thing left for you to do."
         />
 
+        {/* First, not last. Nothing can be posted until this arrives, so it
+            goes above the timeline rather than after it. */}
+        <OrderDetails email={site.contactEmail ?? ''} />
+
+        <h2 className={styles.thenWhat}>Then what happens</h2>
         <ol className={styles.steps}>
           <li>
             <h2>PayFast emails you a receipt</h2>
@@ -56,13 +62,13 @@ export default function ThankYouPage() {
             </p>
           </li>
           <li>
-            <h2>I raise the order</h2>
+            <h2>I raise the order, once I have your address</h2>
             <p>
-              By hand, usually the same day. There is no automated pipeline
-              between this site and the printer yet, which is the honest reason
-              this step has my name on it rather than a robot&rsquo;s. You will
-              get a note from me confirming the size and the address I am
-              sending it to.
+              By hand, usually the same day your email arrives. There is no
+              automated pipeline between this site and the printer yet, which
+              is the honest reason this step has my name on it rather than a
+              robot&rsquo;s. You will get a note back confirming the size and
+              where it is going.
             </p>
           </li>
           <li>
