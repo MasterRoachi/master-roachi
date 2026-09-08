@@ -101,6 +101,10 @@ export default function Footer() {
             {link(socials.github, 'GitHub', true)}
             {socials.linkedin && link(socials.linkedin, 'LinkedIn', true)}
             {link('/rss.xml', 'RSS', true)}
+            {/* Required to be findable, not just to exist: the ECT Act
+                expects a customer to be able to reach the terms before
+                buying. */}
+            {link('/policies/', 'Terms & returns')}
           </div>
         </div>
       </div>

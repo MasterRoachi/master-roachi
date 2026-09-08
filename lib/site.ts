@@ -20,6 +20,46 @@ export const site = {
   // mailbox behind this address. See DEPLOY.md.
   contactEmail: 'roachi@masterroachi.com' as string | null,
 
+  /**
+   * Who a customer is actually dealing with.
+   *
+   * South Africa's ECT Act requires an online seller to say this on the site —
+   * legal name, status, physical address, contact details — and PayFast asked
+   * for it during merchant verification, which is what these pages exist for.
+   * Not decoration: a missing address here is a compliance gap, not a styling
+   * choice.
+   */
+  legal: {
+    proprietor: 'Stephan Engelbrecht',
+    /** Not a registered company. */
+    status: 'Sole proprietor',
+    address: [
+      '858 Delfi Avenue',
+      'Garsfontein',
+      'Pretoria',
+      '0042',
+      'South Africa',
+    ] as string[],
+    /** Who takes the money. Checkout never happens on this site. */
+    paymentProcessor: 'PayFast',
+    /** Who prints and ships. */
+    fulfilment: 'Printful',
+    /** Days from delivery to report a fault and still be covered. */
+    faultWindowDays: 14,
+    /**
+     * The cooling-off window honoured for South African customers.
+     *
+     * The ECT Act gives a right to cancel certain electronic transactions
+     * within seven days of delivery. Whether print-on-demand of a stock design
+     * counts as "made to the consumer's specifications" — which the Act
+     * excludes — is genuinely arguable, so the right is offered rather than
+     * argued about.
+     */
+    coolingOffDays: 7,
+    /** Bumped when the terms change, so a customer can see which they agreed to. */
+    updated: '2026-09-08',
+  },
+
   store: {
     name: 'Fabled Threads',
     /**

@@ -263,8 +263,9 @@ export default async function ProductPage({
             </p>
             <p>
               It also means it takes longer to arrive than something already on
-              a shelf somewhere, and that returns are handled case by case
-              rather than by a policy page written for a warehouse.
+              a shelf somewhere, and that a change of mind cannot be restocked.
+              What happens if it turns up faulty, late or wrong is written
+              down: see <Link href="/policies/">terms, delivery and returns</Link>.
             </p>
           </div>
         </section>

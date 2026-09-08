@@ -1,0 +1,133 @@
+.page {
+  position: relative;
+  padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- section index -------------------------------------------------------- */
+
+.toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: clamp(24px, 4vw, 44px);
+}
+
+.toc a {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.toc a:hover {
+  border-color: color-mix(in oklch, var(--accent) 50%, var(--line));
+  color: var(--ink);
+}
+
+.section {
+  padding-block: clamp(30px, 4.5vw, 52px) 0;
+  /* So an anchor from the index does not land the heading under the nav. */
+  scroll-margin-top: 90px;
+}
+
+/* --- the identity block --------------------------------------------------- */
+
+/* A table would be heavier furniture than six rows deserve, and these are
+   term-and-value pairs, which is what a definition list is for. */
+.facts {
+  margin: 22px 0 0;
+  display: grid;
+  gap: 2px;
+  max-width: 780px;
+}
+
+.facts > div {
+  display: grid;
+  gap: 4px 24px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 620px) {
+  .facts > div {
+    grid-template-columns: 210px minmax(0, 1fr);
+    align-items: baseline;
+  }
+}
+
+.facts dt {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+/* The address is a block of lines, not a sentence. */
+.addressLine {
+  display: block;
+}
+
+/* --- the written policies ------------------------------------------------- */
+
+.prose {
+  max-width: var(--measure);
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.prose h3 {
+  margin: 30px 0 10px;
+  font-size: 1.02rem;
+  color: var(--ink);
+}
+
+.prose h3:first-child {
+  margin-top: 22px;
+}
+
+.prose p {
+  margin: 0 0 14px;
+}
+
+.prose a {
+  color: color-mix(in oklch, var(--accent) 72%, var(--ink));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose a:hover {
+  color: var(--ink);
+}
+
+.back {
+  margin-top: clamp(40px, 6vw, 68px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.back a {
+  color: var(--muted-2);
+  transition: color 0.18s ease;
+}
+
+.back a:hover {
+  color: var(--ink);
+}
