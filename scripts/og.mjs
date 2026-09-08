@@ -122,16 +122,39 @@ console.log(`og: wrote public/og.png (${OG_W}x${OG_H}, ${kb}KB)`);
 const STORE = 'data/store.json';
 const OG_DIR = 'public/store/og';
 
+// The same selling price the pages show, from the same file, because a card
+// quoting Printful's dollars while the page quotes rand is worse than a card
+// with no price on it. lib/pricing.json is plain JSON precisely so this script
+// and lib/store.ts can share it without one importing the other's language.
+const pricing = JSON.parse(fs.readFileSync('lib/pricing.json', 'utf8'));
+
 function priceRange(product) {
-  const amounts = (product.variants ?? [])
-    .map((v) => v.amount)
-    .filter((n) => Number.isFinite(n));
+  const rate = pricing.usdToZar;
+  const step = pricing.roundUpTo || 1;
+  const overrides = pricing.overrides?.[String(product.id)] ?? {};
+
+  const amounts = [];
+  for (const v of product.variants ?? []) {
+    const override = overrides[v.size];
+    if (Number.isFinite(override)) {
+      amounts.push(override);
+    } else if (rate && Number.isFinite(v.amount)) {
+      const cost = v.amount + (pricing.deliveryUsd || 0);
+      amounts.push(Math.ceil((cost * rate) / step) * step);
+    }
+  }
+  // No rate and no overrides means no price anywhere on the site, so the card
+  // says nothing rather than inventing a figure.
   if (amounts.length === 0) return null;
-  const currency = product.variants?.[0]?.currency ?? 'USD';
-  const sign = currency === 'USD' ? '$' : `${currency} `;
+
+  const f = (n) =>
+    new Intl.NumberFormat('en-ZA', {
+      style: 'currency',
+      currency: pricing.currency,
+      maximumFractionDigits: 2,
+    }).format(n);
   const low = Math.min(...amounts);
   const high = Math.max(...amounts);
-  const f = (n) => `${sign}${n.toFixed(2)}`;
   return low === high ? f(low) : `${f(low)} – ${f(high)}`;
 }
 

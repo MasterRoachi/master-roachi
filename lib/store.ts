@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { site } from './site';
+import pricing from './pricing.json';
 
 // Reads the Printful catalogue written by scripts/printful.mjs at build time.
 // Nothing here runs at request time — the site is a static export, so the
@@ -172,9 +173,44 @@ export function money(amount: number, currency: string): string {
   }
 }
 
-export function formatPrice(from: StoreProduct['from']): string | null {
-  if (!from) return null;
-  return money(from.amount, from.currency);
+/**
+ * What one size actually sells for, in the currency the store can charge.
+ *
+ * Printful's own retail price is a supplier figure in dollars. PayFast settles
+ * only in rand, so showing the dollar figure meant the page and the payment
+ * link disagreed about both the number and the currency. This converts, or
+ * takes a deliberate price where one is set.
+ *
+ * Null while no rate and no override exist — the honest state for a store that
+ * cannot yet charge anything, and the reason nothing shows a price until
+ * lib/pricing.json is filled in.
+ */
+export function sellingPrice(
+  product: StoreProduct,
+  size: string,
+): { amount: number; currency: string } | null {
+  const currency = pricing.currency;
+
+  const override = (pricing.overrides as Record<string, Record<string, number>>)[
+    String(product.id)
+  ]?.[size];
+  if (Number.isFinite(override)) return { amount: override, currency };
+
+  const rate = pricing.usdToZar;
+  if (!rate) return null;
+
+  const variant = (product.variants ?? []).find((v) => v.size === size);
+  if (!variant || !Number.isFinite(variant.amount)) return null;
+
+  // Delivery is added before conversion rather than to Printful retail prices,
+  // so Printful stays a supplier figure and the markup lives in one place.
+  const cost = variant.amount + (pricing.deliveryUsd || 0);
+
+  // Rounded up, never down: rounding a converted price down quietly sells at a
+  // loss on every order of that size.
+  const step = pricing.roundUpTo || 1;
+  const amount = Math.ceil((cost * rate) / step) * step;
+  return { amount, currency };
 }
 
 /**
@@ -219,16 +255,43 @@ export interface PriceBand {
 export function priceLadder(product: StoreProduct): PriceBand[] {
   const bands: PriceBand[] = [];
   for (const size of sizesOf(product)) {
-    const v = (product.variants ?? []).find((x) => x.size === size);
-    if (!v || !Number.isFinite(v.amount)) continue;
+    const price = sellingPrice(product, size);
+    if (!price) continue;
     const last = bands[bands.length - 1];
-    if (last && last.amount === v.amount && last.currency === v.currency) {
+    if (last && last.amount === price.amount && last.currency === price.currency) {
       last.sizes.push(size);
     } else {
-      bands.push({ sizes: [size], amount: v.amount, currency: v.currency });
+      bands.push({
+        sizes: [size],
+        amount: price.amount,
+        currency: price.currency,
+      });
     }
   }
   return bands;
+}
+
+/**
+ * The price line: a range when sizes cost different amounts, one figure when
+ * they do not, and nothing at all when the store has no price to charge.
+ *
+ * Lived twice, once on the store index and once on the product page, and each
+ * copy fell back to Printful's dollar figure when there was no ladder — which
+ * is precisely the bug this file exists to remove.
+ */
+export function priceSummary(product: StoreProduct): string | null {
+  const bands = priceLadder(product);
+  if (bands.length === 0) return null;
+  const low = bands[0];
+  const high = bands[bands.length - 1];
+  return low.amount === high.amount
+    ? money(low.amount, low.currency)
+    : `${money(low.amount, low.currency)} – ${money(high.amount, high.currency)}`;
+}
+
+/** Whether anything here can be priced at all. */
+export function isPriced(product: StoreProduct): boolean {
+  return priceLadder(product).length > 0;
 }
 
 /** "XS–XL" for a run, "XS, 3XL" for two, the single size for one. */

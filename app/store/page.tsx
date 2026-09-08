@@ -12,13 +12,13 @@ import { quotes } from '@/lib/quotes';
 import {
   getStore,
   buyUrl,
-  formatPrice,
   categoryOf,
   productPath,
   money,
   sizesOf,
   sizeRun,
   priceLadder,
+  priceSummary,
   isSoldOut,
   garmentLabel,
   type StoreProduct,
@@ -37,17 +37,6 @@ export const metadata: Metadata = pageMeta({
 // Fabled Threads keeps its own colour here, the one its project card carried.
 const ACCENT = 'oklch(72% 0.26 350)';
 const ACCENT_2 = 'oklch(80% 0.14 230)';
-
-/** The price line: a range when sizes cost different amounts, one figure when not. */
-function priceSummary(product: StoreProduct): string | null {
-  const bands = priceLadder(product);
-  if (bands.length === 0) return formatPrice(product.from);
-  const low = bands[0];
-  const high = bands[bands.length - 1];
-  return low.amount === high.amount
-    ? money(low.amount, low.currency)
-    : `${money(low.amount, low.currency)} – ${money(high.amount, high.currency)}`;
-}
 
 export default function StorePage() {
   const { products } = getStore();

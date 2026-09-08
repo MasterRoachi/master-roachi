@@ -11,11 +11,11 @@ import {
   getStoreProducts,
   findProduct,
   buyUrl,
-  formatPrice,
   money,
   sizesOf,
   sizeRun,
   priceLadder,
+  priceSummary,
   isSoldOut,
   garmentLabel,
   blurbOf,
@@ -32,16 +32,6 @@ const ACCENT_2 = 'oklch(80% 0.14 230)';
 
 export function generateStaticParams() {
   return getStoreProducts().map((p) => ({ slug: p.slug ?? String(p.id) }));
-}
-
-function priceSummary(product: StoreProduct): string | null {
-  const bands = priceLadder(product);
-  if (bands.length === 0) return formatPrice(product.from);
-  const low = bands[0];
-  const high = bands[bands.length - 1];
-  return low.amount === high.amount
-    ? money(low.amount, low.currency)
-    : `${money(low.amount, low.currency)} – ${money(high.amount, high.currency)}`;
 }
 
 export async function generateMetadata({
