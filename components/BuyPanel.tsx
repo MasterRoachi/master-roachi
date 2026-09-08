@@ -92,8 +92,8 @@ export default function BuyPanel({
       )}
 
       <p className={styles.note}>
-        Payment is taken by PayFast. You will be asked for a delivery address
-        after paying — or reply to the confirmation email with it.
+        Payment is taken by PayFast, who ask for your delivery address as part
+        of it. Card details never touch this site.
       </p>
     </div>
   );
