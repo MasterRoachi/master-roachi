@@ -20,7 +20,8 @@
     "covers": "node scripts/covers.mjs",
     "achievements": "node --env-file-if-exists=.env.local scripts/achievements.mjs",
     "logo": "node scripts/logo.mjs",
-    "tool-icons": "node scripts/tool-icons.mjs"
+    "tool-icons": "node scripts/tool-icons.mjs",
+    "test:worker": "node scripts/worker-test.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

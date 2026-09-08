@@ -66,9 +66,27 @@
 	// The voter hash is salted by a VOTE_SALT secret, set separately with
 	// `npx wrangler secret put VOTE_SALT` once the Worker is deployed. Without
 	// it the hash of a given address is guessable.
+	//
+	// ORDERS points at the same namespace as VOTES on purpose. The two hold
+	// different things under different key prefixes — "v:" and "order:" — and
+	// pointing a second binding at one namespace costs nothing, while creating
+	// a second namespace is a manual step that would leave the buy flow half
+	// working until it was done. Give it its own id whenever that is worth
+	// doing; nothing in the Worker cares which namespace it lands in.
+	//
+	// Reading orders back needs a secret, set once the Worker is deployed:
+	//
+	//   npx wrangler secret put ORDERS_KEY
+	//
+	// Without it /api/orders serves the 404 page instead of a list of
+	// customers' addresses. A missing secret fails closed.
 	"kv_namespaces": [
 		{
 			"binding": "VOTES",
+			"id": "4015d6eaebb04b8ab4fc9596f87b429e"
+		},
+		{
+			"binding": "ORDERS",
 			"id": "4015d6eaebb04b8ab4fc9596f87b429e"
 		}
 	]

@@ -43,6 +43,21 @@ interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
   VOTES?: KVNamespace;
   /**
+   * Where an order's delivery details go.
+   *
+   * PayFast's shareable links take money without asking where to send
+   * anything, and the amount does not identify the size — R500 covers XS to
+   * XL. So the address is collected here first, and the customer only reaches
+   * PayFast once there is something to post to.
+   */
+  ORDERS?: KVNamespace;
+  /**
+   * Guards the order list. Without it /api/orders answers 404 rather than
+   * handing anyone the customers' addresses — a missing secret must fail
+   * closed, not open.
+   */
+  ORDERS_KEY?: string;
+  /**
    * Salts the voter hash. Without it the hash of a given IP is guessable, so
    * someone could test whether a particular address had voted. Optional
    * because a missing salt should degrade rather than break; set it as a
@@ -53,6 +68,37 @@ interface Env {
 
 /** Votes lapse after six months, so an abandoned poll empties itself. */
 const VOTE_TTL = 60 * 60 * 24 * 180;
+
+/**
+ * How long a delivery address is kept.
+ *
+ * Six months: long enough to cover the order, a slow delivery and a return
+ * inside the fault window, and short enough that this is not a permanent
+ * archive of where customers live. Stated on /policies/ under Privacy, which
+ * has to stay true.
+ */
+const ORDER_TTL = 60 * 60 * 24 * 180;
+
+/** Caps on what an order may contain, so the store cannot be filled with junk. */
+const FIELD_MAX = 200;
+const ORDER_MAX_BYTES = 4096;
+
+/**
+ * A short, human-quotable reference.
+ *
+ * Read out over email between a customer and one person, so it avoids
+ * characters that are argued about out loud: no 0/O, no 1/I.
+ */
+function reference(): string {
+  const alphabet = 'ACDEFGHJKLMNPQRTUVWXY2346789';
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('');
+}
+
+/** Trimmed, length-capped, and never trusted to be a string in the first place. */
+function field(value: unknown, max = FIELD_MAX): string {
+  return typeof value === 'string' ? value.trim().slice(0, max) : '';
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -189,6 +235,90 @@ export default {
     // added the slash, voting would fail silently and the page would fall back
     // to a plain list with no error to explain it.
     const route = url.pathname.replace(/\/+$/, '');
+
+    // --- an order's delivery details ---------------------------------------
+    //
+    // Written before the customer is sent to PayFast, because a shareable
+    // payment link collects no address and its amount does not identify the
+    // size. Nothing about money happens here: the sum is recorded as the
+    // customer saw it, and PayFast decides what is actually charged.
+    if (route === '/api/order') {
+      if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);
+
+      const orders = env.ORDERS;
+      // The buy flow treats this as non-fatal and sends the customer on to
+      // PayFast regardless — the thank-you page then asks for the address by
+      // email, which is where this started. Losing the convenience is better
+      // than blocking a sale.
+      if (!orders) return json({ stored: false, reason: 'not-configured' }, 200);
+
+      const raw = await request.text();
+      if (raw.length > ORDER_MAX_BYTES) {
+        return json({ error: 'Too large.' }, 413);
+      }
+
+      let body: Record<string, unknown>;
+      try {
+        body = JSON.parse(raw) as Record<string, unknown>;
+      } catch {
+        return json({ error: 'Expected a JSON body.' }, 400);
+      }
+
+      const order = {
+        product: field(body.product),
+        productId: field(body.productId, 32),
+        size: field(body.size, 16),
+        // What the page showed. Informational only — the payment link is a
+        // fixed sum and this cannot change it.
+        price: field(body.price, 32),
+        name: field(body.name),
+        email: field(body.email),
+        phone: field(body.phone, 40),
+        address: field(body.address, 600),
+        note: field(body.note, 600),
+      };
+
+      if (!order.name || !order.email || !order.address || !order.size) {
+        return json({ error: 'Name, email, address and size are required.' }, 400);
+      }
+
+      const ref = reference();
+      await orders.put(
+        `order:${new Date().toISOString()}:${ref}`,
+        JSON.stringify({ ...order, ref, at: new Date().toISOString() }),
+        { expirationTtl: ORDER_TTL },
+      );
+
+      return json({ stored: true, ref }, 200);
+    }
+
+    // --- reading them back --------------------------------------------------
+    //
+    // There is no admin page; this is the whole of it. Guarded by a secret
+    // compared in full rather than by a prefix, and answering 404 rather than
+    // 401 when it is wrong, so probing cannot tell the difference between a
+    // bad key and no endpoint.
+    if (route === '/api/orders') {
+      const key = url.searchParams.get('key') ?? '';
+      const expected = env.ORDERS_KEY ?? '';
+      if (!expected || key !== expected) {
+        return env.ASSETS.fetch(request);
+      }
+
+      const orders = env.ORDERS;
+      if (!orders) return json({ configured: false, orders: [] }, 200);
+
+      const page = await orders.list({ prefix: 'order:', limit: 200 });
+      const rows = [];
+      for (const entry of page.keys) {
+        const value = await orders.get(entry.name);
+        if (value) rows.push(JSON.parse(value));
+      }
+      // Newest first: the key carries an ISO timestamp, so this sorts by time.
+      rows.reverse();
+      return json({ configured: true, count: rows.length, orders: rows }, 200);
+    }
+
     if (route !== '/api/vote') return env.ASSETS.fetch(request);
 
     const kv = env.VOTES;

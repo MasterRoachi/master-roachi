@@ -65,3 +65,18 @@
 .fallback a:hover {
   color: var(--ink);
 }
+
+/* Confirmation rather than instruction: the same box, without the urgency. */
+.box[data-confirmed] {
+  border-color: color-mix(in oklch, var(--accent-a) 28%, var(--line));
+}
+
+.ref {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.94em;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+}

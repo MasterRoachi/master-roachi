@@ -295,20 +295,32 @@ export default function PoliciesPage() {
               recorded against you.
             </p>
             <p>
-              Ordering means giving a name, delivery address and email address.
-              That goes to {legal.paymentProcessor} to take the payment and to{' '}
-              {legal.fulfilment} to print and post the item — the two parties
-              who cannot do their job without it — and is not sold, shared or
-              used for marketing. Payment card details are entered on{' '}
-              {legal.paymentProcessor}&rsquo;s system and are never seen by this
-              site or by me.
+              Ordering means giving a name, delivery address, email address and
+              usually a phone number for the courier. That is sent to me before
+              payment — {legal.paymentProcessor} does not collect a delivery
+              address, so this site has to — and it is passed to{' '}
+              {legal.fulfilment} to print and post the item. Those are the two
+              parties who cannot do their job without it. It is not sold,
+              shared further, or used for marketing.
             </p>
             <p>
-              The one thing stored about visitors is on the games poll: voting
-              saves a one-way hash of your address and browser, salted, so the
-              same person cannot vote twice. The address itself is never
-              written down, the hash cannot be turned back into one, and it is
-              deleted after six months.
+              Order details are held in Cloudflare KV, the same storage the
+              rest of this site runs on, and are deleted automatically six
+              months after the order. Nobody but me can read them: the endpoint
+              that lists them is behind a secret and serves the 404 page
+              without it.
+            </p>
+            <p>
+              Payment card details are entered on{' '}
+              {legal.paymentProcessor}&rsquo;s system and are never seen by
+              this site or by me.
+            </p>
+            <p>
+              The only other thing stored about visitors is on the games poll:
+              voting saves a one-way hash of your network address and browser,
+              salted, so the same person cannot vote twice. The address itself
+              is never written down, the hash cannot be turned back into one,
+              and it is deleted after six months.
             </p>
             <p>
               To ask what is held about you, or to have it deleted, email{' '}

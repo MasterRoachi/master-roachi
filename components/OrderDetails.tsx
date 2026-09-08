@@ -21,6 +21,8 @@ interface LastOrder {
   product: string;
   size: string;
   price: string;
+  /** Set when the Worker stored the address; null when it could not. */
+  ref?: string | null;
   at: number;
 }
 
@@ -74,15 +76,41 @@ export default function OrderDetails({ email }: { email: string }) {
     subject,
   )}&body=${encodeURIComponent(body)}`;
 
+  // The address is normally taken before payment, so this usually confirms
+  // rather than asks. It only asks when the Worker could not store it — a
+  // failure that is deliberately allowed through rather than blocking a sale.
+  if (ready && order?.ref) {
+    return (
+      <div className={styles.box} data-confirmed="true">
+        <p className="eyebrow">Nothing else to do</p>
+        <h2 className={styles.title}>I have your address</h2>
+        <p className={styles.why}>
+          Your order is <strong>{known}</strong>, reference{' '}
+          <code className={styles.ref}>{order.ref}</code>. Quote that if you
+          need to write about it. Everything below happens without you.
+        </p>
+        <p className={styles.fallback}>
+          Something wrong, or need to change the address?{' '}
+          <a href={`mailto:${email}?subject=${encodeURIComponent(
+            `Order ${order.ref}`,
+          )}`}>
+            Email me
+          </a>
+          .
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.box}>
       <p className="eyebrow">Do this now</p>
       <h2 className={styles.title}>Send me your delivery address</h2>
 
       <p className={styles.why}>
-        PayFast took the payment but does not pass on an address, so nothing
-        can be posted until you send one. It is one email and the template is
-        already written.
+        Your address did not reach me before payment — that is my end, not
+        yours. PayFast does not pass one on, so nothing can be posted until it
+        arrives. One email, and the template is already written.
       </p>
 
       {/* Shown only once storage has been checked, so the line does not flip

@@ -62,9 +62,9 @@ export default function ThankYouPage() {
             </p>
           </li>
           <li>
-            <h2>I raise the order, once I have your address</h2>
+            <h2>I raise the order</h2>
             <p>
-              By hand, usually the same day your email arrives. There is no
+              By hand, usually the same day. There is no
               automated pipeline between this site and the printer yet, which
               is the honest reason this step has my name on it rather than a
               robot&rsquo;s. You will get a note back confirming the size and
