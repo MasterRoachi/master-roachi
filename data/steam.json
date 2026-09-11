@@ -1,19 +1,19 @@
 {
-  "fetchedAt": "2026-09-09T09:37:12.198Z",
+  "fetchedAt": "2026-09-11T09:33:51.514Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
     "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-    "minutesTwoWeeks": 2865,
-    "minutesTotal": 2865
+    "minutesTwoWeeks": 3104,
+    "minutesTotal": 3104
   },
   "recent": [
     {
       "appid": 431730,
       "title": "Aseprite",
       "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-      "minutesTwoWeeks": 2865,
-      "minutesTotal": 2865
+      "minutesTwoWeeks": 3104,
+      "minutesTotal": 3104
     },
     {
       "appid": 431960,
@@ -46,7 +46,7 @@
     {
       "appid": 570,
       "title": "Dota 2",
-      "icon": "0bbb630d63262dd66d2fdd0f7d37e8661a410075",
+      "icon": "48eb825bb93787945065b460bdc109e395384ebf",
       "minutesTwoWeeks": 0,
       "minutesTotal": 194049
     },
@@ -1019,7 +1019,7 @@
     },
     "431730": {
       "name": "Aseprite",
-      "minutes": 2865,
+      "minutes": 3104,
       "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
       "unlocked": null,
       "total": null
