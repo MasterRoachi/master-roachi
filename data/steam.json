@@ -1,25 +1,25 @@
 {
-  "fetchedAt": "2026-09-12T09:12:46.832Z",
+  "fetchedAt": "2026-09-13T10:09:58.121Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
     "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-    "minutesTwoWeeks": 3573,
-    "minutesTotal": 3886
+    "minutesTwoWeeks": 3382,
+    "minutesTotal": 4025
   },
   "recent": [
     {
       "appid": 431730,
       "title": "Aseprite",
       "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-      "minutesTwoWeeks": 3573,
-      "minutesTotal": 3886
+      "minutesTwoWeeks": 3382,
+      "minutesTotal": 4025
     },
     {
       "appid": 431960,
       "title": "Wallpaper Engine",
       "icon": "72edaed9d748c6cf7397ffb1c83f0b837b9ebd9d",
-      "minutesTwoWeeks": 21,
+      "minutesTwoWeeks": 0,
       "minutesTotal": 406
     },
     {
@@ -1019,7 +1019,7 @@
     },
     "431730": {
       "name": "Aseprite",
-      "minutes": 3886,
+      "minutes": 4025,
       "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
       "unlocked": null,
       "total": null
