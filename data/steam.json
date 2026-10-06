@@ -1,10 +1,10 @@
 {
-  "fetchedAt": "2026-10-02T11:02:02.437Z",
+  "fetchedAt": "2026-10-06T11:57:47.782Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
     "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-    "minutesTwoWeeks": 260,
+    "minutesTwoWeeks": 1,
     "minutesTotal": 4302
   },
   "recent": [
@@ -12,7 +12,7 @@
       "appid": 431730,
       "title": "Aseprite",
       "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-      "minutesTwoWeeks": 260,
+      "minutesTwoWeeks": 1,
       "minutesTotal": 4302
     },
     {
