@@ -83,24 +83,26 @@
 	// The backend's own data: habits, and the trackers that follow. Not in git,
 	// because a daily tick is not worth a commit and a deploy.
 	//
-	// Commented out until the database exists. Create it once:
+	// Created 2026-10-08 in WEUR. An id is an identifier and not a credential —
+	// same as the KV namespace below — so it belongs in the repo; the Worker
+	// still needs the account's own auth to reach it.
 	//
-	//   npx wrangler d1 create master-roachi
+	// The binding is DB and not the `master_roachi` that `d1 create` suggests:
+	// the Worker reads env.DB, the name is local to this config, and DB says
+	// what it is rather than repeating the account's name.
+	//
+	// Schema changes are migrations, applied from THIS directory because that
+	// is where the config and migrations_dir are:
+	//
 	//   npx wrangler d1 migrations apply master-roachi --remote
-	//
-	// then uncomment this and paste in the database_id it printed. An id is an
-	// identifier and not a credential, same as the KV namespace below, so it
-	// belongs in the repo. Until then env.DB is undefined and every tracker
-	// page says it is not set up rather than erroring.
-	//
-	// "d1_databases": [
-	// 	{
-	// 		"binding": "DB",
-	// 		"database_name": "master-roachi",
-	// 		"database_id": "PASTE_THE_ID_HERE",
-	// 		"migrations_dir": "migrations"
-	// 	}
-	// ],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "master-roachi",
+			"database_id": "8f350d84-3123-45d7-a509-c96e50d4d67d",
+			"migrations_dir": "migrations"
+		}
+	],
 
 	"kv_namespaces": [
 		{
