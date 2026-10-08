@@ -509,3 +509,103 @@
   font-size: 0.8125rem;
   margin-bottom: 1rem;
 }
+
+/* --- the route through all the routes ----------------------------------- */
+
+/* One next thing across everything, above the individual cards. The order of
+   the curriculums is that route, which is what the arrows on each card set. */
+.overall {
+  border: 1px solid var(--accent);
+  background: var(--accent-dim);
+  border-radius: 12px;
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.overallHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.overallHead span:first-child {
+  color: var(--accent);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.overallCount {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.overallNext {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.overallNext strong {
+  display: block;
+  font-size: 1.1875rem;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+/* --- off the route ------------------------------------------------------ */
+
+/* Skipped work stays on the page, dimmed. Hiding it would make the route
+   unreviewable: the point of marking a fork is to see what is being left out
+   and be able to change your mind about it. */
+.moduleOff {
+  position: relative;
+  padding: 0 0 0 1.1rem;
+  margin-bottom: 1.1rem;
+  opacity: 0.45;
+}
+
+.moduleOff .node,
+.moduleOff .nodeDone {
+  background: var(--bg-raised);
+  border-color: var(--line);
+  border-style: dashed;
+}
+
+.lessonOff {
+  opacity: 0.5;
+}
+
+/* A dashed strike, so an off-route lesson does not read as a finished one —
+   done is a solid line through it. */
+.lessonOff label {
+  text-decoration: line-through;
+  text-decoration-style: dashed;
+  text-decoration-color: var(--line-bright);
+}
+
+.offBadge {
+  color: var(--muted);
+  border: 1px dashed var(--line-bright);
+  border-radius: 3px;
+  padding: 0 0.3rem;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* How much the route leaves out, next to how much of it is done. */
+.skipped {
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+.moveGroup {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.8;
+}

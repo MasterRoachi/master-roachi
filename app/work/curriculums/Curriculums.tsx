@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   isComplete,
+  moduleOnRoute,
   nextLesson,
+  overallNext,
+  overallProgress,
   progressOf,
   recentlyDone,
   type Curriculum,
@@ -163,8 +166,9 @@ export default function Curriculums() {
 
   function Lessons({ module }: { module: Module }) {
     const moduleProgress = progressOf(module);
+    const onRoute = moduleOnRoute(module);
     return (
-      <div className={styles.module}>
+      <div className={onRoute ? styles.module : styles.moduleOff}>
         <span
           className={
             moduleProgress.total > 0 && moduleProgress.done === moduleProgress.total
@@ -177,9 +181,25 @@ export default function Curriculums() {
           <Name kind="module" id={module.id}>
             {module.name}
           </Name>
-          <span className={styles.moduleCount}>
-            {moduleProgress.done}/{moduleProgress.total}
-          </span>
+          {onRoute ? (
+            <span className={styles.moduleCount}>
+              {moduleProgress.done}/{moduleProgress.total}
+            </span>
+          ) : (
+            <span className={styles.offBadge}>off route</span>
+          )}
+          {/* A fork in a course is a section, so the whole module goes on or
+              off at once — nobody switches forty lessons one at a time. */}
+          <button
+            type="button"
+            className={styles.tiny}
+            title={onRoute ? 'Take this module off the route' : 'Put this module on the route'}
+            onClick={() =>
+              void act({ action: 'set-route', module_id: module.id, on: !onRoute })
+            }
+          >
+            {onRoute ? '⊘' : '⊕'}
+          </button>
           <button
             type="button"
             className={styles.tiny}
@@ -206,33 +226,47 @@ export default function Curriculums() {
         </h3>
 
         <ul className={styles.lessons}>
-          {module.lessons.map((lesson) => (
-            <li key={lesson.id}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={lesson.done_on !== null}
-                  onChange={() => void act({ action: 'toggle-lesson', id: lesson.id })}
-                />
-                <Name
-                  kind="lesson"
-                  id={lesson.id}
-                  className={lesson.done_on ? styles.doneLesson : undefined}
+          {module.lessons.map((lesson) => {
+            const lessonOn = lesson.on_route !== 0;
+            return (
+              <li key={lesson.id} className={lessonOn ? undefined : styles.lessonOff}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={lesson.done_on !== null}
+                    onChange={() => void act({ action: 'toggle-lesson', id: lesson.id })}
+                  />
+                  <Name
+                    kind="lesson"
+                    id={lesson.id}
+                    className={lesson.done_on ? styles.doneLesson : undefined}
+                  >
+                    {lesson.name}
+                  </Name>
+                </label>
+                {lesson.done_on && <span className={styles.when}>{lesson.done_on}</span>}
+                {/* Skipped work stays visible. Hiding it would make the route
+                    unreviewable — the point is to see what is being left out
+                    and be able to change your mind. */}
+                <button
+                  type="button"
+                  className={styles.tiny}
+                  title={lessonOn ? 'Take off the route' : 'Put on the route'}
+                  onClick={() => void act({ action: 'set-route', id: lesson.id, on: !lessonOn })}
                 >
-                  {lesson.name}
-                </Name>
-              </label>
-              {lesson.done_on && <span className={styles.when}>{lesson.done_on}</span>}
-              <button
-                type="button"
-                className={styles.tiny}
-                title="Remove this lesson"
-                onClick={() => void act({ action: 'remove', kind: 'lesson', id: lesson.id })}
-              >
-                ×
-              </button>
-            </li>
-          ))}
+                  {lessonOn ? '⊘' : '⊕'}
+                </button>
+                <button
+                  type="button"
+                  className={styles.tiny}
+                  title="Remove this lesson"
+                  onClick={() => void act({ action: 'remove', kind: 'lesson', id: lesson.id })}
+                >
+                  ×
+                </button>
+              </li>
+            );
+          })}
         </ul>
 
         {/* add-lesson: offered by the API from the start, and until now
@@ -291,7 +325,10 @@ export default function Curriculums() {
               </Name>
             </h2>
             <p className={styles.meta}>
-              {progress.done} of {progress.total} lessons
+              {progress.done} of {progress.total} on route
+              {progress.skipped > 0 && (
+                <span className={styles.skipped}>{progress.skipped} skipped</span>
+              )}
               {progress.total > 0 && recent > 0 && (
                 <span className={styles.recent}>{recent} in a fortnight</span>
               )}
@@ -303,6 +340,26 @@ export default function Curriculums() {
           </div>
 
           <div className={styles.headControls}>
+            {/* The order of the curriculums IS the route through all of them,
+                so these arrows decide what comes next overall. */}
+            <span className={styles.moveGroup}>
+              <button
+                type="button"
+                className={styles.tiny}
+                title="Earlier in the overall route"
+                onClick={() => void act({ action: 'move', id: curriculum.id, direction: 'up' })}
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                className={styles.tiny}
+                title="Later in the overall route"
+                onClick={() => void act({ action: 'move', id: curriculum.id, direction: 'down' })}
+              >
+                ↓
+              </button>
+            </span>
             <select
               value={curriculum.status}
               aria-label={`Status of ${curriculum.name}`}
@@ -456,9 +513,52 @@ export default function Curriculums() {
     );
   }
 
+  const whole = overallProgress(data);
+  const upNext = overallNext(data);
+
   return (
     <div className={styles.page}>
       {error && <p className={styles.warn}>{error}</p>}
+
+      {/* The route through all the routes: one next thing across everything,
+          in the order the curriculums are in. */}
+      {data.length > 0 && (
+        <div className={styles.overall}>
+          <p className={styles.overallHead}>
+            <span>Up next</span>
+            <span className={styles.overallCount}>
+              {whole.done} of {whole.total} across {active.length} active
+            </span>
+          </p>
+
+          {upNext ? (
+            <div className={styles.overallNext}>
+              <button
+                type="button"
+                className={styles.nextTick}
+                aria-label={`Mark ${upNext.lesson.name} done`}
+                onClick={() => void act({ action: 'toggle-lesson', id: upNext.lesson.id })}
+              />
+              <span>
+                <strong>{upNext.lesson.name}</strong>
+                <span className={styles.nextIn}>
+                  {upNext.curriculum.name} › {upNext.module.name}
+                </span>
+              </span>
+            </div>
+          ) : (
+            <div className={styles.overallNext}>
+              <span>
+                <strong>
+                  {active.length === 0
+                    ? 'Nothing active.'
+                    : 'Every route finished.'}
+                </strong>
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {active.map((curriculum) => (
         <Card key={curriculum.id} curriculum={curriculum} />

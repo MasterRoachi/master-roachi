@@ -935,7 +935,7 @@ function fakeD1() {
   ];
   const curriculums = [{ id: 1, name: 'Odin', source: null, status: 'active', position: 1 }];
   const modules = [{ id: 1, curriculum_id: 1, name: 'Foundations', position: 1 }];
-  const lessons = [{ id: 1, module_id: 1, name: 'Intro', position: 1, done_on: null }];
+  const lessons = [{ id: 1, module_id: 1, name: 'Intro', position: 1, done_on: null, on_route: 1 }];
   const sqlLog = [];
 
   const statement = (sql) => {
@@ -976,6 +976,19 @@ function fakeD1() {
         if (sql.includes('from modules') && sql.includes('order by id desc')) {
           return modules.at(-1) ?? null;
         }
+        if (sql.includes('from curriculums') && sql.includes('position <')) {
+          return (
+            curriculums.filter((c) => c.position < bound[0]).sort((a, b) => b.position - a.position)[0] ?? null
+          );
+        }
+        if (sql.includes('from curriculums') && sql.includes('position >')) {
+          return (
+            curriculums.filter((c) => c.position > bound[0]).sort((a, b) => a.position - b.position)[0] ?? null
+          );
+        }
+        if (sql.includes('select position from curriculums')) {
+          return curriculums.find((c) => c.id === bound[0]) ?? null;
+        }
         if (sql.includes('from lessons')) {
           return lessons.find((l) => l.id === bound[0]) ?? null;
         }
@@ -1002,10 +1015,22 @@ function fakeD1() {
         }
         if (sql.startsWith('insert into curriculums')) curriculums.push({ id: curriculums.length + 1, name: bound[0], source: bound[1] });
         if (sql.startsWith('insert into modules')) modules.push({ id: modules.length + 1, curriculum_id: bound[0], name: bound[1], position: bound[2] });
-        if (sql.startsWith('insert into lessons')) lessons.push({ id: lessons.length + 1, module_id: bound[0], name: bound[1], position: bound[2], done_on: null });
-        if (sql.startsWith('update lessons')) {
+        if (sql.startsWith('insert into lessons')) lessons.push({ id: lessons.length + 1, module_id: bound[0], name: bound[1], position: bound[2], done_on: null, on_route: 1 });
+        if (sql.startsWith('update lessons set on_route')) {
+          // By module, or by lesson, depending on which the SQL names.
+          if (sql.includes('where module_id')) {
+            for (const l of lessons.filter((l) => l.module_id === bound[0])) l.on_route = bound[1];
+          } else {
+            const row = lessons.find((l) => l.id === bound[0]);
+            if (row) row.on_route = bound[1];
+          }
+        } else if (sql.startsWith('update lessons')) {
           const row = lessons.find((l) => l.id === bound[0]);
           if (row) row.done_on = bound[1];
+        }
+        if (sql.startsWith('update curriculums set position')) {
+          const row = curriculums.find((c) => c.id === bound[0]);
+          if (row) row.position = bound[1];
         }
         if (sql.startsWith('delete from books')) {
           const at = books.findIndex((b) => b.id === bound[0]);
@@ -1019,7 +1044,11 @@ function fakeD1() {
 
   return {
     prepare: statement,
-    async batch() {},
+    // The real batch runs the statements; the fake has to as well, or a
+    // reorder would silently do nothing in a test and pass.
+    async batch(list) {
+      for (const one of list) await one.run();
+    },
     _ticks: ticks,
     _habits: habits,
     _books: books,
@@ -2149,7 +2178,15 @@ globalThis.fetch = preGh;
 // --- curriculum progress and what is next ----------------------------------
 
 {
-  const lesson = (id, done = null) => ({ id, name: `L${id}`, done_on: done });
+  // on_route is explicit in every fixture. Leaving it undefined made the
+  // earlier tests pass for the wrong reason: `undefined !== 0` is true, so
+  // every lesson counted as on-route and none of the route logic was exercised.
+  const lesson = (id, done = null, onRoute = 1) => ({
+    id,
+    name: `L${id}`,
+    done_on: done,
+    on_route: onRoute,
+  });
   const make = (modules) => ({ id: 1, name: 'Odin', source: null, status: 'active', modules });
 
   const course = make([
@@ -2218,6 +2255,195 @@ globalThis.fetch = preGh;
     'expected 0',
   );
 }
+
+// --- routes ----------------------------------------------------------------
+//
+// A course is a list you take a line through, not a list you finish. The
+// numbers have to be about the line.
+
+{
+  const lesson = (id, done = null, onRoute = 1) => ({
+    id,
+    name: `L${id}`,
+    done_on: done,
+    on_route: onRoute,
+  });
+  const make = (modules, status = 'active', id = 1, name = 'C') => ({
+    id,
+    name,
+    source: null,
+    status,
+    modules,
+  });
+
+  const forked = make([
+    { id: 1, name: 'Foundations', lessons: [lesson(1, '2026-09-01'), lesson(2)] },
+    // A whole section off the route — Odin's Ruby fork, in miniature.
+    { id: 2, name: 'Ruby', lessons: [lesson(3, null, 0), lesson(4, null, 0)] },
+    { id: 3, name: 'NodeJS', lessons: [lesson(5)] },
+  ]);
+
+  let p = curriculum.progressOf(forked);
+  check(
+    'progress counts the route, not the course',
+    p.done === 1 && p.total === 3 && p.percent === 33,
+    JSON.stringify(p),
+  );
+  check('and says how much is being skipped', p.skipped === 2, JSON.stringify(p));
+
+  // Work done off the route was still done, but must not inflate the route —
+  // counting it could put a route over 100%.
+  const strayed = make([
+    { id: 1, name: 'm', lessons: [lesson(1, '2026-09-01'), lesson(2, '2026-09-02', 0)] },
+  ]);
+  p = curriculum.progressOf(strayed);
+  check(
+    'a lesson done off the route does not count towards it',
+    p.done === 1 && p.total === 1 && p.percent === 100 && p.doneOffRoute === 1,
+    JSON.stringify(p),
+  );
+
+  // A course entirely off the route is 0%, not 100% — every lesson "done" of
+  // zero would otherwise be a full ring.
+  p = curriculum.progressOf(make([{ id: 1, name: 'm', lessons: [lesson(1, null, 0)] }]));
+  check('a course with nothing on its route is 0%', p.percent === 0 && p.total === 0, JSON.stringify(p));
+
+  check(
+    'the next lesson skips the off-route section',
+    curriculum.nextLesson(forked)?.lesson.id === 2,
+    JSON.stringify(curriculum.nextLesson(forked)),
+  );
+  const onlyOff = make([
+    { id: 1, name: 'm', lessons: [lesson(1, '2026-01-01'), lesson(2, null, 0)] },
+  ]);
+  check(
+    'an off-route lesson is never offered as next',
+    curriculum.nextLesson(onlyOff) === null,
+    JSON.stringify(curriculum.nextLesson(onlyOff)),
+  );
+
+  check(
+    'a module is off the route when all of its lessons are',
+    !curriculum.moduleOnRoute(forked.modules[1]) && curriculum.moduleOnRoute(forked.modules[0]),
+    'wrong',
+  );
+  check(
+    'and on the route if even one lesson is',
+    curriculum.moduleOnRoute({ id: 9, name: 'm', lessons: [lesson(1, null, 0), lesson(2)] }),
+    'expected true',
+  );
+
+  // --- the route through all the routes ---
+  const first = make([{ id: 1, name: 'm', lessons: [lesson(1, '2026-01-01')] }], 'active', 1, 'Done one');
+  const second = make([{ id: 2, name: 'm', lessons: [lesson(2)] }], 'active', 2, 'Next one');
+  const paused = make([{ id: 3, name: 'm', lessons: [lesson(3)] }], 'paused', 3, 'Paused one');
+
+  let overall = curriculum.overallNext([first, second]);
+  check(
+    'the overall next is the first gap in curriculum order',
+    overall?.lesson.id === 2 && overall.curriculum.name === 'Next one',
+    JSON.stringify(overall),
+  );
+
+  // Pausing a course has to mean something, or pausing it is pointless.
+  overall = curriculum.overallNext([paused, second]);
+  check(
+    'a paused curriculum is passed over',
+    overall?.curriculum.name === 'Next one',
+    JSON.stringify(overall),
+  );
+  check(
+    'everything paused means nothing is next',
+    curriculum.overallNext([paused]) === null,
+    'expected null',
+  );
+  check(
+    'order decides, so reordering changes what is next',
+    curriculum.overallNext([second, first])?.lesson.id === 2 &&
+      curriculum.overallNext([first, second])?.lesson.id === 2,
+    'unexpected',
+  );
+
+  const total = curriculum.overallProgress([first, second, paused]);
+  check(
+    'overall progress counts active routes only',
+    total.done === 1 && total.total === 2,
+    JSON.stringify(total),
+  );
+}
+
+// --- set-route and move, through the endpoint ------------------------------
+
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'set-route',
+    id: 1,
+    on: false,
+  }),
+  dbEnv(),
+);
+check(
+  'a lesson can be taken off the route',
+  res.status === 200 && DB._lessons[0].on_route === 0,
+  JSON.stringify(DB._lessons[0]),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'set-route',
+    module_id: 1,
+    on: true,
+  }),
+  dbEnv(),
+);
+check(
+  'and a whole module at once, because a fork is a section',
+  res.status === 200 && DB._lessons.every((l) => l.module_id !== 1 || l.on_route === 1),
+  JSON.stringify(DB._lessons),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'set-route', on: false }),
+  dbEnv(),
+);
+check('set-route with nothing named is refused', res.status === 400, String(res.status));
+
+// Reordering, which decides the route through all the routes. position has
+// existed since the first migration and nothing could change it.
+DB = fakeD1();
+DB._curriculums.push({ id: 2, name: 'Second', source: null, status: 'active', position: 2 });
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'move', id: 2, direction: 'up' }),
+  dbEnv(),
+);
+check(
+  'moving a curriculum up swaps it with its neighbour',
+  res.status === 200 &&
+    DB._curriculums.find((c) => c.id === 2).position === 1 &&
+    DB._curriculums.find((c) => c.id === 1).position === 2,
+  JSON.stringify(DB._curriculums.map((c) => [c.id, c.position])),
+);
+
+// At the end is not an error — the button is simply at its limit, and a 400
+// would make it look broken.
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'move', id: 2, direction: 'up' }),
+  dbEnv(),
+);
+body = await res.json();
+check(
+  'moving past the end reports nothing happened rather than failing',
+  res.status === 200 && body.moved === false,
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'move', id: 999, direction: 'up' }),
+  dbEnv(),
+);
+check('moving a curriculum that is not there is a 404', res.status === 404, String(res.status));
 
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);

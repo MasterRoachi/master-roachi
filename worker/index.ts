@@ -981,10 +981,16 @@ export default {
               .all<{ id: number; curriculum_id: number; name: string }>(),
             db
               .prepare(
-                `select id, module_id, name, position, done_on from lessons
+                `select id, module_id, name, position, done_on, on_route from lessons
                  order by position, id`,
               )
-              .all<{ id: number; module_id: number; name: string; done_on: string | null }>(),
+              .all<{
+              id: number;
+              module_id: number;
+              name: string;
+              done_on: string | null;
+              on_route: number;
+            }>(),
           ]);
 
           const lessonsByModule = new Map<number, unknown[]>();
@@ -1111,6 +1117,74 @@ export default {
             }
 
             return json({ imported: true, ...size }, 200);
+          }
+
+          // Taking work on or off the route. A whole module at once, because
+          // a fork in a course is a section and switching forty lessons off
+          // one at a time is not a thing anyone would do.
+          if (action === 'set-route') {
+            const on = body.on === true ? 1 : 0;
+
+            if (body.module_id !== undefined) {
+              const moduleId = Number(body.module_id);
+              if (!Number.isInteger(moduleId)) return json({ error: 'which module' }, 400);
+              await db
+                .prepare(`update lessons set on_route = ?2 where module_id = ?1`)
+                .bind(moduleId, on)
+                .run();
+              return json({ updated: true, module_id: moduleId, on: on === 1 }, 200);
+            }
+
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which lesson' }, 400);
+            await db
+              .prepare(`update lessons set on_route = ?2 where id = ?1`)
+              .bind(id, on)
+              .run();
+            return json({ updated: true, id, on: on === 1 }, 200);
+          }
+
+          // The order of the curriculums IS the route through all of them, so
+          // reordering is how that route is decided. position existed from the
+          // first migration and nothing could change it.
+          if (action === 'move') {
+            const id = Number(body.id);
+            const direction = body.direction === 'up' ? 'up' : 'down';
+            if (!Number.isInteger(id)) return json({ error: 'which curriculum' }, 400);
+
+            const mine = await db
+              .prepare(`select position from curriculums where id = ?1`)
+              .bind(id)
+              .first<{ position: number }>();
+            if (!mine) return json({ error: 'no such curriculum' }, 404);
+
+            // The neighbour in that direction, whatever its position number
+            // happens to be — positions can have gaps after a delete, so
+            // "position ± 1" would silently do nothing.
+            const neighbour = await db
+              .prepare(
+                direction === 'up'
+                  ? `select id, position from curriculums where position < ?1
+                     order by position desc limit 1`
+                  : `select id, position from curriculums where position > ?1
+                     order by position asc limit 1`,
+              )
+              .bind(mine.position)
+              .first<{ id: number; position: number }>();
+
+            // Already at the end. Not an error: the button is simply at its
+            // limit, and saying so with a 400 would make it look broken.
+            if (!neighbour) return json({ moved: false }, 200);
+
+            await db.batch([
+              db
+                .prepare(`update curriculums set position = ?2 where id = ?1`)
+                .bind(id, neighbour.position),
+              db
+                .prepare(`update curriculums set position = ?2 where id = ?1`)
+                .bind(neighbour.id, mine.position),
+            ]);
+            return json({ moved: true }, 200);
           }
 
           if (action === 'toggle-lesson') {
