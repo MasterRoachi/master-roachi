@@ -609,3 +609,110 @@
   flex-direction: column;
   line-height: 0.8;
 }
+
+/* --- what a lesson teaches ---------------------------------------------- */
+
+/* A lesson used to be a name and nothing else, which makes a curriculum an
+   index. The substance sits under the lesson, opened on demand — a module of
+   thirty lessons each showing a paragraph would be unreadable — except on the
+   NEXT lesson, where it is shown unasked because that is the one about to be
+   done. */
+
+.detailOff,
+.detailOn {
+  flex-shrink: 0;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  border: 1px solid var(--line-bright);
+  background: none;
+  color: var(--muted);
+  font-size: 0.6rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.detailOff:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.detailOn {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* Full width under its lesson, so it reads as prose rather than as a column
+   squeezed beside the checkbox. */
+.detail {
+  flex: 1 0 100%;
+  margin: 0.3rem 0 0.6rem 1.45rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  max-width: 62ch;
+}
+
+.detailEdit {
+  flex: 1 0 100%;
+  margin: 0.3rem 0 0.6rem 1.45rem;
+}
+
+.detailEdit textarea {
+  width: 100%;
+  max-width: 62ch;
+  min-height: 7rem;
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  padding: 0.5rem 0.6rem;
+  resize: vertical;
+}
+
+.detailEdit textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.detailEdit > span {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.detailEdit button {
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.7rem;
+  cursor: pointer;
+}
+
+.detailEdit button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* On the next lesson, and on the overall Up next, where it is not optional. */
+.nextDetail {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  max-width: 68ch;
+  font-weight: 400;
+}

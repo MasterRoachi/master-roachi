@@ -981,8 +981,8 @@ export default {
               .all<{ id: number; curriculum_id: number; name: string }>(),
             db
               .prepare(
-                `select id, module_id, name, position, done_on, on_route from lessons
-                 order by position, id`,
+                `select id, module_id, name, position, done_on, on_route, detail
+                 from lessons order by position, id`,
               )
               .all<{
               id: number;
@@ -990,6 +990,7 @@ export default {
               name: string;
               done_on: string | null;
               on_route: number;
+              detail: string | null;
             }>(),
           ]);
 
@@ -1215,6 +1216,21 @@ export default {
             const next = lesson.done_on ? null : day;
             await db.prepare(`update lessons set done_on = ?2 where id = ?1`).bind(id, next).run();
             return json({ done: next !== null, day: next }, 200);
+          }
+
+          // The substance of a lesson, which the name only labels. Separate
+          // from rename because a name is a line and this is a passage.
+          if (action === 'set-detail') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which lesson' }, 400);
+            const detail = typeof body.detail === 'string' ? body.detail.slice(0, 8000) : null;
+            await db
+              .prepare(`update lessons set detail = ?2 where id = ?1`)
+              // Empty means cleared, not "leave it alone" — otherwise a note
+              // could never be removed once written.
+              .bind(id, detail && detail.trim() ? detail : null)
+              .run();
+            return json({ updated: true, id }, 200);
           }
 
           if (action === 'rename') {

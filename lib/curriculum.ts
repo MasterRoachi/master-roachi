@@ -10,6 +10,11 @@ export interface Lesson {
   name: string;
   done_on: string | null;
   /**
+   * What the lesson actually teaches, in Markdown. Null where the substance
+   * lives in the resource instead — see migrations/0007_lesson_detail.sql.
+   */
+  detail: string | null;
+  /**
    * 1 when the lesson is on the route being taken, 0 when it is being skipped.
    *
    * A number rather than a boolean because that is what SQLite stores, and

@@ -62,6 +62,9 @@ export default function Curriculums() {
   const [rename, setRename] = useState('');
   const [addingTo, setAddingTo] = useState<number | null>(null);
   const [lessonName, setLessonName] = useState('');
+  const [showing, setShowing] = useState<Set<number>>(new Set());
+  const [editingDetail, setEditingDetail] = useState<number | null>(null);
+  const [detailDraft, setDetailDraft] = useState('');
 
   const load = useCallback(async () => {
     try {
@@ -266,6 +269,22 @@ export default function Curriculums() {
                     {lesson.name}
                   </Name>
                 </label>
+                {lesson.detail && (
+                  <button
+                    type="button"
+                    className={showing.has(lesson.id) ? styles.detailOn : styles.detailOff}
+                    title="What this teaches"
+                    aria-expanded={showing.has(lesson.id)}
+                    onClick={() => {
+                      const next = new Set(showing);
+                      if (next.has(lesson.id)) next.delete(lesson.id);
+                      else next.add(lesson.id);
+                      setShowing(next);
+                    }}
+                  >
+                    ?
+                  </button>
+                )}
                 {lesson.done_on && <span className={styles.when}>{lesson.done_on}</span>}
                 {/* Skipped work stays visible. Hiding it would make the route
                     unreviewable — the point is to see what is being left out
@@ -281,11 +300,55 @@ export default function Curriculums() {
                 <button
                   type="button"
                   className={styles.tiny}
+                  title={lesson.detail ? 'Edit what this teaches' : 'Write what this teaches'}
+                  onClick={() => {
+                    setDetailDraft(lesson.detail ?? '');
+                    setEditingDetail(lesson.id);
+                  }}
+                >
+                  ✎
+                </button>
+                <button
+                  type="button"
+                  className={styles.tiny}
                   title="Remove this lesson"
                   onClick={() => void act({ action: 'remove', kind: 'lesson', id: lesson.id })}
                 >
                   ×
                 </button>
+
+                {/* The substance, under the lesson it belongs to. Opened on
+                    demand rather than always shown: a module of thirty
+                    lessons each carrying a paragraph is unreadable. */}
+                {showing.has(lesson.id) && editingDetail !== lesson.id && (
+                  <p className={styles.detail}>{lesson.detail}</p>
+                )}
+
+                {editingDetail === lesson.id && (
+                  <span className={styles.detailEdit}>
+                    <textarea
+                      autoFocus
+                      value={detailDraft}
+                      placeholder="What this teaches. Markdown."
+                      aria-label={`What ${lesson.name} teaches`}
+                      onChange={(event) => setDetailDraft(event.target.value)}
+                    />
+                    <span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          void act({ action: 'set-detail', id: lesson.id, detail: detailDraft });
+                          setEditingDetail(null);
+                        }}
+                      >
+                        Keep
+                      </button>
+                      <button type="button" onClick={() => setEditingDetail(null)}>
+                        Cancel
+                      </button>
+                    </span>
+                  </span>
+                )}
               </li>
             );
           })}
@@ -570,6 +633,9 @@ export default function Curriculums() {
                 <span className={styles.nextIn}>
                   {upNext.curriculum.name} › {upNext.module.name}
                 </span>
+                {upNext.lesson.detail && (
+                  <span className={styles.nextDetail}>{upNext.lesson.detail}</span>
+                )}
               </span>
             </div>
           ) : (
