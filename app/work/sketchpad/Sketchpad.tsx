@@ -13,7 +13,7 @@ import {
   type Stroke,
   type TextItem,
 } from '@/lib/sketch';
-import styles from './scratchpad.module.css';
+import styles from './sketchpad.module.css';
 
 // One page you can write and draw on, saved as one file.
 //
@@ -66,9 +66,31 @@ export default function Sketchpad() {
   const [status, setStatus] = useState<string | null>(null);
 
   const surface = useRef<SVGSVGElement | null>(null);
+  const editor = useRef<HTMLTextAreaElement | null>(null);
+  /**
+   * Whether the text editor has actually had focus.
+   *
+   * Guards the delete-on-blur below. Without it an empty box could be created
+   * and destroyed in the same frame — which is exactly what happened: the
+   * pointerdown's default action moved focus away before the textarea mounted,
+   * onBlur fired on a brand new item whose text was still empty, and the item
+   * was deleted. The box flashed and text could not be added at all.
+   */
+  const everFocused = useRef(false);
   const drawing = useRef<Stroke | null>(null);
   const dragging = useRef<{ id: string; from: [number, number] } | null>(null);
   const [live, setLive] = useState<Stroke | null>(null);
+
+  // autoFocus races the pointerdown that created the item. Focusing from an
+  // effect runs after the element is in the document, which is deterministic.
+  useEffect(() => {
+    if (editing === null) return;
+    everFocused.current = false;
+    const element = editor.current;
+    if (!element) return;
+    element.focus();
+    element.setSelectionRange(element.value.length, element.value.length);
+  }, [editing]);
 
   const loadList = useCallback(async () => {
     const response = await fetch('/work/api/content?collection=notes', { cache: 'no-store' });
@@ -415,11 +437,21 @@ export default function Sketchpad() {
             viewBox={`0 0 ${PAGE.width} ${PAGE.height}`}
             data-tool={tool}
             onPointerDown={(event) => {
-              if (editing !== null) return;
-              event.currentTarget.setPointerCapture(event.pointerId);
+              // Editing: this click is the way out of it. Blurring commits the
+              // text; returning here means the same click does not also start
+              // a stroke or drop a second text box.
+              if (editing !== null) {
+                editor.current?.blur();
+                return;
+              }
+
               const point = at(event);
 
               if (tool === 'pen') {
+                // Capture only for drawing and dragging. On the text tool it
+                // keeps the pointer — and the focus — on the surface, which is
+                // half of why text could not be added.
+                event.currentTarget.setPointerCapture(event.pointerId);
                 drawing.current = {
                   kind: 'stroke',
                   id: newId(),
@@ -432,6 +464,10 @@ export default function Sketchpad() {
               }
 
               if (tool === 'text') {
+                // Stops the default action moving focus to the surface a tick
+                // after this handler, which would blur the editor before it
+                // was ever used.
+                event.preventDefault();
                 const item: TextItem = {
                   kind: 'text',
                   id: newId(),
@@ -449,7 +485,9 @@ export default function Sketchpad() {
                 return;
               }
 
-              // Select: an empty click clears the selection.
+              // Select: an empty click clears the selection. Capture so a drag
+              // that leaves the surface still ends here.
+              event.currentTarget.setPointerCapture(event.pointerId);
               setSelected(null);
             }}
             onPointerMove={(event) => {
@@ -584,7 +622,7 @@ export default function Sketchpad() {
               would not render outside a browser. */}
           {editingItem && (
             <textarea
-              autoFocus
+              ref={editor}
               className={styles.textEditor}
               value={editingItem.text}
               style={{
@@ -600,7 +638,15 @@ export default function Sketchpad() {
                   ),
                 )
               }
+              onFocus={() => {
+                everFocused.current = true;
+              }}
               onBlur={() => {
+                // Only discard an empty box that was actually used. A blur
+                // before the editor ever had focus is the browser moving
+                // focus, not him deciding against the text — and deleting on
+                // that is what made text impossible to add.
+                if (!everFocused.current) return;
                 // An empty box left behind would be an invisible thing to
                 // click on later.
                 if (!editingItem.text.trim()) {

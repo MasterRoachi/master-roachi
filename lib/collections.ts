@@ -17,8 +17,9 @@ export interface Collection {
   dir: string;
   /**
    * Every extension that may be read or written in it. An array and not one
-   * string because a scratchpad note is a .md file and its drawing is a .png
-   * beside it — a registry that cannot say that is the wrong registry.
+   * string because a collection may hold more than one kind of file — the
+   * sketchpad held .md and .png before it became one .svg, and a registry
+   * that cannot say that is the wrong registry.
    *
    * The first is what a new file gets named with.
    */

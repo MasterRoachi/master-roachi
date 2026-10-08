@@ -11,7 +11,7 @@ import Sketchpad from './Sketchpad';
 // page is what is in the file. See lib/sketch.ts for why SVG and not a canvas.
 
 export const metadata: Metadata = pageMeta({
-  path: '/work/scratchpad/',
+  path: '/work/sketchpad/',
   title: 'Sketchpad',
   description: 'Write and draw on the same page.',
   noIndex: true,

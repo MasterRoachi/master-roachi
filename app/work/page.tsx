@@ -46,7 +46,7 @@ const TOOLS = [
     what: 'What is being studied, and how far through it you are.',
   },
   {
-    href: '/work/scratchpad/',
+    href: '/work/sketchpad/',
     name: 'Sketchpad',
     what: 'Write and draw on one page. Saved as one file.',
   },
