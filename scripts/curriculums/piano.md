@@ -49,6 +49,22 @@ stage. It is the skill that decays fastest without constant use, and the
 single thing most self-taught players neglect until it is the thing stopping
 them.
 
+The **FUN** entries are there for the same structural reason and a different
+human one. Eight stages of Bach and Hanon with nothing you would choose to
+play is how a classical path gets abandoned around stage 4. Each stage from 2
+onward carries something off the game and anime shelf that is genuinely
+playable at that level — folded in rather than kept apart, so it comes up
+regularly and is never harder than the hands currently are.
+
+**Difficulty there is a claim about an arrangement, not about a piece.**
+"Merry-Go-Round of Life" exists at grade 2 and at concert level. The stage it
+sits in assumes the simpler arrangement; the hard one reappears at stage 7 on
+purpose, because by then it is a reasonable target rather than a wall.
+
+Where to find them: these are not public domain, so IMSLP does not have them.
+MuseScore's community arrangements do, at several difficulties each, which is
+exactly why the difficulty claim is about the arrangement you pick.
+
 ## The stages
 
 ### 1 — At the keyboard
@@ -93,11 +109,36 @@ which "learning piano" becomes "playing piano".
 ### 8 — Keeping it
 
 Ongoing, and never finished: sight-reading, aural work, transposition,
-memorisation, recording yourself. This stage has no end and is the one that
-makes the rest stick.
+memorisation, recording yourself, and one song a month that you simply wanted
+to play. This stage has no end and is the one that makes the rest stick.
+
+## More for the fun track
+
+Slotted in already, by stage: Wet Hands and Zelda's Lullaby (2), Path of the
+Wind and Song of Storms (3), Sadness and Sorrow and Undertale's Home (4),
+Merry-Go-Round of Life and Always With Me and Brothers (5), L's Theme and To
+Zanarkand and Megalovania (6), Nandemonaiya and Vogel im Käfig and Gurenge
+(7).
+
+Others worth reaching for when one of those is done, roughly in order of
+difficulty:
+
+- **Early** — Minecraft *Sweden*; Pokémon Centre theme; Chrono Trigger
+  *Secret of the Forest*; Undertale *Snowy*
+- **Middle** — Spirited Away *One Summer's Day*; Death Note *Light's Theme*;
+  Clannad *Nagisa*; Cowboy Bebop *Tank!* (the melody only — the full chart is
+  a different instrument's problem)
+- **Later** — Evangelion *Cruel Angel's Thesis*; Tokyo Ghoul *Unravel*; Attack
+  on Titan *Guren no Yumiya*; Final Fantasy *One-Winged Angel*
+
+None of this is a syllabus. It is a shelf to pull from whenever the classical
+side starts feeling like homework.
 
 ## References
 
-- [IMSLP](https://imslp.org) — every piece and exercise book named here, free
+- [IMSLP](https://imslp.org) — every classical piece and exercise book named
+  here, free and public domain
+- [MuseScore](https://musescore.com) — community arrangements of the game and
+  anime pieces, which IMSLP cannot carry
 - [ABRSM piano syllabus](https://www.abrsm.org/en-gb/our-exams/piano) — for a
   second opinion on ordering, not followed here

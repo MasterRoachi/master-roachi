@@ -17,6 +17,19 @@
 // come up as the next thing until everything else was finished, which is
 // exactly backwards for the skill that needs the most repetition.
 //
+// The FUN entries are there for the same structural reason and a different
+// human one. Eight stages of Bach and Hanon with nothing anyone would choose
+// to play is how a classical path gets abandoned around stage 4, so each stage
+// from 2 onward carries something off the game and anime shelf that is
+// genuinely playable at that level. Folded in rather than kept in a module of
+// its own, so they are offered regularly and are never harder than the hands
+// currently are.
+//
+// Difficulty here is a claim about an ARRANGEMENT, not about a piece.
+// "Merry-Go-Round of Life" exists at grade 2 and at concert level; the stage
+// it sits in assumes the simpler one, and the harder one reappears at stage 7
+// on purpose.
+//
 // Prints SQL. Nothing is executed here.
 
 const SOURCE = 'scripts/curriculums/piano.md';
@@ -49,6 +62,8 @@ const stages = [
       'Play a written four-bar melody, right hand, counting aloud',
       'Play a written four-bar melody, left hand, counting aloud',
       'Sight-read: four new bars a day, one hand, no stopping',
+      'FUN · Minecraft — Wet Hands (C418), right-hand melody',
+      'FUN · Zelda — Zelda\u2019s Lullaby, melody only',
     ],
   },
   {
@@ -62,6 +77,9 @@ const stages = [
       'Phrasing: shape a four-bar phrase rather than play eight equal notes',
       'Play to a metronome at 60 without drifting',
       'Sight-read: four new bars a day, hands together',
+      'FUN · Minecraft — Wet Hands, hands together',
+      'FUN · My Neighbour Totoro — Path of the Wind, easy arrangement',
+      'FUN · Zelda — Song of Storms, easy arrangement',
     ],
   },
   {
@@ -78,6 +96,8 @@ const stages = [
       'All twelve major scales, two octaves, hands together',
       'All twelve harmonic minor scales, two octaves, hands together',
       'Sight-read: a piece in a key with three or more accidentals',
+      'FUN · Naruto — Sadness and Sorrow',
+      'FUN · Undertale — Home',
     ],
   },
   {
@@ -92,6 +112,9 @@ const stages = [
       'Beethoven — Für Elise, main section',
       'Satie — Gymnopédie no. 1',
       'Sight-read: a complete short piece, first time, at half tempo',
+      'FUN · Howl\u2019s Moving Castle — Merry-Go-Round of Life, easy arrangement',
+      'FUN · Spirited Away — Always With Me (Itsumo Nando Demo)',
+      'FUN · Fullmetal Alchemist — Brothers',
     ],
   },
   {
@@ -106,6 +129,9 @@ const stages = [
       'Octave reaches and the stretch between 1 and 5',
       'Trills, mordents and the ornaments Bach assumes you know',
       'Sight-read: a piece with pedal markings, observed',
+      'FUN · Death Note — L\u2019s Theme',
+      'FUN · Final Fantasy X — To Zanarkand',
+      'FUN · Undertale — Megalovania',
     ],
   },
   {
@@ -119,6 +145,10 @@ const stages = [
       'Debussy — Clair de Lune',
       'Bach — a fugue from WTC Book I, voices audible separately',
       'Sight-read: a movement you have never heard, hands together',
+      'FUN · Howl\u2019s Moving Castle — Merry-Go-Round of Life, full arrangement',
+      'FUN · Your Name — Nandemonaiya (RADWIMPS)',
+      'FUN · Attack on Titan — Vogel im Käfig',
+      'FUN · Demon Slayer — Gurenge',
     ],
   },
   {
@@ -131,6 +161,7 @@ const stages = [
       'Play a song from a lead sheet, left hand improvised',
       'Memorise one piece completely, hands separately as well as together',
       'Record yourself monthly and listen back to the whole thing',
+      'FUN · Learn one song you actually want to play, every month, forever',
     ],
   },
 ];
