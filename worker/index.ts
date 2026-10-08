@@ -12,6 +12,7 @@ import { collectionFor, newPath, pathAllowed, setDraft } from '../lib/collection
 import { isDay, isMonth, localDay, monthDays, type D1Database } from './db';
 import { outlineSize, parseOutline } from '../lib/outline';
 import { validIconName } from '../lib/habit-icons';
+import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -763,7 +764,7 @@ export default {
           const books = await db
             .prepare(
               `select id, title, author, status, pages, page,
-                      started_on, finished_on, rating, notes
+                      started_on, finished_on, rating, notes, post_path
                from books order by status, id desc`,
             )
             .all();
@@ -866,6 +867,65 @@ export default {
               )
               .run();
             return json({ updated: true, id, status }, 200);
+          }
+
+          // A book's notes, as a draft post on the site.
+          //
+          // Idempotent by design: a book that already became a post opens that
+          // post instead of writing a second one. Without the guard, pressing
+          // twice leaves a duplicate under a second slug and the site grows a
+          // post nobody asked for.
+          if (body.action === 'post') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which book' }, 400);
+
+            const token = env.GITHUB_TOKEN;
+            if (!token) return json({ error: 'GITHUB_TOKEN is not set' }, 400);
+
+            const book = await db
+              .prepare(
+                `select title, author, pages, rating, started_on, finished_on, notes, post_path
+                 from books where id = ?1`,
+              )
+              .bind(id)
+              .first<{
+                title: string;
+                author: string | null;
+                pages: number | null;
+                rating: number | null;
+                started_on: string | null;
+                finished_on: string | null;
+                notes: string | null;
+                post_path: string | null;
+              }>();
+            if (!book) return json({ error: 'no such book' }, 404);
+
+            if (book.post_path) {
+              return json({ already: true, path: book.post_path }, 200);
+            }
+            // Nothing to post is not an error worth a 500, but it is not a
+            // post either — an empty draft would be a file to go and delete.
+            if (!book.notes?.trim()) {
+              return json({ error: 'write something about it first' }, 400);
+            }
+
+            const slug = slugFor(book.title);
+            if (!slug) return json({ error: 'that title does not make a filename' }, 400);
+            const path = `content/writing/${slug}.mdx`;
+
+            await writeFile(
+              token,
+              path,
+              postFor(book, localDay()),
+              `Add ${slug}.mdx from the reading notes`,
+            );
+
+            await db
+              .prepare(`update books set post_path = ?2 where id = ?1`)
+              .bind(id, path)
+              .run();
+
+            return json({ posted: true, path }, 200);
           }
 
           if (body.action === 'remove') {

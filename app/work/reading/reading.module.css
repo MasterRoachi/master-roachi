@@ -217,7 +217,7 @@
   backdrop-filter: blur(3px);
   display: grid;
   place-items: center;
-  padding: 1rem;
+  padding: 1.25rem;
   animation: fade 0.18s ease;
 }
 
@@ -234,8 +234,8 @@
 .bookClosed,
 .bookOpen {
   position: relative;
-  width: min(40rem, 100%);
-  height: min(27.5rem, 85vh);
+  width: min(86rem, 100%);
+  height: min(92vh, 60rem);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
@@ -265,10 +265,17 @@
   }
 }
 
+/* The left page is the narrower one now that the book is nearly full screen:
+   the facts are a fixed amount of text and the writing wants the room. */
+.bookClosed,
+.bookOpen {
+  grid-template-columns: minmax(16rem, 26rem) 1fr;
+}
+
 .leftPage,
 .rightPage {
   background: var(--bg-raised);
-  padding: 1.25rem 1.35rem;
+  padding: 1.6rem 1.8rem;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -298,7 +305,7 @@
   .bookClosed,
   .bookOpen {
     grid-template-columns: 1fr;
-    height: min(34rem, 88vh);
+    height: min(92vh, 44rem);
   }
 
   .leftPage,
@@ -426,15 +433,17 @@
   margin-bottom: 0.4rem;
 }
 
-/* Serif, and the width of a column of prose. This is the page you write on. */
+/* Serif, and capped at a readable measure even though the page is now wide —
+   prose set across eighty characters is harder to read, not easier. */
 .rightPage textarea {
   flex: 1 1 auto;
   width: 100%;
+  max-width: 44rem;
   background: none;
   border: 0;
   color: var(--ink);
   font-family: ui-serif, Georgia, serif;
-  font-size: 0.95rem;
+  font-size: 1.0625rem;
   line-height: 1.68;
   resize: none;
   padding: 0;
@@ -551,4 +560,47 @@
   padding: 0.6rem 0.8rem;
   font-size: 0.8125rem;
   margin-bottom: 1rem;
+}
+
+/* --- becoming a post ---------------------------------------------------- */
+
+.postBlock {
+  margin-top: auto;
+  padding-top: 1.25rem;
+}
+
+.makePost {
+  background: none;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+}
+
+.makePost:hover:not(:disabled) {
+  background: var(--accent-dim);
+}
+
+.makePost:disabled {
+  opacity: 0.35;
+  border-color: var(--line-bright);
+  color: var(--muted);
+  cursor: default;
+}
+
+/* Says plainly that it is a draft. A tool that wrote to a public site on one
+   click and did not say so would be one nobody could use for a first draft. */
+.postedLine {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.5rem 0 0;
+  max-width: 34ch;
+}
+
+.postedLine a {
+  color: var(--accent);
 }

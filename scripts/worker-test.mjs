@@ -75,6 +75,16 @@ execFileSync(
 );
 const spines = await import(pathToFileURL(spineBundle).href);
 
+// The post builder writes YAML that the site's build parses. Bad quoting there
+// commits a file that fails the build — and the build is the deploy.
+const postBundle = path.join(os.tmpdir(), 'master-roachi-post-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/book-post.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${postBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const bookPost = await import(pathToFileURL(postBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -973,7 +983,11 @@ function fakeD1() {
         }
         if (sql.startsWith('update books')) {
           const row = books.find((b) => b.id === bound[0]);
-          if (row) Object.assign(row, { _update: bound });
+          if (row) {
+            Object.assign(row, { _update: bound });
+            // Applied for real, so the idempotency guard has something to see.
+            if (sql.includes('set post_path')) row.post_path = bound[1];
+          }
         }
         if (sql.startsWith('insert into curriculums')) curriculums.push({ id: curriculums.length + 1, name: bound[0], source: bound[1] });
         if (sql.startsWith('insert into modules')) modules.push({ id: modules.length + 1, curriculum_id: bound[0], name: bound[1], position: bound[2] });
@@ -1944,6 +1958,183 @@ globalThis.fetch = preGh;
   );
 }
 
+// --- a book as a post ------------------------------------------------------
+//
+// The frontmatter is parsed by the site's own build, so a quoting mistake does
+// not fail here — it fails the next deploy, and takes whatever else was in it.
+
+{
+  const base = {
+    title: 'On the Incarnation',
+    author: 'Athanasius',
+    pages: 120,
+    rating: 5,
+    started_on: '2026-09-01',
+    finished_on: '2026-09-20',
+    notes: 'Short, and not simple. Worth reading slowly. The second half earns the first.',
+  };
+
+  const mdx = bookPost.postFor(base, '2026-10-08');
+
+  check('the post opens with frontmatter', mdx.startsWith('---\n'), mdx.slice(0, 20));
+  check(
+    'it is always a draft, never published',
+    /^draft: true$/m.test(mdx),
+    mdx.split('---')[1],
+  );
+  check(
+    'the date is the day it was finished, not today',
+    /^date: 2026-09-20$/m.test(mdx),
+    mdx.match(/^date:.*$/m)?.[0],
+  );
+  check(
+    'track is absent rather than guessed',
+    !/^track:/m.test(mdx),
+    mdx.match(/^track:.*$/m)?.[0] ?? 'absent',
+  );
+  check(
+    'the facts line carries author, pages and stars',
+    mdx.includes('*Athanasius · 120 pages · ★★★★★ · finished 2026-09-20*'),
+    mdx.split('\n').find((l) => l.startsWith('*')) ?? 'missing',
+  );
+  check('the notes are the body', mdx.trimEnd().endsWith('earns the first.'), mdx.slice(-40));
+
+  // THE ONE THAT MATTERS. A colon in a title is a mapping to YAML.
+  const colon = bookPost.postFor({ ...base, title: 'Dune: Messiah' }, '2026-10-08');
+  check(
+    'a colon in the title is quoted, not left to break the build',
+    colon.includes('title: "Dune: Messiah"'),
+    colon.match(/^title:.*$/m)?.[0],
+  );
+
+  const quoted = bookPost.postFor(
+    { ...base, title: 'He said "yes" \\ loudly' },
+    '2026-10-08',
+  );
+  check(
+    'quotes and backslashes inside the title are escaped',
+    quoted.includes('title: "He said \\"yes\\" \\\\ loudly"'),
+    quoted.match(/^title:.*$/m)?.[0],
+  );
+
+  // A note with a newline in its first sentence would otherwise put a line
+  // break inside a frontmatter value, which ends the value early.
+  const multi = bookPost.postFor(
+    { ...base, notes: 'First line.\nSecond line, which is longer and continues on.' },
+    '2026-10-08',
+  );
+  const summaryLine = multi.match(/^summary:.*$/m)?.[0] ?? '';
+  check(
+    'the summary is one line whatever the note looks like',
+    multi.split('---')[1].split('\n').filter((l) => l.startsWith('summary:')).length === 1 &&
+      !summaryLine.includes('\n'),
+    summaryLine,
+  );
+
+  check(
+    'a long note is truncated rather than filling the frontmatter',
+    bookPost.summaryFrom('x'.repeat(500)).length <= 181,
+    String(bookPost.summaryFrom('x'.repeat(500)).length),
+  );
+  check(
+    'a note with a sentence uses it',
+    bookPost.summaryFrom('A clean opening sentence about it. Then more.') ===
+      'A clean opening sentence about it.',
+    bookPost.summaryFrom('A clean opening sentence about it. Then more.'),
+  );
+
+  // A book with nothing but a title still has to produce a valid file.
+  const bare = bookPost.postFor(
+    { title: 'Untitled', author: null, pages: null, rating: null, started_on: null, finished_on: null, notes: 'A thought.' },
+    '2026-10-08',
+  );
+  check(
+    'a book with no facts still makes a valid post dated today',
+    bare.includes('date: 2026-10-08') && !bare.includes('·') && bare.includes('A thought.'),
+    bare,
+  );
+
+  check(
+    'the slug is filename safe',
+    bookPost.slugFor('Dune: Messiah — Part 2!') === 'dune-messiah-part-2',
+    bookPost.slugFor('Dune: Messiah — Part 2!'),
+  );
+  check('a title that slugifies to nothing is empty', bookPost.slugFor('!!!') === '', 'expected empty');
+}
+
+// --- a book becoming a post, through the endpoint --------------------------
+
+DB = fakeD1();
+globalThis.fetch = ghFetch;
+const postEnv = { ...env, DB, GITHUB_TOKEN: 'ghtok' };
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
+  postEnv,
+);
+check(
+  'a book with no notes cannot become a post',
+  res.status === 400,
+  String(res.status),
+);
+
+DB = fakeD1();
+DB._books[0].notes = 'Short, and not simple. Worth reading slowly.';
+const postEnv2 = { ...env, DB, GITHUB_TOKEN: 'ghtok' };
+
+commits.length = 0;
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
+  postEnv2,
+);
+body = await res.json();
+check(
+  'a book with notes becomes a draft post named from its title',
+  body.posted === true && body.path === 'content/writing/on-the-incarnation.mdx',
+  JSON.stringify(body),
+);
+check(
+  'and the file committed is the post, as a draft',
+  commits.length === 1 &&
+    Buffer.from(commits[0].content, 'base64').toString('utf8').includes('draft: true'),
+  String(commits.length),
+);
+check(
+  'the book records which post it became',
+  DB._books[0].post_path === 'content/writing/on-the-incarnation.mdx',
+  JSON.stringify(DB._books[0].post_path),
+);
+
+// THE GUARD. Without it a second press writes a second file under a second
+// slug and the site grows a duplicate nobody asked for.
+commits.length = 0;
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
+  postEnv2,
+);
+body = await res.json();
+check(
+  'pressing it again opens the existing post rather than writing another',
+  body.already === true && body.path === 'content/writing/on-the-incarnation.mdx',
+  JSON.stringify(body),
+);
+check('and nothing was committed the second time', commits.length === 0, String(commits.length));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 4040 }),
+  postEnv2,
+);
+check('posting a book that is not there is a 404', res.status === 404, String(res.status));
+
+// Without the token there is nowhere to write it, and saying so beats a 502.
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
+  { ...env, DB: fakeD1() },
+);
+check('with no GitHub token it refuses clearly', res.status === 400, String(res.status));
+
+globalThis.fetch = preGh;
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -1959,4 +2150,5 @@ fs.rmSync(habitsBundle, { force: true });
 fs.rmSync(dbBundle, { force: true });
 fs.rmSync(iconBundle, { force: true });
 fs.rmSync(spineBundle, { force: true });
+fs.rmSync(postBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

@@ -31,6 +31,8 @@ interface Book {
   finished_on: string | null;
   rating: number | null;
   notes: string | null;
+  /** The post this book became, if it became one. Null is the normal state. */
+  post_path: string | null;
 }
 
 const SHELVES: { status: Status; label: string }[] = [
@@ -65,6 +67,8 @@ export default function Reading() {
   const [settled, setSettled] = useState(false);
   const [draft, setDraft] = useState('');
   const [openYears, setOpenYears] = useState<Set<string>>(new Set());
+  const [posting, setPosting] = useState(false);
+  const [posted, setPosted] = useState<string | null>(null);
 
   const sheet = useRef<HTMLDivElement | null>(null);
 
@@ -126,7 +130,43 @@ export default function Reading() {
     setFrom(element.getBoundingClientRect());
     setDraft(book.notes ?? '');
     setSettled(false);
+    setPosted(null);
     setOpen(book.id);
+  }
+
+  /**
+   * The notes, as a draft post on the site.
+   *
+   * The note is saved first. Otherwise the post is built from whatever was
+   * last stored rather than from what is on the screen, and the two would
+   * differ by exactly the paragraph just typed.
+   */
+  async function makePost(book: Book) {
+    setPosting(true);
+    try {
+      if (draft !== (book.notes ?? '')) {
+        await act({ action: 'update', id: book.id, notes: draft });
+      }
+      const response = await fetch('/work/api/reading', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'post', id: book.id }),
+      });
+      const data = (await response.json()) as {
+        posted?: boolean;
+        already?: boolean;
+        path?: string;
+        error?: string;
+      };
+      if (!response.ok) {
+        setError(data.error ?? `Failed (${response.status}).`);
+        return;
+      }
+      setPosted(data.path ?? null);
+      await load();
+    } finally {
+      setPosting(false);
+    }
   }
 
   function close() {
@@ -405,6 +445,38 @@ export default function Reading() {
                   </select>
                 </dd>
               </dl>
+
+              {/* A draft, never a publication: the post comes out with
+                  draft: true and stays off the live site until it is
+                  published from the writing editor. */}
+              <div className={styles.postBlock}>
+                {opened.post_path ? (
+                  <p className={styles.postedLine}>
+                    This is a post.{' '}
+                    <a href="/work/writing/">Edit it in Writing →</a>
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    className={styles.makePost}
+                    disabled={posting || !draft.trim()}
+                    title={
+                      draft.trim()
+                        ? 'Writes a draft post from these thoughts'
+                        : 'Write something about it first'
+                    }
+                    onClick={() => void makePost(opened)}
+                  >
+                    {posting ? 'Writing…' : 'Make a post from this'}
+                  </button>
+                )}
+                {posted && (
+                  <p className={styles.postedLine}>
+                    Written to {posted} as a draft. It is not on the site until you
+                    publish it.
+                  </p>
+                )}
+              </div>
 
               <button
                 type="button"
