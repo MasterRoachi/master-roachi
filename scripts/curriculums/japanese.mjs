@@ -1,147 +1,205 @@
-// Builds the Japanese curriculum from its own document.
+// Builds the Japanese curriculum from its own document, as combined sessions.
 //
-// The source is Media/Courses/Languages/Japanese/Japanese-Language-Curriculum-
-// 2026-2029.md, which already names the resources in order, the sequencing
-// rules, and a page map for every book. Nothing here is invented — this script
-// is a transcription of that document into modules and lessons, so the two can
-// be compared line by line.
+// Source: Media/Courses/Languages/Japanese/Japanese-Language-Curriculum-
+// 2026-2029.md. The resources there are not a queue of fourteen books, they
+// are concurrent tracks — kana "run alongside Pimsleur/JFZ from the start",
+// EJV "alongside JFZ 2 onward", RTK 1 "once kana is solid and you're into
+// JFZ 2". A session therefore bundles whatever is active at that point, and
+// the first version of this script was wrong to flatten it into a sequence.
 //
-// Lesson names carry their page references, because "JFZ1 Lesson 3" sends you
-// looking and "JFZ1 Lesson 3 · pp. 68-88" does not.
+// PIMSLEUR SETS THE CADENCE. It is the one resource with a real rhythm — 90
+// lessons of about half an hour — so there are 90 sessions, and everything
+// else is "the next bit of", entering and leaving on the document's rules.
+// The resource codes are the document's own (JFZ1-5, KANA, RTK1-3, EJV).
 //
-// Prints SQL. Nothing is executed from here: the output is read before it is
-// run, and 250 inserts are not something to fire blind at a live database.
+// What the document does NOT fix is the pacing: it says "no gates, just go".
+// So the placements below are derived from its rules rather than quoted from
+// it, and every one is a single number to move.
+//
+// Prints SQL. Nothing is executed here — 400 inserts are not something to
+// fire blind at a live database.
 
-const CURRICULUM = 'Japanese';
 const SOURCE =
   'Media/Courses/Languages/Japanese/Japanese-Language-Curriculum-2026-2029.md';
 
-/** A run of lessons from a list of start pages: "Lesson 1 · from p. 9". */
-const fromStarts = (starts) =>
-  starts.map((page, i) => `Lesson ${i + 1} · from p. ${page}`);
+const SESSIONS = 90;
 
-/** A run of lessons from explicit page ranges. */
-const fromRanges = (ranges, label = 'Lesson') =>
-  ranges.map(([a, b], i) => `${label} ${i + 1} · pp. ${a}-${b}`);
+/** Pimsleur level and lesson for a session. Three levels of thirty. */
+function pimsleur(session) {
+  const level = ['I', 'II', 'III'][Math.floor((session - 1) / 30)];
+  return `Pimsleur ${level}-${((session - 1) % 30) + 1}`;
+}
 
-const modules = [
-  // 1-3. Pimsleur I-III. Thirty lessons each, confirmed against the audio on
-  // disk rather than taken on trust: 30 numbered files per level, 90 in all,
-  // which is what the document says.
-  ...[1, 2, 3].map((level) => ({
-    name: `Pimsleur Japanese ${'I'.repeat(level)}`,
-    lessons: Array.from({ length: 30 }, (_, i) => `Lesson ${i + 1}`),
-  })),
+/**
+ * Place items across a span of sessions, in order and evenly.
+ *
+ * Monotonic: item i lands at or after item i-1, so a book is never worked
+ * backwards. Where there are more sessions than items the gaps fall between
+ * them, which is the point — RTK 1's 56 lessons over 63 sessions should
+ * breathe rather than stop early.
+ */
+function place(into, items, from, to) {
+  const span = to - from + 1;
+  items.forEach((item, i) => {
+    const at = from + Math.floor((i * span) / items.length);
+    if (!into.has(at)) into.set(at, []);
+    into.get(at).push(item);
+  });
+}
 
-  // 4. The kana guide, which the document says to run alongside from the start.
-  {
-    name: 'Hiragana & Katakana',
-    lessons: [
-      'How to use the book · pp. 7-16',
-      'Hiragana a-ko · pp. 19-24',
-      'Hiragana sa-to · pp. 26-31',
-      'Hiragana na-ho · pp. 33-38',
-      'Hiragana ma-yo · pp. 40-44',
-      'Hiragana ra-n · pp. 46-50',
-      'Hiragana modifications and reviews · pp. 52-68',
-      'Katakana basics and reviews · pp. 71-96',
-      'Katakana modifications and reviews · pp. 98-108',
-      'Final combined review · pp. 109-120',
-    ],
-  },
+const parts = new Map();
 
-  // 5-9. Japanese From Zero! 1-5, the grammar spine.
-  {
-    name: 'Japanese From Zero! 1',
-    lessons: [
-      'Pre-Lesson A · pp. 13-16',
-      'Pre-Lesson B · pp. 17-21',
-      'Pre-Lesson C · pp. 22-28',
-      'Pre-Lesson D · pp. 29-33',
-      ...fromRanges([
-        [34, 48], [49, 67], [68, 88], [89, 107], [108, 125], [126, 145],
-        [146, 163], [164, 182], [183, 197], [198, 217], [218, 232],
-        [233, 251], [252, 273],
-      ]),
-    ],
-  },
-  {
-    name: 'Japanese From Zero! 2',
-    lessons: fromRanges([
-      [17, 46], [47, 78], [79, 96], [97, 128], [129, 156], [157, 184],
-      [185, 210], [211, 240], [241, 266], [267, 296], [297, 320], [321, 344],
-    ]),
-  },
-  {
-    name: 'Japanese From Zero! 3',
-    lessons: fromStarts([9, 33, 53, 75, 97, 117, 141, 159, 177, 201, 219, 239, 257]),
-  },
-  {
-    name: 'Japanese From Zero! 4',
-    lessons: fromStarts([7, 31, 61, 89, 117, 141, 165, 193, 221, 247, 273, 303, 329, 353]),
-  },
-  {
-    name: 'Japanese From Zero! 5',
-    lessons: fromStarts([34, 65, 96, 132, 161, 193, 227, 256, 286, 318, 343, 373, 401]),
-  },
+// KANA, from the very start. Hiragana first, then katakana, as the document
+// says. Ten items over the first ten sessions.
+place(
+  parts,
+  [
+    'KANA: how to use the book · pp. 7-16',
+    'KANA: hiragana a-ko · pp. 19-24',
+    'KANA: hiragana sa-to · pp. 26-31',
+    'KANA: hiragana na-ho · pp. 33-38',
+    'KANA: hiragana ma-yo · pp. 40-44',
+    'KANA: hiragana ra-n · pp. 46-50',
+    'KANA: hiragana modifications · pp. 52-68',
+    'KANA: katakana · pp. 71-96',
+    'KANA: katakana modifications · pp. 98-108',
+    'KANA: combined review · pp. 109-120',
+  ],
+  1,
+  10,
+);
 
-  // 10. Essential Japanese Vocabulary. One lesson, not a hundred: the document
-  // is explicit that it is dipped into when a usage question comes up and is
-  // "not a book to grind cover to cover". A single item marks the point at
-  // which it joins, which is what the plan actually says.
-  {
-    name: 'Essential Japanese Vocabulary',
-    lessons: ['Start using it alongside JFZ 2 onward, for usage questions'],
-  },
+// JFZ 1 begins once kana is done — the document's one hard rule is not to lean
+// on romaji, so the book waits for the script.
+place(
+  parts,
+  [
+    'JFZ1 Pre-A · pp. 13-16',
+    'JFZ1 Pre-B · pp. 17-21',
+    'JFZ1 Pre-C · pp. 22-28',
+    'JFZ1 Pre-D · pp. 29-33',
+    ...[
+      [34, 48], [49, 67], [68, 88], [89, 107], [108, 125], [126, 145],
+      [146, 163], [164, 182], [183, 197], [198, 217], [218, 232],
+      [233, 251], [252, 273],
+    ].map(([a, b], i) => `JFZ1 L${i + 1} · pp. ${a}-${b}`),
+  ],
+  11,
+  27,
+);
 
-  // 11-13. Remembering the Kanji. Not to be started until kana is comfortable
-  // and a few JFZ books are in — the document's one real sequencing rule.
-  {
-    name: 'Remembering the Kanji 1',
-    lessons: Array.from({ length: 56 }, (_, i) => `Lesson ${i + 1}`),
-  },
-  {
-    name: 'Remembering the Kanji 2',
-    lessons: fromStarts([11, 20, 76, 82, 86, 117, 146, 192, 219, 251, 289]).map((l) =>
-      l.replace('Lesson', 'Chapter'),
-    ),
-  },
-  {
-    name: 'Remembering the Kanji 3',
-    lessons: [
-      ...fromStarts([13, 24, 120, 134, 136, 138]).map((l) =>
-        l.replace('Lesson', 'Writing chapter'),
-      ),
-      ...fromStarts([149, 171, 198, 221, 250, 288, 298, 301]).map((l) =>
-        l.replace('Lesson', 'Reading chapter'),
-      ),
-    ],
-  },
+// JFZ 2, and with it the two things the document gates on being "into JFZ 2":
+// RTK 1 and the vocabulary book.
+place(
+  parts,
+  [
+    [17, 46], [47, 78], [79, 96], [97, 128], [129, 156], [157, 184],
+    [185, 210], [211, 240], [241, 266], [267, 296], [297, 320], [321, 344],
+  ].map(([a, b], i) => `JFZ2 L${i + 1} · pp. ${a}-${b}`),
+  28,
+  39,
+);
 
-  // 14. The stories, in the order the document puts them: two simpler
-  // folktales first, the three longer ones later.
+place(parts, ['EJV: start dipping into it for usage questions'], 28, 28);
+
+// RTK 1, from JFZ 2 to the end of the ninety. 56 lessons over 63 sessions.
+place(
+  parts,
+  Array.from({ length: 56 }, (_, i) => `RTK1 L${i + 1}`),
+  28,
+  90,
+);
+
+// JFZ 3, 4 and 5, in order, book by book.
+place(
+  parts,
+  [9, 33, 53, 75, 97, 117, 141, 159, 177, 201, 219, 239, 257].map(
+    (p, i) => `JFZ3 L${i + 1} · from p. ${p}`,
+  ),
+  40,
+  52,
+);
+place(
+  parts,
+  [7, 31, 61, 89, 117, 141, 165, 193, 221, 247, 273, 303, 329, 353].map(
+    (p, i) => `JFZ4 L${i + 1} · from p. ${p}`,
+  ),
+  53,
+  66,
+);
+place(
+  parts,
+  [34, 65, 96, 132, 161, 193, 227, 256, 286, 318, 343, 373, 401].map(
+    (p, i) => `JFZ5 L${i + 1} · from p. ${p}`,
+  ),
+  67,
+  79,
+);
+
+// The two simpler folktales, once past the JFZ beginner books — 1 and 2 are
+// the beginner pair, so these sit comfortably after JFZ 2 rather than at the
+// very end.
+place(parts, ['STORIES: Urashima Taro · pp. 10-21'], 45, 45);
+place(parts, ['STORIES: Snow Woman · pp. 22-35'], 55, 55);
+
+/** The three stages, one per Pimsleur level, named for what happens in them. */
+const STAGES = [
   {
-    name: 'Japanese Stories for Language Learners',
-    lessons: [
-      'Urashima Taro · pp. 10-21',
-      'Snow Woman · pp. 22-35',
-      "The Spider's Thread · pp. 36-59",
-      'The Siblings Who Almost Drowned · pp. 60-109',
-      'Gauche the Cellist · pp. 110-188',
-    ],
+    name: 'Stage 1 · Kana and the spoken foundation',
+    from: 1,
+    to: 30,
+  },
+  {
+    name: 'Stage 2 · Grammar and kanji begin',
+    from: 31,
+    to: 60,
+  },
+  {
+    name: 'Stage 3 · Intermediate',
+    from: 61,
+    to: 90,
   },
 ];
+
+const modules = STAGES.map((stage) => ({
+  name: stage.name,
+  lessons: Array.from({ length: stage.to - stage.from + 1 }, (_, i) => {
+    const session = stage.from + i;
+    return [`${session} · ${pimsleur(session)}`, ...(parts.get(session) ?? [])].join(' · ');
+  }),
+}));
+
+// After the ninety: what the document explicitly defers. RTK 2 waits on RTK 1
+// feeling solid, RTK 3 is "later, whenever you get to it", and the three
+// longer stories come after the two folktales.
+modules.push({
+  name: 'Beyond the ninety',
+  lessons: [
+    ...[11, 20, 76, 82, 86, 117, 146, 192, 219, 251, 289].map(
+      (p, i) => `RTK2 chapter ${i + 1} · from p. ${p}`,
+    ),
+    ...[13, 24, 120, 134, 136, 138].map(
+      (p, i) => `RTK3 writing chapter ${i + 1} · from p. ${p}`,
+    ),
+    ...[149, 171, 198, 221, 250, 288, 298, 301].map(
+      (p, i) => `RTK3 reading chapter ${i + 1} · from p. ${p}`,
+    ),
+    "STORIES: The Spider's Thread · pp. 36-59",
+    'STORIES: The Siblings Who Almost Drowned · pp. 60-109',
+    'STORIES: Gauche the Cellist · pp. 110-188',
+  ],
+});
 
 /** SQL single-quoted string. An apostrophe in a title ends the literal early. */
 const q = (value) => `'${String(value).replace(/'/g, "''")}'`;
 
-const out = [];
-out.push('-- Generated by scripts/curriculums/japanese.mjs. Read before running.');
-out.push(
+const out = [
+  '-- Generated by scripts/curriculums/japanese.mjs. Read before running.',
+  `delete from curriculums where name = 'Japanese';`,
   `insert into curriculums (name, source, status, position, created_at)\n` +
-    `  values (${q(CURRICULUM)}, ${q(SOURCE)}, 'active',\n` +
+    `  values ('Japanese', ${q(SOURCE)}, 'active',\n` +
     `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())});`,
-);
+];
 
 modules.forEach((module, m) => {
   out.push(
@@ -158,5 +216,5 @@ modules.forEach((module, m) => {
 
 console.log(out.join('\n'));
 console.error(
-  `modules: ${modules.length}  lessons: ${modules.reduce((n, m) => n + m.lessons.length, 0)}`,
+  `modules: ${modules.length}  sessions: ${modules.reduce((n, m) => n + m.lessons.length, 0)}`,
 );
