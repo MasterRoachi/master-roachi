@@ -71,6 +71,30 @@ export function isHiddenBoard(name: string): boolean {
   return named(HIDDEN_BOARDS, name);
 }
 
+/**
+ * The order boards appear in, most-looked-at first.
+ *
+ * Explicit because the alternative is whatever `/members/me/boards` happened
+ * to return, which is neither stable nor meaningful — a board moving up the
+ * page because Trello reordered its own response is not a feature. Anything
+ * not listed falls to the end in alphabetical order, so a new board appears
+ * without an edit here and can then be placed.
+ */
+const BOARD_ORDER = [
+  'Command',
+  'Shepherds We Shall Be — Production',
+  'The Lost Sheep: Black Pastures',
+  'Cultus Botanicus',
+  'North Star',
+  'Sales',
+];
+
+/** Sort key for a board name: its place in BOARD_ORDER, or the end. */
+export function boardRank(name: string): number {
+  const at = BOARD_ORDER.findIndex((entry) => entry.toLowerCase() === name.trim().toLowerCase());
+  return at === -1 ? BOARD_ORDER.length : at;
+}
+
 /** The order the hub reads in: what I am on, then what is live, then what is queued. */
 export const BUCKET_ORDER: BucketKey[] = ['today', 'doing', 'week'];
 

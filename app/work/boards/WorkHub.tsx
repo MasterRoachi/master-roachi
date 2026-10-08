@@ -5,13 +5,14 @@ import {
   BUCKET_LABELS,
   BUCKET_ORDER,
   CARDS_PER_LIST,
+  boardRank,
   STALE_DAYS,
   daysSince,
   type BucketKey,
   type WorkBoard,
   type WorkHubPayload,
 } from '@/lib/work-hub';
-import styles from './work.module.css';
+import styles from './boards.module.css';
 
 // The hub's only moving part.
 //
@@ -137,117 +138,6 @@ function Board({ board }: { board: WorkBoard }) {
   );
 }
 
-/**
- * Whether what is deployed is the newest commit.
- *
- * No Cloudflare credential: every build stamps its commit into
- * /version.json, and this compares that with the head of main. It therefore
- * reports a FAILED build the same way as one still running — the site is
- * simply not current — which is the question actually being asked. Asking
- * Cloudflare for the last build's status would say "failed" and still leave
- * you working out what is live.
- */
-function Version() {
-  const [state, setState] = useState<{
-    live: string | null;
-    head: string | null;
-    current: boolean | null;
-  } | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const response = await fetch('/work/api/version', { cache: 'no-store' });
-        if (!response.ok) return;
-        const data = await response.json();
-        if (alive) setState(data);
-      } catch {
-        /* the hub works without this line */
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  if (!state) return null;
-
-  // Unknown is its own answer, not a problem: a build made before the stamp
-  // existed has nothing to compare, and must not read as out of date.
-  if (state.current === null) {
-    return (
-      <p className={styles.unmatched}>
-        Deployed version unknown — this build predates the version stamp.
-      </p>
-    );
-  }
-
-  if (state.current) {
-    return (
-      <p className={styles.unmatched}>
-        Live and current, at {state.live?.slice(0, 7)}.
-      </p>
-    );
-  }
-
-  return (
-    <p className={styles.warn}>
-      The site is serving {state.live?.slice(0, 7)} but main is at{' '}
-      {state.head?.slice(0, 7)}. A build is either still running or it failed.
-    </p>
-  );
-}
-
-/**
- * Make the site rebuild.
- *
- * Confirmed rather than instant, because it costs a commit in the history and
- * a build, and because the one thing worse than forgetting to rebuild is
- * rebuilding four times by double-clicking.
- */
-function Rebuild() {
-  const [state, setState] = useState<'idle' | 'working' | string>('idle');
-
-  async function go() {
-    if (!confirm('Rebuild the site? This commits and redeploys — about two minutes.')) return;
-    setState('working');
-    try {
-      const response = await fetch('/work/api/rebuild', { method: 'POST' });
-      const data = (await response.json()) as {
-        started?: boolean;
-        commit?: string;
-        configured?: boolean;
-        error?: string;
-      };
-      if (data.configured === false) {
-        setState('Not connected — GITHUB_TOKEN is not set.');
-      } else if (!response.ok || !data.started) {
-        setState(data.error ?? `Failed (${response.status}).`);
-      } else {
-        setState(`Building ${data.commit?.slice(0, 7)} — live in about two minutes.`);
-      }
-    } catch (error) {
-      setState(error instanceof Error ? error.message : 'Failed.');
-    }
-  }
-
-  return (
-    <p className={styles.status}>
-      <button type="button" onClick={() => void go()} disabled={state === 'working'}>
-        {state === 'working' ? 'Starting…' : 'Rebuild the site'}
-      </button>
-      {/* Says what it is for, because "rebuild" on its own does not explain
-          why the store would be out of date. */}
-      <span>
-        {state === 'idle' || state === 'working'
-          ? 'Refetches Printful, Steam, RetroAchievements and YouTube.'
-          : state}
-      </span>
-    </p>
-  );
-}
-
 export default function WorkHub() {
   const [state, setState] = useState<State>({ phase: 'loading' });
   const [nonce, setNonce] = useState(0);
@@ -312,8 +202,6 @@ export default function WorkHub() {
         </button>
       </p>
 
-      <Rebuild />
-      <Version />
 
       {/* Trello and the rest fail independently, so a missing token costs the
           boards and not the page. */}
@@ -333,23 +221,27 @@ export default function WorkHub() {
         </ul>
       )}
 
-      <h2 className={styles.group}>The day job</h2>
-      <div className={styles.boards}>
-        {data.boards
-          .filter((b) => b.scope === 'day-job')
-          .map((board) => (
-            <Board key={board.id} board={board} />
-          ))}
-      </div>
+      {/* His own work first now. The day-job boards are the long ones, and
+          putting them at the top meant scrolling past someone else's backlog
+          to reach his own. Both groups sort by BOARD_ORDER rather than by
+          whatever Trello returned. */}
+      {(['mine', 'day-job'] as const).map((scope) => {
+        const boards = data.boards
+          .filter((board) => board.scope === scope)
+          .sort((a, b) => boardRank(a.name) - boardRank(b.name) || a.name.localeCompare(b.name));
+        if (boards.length === 0) return null;
 
-      <h2 className={styles.group}>Mine</h2>
-      <div className={styles.boards}>
-        {data.boards
-          .filter((b) => b.scope === 'mine')
-          .map((board) => (
-            <Board key={board.id} board={board} />
-          ))}
-      </div>
+        return (
+          <section key={scope}>
+            <h2 className={styles.group}>{scope === 'mine' ? 'Mine' : 'The day job'}</h2>
+            <div className={styles.boards}>
+              {boards.map((board) => (
+                <Board key={board.id} board={board} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
 
       {/* Named, not drawn. If one of these is a board of his whose Today list
           got renamed, this line is how he finds out; the rest is just what the

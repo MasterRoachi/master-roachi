@@ -1,0 +1,79 @@
+/* The front door: a list of ways in, and the two site-wide actions. */
+
+.tools {
+  list-style: none;
+  margin: 2rem 0 3rem;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tools li {
+  background: var(--bg-raised);
+  padding: 1rem 1.25rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.tools a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: var(--step-sub);
+  line-height: 1.2;
+}
+
+.tools a:hover {
+  color: var(--accent);
+}
+
+/* What the tool is for. Each one is a sentence because "Boards" alone does
+   not say whether it reads Trello or edits it. */
+.tools span {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 4rem;
+  font-size: 0.875rem;
+}
+
+.actions button {
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+}
+
+.actions button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.quiet {
+  color: var(--muted);
+}
+
+/* What is live is not what is committed. Worth noticing. */
+.stale {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-radius: 3px;
+  padding: 0.1rem 0.4rem;
+}
