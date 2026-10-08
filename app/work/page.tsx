@@ -31,6 +31,11 @@ const TOOLS = [
     what: 'What is next across Trello, and the day job.',
   },
   {
+    href: '/work/habits/',
+    name: 'Habits',
+    what: 'What got done, and what did not.',
+  },
+  {
     href: '/work/writing/',
     name: 'Writing',
     what: 'Posts. Editing one commits it, and the commit publishes it.',

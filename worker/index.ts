@@ -9,6 +9,7 @@ import {
   writeFile,
 } from './github';
 import { collectionFor, pathAllowed, setDraft } from '../lib/collections';
+import { dayWindow, isDay, localDay, type D1Database } from './db';
 import type { WorkHubPayload } from '../lib/work-hub';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -103,6 +104,16 @@ interface Env {
    * Absent means the editor says it is not connected rather than breaking.
    */
   GITHUB_TOKEN?: string;
+
+  /**
+   * The backend's own data — habits now, the other trackers next.
+   *
+   * Not in git: a daily tick is not worth a commit, and a year of them would
+   * be a year of deploys. Optional because the binding is commented out in
+   * wrangler.jsonc until the database is created, and every tracker says it is
+   * not set up rather than erroring.
+   */
+  DB?: D1Database;
 }
 
 /** Votes lapse after six months, so an abandoned poll empties itself. */
@@ -549,6 +560,136 @@ export default {
         },
         200,
       );
+    }
+
+    // --- habits ------------------------------------------------------------
+    //
+    // Under /work/api/ with the rest of the backend, so the one Access policy
+    // covers it.
+    if (route === '/work/api/habits') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      const db = env.DB;
+      if (!db) return json({ configured: false, habits: [], ticks: {} }, 200);
+
+      const today = localDay();
+
+      try {
+        if (request.method === 'GET') {
+          // A window rather than everything: the page draws a fixed number of
+          // columns, and a year of ticks is not worth sending to render six
+          // weeks of them.
+          const asked = Number(url.searchParams.get('days') ?? '35');
+          const days = Number.isFinite(asked) ? Math.min(Math.max(asked, 7), 180) : 35;
+          const window = dayWindow(days);
+
+          const habits = await db
+            .prepare(
+              `select id, name, cadence, target from habits
+               where archived = 0 order by position, id`,
+            )
+            .all();
+
+          const ticks = await db
+            .prepare(`select habit_id, day from habit_ticks where day >= ?1 order by day`)
+            .bind(window[0])
+            .all<{ habit_id: number; day: string }>();
+
+          const byHabit: Record<string, string[]> = {};
+          for (const row of ticks.results) {
+            (byHabit[String(row.habit_id)] ??= []).push(row.day);
+          }
+
+          return json(
+            { configured: true, habits: habits.results, ticks: byHabit, window, today },
+            200,
+          );
+        }
+
+        if (request.method === 'POST') {
+          const body = (await request.json().catch(() => null)) as {
+            action?: string;
+            id?: number;
+            day?: string;
+            name?: string;
+            cadence?: string;
+            target?: number;
+          } | null;
+          if (!body) return json({ error: 'malformed body' }, 400);
+
+          if (body.action === 'toggle') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which habit' }, 400);
+
+            const day = body.day === undefined ? today : body.day;
+            if (!isDay(day)) return json({ error: 'not a date' }, 400);
+            // Refused rather than clamped. Ticking tomorrow is always a
+            // mistake — usually a timezone one — and silently moving it to
+            // today would hide that.
+            if (day > today) return json({ error: 'that day has not happened' }, 400);
+
+            // The primary key makes this idempotent, so a toggle is a delete
+            // if it was there and an insert if it was not.
+            const existing = await db
+              .prepare(`select 1 as hit from habit_ticks where habit_id = ?1 and day = ?2`)
+              .bind(id, day)
+              .first();
+
+            if (existing) {
+              await db
+                .prepare(`delete from habit_ticks where habit_id = ?1 and day = ?2`)
+                .bind(id, day)
+                .run();
+              return json({ ticked: false, id, day }, 200);
+            }
+
+            await db
+              .prepare(`insert into habit_ticks (habit_id, day) values (?1, ?2)`)
+              .bind(id, day)
+              .run();
+            return json({ ticked: true, id, day }, 200);
+          }
+
+          if (body.action === 'add') {
+            const name = typeof body.name === 'string' ? body.name.trim().slice(0, 120) : '';
+            if (!name) return json({ error: 'needs a name' }, 400);
+
+            const cadence = body.cadence === 'weekly' ? 'weekly' : 'daily';
+            // A target belongs to a weekly habit and nothing else, so a daily
+            // one is stored with null rather than with 7 — see the migration.
+            const target =
+              cadence === 'weekly'
+                ? Math.min(Math.max(Number(body.target) || 1, 1), 7)
+                : null;
+
+            await db
+              .prepare(
+                `insert into habits (name, cadence, target, position, created_at)
+                 values (?1, ?2, ?3, (select coalesce(max(position), 0) + 1 from habits), ?4)`,
+              )
+              .bind(name, cadence, target, new Date().toISOString())
+              .run();
+            return json({ added: true }, 200);
+          }
+
+          if (body.action === 'archive') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which habit' }, 400);
+            // Archived, never deleted: the ticks are history and a cascade
+            // would take years of them with it.
+            await db.prepare(`update habits set archived = 1 where id = ?1`).bind(id).run();
+            return json({ archived: true, id }, 200);
+          }
+
+          return json({ error: 'unknown action' }, 400);
+        }
+
+        return json({ error: 'method not allowed' }, 405);
+      } catch (error) {
+        return json({ error: String(error instanceof Error ? error.message : error) }, 502);
+      }
     }
 
     // --- rebuild on demand -------------------------------------------------

@@ -80,6 +80,28 @@
 	//
 	// Without it /api/orders serves the 404 page instead of a list of
 	// customers' addresses. A missing secret fails closed.
+	// The backend's own data: habits, and the trackers that follow. Not in git,
+	// because a daily tick is not worth a commit and a deploy.
+	//
+	// Commented out until the database exists. Create it once:
+	//
+	//   npx wrangler d1 create master-roachi
+	//   npx wrangler d1 migrations apply master-roachi --remote
+	//
+	// then uncomment this and paste in the database_id it printed. An id is an
+	// identifier and not a credential, same as the KV namespace below, so it
+	// belongs in the repo. Until then env.DB is undefined and every tracker
+	// page says it is not set up rather than erroring.
+	//
+	// "d1_databases": [
+	// 	{
+	// 		"binding": "DB",
+	// 		"database_name": "master-roachi",
+	// 		"database_id": "PASTE_THE_ID_HERE",
+	// 		"migrations_dir": "migrations"
+	// 	}
+	// ],
+
 	"kv_namespaces": [
 		{
 			"binding": "VOTES",

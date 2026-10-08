@@ -827,6 +827,203 @@ check(
 
 globalThis.fetch = preGh;
 
+// --- habits ----------------------------------------------------------------
+//
+// The date rule is the thing worth testing. A tick belongs to a day in
+// Africa/Johannesburg, and getting that wrong files a late-night tick under
+// yesterday — which is exactly when someone ticks something.
+
+/** Enough D1 to exercise the endpoint, holding ticks in a Set. */
+function fakeD1() {
+  const ticks = new Set();
+  const habits = [{ id: 1, name: 'Read', cadence: 'daily', target: null }];
+  const sqlLog = [];
+
+  const statement = (sql) => {
+    let bound = [];
+    const self = {
+      bind(...values) {
+        bound = values;
+        return self;
+      },
+      async all() {
+        sqlLog.push(sql);
+        if (sql.includes('from habits')) return { results: habits };
+        if (sql.includes('from habit_ticks')) {
+          const since = bound[0];
+          return {
+            results: [...ticks]
+              .map((key) => {
+                const [habit_id, day] = key.split('@');
+                return { habit_id: Number(habit_id), day };
+              })
+              .filter((row) => row.day >= since),
+          };
+        }
+        return { results: [] };
+      },
+      async first() {
+        sqlLog.push(sql);
+        return ticks.has(`${bound[0]}@${bound[1]}`) ? { hit: 1 } : null;
+      },
+      async run() {
+        sqlLog.push(sql);
+        if (sql.startsWith('insert into habit_ticks')) ticks.add(`${bound[0]}@${bound[1]}`);
+        if (sql.startsWith('delete from habit_ticks')) ticks.delete(`${bound[0]}@${bound[1]}`);
+        if (sql.startsWith('insert into habits')) habits.push({ id: habits.length + 1, name: bound[0], cadence: bound[1], target: bound[2] });
+        if (sql.startsWith('update habits')) habits.length = 0;
+        return {};
+      },
+    };
+    return self;
+  };
+
+  return { prepare: statement, async batch() {}, _ticks: ticks, _habits: habits, _sql: sqlLog };
+}
+
+let DB = fakeD1();
+const dbEnv = () => ({ ...env, DB });
+
+const postJson = (url, payload) =>
+  new Request(url, {
+    method: 'POST',
+    headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+res = await worker.fetch(get('https://masterroachi.com/work/api/habits'), dbEnv());
+check(
+  'habits without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/habits'), env);
+body = await res.json();
+check(
+  'habits with no database answers configured:false',
+  res.status === 200 && body.configured === false,
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/habits'), dbEnv());
+body = await res.json();
+const todayFromServer = body.today;
+check(
+  'the server sends the window and its own idea of today',
+  body.window.length === 35 && body.window[34] === todayFromServer && /^\d{4}-\d{2}-\d{2}$/.test(todayFromServer),
+  JSON.stringify({ last: body.window?.at(-1), today: todayFromServer }),
+);
+
+// The page never names a date, so the default has to be today.
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', { action: 'toggle', id: 1 }),
+  dbEnv(),
+);
+body = await res.json();
+check(
+  'a toggle with no day ticks today',
+  body.ticked === true && body.day === todayFromServer,
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', { action: 'toggle', id: 1 }),
+  dbEnv(),
+);
+body = await res.json();
+check('toggling again clears it', body.ticked === false, JSON.stringify(body));
+check('and the row is gone', DB._ticks.size === 0, JSON.stringify([...DB._ticks]));
+
+// Tomorrow is always a mistake, usually a timezone one. Refused, not clamped.
+const tomorrow = new Date(Date.now() + 86_400_000 * 2).toISOString().slice(0, 10);
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', {
+    action: 'toggle',
+    id: 1,
+    day: tomorrow,
+  }),
+  dbEnv(),
+);
+check('a future day is refused', res.status === 400, String(res.status));
+check('and nothing was written', DB._ticks.size === 0, JSON.stringify([...DB._ticks]));
+
+for (const bad of ['8 October', '2026-13-99x', '', '2026/10/08']) {
+  res = await worker.fetch(
+    postJson('https://masterroachi.com/work/api/habits', { action: 'toggle', id: 1, day: bad }),
+    dbEnv(),
+  );
+  check(`a malformed day is refused: ${JSON.stringify(bad)}`, res.status === 400, String(res.status));
+}
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', { action: 'toggle' }),
+  dbEnv(),
+);
+check('a toggle with no habit is refused', res.status === 400, String(res.status));
+
+// A daily habit must not be stored with a target, or it is half a weekly one.
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', {
+    action: 'add',
+    name: '  Pray  ',
+    target: 4,
+  }),
+  dbEnv(),
+);
+check(
+  'a daily habit is trimmed and stored with no target',
+  DB._habits.at(-1)?.name === 'Pray' &&
+    DB._habits.at(-1)?.cadence === 'daily' &&
+    DB._habits.at(-1)?.target === null,
+  JSON.stringify(DB._habits.at(-1)),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', {
+    action: 'add',
+    name: 'Gym',
+    cadence: 'weekly',
+    target: 99,
+  }),
+  dbEnv(),
+);
+check(
+  'a weekly target is clamped into a week',
+  DB._habits.at(-1)?.cadence === 'weekly' && DB._habits.at(-1)?.target === 7,
+  JSON.stringify(DB._habits.at(-1)),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', { action: 'add', name: '   ' }),
+  dbEnv(),
+);
+check('a nameless habit is refused', res.status === 400, String(res.status));
+
+// Archive, never delete: the ticks are the history.
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', { action: 'archive', id: 1 }),
+  dbEnv(),
+);
+check(
+  'archiving updates rather than deletes',
+  res.status === 200 && DB._sql.some((q) => q.startsWith('update habits')) &&
+    !DB._sql.some((q) => q.startsWith('delete from habits')),
+  JSON.stringify(DB._sql),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', { action: 'burn it all' }),
+  dbEnv(),
+);
+check('an unknown action is refused', res.status === 400, String(res.status));
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/habits?days=9999'), dbEnv());
+body = await res.json();
+check('the window is capped', body.window.length === 180, String(body.window?.length));
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
