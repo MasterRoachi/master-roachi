@@ -22,6 +22,18 @@ execFileSync(
 
 const { default: worker } = await import(pathToFileURL(bundle).href);
 
+// The sketch format is pure and lives in lib/, but it is the one piece here
+// whose breakage is invisible: a file that round-trips wrongly looks fine
+// until a sketch is reopened and is not what was left. Bundled and tested in
+// the same run so there is one command to trust.
+const sketchBundle = path.join(os.tmpdir(), 'master-roachi-sketch-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/sketch.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${sketchBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const sketch = await import(pathToFileURL(sketchBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -1431,97 +1443,151 @@ check(
   JSON.stringify(body),
 );
 
-// Both extensions are allowed in notes/, and nothing else is.
-for (const ok of ['notes/a-note.md', 'notes/a-note.png']) {
-  commits.length = 0;
-  res = await worker.fetch(
-    postContent({ collection: 'notes', path: ok, text: ok.endsWith('.png') ? 'aGVsbG8=' : '# hi' }),
-    ghEnv,
-  );
-  check(`notes accepts ${ok}`, res.status === 200, String(res.status));
-}
+// A sketch is one .svg, and nothing else is allowed in notes/.
+commits.length = 0;
+res = await worker.fetch(
+  postContent({ collection: 'notes', path: 'notes/a-sketch.svg', text: '<svg/>' }),
+  ghEnv,
+);
+check('notes accepts a .svg', res.status === 200, String(res.status));
 
 for (const bad of [
-  'notes/a-note.mdx',
-  'notes/a-note.jpg',
-  'notes/nested/a.md',
-  'content/writing/a.md',
+  'notes/a-sketch.md',
+  'notes/a-sketch.png',
+  'notes/a-sketch.mdx',
+  'notes/nested/a.svg',
+  'content/writing/a.svg',
   'notes/../worker/index.ts',
 ]) {
   res = await worker.fetch(postContent({ collection: 'notes', path: bad, text: 'x' }), ghEnv);
   check(`notes refuses ${bad}`, res.status === 400, String(res.status));
 }
 
-// A .md path must not be treated as a published .mdx, so the draft rewriting
-// must not touch it.
+// A sketch is text, not a published post, so the draft rewriting must not
+// reach into it — it shares the endpoint with the writing collection.
 commits.length = 0;
 res = await worker.fetch(
   postContent({
     collection: 'notes',
-    path: 'notes/a-note.md',
-    text: '---\ntitle: x\n---\n\nBody.',
+    path: 'notes/a-sketch.svg',
+    text: '<svg><metadata/></svg>',
     draft: true,
   }),
   ghEnv,
 );
 let written = Buffer.from(commits[0].content, 'base64').toString('utf8');
 check(
-  'a note never has a draft flag injected into it',
-  !written.includes('draft:'),
+  'a sketch never has a draft flag injected into it',
+  !written.includes('draft:') && written === '<svg><metadata/></svg>',
   JSON.stringify(written),
 );
 
-// THE ONE THAT WOULD CORRUPT SILENTLY: a PNG arrives already base64, and
-// encoding it a second time commits a file nothing can open.
-commits.length = 0;
-const pngBase64 =
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==';
-res = await worker.fetch(
-  postContent({ collection: 'notes', path: 'notes/a-note.png', text: pngBase64 }),
-  ghEnv,
-);
-check(
-  'a drawing is committed as the bytes it already is, not base64 of base64',
-  commits[0]?.content === pngBase64,
-  JSON.stringify({ sent: pngBase64.slice(0, 20), committed: String(commits[0]?.content).slice(0, 20) }),
-);
-check(
-  'and those bytes really are a PNG',
-  Buffer.from(commits[0].content, 'base64').subarray(1, 4).toString('ascii') === 'PNG',
-  Buffer.from(commits[0].content, 'base64').subarray(0, 8).toString('hex'),
-);
-
-// A data-URI prefix left on the front is not image data.
-res = await worker.fetch(
-  postContent({
-    collection: 'notes',
-    path: 'notes/a-note.png',
-    text: `data:image/png;base64,${pngBase64}`,
-  }),
-  ghEnv,
-);
-check('a stray data-URI prefix is refused', res.status === 400, String(res.status));
-
-res = await worker.fetch(
-  postContent({ collection: 'notes', path: 'notes/a-note.png', text: 'not base64 !!' }),
-  ghEnv,
-);
-check('non-base64 image data is refused', res.status === 400, String(res.status));
-
-// A new note is still named from its title, and gets .md rather than .mdx.
 commits.length = 0;
 res = await worker.fetch(
-  postContent({ collection: 'notes', title: 'Thoughts on Mondays', text: 'x' }),
+  postContent({ collection: 'notes', title: 'Thoughts on Mondays', text: '<svg/>' }),
   ghEnv,
 );
 body = await res.json();
 check(
-  'a new note is named from its title with the collection extension',
-  body.path === 'notes/thoughts-on-mondays.md',
+  'a new sketch is named from its title, as .svg',
+  body.path === 'notes/thoughts-on-mondays.svg',
   JSON.stringify(body),
 );
 
 globalThis.fetch = preGh;
+
+// --- the sketch file format ------------------------------------------------
+//
+// One file holding ink and text, which has to come back exactly. A format that
+// loses something on the round trip fails silently: the file renders, and the
+// loss only shows when a sketch is reopened and is not what was left.
+
+{
+  const scene = {
+    version: 1,
+    background: '#16181d',
+    items: [
+      { kind: 'stroke', id: 'a', colour: '#f5f5f5', width: 4, points: [[10, 10], [20, 25]] },
+      { kind: 'stroke', id: 'b', colour: '#d9a13b', width: 9, points: [[5, 5]] },
+      {
+        kind: 'text',
+        id: 'c',
+        x: 100,
+        y: 200,
+        size: 32,
+        colour: '#9ece6a',
+        // Every character that breaks XML, plus the one sequence CDATA cannot
+        // carry — all three have been real bugs in formats like this.
+        text: 'Tom & Jerry <3\n"quoted" line\nends with ]]> oddly',
+      },
+    ],
+  };
+
+  const svg = sketch.toSvg(scene);
+
+  check(
+    'the svg is a standalone document',
+    svg.startsWith('<svg xmlns="http://www.w3.org/2000/svg"') && svg.includes('viewBox="0 0 1600 1200"'),
+    svg.slice(0, 60),
+  );
+  check(
+    'ampersands and angle brackets are escaped outside the metadata',
+    !/&(?!amp;|quot;|lt;|gt;)/.test(svg.replace(/<!\[CDATA\[[\s\S]*?]]>/, '')),
+    'unescaped character in the rendered svg',
+  );
+  check(
+    'a single tap renders as a dot rather than nothing',
+    svg.includes('<circle'),
+    svg,
+  );
+  check(
+    'each line of text is its own tspan',
+    (svg.match(/<tspan/g) || []).length === 3,
+    String((svg.match(/<tspan/g) || []).length),
+  );
+
+  const back = sketch.fromSvg(svg);
+  check(
+    'a sketch round-trips exactly',
+    JSON.stringify(back) === JSON.stringify(scene),
+    JSON.stringify(back),
+  );
+  check(
+    'text with ]]> in it survives the CDATA boundary',
+    back?.items[2].text === scene.items[2].text,
+    JSON.stringify(back?.items[2]?.text),
+  );
+
+  // An SVG from somewhere else has no scene to restore. Returning an empty
+  // one would invite saving that emptiness over a real file.
+  check(
+    'a foreign svg yields no scene',
+    sketch.fromSvg('<svg><path d="M0 0"/></svg>') === null,
+    'expected null',
+  );
+  check(
+    'broken metadata yields no scene',
+    sketch.fromSvg('<svg><metadata><sketch><![CDATA[{not json]]></sketch></metadata></svg>') === null,
+    'expected null',
+  );
+  check(
+    'a future version yields no scene',
+    sketch.fromSvg('<svg><metadata><sketch><![CDATA[{"version":2,"items":[]}]]></sketch></metadata></svg>') === null,
+    'expected null',
+  );
+
+  check(
+    'an empty page and a page of blank text both count as blank',
+    sketch.isBlank(sketch.emptyScene()) &&
+      sketch.isBlank({ version: 1, background: '#000', items: [{ kind: 'text', id: 'x', x: 0, y: 0, size: 10, colour: '#fff', text: '   ' }] }),
+    'expected both blank',
+  );
+  check(
+    'a page with a stroke is not blank',
+    !sketch.isBlank({ version: 1, background: '#000', items: [{ kind: 'stroke', id: 'x', colour: '#fff', width: 1, points: [[0, 0]] }] }),
+    'expected not blank',
+  );
+}
 
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
@@ -1533,4 +1599,5 @@ for (const r of results) {
 }
 console.log(`\n  ${results.length - failed.length}/${results.length} passed`);
 fs.rmSync(bundle, { force: true });
+fs.rmSync(sketchBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

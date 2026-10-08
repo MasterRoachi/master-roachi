@@ -491,10 +491,6 @@ export default {
               : pathAllowed(collection, newPath(collection, slugify(String(body.title ?? '')))));
           if (!path) return json({ error: 'need a usable title' }, 400);
 
-          // Keyed on what is being written rather than on the collection, now
-          // that a collection can hold more than one kind of file.
-          const binary = path.endsWith('.png');
-
           // The draft flag is applied here as well as in the editor, so that
           // publishing is a property of the save rather than of whether the
           // page remembered to rewrite the text first.
@@ -512,17 +508,11 @@ export default {
             }
           }
 
-          // A drawing arrives as base64 already. Refusing anything that is not
-          // plausible base64 keeps a stray data-URI prefix from being
-          // committed as if it were image bytes.
-          if (binary && !/^[A-Za-z0-9+/]+={0,2}$/.test(text.replace(/\s/g, ''))) {
-            return json({ error: 'that is not base64 image data' }, 400);
-          }
 
           const name = path.split('/').pop();
           const message = body.sha ? `Update ${name}` : `Add ${name}`;
 
-          const { commit } = await writeFile(token, path, text, message, body.sha, binary);
+          const { commit } = await writeFile(token, path, text, message, body.sha);
           return json({ saved: true, path, commit }, 200);
         }
 

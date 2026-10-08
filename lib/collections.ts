@@ -88,14 +88,11 @@ cover:
     // repo is for once the Access gate is in front of the only page that
     // reads them. lib/content.ts never looks here.
     dir: 'notes',
-    // The note, and the drawing that may sit beside it under the same slug.
-    exts: ['.md', '.png'],
-    template: (today) => `---
-title: ""
-date: ${today}
----
-
-`,
+    // One file per sketch. It was .md plus a .png at first, which was two
+    // tools sharing a page rather than a sketchpad — writing in one place,
+    // drawing in another, saved as a document and a picture that only this app
+    // knew were related. An SVG holds both at the positions they were put.
+    exts: ['.svg'],
   },
 ];
 

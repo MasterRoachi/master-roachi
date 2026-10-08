@@ -47,8 +47,8 @@ const TOOLS = [
   },
   {
     href: '/work/scratchpad/',
-    name: 'Scratchpad',
-    what: 'Write or draw. Saving commits it; export takes a copy out.',
+    name: 'Sketchpad',
+    what: 'Write and draw on one page. Saved as one file.',
   },
   {
     href: '/work/writing/',

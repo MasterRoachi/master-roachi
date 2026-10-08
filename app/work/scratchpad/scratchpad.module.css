@@ -1,14 +1,14 @@
-/* Write on the left, draw underneath. Tokens from app/globals.css. */
+/* One surface, with its tools above it. Tokens from app/globals.css. */
 
 .pad {
   display: grid;
-  grid-template-columns: minmax(150px, 200px) 1fr;
+  grid-template-columns: minmax(140px, 190px) 1fr;
   gap: 1.5rem;
   margin: 2rem 0 4rem;
   align-items: start;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 760px) {
   .pad {
     grid-template-columns: 1fr;
   }
@@ -64,8 +64,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  margin: 0 0 0.75rem;
-  font-size: 0.875rem;
+  margin: 0 0 0.6rem;
 }
 
 .title {
@@ -76,33 +75,35 @@
   font: inherit;
   font-size: 0.9375rem;
   padding: 0.3rem 0.6rem;
-  flex: 1 1 12rem;
+  flex: 1 1 11rem;
   min-width: 0;
 }
 
-.title:focus,
-.text:focus {
+.title:focus {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.bar button {
+.bar button,
+.tools button {
   background: none;
   border: 1px solid var(--line-bright);
   border-radius: 4px;
   color: var(--ink);
   font: inherit;
   font-size: 0.8125rem;
-  padding: 0.25rem 0.65rem;
+  padding: 0.22rem 0.6rem;
   cursor: pointer;
 }
 
-.bar button:hover:not(:disabled) {
+.bar button:hover:not(:disabled),
+.tools button:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.bar button:disabled {
+.bar button:disabled,
+.tools button:disabled {
   opacity: 0.4;
   cursor: default;
 }
@@ -123,98 +124,108 @@
   letter-spacing: 0.08em;
 }
 
-/* Both of these are for paper only. On screen the title is the input above
-   and the body is the textarea. */
-.printTitle,
-.printCopy {
-  display: none;
-}
-
-.text {
-  width: 100%;
-  min-height: 45vh;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--ink);
-  padding: 1rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.9375rem;
-  line-height: 1.7;
-  resize: vertical;
-  tab-size: 2;
-}
-
-.drawing {
-  margin: 1rem 0 0;
-}
-
 .tools {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Which tool is in hand needs to be obvious at a glance — the surface behaves
+   completely differently under each one. */
+.toolOn {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background: var(--accent-dim) !important;
+}
+
+.sep {
+  width: 1px;
+  height: 1.2rem;
+  background: var(--line);
+  margin: 0 0.3rem;
 }
 
 .swatch,
 .swatchOn {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid var(--line-bright);
+  padding: 0;
 }
 
 .swatchOn {
   border-color: var(--ink);
 }
 
-.widthLabel {
+.sizeLabel {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   color: var(--muted);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-.widthLabel input {
+.sizeLabel input {
   accent-color: var(--accent);
   width: 5rem;
 }
 
-.tools button {
-  background: none;
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.6rem;
-  cursor: pointer;
-}
-
-.tools button:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.tools button:disabled {
-  opacity: 0.4;
-  cursor: default;
+/* The wrap is the positioning context for the text editor laid over the page. */
+.surfaceWrap {
+  position: relative;
 }
 
 /* touch-action: none, or a stylus drag scrolls the page instead of drawing. */
-.canvas {
-  width: 100%;
-  height: 50vh;
+.surface {
   display: block;
-  background: var(--bg-raised);
+  width: 100%;
+  height: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
   touch-action: none;
+}
+
+.surface[data-tool='pen'] {
   cursor: crosshair;
+}
+
+.surface[data-tool='text'] {
+  cursor: text;
+}
+
+.surface[data-tool='select'] {
+  cursor: default;
+}
+
+/* Laid over the text it is editing, matched in position and size so what is
+   typed sits where it will sit. Transparent, because the real text is still
+   rendered underneath at low opacity — that is what keeps the two aligned. */
+.textEditor {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 1px dashed var(--accent);
+  background: transparent;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.35;
+  resize: none;
+  overflow: hidden;
+  min-width: 8rem;
+  min-height: 1.4em;
+  field-sizing: content;
+  white-space: pre;
+}
+
+.textEditor:focus {
+  outline: none;
 }
 
 .status {
@@ -231,18 +242,19 @@
   margin: 0.75rem 0 0;
 }
 
-/* PDF is the browser's own print writer rather than a bundled PDF library:
-   every browser has a competent one behind Ctrl+P, it handles fonts and page
-   breaks properly, and the alternative is a megabyte of dependency that
-   renders worse. So printing has to hide the application and leave the note. */
+/* PDF is the browser's own print writer rather than a bundled PDF library.
+   The page is already one SVG that scales, so printing is a matter of hiding
+   the application around it — no second rendering path, and what prints is
+   exactly what is saved. */
 @media print {
   :global(nav),
   :global(footer),
   :global(header),
   .list,
   .bar,
-  .drawing,
-  .message {
+  .tools,
+  .message,
+  .textEditor {
     display: none !important;
   }
 
@@ -251,30 +263,8 @@
     margin: 0;
   }
 
-  .printTitle {
-    display: block;
-    font-size: 22pt;
-    margin: 0 0 1rem;
-  }
-
-  /* The textarea does not print at all: it would print only what is scrolled
-     into view, and the CSS that would fix that (field-sizing) is too recent to
-     rely on for an export — a browser without it prints a truncated note and
-     looks like it worked. The <pre> takes its place and is always full height. */
-  .text {
-    display: none !important;
-  }
-
-  .printCopy {
-    display: block;
-    color: #000;
-    margin: 0;
-    font-family: ui-serif, Georgia, serif;
-    font-size: 11pt;
-    line-height: 1.55;
-    /* It is Markdown, so the line breaks are meaningful — but it must still
-       wrap rather than run off the side of the page. */
-    white-space: pre-wrap;
-    word-break: break-word;
+  .surface {
+    border: 0;
+    width: 100%;
   }
 }
