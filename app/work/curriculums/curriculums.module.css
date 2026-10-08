@@ -1,127 +1,88 @@
-/* Three levels, collapsed by default. Tokens from app/globals.css. */
+/* A curriculum is a path. Tokens from app/globals.css.
+ *
+ * The card leads with where you were, not with how far you have come: opening
+ * a course tracker, the question is "what is next", and the percentage is
+ * context for it. So the next lesson is the biggest thing on the card and the
+ * ring is small beside the title. */
 
-.add {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 2rem 0;
+.page {
+  max-width: 52rem;
+  margin: 2rem auto 4rem;
 }
 
-.add input {
-  background: var(--bg-raised);
+/* --- the card ----------------------------------------------------------- */
+
+.card {
   border: 1px solid var(--line);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.875rem;
-  padding: 0.35rem 0.6rem;
-  flex: 1 1 12rem;
-}
-
-.add input:focus,
-.importer textarea:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.add button,
-.importActions button {
-  background: none;
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.875rem;
-  padding: 0.35rem 0.9rem;
-  cursor: pointer;
-}
-
-.add button:hover:not(:disabled),
-.importActions button:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.add button:disabled,
-.importActions button:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.curriculum {
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--bg-raised);
-  padding: 0.9rem 1.1rem;
-  margin-bottom: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
 }
 
-/* A paused or finished curriculum should not look as live as an active one,
-   without being hidden — pausing something is not abandoning it. */
-.curriculum[data-status='paused'],
-.curriculum[data-status='done'] {
-  opacity: 0.6;
+/* Paused and finished are present but quieter. Pausing a course is not
+   abandoning it, and hiding it would make it easy to forget on purpose. */
+.card[data-status='paused'],
+.card[data-status='done'] {
+  opacity: 0.62;
 }
 
-.curriculum header {
+.card header {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.9rem;
 }
 
-.curriculum h2 {
-  font-size: var(--step-sub);
-  margin: 0;
-  line-height: 1.2;
+.headText {
   flex: 1 1 auto;
+  min-width: 0;
 }
 
-.disclose {
-  background: none;
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--muted);
-  font: inherit;
-  width: 1.5rem;
-  height: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  flex: 0 0 auto;
+.card h2 {
+  font-size: var(--step-sub);
+  line-height: 1.15;
+  margin: 0;
 }
 
-.disclose:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* The count leads and the bar follows: "41 of 112" is the question, and a bar
-   on its own cannot be read precisely. */
-.progress {
+.meta {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
   color: var(--muted);
   font-size: 0.8125rem;
+  margin: 0.2rem 0 0;
   font-variant-numeric: tabular-nums;
 }
 
-.bar {
-  display: block;
-  width: 72px;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--line);
-  overflow: hidden;
+/* Whether it is actually moving, which a percentage cannot say — 40% that has
+   not changed in a month and 40% climbing look identical otherwise. */
+.recent {
+  color: var(--accent);
 }
 
-.bar span {
-  display: block;
-  height: 100%;
-  background: var(--accent);
+.stalled {
+  color: var(--muted);
+  opacity: 0.75;
+  font-style: italic;
 }
 
-.curriculum select {
+.source {
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin: 0.25rem 0 0;
+  word-break: break-all;
+  opacity: 0.8;
+}
+
+.headControls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.headControls select {
   background: var(--bg);
   border: 1px solid var(--line-bright);
   border-radius: 4px;
@@ -131,30 +92,153 @@
   padding: 0.2rem 0.3rem;
 }
 
-.source {
-  color: var(--muted);
-  font-size: 0.75rem;
-  margin: 0.3rem 0 0;
-  word-break: break-all;
+/* --- the ring ----------------------------------------------------------- */
+
+.ring {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
 }
 
-.module {
-  margin: 1.1rem 0 0;
-  padding-left: 0.5rem;
+.ringTrack,
+.ringFill {
+  fill: none;
+  stroke-width: 3.5;
+}
+
+.ringTrack {
+  stroke: var(--line);
+}
+
+.ringFill {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.3s ease;
+}
+
+.ringText {
+  fill: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- the headline ------------------------------------------------------- */
+
+.next {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.9rem 0 0;
+  padding: 0.7rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.next strong {
+  display: block;
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.nextLabel {
+  display: block;
+  color: var(--muted);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.15rem;
+}
+
+.nextIn {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+/* The tick sits next to the lesson it finishes, so the common action — "did
+   that one" — is one click from opening the page. */
+.nextTick {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1.5px solid var(--line-bright);
+  background: none;
+  cursor: pointer;
+}
+
+.nextTick:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.disclose {
+  margin: 0.75rem 0 0;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+}
+
+.disclose:hover {
+  color: var(--accent);
+}
+
+/* --- the path ----------------------------------------------------------- */
+
+/* A line down the left with a node per module. How far down the line the
+   filled nodes reach is the shape of the progress, which a bar cannot show. */
+.path {
+  margin: 1rem 0 0;
+  padding-left: 0.3rem;
   border-left: 2px solid var(--line);
 }
 
+.module {
+  position: relative;
+  padding: 0 0 0 1.1rem;
+  margin-bottom: 1.1rem;
+}
+
+.node,
+.nodeDone {
+  position: absolute;
+  left: -0.72rem;
+  top: 0.3rem;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--line-bright);
+  background: var(--bg-raised);
+}
+
+/* A finished module fills its node. A row of filled nodes with one hollow one
+   is the position on the path. */
+.nodeDone {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 .module h3 {
-  font-size: 0.875rem;
-  margin: 0 0 0.35rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 0.875rem;
+  margin: 0 0 0.35rem;
 }
 
 .moduleCount {
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -178,11 +262,14 @@
   align-items: center;
   gap: 0.45rem;
   cursor: pointer;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .lessons input {
   accent-color: var(--accent);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 /* Struck through rather than hidden: the list is the curriculum, and what is
@@ -192,21 +279,121 @@
   text-decoration: line-through;
 }
 
-/* The day it was done, which is the reason completion is a date. */
+/* The day it was done, which is the reason completion is a date and not a
+   flag. */
 .when {
   color: var(--muted);
   font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
+
+/* --- renaming ----------------------------------------------------------- */
+
+/* Double-click to rename, at all three levels. The API has offered this from
+   the start and nothing could reach it, so a typo in an imported outline used
+   to be permanent. */
+.renameBox {
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: inherit;
+  padding: 0.05rem 0.3rem;
+  min-width: 10rem;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.renameBox:focus {
+  outline: none;
+}
+
+/* --- small controls ----------------------------------------------------- */
+
+/* Hidden until the thing they belong to is hovered. A page of × and + is
+   clutter, and these are all destructive or rare. */
+.tiny {
+  background: none;
+  border: 0;
+  color: transparent;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.2rem;
+  flex-shrink: 0;
+}
+
+.module:hover .tiny,
+.lessons li:hover .tiny,
+.card header:hover .tiny,
+.tiny:focus-visible {
+  color: var(--muted);
+}
+
+.tiny:hover {
+  color: var(--accent) !important;
+}
+
+.inlineAdd {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0;
+}
+
+.inlineAdd input {
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.2rem 0.5rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.inlineAdd input:focus,
+.importer textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.inlineAdd button,
+.importActions button {
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.2rem 0.7rem;
+  cursor: pointer;
+}
+
+.inlineAdd button:hover:not(:disabled),
+.importActions button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.inlineAdd button:disabled,
+.importActions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* --- the importer ------------------------------------------------------- */
 
 .importActions {
   display: flex;
   gap: 0.5rem;
-  margin: 1rem 0 0;
+  margin: 0.75rem 0 0;
 }
 
 .importer {
-  margin: 1rem 0 0;
+  margin: 0.75rem 0 0;
 }
 
 .importer textarea {
@@ -223,7 +410,9 @@
   resize: vertical;
 }
 
-/* What the paste was understood to mean, before anything is written. */
+/* What the paste was understood to mean, before anything is written — the
+   parser cannot tell a flat numbered list of lessons from numbered sections,
+   and that ambiguity is in the text rather than in the code. */
 .preview {
   list-style: none;
   margin: 0.5rem 0 0;
@@ -243,9 +432,73 @@
   font-weight: 600;
 }
 
+/* --- the rest ----------------------------------------------------------- */
+
+.shelvedHead {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 2rem 0 0.75rem;
+}
+
+.add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 2rem 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.add input {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.6rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.add input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.add button {
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+}
+
+.add button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.add button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .status {
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  max-width: 52ch;
+  line-height: 1.6;
 }
 
 .warn {
@@ -254,18 +507,5 @@
   border-radius: 6px;
   padding: 0.6rem 0.8rem;
   font-size: 0.8125rem;
-}
-
-.remove {
-  background: none;
-  border: 0;
-  color: var(--muted);
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 0.2rem;
-}
-
-.remove:hover {
-  color: var(--accent);
+  margin-bottom: 1rem;
 }

@@ -1,51 +1,64 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import {
+  isComplete,
+  nextLesson,
+  progressOf,
+  recentlyDone,
+  type Curriculum,
+  type Module,
+} from '@/lib/curriculum';
 import { outlineSize, parseOutline } from '@/lib/outline';
 import styles from './curriculums.module.css';
 
-// Three levels, with the counts that say how far through each one is.
+// A curriculum is a path, so it is drawn as one: a line down the left with a
+// node per module, filled as the module finishes, and the lessons hanging off
+// it. How far along the line you are is the thing being asked.
 //
-// The import previews before it writes. The parser cannot tell a flat
-// numbered list of lessons from a list of numbered sections — that ambiguity
-// is in the text, not in the code — so the fix is to show what it made of the
-// paste and let him look before two hundred rows exist. The same parser runs
-// here and on the server, so the preview is what will actually be created.
+// Above that, the headline is NOT the percentage. Opening a course tracker the
+// question is never "how many have I done", it is "where was I" — so the next
+// unfinished lesson is the largest thing on each card, with the tick next to
+// it. Everything else is context for that one line.
 
-interface Lesson {
-  id: number;
-  name: string;
-  done_on: string | null;
-}
+const RING = 2 * Math.PI * 20;
 
-interface Module {
-  id: number;
-  name: string;
-  lessons: Lesson[];
-}
-
-interface Curriculum {
-  id: number;
-  name: string;
-  source: string | null;
-  status: 'active' | 'paused' | 'done';
-  modules: Module[];
-}
-
-function counts(curriculum: Curriculum) {
-  const lessons = curriculum.modules.flatMap((module) => module.lessons);
-  return { done: lessons.filter((l) => l.done_on).length, total: lessons.length };
+function Ring({ percent }: { percent: number }) {
+  return (
+    <svg className={styles.ring} viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="20" className={styles.ringTrack} />
+      <circle
+        cx="24"
+        cy="24"
+        r="20"
+        className={styles.ringFill}
+        // Drawn from the top rather than from three o'clock, which is where a
+        // circle starts and nobody reads a dial from.
+        strokeDasharray={`${(percent / 100) * RING} ${RING}`}
+        transform="rotate(-90 24 24)"
+      />
+      <text x="24" y="24" className={styles.ringText}>
+        {percent}
+      </text>
+    </svg>
+  );
 }
 
 export default function Curriculums() {
   const [data, setData] = useState<Curriculum[] | null>(null);
+  const [today, setToday] = useState('');
   const [configured, setConfigured] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [name, setName] = useState('');
   const [source, setSource] = useState('');
+  const [open, setOpen] = useState<Set<number>>(new Set());
   const [importing, setImporting] = useState<number | null>(null);
   const [outline, setOutline] = useState('');
-  const [open, setOpen] = useState<Set<number>>(new Set());
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [rename, setRename] = useState('');
+  const [addingTo, setAddingTo] = useState<number | null>(null);
+  const [lessonName, setLessonName] = useState('');
 
   const load = useCallback(async () => {
     try {
@@ -54,9 +67,11 @@ export default function Curriculums() {
       const payload = (await response.json()) as {
         configured: boolean;
         curriculums: Curriculum[];
+        today: string;
       };
       setConfigured(payload.configured);
       setData(payload.curriculums ?? []);
+      setToday(payload.today ?? '');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not read them.');
     }
@@ -95,9 +110,375 @@ export default function Curriculums() {
   const preview = outline.trim() ? parseOutline(outline) : [];
   const previewSize = outlineSize(preview);
 
+  /** Inline renaming, which the API has always offered and nothing could reach. */
+  function Name({
+    kind,
+    id,
+    children,
+    className,
+  }: {
+    kind: 'curriculum' | 'module' | 'lesson';
+    id: number;
+    children: string;
+    className?: string;
+  }) {
+    const key = `${kind}:${id}`;
+    if (renaming === key) {
+      return (
+        <input
+          autoFocus
+          className={styles.renameBox}
+          value={rename}
+          aria-label={`Rename ${children}`}
+          onChange={(event) => setRename(event.target.value)}
+          onBlur={() => {
+            if (rename.trim() && rename !== children) {
+              void act({ action: 'rename', kind, id, name: rename });
+            }
+            setRenaming(null);
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') event.currentTarget.blur();
+            if (event.key === 'Escape') {
+              setRename(children);
+              setRenaming(null);
+            }
+          }}
+        />
+      );
+    }
+    return (
+      <span
+        className={className}
+        title="Double-click to rename"
+        onDoubleClick={() => {
+          setRename(children);
+          setRenaming(key);
+        }}
+      >
+        {children}
+      </span>
+    );
+  }
+
+  function Lessons({ module }: { module: Module }) {
+    const moduleProgress = progressOf(module);
+    return (
+      <div className={styles.module}>
+        <span
+          className={
+            moduleProgress.total > 0 && moduleProgress.done === moduleProgress.total
+              ? styles.nodeDone
+              : styles.node
+          }
+          aria-hidden="true"
+        />
+        <h3>
+          <Name kind="module" id={module.id}>
+            {module.name}
+          </Name>
+          <span className={styles.moduleCount}>
+            {moduleProgress.done}/{moduleProgress.total}
+          </span>
+          <button
+            type="button"
+            className={styles.tiny}
+            title="Add a lesson to this module"
+            onClick={() => {
+              setAddingTo(addingTo === module.id ? null : module.id);
+              setLessonName('');
+            }}
+          >
+            +
+          </button>
+          <button
+            type="button"
+            className={styles.tiny}
+            title="Remove this module and its lessons"
+            onClick={() => {
+              if (confirm(`Remove "${module.name}"?`)) {
+                void act({ action: 'remove', kind: 'module', id: module.id });
+              }
+            }}
+          >
+            ×
+          </button>
+        </h3>
+
+        <ul className={styles.lessons}>
+          {module.lessons.map((lesson) => (
+            <li key={lesson.id}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={lesson.done_on !== null}
+                  onChange={() => void act({ action: 'toggle-lesson', id: lesson.id })}
+                />
+                <Name
+                  kind="lesson"
+                  id={lesson.id}
+                  className={lesson.done_on ? styles.doneLesson : undefined}
+                >
+                  {lesson.name}
+                </Name>
+              </label>
+              {lesson.done_on && <span className={styles.when}>{lesson.done_on}</span>}
+              <button
+                type="button"
+                className={styles.tiny}
+                title="Remove this lesson"
+                onClick={() => void act({ action: 'remove', kind: 'lesson', id: lesson.id })}
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        {/* add-lesson: offered by the API from the start, and until now
+            unreachable — the only way a lesson got in was the bulk import. */}
+        {addingTo === module.id && (
+          <form
+            className={styles.inlineAdd}
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!lessonName.trim()) return;
+              void act({ action: 'add-lesson', module_id: module.id, name: lessonName }).then(
+                (ok) => {
+                  if (ok) setLessonName('');
+                },
+              );
+            }}
+          >
+            <input
+              autoFocus
+              value={lessonName}
+              placeholder="Lesson name"
+              aria-label="Lesson name"
+              onChange={(event) => setLessonName(event.target.value)}
+            />
+            <button type="submit" disabled={!lessonName.trim()}>
+              Add
+            </button>
+            <button type="button" onClick={() => setAddingTo(null)}>
+              Done
+            </button>
+          </form>
+        )}
+      </div>
+    );
+  }
+
+  const active = data.filter((c) => c.status === 'active');
+  const shelved = data.filter((c) => c.status !== 'active');
+
+  function Card({ curriculum }: { curriculum: Curriculum }) {
+    const progress = progressOf(curriculum);
+    const next = nextLesson(curriculum);
+    const complete = isComplete(curriculum);
+    const recent = recentlyDone(curriculum, today);
+    const expanded = open.has(curriculum.id);
+
+    return (
+      <section className={styles.card} data-status={curriculum.status}>
+        <header>
+          <Ring percent={progress.percent} />
+
+          <div className={styles.headText}>
+            <h2>
+              <Name kind="curriculum" id={curriculum.id}>
+                {curriculum.name}
+              </Name>
+            </h2>
+            <p className={styles.meta}>
+              {progress.done} of {progress.total} lessons
+              {progress.total > 0 && recent > 0 && (
+                <span className={styles.recent}>{recent} in a fortnight</span>
+              )}
+              {progress.total > 0 && recent === 0 && !complete && (
+                <span className={styles.stalled}>nothing in a fortnight</span>
+              )}
+            </p>
+            {curriculum.source && <p className={styles.source}>{curriculum.source}</p>}
+          </div>
+
+          <div className={styles.headControls}>
+            <select
+              value={curriculum.status}
+              aria-label={`Status of ${curriculum.name}`}
+              onChange={(event) =>
+                void act({ action: 'set-status', id: curriculum.id, status: event.target.value })
+              }
+            >
+              <option value="active">Active</option>
+              <option value="paused">Paused</option>
+              <option value="done">Done</option>
+            </select>
+            <button
+              type="button"
+              className={styles.tiny}
+              title="Remove, with every module and lesson in it"
+              onClick={() => {
+                if (confirm(`Remove "${curriculum.name}" and all ${progress.total} lessons?`)) {
+                  void act({ action: 'remove', kind: 'curriculum', id: curriculum.id });
+                }
+              }}
+            >
+              ×
+            </button>
+          </div>
+        </header>
+
+        {/* The headline. Not the percentage — the question on opening this is
+            "where was I", and this is the answer with the tick beside it. */}
+        {next ? (
+          <div className={styles.next}>
+            <button
+              type="button"
+              className={styles.nextTick}
+              aria-label={`Mark ${next.lesson.name} done`}
+              onClick={() => void act({ action: 'toggle-lesson', id: next.lesson.id })}
+            />
+            <span>
+              <span className={styles.nextLabel}>Next</span>
+              <strong>{next.lesson.name}</strong>
+              <span className={styles.nextIn}>in {next.module.name}</span>
+            </span>
+          </div>
+        ) : (
+          <div className={styles.next}>
+            <span>
+              <strong>
+                {progress.total === 0
+                  ? 'Nothing in it yet — paste an outline below.'
+                  : 'Every lesson done.'}
+              </strong>
+            </span>
+          </div>
+        )}
+
+        <button
+          type="button"
+          className={styles.disclose}
+          aria-expanded={expanded}
+          onClick={() => {
+            const next = new Set(open);
+            if (expanded) next.delete(curriculum.id);
+            else next.add(curriculum.id);
+            setOpen(next);
+          }}
+        >
+          {expanded
+            ? 'Hide the path'
+            : `Show the path — ${curriculum.modules.length} module${
+                curriculum.modules.length === 1 ? '' : 's'
+              }`}
+        </button>
+
+        {expanded && (
+          <div className={styles.path}>
+            {curriculum.modules.map((module) => (
+              <Lessons key={module.id} module={module} />
+            ))}
+
+            {importing === curriculum.id ? (
+              <div className={styles.importer}>
+                <textarea
+                  value={outline}
+                  onChange={(event) => setOutline(event.target.value)}
+                  placeholder={'Paste an outline.\n\nSection\n  - lesson\n  - lesson'}
+                  aria-label="Outline"
+                />
+                <p className={styles.status}>
+                  {preview.length === 0
+                    ? 'Nothing recognised yet.'
+                    : `${previewSize.modules} module${previewSize.modules === 1 ? '' : 's'}, ${previewSize.lessons} lesson${previewSize.lessons === 1 ? '' : 's'}:`}
+                </p>
+                {preview.length > 0 && (
+                  <ul className={styles.preview}>
+                    {preview.map((module, i) => (
+                      <li key={`${i}-${module.name}`}>
+                        <strong>{module.name}</strong>
+                        {module.lessons.length > 0 && <> — {module.lessons.join(', ')}</>}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className={styles.importActions}>
+                  <button
+                    type="button"
+                    disabled={preview.length === 0}
+                    onClick={() =>
+                      void act({
+                        action: 'import',
+                        curriculum_id: curriculum.id,
+                        outline,
+                      }).then((ok) => {
+                        if (ok) {
+                          setOutline('');
+                          setImporting(null);
+                        }
+                      })
+                    }
+                  >
+                    Create these
+                  </button>
+                  <button type="button" onClick={() => setImporting(null)}>
+                    Cancel
+                  </button>
+                </p>
+              </div>
+            ) : (
+              <p className={styles.importActions}>
+                <button type="button" onClick={() => setImporting(curriculum.id)}>
+                  Paste an outline
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const moduleName = prompt('Module name');
+                    if (moduleName?.trim()) {
+                      void act({
+                        action: 'add-module',
+                        curriculum_id: curriculum.id,
+                        name: moduleName,
+                      });
+                    }
+                  }}
+                >
+                  Add a module
+                </button>
+              </p>
+            )}
+          </div>
+        )}
+      </section>
+    );
+  }
+
   return (
-    <>
+    <div className={styles.page}>
       {error && <p className={styles.warn}>{error}</p>}
+
+      {active.map((curriculum) => (
+        <Card key={curriculum.id} curriculum={curriculum} />
+      ))}
+
+      {shelved.length > 0 && (
+        <>
+          <h2 className={styles.shelvedHead}>Paused and finished</h2>
+          {shelved.map((curriculum) => (
+            <Card key={curriculum.id} curriculum={curriculum} />
+          ))}
+        </>
+      )}
+
+      {data.length === 0 && (
+        <p className={styles.empty}>
+          Nothing being studied yet. Add a curriculum below, then open it and paste the course
+          outline — a section per line with its lessons indented under it.
+        </p>
+      )}
 
       <form
         className={styles.add}
@@ -113,188 +494,11 @@ export default function Curriculums() {
         }}
       >
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Curriculum" aria-label="Curriculum name" />
-        <input value={source} onChange={(e) => setSource(e.target.value)} placeholder="Source (optional)" aria-label="Source" />
+        <input value={source} onChange={(e) => setSource(e.target.value)} placeholder="Source — a URL, a book, a syllabus" aria-label="Source" />
         <button type="submit" disabled={!name.trim()}>
           Add
         </button>
       </form>
-
-      {data.length === 0 && <p className={styles.status}>Nothing being studied yet.</p>}
-
-      {data.map((curriculum) => {
-        const { done, total } = counts(curriculum);
-        const expanded = open.has(curriculum.id);
-
-        return (
-          <section key={curriculum.id} className={styles.curriculum} data-status={curriculum.status}>
-            <header>
-              <button
-                type="button"
-                className={styles.disclose}
-                aria-expanded={expanded}
-                onClick={() => {
-                  const next = new Set(open);
-                  if (expanded) next.delete(curriculum.id);
-                  else next.add(curriculum.id);
-                  setOpen(next);
-                }}
-              >
-                {expanded ? '−' : '+'}
-              </button>
-
-              <h2>{curriculum.name}</h2>
-
-              {/* The number first, because "41 of 112" is the question being
-                  asked and a bar alone cannot be read precisely. */}
-              <span className={styles.progress}>
-                {total === 0 ? 'empty' : `${done} of ${total}`}
-                {total > 0 && (
-                  <span className={styles.bar}>
-                    <span style={{ width: `${Math.round((done / total) * 100)}%` }} />
-                  </span>
-                )}
-              </span>
-
-              <select
-                value={curriculum.status}
-                aria-label={`Status of ${curriculum.name}`}
-                onChange={(e) => void act({ action: 'set-status', id: curriculum.id, status: e.target.value })}
-              >
-                <option value="active">Active</option>
-                <option value="paused">Paused</option>
-                <option value="done">Done</option>
-              </select>
-
-              <button
-                type="button"
-                className={styles.remove}
-                title="Remove, with every module and lesson in it"
-                onClick={() => {
-                  if (confirm(`Remove "${curriculum.name}" and all ${total} lessons?`)) {
-                    void act({ action: 'remove', kind: 'curriculum', id: curriculum.id });
-                  }
-                }}
-              >
-                ×
-              </button>
-            </header>
-
-            {curriculum.source && <p className={styles.source}>{curriculum.source}</p>}
-
-            {expanded && (
-              <>
-                {curriculum.modules.map((module) => {
-                  const moduleDone = module.lessons.filter((l) => l.done_on).length;
-                  return (
-                    <div key={module.id} className={styles.module}>
-                      <h3>
-                        {module.name}
-                        <span className={styles.moduleCount}>
-                          {moduleDone}/{module.lessons.length}
-                        </span>
-                        <button
-                          type="button"
-                          className={styles.remove}
-                          title="Remove this module and its lessons"
-                          onClick={() => {
-                            if (confirm(`Remove "${module.name}"?`)) {
-                              void act({ action: 'remove', kind: 'module', id: module.id });
-                            }
-                          }}
-                        >
-                          ×
-                        </button>
-                      </h3>
-
-                      <ul className={styles.lessons}>
-                        {module.lessons.map((lesson) => (
-                          <li key={lesson.id}>
-                            <label>
-                              <input
-                                type="checkbox"
-                                checked={lesson.done_on !== null}
-                                onChange={() => void act({ action: 'toggle-lesson', id: lesson.id })}
-                              />
-                              <span className={lesson.done_on ? styles.doneLesson : undefined}>
-                                {lesson.name}
-                              </span>
-                            </label>
-                            {lesson.done_on && <span className={styles.when}>{lesson.done_on}</span>}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })}
-
-                {importing === curriculum.id ? (
-                  <div className={styles.importer}>
-                    <textarea
-                      value={outline}
-                      onChange={(e) => setOutline(e.target.value)}
-                      placeholder={'Paste an outline.\n\nSection\n  - lesson\n  - lesson'}
-                      aria-label="Outline"
-                    />
-                    <p className={styles.status}>
-                      {preview.length === 0
-                        ? 'Nothing recognised yet.'
-                        : `${previewSize.modules} module${previewSize.modules === 1 ? '' : 's'}, ${previewSize.lessons} lesson${previewSize.lessons === 1 ? '' : 's'}:`}
-                    </p>
-                    {preview.length > 0 && (
-                      <ul className={styles.preview}>
-                        {preview.map((module, i) => (
-                          <li key={`${i}-${module.name}`}>
-                            <strong>{module.name}</strong>
-                            {module.lessons.length > 0 && <> — {module.lessons.join(', ')}</>}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <p className={styles.importActions}>
-                      <button
-                        type="button"
-                        disabled={preview.length === 0}
-                        onClick={() =>
-                          void act({ action: 'import', curriculum_id: curriculum.id, outline }).then(
-                            (ok) => {
-                              if (ok) {
-                                setOutline('');
-                                setImporting(null);
-                              }
-                            },
-                          )
-                        }
-                      >
-                        Create these
-                      </button>
-                      <button type="button" onClick={() => setImporting(null)}>
-                        Cancel
-                      </button>
-                    </p>
-                  </div>
-                ) : (
-                  <p className={styles.importActions}>
-                    <button type="button" onClick={() => setImporting(curriculum.id)}>
-                      Paste an outline
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const moduleName = prompt('Module name');
-                        if (moduleName?.trim()) {
-                          void act({ action: 'add-module', curriculum_id: curriculum.id, name: moduleName });
-                        }
-                      }}
-                    >
-                      Add a module
-                    </button>
-                  </p>
-                )}
-              </>
-            )}
-          </section>
-        );
-      })}
-    </>
+    </div>
   );
 }

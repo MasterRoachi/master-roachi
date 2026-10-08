@@ -23,7 +23,7 @@ export default function WorkCurriculumsPage() {
       <PageHeader
         eyebrow="Private"
         title="Curriculums"
-        lede="Paste an outline to build one. Tick a lesson to record the day it was done."
+        lede="Where you were, and the path from here."
       />
       <p>
         <Link href="/work/">← Work</Link>

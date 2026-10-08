@@ -85,6 +85,17 @@ execFileSync(
 );
 const bookPost = await import(pathToFileURL(postBundle).href);
 
+// "What is next" is the headline of the curriculum page, so it has to be right
+// in order rather than by id — a skipped lesson leaves an earlier gap, and
+// that gap is what should come back.
+const curriculumBundle = path.join(os.tmpdir(), 'master-roachi-curriculum-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/curriculum.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${curriculumBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const curriculum = await import(pathToFileURL(curriculumBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -2135,6 +2146,79 @@ check('with no GitHub token it refuses clearly', res.status === 400, String(res.
 
 globalThis.fetch = preGh;
 
+// --- curriculum progress and what is next ----------------------------------
+
+{
+  const lesson = (id, done = null) => ({ id, name: `L${id}`, done_on: done });
+  const make = (modules) => ({ id: 1, name: 'Odin', source: null, status: 'active', modules });
+
+  const course = make([
+    { id: 1, name: 'Foundations', lessons: [lesson(1, '2026-09-01'), lesson(2, '2026-09-02')] },
+    { id: 2, name: 'JavaScript', lessons: [lesson(3, '2026-09-10'), lesson(4), lesson(5)] },
+    { id: 3, name: 'NodeJS', lessons: [lesson(6)] },
+  ]);
+
+  let p = curriculum.progressOf(course);
+  check('progress counts across modules', p.done === 3 && p.total === 6 && p.percent === 50, JSON.stringify(p));
+
+  // An empty course must not read as finished, and must not read as NaN.
+  p = curriculum.progressOf(make([]));
+  check('an empty curriculum is 0%, not 100% and not NaN', p.percent === 0 && p.total === 0, JSON.stringify(p));
+  p = curriculum.progressOf(make([{ id: 1, name: 'm', lessons: [] }]));
+  check('a module with no lessons is also 0%', p.percent === 0, JSON.stringify(p));
+
+  let next = curriculum.nextLesson(course);
+  check(
+    'the next lesson is the first gap in course order',
+    next?.lesson.id === 4 && next.module.name === 'JavaScript',
+    JSON.stringify(next),
+  );
+
+  // THE ONE THAT MATTERS: skipping ahead must not move "next" past the gap.
+  const skipped = make([
+    { id: 1, name: 'Foundations', lessons: [lesson(1), lesson(2, '2026-09-02')] },
+    { id: 2, name: 'JavaScript', lessons: [lesson(3, '2026-09-10')] },
+  ]);
+  next = curriculum.nextLesson(skipped);
+  check(
+    'a later lesson done does not skip an earlier gap',
+    next?.lesson.id === 1,
+    JSON.stringify(next),
+  );
+
+  check(
+    'a finished course has no next lesson',
+    curriculum.nextLesson(make([{ id: 1, name: 'm', lessons: [lesson(1, '2026-09-01')] }])) === null,
+    'expected null',
+  );
+  check('an empty course has no next lesson', curriculum.nextLesson(make([])) === null, 'expected null');
+
+  check('a fully ticked course is complete', curriculum.isComplete(make([{ id: 1, name: 'm', lessons: [lesson(1, '2026-01-01')] }])), 'expected true');
+  // Empty is not complete, or a course with nothing in it would congratulate
+  // itself.
+  check('an empty course is not complete', !curriculum.isComplete(make([])), 'expected false');
+  check('a partly done course is not complete', !curriculum.isComplete(course), 'expected false');
+
+  // Recent activity, which is what tells a stalled 40% from a climbing one.
+  const recent = make([
+    {
+      id: 1,
+      name: 'm',
+      lessons: [lesson(1, '2026-10-07'), lesson(2, '2026-09-20'), lesson(3, '2026-10-01')],
+    },
+  ]);
+  check(
+    'recent counts only the last fortnight',
+    curriculum.recentlyDone(recent, '2026-10-08') === 2,
+    String(curriculum.recentlyDone(recent, '2026-10-08')),
+  );
+  check(
+    'and nothing recent reads as zero rather than as unknown',
+    curriculum.recentlyDone(make([{ id: 1, name: 'm', lessons: [lesson(1, '2026-01-01')] }]), '2026-10-08') === 0,
+    'expected 0',
+  );
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -2151,4 +2235,5 @@ fs.rmSync(dbBundle, { force: true });
 fs.rmSync(iconBundle, { force: true });
 fs.rmSync(spineBundle, { force: true });
 fs.rmSync(postBundle, { force: true });
+fs.rmSync(curriculumBundle, { force: true });
 process.exit(failed.length ? 1 : 0);
