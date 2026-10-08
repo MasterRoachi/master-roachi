@@ -34,6 +34,17 @@ execFileSync(
 );
 const sketch = await import(pathToFileURL(sketchBundle).href);
 
+// Same reasoning for the habit grid's week maths: pure, and wrong in a way
+// nothing would announce — a misread weekday shifts the weekend shading and a
+// misread week boundary miscounts every weekly habit.
+const habitsBundle = path.join(os.tmpdir(), 'master-roachi-habits-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/habits.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${habitsBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const habits = await import(pathToFileURL(habitsBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -1589,6 +1600,61 @@ globalThis.fetch = preGh;
   );
 }
 
+// --- the habit grid's week maths -------------------------------------------
+
+{
+  // 2026-10-08 is a Thursday. Anything else here is wrong.
+  check('a weekday is read in UTC, not the viewer zone', habits.weekday('2026-10-08') === 4, String(habits.weekday('2026-10-08')));
+  check('Sunday is 0', habits.weekday('2026-10-11') === 0, String(habits.weekday('2026-10-11')));
+  check('Monday is 1', habits.weekday('2026-10-12') === 1, String(habits.weekday('2026-10-12')));
+
+  // Weeks start Monday, so a Sunday belongs to the week BEFORE it — starting
+  // Sunday would split every weekend and score a weekly habit differently
+  // depending on which day it was done.
+  check('a Thursday maps to its Monday', habits.weekOf('2026-10-08') === '2026-10-05', habits.weekOf('2026-10-08'));
+  check('a Monday maps to itself', habits.weekOf('2026-10-05') === '2026-10-05', habits.weekOf('2026-10-05'));
+  check('a Sunday maps back, not forward', habits.weekOf('2026-10-11') === '2026-10-05', habits.weekOf('2026-10-11'));
+  check('the next Monday is a new week', habits.weekOf('2026-10-12') === '2026-10-12', habits.weekOf('2026-10-12'));
+  check('a week spanning a month boundary still resolves', habits.weekOf('2026-11-01') === '2026-10-26', habits.weekOf('2026-11-01'));
+
+  const window = ['2026-10-05','2026-10-06','2026-10-07','2026-10-08'];
+
+  check(
+    'a streak counts back to the first gap',
+    habits.streak(['2026-10-06','2026-10-07','2026-10-08'], window, '2026-10-08') === 3,
+    String(habits.streak(['2026-10-06','2026-10-07','2026-10-08'], window, '2026-10-08')),
+  );
+  // The one that matters every morning: today unticked must not read as a
+  // broken streak, because the day is not over.
+  check(
+    'an unticked today does not break the streak',
+    habits.streak(['2026-10-06','2026-10-07'], window, '2026-10-08') === 2,
+    String(habits.streak(['2026-10-06','2026-10-07'], window, '2026-10-08')),
+  );
+  check(
+    'but a gap before today does',
+    habits.streak(['2026-10-05','2026-10-08'], window, '2026-10-08') === 1,
+    String(habits.streak(['2026-10-05','2026-10-08'], window, '2026-10-08')),
+  );
+  check('no ticks is no streak', habits.streak([], window, '2026-10-08') === 0, 'expected 0');
+
+  check(
+    'this week counts only the week containing today',
+    habits.thisWeek(['2026-10-04','2026-10-06','2026-10-08'], '2026-10-08') === 2,
+    String(habits.thisWeek(['2026-10-04','2026-10-06','2026-10-08'], '2026-10-08')),
+  );
+  check(
+    'and a Sunday tick lands in the week it belongs to',
+    habits.thisWeek(['2026-10-11'], '2026-10-08') === 1,
+    String(habits.thisWeek(['2026-10-11'], '2026-10-08')),
+  );
+  check(
+    'initials line up with the weekday numbers',
+    habits.INITIALS[habits.weekday('2026-10-08')] === 'T' && habits.INITIALS[habits.weekday('2026-10-11')] === 'S',
+    `${habits.INITIALS[habits.weekday('2026-10-08')]} ${habits.INITIALS[habits.weekday('2026-10-11')]}`,
+  );
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -1600,4 +1666,5 @@ for (const r of results) {
 console.log(`\n  ${results.length - failed.length}/${results.length} passed`);
 fs.rmSync(bundle, { force: true });
 fs.rmSync(sketchBundle, { force: true });
+fs.rmSync(habitsBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

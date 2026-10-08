@@ -1,11 +1,44 @@
-/* A grid of squares. Tokens from app/globals.css. */
+/* A grid of squares, read in one glance. Tokens from app/globals.css.
+ *
+ * The design problem is that thirty-five columns of yes-or-no is a wall
+ * unless something gives it structure. Three things do: the weekday initial
+ * above each date, weekend columns shaded a shade darker, and a rule where a
+ * month begins. A gap every seventh column then reads as a pattern rather
+ * than as a run of numbers. */
+
+/* The answer to "am I done today", before the grid. */
+.todayLine {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 2rem 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.todayLine strong {
+  color: var(--ink);
+  font-size: var(--step-sub);
+  font-variant-numeric: tabular-nums;
+}
+
+.all {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-radius: 3px;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 
 /* Thirty-five columns do not fit a phone, and shrinking the squares to make
    them fit makes them unhittable. Scrolls sideways instead, with the habit
    names pinned so a row stays identifiable. */
 .scroll {
   overflow-x: auto;
-  margin: 2rem 0 1.5rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.4rem;
 }
 
 .grid {
@@ -16,9 +49,10 @@
 .grid th {
   font-weight: 500;
   color: var(--muted);
-  font-size: 0.7rem;
-  padding: 0.2rem;
+  font-size: 0.65rem;
+  padding: 0.15rem 0;
   text-align: center;
+  vertical-align: bottom;
 }
 
 .grid td {
@@ -26,30 +60,58 @@
   text-align: center;
 }
 
+/* The weekday initial, quieter than the date beneath it. */
+.wd {
+  display: block;
+  font-size: 0.6rem;
+  opacity: 0.55;
+  letter-spacing: 0;
+}
+
+.grid abbr {
+  text-decoration: none;
+  cursor: help;
+  font-variant-numeric: tabular-nums;
+}
+
 .nameCell {
   position: sticky;
   left: 0;
   background: var(--bg);
   text-align: left !important;
-  padding-right: 0.75rem !important;
+  padding-right: 0.9rem !important;
   color: var(--ink) !important;
   font-size: 0.875rem !important;
   white-space: nowrap;
+  /* Over the shaded weekend columns as the grid scrolls under it. */
+  z-index: 1;
 }
 
 .cadence {
   color: var(--muted);
   font-size: 0.7rem;
-  margin-left: 0.4rem;
+  margin-left: 0.45rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Saturday and Sunday, a shade back. Enough to see the week, not enough to
+   suggest those days count for less. */
+.weekend {
+  background: color-mix(in oklab, var(--bg-raised) 55%, var(--bg));
+}
+
+/* Where a month starts. One hairline, so five weeks has one or two of them
+   rather than a ruled page. */
+.monthStart {
+  border-left: 1px solid var(--line-bright);
 }
 
 .today {
   color: var(--accent) !important;
 }
 
-.grid abbr {
-  text-decoration: none;
-  cursor: help;
+.todayCol {
+  background: var(--accent-dim);
 }
 
 /* 22px: big enough to hit on a phone, small enough that five weeks of them
@@ -58,10 +120,11 @@
 .off {
   width: 22px;
   height: 22px;
-  border-radius: 4px;
+  border-radius: 5px;
   border: 1px solid var(--line-bright);
   cursor: pointer;
   display: block;
+  padding: 0;
 }
 
 .off {
@@ -77,33 +140,86 @@
   border-color: var(--accent);
 }
 
+.on:hover {
+  /* Darkened rather than lightened, so hovering a done square reads as
+     "undo this" instead of as more emphasis. */
+  background: color-mix(in oklab, var(--accent) 80%, black);
+}
+
+.off:focus-visible,
+.on:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.runHead {
+  padding-left: 0.7rem !important;
+}
+
+.run,
+.runMet {
+  font-variant-numeric: tabular-nums;
+  padding-left: 0.7rem !important;
+  white-space: nowrap;
+}
+
 .run {
   color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  padding-left: 0.6rem !important;
+}
+
+/* A weekly habit that has hit its number this week. The distinction is worth
+   making: 3/3 and 1/3 are the same shape otherwise. */
+.runMet {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-radius: 3px;
 }
 
 .archive {
   background: none;
   border: 0;
-  color: var(--muted);
+  color: transparent;
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
   padding: 0 0.3rem;
 }
 
+/* Hidden until the row is under the cursor. Archiving is rare, and a column
+   of × down the side of a page read every morning is clutter inviting an
+   accident. */
+.grid tr:hover .archive,
+.archive:focus-visible {
+  color: var(--muted);
+}
+
 .archive:hover {
-  color: var(--accent);
+  color: var(--accent) !important;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  max-width: 48ch;
+  line-height: 1.6;
+  margin: 1rem 0;
+}
+
+.empty em {
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 600;
 }
 
 .add {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin: 0 0 4rem;
 }
 
-.add input {
+.add input,
+.add select {
   background: var(--bg-raised);
   border: 1px solid var(--line);
   border-radius: 4px;
@@ -111,10 +227,19 @@
   font: inherit;
   font-size: 0.875rem;
   padding: 0.35rem 0.6rem;
+}
+
+.add input[type='text'],
+.add input:not([type]) {
   min-width: 14rem;
 }
 
-.add input:focus {
+.target {
+  width: 4rem;
+}
+
+.add input:focus,
+.add select:focus {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -126,7 +251,7 @@
   color: var(--ink);
   font: inherit;
   font-size: 0.875rem;
-  padding: 0.35rem 0.8rem;
+  padding: 0.35rem 0.9rem;
   cursor: pointer;
 }
 
