@@ -2,6 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { site } from './site';
 import pricing from './pricing.json';
+// Authored product copy, keyed by Printful id. In content/ rather than in this
+// file so that a form can edit it without rewriting TypeScript.
+import storeCopy from '../content/store/copy.json';
 
 // Reads the Printful catalogue written by scripts/printful.mjs at build time.
 // Nothing here runs at request time — the site is a static export, so the
@@ -359,7 +362,11 @@ export function sizeRun(sizes: string[]): string {
  * does not come out of an API. Empty is the normal state for a new product.
  */
 export function blurbOf(product: StoreProduct): string[] {
-  return site.store.blurbs[String(product.id)] ?? [];
+  const entry = (storeCopy as Record<string, unknown>)[String(product.id)];
+  // $comment is documentation living in the same object, and an id that has no
+  // entry is the normal state for a freshly synced product. Both have to come
+  // back as "no copy" rather than as something the page tries to render.
+  return Array.isArray(entry) ? (entry as string[]) : [];
 }
 
 /** Something to show in the stage, turnable or not. */

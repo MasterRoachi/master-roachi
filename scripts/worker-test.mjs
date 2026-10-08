@@ -378,6 +378,164 @@ check('work hub answers on localhost without Access', res.status === 200, String
 
 globalThis.fetch = realFetch;
 
+// --- the content API -------------------------------------------------------
+//
+// This one commits to a repository that deploys itself, so the tests that
+// matter are the ones about what it REFUSES.
+
+const ghEnv = { ...env, GITHUB_TOKEN: 'ghtok' };
+const commits = [];
+
+const ghFetch = async (input, init = {}) => {
+  const url = String(input);
+  const reply = (data, status = 200) =>
+    new Response(JSON.stringify(data), {
+      status,
+      headers: { 'content-type': 'application/json' },
+    });
+
+  if (url.includes('/contents/content/writing?')) {
+    return reply([
+      { name: 'the-road-in.mdx', path: 'content/writing/the-road-in.mdx', sha: 's1', type: 'file' },
+      { name: 'notes.txt', path: 'content/writing/notes.txt', sha: 's2', type: 'file' },
+    ]);
+  }
+  if (init.method === 'PUT') {
+    const body = JSON.parse(init.body);
+    commits.push({ url, ...body });
+    return reply({ commit: { sha: 'abc123' } });
+  }
+  if (url.includes('/contents/content/writing/')) {
+    // "Fróm — the road" round-tripped through UTF-8 base64.
+    const text = '---\ntitle: Fróm — the road\n---\n\nIt’s a test.';
+    const bytes = new TextEncoder().encode(text);
+    let binary = '';
+    for (const b of bytes) binary += String.fromCharCode(b);
+    return reply({ content: btoa(binary), sha: 's1' });
+  }
+  return new Response('nope', { status: 404 });
+};
+
+const preGh = globalThis.fetch;
+globalThis.fetch = ghFetch;
+
+res = await worker.fetch(get('https://masterroachi.com/work/api/content'), ghEnv);
+check(
+  'content API without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/content'), env);
+body = await res.json();
+check(
+  'no GitHub token answers configured:false',
+  res.status === 200 && body.configured === false,
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/content'), ghEnv);
+body = await res.json();
+check(
+  'listing returns only .mdx posts',
+  body.posts?.length === 1 && body.posts[0].path === 'content/writing/the-road-in.mdx',
+  JSON.stringify(body.posts),
+);
+
+// --- the path guard, which is the whole security story here ---------------
+for (const bad of [
+  '.github/workflows/play-data.yml',
+  'content/writing/../../.github/workflows/x.mdx',
+  'content/writing/UPPER.mdx',
+  'content/writing/post.md',
+  'wrangler.jsonc',
+  'content/writing/nested/post.mdx',
+]) {
+  res = await worker.fetch(
+    viaAccess(`https://masterroachi.com/work/api/content?path=${encodeURIComponent(bad)}`),
+    ghEnv,
+  );
+  check(`read refuses ${bad}`, res.status === 400, String(res.status));
+}
+
+res = await worker.fetch(
+  viaAccess('https://masterroachi.com/work/api/content?path=content/writing/the-road-in.mdx'),
+  ghEnv,
+);
+body = await res.json();
+check(
+  'a post round-trips non-ASCII intact',
+  body.post?.text.includes('Fróm — the road') && body.post.text.includes('It’s a test.'),
+  JSON.stringify(body.post?.text),
+);
+
+// --- writing ---------------------------------------------------------------
+const postContent = (payload, url = 'https://masterroachi.com/work/api/content') =>
+  new Request(url, {
+    method: 'POST',
+    headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+res = await worker.fetch(
+postContent({ path: '.github/workflows/evil.yml', text: 'jobs:' }),
+  ghEnv,
+);
+check('write refuses a workflow path', res.status === 400, String(res.status));
+
+res = await worker.fetch(
+postContent({ text: '   ' }), ghEnv);
+check('write refuses an empty body', res.status === 400, String(res.status));
+
+res = await worker.fetch(
+postContent({ title: '!!!', text: 'something' }), ghEnv);
+check('write refuses a title that slugifies to nothing', res.status === 400, String(res.status));
+
+commits.length = 0;
+res = await worker.fetch(
+postContent({ title: 'A Néw Post — part [skip ci] two', text: '---\ntitle: x\n---\n\nBody.' }),
+  ghEnv,
+);
+body = await res.json();
+check(
+  'a new post is named from its title',
+  body.saved === true && body.path === 'content/writing/a-new-post-part-skip-ci-two.mdx',
+  JSON.stringify(body),
+);
+check(
+  'the commit message cannot skip its own deploy',
+  commits.length === 1 && !/\[skip ci\]|\[ci skip\]/i.test(commits[0].message),
+  JSON.stringify(commits[0]?.message),
+);
+check(
+  'a new post is sent without a sha',
+  commits[0].sha === undefined,
+  JSON.stringify(Object.keys(commits[0])),
+);
+
+commits.length = 0;
+res = await worker.fetch(
+postContent({ path: 'content/writing/the-road-in.mdx', text: 'edited', sha: 's1' }),
+  ghEnv,
+);
+check(
+  'an edit carries the sha it was loaded with',
+  commits[0]?.sha === 's1' && commits[0].message === 'Update the-road-in.mdx',
+  JSON.stringify(commits[0]),
+);
+
+globalThis.fetch = async (input, init = {}) =>
+  init.method === 'PUT'
+    ? new Response('{}', { status: 409 })
+    : ghFetch(input, init);
+res = await worker.fetch(
+postContent({ path: 'content/writing/the-road-in.mdx', text: 'x', sha: 'stale' }),
+  ghEnv,
+);
+check('a stale sha reports a conflict, not a 500', res.status === 409, String(res.status));
+
+globalThis.fetch = preGh;
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');

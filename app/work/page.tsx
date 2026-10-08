@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { pageMeta } from '@/lib/seo';
+import Link from 'next/link';
 import PageHeader from '@/components/PageHeader';
 import WorkHub from './WorkHub';
 
@@ -37,6 +38,12 @@ export default function WorkPage() {
         title="Work"
         lede="What is next, per project, straight off the boards."
       />
+      {/* Neither backend page is in the site nav — they are private, and the
+          nav is for visitors. This is how one reaches the other. */}
+      <p>
+        <Link href="/work/writing/">Writing →</Link>
+      </p>
+
       <WorkHub />
     </div>
   );

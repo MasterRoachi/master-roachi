@@ -1,0 +1,26 @@
+{
+  "$comment": [
+    "What each design is, in Master Roachi's own words — the one part of a",
+    "product page that is not a number out of Printful.",
+    "",
+    "Keyed by Printful product id, like the payment links in lib/site.ts and",
+    "for the same reason: the id survives a rename and the slug does not. One",
+    "string per paragraph. A product with no entry shows no section at all,",
+    "rather than a heading over an empty space, so missing is a supported",
+    "state and is normal for a product that has just been synced.",
+    "",
+    "It lives here, in content/ rather than data/, because data/ is what the",
+    "build fetches and content/ is what he writes. It is JSON rather than MDX",
+    "because it is keyed by id and MDX collections are keyed by filename, and",
+    "a file called 464722916.mdx is not an improvement on anything.",
+    "",
+    "lib/content.ts only ever reads *.mdx, so this file is invisible to the",
+    "content collections and will not turn up as a page."
+  ],
+  "464722916": [
+    "That’s my face.",
+    "It went first because it’s the one I finished first — there was no plan. Wear it if you think it looks cool, which is the entire qualification.",
+    "And if you really love me, you’d wear this.",
+    "Chest print only; the back is a plain shirt."
+  ]
+}

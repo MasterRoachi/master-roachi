@@ -1,5 +1,6 @@
 import { POLL_ID, pollCandidates } from '../lib/poll';
 import { readAccount, type TrelloCreds } from './trello';
+import { WRITING_DIR, listPosts, readPost, slugify, writePost } from './github';
 import type { WorkHubPayload } from '../lib/work-hub';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -82,6 +83,18 @@ interface Env {
   TRELLO_KEY?: string;
   TRELLO_TOKEN?: string;
 
+  /**
+   * Commits content to the repo, which publishes it.
+   *
+   * The most powerful secret here by a distance: Workers Builds deploys on
+   * push, so anything committed with this goes live by itself. A fine-grained
+   * token, this repository only, Contents: read and write, nothing else.
+   *
+   *   npx wrangler secret put GITHUB_TOKEN
+   *
+   * Absent means the editor says it is not connected rather than breaking.
+   */
+  GITHUB_TOKEN?: string;
 }
 
 /** Votes lapse after six months, so an abandoned poll empties itself. */
@@ -386,6 +399,79 @@ export default {
         errors,
       };
       return json(payload, 200);
+    }
+
+    // --- the backend's content API -----------------------------------------
+    //
+    // Under /work/api/ on purpose. The Access application covers the path
+    // `work` as a PREFIX, so everything the backend ever adds under here is
+    // protected by the one rule he has already configured — no going back to
+    // the Zero Trust dashboard per endpoint, and no endpoint that is live
+    // before its policy is.
+    if (route === '/work/api/content') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      const token = env.GITHUB_TOKEN;
+      if (!token) return json({ configured: false, posts: [] }, 200);
+
+      // THE IMPORTANT GUARD. Without it this endpoint commits anywhere in the
+      // repo, and the first thing worth committing to is .github/workflows —
+      // which would turn a stolen Access session into arbitrary CI execution.
+      // An allow-list of one directory and one extension, matched whole, so
+      // no amount of ../ or URL-encoding widens it.
+      const safePath = (candidate: unknown): string | null => {
+        if (typeof candidate !== 'string') return null;
+        return /^content\/writing\/[a-z0-9-]+\.mdx$/.test(candidate) ? candidate : null;
+      };
+
+      try {
+        if (request.method === 'GET') {
+          const wanted = url.searchParams.get('path');
+          if (wanted === null) {
+            return json({ configured: true, posts: await listPosts(token) }, 200);
+          }
+          const path = safePath(wanted);
+          if (!path) return json({ error: 'not a writing path' }, 400);
+          return json({ configured: true, post: await readPost(token, path) }, 200);
+        }
+
+        if (request.method === 'POST') {
+          const body = (await request.json().catch(() => null)) as {
+            path?: string;
+            title?: string;
+            text?: string;
+            sha?: string;
+          } | null;
+          if (!body) return json({ error: 'malformed body' }, 400);
+
+          const text = typeof body.text === 'string' ? body.text : '';
+          if (!text.trim()) return json({ error: 'nothing to save' }, 400);
+
+          // An existing post names its own path. A new one is named from its
+          // title, which is the only moment a slug is ever decided — renaming
+          // later would break a published URL.
+          const path =
+            safePath(body.path) ??
+            safePath(`${WRITING_DIR}/${slugify(String(body.title ?? ''))}.mdx`);
+          if (!path) return json({ error: 'need a usable title' }, 400);
+
+          const message = body.sha
+            ? `Update ${path.split('/').pop()}`
+            : `Add ${path.split('/').pop()}`;
+
+          const { commit } = await writePost(token, path, text, message, body.sha);
+          return json({ saved: true, path, commit }, 200);
+        }
+
+        return json({ error: 'method not allowed' }, 405);
+      } catch (error) {
+        const message = String(error instanceof Error ? error.message : error);
+        // A conflict is the one failure the page can do something about, so it
+        // gets its own status rather than being lost in a 500.
+        return json({ error: message }, message.startsWith('conflict') ? 409 : 502);
+      }
     }
 
     if (route !== '/api/vote') return env.ASSETS.fetch(request);
