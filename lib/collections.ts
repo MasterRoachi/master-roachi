@@ -15,8 +15,14 @@ export interface Collection {
   label: string;
   /** Repo-relative directory, no trailing slash. */
   dir: string;
-  /** The only extension that may be read or written in it. */
-  ext: '.mdx' | '.json';
+  /**
+   * Every extension that may be read or written in it. An array and not one
+   * string because a scratchpad note is a .md file and its drawing is a .png
+   * beside it — a registry that cannot say that is the wrong registry.
+   *
+   * The first is what a new file gets named with.
+   */
+  exts: readonly string[];
   /**
    * A single file rather than a directory of them.
    *
@@ -33,7 +39,7 @@ export const COLLECTIONS: Collection[] = [
     key: 'writing',
     label: 'Writing',
     dir: 'content/writing',
-    ext: '.mdx',
+    exts: ['.mdx'],
     template: (today) => `---
 title: ""
 summary:
@@ -48,7 +54,7 @@ draft: true
     key: 'projects',
     label: 'Projects',
     dir: 'content/projects',
-    ext: '.mdx',
+    exts: ['.mdx'],
     // Matches what the existing project pages carry. weight orders the grid and
     // the accents drive each card's colour, so a project with neither looks
     // broken rather than plain — they are in the template for that reason.
@@ -71,10 +77,32 @@ cover:
     key: 'store-copy',
     label: 'Product copy',
     dir: 'content/store',
-    ext: '.json',
+    exts: ['.json'],
     singleFile: 'content/store/copy.json',
   },
+  {
+    key: 'notes',
+    label: 'Notes',
+    // Not under content/, deliberately. content/ is what the site publishes,
+    // and these are his own notes — versioned and private, which is what the
+    // repo is for once the Access gate is in front of the only page that
+    // reads them. lib/content.ts never looks here.
+    dir: 'notes',
+    // The note, and the drawing that may sit beside it under the same slug.
+    exts: ['.md', '.png'],
+    template: (today) => `---
+title: ""
+date: ${today}
+---
+
+`,
+  },
 ];
+
+/** What a new file in this collection is called. */
+export function newPath(collection: Collection, slug: string): string {
+  return `${collection.dir}/${slug}${collection.exts[0]}`;
+}
 
 export function collectionFor(key: unknown): Collection | null {
   if (typeof key !== 'string') return null;
@@ -96,9 +124,9 @@ export function pathAllowed(collection: Collection, candidate: unknown): string 
     return candidate === collection.singleFile ? candidate : null;
   }
 
-  const pattern = new RegExp(
-    `^${collection.dir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/[a-z0-9-]+\\${collection.ext}$`,
-  );
+  const dir = collection.dir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const exts = collection.exts.map((ext) => ext.replace('.', '\\.')).join('|');
+  const pattern = new RegExp(`^${dir}/[a-z0-9-]+(${exts})$`);
   return pattern.test(candidate) ? candidate : null;
 }
 

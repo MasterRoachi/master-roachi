@@ -132,13 +132,22 @@ export async function writeFile(
   text: string,
   message: string,
   sha?: string,
+  /**
+   * The content is already base64 and must not be encoded again.
+   *
+   * For a drawing: a canvas gives a data URI, which is base64 of the PNG's
+   * bytes. Running that through toBase64() would store the base64 OF the
+   * base64 and the file would be unopenable — a corruption that commits
+   * cleanly and only shows up when something tries to read the image.
+   */
+  preEncoded = false,
 ): Promise<{ commit: string }> {
   const response = await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${encodeURI(path)}`, {
     method: 'PUT',
     headers: { ...headers(token), 'content-type': 'application/json' },
     body: JSON.stringify({
       message: safeMessage(message),
-      content: toBase64(text),
+      content: preEncoded ? text : toBase64(text),
       branch: BRANCH,
       ...(sha ? { sha } : {}),
     }),

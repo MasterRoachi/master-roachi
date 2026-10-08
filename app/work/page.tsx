@@ -46,6 +46,11 @@ const TOOLS = [
     what: 'What is being studied, and how far through it you are.',
   },
   {
+    href: '/work/scratchpad/',
+    name: 'Scratchpad',
+    what: 'Write or draw. Saving commits it; export takes a copy out.',
+  },
+  {
     href: '/work/writing/',
     name: 'Writing',
     what: 'Posts. Editing one commits it, and the commit publishes it.',

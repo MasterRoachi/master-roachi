@@ -8,7 +8,7 @@ import {
   slugify,
   writeFile,
 } from './github';
-import { collectionFor, pathAllowed, setDraft } from '../lib/collections';
+import { collectionFor, newPath, pathAllowed, setDraft } from '../lib/collections';
 import { dayWindow, isDay, localDay, type D1Database } from './db';
 import { outlineSize, parseOutline } from '../lib/outline';
 import type { WorkHubPayload } from '../lib/work-hub';
@@ -448,7 +448,17 @@ export default {
             // itself as its own only entry and the page needs no special case.
             const files = collection.singleFile
               ? [{ path: collection.singleFile, sha: '' }]
-              : await listFiles(token, collection.dir, collection.ext);
+              : (
+                  await Promise.all(
+                    collection.exts.map((ext) =>
+                      // A missing directory is an empty collection, not an
+                      // error: notes/ does not exist until the first note.
+                      listFiles(token, collection.dir, ext).catch(() => []),
+                    ),
+                  )
+                )
+                  .flat()
+                  .sort((a, b) => a.path.localeCompare(b.path));
             return json({ configured: true, files }, 200);
           }
 
@@ -474,16 +484,27 @@ export default {
           let text = typeof body.text === 'string' ? body.text : '';
           if (!text.trim()) return json({ error: 'nothing to save' }, 400);
 
+          const path =
+            pathAllowed(collection, body.path) ??
+            (collection.singleFile
+              ? null
+              : pathAllowed(collection, newPath(collection, slugify(String(body.title ?? '')))));
+          if (!path) return json({ error: 'need a usable title' }, 400);
+
+          // Keyed on what is being written rather than on the collection, now
+          // that a collection can hold more than one kind of file.
+          const binary = path.endsWith('.png');
+
           // The draft flag is applied here as well as in the editor, so that
           // publishing is a property of the save rather than of whether the
           // page remembered to rewrite the text first.
-          if (typeof body.draft === 'boolean' && collection.ext === '.mdx') {
+          if (typeof body.draft === 'boolean' && path.endsWith('.mdx')) {
             text = setDraft(text, body.draft);
           }
 
           // Malformed JSON would commit cleanly and then fail the build, which
           // leaves the old site up and no obvious cause. Cheaper to refuse.
-          if (collection.ext === '.json') {
+          if (path.endsWith('.json')) {
             try {
               JSON.parse(text);
             } catch {
@@ -491,20 +512,17 @@ export default {
             }
           }
 
-          const path =
-            pathAllowed(collection, body.path) ??
-            (collection.singleFile
-              ? null
-              : pathAllowed(
-                  collection,
-                  `${collection.dir}/${slugify(String(body.title ?? ''))}${collection.ext}`,
-                ));
-          if (!path) return json({ error: 'need a usable title' }, 400);
+          // A drawing arrives as base64 already. Refusing anything that is not
+          // plausible base64 keeps a stray data-URI prefix from being
+          // committed as if it were image bytes.
+          if (binary && !/^[A-Za-z0-9+/]+={0,2}$/.test(text.replace(/\s/g, ''))) {
+            return json({ error: 'that is not base64 image data' }, 400);
+          }
 
           const name = path.split('/').pop();
           const message = body.sha ? `Update ${name}` : `Add ${name}`;
 
-          const { commit } = await writeFile(token, path, text, message, body.sha);
+          const { commit } = await writeFile(token, path, text, message, body.sha, binary);
           return json({ saved: true, path, commit }, 200);
         }
 

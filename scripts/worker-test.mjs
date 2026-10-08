@@ -394,6 +394,14 @@ const ghFetch = async (input, init = {}) => {
       headers: { 'content-type': 'application/json' },
     });
 
+  if (url.includes('/contents/notes?')) {
+    // A missing directory, which is what notes/ is until the first note. The
+    // listing must read as empty rather than failing the whole collection.
+    return new Response('{"message":"Not Found"}', {
+      status: 404,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
   if (url.includes('/contents/content/writing?')) {
     return reply([
       { name: 'the-road-in.mdx', path: 'content/writing/the-road-in.mdx', sha: 's1', type: 'file' },
@@ -1404,6 +1412,116 @@ res = await worker.fetch(
   dbEnv(),
 );
 check('a module with no curriculum is refused', res.status === 400, String(res.status));
+
+// --- the scratchpad --------------------------------------------------------
+//
+// A note is Markdown and its drawing is a PNG beside it, so this is the first
+// collection holding two kinds of file — and the first thing writing binary.
+
+globalThis.fetch = ghFetch;
+
+res = await worker.fetch(
+  viaAccess('https://masterroachi.com/work/api/content?collection=notes'),
+  ghEnv,
+);
+body = await res.json();
+check(
+  'a collection whose directory does not exist yet lists as empty',
+  res.status === 200 && body.configured === true && body.files.length === 0,
+  JSON.stringify(body),
+);
+
+// Both extensions are allowed in notes/, and nothing else is.
+for (const ok of ['notes/a-note.md', 'notes/a-note.png']) {
+  commits.length = 0;
+  res = await worker.fetch(
+    postContent({ collection: 'notes', path: ok, text: ok.endsWith('.png') ? 'aGVsbG8=' : '# hi' }),
+    ghEnv,
+  );
+  check(`notes accepts ${ok}`, res.status === 200, String(res.status));
+}
+
+for (const bad of [
+  'notes/a-note.mdx',
+  'notes/a-note.jpg',
+  'notes/nested/a.md',
+  'content/writing/a.md',
+  'notes/../worker/index.ts',
+]) {
+  res = await worker.fetch(postContent({ collection: 'notes', path: bad, text: 'x' }), ghEnv);
+  check(`notes refuses ${bad}`, res.status === 400, String(res.status));
+}
+
+// A .md path must not be treated as a published .mdx, so the draft rewriting
+// must not touch it.
+commits.length = 0;
+res = await worker.fetch(
+  postContent({
+    collection: 'notes',
+    path: 'notes/a-note.md',
+    text: '---\ntitle: x\n---\n\nBody.',
+    draft: true,
+  }),
+  ghEnv,
+);
+let written = Buffer.from(commits[0].content, 'base64').toString('utf8');
+check(
+  'a note never has a draft flag injected into it',
+  !written.includes('draft:'),
+  JSON.stringify(written),
+);
+
+// THE ONE THAT WOULD CORRUPT SILENTLY: a PNG arrives already base64, and
+// encoding it a second time commits a file nothing can open.
+commits.length = 0;
+const pngBase64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==';
+res = await worker.fetch(
+  postContent({ collection: 'notes', path: 'notes/a-note.png', text: pngBase64 }),
+  ghEnv,
+);
+check(
+  'a drawing is committed as the bytes it already is, not base64 of base64',
+  commits[0]?.content === pngBase64,
+  JSON.stringify({ sent: pngBase64.slice(0, 20), committed: String(commits[0]?.content).slice(0, 20) }),
+);
+check(
+  'and those bytes really are a PNG',
+  Buffer.from(commits[0].content, 'base64').subarray(1, 4).toString('ascii') === 'PNG',
+  Buffer.from(commits[0].content, 'base64').subarray(0, 8).toString('hex'),
+);
+
+// A data-URI prefix left on the front is not image data.
+res = await worker.fetch(
+  postContent({
+    collection: 'notes',
+    path: 'notes/a-note.png',
+    text: `data:image/png;base64,${pngBase64}`,
+  }),
+  ghEnv,
+);
+check('a stray data-URI prefix is refused', res.status === 400, String(res.status));
+
+res = await worker.fetch(
+  postContent({ collection: 'notes', path: 'notes/a-note.png', text: 'not base64 !!' }),
+  ghEnv,
+);
+check('non-base64 image data is refused', res.status === 400, String(res.status));
+
+// A new note is still named from its title, and gets .md rather than .mdx.
+commits.length = 0;
+res = await worker.fetch(
+  postContent({ collection: 'notes', title: 'Thoughts on Mondays', text: 'x' }),
+  ghEnv,
+);
+body = await res.json();
+check(
+  'a new note is named from its title with the collection extension',
+  body.path === 'notes/thoughts-on-mondays.md',
+  JSON.stringify(body),
+);
+
+globalThis.fetch = preGh;
 
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
