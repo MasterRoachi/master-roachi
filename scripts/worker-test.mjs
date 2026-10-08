@@ -45,6 +45,16 @@ execFileSync(
 );
 const habits = await import(pathToFileURL(habitsBundle).href);
 
+// monthDays decides how many columns a month has, and gets February wrong once
+// every four years if it is done with a table of month lengths.
+const dbBundle = path.join(os.tmpdir(), 'master-roachi-db-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'worker/db.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${dbBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const dbLib = await import(pathToFileURL(dbBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -934,7 +944,9 @@ function fakeD1() {
         sqlLog.push(sql);
         if (sql.startsWith('insert into habit_ticks')) ticks.add(`${bound[0]}@${bound[1]}`);
         if (sql.startsWith('delete from habit_ticks')) ticks.delete(`${bound[0]}@${bound[1]}`);
-        if (sql.startsWith('insert into habits')) habits.push({ id: habits.length + 1, name: bound[0], cadence: bound[1], target: bound[2] });
+        if (sql.startsWith('insert into habits')) {
+          habits.push({ id: habits.length + 1, name: bound[0], cadence: bound[1], target: bound[2], icon: bound[3] });
+        }
         if (sql.startsWith('update habits')) habits.length = 0;
         if (sql.startsWith('insert into books')) {
           books.push({ id: books.length + 1, title: bound[0], author: bound[1], status: bound[2], started_on: bound[3] });
@@ -1002,10 +1014,46 @@ res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/habits'), 
 body = await res.json();
 const todayFromServer = body.today;
 check(
-  'the server sends the window and its own idea of today',
-  body.window.length === 35 && body.window[34] === todayFromServer && /^\d{4}-\d{2}-\d{2}$/.test(todayFromServer),
-  JSON.stringify({ last: body.window?.at(-1), today: todayFromServer }),
+  'with no month asked for, the current one comes back',
+  body.month === todayFromServer.slice(0, 7) && /^\d{4}-\d{2}-\d{2}$/.test(todayFromServer),
+  JSON.stringify({ month: body.month, today: todayFromServer }),
 );
+check(
+  'and it carries that whole month, first day to last',
+  body.days[0] === `${body.month}-01` && body.days.at(-1).startsWith(body.month),
+  JSON.stringify({ first: body.days?.[0], last: body.days?.at(-1) }),
+);
+check(
+  'the years offered include the current one',
+  Array.isArray(body.years) && body.years.includes(Number(todayFromServer.slice(0, 4))),
+  JSON.stringify(body.years),
+);
+
+res = await worker.fetch(
+  viaAccess('https://masterroachi.com/work/api/habits?month=2026-02'),
+  dbEnv(),
+);
+body = await res.json();
+check(
+  'a month that is asked for is the month that comes back',
+  body.month === '2026-02' && body.days.length === 28,
+  JSON.stringify({ month: body.month, days: body.days?.length }),
+);
+
+// A month the page could never render is not worth erroring over — the grid
+// is readable either way, so it falls back rather than failing.
+for (const bad of ['2026-13', 'February', '2026-2', '']) {
+  res = await worker.fetch(
+    viaAccess(`https://masterroachi.com/work/api/habits?month=${encodeURIComponent(bad)}`),
+    dbEnv(),
+  );
+  body = await res.json();
+  check(
+    `a malformed month ${JSON.stringify(bad)} falls back to this one`,
+    body.month === todayFromServer.slice(0, 7),
+    JSON.stringify(body.month),
+  );
+}
 
 // The page never names a date, so the default has to be today.
 res = await worker.fetch(
@@ -1112,9 +1160,36 @@ res = await worker.fetch(
 );
 check('an unknown action is refused', res.status === 400, String(res.status));
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/habits?days=9999'), dbEnv());
-body = await res.json();
-check('the window is capped', body.window.length === 180, String(body.window?.length));
+// An unknown icon name must not reach the database, where it would render as
+// a blank cell with nothing saying why.
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', {
+    action: 'add',
+    name: 'Read',
+    icon: 'definitely-not-an-icon',
+  }),
+  dbEnv(),
+);
+check(
+  'an unknown icon is stored as none, not as itself',
+  res.status === 200 && DB._habits.at(-1)?.icon === null,
+  JSON.stringify(DB._habits.at(-1)),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/habits', {
+    action: 'add',
+    name: 'Pray',
+    icon: 'cross',
+  }),
+  dbEnv(),
+);
+check(
+  'a known icon is kept',
+  DB._habits.at(-1)?.icon === 'cross',
+  JSON.stringify(DB._habits.at(-1)),
+);
 
 // --- reading ---------------------------------------------------------------
 //
@@ -1655,6 +1730,30 @@ globalThis.fetch = preGh;
   );
 }
 
+// --- month lengths ---------------------------------------------------------
+
+{
+  check('January has 31', dbLib.monthDays('2026-01').length === 31, String(dbLib.monthDays('2026-01').length));
+  check('April has 30', dbLib.monthDays('2026-04').length === 30, String(dbLib.monthDays('2026-04').length));
+  check('February 2026 has 28', dbLib.monthDays('2026-02').length === 28, String(dbLib.monthDays('2026-02').length));
+  // The one a hardcoded table gets wrong.
+  check('February 2028 has 29', dbLib.monthDays('2028-02').length === 29, String(dbLib.monthDays('2028-02').length));
+  check('February 2100 has 28, not 29', dbLib.monthDays('2100-02').length === 28, String(dbLib.monthDays('2100-02').length));
+  check('February 2000 had 29', dbLib.monthDays('2000-02').length === 29, String(dbLib.monthDays('2000-02').length));
+
+  const march = dbLib.monthDays('2026-03');
+  check(
+    'days are padded date strings in order',
+    march[0] === '2026-03-01' && march[8] === '2026-03-09' && march[30] === '2026-03-31',
+    JSON.stringify([march[0], march[8], march[30]]),
+  );
+
+  check('a good month passes isMonth', dbLib.isMonth('2026-07'), 'expected true');
+  for (const bad of ['2026-00', '2026-13', '2026-7', '26-07', '2026-07-01', 'July']) {
+    check(`isMonth refuses ${JSON.stringify(bad)}`, !dbLib.isMonth(bad), 'expected false');
+  }
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -1667,4 +1766,5 @@ console.log(`\n  ${results.length - failed.length}/${results.length} passed`);
 fs.rmSync(bundle, { force: true });
 fs.rmSync(sketchBundle, { force: true });
 fs.rmSync(habitsBundle, { force: true });
+fs.rmSync(dbBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

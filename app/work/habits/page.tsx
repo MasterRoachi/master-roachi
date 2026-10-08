@@ -23,7 +23,7 @@ export default function WorkHabitsPage() {
       <PageHeader
         eyebrow="Private"
         title="Habits"
-        lede="Today is the last column. Click any square to change it."
+        lede="A year opens into months. A month shows its days."
       />
       <p>
         <Link href="/work/">← Work</Link>

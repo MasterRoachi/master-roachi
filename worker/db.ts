@@ -39,6 +39,27 @@ export function dayWindow(days: number, now: Date = new Date()): string[] {
   return out;
 }
 
+/** A plausible 'YYYY-MM'. */
+export function isMonth(value: unknown): value is string {
+  return typeof value === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(value);
+}
+
+/**
+ * Every day of a calendar month, as date strings.
+ *
+ * Day 0 of the following month is the last day of this one, which is how the
+ * 28/29/30/31 question answers itself — including February in a leap year,
+ * which a table of month lengths gets wrong once every four years.
+ */
+export function monthDays(month: string): string[] {
+  const [year, index] = month.split('-').map(Number);
+  const length = new Date(Date.UTC(year, index, 0)).getUTCDate();
+  return Array.from(
+    { length },
+    (_, i) => `${month}-${String(i + 1).padStart(2, '0')}`,
+  );
+}
+
 /** A plausible 'YYYY-MM-DD'. Rejects anything that is not one, rather than coercing. */
 export function isDay(value: unknown): value is string {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);

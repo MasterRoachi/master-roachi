@@ -1,43 +1,134 @@
-/* A grid of squares, read in one glance. Tokens from app/globals.css.
+/* Year, month, grid. Tokens from app/globals.css.
  *
- * The design problem is that thirty-five columns of yes-or-no is a wall
- * unless something gives it structure. Three things do: the weekday initial
- * above each date, weekend columns shaded a shade darker, and a rule where a
- * month begins. A gap every seventh column then reads as a pattern rather
- * than as a run of numbers. */
+ * The page is centred and narrow until a month opens, at which point the grid
+ * wants room — so the column is centred and the grid scrolls inside it rather
+ * than the page widening and reflowing everything above. */
 
-/* The answer to "am I done today", before the grid. */
-.todayLine {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  margin: 2rem 0 0.75rem;
-  color: var(--muted);
-  font-size: 0.9375rem;
+.page {
+  max-width: 60rem;
+  margin: 2rem auto 4rem;
 }
 
-.todayLine strong {
+/* --- the year pills ------------------------------------------------------ */
+
+.year,
+.yearOpen {
+  margin: 0 auto 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+  overflow: hidden;
+  transition: max-width 0.18s ease;
+}
+
+/* Closed, it is a pill in the middle of the page. Open, it is a section the
+   width of the column — which is the expansion, rather than a panel appearing
+   from somewhere else. */
+.year {
+  max-width: 16rem;
+}
+
+.yearOpen {
+  max-width: 100%;
+  border-color: var(--line-bright);
+}
+
+.yearPill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  background: none;
+  border: 0;
   color: var(--ink);
+  font: inherit;
   font-size: var(--step-sub);
   font-variant-numeric: tabular-nums;
+  padding: 0.7rem 1.1rem;
+  cursor: pointer;
 }
 
-.all {
+.yearPill:hover {
   color: var(--accent);
-  background: var(--accent-dim);
-  border-radius: 3px;
-  padding: 0.05rem 0.4rem;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
-/* Thirty-five columns do not fit a phone, and shrinking the squares to make
+.chev {
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.section {
+  padding: 0 1.1rem 1.1rem;
+}
+
+/* --- the month pills ----------------------------------------------------- */
+
+.months {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0.2rem 0 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.month,
+.monthOn {
+  flex: 1 1 auto;
+  min-width: 3.1rem;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.1rem;
+  cursor: pointer;
+}
+
+.month:hover:not(:disabled) {
+  border-color: var(--line-bright);
+  color: var(--ink);
+}
+
+/* A month that has not happened. Dimmed and inert rather than hidden, so the
+   year still reads as twelve months. */
+.month:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.monthOn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.9rem 0 0.6rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.caption strong {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+/* --- the grid ----------------------------------------------------------- */
+
+/* Thirty-one columns do not fit a phone, and shrinking the squares to make
    them fit makes them unhittable. Scrolls sideways instead, with the habit
    names pinned so a row stays identifiable. */
 .scroll {
   overflow-x: auto;
-  margin: 0 0 1rem;
   padding-bottom: 0.4rem;
 }
 
@@ -60,12 +151,12 @@
   text-align: center;
 }
 
-/* The weekday initial, quieter than the date beneath it. */
+/* The weekday initial above the date. A gap every seventh column then reads
+   as a pattern rather than as a run of numbers. */
 .wd {
   display: block;
   font-size: 0.6rem;
   opacity: 0.55;
-  letter-spacing: 0;
 }
 
 .grid abbr {
@@ -77,14 +168,42 @@
 .nameCell {
   position: sticky;
   left: 0;
-  background: var(--bg);
+  background: var(--bg-raised);
   text-align: left !important;
-  padding-right: 0.9rem !important;
+  padding: 0 0.9rem 0 0 !important;
   color: var(--ink) !important;
   font-size: 0.875rem !important;
   white-space: nowrap;
-  /* Over the shaded weekend columns as the grid scrolls under it. */
-  z-index: 1;
+  z-index: 2;
+}
+
+/* Icon and name on one line, so the row is identifiable by shape before it is
+   read. */
+.iconButton {
+  background: none;
+  border: 0;
+  padding: 0 0.4rem 0 0;
+  cursor: pointer;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.glyph {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.iconButton:hover .glyph {
+  stroke: var(--accent);
+}
+
+.habitName {
+  vertical-align: middle;
 }
 
 .cadence {
@@ -94,19 +213,86 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* --- the icon picker ---------------------------------------------------- */
+
+.picker,
+.iconChoice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  max-width: 17rem;
+}
+
+/* Over the grid rather than pushing the row apart — a picker that resized the
+   table would move every square the moment it opened. */
+.picker {
+  position: absolute;
+  z-index: 3;
+  margin-top: 0.3rem;
+  padding: 0.4rem;
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  border-radius: 8px;
+}
+
+.iconChoice {
+  max-width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.pick,
+.pickOn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.pick svg,
+.pickOn svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pick svg {
+  stroke: var(--muted);
+}
+
+.pick:hover {
+  border-color: var(--line-bright);
+}
+
+.pick:hover svg {
+  stroke: var(--ink);
+}
+
+.pickOn {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.pickOn svg {
+  stroke: var(--accent);
+}
+
+/* --- the squares -------------------------------------------------------- */
+
 /* Saturday and Sunday, a shade back. Enough to see the week, not enough to
    suggest those days count for less. */
 .weekend {
-  background: color-mix(in oklab, var(--bg-raised) 55%, var(--bg));
+  background: color-mix(in oklab, var(--bg) 35%, var(--bg-raised));
 }
 
-/* Where a month starts. One hairline, so five weeks has one or two of them
-   rather than a ruled page. */
-.monthStart {
-  border-left: 1px solid var(--line-bright);
-}
-
-.today {
+.todayHead {
   color: var(--accent) !important;
 }
 
@@ -114,21 +300,26 @@
   background: var(--accent-dim);
 }
 
-/* 22px: big enough to hit on a phone, small enough that five weeks of them
-   is still a shape rather than a spreadsheet. */
+/* 22px: big enough to hit on a phone, small enough that a month of them is
+   still a shape rather than a spreadsheet. */
 .on,
-.off {
+.off,
+.future {
   width: 22px;
   height: 22px;
   border-radius: 5px;
   border: 1px solid var(--line-bright);
-  cursor: pointer;
   display: block;
   padding: 0;
 }
 
+.off,
+.on {
+  cursor: pointer;
+}
+
 .off {
-  background: var(--bg-raised);
+  background: var(--bg);
 }
 
 .off:hover {
@@ -140,10 +331,19 @@
   border-color: var(--accent);
 }
 
+/* Darkened rather than lightened, so hovering a done square reads as "undo
+   this" instead of as more emphasis. */
 .on:hover {
-  /* Darkened rather than lightened, so hovering a done square reads as
-     "undo this" instead of as more emphasis. */
   background: color-mix(in oklab, var(--accent) 80%, black);
+}
+
+/* A day that has not happened. Barely there, and not clickable. */
+.future {
+  background: none;
+  border-style: dashed;
+  border-color: var(--line);
+  opacity: 0.4;
+  cursor: default;
 }
 
 .off:focus-visible,
@@ -161,16 +361,12 @@
   font-variant-numeric: tabular-nums;
   padding-left: 0.7rem !important;
   white-space: nowrap;
-}
-
-.run {
   color: var(--accent);
 }
 
-/* A weekly habit that has hit its number this week. The distinction is worth
-   making: 3/3 and 1/3 are the same shape otherwise. */
+/* A weekly habit that has hit its number this week — 3/3 and 1/3 are the same
+   shape otherwise. */
 .runMet {
-  color: var(--accent);
   background: var(--accent-dim);
   border-radius: 3px;
 }
@@ -185,9 +381,8 @@
   padding: 0 0.3rem;
 }
 
-/* Hidden until the row is under the cursor. Archiving is rare, and a column
-   of × down the side of a page read every morning is clutter inviting an
-   accident. */
+/* Hidden until the row is hovered. Archiving is rare, and a column of × down
+   a page read every morning is clutter inviting an accident. */
 .grid tr:hover .archive,
 .archive:focus-visible {
   color: var(--muted);
@@ -196,6 +391,8 @@
 .archive:hover {
   color: var(--accent) !important;
 }
+
+/* --- adding ------------------------------------------------------------- */
 
 .empty {
   color: var(--muted);
@@ -212,15 +409,20 @@
 }
 
 .add {
+  margin: 1.25rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.addRow {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 0 0 4rem;
 }
 
 .add input,
 .add select {
-  background: var(--bg-raised);
+  background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 4px;
   color: var(--ink);
@@ -229,9 +431,9 @@
   padding: 0.35rem 0.6rem;
 }
 
-.add input[type='text'],
-.add input:not([type]) {
-  min-width: 14rem;
+.add input:not([type='number']) {
+  min-width: 13rem;
+  flex: 1 1 13rem;
 }
 
 .target {
@@ -244,7 +446,7 @@
   outline-offset: 2px;
 }
 
-.add button {
+.add button[type='submit'] {
   background: none;
   border: 1px solid var(--line-bright);
   border-radius: 4px;
@@ -255,12 +457,12 @@
   cursor: pointer;
 }
 
-.add button:hover:not(:disabled) {
+.add button[type='submit']:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.add button:disabled {
+.add button[type='submit']:disabled {
   opacity: 0.4;
   cursor: default;
 }
@@ -277,4 +479,5 @@
   border-radius: 6px;
   padding: 0.6rem 0.8rem;
   font-size: 0.8125rem;
+  margin-bottom: 1rem;
 }

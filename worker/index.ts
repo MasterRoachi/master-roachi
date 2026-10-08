@@ -9,8 +9,9 @@ import {
   writeFile,
 } from './github';
 import { collectionFor, newPath, pathAllowed, setDraft } from '../lib/collections';
-import { dayWindow, isDay, localDay, type D1Database } from './db';
+import { isDay, isMonth, localDay, monthDays, type D1Database } from './db';
 import { outlineSize, parseOutline } from '../lib/outline';
+import { validIconName } from '../lib/habit-icons';
 import type { WorkHubPayload } from '../lib/work-hub';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -587,23 +588,27 @@ export default {
 
       try {
         if (request.method === 'GET') {
-          // A window rather than everything: the page draws a fixed number of
-          // columns, and a year of ticks is not worth sending to render six
-          // weeks of them.
-          const asked = Number(url.searchParams.get('days') ?? '35');
-          const days = Number.isFinite(asked) ? Math.min(Math.max(asked, 7), 180) : 35;
-          const window = dayWindow(days);
+          // One calendar month, because that is what the page draws: a year of
+          // ticks is not worth sending to render thirty-one columns. An
+          // unparseable month falls back to the current one rather than
+          // erroring — the page is readable either way.
+          const asked = url.searchParams.get('month');
+          const month = isMonth(asked) ? asked : today.slice(0, 7);
+          const days = monthDays(month);
 
           const habits = await db
             .prepare(
-              `select id, name, cadence, target from habits
+              `select id, name, cadence, target, icon from habits
                where archived = 0 order by position, id`,
             )
             .all();
 
           const ticks = await db
-            .prepare(`select habit_id, day from habit_ticks where day >= ?1 order by day`)
-            .bind(window[0])
+            .prepare(
+              `select habit_id, day from habit_ticks
+               where day >= ?1 and day <= ?2 order by day`,
+            )
+            .bind(days[0], days[days.length - 1])
             .all<{ habit_id: number; day: string }>();
 
           const byHabit: Record<string, string[]> = {};
@@ -611,8 +616,35 @@ export default {
             (byHabit[String(row.habit_id)] ??= []).push(row.day);
           }
 
+          // Which years the page offers. From the earliest thing that exists —
+          // a tick, or a habit that was created before its first tick — through
+          // the current year, so the list grows on its own and never shows a
+          // year with nothing in it.
+          const earliest = await db
+            .prepare(
+              `select min(d) as first from (
+                 select min(day) as d from habit_ticks
+                 union all
+                 select min(substr(created_at, 1, 10)) as d from habits
+               ) where d is not null`,
+            )
+            .first<{ first: string | null }>();
+
+          const firstYear = Number((earliest?.first ?? today).slice(0, 4));
+          const thisYear = Number(today.slice(0, 4));
+          const years: number[] = [];
+          for (let year = firstYear; year <= thisYear; year += 1) years.push(year);
+
           return json(
-            { configured: true, habits: habits.results, ticks: byHabit, window, today },
+            {
+              configured: true,
+              habits: habits.results,
+              ticks: byHabit,
+              month,
+              days,
+              today,
+              years: years.length > 0 ? years : [thisYear],
+            },
             200,
           );
         }
@@ -625,6 +657,7 @@ export default {
             name?: string;
             cadence?: string;
             target?: number;
+            icon?: string;
           } | null;
           if (!body) return json({ error: 'malformed body' }, 400);
 
@@ -675,12 +708,25 @@ export default {
 
             await db
               .prepare(
-                `insert into habits (name, cadence, target, position, created_at)
-                 values (?1, ?2, ?3, (select coalesce(max(position), 0) + 1 from habits), ?4)`,
+                `insert into habits (name, cadence, target, icon, position, created_at)
+                 values (?1, ?2, ?3, ?4, (select coalesce(max(position), 0) + 1 from habits), ?5)`,
               )
-              .bind(name, cadence, target, new Date().toISOString())
+              // Checked against the set rather than stored as given: an
+              // unknown name would render as a blank cell with nothing saying
+              // why.
+              .bind(name, cadence, target, validIconName(body.icon), new Date().toISOString())
               .run();
             return json({ added: true }, 200);
+          }
+
+          if (body.action === 'icon') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which habit' }, 400);
+            await db
+              .prepare(`update habits set icon = ?2 where id = ?1`)
+              .bind(id, validIconName(body.icon))
+              .run();
+            return json({ updated: true, id }, 200);
           }
 
           if (body.action === 'archive') {
