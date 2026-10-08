@@ -36,6 +36,11 @@ const TOOLS = [
     what: 'What got done, and what did not.',
   },
   {
+    href: '/work/reading/',
+    name: 'Reading',
+    what: 'What is open, what is next, and what was put down.',
+  },
+  {
     href: '/work/writing/',
     name: 'Writing',
     what: 'Posts. Editing one commits it, and the commit publishes it.',

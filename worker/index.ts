@@ -692,6 +692,146 @@ export default {
       }
     }
 
+    // --- reading -----------------------------------------------------------
+    if (route === '/work/api/reading') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      const db = env.DB;
+      if (!db) return json({ configured: false, books: [] }, 200);
+
+      const STATUSES = ['want', 'reading', 'read', 'abandoned'];
+
+      try {
+        if (request.method === 'GET') {
+          const books = await db
+            .prepare(
+              `select id, title, author, status, pages, page,
+                      started_on, finished_on, rating, notes
+               from books order by status, id desc`,
+            )
+            .all();
+          return json({ configured: true, books: books.results, today: localDay() }, 200);
+        }
+
+        if (request.method === 'POST') {
+          const body = (await request.json().catch(() => null)) as {
+            action?: string;
+            id?: number;
+            title?: string;
+            author?: string;
+            status?: string;
+            pages?: number | null;
+            page?: number | null;
+            rating?: number | null;
+            notes?: string;
+          } | null;
+          if (!body) return json({ error: 'malformed body' }, 400);
+
+          if (body.action === 'add') {
+            const title = typeof body.title === 'string' ? body.title.trim().slice(0, 300) : '';
+            if (!title) return json({ error: 'needs a title' }, 400);
+            const author =
+              typeof body.author === 'string' && body.author.trim()
+                ? body.author.trim().slice(0, 200)
+                : null;
+            const status = STATUSES.includes(String(body.status)) ? String(body.status) : 'want';
+
+            await db
+              .prepare(
+                `insert into books (title, author, status, started_on, created_at)
+                 values (?1, ?2, ?3, ?4, ?5)`,
+              )
+              // Added straight to 'reading' means it was started today, which
+              // is the only sensible reading of that.
+              .bind(title, author, status, status === 'reading' ? localDay() : null, new Date().toISOString())
+              .run();
+            return json({ added: true }, 200);
+          }
+
+          if (body.action === 'update') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which book' }, 400);
+
+            const current = await db
+              .prepare(`select status, started_on, finished_on from books where id = ?1`)
+              .bind(id)
+              .first<{ status: string; started_on: string | null; finished_on: string | null }>();
+            if (!current) return json({ error: 'no such book' }, 404);
+
+            const status = STATUSES.includes(String(body.status))
+              ? String(body.status)
+              : current.status;
+
+            // Dates are stamped on the first transition into a state and never
+            // cleared automatically. Moving a book back to 'reading' to add a
+            // few pages must not erase the day it was finished — that is a
+            // fact, and an undo is not worth losing it over.
+            const started =
+              current.started_on ??
+              (status === 'reading' || status === 'read' ? localDay() : null);
+            const finished =
+              current.finished_on ?? (status === 'read' ? localDay() : null);
+
+            const clamp = (value: unknown, max: number): number | null => {
+              const n = Number(value);
+              return Number.isFinite(n) && n > 0 ? Math.min(Math.floor(n), max) : null;
+            };
+
+            const rating =
+              body.rating === null
+                ? null
+                : body.rating === undefined
+                  ? undefined
+                  : Math.min(Math.max(Math.floor(Number(body.rating)) || 1, 1), 5);
+
+            await db
+              .prepare(
+                `update books set
+                   status = ?2,
+                   pages = coalesce(?3, pages),
+                   page = coalesce(?4, page),
+                   started_on = ?5,
+                   finished_on = ?6,
+                   rating = case when ?7 = 1 then ?8 else rating end,
+                   notes = coalesce(?9, notes)
+                 where id = ?1`,
+              )
+              .bind(
+                id,
+                status,
+                clamp(body.pages, 100000),
+                clamp(body.page, 100000),
+                started,
+                finished,
+                rating === undefined ? 0 : 1,
+                rating ?? null,
+                typeof body.notes === 'string' ? body.notes.slice(0, 4000) : null,
+              )
+              .run();
+            return json({ updated: true, id, status }, 200);
+          }
+
+          if (body.action === 'remove') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which book' }, 400);
+            // Deleted, unlike a habit. A habit's ticks are years of history;
+            // a book row is one line, and a mistyped title is worth removing
+            // rather than keeping forever. Giving up on a book is 'abandoned'.
+            await db.prepare(`delete from books where id = ?1`).bind(id).run();
+            return json({ removed: true, id }, 200);
+          }
+
+          return json({ error: 'unknown action' }, 400);
+        }
+
+        return json({ error: 'method not allowed' }, 405);
+      } catch (error) {
+        return json({ error: String(error instanceof Error ? error.message : error) }, 502);
+      }
+    }
+
     // --- rebuild on demand -------------------------------------------------
     //
     // Under /work/api/ with the rest of the backend, so the one Access policy

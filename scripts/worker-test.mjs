@@ -837,6 +837,20 @@ globalThis.fetch = preGh;
 function fakeD1() {
   const ticks = new Set();
   const habits = [{ id: 1, name: 'Read', cadence: 'daily', target: null }];
+  const books = [
+    {
+      id: 1,
+      title: 'On the Incarnation',
+      author: 'Athanasius',
+      status: 'reading',
+      pages: 120,
+      page: 40,
+      started_on: '2026-09-01',
+      finished_on: null,
+      rating: null,
+      notes: null,
+    },
+  ];
   const sqlLog = [];
 
   const statement = (sql) => {
@@ -848,6 +862,7 @@ function fakeD1() {
       },
       async all() {
         sqlLog.push(sql);
+        if (sql.includes('from books')) return { results: books };
         if (sql.includes('from habits')) return { results: habits };
         if (sql.includes('from habit_ticks')) {
           const since = bound[0];
@@ -864,6 +879,9 @@ function fakeD1() {
       },
       async first() {
         sqlLog.push(sql);
+        if (sql.includes('from books')) {
+          return books.find((b) => b.id === bound[0]) ?? null;
+        }
         return ticks.has(`${bound[0]}@${bound[1]}`) ? { hit: 1 } : null;
       },
       async run() {
@@ -872,13 +890,31 @@ function fakeD1() {
         if (sql.startsWith('delete from habit_ticks')) ticks.delete(`${bound[0]}@${bound[1]}`);
         if (sql.startsWith('insert into habits')) habits.push({ id: habits.length + 1, name: bound[0], cadence: bound[1], target: bound[2] });
         if (sql.startsWith('update habits')) habits.length = 0;
+        if (sql.startsWith('insert into books')) {
+          books.push({ id: books.length + 1, title: bound[0], author: bound[1], status: bound[2], started_on: bound[3] });
+        }
+        if (sql.startsWith('update books')) {
+          const row = books.find((b) => b.id === bound[0]);
+          if (row) Object.assign(row, { _update: bound });
+        }
+        if (sql.startsWith('delete from books')) {
+          const at = books.findIndex((b) => b.id === bound[0]);
+          if (at !== -1) books.splice(at, 1);
+        }
         return {};
       },
     };
     return self;
   };
 
-  return { prepare: statement, async batch() {}, _ticks: ticks, _habits: habits, _sql: sqlLog };
+  return {
+    prepare: statement,
+    async batch() {},
+    _ticks: ticks,
+    _habits: habits,
+    _books: books,
+    _sql: sqlLog,
+  };
 }
 
 let DB = fakeD1();
@@ -1023,6 +1059,167 @@ check('an unknown action is refused', res.status === 400, String(res.status));
 res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/habits?days=9999'), dbEnv());
 body = await res.json();
 check('the window is capped', body.window.length === 180, String(body.window?.length));
+
+// --- reading ---------------------------------------------------------------
+//
+// The rule worth testing is that a date, once stamped, is never cleared
+// automatically. Moving a finished book back to reading to add a few pages
+// must not erase the day it was finished.
+
+DB = fakeD1();
+
+res = await worker.fetch(get('https://masterroachi.com/work/api/reading'), dbEnv());
+check(
+  'reading without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/reading'), env);
+body = await res.json();
+check(
+  'reading with no database answers configured:false',
+  res.status === 200 && body.configured === false,
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'add', title: '  Dune  ' }),
+  dbEnv(),
+);
+check(
+  'a book added without a status is queued, not started',
+  DB._books.at(-1)?.title === 'Dune' &&
+    DB._books.at(-1)?.status === 'want' &&
+    DB._books.at(-1)?.started_on === null,
+  JSON.stringify(DB._books.at(-1)),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', {
+    action: 'add',
+    title: 'Confessions',
+    author: 'Augustine',
+    status: 'reading',
+  }),
+  dbEnv(),
+);
+check(
+  'a book added as open now is started today',
+  DB._books.at(-1)?.started_on !== null && DB._books.at(-1)?.author === 'Augustine',
+  JSON.stringify(DB._books.at(-1)),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'add', title: '   ' }),
+  dbEnv(),
+);
+check('a titleless book is refused', res.status === 400, String(res.status));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'add', title: 'x', status: 'devoured' }),
+  dbEnv(),
+);
+check(
+  'an invalid status falls back rather than being stored',
+  res.status === 200 && DB._books.at(-1)?.status === 'want',
+  JSON.stringify(DB._books.at(-1)),
+);
+
+// Book 1 already has started_on 2026-09-01 and no finished_on.
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', {
+    action: 'update',
+    id: 1,
+    status: 'read',
+  }),
+  dbEnv(),
+);
+let bound = DB._books.find((b) => b.id === 1)?._update;
+check(
+  'finishing stamps finished_on and keeps the original started_on',
+  bound?.[4] === '2026-09-01' && /^\d{4}-\d{2}-\d{2}$/.test(String(bound?.[5])),
+  JSON.stringify({ started: bound?.[4], finished: bound?.[5] }),
+);
+
+// Now pretend it is finished, and move it back.
+DB = fakeD1();
+DB._books[0].status = 'read';
+DB._books[0].finished_on = '2026-09-20';
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', {
+    action: 'update',
+    id: 1,
+    status: 'reading',
+  }),
+  dbEnv(),
+);
+bound = DB._books.find((b) => b.id === 1)?._update;
+check(
+  'going back to reading does not erase the day it was finished',
+  bound?.[5] === '2026-09-20',
+  JSON.stringify({ finished: bound?.[5] }),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', {
+    action: 'update',
+    id: 1,
+    rating: 99,
+  }),
+  dbEnv(),
+);
+bound = DB._books.find((b) => b.id === 1)?._update;
+check('a rating is clamped to five', bound?.[7] === 5, JSON.stringify(bound?.[7]));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', {
+    action: 'update',
+    id: 1,
+    rating: null,
+  }),
+  dbEnv(),
+);
+bound = DB._books.find((b) => b.id === 1)?._update;
+check(
+  'a null rating clears it, rather than being ignored as absent',
+  bound?.[6] === 1 && bound?.[7] === null,
+  JSON.stringify({ touch: bound?.[6], rating: bound?.[7] }),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 1, page: 55 }),
+  dbEnv(),
+);
+bound = DB._books.find((b) => b.id === 1)?._update;
+check(
+  'updating only the page leaves the rating untouched',
+  bound?.[6] === 0 && bound?.[3] === 55,
+  JSON.stringify({ touch: bound?.[6], page: bound?.[3] }),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 404 }),
+  dbEnv(),
+);
+check('updating a book that is not there is a 404', res.status === 404, String(res.status));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'remove', id: 1 }),
+  dbEnv(),
+);
+check(
+  'a book can be removed outright, unlike a habit',
+  res.status === 200 && !DB._books.some((b) => b.id === 1),
+  JSON.stringify(DB._books.map((b) => b.id)),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'incinerate' }),
+  dbEnv(),
+);
+check('an unknown reading action is refused', res.status === 400, String(res.status));
 
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
