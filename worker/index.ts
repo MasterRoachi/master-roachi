@@ -1,6 +1,6 @@
 import { POLL_ID, pollCandidates } from '../lib/poll';
 import { readAccount, type TrelloCreds } from './trello';
-import { WRITING_DIR, listPosts, readPost, slugify, writePost } from './github';
+import { WRITING_DIR, listPosts, readPost, rebuild, slugify, writePost } from './github';
 import type { WorkHubPayload } from '../lib/work-hub';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -471,6 +471,28 @@ export default {
         // A conflict is the one failure the page can do something about, so it
         // gets its own status rather than being lost in a 500.
         return json({ error: message }, message.startsWith('conflict') ? 409 : 502);
+      }
+    }
+
+    // --- rebuild on demand -------------------------------------------------
+    //
+    // Under /work/api/ with the rest of the backend, so the one Access policy
+    // covers it. POST only: a GET that changed the deployed site could be
+    // fired by anything that prefetches a link.
+    if (route === '/work/api/rebuild') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (request.method !== 'POST') return json({ error: 'method not allowed' }, 405);
+
+      const token = env.GITHUB_TOKEN;
+      if (!token) return json({ configured: false }, 200);
+
+      try {
+        const { commit } = await rebuild(token, 'Rebuild from the work hub');
+        return json({ started: true, commit }, 200);
+      } catch (error) {
+        return json({ error: String(error instanceof Error ? error.message : error) }, 502);
       }
     }
 

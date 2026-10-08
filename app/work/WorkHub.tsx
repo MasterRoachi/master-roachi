@@ -137,6 +137,55 @@ function Board({ board }: { board: WorkBoard }) {
   );
 }
 
+/**
+ * Make the site rebuild.
+ *
+ * Confirmed rather than instant, because it costs a commit in the history and
+ * a build, and because the one thing worse than forgetting to rebuild is
+ * rebuilding four times by double-clicking.
+ */
+function Rebuild() {
+  const [state, setState] = useState<'idle' | 'working' | string>('idle');
+
+  async function go() {
+    if (!confirm('Rebuild the site? This commits and redeploys — about two minutes.')) return;
+    setState('working');
+    try {
+      const response = await fetch('/work/api/rebuild', { method: 'POST' });
+      const data = (await response.json()) as {
+        started?: boolean;
+        commit?: string;
+        configured?: boolean;
+        error?: string;
+      };
+      if (data.configured === false) {
+        setState('Not connected — GITHUB_TOKEN is not set.');
+      } else if (!response.ok || !data.started) {
+        setState(data.error ?? `Failed (${response.status}).`);
+      } else {
+        setState(`Building ${data.commit?.slice(0, 7)} — live in about two minutes.`);
+      }
+    } catch (error) {
+      setState(error instanceof Error ? error.message : 'Failed.');
+    }
+  }
+
+  return (
+    <p className={styles.status}>
+      <button type="button" onClick={() => void go()} disabled={state === 'working'}>
+        {state === 'working' ? 'Starting…' : 'Rebuild the site'}
+      </button>
+      {/* Says what it is for, because "rebuild" on its own does not explain
+          why the store would be out of date. */}
+      <span>
+        {state === 'idle' || state === 'working'
+          ? 'Refetches Printful, Steam, RetroAchievements and YouTube.'
+          : state}
+      </span>
+    </p>
+  );
+}
+
 export default function WorkHub() {
   const [state, setState] = useState<State>({ phase: 'loading' });
   const [nonce, setNonce] = useState(0);
@@ -201,7 +250,9 @@ export default function WorkHub() {
         </button>
       </p>
 
-      {/* Trello and SensusAir fail independently, so a missing token costs the
+      <Rebuild />
+
+      {/* Trello and the rest fail independently, so a missing token costs the
           boards and not the page. */}
       {!data.configured && (
         <p className={styles.warn}>

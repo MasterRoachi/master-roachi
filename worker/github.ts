@@ -149,6 +149,61 @@ export async function writePost(
   return { commit: result.commit?.sha ?? '' };
 }
 
+/**
+ * Make the site rebuild, by giving Workers Builds a push to build.
+ *
+ * Several things on this site only change at build time — the store comes
+ * from Printful, the play strip from Steam and RetroAchievements, the videos
+ * from YouTube — and all of them are fetched by the `prebuild` script that
+ * runs ahead of `next build`. There is no way to refresh them without a
+ * build, and no deploy hook: a push is the only trigger, which is what
+ * .github/workflows/play-data.yml depends on too.
+ *
+ * So this commits nothing. It writes a new commit pointing at the SAME tree
+ * as its parent — an empty commit — which is a new sha, which is a push, which
+ * is a build. The cost is a bookkeeping commit in the history, which the
+ * repository already has plenty of under "Refresh play data".
+ *
+ * Four calls, because the contents API cannot express a commit with no
+ * changes in it; the git database can.
+ */
+export async function rebuild(token: string, message: string): Promise<{ commit: string }> {
+  const base = `${API}/repos/${OWNER}/${REPO}/git`;
+  const h = headers(token);
+
+  const refResponse = await fetch(`${base}/ref/heads/${BRANCH}`, { headers: h });
+  if (!refResponse.ok) throw new Error(`ref: ${refResponse.status}`);
+  const { object } = (await refResponse.json()) as { object: { sha: string } };
+
+  const headResponse = await fetch(`${base}/commits/${object.sha}`, { headers: h });
+  if (!headResponse.ok) throw new Error(`head: ${headResponse.status}`);
+  const head = (await headResponse.json()) as { tree: { sha: string } };
+
+  const made = await fetch(`${base}/commits`, {
+    method: 'POST',
+    headers: { ...h, 'content-type': 'application/json' },
+    body: JSON.stringify({
+      message: safeMessage(message),
+      tree: head.tree.sha,
+      parents: [object.sha],
+    }),
+  });
+  if (!made.ok) throw new Error(`commit: ${made.status}`);
+  const commit = (await made.json()) as { sha: string };
+
+  // Not forced. If anything landed on the branch between reading the ref and
+  // here, this is no longer a fast-forward and GitHub refuses it — which is
+  // the right outcome: a rebuild is never worth rewriting history for.
+  const moved = await fetch(`${base}/refs/heads/${BRANCH}`, {
+    method: 'PATCH',
+    headers: { ...h, 'content-type': 'application/json' },
+    body: JSON.stringify({ sha: commit.sha, force: false }),
+  });
+  if (!moved.ok) throw new Error(`ref update: ${moved.status}`);
+
+  return { commit: commit.sha };
+}
+
 /** A slug that is safe as a filename and as a URL. */
 export function slugify(title: string): string {
   return title

@@ -22,7 +22,8 @@
     "logo": "node scripts/logo.mjs",
     "tool-icons": "node scripts/tool-icons.mjs",
     "test:worker": "node scripts/worker-test.mjs",
-    "trello-auth": "node scripts/trello-auth.mjs"
+    "trello-auth": "node scripts/trello-auth.mjs",
+    "github-auth": "node scripts/github-auth.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

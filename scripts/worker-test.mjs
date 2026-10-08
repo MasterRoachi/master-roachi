@@ -536,6 +536,91 @@ check('a stale sha reports a conflict, not a 500', res.status === 409, String(re
 
 globalThis.fetch = preGh;
 
+// --- the rebuild button ----------------------------------------------------
+//
+// It changes what is deployed, so the tests are about who may fire it and
+// what it must not do to the history.
+
+const rebuildCalls = [];
+globalThis.fetch = async (input, init = {}) => {
+  const url = String(input);
+  const reply = (data, status = 200) =>
+    new Response(JSON.stringify(data), {
+      status,
+      headers: { 'content-type': 'application/json' },
+    });
+
+  if (url.endsWith('/git/ref/heads/main')) return reply({ object: { sha: 'parent-sha' } });
+  if (url.includes('/git/commits/parent-sha')) return reply({ tree: { sha: 'tree-sha' } });
+  if (url.endsWith('/git/commits') && init.method === 'POST') {
+    rebuildCalls.push({ step: 'commit', ...JSON.parse(init.body) });
+    return reply({ sha: 'new-sha' });
+  }
+  if (url.endsWith('/git/refs/heads/main') && init.method === 'PATCH') {
+    rebuildCalls.push({ step: 'ref', ...JSON.parse(init.body) });
+    return reply({});
+  }
+  return new Response('nope', { status: 404 });
+};
+
+res = await worker.fetch(
+  new Request('https://masterroachi.com/work/api/rebuild', { method: 'POST' }),
+  ghEnv,
+);
+check(
+  'rebuild without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/rebuild'), ghEnv);
+check('rebuild refuses GET', res.status === 405, String(res.status));
+
+res = await worker.fetch(
+  new Request('https://masterroachi.com/work/api/rebuild', {
+    method: 'POST',
+    headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
+  }),
+  env,
+);
+body = await res.json();
+check(
+  'rebuild with no GitHub token answers configured:false',
+  res.status === 200 && body.configured === false,
+  JSON.stringify(body),
+);
+
+rebuildCalls.length = 0;
+res = await worker.fetch(
+  new Request('https://masterroachi.com/work/api/rebuild', {
+    method: 'POST',
+    headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
+  }),
+  ghEnv,
+);
+body = await res.json();
+const made = rebuildCalls.find((c) => c.step === 'commit');
+const moved = rebuildCalls.find((c) => c.step === 'ref');
+
+check('rebuild reports the new commit', body.started === true && body.commit === 'new-sha', JSON.stringify(body));
+check(
+  'the commit reuses the parent tree, so nothing is changed',
+  made?.tree === 'tree-sha' && JSON.stringify(made.parents) === JSON.stringify(['parent-sha']),
+  JSON.stringify(made),
+);
+check(
+  'the ref is moved without force, so history cannot be rewritten',
+  moved?.sha === 'new-sha' && moved.force === false,
+  JSON.stringify(moved),
+);
+check(
+  'the rebuild message cannot skip its own build',
+  !/\[skip ci\]|\[ci skip\]/i.test(made?.message ?? ''),
+  JSON.stringify(made?.message),
+);
+
+globalThis.fetch = preGh;
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
