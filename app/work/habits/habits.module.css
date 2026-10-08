@@ -220,7 +220,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.2rem;
-  max-width: 17rem;
+}
+
+/* Thirty-six of them, so the picker is capped and scrolls rather than
+   growing taller than the window. */
+.picker {
+  width: 17rem;
+  max-height: 13rem;
+  overflow-y: auto;
 }
 
 /* Over the grid rather than pushing the row apart — a picker that resized the
@@ -235,9 +242,11 @@
   border-radius: 8px;
 }
 
+/* In the add form it lays out across the full width, where there is room for
+   it, instead of being a column of nine rows. */
 .iconChoice {
   max-width: 100%;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
 .pick,
@@ -480,4 +489,17 @@
   padding: 0.6rem 0.8rem;
   font-size: 0.8125rem;
   margin-bottom: 1rem;
+}
+
+/* A month still in flight. The pills and the caption have already moved, so
+   this says only that the squares are not known yet — and it holds the space
+   the grid will take, so nothing below it jumps when they arrive. */
+.waiting {
+  min-height: 9rem;
+}
+
+.loading {
+  color: var(--muted);
+  font-size: 0.75rem;
+  opacity: 0.7;
 }

@@ -55,6 +55,16 @@ execFileSync(
 );
 const dbLib = await import(pathToFileURL(dbBundle).href);
 
+// The icon set, where a typo is silent: a malformed path renders as nothing
+// and a duplicated name makes one icon unreachable.
+const iconBundle = path.join(os.tmpdir(), 'master-roachi-icon-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/habit-icons.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${iconBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const icons = await import(pathToFileURL(iconBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -1754,6 +1764,56 @@ globalThis.fetch = preGh;
   }
 }
 
+// --- the icon set ----------------------------------------------------------
+//
+// Hand-written path data, which fails quietly: a malformed `d` draws nothing
+// and the cell just looks empty.
+
+{
+  const all = icons.HABIT_ICONS;
+  check('there is a set at all', Array.isArray(all) && all.length >= 30, String(all?.length));
+
+  const names = all.map((i) => i.name);
+  check(
+    'every name is unique',
+    new Set(names).size === names.length,
+    names.filter((n, i) => names.indexOf(n) !== i).join(', ') || 'none',
+  );
+  check(
+    'every name is a usable slug',
+    names.every((n) => /^[a-z][a-z0-9-]*$/.test(n)),
+    names.filter((n) => !/^[a-z][a-z0-9-]*$/.test(n)).join(', ') || 'none',
+  );
+  check(
+    'every icon has a label',
+    all.every((i) => typeof i.label === 'string' && i.label.trim().length > 1),
+    all.filter((i) => !i.label?.trim()).map((i) => i.name).join(', ') || 'none',
+  );
+
+  // Path data starts with a move and contains only SVG path grammar. A stray
+  // character makes the browser drop the whole path silently.
+  const bad = all.filter((i) => !/^M[\s\d.-]/.test(i.d) || /[^MmLlHhVvCcSsQqTtAaZz\s\d.,-]/.test(i.d));
+  check('every path is well formed', bad.length === 0, bad.map((i) => i.name).join(', ') || 'none');
+
+  const short = all.filter((i) => i.d.length < 12);
+  check('no path is suspiciously empty', short.length === 0, short.map((i) => i.name).join(', ') || 'none');
+
+  // The ones asked for by name, so a rename does not quietly remove them.
+  for (const wanted of ['cigarette', 'weed', 'glass', 'book', 'cross', 'weights']) {
+    check(`the set has ${wanted}`, icons.iconFor(wanted) !== null, 'missing');
+  }
+
+  check('an unknown name resolves to nothing', icons.iconFor('nope') === null, 'expected null');
+  check('a null name resolves to nothing', icons.iconFor(null) === null, 'expected null');
+  check(
+    'validIconName only passes names in the set',
+    icons.validIconName('weed') === 'weed' &&
+      icons.validIconName('weeeed') === null &&
+      icons.validIconName(42) === null,
+    'unexpected',
+  );
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -1767,4 +1827,5 @@ fs.rmSync(bundle, { force: true });
 fs.rmSync(sketchBundle, { force: true });
 fs.rmSync(habitsBundle, { force: true });
 fs.rmSync(dbBundle, { force: true });
+fs.rmSync(iconBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

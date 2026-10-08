@@ -56,8 +56,20 @@ function Glyph({ name }: { name: string | null }) {
 }
 
 export default function Habits() {
-  const [data, setData] = useState<Payload | null>(null);
+  /**
+   * Months already fetched, kept so going back to one is free.
+   *
+   * A month is immutable history once it is past, and the current one only
+   * changes when something on this page changes it — so a second request for
+   * a month already held buys nothing and costs a round trip to Western
+   * Europe. Ticking a square refetches the month it belongs to, which is the
+   * only thing that can invalidate one.
+   */
+  const [cache, setCache] = useState<Record<string, Payload>>({});
+  /** The newest payload, for the things that do not vary by month. */
+  const [latest, setLatest] = useState<Payload | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Which month is being asked for. Null means "whatever the server calls
   // now", which is how the current month opens by default without the page
@@ -71,26 +83,34 @@ export default function Habits() {
   const [icon, setIcon] = useState<string>(HABIT_ICONS[0].name);
   const [picking, setPicking] = useState<number | null>(null);
 
-  const load = useCallback(async () => {
+  const fetchMonth = useCallback(async (wanted: string | null, force = false) => {
+    if (wanted && !force && cache[wanted]) return;
+    setLoading(true);
     try {
       const response = await fetch(
-        `/work/api/habits${month ? `?month=${month}` : ''}`,
+        `/work/api/habits${wanted ? `?month=${wanted}` : ''}`,
         { cache: 'no-store' },
       );
       if (!response.ok) throw new Error(`could not read them (${response.status})`);
       const payload = (await response.json()) as Payload;
-      setData(payload);
-      // The year containing whatever month came back, so the page opens with
-      // the current one expanded and stays put when a month is picked.
+      setCache((held) => ({ ...held, [payload.month]: payload }));
+      setLatest(payload);
+      // On the first load there is no month yet, so the server's answer
+      // becomes the selection — which is how the current month opens without
+      // the page working out what month it is.
+      setMonth((current) => current ?? payload.month);
       setOpenYear((current) => current ?? Number(payload.month.slice(0, 4)));
+      setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not read them.');
+    } finally {
+      setLoading(false);
     }
-  }, [month]);
+  }, [cache]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void fetchMonth(month);
+  }, [month, fetchMonth]);
 
   async function act(body: Record<string, unknown>) {
     // Optimism would be wrong here: a refused tick (a future day, say) has to
@@ -106,11 +126,23 @@ export default function Habits() {
       return;
     }
     setError(null);
-    await load();
+    // Forced: this is the one thing that makes a cached month wrong. Adding or
+    // archiving a habit changes every month, so the whole cache goes.
+    if (body.action === 'toggle') await fetchMonth(month, true);
+    else {
+      setCache({});
+      await fetchMonth(month, true);
+    }
   }
 
-  if (error && !data) return <p className={styles.status}>{error}</p>;
-  if (!data) return <p className={styles.status}>Reading…</p>;
+  if (error && !latest) return <p className={styles.status}>{error}</p>;
+  if (!latest) return <p className={styles.status}>Reading…</p>;
+
+  const data = latest;
+  // What the grid draws. Undefined for a month still in flight, which is why
+  // everything the CLICK affects reads from `month` rather than from here —
+  // the pills and the caption must move on the click, not on the response.
+  const shown = month ? cache[month] : undefined;
 
   if (!data.configured) {
     return (
@@ -122,14 +154,15 @@ export default function Habits() {
     );
   }
 
-  const shownYear = Number(data.month.slice(0, 4));
-  const shownMonth = Number(data.month.slice(5, 7));
+  const selected = month ?? data.month;
+  const shownYear = Number(selected.slice(0, 4));
+  const shownMonth = Number(selected.slice(5, 7));
   const thisMonth = data.today.slice(0, 7);
 
   const doneToday =
-    data.month === thisMonth
-      ? data.habits.filter((habit) =>
-          (data.ticks[String(habit.id)] ?? []).includes(data.today),
+    selected === thisMonth && shown
+      ? shown.habits.filter((habit) =>
+          (shown.ticks[String(habit.id)] ?? []).includes(data.today),
         ).length
       : null;
 
@@ -173,7 +206,11 @@ export default function Habits() {
                 <nav className={styles.months} aria-label={`Months of ${year}`}>
                   {MONTHS.map((label, i) => {
                     const value = `${year}-${String(i + 1).padStart(2, '0')}`;
-                    const active = data.month === value;
+                    // From the click, not from the response. This is the
+                    // whole of the "serious delay": the pill used to wait for
+                    // a round trip to Western Europe before lighting up, so
+                    // every click looked like nothing had happened.
+                    const active = selected === value;
                     // A month that has not happened cannot be ticked, so it is
                     // not offered — rather than opening an empty grid that
                     // refuses every square.
@@ -197,6 +234,7 @@ export default function Habits() {
                   <strong>
                     {MONTHS[shownMonth - 1]} {shownYear}
                   </strong>
+                  {loading && <span className={styles.loading}>reading…</span>}
                   {doneToday !== null && (
                     <span>
                       {doneToday} of {data.habits.length} done today
@@ -204,7 +242,12 @@ export default function Habits() {
                   )}
                 </p>
 
-                {data.habits.length === 0 ? (
+                {!shown ? (
+                  // The frame is already correct; only the squares are not
+                  // known yet. Reserving the space stops the page jumping when
+                  // they arrive.
+                  <div className={styles.waiting} aria-hidden="true" />
+                ) : data.habits.length === 0 ? (
                   <p className={styles.empty}>
                     Nothing tracked yet. Add one below — <em>every day</em> for something
                     expected daily, or <em>times a week</em> for something with a number
@@ -216,7 +259,7 @@ export default function Habits() {
                       <thead>
                         <tr>
                           <th scope="col" className={styles.nameCell} />
-                          {data.days.map((day) => {
+                          {shown.days.map((day) => {
                             const wd = weekday(day);
                             return (
                               <th
@@ -241,12 +284,12 @@ export default function Habits() {
                         </tr>
                       </thead>
                       <tbody>
-                        {data.habits.map((habit) => {
-                          const days = data.ticks[String(habit.id)] ?? [];
+                        {shown.habits.map((habit) => {
+                          const days = shown.ticks[String(habit.id)] ?? [];
                           const done = new Set(days);
                           const weekly = habit.cadence === 'weekly';
                           const week = thisWeek(days, data.today);
-                          const run = streak(days, data.days, data.today);
+                          const run = streak(days, shown.days, data.today);
                           const met = weekly && habit.target !== null && week >= habit.target;
 
                           return (
@@ -298,7 +341,7 @@ export default function Habits() {
                                 )}
                               </th>
 
-                              {data.days.map((day) => {
+                              {shown.days.map((day) => {
                                 const wd = weekday(day);
                                 const future = day > data.today;
                                 return (
