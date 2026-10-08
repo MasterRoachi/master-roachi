@@ -65,6 +65,16 @@ execFileSync(
 );
 const icons = await import(pathToFileURL(iconBundle).href);
 
+// A spine's look is derived rather than stored, so it must be identical on
+// every visit — a shelf that reshuffles its colours on reload cannot be read.
+const spineBundle = path.join(os.tmpdir(), 'master-roachi-spine-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/book-spine.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${spineBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const spines = await import(pathToFileURL(spineBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -1867,6 +1877,73 @@ globalThis.fetch = preGh;
   );
 }
 
+// --- book spines -----------------------------------------------------------
+//
+// Derived, not stored, so the only thing that matters is that it is stable and
+// that nothing comes out malformed. The first version used signed shifts and
+// produced `oklch(undefined% ...)` for any hash above 2^31 — silent, because a
+// browser just drops a colour it cannot parse.
+
+{
+  const book = { id: 7, title: 'On the Incarnation', pages: 120 };
+
+  check(
+    'the same book gives the same spine every time',
+    JSON.stringify(spines.spineFor(book)) === JSON.stringify(spines.spineFor(book)),
+    'not stable',
+  );
+
+  // Over a wide spread of ids and titles, nothing may come out unparseable.
+  const many = Array.from({ length: 500 }, (_, i) => ({
+    id: i * 7919,
+    title: `Book ${i} ${'x'.repeat(i % 17)}`,
+    pages: i % 3 === 0 ? null : (i * 13) % 1200,
+  })).map((b) => spines.spineFor(b));
+
+  check(
+    'no spine has an undefined or NaN colour',
+    many.every((s) => /^oklch\(\d+(\.\d+)?% [\d.]+ \d+\)$/.test(s.colour) && /^oklch\(\d+(\.\d+)?% [\d.]+ \d+\)$/.test(s.edge)),
+    many.find((s) => s.colour.includes('undefined') || s.colour.includes('NaN'))?.colour ?? 'bad format',
+  );
+  check(
+    'every width is a sane number of pixels',
+    many.every((s) => Number.isFinite(s.width) && s.width >= 20 && s.width <= 64),
+    JSON.stringify([...new Set(many.map((s) => s.width))].sort((a, b) => a - b).slice(0, 3)),
+  );
+  check(
+    'every height is in the shelf band',
+    many.every((s) => Number.isFinite(s.height) && s.height >= 156 && s.height <= 200),
+    JSON.stringify([...new Set(many.map((s) => s.height))].sort((a, b) => a - b)),
+  );
+
+  // Thickness from the page count is the one honest mapping available.
+  check(
+    'a long book is thicker than a short one',
+    spines.spineFor({ id: 1, title: 'x', pages: 1000 }).width >
+      spines.spineFor({ id: 1, title: 'x', pages: 80 }).width,
+    'not thicker',
+  );
+  // Unknown must not read as slim, or every unmeasured book looks like a
+  // pamphlet.
+  const unknown = spines.spineFor({ id: 1, title: 'x', pages: null }).width;
+  check(
+    'an unknown page count is middling, not thinnest',
+    unknown > spines.spineFor({ id: 1, title: 'x', pages: 60 }).width,
+    String(unknown),
+  );
+
+  check(
+    'the shelf uses more than one colour',
+    new Set(many.map((s) => s.colour)).size > 10,
+    String(new Set(many.map((s) => s.colour)).size),
+  );
+  check(
+    'and some spines are pale, so the dark-lettering case is reachable',
+    many.some((s) => s.light) && many.some((s) => !s.light),
+    'all one way',
+  );
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -1881,4 +1958,5 @@ fs.rmSync(sketchBundle, { force: true });
 fs.rmSync(habitsBundle, { force: true });
 fs.rmSync(dbBundle, { force: true });
 fs.rmSync(iconBundle, { force: true });
+fs.rmSync(spineBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

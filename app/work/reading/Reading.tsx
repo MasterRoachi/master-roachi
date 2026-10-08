@@ -1,16 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { spineFor } from '@/lib/book-spine';
 import styles from './reading.module.css';
 
-// What is open, what is next, what was finished, and what was put down.
+// A bookcase.
 //
-// The four are not four of the same thing. Open now is one or two books being
-// actively read and wants room — the page number, the progress, a thought
-// about it. Next is a queue and wants to be compact. Finished is an archive
-// that grows for years, so it is grouped by the year it was finished in, the
-// way the habit grid is grouped by month. Put down is small and stays shut
-// until there is something in it.
+// The shelves are the four states — open now, next, finished, put down — and a
+// book stands on one as a spine whose thickness comes from its page count and
+// whose colour is derived from it, so the same book always looks the same and
+// is findable by shape before it is read. See lib/book-spine.ts.
+//
+// Clicking one pulls it off the shelf: the spine itself animates from where it
+// stood to the middle of the screen, where it opens into two pages. That is a
+// FLIP — the open book starts life transformed back onto the spine's measured
+// position and is then released — which is the only way to make the movement
+// start from the book that was actually clicked rather than from the centre of
+// the window.
 
 type Status = 'reading' | 'want' | 'read' | 'abandoned';
 
@@ -27,6 +33,12 @@ interface Book {
   notes: string | null;
 }
 
+const SHELVES: { status: Status; label: string }[] = [
+  { status: 'reading', label: 'Open now' },
+  { status: 'want', label: 'Next' },
+  { status: 'abandoned', label: 'Put down' },
+];
+
 /** Days from start to finish, when both are known. The reason both are stored. */
 function took(book: Book): number | null {
   if (!book.started_on || !book.finished_on) return null;
@@ -35,31 +47,6 @@ function took(book: Book): number | null {
       86_400_000,
   );
   return days >= 0 ? days : null;
-}
-
-function Stars({
-  rating,
-  onPick,
-}: {
-  rating: number | null;
-  onPick: (value: number | null) => void;
-}) {
-  return (
-    <span className={styles.stars}>
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button
-          key={n}
-          type="button"
-          className={(rating ?? 0) >= n ? styles.starOn : styles.starOff}
-          aria-label={`${n} out of 5`}
-          // Clicking the current rating clears it, so a mis-tap is undoable.
-          onClick={() => onPick(rating === n ? null : n)}
-        >
-          ★
-        </button>
-      ))}
-    </span>
-  );
 }
 
 export default function Reading() {
@@ -72,10 +59,14 @@ export default function Reading() {
   const [author, setAuthor] = useState('');
   const [addAs, setAddAs] = useState<Status>('want');
 
-  const [noting, setNoting] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(null);
+  /** Where the clicked spine was, so the open book can start there. */
+  const [from, setFrom] = useState<DOMRect | null>(null);
+  const [settled, setSettled] = useState(false);
   const [draft, setDraft] = useState('');
   const [openYears, setOpenYears] = useState<Set<string>>(new Set());
-  const [showPutDown, setShowPutDown] = useState(false);
+
+  const sheet = useRef<HTMLDivElement | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -98,6 +89,24 @@ export default function Reading() {
     void load();
   }, [load]);
 
+  // Released on the frame after mount, so the browser has a start position to
+  // animate FROM. Setting both in one frame would show no movement at all.
+  useEffect(() => {
+    if (open === null) return;
+    const id = requestAnimationFrame(() => setSettled(true));
+    return () => cancelAnimationFrame(id);
+  }, [open]);
+
+  useEffect(() => {
+    if (open === null) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') close();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
   async function act(body: Record<string, unknown>) {
     const response = await fetch('/work/api/reading', {
       method: 'POST',
@@ -113,6 +122,25 @@ export default function Reading() {
     await load();
   }
 
+  function pull(book: Book, element: HTMLElement) {
+    setFrom(element.getBoundingClientRect());
+    setDraft(book.notes ?? '');
+    setSettled(false);
+    setOpen(book.id);
+  }
+
+  function close() {
+    // The note is kept on the way out rather than behind a button: it was
+    // typed, which is intent enough, and losing a paragraph to a stray Escape
+    // is the only real way to be annoyed by this screen.
+    const book = books?.find((b) => b.id === open);
+    if (book && draft !== (book.notes ?? '')) {
+      void act({ action: 'update', id: book.id, notes: draft });
+    }
+    setSettled(false);
+    setOpen(null);
+  }
+
   if (error && !books) return <p className={styles.status}>{error}</p>;
   if (!books) return <p className={styles.status}>Reading…</p>;
   if (!configured) {
@@ -123,16 +151,14 @@ export default function Reading() {
     );
   }
 
-  const open = books.filter((b) => b.status === 'reading');
-  const next = books.filter((b) => b.status === 'want');
-  const done = books.filter((b) => b.status === 'read');
-  const putDown = books.filter((b) => b.status === 'abandoned');
-
+  const opened = books.find((book) => book.id === open) ?? null;
   const thisYear = today.slice(0, 4);
+  const done = books.filter((b) => b.status === 'read');
   const finishedThisYear = done.filter((b) => b.finished_on?.startsWith(thisYear)).length;
+  const reading = books.filter((b) => b.status === 'reading');
 
-  // Finished, by the year it was finished in. Newest first, because the recent
-  // year is the one being added to and the rest is archive.
+  // Finished, by the year it was finished in — newest first, since the recent
+  // year is the one being added to and the rest is a wall of older shelves.
   const byYear = new Map<string, Book[]>();
   for (const book of done) {
     const year = book.finished_on?.slice(0, 4) ?? 'undated';
@@ -141,72 +167,54 @@ export default function Reading() {
   }
   const years = [...byYear.keys()].sort().reverse();
 
-  const statusSelect = (book: Book) => (
-    <select
-      value={book.status}
-      aria-label={`Shelf for ${book.title}`}
-      className={styles.shelf}
-      onChange={(event) => void act({ action: 'update', id: book.id, status: event.target.value })}
-    >
-      <option value="want">Next</option>
-      <option value="reading">Open now</option>
-      <option value="read">Finished</option>
-      <option value="abandoned">Put down</option>
-    </select>
-  );
-
-  const remove = (book: Book) => (
-    <button
-      type="button"
-      className={styles.remove}
-      title="Remove — for a mistyped entry. Giving up on it is Put down."
-      onClick={() => {
-        if (confirm(`Remove "${book.title}" entirely?`)) {
-          void act({ action: 'remove', id: book.id });
-        }
-      }}
-    >
-      ×
-    </button>
-  );
-
-  const notes = (book: Book) =>
-    noting === book.id ? (
-      <div className={styles.noteBox}>
-        <textarea
-          autoFocus
-          value={draft}
-          placeholder="A thought about it."
-          aria-label={`Notes on ${book.title}`}
-          onChange={(event) => setDraft(event.target.value)}
-        />
-        <p>
-          <button
-            type="button"
-            onClick={() => {
-              void act({ action: 'update', id: book.id, notes: draft });
-              setNoting(null);
-            }}
-          >
-            Keep
-          </button>
-          <button type="button" onClick={() => setNoting(null)}>
-            Cancel
-          </button>
-        </p>
-      </div>
-    ) : (
+  function Spine({ book }: { book: Book }) {
+    const spine = spineFor(book);
+    return (
       <button
         type="button"
-        className={book.notes ? styles.noteShown : styles.noteAdd}
-        onClick={() => {
-          setDraft(book.notes ?? '');
-          setNoting(book.id);
+        className={`${styles.spine} ${spine.light ? styles.spineLight : ''} ${
+          open === book.id ? styles.spineGone : ''
+        }`}
+        style={{
+          width: spine.width,
+          height: spine.height,
+          background: spine.colour,
+          borderColor: spine.edge,
         }}
+        title={`${book.title}${book.author ? ` — ${book.author}` : ''}`}
+        onClick={(event) => pull(book, event.currentTarget)}
       >
-        {book.notes ? book.notes : 'Add a note'}
+        {/* Binding bands, which are most of what says "book" rather than
+            "coloured rectangle". */}
+        <span className={styles.band} />
+        <span className={styles.spineText}>
+          <span className={styles.spineTitle}>{book.title}</span>
+          {book.author && <span className={styles.spineAuthor}>{book.author}</span>}
+        </span>
+        <span className={styles.band} />
       </button>
     );
+  }
+
+  function Shelf({ list, label }: { list: Book[]; label: string }) {
+    return (
+      <section className={styles.shelfBlock}>
+        <h2>
+          {label}
+          <span className={styles.count}>{list.length}</span>
+        </h2>
+        <div className={styles.shelf}>
+          <div className={styles.books}>
+            {list.map((book) => (
+              <Spine key={book.id} book={book} />
+            ))}
+          </div>
+          {/* The board. Without it the spines are floating rectangles. */}
+          <div className={styles.board} />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -215,18 +223,52 @@ export default function Reading() {
       {books.length > 0 && (
         <p className={styles.tally}>
           <strong>{finishedThisYear}</strong> finished in {thisYear}
-          {open.length > 0 && (
+          {reading.length > 0 && (
             <>
               {' · '}
-              <strong>{open.length}</strong> open
+              <strong>{reading.length}</strong> open
             </>
           )}
-          {next.length > 0 && (
-            <>
-              {' · '}
-              {next.length} queued
-            </>
-          )}
+        </p>
+      )}
+
+      {SHELVES.map(({ status, label }) => {
+        const list = books.filter((book) => book.status === status);
+        // An empty Put down shelf is just a reminder of nothing. Open now and
+        // Next stay, because an empty shelf there is a prompt.
+        if (list.length === 0 && status === 'abandoned') return null;
+        return <Shelf key={status} list={list} label={label} />;
+      })}
+
+      {years.map((year) => {
+        const isOpen = openYears.has(year) || (openYears.size === 0 && year === thisYear);
+        const group = byYear.get(year)!;
+        return (
+          <div key={year}>
+            <button
+              type="button"
+              className={styles.yearPill}
+              aria-expanded={isOpen}
+              onClick={() => {
+                const next = new Set(openYears.size === 0 ? [thisYear] : openYears);
+                if (next.has(year)) next.delete(year);
+                else next.add(year);
+                setOpenYears(next.size === 0 ? new Set(['none']) : next);
+              }}
+            >
+              <span>Finished {year === 'undated' ? '(no date)' : year}</span>
+              <span className={styles.count}>{group.length}</span>
+              <span aria-hidden="true">{isOpen ? '−' : '+'}</span>
+            </button>
+            {isOpen && <Shelf list={group} label="" />}
+          </div>
+        );
+      })}
+
+      {books.length === 0 && (
+        <p className={styles.empty}>
+          An empty bookcase. Add a book below — <em>Next</em> if it is waiting, or{' '}
+          <em>Open now</em> if you have started it, which records today as the day you did.
         </p>
       )}
 
@@ -253,218 +295,150 @@ export default function Reading() {
         </button>
       </form>
 
-      {/* --- open now: the only shelf that gets room ------------------- */}
-      <section className={styles.group}>
-        <h2>Open now</h2>
-        {open.length === 0 ? (
-          <p className={styles.status}>Nothing open.</p>
-        ) : (
-          <ul className={styles.openList}>
-            {open.map((book) => {
-              const through =
-                book.pages && book.page ? Math.min(100, Math.round((book.page / book.pages) * 100)) : null;
-              return (
-                <li key={book.id} className={styles.openCard}>
-                  <div className={styles.openHead}>
-                    <div>
-                      <strong>{book.title}</strong>
-                      {book.author && <span className={styles.author}>{book.author}</span>}
-                    </div>
-                    <div className={styles.controls}>
-                      {statusSelect(book)}
-                      {remove(book)}
-                    </div>
-                  </div>
-
-                  {/* The page total was storable and displayable but never
-                      settable, so "of 320" could not exist. Both halves are
-                      inputs now. */}
-                  <div className={styles.progress}>
-                    <label>
-                      p.
-                      <input
-                        type="number"
-                        min={0}
-                        defaultValue={book.page ?? ''}
-                        aria-label={`Page in ${book.title}`}
-                        onBlur={(event) => {
-                          const value = Number(event.target.value);
-                          if (value && value !== book.page) {
-                            void act({ action: 'update', id: book.id, page: value });
-                          }
-                        }}
-                      />
-                    </label>
-                    <label>
-                      of
-                      <input
-                        type="number"
-                        min={0}
-                        defaultValue={book.pages ?? ''}
-                        aria-label={`Total pages in ${book.title}`}
-                        onBlur={(event) => {
-                          const value = Number(event.target.value);
-                          if (value && value !== book.pages) {
-                            void act({ action: 'update', id: book.id, pages: value });
-                          }
-                        }}
-                      />
-                    </label>
-
-                    {through !== null && (
-                      <span className={styles.bar} aria-label={`${through} per cent`}>
-                        <span style={{ width: `${through}%` }} />
-                      </span>
-                    )}
-                    {through !== null && <span className={styles.pct}>{through}%</span>}
-
-                    {book.started_on && (
-                      <span className={styles.since}>since {book.started_on}</span>
-                    )}
-                  </div>
-
-                  {notes(book)}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-
-      {/* --- next: a queue, so compact -------------------------------- */}
-      {next.length > 0 && (
-        <section className={styles.group}>
-          <h2>
-            Next<span className={styles.count}>{next.length}</span>
-          </h2>
-          <ul className={styles.rows}>
-            {next.map((book) => (
-              <li key={book.id} className={styles.row}>
-                <span className={styles.what}>
-                  <strong>{book.title}</strong>
-                  {book.author && <span className={styles.author}>{book.author}</span>}
-                </span>
-                <span className={styles.controls}>
-                  {statusSelect(book)}
-                  {remove(book)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {/* --- finished: an archive, so by year ------------------------- */}
-      {done.length > 0 && (
-        <section className={styles.group}>
-          <h2>
-            Finished<span className={styles.count}>{done.length}</span>
-          </h2>
-          {years.map((year) => {
-            // The current year starts open; older years are archive and start
-            // shut, so a decade of reading does not unroll down the page.
-            const isOpen = openYears.has(year) || (openYears.size === 0 && year === thisYear);
-            const group = byYear.get(year)!;
-            return (
-              <div key={year} className={styles.yearBlock}>
-                <button
-                  type="button"
-                  className={styles.yearPill}
-                  aria-expanded={isOpen}
-                  onClick={() => {
-                    const nextOpen = new Set(openYears.size === 0 ? [thisYear] : openYears);
-                    if (nextOpen.has(year)) nextOpen.delete(year);
-                    else nextOpen.add(year);
-                    // Never empty, or the "current year open by default" rule
-                    // would silently come back and reopen it.
-                    setOpenYears(nextOpen.size === 0 ? new Set(['none']) : nextOpen);
-                  }}
-                >
-                  <span>{year === 'undated' ? 'No date' : year}</span>
-                  <span className={styles.count}>{group.length}</span>
-                  <span aria-hidden="true">{isOpen ? '−' : '+'}</span>
-                </button>
-
-                {isOpen && (
-                  <ul className={styles.rows}>
-                    {group.map((book) => {
-                      const days = took(book);
-                      return (
-                        <li key={book.id} className={styles.row}>
-                          <span className={styles.what}>
-                            <strong>{book.title}</strong>
-                            {book.author && <span className={styles.author}>{book.author}</span>}
-                            {notes(book)}
-                          </span>
-                          <span className={styles.controls}>
-                            {/* Both dates are stored so this can be said. */}
-                            {days !== null && (
-                              <span className={styles.took}>
-                                {days === 0 ? 'in a day' : `in ${days}d`}
-                              </span>
-                            )}
-                            {book.finished_on && (
-                              <span className={styles.since}>{book.finished_on}</span>
-                            )}
-                            <Stars
-                              rating={book.rating}
-                              onPick={(value) =>
-                                void act({ action: 'update', id: book.id, rating: value })
-                              }
-                            />
-                            {statusSelect(book)}
-                            {remove(book)}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
-        </section>
-      )}
-
-      {/* --- put down: present, but not in the way -------------------- */}
-      {putDown.length > 0 && (
-        <section className={styles.group}>
-          <button
-            type="button"
-            className={styles.yearPill}
-            aria-expanded={showPutDown}
-            onClick={() => setShowPutDown(!showPutDown)}
+      {/* --- the book, off the shelf and open ------------------------- */}
+      {opened && (
+        <div className={styles.overlay} onClick={close} role="presentation">
+          <div
+            ref={sheet}
+            className={settled ? styles.bookOpen : styles.bookClosed}
+            // The spine's measured position, as a transform away from where
+            // the open book sits. Released a frame later, so the browser has
+            // something to animate from.
+            style={
+              settled || !from
+                ? undefined
+                : {
+                    transform: `translate(${from.left + from.width / 2 - window.innerWidth / 2}px, ${
+                      from.top + from.height / 2 - window.innerHeight / 2
+                    }px) scaleX(${Math.max(from.width / 640, 0.04)}) scaleY(${from.height / 440})`,
+                  }
+            }
+            onClick={(event) => event.stopPropagation()}
           >
-            <span>Put down</span>
-            <span className={styles.count}>{putDown.length}</span>
-            <span aria-hidden="true">{showPutDown ? '−' : '+'}</span>
-          </button>
-          {showPutDown && (
-            <ul className={styles.rows}>
-              {putDown.map((book) => (
-                <li key={book.id} className={styles.row}>
-                  <span className={styles.what}>
-                    <strong>{book.title}</strong>
-                    {book.author && <span className={styles.author}>{book.author}</span>}
-                    {book.page && <span className={styles.since}>stopped at p.{book.page}</span>}
-                    {notes(book)}
-                  </span>
-                  <span className={styles.controls}>
-                    {statusSelect(book)}
-                    {remove(book)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      )}
+            <div className={styles.leftPage}>
+              <h3>{opened.title}</h3>
+              {opened.author && <p className={styles.byline}>{opened.author}</p>}
 
-      {books.length === 0 && (
-        <p className={styles.empty}>
-          Nothing here yet. Add a book above — put it on <em>Next</em> if it is waiting, or{' '}
-          <em>Open now</em> if you have started it, which records today as the day you did.
-        </p>
+              <dl className={styles.facts}>
+                {opened.started_on && (
+                  <>
+                    <dt>Started</dt>
+                    <dd>{opened.started_on}</dd>
+                  </>
+                )}
+                {opened.finished_on && (
+                  <>
+                    <dt>Finished</dt>
+                    <dd>
+                      {opened.finished_on}
+                      {took(opened) !== null && (
+                        <span className={styles.took}>
+                          {took(opened) === 0 ? ' · in a day' : ` · in ${took(opened)}d`}
+                        </span>
+                      )}
+                    </dd>
+                  </>
+                )}
+                <dt>Pages</dt>
+                <dd className={styles.pageInputs}>
+                  <input
+                    type="number"
+                    min={0}
+                    defaultValue={opened.page ?? ''}
+                    aria-label="Current page"
+                    onBlur={(event) => {
+                      const value = Number(event.target.value);
+                      if (value && value !== opened.page) {
+                        void act({ action: 'update', id: opened.id, page: value });
+                      }
+                    }}
+                  />
+                  <span>of</span>
+                  <input
+                    type="number"
+                    min={0}
+                    defaultValue={opened.pages ?? ''}
+                    aria-label="Total pages"
+                    onBlur={(event) => {
+                      const value = Number(event.target.value);
+                      if (value && value !== opened.pages) {
+                        void act({ action: 'update', id: opened.id, pages: value });
+                      }
+                    }}
+                  />
+                </dd>
+                <dt>Rating</dt>
+                <dd>
+                  <span className={styles.stars}>
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button
+                        key={n}
+                        type="button"
+                        className={(opened.rating ?? 0) >= n ? styles.starOn : styles.starOff}
+                        aria-label={`${n} out of 5`}
+                        onClick={() =>
+                          void act({
+                            action: 'update',
+                            id: opened.id,
+                            rating: opened.rating === n ? null : n,
+                          })
+                        }
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </span>
+                </dd>
+                <dt>Shelf</dt>
+                <dd>
+                  <select
+                    value={opened.status}
+                    aria-label="Shelf"
+                    onChange={(event) =>
+                      void act({ action: 'update', id: opened.id, status: event.target.value })
+                    }
+                  >
+                    <option value="want">Next</option>
+                    <option value="reading">Open now</option>
+                    <option value="read">Finished</option>
+                    <option value="abandoned">Put down</option>
+                  </select>
+                </dd>
+              </dl>
+
+              <button
+                type="button"
+                className={styles.removeBook}
+                onClick={() => {
+                  if (confirm(`Remove "${opened.title}" entirely?`)) {
+                    setOpen(null);
+                    void act({ action: 'remove', id: opened.id });
+                  }
+                }}
+              >
+                Remove this book
+              </button>
+            </div>
+
+            <div className={styles.rightPage}>
+              <label htmlFor="thoughts">Thoughts</label>
+              {/* Markdown, and said so, because this is meant to become a post
+                  on the site later — see the note in page.tsx. Writing it as
+                  prose now means there is nothing to convert then. */}
+              <textarea
+                id="thoughts"
+                value={draft}
+                placeholder="What it was like. Markdown."
+                onChange={(event) => setDraft(event.target.value)}
+              />
+              <p className={styles.hint}>Kept when you close. Escape closes.</p>
+            </div>
+
+            <button type="button" className={styles.shut} onClick={close} aria-label="Close">
+              ×
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

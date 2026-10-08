@@ -1,20 +1,19 @@
-/* Four shelves that are not four of the same thing. Tokens from globals.css.
+/* A bookcase. Tokens from app/globals.css.
  *
- * Open now gets room — it is one or two books, actively read, and the page
- * number and a thought about it are the whole point. Next and Put down are
- * single rows. Finished is an archive, so it is folded by year. */
+ * The shelves are the four states, and a book stands on one as a spine. What
+ * makes it read as a bookcase rather than as a chart is that the spines differ
+ * in width, height and colour — all derived, see lib/book-spine.ts — and that
+ * each shelf has a board under it. Floating rectangles are not books. */
 
 .page {
-  max-width: 54rem;
+  max-width: 56rem;
   margin: 2rem auto 4rem;
 }
 
-/* The two numbers worth knowing before any list: how much got read this year,
-   and how much is open. */
 .tally {
   color: var(--muted);
   font-size: 0.9375rem;
-  margin: 0 0 1.25rem;
+  margin: 0 0 1.5rem;
 }
 
 .tally strong {
@@ -24,15 +23,458 @@
   margin-right: 0.15rem;
 }
 
+/* --- shelves ------------------------------------------------------------ */
+
+.shelfBlock {
+  margin-bottom: 1.75rem;
+}
+
+.shelfBlock h2 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
+.shelfBlock h2:empty {
+  display: none;
+}
+
+.count {
+  color: var(--accent);
+  margin-left: 0.5rem;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.shelf {
+  position: relative;
+}
+
+/* align-items: flex-end so books of different heights all stand ON the
+   shelf rather than being centred in the air above it. Scrolls sideways once
+   a shelf fills, which is what a real one does too. */
+.books {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  min-height: 3.5rem;
+  padding: 0 0.6rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* The board: a lip in front and a shadow under, so the books sit on something
+   and the shelf has a front edge. */
+.board {
+  height: 10px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--line-bright) 70%, var(--bg)),
+    var(--bg-raised)
+  );
+  box-shadow:
+    0 2px 0 color-mix(in oklab, black 45%, transparent),
+    0 10px 14px -8px color-mix(in oklab, black 70%, transparent);
+}
+
+/* --- a spine ------------------------------------------------------------ */
+
+.spine,
+.spineLight {
+  position: relative;
+  flex: 0 0 auto;
+  border: 1px solid;
+  border-radius: 2px 2px 1px 1px;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  /* A spine is read bottom-to-top on most shelves. */
+  overflow: hidden;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+  box-shadow: inset -2px 0 4px -2px color-mix(in oklab, black 60%, transparent);
+}
+
+.spine {
+  color: oklch(92% 0.02 85);
+}
+
+/* A pale binding needs dark lettering, which is why the spine says whether it
+   is light. */
+.spineLight {
+  color: oklch(22% 0.03 85);
+}
+
+/* Lifts out of the shelf a little on hover — the gesture the click completes. */
+.spine:hover,
+.spineLight:hover {
+  transform: translateY(-7px);
+  box-shadow:
+    inset -2px 0 4px -2px color-mix(in oklab, black 60%, transparent),
+    0 8px 12px -4px color-mix(in oklab, black 70%, transparent);
+}
+
+.spine:focus-visible,
+.spineLight:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The book that is currently open is off the shelf, so its slot is empty
+   rather than showing a duplicate of it. */
+.spineGone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Binding bands near each end — most of what distinguishes a spine from a
+   coloured rectangle. */
+.band {
+  flex: 0 0 auto;
+  width: 72%;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+}
+
+.spineText {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  /* Vertical text, reading bottom to top, which is how most spines are set. */
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 0.3rem 0;
+}
+
+.spineTitle {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 100%;
+}
+
+.spineAuthor {
+  font-size: 0.62rem;
+  opacity: 0.72;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 40%;
+  flex: 0 0 auto;
+}
+
+/* --- year folds --------------------------------------------------------- */
+
+.yearPill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.3rem 0.9rem;
+  margin: 0 0 0.5rem;
+  cursor: pointer;
+}
+
+.yearPill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.yearPill span:last-child {
+  margin-left: auto;
+  color: var(--muted);
+}
+
+/* --- the book, off the shelf and open ----------------------------------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: color-mix(in oklab, black 72%, transparent);
+  backdrop-filter: blur(3px);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  animation: fade 0.18s ease;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Two pages side by side with a gutter between them. The closed state is the
+   same element transformed back onto the spine that was clicked — a FLIP —
+   which is what makes it look like that book came off that shelf rather than
+   a panel appearing in the middle of the screen. */
+.bookClosed,
+.bookOpen {
+  position: relative;
+  width: min(40rem, 100%);
+  height: min(27.5rem, 85vh);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--line-bright);
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  box-shadow: 0 30px 60px -20px color-mix(in oklab, black 90%, transparent);
+  transform-origin: center;
+  transition:
+    transform 0.34s cubic-bezier(0.2, 0.9, 0.25, 1),
+    opacity 0.2s ease;
+}
+
+.bookClosed {
+  opacity: 0.4;
+}
+
+.bookOpen {
+  transform: none;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bookClosed,
+  .bookOpen {
+    transition: none;
+  }
+}
+
+.leftPage,
+.rightPage {
+  background: var(--bg-raised);
+  padding: 1.25rem 1.35rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The gutter: a page is lit from the outside edge and falls into shadow at the
+   spine, which is most of what makes two rectangles read as one open book. */
+.leftPage {
+  border-radius: 3px 0 0 3px;
+  background-image: linear-gradient(
+    to right,
+    transparent 70%,
+    color-mix(in oklab, black 30%, transparent)
+  );
+}
+
+.rightPage {
+  border-radius: 0 3px 3px 0;
+  background-image: linear-gradient(
+    to left,
+    transparent 70%,
+    color-mix(in oklab, black 30%, transparent)
+  );
+}
+
+@media (max-width: 680px) {
+  .bookClosed,
+  .bookOpen {
+    grid-template-columns: 1fr;
+    height: min(34rem, 88vh);
+  }
+
+  .leftPage,
+  .rightPage {
+    background-image: none;
+    border-radius: 3px;
+  }
+}
+
+.leftPage h3 {
+  font-size: var(--step-sub);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.byline {
+  color: var(--muted);
+  margin: 0.2rem 0 1rem;
+  font-size: 0.9375rem;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.45rem 0.9rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  align-items: center;
+}
+
+.facts dt {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.65rem;
+}
+
+.facts dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.took {
+  color: var(--accent);
+}
+
+.pageInputs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--muted);
+}
+
+.pageInputs input,
+.facts select {
+  width: 4.4rem;
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.12rem 0.35rem;
+}
+
+.facts select {
+  width: auto;
+}
+
+.pageInputs input:focus,
+.facts select:focus,
+.rightPage textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.stars {
+  display: flex;
+}
+
+.starOn,
+.starOff {
+  background: none;
+  border: 0;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.03rem;
+}
+
+.starOn {
+  color: var(--accent);
+}
+
+.starOff {
+  color: var(--line-bright);
+}
+
+.starOff:hover {
+  color: var(--muted);
+}
+
+/* Last, and quiet. Removing a book is rare and irreversible. */
+.removeBook {
+  margin-top: auto;
+  padding-top: 1rem;
+  background: none;
+  border: 0;
+  color: var(--line-bright);
+  font: inherit;
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.removeBook:hover {
+  color: var(--accent);
+}
+
+.rightPage label {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  margin-bottom: 0.4rem;
+}
+
+/* Serif, and the width of a column of prose. This is the page you write on. */
+.rightPage textarea {
+  flex: 1 1 auto;
+  width: 100%;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font-family: ui-serif, Georgia, serif;
+  font-size: 0.95rem;
+  line-height: 1.68;
+  resize: none;
+  padding: 0;
+}
+
+.hint {
+  color: var(--line-bright);
+  font-size: 0.65rem;
+  margin: 0.5rem 0 0;
+}
+
+.shut {
+  position: absolute;
+  top: -0.6rem;
+  right: -0.6rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  border: 1px solid var(--line-bright);
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.shut:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* --- adding ------------------------------------------------------------- */
 
 .add {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 0 0 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--line);
+  margin: 2.5rem 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
 }
 
 .add input {
@@ -47,8 +489,7 @@
   min-width: 0;
 }
 
-.add select,
-.shelf {
+.add select {
   background: var(--bg);
   border: 1px solid var(--line-bright);
   border-radius: 4px;
@@ -83,333 +524,6 @@
 .add button:disabled {
   opacity: 0.4;
   cursor: default;
-}
-
-/* --- shelves ------------------------------------------------------------ */
-
-.group {
-  margin-bottom: 2.25rem;
-}
-
-.group h2 {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  margin: 0 0 0.75rem;
-}
-
-.count {
-  color: var(--accent);
-  margin-left: 0.5rem;
-  letter-spacing: 0;
-  font-variant-numeric: tabular-nums;
-}
-
-/* --- open now ----------------------------------------------------------- */
-
-.openList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.75rem;
-}
-
-/* A card rather than a row: this is the book being read, and the accent edge
-   says so without a second colour scheme. */
-.openCard {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
-  border-radius: 8px;
-  padding: 0.85rem 1rem;
-}
-
-.openHead {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.openCard strong {
-  font-size: 1.0625rem;
-  font-weight: 600;
-}
-
-.progress {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
-  margin: 0.6rem 0 0;
-  color: var(--muted);
-  font-size: 0.8125rem;
-}
-
-.progress label {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.progress input {
-  width: 4.5rem;
-  background: var(--bg);
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.15rem 0.4rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.progress input:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.bar {
-  flex: 1 1 6rem;
-  min-width: 4rem;
-  height: 5px;
-  border-radius: 3px;
-  background: var(--line);
-  overflow: hidden;
-}
-
-.bar span {
-  display: block;
-  height: 100%;
-  background: var(--accent);
-}
-
-.pct {
-  font-variant-numeric: tabular-nums;
-}
-
-/* --- rows (next, finished, put down) ------------------------------------ */
-
-.rows {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-/* Hairline-separated rows rather than a card each: a queue of fifteen books
-   as fifteen cards is a page of boxes. */
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--bg-raised);
-  padding: 0.5rem 0.8rem;
-}
-
-.what {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem;
-  min-width: 0;
-}
-
-.what strong {
-  font-weight: 600;
-  font-size: 0.9375rem;
-}
-
-.author {
-  color: var(--muted);
-  font-size: 0.8125rem;
-  margin-left: 0.5rem;
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-shrink: 0;
-}
-
-/* The date, and how long it took — both dates are stored so this can be said. */
-.since,
-.took {
-  color: var(--muted);
-  font-size: 0.7rem;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.took {
-  color: var(--accent);
-}
-
-/* --- year folds --------------------------------------------------------- */
-
-.yearBlock {
-  margin-bottom: 0.5rem;
-}
-
-.yearPill {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  background: none;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-  padding: 0.3rem 0.9rem;
-  margin-bottom: 0.4rem;
-  cursor: pointer;
-}
-
-.yearPill:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.yearPill span:last-child {
-  margin-left: auto;
-  color: var(--muted);
-}
-
-/* --- stars -------------------------------------------------------------- */
-
-.stars {
-  display: flex;
-}
-
-.starOn,
-.starOff {
-  background: none;
-  border: 0;
-  font-size: 0.95rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 0.03rem;
-}
-
-.starOn {
-  color: var(--accent);
-}
-
-.starOff {
-  color: var(--line-bright);
-}
-
-.starOff:hover {
-  color: var(--muted);
-}
-
-/* --- notes -------------------------------------------------------------- */
-
-/* A 4000-character field the interface could not write to. It is here now,
-   and shown inline rather than behind a panel, because the note about a book
-   is most of what is worth keeping about having read it. */
-.noteAdd,
-.noteShown {
-  display: block;
-  background: none;
-  border: 0;
-  padding: 0.3rem 0 0;
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
-  width: 100%;
-}
-
-.noteAdd {
-  color: var(--line-bright);
-  font-size: 0.75rem;
-}
-
-.noteAdd:hover {
-  color: var(--accent);
-}
-
-.noteShown {
-  color: var(--muted);
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  white-space: pre-wrap;
-}
-
-.noteShown:hover {
-  color: var(--ink);
-}
-
-.noteBox textarea {
-  width: 100%;
-  min-height: 4.5rem;
-  background: var(--bg);
-  border: 1px solid var(--line-bright);
-  border-radius: 6px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.875rem;
-  line-height: 1.55;
-  padding: 0.5rem 0.6rem;
-  resize: vertical;
-  margin-top: 0.4rem;
-}
-
-.noteBox textarea:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.noteBox p {
-  display: flex;
-  gap: 0.4rem;
-  margin: 0.4rem 0 0;
-}
-
-.noteBox button {
-  background: none;
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.7rem;
-  cursor: pointer;
-}
-
-.noteBox button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* --- the rest ----------------------------------------------------------- */
-
-.remove {
-  background: none;
-  border: 0;
-  color: var(--line-bright);
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 0.2rem;
-}
-
-.remove:hover {
-  color: var(--accent);
 }
 
 .status {
