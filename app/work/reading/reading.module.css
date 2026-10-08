@@ -1,10 +1,38 @@
-/* Four shelves. Tokens from app/globals.css. */
+/* Four shelves that are not four of the same thing. Tokens from globals.css.
+ *
+ * Open now gets room — it is one or two books, actively read, and the page
+ * number and a thought about it are the whole point. Next and Put down are
+ * single rows. Finished is an archive, so it is folded by year. */
+
+.page {
+  max-width: 54rem;
+  margin: 2rem auto 4rem;
+}
+
+/* The two numbers worth knowing before any list: how much got read this year,
+   and how much is open. */
+.tally {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  margin: 0 0 1.25rem;
+}
+
+.tally strong {
+  color: var(--ink);
+  font-size: var(--step-sub);
+  font-variant-numeric: tabular-nums;
+  margin-right: 0.15rem;
+}
+
+/* --- adding ------------------------------------------------------------- */
 
 .add {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 2rem 0;
+  margin: 0 0 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
 }
 
 .add input {
@@ -15,12 +43,23 @@
   font: inherit;
   font-size: 0.875rem;
   padding: 0.35rem 0.6rem;
-  min-width: 12rem;
-  flex: 1 1 12rem;
+  flex: 1 1 11rem;
+  min-width: 0;
+}
+
+.add select,
+.shelf {
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.3rem;
 }
 
 .add input:focus,
-.pageInput:focus {
+.add select:focus {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -46,8 +85,10 @@
   cursor: default;
 }
 
+/* --- shelves ------------------------------------------------------------ */
+
 .group {
-  margin-bottom: 2.5rem;
+  margin-bottom: 2.25rem;
 }
 
 .group h2 {
@@ -55,8 +96,6 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted);
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 0.35rem;
   margin: 0 0 0.75rem;
 }
 
@@ -64,76 +103,193 @@
   color: var(--accent);
   margin-left: 0.5rem;
   letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
 }
 
-.books {
+/* --- open now ----------------------------------------------------------- */
+
+.openList {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-.book {
+/* A card rather than a row: this is the book being read, and the accent edge
+   says so without a second colour scheme. */
+.openCard {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.openHead {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.openCard strong {
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.progress label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.progress input {
+  width: 4.5rem;
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.15rem 0.4rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.bar {
+  flex: 1 1 6rem;
+  min-width: 4rem;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.pct {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- rows (next, finished, put down) ------------------------------------ */
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Hairline-separated rows rather than a card each: a queue of fifteen books
+   as fifteen cards is a page of boxes. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
   align-items: center;
   justify-content: space-between;
   background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.6rem 0.8rem;
+  padding: 0.5rem 0.8rem;
 }
 
 .what {
-  display: grid;
-  gap: 0.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
   min-width: 0;
 }
 
 .what strong {
   font-weight: 600;
+  font-size: 0.9375rem;
 }
 
 .author {
   color: var(--muted);
-  font-size: 0.875rem;
-}
-
-/* Started, finished, and where the bookmark is. Quiet, but it is the whole
-   record of how long something took. */
-.dates {
-  color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
+  margin-left: 0.5rem;
 }
 
 .controls {
   display: flex;
   align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+/* The date, and how long it took — both dates are stored so this can be said. */
+.since,
+.took {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.took {
+  color: var(--accent);
+}
+
+/* --- year folds --------------------------------------------------------- */
+
+.yearBlock {
+  margin-bottom: 0.5rem;
+}
+
+.yearPill {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
-}
-
-.pageInput {
-  width: 5rem;
-  background: var(--bg);
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
   color: var(--ink);
   font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.2rem 0.4rem;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.3rem 0.9rem;
+  margin-bottom: 0.4rem;
+  cursor: pointer;
 }
 
-.controls select {
-  background: var(--bg);
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.2rem 0.3rem;
+.yearPill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
+
+.yearPill span:last-child {
+  margin-left: auto;
+  color: var(--muted);
+}
+
+/* --- stars -------------------------------------------------------------- */
 
 .stars {
   display: flex;
@@ -143,10 +299,10 @@
 .starOff {
   background: none;
   border: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1;
   cursor: pointer;
-  padding: 0 0.05rem;
+  padding: 0 0.03rem;
 }
 
 .starOn {
@@ -161,10 +317,91 @@
   color: var(--muted);
 }
 
+/* --- notes -------------------------------------------------------------- */
+
+/* A 4000-character field the interface could not write to. It is here now,
+   and shown inline rather than behind a panel, because the note about a book
+   is most of what is worth keeping about having read it. */
+.noteAdd,
+.noteShown {
+  display: block;
+  background: none;
+  border: 0;
+  padding: 0.3rem 0 0;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+}
+
+.noteAdd {
+  color: var(--line-bright);
+  font-size: 0.75rem;
+}
+
+.noteAdd:hover {
+  color: var(--accent);
+}
+
+.noteShown {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.noteShown:hover {
+  color: var(--ink);
+}
+
+.noteBox textarea {
+  width: 100%;
+  min-height: 4.5rem;
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  padding: 0.5rem 0.6rem;
+  resize: vertical;
+  margin-top: 0.4rem;
+}
+
+.noteBox textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.noteBox p {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.4rem 0 0;
+}
+
+.noteBox button {
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.7rem;
+  cursor: pointer;
+}
+
+.noteBox button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* --- the rest ----------------------------------------------------------- */
+
 .remove {
   background: none;
   border: 0;
-  color: var(--muted);
+  color: var(--line-bright);
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
@@ -180,10 +417,24 @@
   font-size: 0.875rem;
 }
 
+.empty {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  max-width: 50ch;
+  line-height: 1.6;
+}
+
+.empty em {
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 600;
+}
+
 .warn {
   border: 1px solid var(--accent);
   background: var(--accent-dim);
   border-radius: 6px;
   padding: 0.6rem 0.8rem;
   font-size: 0.8125rem;
+  margin-bottom: 1rem;
 }

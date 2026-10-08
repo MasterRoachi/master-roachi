@@ -1340,6 +1340,59 @@ check(
   JSON.stringify({ touch: bound?.[6], page: bound?.[3] }),
 );
 
+// --- the two fields the interface could not reach -------------------------
+//
+// Both were storable and one was displayable, but nothing could set either:
+// the page TOTAL, so "p.40 of 320" could never have its second half, and the
+// note, a 4000-character field with no way in. Tested now that there is one.
+
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 1, pages: 320 }),
+  dbEnv(),
+);
+bound = DB._books.find((b) => b.id === 1)?._update;
+check('the page total is settable', bound?.[2] === 320, JSON.stringify(bound?.[2]));
+
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', {
+    action: 'update',
+    id: 1,
+    notes: 'Slower than it looks. Worth the second read.',
+  }),
+  dbEnv(),
+);
+bound = DB._books.find((b) => b.id === 1)?._update;
+check(
+  'a note is settable',
+  bound?.[8] === 'Slower than it looks. Worth the second read.',
+  JSON.stringify(bound?.[8]),
+);
+check(
+  'and setting one does not disturb the page or the rating',
+  bound?.[2] === null && bound?.[3] === null && bound?.[6] === 0,
+  JSON.stringify({ pages: bound?.[2], page: bound?.[3], ratingTouched: bound?.[6] }),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 1, notes: '' }),
+  dbEnv(),
+);
+bound = DB._books.find((b) => b.id === 1)?._update;
+check('an empty note clears rather than being ignored', bound?.[8] === '', JSON.stringify(bound?.[8]));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/reading', {
+    action: 'update',
+    id: 1,
+    pages: 9999999,
+  }),
+  dbEnv(),
+);
+bound = DB._books.find((b) => b.id === 1)?._update;
+check('an absurd page total is clamped', bound?.[2] === 100000, JSON.stringify(bound?.[2]));
+
 res = await worker.fetch(
   postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 404 }),
   dbEnv(),

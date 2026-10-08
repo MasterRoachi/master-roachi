@@ -20,7 +20,7 @@ export default function WorkReadingPage() {
       <PageHeader
         eyebrow="Private"
         title="Reading"
-        lede="What is open, what is next, and what was put down."
+        lede="What is open now, what is next, and the years behind it."
       />
       <p>
         <Link href="/work/">← Work</Link>
