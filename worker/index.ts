@@ -1,4 +1,6 @@
 import { POLL_ID, pollCandidates } from '../lib/poll';
+import { readAccount, type TrelloCreds } from './trello';
+import type { WorkHubPayload } from '../lib/work-hub';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -64,6 +66,22 @@ interface Env {
    * Worker secret.
    */
   VOTE_SALT?: string;
+
+  /**
+   * Trello, personal account — Command and the three game boards.
+   *
+   * A key identifies the integration, a token authorises one account, and
+   * together they are full access to that account. Both are Worker secrets:
+   *
+   *   npx wrangler secret put TRELLO_KEY
+   *   npx wrangler secret put TRELLO_TOKEN
+   *
+   * Missing either one makes /api/work answer `configured: false`, and the
+   * hub explains itself instead of looking broken.
+   */
+  TRELLO_KEY?: string;
+  TRELLO_TOKEN?: string;
+
 }
 
 /** Votes lapse after six months, so an abandoned poll empties itself. */
@@ -317,6 +335,57 @@ export default {
       // Newest first: the key carries an ISO timestamp, so this sorts by time.
       rows.reverse();
       return json({ configured: true, count: rows.length, orders: rows }, 200);
+    }
+
+    // --- the work hub -------------------------------------------------------
+    //
+    // What is next, per project, read live from Trello on every request. See
+    // lib/work-hub.ts for why none of it is cached.
+    //
+    // THE GATE IS CLOUDFLARE ACCESS, not this code. An Access application has
+    // to cover BOTH /work* and /api/work — protecting only the page would
+    // leave the JSON, which is the whole of the data, served to anyone who
+    // guessed the path.
+    //
+    // The header check below is a second lock, not the first. Cloudflare
+    // overwrites client-supplied CF-* headers at the edge, so its presence
+    // means the request came through Access; its absence means it did not.
+    // This deliberately does not verify the JWT's signature, which would need
+    // the team's public keys fetched and cached — so treat it as a backstop
+    // that catches a misconfigured Access path, and not as authentication.
+    // Answering with the 404 page rather than 401 keeps the endpoint
+    // indistinguishable from one that was never there.
+    if (route === '/api/work') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      const creds: TrelloCreds | null =
+        env.TRELLO_KEY && env.TRELLO_TOKEN
+          ? { key: env.TRELLO_KEY, token: env.TRELLO_TOKEN }
+          : null;
+
+      if (!creds) {
+        const empty: WorkHubPayload = {
+          configured: false,
+          boards: [],
+          unmatched: [],
+          fetchedAt: new Date().toISOString(),
+          errors: [],
+        };
+        return json(empty, 200);
+      }
+
+      const { boards, unmatched, errors } = await readAccount(creds);
+
+      const payload: WorkHubPayload = {
+        configured: true,
+        boards,
+        unmatched,
+        fetchedAt: new Date().toISOString(),
+        errors,
+      };
+      return json(payload, 200);
     }
 
     if (route !== '/api/vote') return env.ASSETS.fetch(request);

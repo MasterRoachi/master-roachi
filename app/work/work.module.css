@@ -1,0 +1,228 @@
+/* The hub is read, not browsed.
+ *
+ * One glance has to answer "what am I doing today" across four or five
+ * projects, so the boards sit side by side rather than stacked — stacking
+ * would mean scrolling past Shepherds to find out whether SensusAir needs
+ * anything, which is exactly the question the page exists to answer.
+ *
+ * Tokens come from app/globals.css; nothing here invents a colour. */
+
+.boards {
+  display: grid;
+  /* auto-fit rather than a fixed count: the number of boards is whatever
+     Trello returns, and a fourth game should not need this file edited. */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0 4rem;
+}
+
+.board {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.25rem;
+  background: var(--bg-raised);
+}
+
+/* Work is somebody else's board on a personal page. The left edge says so at
+   a glance, without a second colour scheme. */
+.board[data-source='work'] {
+  border-left: 3px solid var(--accent);
+}
+
+.boardName {
+  font-size: var(--step-sub);
+  margin: 0 0 1rem;
+  line-height: 1.2;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.boardName a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.boardName a:hover {
+  text-decoration: underline;
+}
+
+.badge {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+}
+
+.bucket {
+  margin-bottom: 1.25rem;
+}
+
+.bucketName {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.card {
+  font-size: 0.9375rem;
+}
+
+.cardName {
+  color: var(--ink);
+  text-decoration: none;
+  display: block;
+  line-height: 1.35;
+}
+
+.cardName:hover {
+  color: var(--accent);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.list {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.label {
+  border: 1px solid var(--line-bright);
+  border-radius: 3px;
+  padding: 0 0.3rem;
+}
+
+/* The two things that mean act now. Both borrow the accent rather than
+   introducing red, which on this palette would be the only pure hue on the
+   site and would shout across every other page. */
+.overdue,
+.stale {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-radius: 3px;
+  padding: 0 0.3rem;
+}
+
+.status {
+  color: var(--muted);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status button {
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.15rem 0.6rem;
+  cursor: pointer;
+}
+
+.status button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Something is wrong and the page has to say so, because the failure mode
+   being guarded against is a column that looks calm and is actually blind. */
+.warn {
+  border: 1px solid var(--accent);
+  background: var(--accent-dim);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.8125rem;
+  margin: 0 0 1rem;
+}
+
+.errors {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  padding-left: 1.2rem;
+}
+
+.clear {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* SensusAir is not one of the games and should not read as one. It leads the
+   row because it is the only panel whose work belongs to someone else, and it
+   is the only panel that can be out of date. */
+.sensus {
+  border-left: 3px solid var(--accent);
+}
+
+/* The boards the hub can see and cannot read. Quiet on purpose — this is a
+   footnote that occasionally turns out to be a bug report. */
+.unmatched {
+  color: var(--muted);
+  font-size: 0.75rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+  margin: 0 0 3rem;
+}
+
+/* Two headings, because whose work it is matters more than which project. */
+.group {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin: 2.5rem 0 0;
+}
+
+/* A day-job board is someone else's priority wearing his time. Marked the same
+   way as the SensusAir panel, which belongs to the same half of the page. */
+.board[data-scope='day-job'] {
+  border-left: 3px solid var(--accent);
+}
+
+/* How many a folded list is really holding. */
+.count {
+  margin-left: 0.4rem;
+  color: var(--accent);
+  letter-spacing: 0;
+}
+
+.more {
+  background: none;
+  border: 0;
+  padding: 0.35rem 0;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.more:hover {
+  color: var(--accent);
+}
