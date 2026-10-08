@@ -188,6 +188,28 @@ export default function Curriculums() {
           ) : (
             <span className={styles.offBadge}>off route</span>
           )}
+          <span className={styles.moveGroup}>
+            <button
+              type="button"
+              className={styles.tiny}
+              title="Earlier in this course"
+              onClick={() =>
+                void act({ action: 'move', kind: 'module', id: module.id, direction: 'up' })
+              }
+            >
+              ↑
+            </button>
+            <button
+              type="button"
+              className={styles.tiny}
+              title="Later in this course"
+              onClick={() =>
+                void act({ action: 'move', kind: 'module', id: module.id, direction: 'down' })
+              }
+            >
+              ↓
+            </button>
+          </span>
           {/* A fork in a course is a section, so the whole module goes on or
               off at once — nobody switches forty lessons one at a time. */}
           <button
@@ -347,7 +369,9 @@ export default function Curriculums() {
                 type="button"
                 className={styles.tiny}
                 title="Earlier in the overall route"
-                onClick={() => void act({ action: 'move', id: curriculum.id, direction: 'up' })}
+                onClick={() =>
+                void act({ action: 'move', kind: 'curriculum', id: curriculum.id, direction: 'up' })
+              }
               >
                 ↑
               </button>
@@ -355,7 +379,9 @@ export default function Curriculums() {
                 type="button"
                 className={styles.tiny}
                 title="Later in the overall route"
-                onClick={() => void act({ action: 'move', id: curriculum.id, direction: 'down' })}
+                onClick={() =>
+                void act({ action: 'move', kind: 'curriculum', id: curriculum.id, direction: 'down' })
+              }
               >
                 ↓
               </button>

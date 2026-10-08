@@ -989,6 +989,25 @@ function fakeD1() {
         if (sql.includes('select position from curriculums')) {
           return curriculums.find((c) => c.id === bound[0]) ?? null;
         }
+        if (sql.includes('select position from modules')) {
+          return modules.find((m) => m.id === bound[0]) ?? null;
+        }
+        if (sql.includes('from modules') && sql.includes('position <')) {
+          const me = modules.find((m) => m.id === bound[1]);
+          return (
+            modules
+              .filter((m) => m.position < bound[0] && m.curriculum_id === me?.curriculum_id)
+              .sort((a, b) => b.position - a.position)[0] ?? null
+          );
+        }
+        if (sql.includes('from modules') && sql.includes('position >')) {
+          const me = modules.find((m) => m.id === bound[1]);
+          return (
+            modules
+              .filter((m) => m.position > bound[0] && m.curriculum_id === me?.curriculum_id)
+              .sort((a, b) => a.position - b.position)[0] ?? null
+          );
+        }
         if (sql.includes('from lessons')) {
           return lessons.find((l) => l.id === bound[0]) ?? null;
         }
@@ -1030,6 +1049,10 @@ function fakeD1() {
         }
         if (sql.startsWith('update curriculums set position')) {
           const row = curriculums.find((c) => c.id === bound[0]);
+          if (row) row.position = bound[1];
+        }
+        if (sql.startsWith('update modules set position')) {
+          const row = modules.find((m) => m.id === bound[0]);
           if (row) row.position = bound[1];
         }
         if (sql.startsWith('delete from books')) {
@@ -2444,6 +2467,50 @@ res = await worker.fetch(
   dbEnv(),
 );
 check('moving a curriculum that is not there is a 404', res.status === 404, String(res.status));
+
+// Modules reorder too, and only within their own course — swapping one with a
+// module from another curriculum would reorder somebody else's path.
+DB = fakeD1();
+DB._modules.push({ id: 2, curriculum_id: 1, name: 'Second', position: 2 });
+DB._modules.push({ id: 3, curriculum_id: 99, name: 'Elsewhere', position: 1 });
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'move',
+    kind: 'module',
+    id: 2,
+    direction: 'up',
+  }),
+  dbEnv(),
+);
+check(
+  'a module moves within its course',
+  res.status === 200 &&
+    DB._modules.find((m) => m.id === 2).position === 1 &&
+    DB._modules.find((m) => m.id === 1).position === 2,
+  JSON.stringify(DB._modules.map((m) => [m.id, m.curriculum_id, m.position])),
+);
+check(
+  'and a module in another course is left alone',
+  DB._modules.find((m) => m.id === 3).position === 1,
+  JSON.stringify(DB._modules.find((m) => m.id === 3)),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'move',
+    kind: 'module',
+    id: 3,
+    direction: 'up',
+  }),
+  dbEnv(),
+);
+body = await res.json();
+check(
+  'the only module in a course has nowhere to go',
+  res.status === 200 && body.moved === false,
+  JSON.stringify(body),
+);
 
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);

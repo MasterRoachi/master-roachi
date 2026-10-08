@@ -1,0 +1,162 @@
+// Builds the Japanese curriculum from its own document.
+//
+// The source is Media/Courses/Languages/Japanese/Japanese-Language-Curriculum-
+// 2026-2029.md, which already names the resources in order, the sequencing
+// rules, and a page map for every book. Nothing here is invented — this script
+// is a transcription of that document into modules and lessons, so the two can
+// be compared line by line.
+//
+// Lesson names carry their page references, because "JFZ1 Lesson 3" sends you
+// looking and "JFZ1 Lesson 3 · pp. 68-88" does not.
+//
+// Prints SQL. Nothing is executed from here: the output is read before it is
+// run, and 250 inserts are not something to fire blind at a live database.
+
+const CURRICULUM = 'Japanese';
+const SOURCE =
+  'Media/Courses/Languages/Japanese/Japanese-Language-Curriculum-2026-2029.md';
+
+/** A run of lessons from a list of start pages: "Lesson 1 · from p. 9". */
+const fromStarts = (starts) =>
+  starts.map((page, i) => `Lesson ${i + 1} · from p. ${page}`);
+
+/** A run of lessons from explicit page ranges. */
+const fromRanges = (ranges, label = 'Lesson') =>
+  ranges.map(([a, b], i) => `${label} ${i + 1} · pp. ${a}-${b}`);
+
+const modules = [
+  // 1-3. Pimsleur I-III. Thirty lessons each, confirmed against the audio on
+  // disk rather than taken on trust: 30 numbered files per level, 90 in all,
+  // which is what the document says.
+  ...[1, 2, 3].map((level) => ({
+    name: `Pimsleur Japanese ${'I'.repeat(level)}`,
+    lessons: Array.from({ length: 30 }, (_, i) => `Lesson ${i + 1}`),
+  })),
+
+  // 4. The kana guide, which the document says to run alongside from the start.
+  {
+    name: 'Hiragana & Katakana',
+    lessons: [
+      'How to use the book · pp. 7-16',
+      'Hiragana a-ko · pp. 19-24',
+      'Hiragana sa-to · pp. 26-31',
+      'Hiragana na-ho · pp. 33-38',
+      'Hiragana ma-yo · pp. 40-44',
+      'Hiragana ra-n · pp. 46-50',
+      'Hiragana modifications and reviews · pp. 52-68',
+      'Katakana basics and reviews · pp. 71-96',
+      'Katakana modifications and reviews · pp. 98-108',
+      'Final combined review · pp. 109-120',
+    ],
+  },
+
+  // 5-9. Japanese From Zero! 1-5, the grammar spine.
+  {
+    name: 'Japanese From Zero! 1',
+    lessons: [
+      'Pre-Lesson A · pp. 13-16',
+      'Pre-Lesson B · pp. 17-21',
+      'Pre-Lesson C · pp. 22-28',
+      'Pre-Lesson D · pp. 29-33',
+      ...fromRanges([
+        [34, 48], [49, 67], [68, 88], [89, 107], [108, 125], [126, 145],
+        [146, 163], [164, 182], [183, 197], [198, 217], [218, 232],
+        [233, 251], [252, 273],
+      ]),
+    ],
+  },
+  {
+    name: 'Japanese From Zero! 2',
+    lessons: fromRanges([
+      [17, 46], [47, 78], [79, 96], [97, 128], [129, 156], [157, 184],
+      [185, 210], [211, 240], [241, 266], [267, 296], [297, 320], [321, 344],
+    ]),
+  },
+  {
+    name: 'Japanese From Zero! 3',
+    lessons: fromStarts([9, 33, 53, 75, 97, 117, 141, 159, 177, 201, 219, 239, 257]),
+  },
+  {
+    name: 'Japanese From Zero! 4',
+    lessons: fromStarts([7, 31, 61, 89, 117, 141, 165, 193, 221, 247, 273, 303, 329, 353]),
+  },
+  {
+    name: 'Japanese From Zero! 5',
+    lessons: fromStarts([34, 65, 96, 132, 161, 193, 227, 256, 286, 318, 343, 373, 401]),
+  },
+
+  // 10. Essential Japanese Vocabulary. One lesson, not a hundred: the document
+  // is explicit that it is dipped into when a usage question comes up and is
+  // "not a book to grind cover to cover". A single item marks the point at
+  // which it joins, which is what the plan actually says.
+  {
+    name: 'Essential Japanese Vocabulary',
+    lessons: ['Start using it alongside JFZ 2 onward, for usage questions'],
+  },
+
+  // 11-13. Remembering the Kanji. Not to be started until kana is comfortable
+  // and a few JFZ books are in — the document's one real sequencing rule.
+  {
+    name: 'Remembering the Kanji 1',
+    lessons: Array.from({ length: 56 }, (_, i) => `Lesson ${i + 1}`),
+  },
+  {
+    name: 'Remembering the Kanji 2',
+    lessons: fromStarts([11, 20, 76, 82, 86, 117, 146, 192, 219, 251, 289]).map((l) =>
+      l.replace('Lesson', 'Chapter'),
+    ),
+  },
+  {
+    name: 'Remembering the Kanji 3',
+    lessons: [
+      ...fromStarts([13, 24, 120, 134, 136, 138]).map((l) =>
+        l.replace('Lesson', 'Writing chapter'),
+      ),
+      ...fromStarts([149, 171, 198, 221, 250, 288, 298, 301]).map((l) =>
+        l.replace('Lesson', 'Reading chapter'),
+      ),
+    ],
+  },
+
+  // 14. The stories, in the order the document puts them: two simpler
+  // folktales first, the three longer ones later.
+  {
+    name: 'Japanese Stories for Language Learners',
+    lessons: [
+      'Urashima Taro · pp. 10-21',
+      'Snow Woman · pp. 22-35',
+      "The Spider's Thread · pp. 36-59",
+      'The Siblings Who Almost Drowned · pp. 60-109',
+      'Gauche the Cellist · pp. 110-188',
+    ],
+  },
+];
+
+/** SQL single-quoted string. An apostrophe in a title ends the literal early. */
+const q = (value) => `'${String(value).replace(/'/g, "''")}'`;
+
+const out = [];
+out.push('-- Generated by scripts/curriculums/japanese.mjs. Read before running.');
+out.push(
+  `insert into curriculums (name, source, status, position, created_at)\n` +
+    `  values (${q(CURRICULUM)}, ${q(SOURCE)}, 'active',\n` +
+    `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())});`,
+);
+
+modules.forEach((module, m) => {
+  out.push(
+    `insert into modules (curriculum_id, name, position)\n` +
+      `  values ((select max(id) from curriculums), ${q(module.name)}, ${m + 1});`,
+  );
+  module.lessons.forEach((lesson, l) => {
+    out.push(
+      `insert into lessons (module_id, name, position, on_route)\n` +
+        `  values ((select max(id) from modules), ${q(lesson)}, ${l + 1}, 1);`,
+    );
+  });
+});
+
+console.log(out.join('\n'));
+console.error(
+  `modules: ${modules.length}  lessons: ${modules.reduce((n, m) => n + m.lessons.length, 0)}`,
+);

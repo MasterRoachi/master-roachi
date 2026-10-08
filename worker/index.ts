@@ -1150,13 +1150,26 @@ export default {
           if (action === 'move') {
             const id = Number(body.id);
             const direction = body.direction === 'up' ? 'up' : 'down';
-            if (!Number.isInteger(id)) return json({ error: 'which curriculum' }, 400);
+            if (!Number.isInteger(id)) return json({ error: 'which one' }, 400);
+
+            // Curriculums or modules. Both carry a position, both orders
+            // decide what comes next, and modules could not be reordered at
+            // all until now — the column was written on insert and never
+            // touched again, so a fourteen-module course was stuck in import
+            // order.
+            const table = body.kind === 'module' ? 'modules' : 'curriculums';
+            // A module only moves within its own curriculum. Swapping it with
+            // one from another course would reorder somebody else's path.
+            const scope =
+              table === 'modules'
+                ? `and curriculum_id = (select curriculum_id from modules where id = ?2)`
+                : '';
 
             const mine = await db
-              .prepare(`select position from curriculums where id = ?1`)
+              .prepare(`select position from ${table} where id = ?1`)
               .bind(id)
               .first<{ position: number }>();
-            if (!mine) return json({ error: 'no such curriculum' }, 404);
+            if (!mine) return json({ error: 'no such thing' }, 404);
 
             // The neighbour in that direction, whatever its position number
             // happens to be — positions can have gaps after a delete, so
@@ -1164,12 +1177,12 @@ export default {
             const neighbour = await db
               .prepare(
                 direction === 'up'
-                  ? `select id, position from curriculums where position < ?1
+                  ? `select id, position from ${table} where position < ?1 ${scope}
                      order by position desc limit 1`
-                  : `select id, position from curriculums where position > ?1
+                  : `select id, position from ${table} where position > ?1 ${scope}
                      order by position asc limit 1`,
               )
-              .bind(mine.position)
+              .bind(mine.position, id)
               .first<{ id: number; position: number }>();
 
             // Already at the end. Not an error: the button is simply at its
@@ -1177,12 +1190,8 @@ export default {
             if (!neighbour) return json({ moved: false }, 200);
 
             await db.batch([
-              db
-                .prepare(`update curriculums set position = ?2 where id = ?1`)
-                .bind(id, neighbour.position),
-              db
-                .prepare(`update curriculums set position = ?2 where id = ?1`)
-                .bind(neighbour.id, mine.position),
+              db.prepare(`update ${table} set position = ?2 where id = ?1`).bind(id, neighbour.position),
+              db.prepare(`update ${table} set position = ?2 where id = ?1`).bind(neighbour.id, mine.position),
             ]);
             return json({ moved: true }, 200);
           }
