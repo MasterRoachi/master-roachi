@@ -851,6 +851,9 @@ function fakeD1() {
       notes: null,
     },
   ];
+  const curriculums = [{ id: 1, name: 'Odin', source: null, status: 'active', position: 1 }];
+  const modules = [{ id: 1, curriculum_id: 1, name: 'Foundations', position: 1 }];
+  const lessons = [{ id: 1, module_id: 1, name: 'Intro', position: 1, done_on: null }];
   const sqlLog = [];
 
   const statement = (sql) => {
@@ -863,6 +866,9 @@ function fakeD1() {
       async all() {
         sqlLog.push(sql);
         if (sql.includes('from books')) return { results: books };
+        if (sql.includes('from curriculums')) return { results: curriculums };
+        if (sql.includes('from modules')) return { results: modules };
+        if (sql.includes('from lessons')) return { results: lessons };
         if (sql.includes('from habits')) return { results: habits };
         if (sql.includes('from habit_ticks')) {
           const since = bound[0];
@@ -882,6 +888,15 @@ function fakeD1() {
         if (sql.includes('from books')) {
           return books.find((b) => b.id === bound[0]) ?? null;
         }
+        if (sql.includes('max(position)') && sql.includes('from modules')) {
+          return { at: modules.length };
+        }
+        if (sql.includes('from modules') && sql.includes('order by id desc')) {
+          return modules.at(-1) ?? null;
+        }
+        if (sql.includes('from lessons')) {
+          return lessons.find((l) => l.id === bound[0]) ?? null;
+        }
         return ticks.has(`${bound[0]}@${bound[1]}`) ? { hit: 1 } : null;
       },
       async run() {
@@ -896,6 +911,13 @@ function fakeD1() {
         if (sql.startsWith('update books')) {
           const row = books.find((b) => b.id === bound[0]);
           if (row) Object.assign(row, { _update: bound });
+        }
+        if (sql.startsWith('insert into curriculums')) curriculums.push({ id: curriculums.length + 1, name: bound[0], source: bound[1] });
+        if (sql.startsWith('insert into modules')) modules.push({ id: modules.length + 1, curriculum_id: bound[0], name: bound[1], position: bound[2] });
+        if (sql.startsWith('insert into lessons')) lessons.push({ id: lessons.length + 1, module_id: bound[0], name: bound[1], position: bound[2], done_on: null });
+        if (sql.startsWith('update lessons')) {
+          const row = lessons.find((l) => l.id === bound[0]);
+          if (row) row.done_on = bound[1];
         }
         if (sql.startsWith('delete from books')) {
           const at = books.findIndex((b) => b.id === bound[0]);
@@ -913,6 +935,9 @@ function fakeD1() {
     _ticks: ticks,
     _habits: habits,
     _books: books,
+    _curriculums: curriculums,
+    _modules: modules,
+    _lessons: lessons,
     _sql: sqlLog,
   };
 }
@@ -1220,6 +1245,165 @@ res = await worker.fetch(
   dbEnv(),
 );
 check('an unknown reading action is refused', res.status === 400, String(res.status));
+
+// --- curriculums -----------------------------------------------------------
+//
+// Three levels, and an import that writes many rows from one paste — so the
+// tests are about what it refuses to write and what it does not interpolate.
+
+DB = fakeD1();
+
+res = await worker.fetch(get('https://masterroachi.com/work/api/curriculums'), dbEnv());
+check(
+  'curriculums without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/curriculums'), env);
+body = await res.json();
+check(
+  'curriculums with no database answers configured:false',
+  res.status === 200 && body.configured === false,
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/curriculums'), dbEnv());
+body = await res.json();
+check(
+  'the three levels come back nested, not as a flat join',
+  body.curriculums?.[0]?.modules?.[0]?.lessons?.[0]?.name === 'Intro',
+  JSON.stringify(body.curriculums),
+);
+
+// --- the import ------------------------------------------------------------
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'import',
+    curriculum_id: 1,
+    outline: 'Foundations\n  - Intro to Web\n  - Installations\n1. JavaScript\n   1) Organizing\nNodeJS\n* Mini Message Board',
+  }),
+  dbEnv(),
+);
+body = await res.json();
+check(
+  'an outline becomes modules and lessons, with numbered sections as sections',
+  body.imported === true && body.modules === 3 && body.lessons === 4,
+  JSON.stringify(body),
+);
+check(
+  'the lessons landed under modules rather than at the top',
+  DB._lessons.some((l) => l.name === 'Mini Message Board') &&
+    DB._modules.some((m) => m.name === 'JavaScript'),
+  JSON.stringify({ modules: DB._modules.map((m) => m.name), lessons: DB._lessons.map((l) => l.name) }),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'import',
+    curriculum_id: 1,
+    outline: '   \n\n  ',
+  }),
+  dbEnv(),
+);
+check('an empty outline is refused', res.status === 400, String(res.status));
+
+// A whole pasted web page must not write ten thousand rows unnoticed.
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'import',
+    curriculum_id: 1,
+    outline: Array.from({ length: 300 }, (_, i) => `Module ${i}`).join('\n'),
+  }),
+  dbEnv(),
+);
+check('an oversized import is refused', res.status === 400, String(res.status));
+
+// --- ticking a lesson ------------------------------------------------------
+DB = fakeD1();
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 1 }),
+  dbEnv(),
+);
+body = await res.json();
+check(
+  'a lesson records the day it was done, not a flag',
+  body.done === true && /^\d{4}-\d{2}-\d{2}$/.test(body.day),
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 1 }),
+  dbEnv(),
+);
+body = await res.json();
+check('ticking again clears the day', body.done === false && body.day === null, JSON.stringify(body));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'toggle-lesson',
+    id: 1,
+    day: '2099-01-01',
+  }),
+  dbEnv(),
+);
+check('a lesson cannot be done in the future', res.status === 400, String(res.status));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 9999 }),
+  dbEnv(),
+);
+check('ticking a lesson that is not there is a 404', res.status === 404, String(res.status));
+
+// --- the kind map ----------------------------------------------------------
+//
+// `kind` chooses a table, so the one thing that must never happen is a table
+// name coming out of the request body.
+for (const kind of ['curriculums', 'sqlite_master', 'lessons; drop table lessons', '']) {
+  res = await worker.fetch(
+    postJson('https://masterroachi.com/work/api/curriculums', {
+      action: 'remove',
+      kind,
+      id: 1,
+    }),
+    dbEnv(),
+  );
+  check(`remove refuses kind ${JSON.stringify(kind)}`, res.status === 400, String(res.status));
+}
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'rename',
+    kind: 'lesson',
+    id: 1,
+    name: 'Renamed',
+  }),
+  dbEnv(),
+);
+check('a valid kind renames', res.status === 200, String(res.status));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', {
+    action: 'set-status',
+    id: 1,
+    status: 'abandoned',
+  }),
+  dbEnv(),
+);
+check('an invalid curriculum status is refused', res.status === 400, String(res.status));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'add-curriculum', name: '  ' }),
+  dbEnv(),
+);
+check('a nameless curriculum is refused', res.status === 400, String(res.status));
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/curriculums', { action: 'add-module', name: 'x' }),
+  dbEnv(),
+);
+check('a module with no curriculum is refused', res.status === 400, String(res.status));
 
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);

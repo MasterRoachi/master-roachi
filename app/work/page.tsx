@@ -41,6 +41,11 @@ const TOOLS = [
     what: 'What is open, what is next, and what was put down.',
   },
   {
+    href: '/work/curriculums/',
+    name: 'Curriculums',
+    what: 'What is being studied, and how far through it you are.',
+  },
+  {
     href: '/work/writing/',
     name: 'Writing',
     what: 'Posts. Editing one commits it, and the commit publishes it.',

@@ -10,6 +10,7 @@ import {
 } from './github';
 import { collectionFor, pathAllowed, setDraft } from '../lib/collections';
 import { dayWindow, isDay, localDay, type D1Database } from './db';
+import { outlineSize, parseOutline } from '../lib/outline';
 import type { WorkHubPayload } from '../lib/work-hub';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -821,6 +822,244 @@ export default {
             // rather than keeping forever. Giving up on a book is 'abandoned'.
             await db.prepare(`delete from books where id = ?1`).bind(id).run();
             return json({ removed: true, id }, 200);
+          }
+
+          return json({ error: 'unknown action' }, 400);
+        }
+
+        return json({ error: 'method not allowed' }, 405);
+      } catch (error) {
+        return json({ error: String(error instanceof Error ? error.message : error) }, 502);
+      }
+    }
+
+    // --- curriculums -------------------------------------------------------
+    //
+    // Three levels: curriculum, module, lesson. A lesson's completion is a
+    // date rather than a flag, for the reason given in the migration.
+    if (route === '/work/api/curriculums') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      const db = env.DB;
+      if (!db) return json({ configured: false, curriculums: [] }, 200);
+
+      const text = (value: unknown, max = 300): string =>
+        typeof value === 'string' ? value.trim().slice(0, max) : '';
+
+      try {
+        if (request.method === 'GET') {
+          // Three flat reads assembled here, rather than a join returning one
+          // row per lesson with its curriculum's name repeated on every one.
+          const [curriculums, modules, lessons] = await Promise.all([
+            db
+              .prepare(
+                `select id, name, source, status, position from curriculums
+                 order by position, id`,
+              )
+              .all(),
+            db
+              .prepare(
+                `select id, curriculum_id, name, position from modules
+                 order by position, id`,
+              )
+              .all<{ id: number; curriculum_id: number; name: string }>(),
+            db
+              .prepare(
+                `select id, module_id, name, position, done_on from lessons
+                 order by position, id`,
+              )
+              .all<{ id: number; module_id: number; name: string; done_on: string | null }>(),
+          ]);
+
+          const lessonsByModule = new Map<number, unknown[]>();
+          for (const lesson of lessons.results) {
+            if (!lessonsByModule.has(lesson.module_id)) lessonsByModule.set(lesson.module_id, []);
+            lessonsByModule.get(lesson.module_id)!.push(lesson);
+          }
+
+          const modulesByCurriculum = new Map<number, unknown[]>();
+          for (const module of modules.results) {
+            if (!modulesByCurriculum.has(module.curriculum_id)) {
+              modulesByCurriculum.set(module.curriculum_id, []);
+            }
+            modulesByCurriculum
+              .get(module.curriculum_id)!
+              .push({ ...module, lessons: lessonsByModule.get(module.id) ?? [] });
+          }
+
+          return json(
+            {
+              configured: true,
+              today: localDay(),
+              curriculums: curriculums.results.map((c) => ({
+                ...c,
+                modules: modulesByCurriculum.get(Number(c.id)) ?? [],
+              })),
+            },
+            200,
+          );
+        }
+
+        if (request.method === 'POST') {
+          const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+          if (!body) return json({ error: 'malformed body' }, 400);
+          const action = String(body.action ?? '');
+
+          if (action === 'add-curriculum') {
+            const name = text(body.name);
+            if (!name) return json({ error: 'needs a name' }, 400);
+            await db
+              .prepare(
+                `insert into curriculums (name, source, position, created_at)
+                 values (?1, ?2, (select coalesce(max(position), 0) + 1 from curriculums), ?3)`,
+              )
+              .bind(name, text(body.source, 500) || null, new Date().toISOString())
+              .run();
+            return json({ added: true }, 200);
+          }
+
+          if (action === 'add-module') {
+            const id = Number(body.curriculum_id);
+            const name = text(body.name);
+            if (!Number.isInteger(id) || !name) return json({ error: 'needs a curriculum and a name' }, 400);
+            await db
+              .prepare(
+                `insert into modules (curriculum_id, name, position)
+                 values (?1, ?2, (select coalesce(max(position), 0) + 1 from modules where curriculum_id = ?1))`,
+              )
+              .bind(id, name)
+              .run();
+            return json({ added: true }, 200);
+          }
+
+          if (action === 'add-lesson') {
+            const id = Number(body.module_id);
+            const name = text(body.name);
+            if (!Number.isInteger(id) || !name) return json({ error: 'needs a module and a name' }, 400);
+            await db
+              .prepare(
+                `insert into lessons (module_id, name, position)
+                 values (?1, ?2, (select coalesce(max(position), 0) + 1 from lessons where module_id = ?1))`,
+              )
+              .bind(id, name)
+              .run();
+            return json({ added: true }, 200);
+          }
+
+          // Paste an outline, get modules and lessons. Without this, building
+          // a curriculum by hand is hundreds of clicks and the dashboard is
+          // finished while the content is the hard part.
+          if (action === 'import') {
+            const id = Number(body.curriculum_id);
+            if (!Number.isInteger(id)) return json({ error: 'which curriculum' }, 400);
+
+            const parsed = parseOutline(String(body.outline ?? ''));
+            const size = outlineSize(parsed);
+            if (size.modules === 0) return json({ error: 'nothing to import' }, 400);
+            // A cap, so a pasted entire web page cannot write ten thousand
+            // rows before anyone notices.
+            if (size.modules > 200 || size.lessons > 2000) {
+              return json({ error: 'that is too much at once' }, 400);
+            }
+
+            let modulePosition = Number(
+              (
+                await db
+                  .prepare(`select coalesce(max(position), 0) as at from modules where curriculum_id = ?1`)
+                  .bind(id)
+                  .first<{ at: number }>()
+              )?.at ?? 0,
+            );
+
+            for (const module of parsed) {
+              modulePosition += 1;
+              await db
+                .prepare(`insert into modules (curriculum_id, name, position) values (?1, ?2, ?3)`)
+                .bind(id, module.name, modulePosition)
+                .run();
+
+              const made = await db
+                .prepare(`select id from modules where curriculum_id = ?1 order by id desc limit 1`)
+                .bind(id)
+                .first<{ id: number }>();
+              if (!made) continue;
+
+              let lessonPosition = 0;
+              for (const lesson of module.lessons) {
+                lessonPosition += 1;
+                await db
+                  .prepare(`insert into lessons (module_id, name, position) values (?1, ?2, ?3)`)
+                  .bind(made.id, lesson, lessonPosition)
+                  .run();
+              }
+            }
+
+            return json({ imported: true, ...size }, 200);
+          }
+
+          if (action === 'toggle-lesson') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which lesson' }, 400);
+
+            const lesson = await db
+              .prepare(`select done_on from lessons where id = ?1`)
+              .bind(id)
+              .first<{ done_on: string | null }>();
+            if (!lesson) return json({ error: 'no such lesson' }, 404);
+
+            // A given day may be supplied — for catching up on something done
+            // yesterday — but never one that has not happened.
+            const day = body.day === undefined ? localDay() : body.day;
+            if (!isDay(day)) return json({ error: 'not a date' }, 400);
+            if (day > localDay()) return json({ error: 'that day has not happened' }, 400);
+
+            const next = lesson.done_on ? null : day;
+            await db.prepare(`update lessons set done_on = ?2 where id = ?1`).bind(id, next).run();
+            return json({ done: next !== null, day: next }, 200);
+          }
+
+          if (action === 'rename') {
+            const table = { curriculum: 'curriculums', module: 'modules', lesson: 'lessons' }[
+              String(body.kind)
+            ];
+            const id = Number(body.id);
+            const name = text(body.name);
+            if (!table || !Number.isInteger(id) || !name) {
+              return json({ error: 'needs a kind, an id and a name' }, 400);
+            }
+            // The table name comes from a fixed map and never from the body,
+            // so no part of a caller's input reaches the SQL text.
+            await db.prepare(`update ${table} set name = ?2 where id = ?1`).bind(id, name).run();
+            return json({ renamed: true }, 200);
+          }
+
+          if (action === 'set-status') {
+            const id = Number(body.id);
+            const status = String(body.status);
+            if (!Number.isInteger(id) || !['active', 'paused', 'done'].includes(status)) {
+              return json({ error: 'needs an id and a status' }, 400);
+            }
+            await db
+              .prepare(`update curriculums set status = ?2 where id = ?1`)
+              .bind(id, status)
+              .run();
+            return json({ updated: true }, 200);
+          }
+
+          if (action === 'remove') {
+            const table = { curriculum: 'curriculums', module: 'modules', lesson: 'lessons' }[
+              String(body.kind)
+            ];
+            const id = Number(body.id);
+            if (!table || !Number.isInteger(id)) return json({ error: 'needs a kind and an id' }, 400);
+            // Foreign keys are declared ON DELETE CASCADE, but SQLite only
+            // enforces them when asked — and D1 does ask. Stated here anyway
+            // because removing a curriculum taking its modules and lessons
+            // with it is intended, not incidental.
+            await db.prepare(`delete from ${table} where id = ?1`).bind(id).run();
+            return json({ removed: true }, 200);
           }
 
           return json({ error: 'unknown action' }, 400);
