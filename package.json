@@ -10,7 +10,7 @@
     "preview": "npx serve@latest out",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "prebuild": "node --env-file-if-exists=.env.local scripts/steam.mjs && node --env-file-if-exists=.env.local scripts/retro.mjs && node --env-file-if-exists=.env.local scripts/youtube.mjs && node --env-file-if-exists=.env.local scripts/printful.mjs && node scripts/store-art.mjs && node --env-file-if-exists=.env.local scripts/achievements.mjs && node scripts/covers.mjs && node scripts/og.mjs",
+    "prebuild": "node scripts/version.mjs && node --env-file-if-exists=.env.local scripts/steam.mjs && node --env-file-if-exists=.env.local scripts/retro.mjs && node --env-file-if-exists=.env.local scripts/youtube.mjs && node --env-file-if-exists=.env.local scripts/printful.mjs && node scripts/store-art.mjs && node --env-file-if-exists=.env.local scripts/achievements.mjs && node scripts/covers.mjs && node scripts/og.mjs",
     "steam": "node --env-file-if-exists=.env.local scripts/steam.mjs",
     "store": "node --env-file-if-exists=.env.local scripts/printful.mjs",
     "retro": "node --env-file-if-exists=.env.local scripts/retro.mjs",
@@ -23,7 +23,8 @@
     "tool-icons": "node scripts/tool-icons.mjs",
     "test:worker": "node scripts/worker-test.mjs",
     "trello-auth": "node scripts/trello-auth.mjs",
-    "github-auth": "node scripts/github-auth.mjs"
+    "github-auth": "node scripts/github-auth.mjs",
+    "version": "node scripts/version.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

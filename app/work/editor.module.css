@@ -131,3 +131,53 @@
   font-size: 0.8125rem;
   margin: 0.75rem 0 0;
 }
+
+/* Unpublished, and therefore invisible on the live site. Stated plainly next
+   to the filename, because a draft looks exactly like a post otherwise and
+   "why isn't it up" is a bad question to have to debug. */
+.draft {
+  color: var(--muted);
+  border: 1px solid var(--line-bright);
+  border-radius: 3px;
+  padding: 0 0.35rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Product copy: a labelled box per product rather than the raw JSON. */
+.product {
+  margin: 1.5rem 0;
+}
+
+.product label {
+  display: block;
+  font-size: 0.875rem;
+  margin-bottom: 0.4rem;
+}
+
+/* The Printful id, which is the key the file is actually written under. */
+.id {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.productText {
+  width: 100%;
+  min-height: 7rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.75rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.productText:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

@@ -226,3 +226,13 @@
 .more:hover {
   color: var(--accent);
 }
+
+/* The way in to the editors. A row, because there are three of them and a
+   sidebar for three links is furniture. */
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin: 1.5rem 0 0;
+  font-size: 0.9375rem;
+}

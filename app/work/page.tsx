@@ -3,6 +3,7 @@ import { pageMeta } from '@/lib/seo';
 import Link from 'next/link';
 import PageHeader from '@/components/PageHeader';
 import WorkHub from './WorkHub';
+import styles from './work.module.css';
 
 // The work hub: what is next, per project, read live from Trello.
 //
@@ -38,11 +39,13 @@ export default function WorkPage() {
         title="Work"
         lede="What is next, per project, straight off the boards."
       />
-      {/* Neither backend page is in the site nav — they are private, and the
-          nav is for visitors. This is how one reaches the other. */}
-      <p>
-        <Link href="/work/writing/">Writing →</Link>
-      </p>
+      {/* No backend page is in the site nav — they are private, and the nav is
+          for visitors. This is the way in to all of them. */}
+      <nav className={styles.tools}>
+        <Link href="/work/writing/">Writing</Link>
+        <Link href="/work/projects/">Projects</Link>
+        <Link href="/work/store/">Product copy</Link>
+      </nav>
 
       <WorkHub />
     </div>

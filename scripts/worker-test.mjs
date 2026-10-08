@@ -426,7 +426,7 @@ check(
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/content'), env);
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/content?collection=writing'), env);
 body = await res.json();
 check(
   'no GitHub token answers configured:false',
@@ -434,12 +434,12 @@ check(
   JSON.stringify(body),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/content'), ghEnv);
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/content?collection=writing'), ghEnv);
 body = await res.json();
 check(
   'listing returns only .mdx posts',
-  body.posts?.length === 1 && body.posts[0].path === 'content/writing/the-road-in.mdx',
-  JSON.stringify(body.posts),
+  body.files?.length === 1 && body.files[0].path === 'content/writing/the-road-in.mdx',
+  JSON.stringify(body.files),
 );
 
 // --- the path guard, which is the whole security story here ---------------
@@ -452,21 +452,23 @@ for (const bad of [
   'content/writing/nested/post.mdx',
 ]) {
   res = await worker.fetch(
-    viaAccess(`https://masterroachi.com/work/api/content?path=${encodeURIComponent(bad)}`),
+    viaAccess(`https://masterroachi.com/work/api/content?collection=writing&path=${encodeURIComponent(bad)}`),
     ghEnv,
   );
   check(`read refuses ${bad}`, res.status === 400, String(res.status));
 }
 
 res = await worker.fetch(
-  viaAccess('https://masterroachi.com/work/api/content?path=content/writing/the-road-in.mdx'),
+  viaAccess(
+    'https://masterroachi.com/work/api/content?collection=writing&path=content/writing/the-road-in.mdx',
+  ),
   ghEnv,
 );
 body = await res.json();
 check(
   'a post round-trips non-ASCII intact',
-  body.post?.text.includes('Fróm — the road') && body.post.text.includes('It’s a test.'),
-  JSON.stringify(body.post?.text),
+  body.file?.text.includes('Fróm — the road') && body.file.text.includes('It’s a test.'),
+  JSON.stringify(body.file?.text),
 );
 
 // --- writing ---------------------------------------------------------------
@@ -478,22 +480,27 @@ const postContent = (payload, url = 'https://masterroachi.com/work/api/content')
   });
 
 res = await worker.fetch(
-postContent({ path: '.github/workflows/evil.yml', text: 'jobs:' }),
+postContent(
+  { collection: 'writing', path: '.github/workflows/evil.yml', text: 'jobs:' }),
   ghEnv,
 );
 check('write refuses a workflow path', res.status === 400, String(res.status));
 
 res = await worker.fetch(
-postContent({ text: '   ' }), ghEnv);
+postContent({ collection: 'writing', text: '   ' }), ghEnv);
 check('write refuses an empty body', res.status === 400, String(res.status));
 
 res = await worker.fetch(
-postContent({ title: '!!!', text: 'something' }), ghEnv);
+postContent({ collection: 'writing', title: '!!!', text: 'something' }), ghEnv);
 check('write refuses a title that slugifies to nothing', res.status === 400, String(res.status));
 
 commits.length = 0;
 res = await worker.fetch(
-postContent({ title: 'A Néw Post — part [skip ci] two', text: '---\ntitle: x\n---\n\nBody.' }),
+postContent({
+    collection: 'writing',
+    title: 'A Néw Post — part [skip ci] two',
+    text: '---\ntitle: x\n---\n\nBody.',
+  }),
   ghEnv,
 );
 body = await res.json();
@@ -515,7 +522,12 @@ check(
 
 commits.length = 0;
 res = await worker.fetch(
-postContent({ path: 'content/writing/the-road-in.mdx', text: 'edited', sha: 's1' }),
+postContent({
+    collection: 'writing',
+    path: 'content/writing/the-road-in.mdx',
+    text: 'edited',
+    sha: 's1',
+  }),
   ghEnv,
 );
 check(
@@ -529,7 +541,12 @@ globalThis.fetch = async (input, init = {}) =>
     ? new Response('{}', { status: 409 })
     : ghFetch(input, init);
 res = await worker.fetch(
-postContent({ path: 'content/writing/the-road-in.mdx', text: 'x', sha: 'stale' }),
+postContent({
+    collection: 'writing',
+    path: 'content/writing/the-road-in.mdx',
+    text: 'x',
+    sha: 'stale',
+  }),
   ghEnv,
 );
 check('a stale sha reports a conflict, not a 500', res.status === 409, String(res.status));
@@ -617,6 +634,195 @@ check(
   'the rebuild message cannot skip its own build',
   !/\[skip ci\]|\[ci skip\]/i.test(made?.message ?? ''),
   JSON.stringify(made?.message),
+);
+
+globalThis.fetch = preGh;
+
+// --- collections, drafts and the version stamp -----------------------------
+
+// The rebuild block restored the real fetch, so the GitHub stub goes back on.
+globalThis.fetch = ghFetch;
+
+// Unknown collections cannot be read or written, so a new directory is only
+// reachable once lib/collections.ts says so.
+res = await worker.fetch(
+  viaAccess('https://masterroachi.com/work/api/content?collection=secrets'),
+  ghEnv,
+);
+check('an unknown collection is refused', res.status === 400, String(res.status));
+
+res = await worker.fetch(postContent({ collection: 'secrets', text: 'x' }), ghEnv);
+check('writing to an unknown collection is refused', res.status === 400, String(res.status));
+
+// The guard is per collection: a projects path is not a writing path.
+res = await worker.fetch(
+  viaAccess(
+    'https://masterroachi.com/work/api/content?collection=writing&path=content/projects/terrath.mdx',
+  ),
+  ghEnv,
+);
+check(
+  'a path from another collection is refused',
+  res.status === 400,
+  String(res.status),
+);
+
+// The single-file collection may touch exactly one path, and nothing else in
+// its own directory either.
+res = await worker.fetch(
+  postContent({
+    collection: 'store-copy',
+    path: 'content/store/other.json',
+    text: '{}',
+  }),
+  ghEnv,
+);
+check(
+  'the single-file collection refuses a sibling file',
+  res.status === 400,
+  String(res.status),
+);
+
+res = await worker.fetch(
+  postContent({
+    collection: 'store-copy',
+    path: 'content/store/copy.json',
+    text: '{ "464722916": ["One." ',
+    sha: 's1',
+  }),
+  ghEnv,
+);
+check(
+  'malformed JSON is refused before it can fail a build',
+  res.status === 400,
+  String(res.status),
+);
+
+commits.length = 0;
+res = await worker.fetch(
+  postContent({
+    collection: 'store-copy',
+    path: 'content/store/copy.json',
+    text: '{"464722916":["One."]}',
+    sha: 's1',
+  }),
+  ghEnv,
+);
+body = await res.json();
+check('valid JSON saves', body.saved === true, JSON.stringify(body));
+
+// --- the draft flag --------------------------------------------------------
+commits.length = 0;
+res = await worker.fetch(
+  postContent({
+    collection: 'writing',
+    path: 'content/writing/the-road-in.mdx',
+    sha: 's1',
+    text: '---\ntitle: x\ndraft: true\n---\n\nBody.',
+    draft: false,
+  }),
+  ghEnv,
+);
+let saved = Buffer.from(commits[0].content, 'base64').toString('utf8');
+check(
+  'publishing clears draft: true in the file itself',
+  saved.includes('draft: false') && !saved.includes('draft: true'),
+  JSON.stringify(saved),
+);
+
+commits.length = 0;
+res = await worker.fetch(
+  postContent({
+    collection: 'writing',
+    path: 'content/writing/the-road-in.mdx',
+    sha: 's1',
+    text: '---\ntitle: x\nsummary: y\n---\n\nBody.',
+    draft: true,
+  }),
+  ghEnv,
+);
+saved = Buffer.from(commits[0].content, 'base64').toString('utf8');
+check(
+  'a file with no draft line gets one inside the frontmatter',
+  /^---\n[\s\S]*draft: true\n---/.test(saved) && saved.endsWith('Body.'),
+  JSON.stringify(saved),
+);
+
+commits.length = 0;
+res = await worker.fetch(
+  postContent({
+    collection: 'store-copy',
+    path: 'content/store/copy.json',
+    text: '{"a":["b"]}',
+    sha: 's1',
+    draft: true,
+  }),
+  ghEnv,
+);
+saved = Buffer.from(commits[0].content, 'base64').toString('utf8');
+check(
+  'a draft flag is never injected into JSON',
+  saved === '{"a":["b"]}',
+  JSON.stringify(saved),
+);
+
+// --- the version stamp -----------------------------------------------------
+//
+// Reads the deployment's own asset rather than the public URL, so a cache
+// cannot answer for it.
+const stampEnv = (commit) => ({
+  ...ghEnv,
+  ASSETS: {
+    fetch: async (request) =>
+      String(request.url).endsWith('/version.json') && commit
+        ? new Response(JSON.stringify({ commit }), {
+            headers: { 'content-type': 'application/json' },
+          })
+        : new Response('404 page', { status: 404 }),
+  },
+});
+
+globalThis.fetch = async (input) =>
+  String(input).endsWith('/git/ref/heads/main')
+    ? new Response(JSON.stringify({ object: { sha: 'head-sha' } }), {
+        headers: { 'content-type': 'application/json' },
+      })
+    : new Response('nope', { status: 404 });
+
+res = await worker.fetch(
+  viaAccess('https://masterroachi.com/work/api/version'),
+  stampEnv('head-sha'),
+);
+body = await res.json();
+check('a matching stamp reads as current', body.current === true, JSON.stringify(body));
+
+res = await worker.fetch(
+  viaAccess('https://masterroachi.com/work/api/version'),
+  stampEnv('older-sha'),
+);
+body = await res.json();
+check(
+  'an older stamp reads as not current',
+  body.current === false && body.live === 'older-sha' && body.head === 'head-sha',
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(
+  viaAccess('https://masterroachi.com/work/api/version'),
+  stampEnv(null),
+);
+body = await res.json();
+check(
+  'no stamp reads as unknown, not as out of date',
+  body.current === null && body.live === null,
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(get('https://masterroachi.com/work/api/version'), stampEnv('x'));
+check(
+  'version without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
 );
 
 globalThis.fetch = preGh;

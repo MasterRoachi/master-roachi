@@ -138,6 +138,68 @@ function Board({ board }: { board: WorkBoard }) {
 }
 
 /**
+ * Whether what is deployed is the newest commit.
+ *
+ * No Cloudflare credential: every build stamps its commit into
+ * /version.json, and this compares that with the head of main. It therefore
+ * reports a FAILED build the same way as one still running — the site is
+ * simply not current — which is the question actually being asked. Asking
+ * Cloudflare for the last build's status would say "failed" and still leave
+ * you working out what is live.
+ */
+function Version() {
+  const [state, setState] = useState<{
+    live: string | null;
+    head: string | null;
+    current: boolean | null;
+  } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const response = await fetch('/work/api/version', { cache: 'no-store' });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (alive) setState(data);
+      } catch {
+        /* the hub works without this line */
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (!state) return null;
+
+  // Unknown is its own answer, not a problem: a build made before the stamp
+  // existed has nothing to compare, and must not read as out of date.
+  if (state.current === null) {
+    return (
+      <p className={styles.unmatched}>
+        Deployed version unknown — this build predates the version stamp.
+      </p>
+    );
+  }
+
+  if (state.current) {
+    return (
+      <p className={styles.unmatched}>
+        Live and current, at {state.live?.slice(0, 7)}.
+      </p>
+    );
+  }
+
+  return (
+    <p className={styles.warn}>
+      The site is serving {state.live?.slice(0, 7)} but main is at{' '}
+      {state.head?.slice(0, 7)}. A build is either still running or it failed.
+    </p>
+  );
+}
+
+/**
  * Make the site rebuild.
  *
  * Confirmed rather than instant, because it costs a commit in the history and
@@ -251,6 +313,7 @@ export default function WorkHub() {
       </p>
 
       <Rebuild />
+      <Version />
 
       {/* Trello and the rest fail independently, so a missing token costs the
           boards and not the page. */}

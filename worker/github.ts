@@ -17,8 +17,8 @@ const OWNER = 'MasterRoachi';
 const REPO = 'master-roachi';
 const BRANCH = 'main';
 
-/** Where posts live. Everything this module touches is under here. */
-export const WRITING_DIR = 'content/writing';
+// Which directories are editable is not decided here — see lib/collections.ts.
+// This module takes a path it has already been told is allowed.
 
 export interface GitFile {
   /** Path within the repo. */
@@ -82,10 +82,14 @@ function safeMessage(message: string): string {
     .slice(0, 500);
 }
 
-/** Every post in the writing collection, newest filename last. */
-export async function listPosts(token: string): Promise<GitFile[]> {
+/** Every file of one extension in a directory, by name. */
+export async function listFiles(
+  token: string,
+  dir: string,
+  ext: string,
+): Promise<GitFile[]> {
   const response = await fetch(
-    `${API}/repos/${OWNER}/${REPO}/contents/${WRITING_DIR}?ref=${BRANCH}`,
+    `${API}/repos/${OWNER}/${REPO}/contents/${encodeURI(dir)}?ref=${BRANCH}`,
     { headers: headers(token) },
   );
   if (!response.ok) throw new Error(`list: ${response.status}`);
@@ -98,13 +102,13 @@ export async function listPosts(token: string): Promise<GitFile[]> {
   }[];
 
   return entries
-    .filter((e) => e.type === 'file' && e.name.endsWith('.mdx'))
+    .filter((e) => e.type === 'file' && e.name.endsWith(ext))
     .map((e) => ({ path: e.path, sha: e.sha }))
     .sort((a, b) => a.path.localeCompare(b.path));
 }
 
 /** One post, with the sha that says which version this is. */
-export async function readPost(token: string, path: string): Promise<GitPost> {
+export async function readFile(token: string, path: string): Promise<GitPost> {
   const response = await fetch(
     `${API}/repos/${OWNER}/${REPO}/contents/${encodeURI(path)}?ref=${BRANCH}`,
     { headers: headers(token) },
@@ -122,7 +126,7 @@ export async function readPost(token: string, path: string): Promise<GitPost> {
  * a stale one and GitHub answers 409 rather than overwriting — which is the
  * behaviour we want if the file changed under us between load and save.
  */
-export async function writePost(
+export async function writeFile(
   token: string,
   path: string,
   text: string,
@@ -202,6 +206,16 @@ export async function rebuild(token: string, message: string): Promise<{ commit:
   if (!moved.ok) throw new Error(`ref update: ${moved.status}`);
 
   return { commit: commit.sha };
+}
+
+/** The newest commit on the branch, which is what a healthy deploy should be serving. */
+export async function headCommit(token: string): Promise<string> {
+  const response = await fetch(`${API}/repos/${OWNER}/${REPO}/git/ref/heads/${BRANCH}`, {
+    headers: headers(token),
+  });
+  if (!response.ok) throw new Error(`head ref: ${response.status}`);
+  const { object } = (await response.json()) as { object: { sha: string } };
+  return object.sha;
 }
 
 /** A slug that is safe as a filename and as a URL. */

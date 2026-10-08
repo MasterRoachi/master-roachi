@@ -9,6 +9,11 @@ out/
 next-env.d.ts
 *.tsbuildinfo
 
+# Written by scripts/version.mjs at the start of every build, so that the
+# deployed site can say which commit it is. Generated, not authored — and
+# committing it would mean every build dirtied the tree with its own stamp.
+/public/version.json
+
 # Wrangler
 .wrangler/
 .dev.vars

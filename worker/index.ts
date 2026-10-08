@@ -1,6 +1,14 @@
 import { POLL_ID, pollCandidates } from '../lib/poll';
 import { readAccount, type TrelloCreds } from './trello';
-import { WRITING_DIR, listPosts, readPost, rebuild, slugify, writePost } from './github';
+import {
+  headCommit,
+  listFiles,
+  readFile,
+  rebuild,
+  slugify,
+  writeFile,
+} from './github';
+import { collectionFor, pathAllowed, setDraft } from '../lib/collections';
 import type { WorkHubPayload } from '../lib/work-hub';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -414,64 +422,133 @@ export default {
       if (!throughAccess && !local) return env.ASSETS.fetch(request);
 
       const token = env.GITHUB_TOKEN;
-      if (!token) return json({ configured: false, posts: [] }, 200);
-
-      // THE IMPORTANT GUARD. Without it this endpoint commits anywhere in the
-      // repo, and the first thing worth committing to is .github/workflows —
-      // which would turn a stolen Access session into arbitrary CI execution.
-      // An allow-list of one directory and one extension, matched whole, so
-      // no amount of ../ or URL-encoding widens it.
-      const safePath = (candidate: unknown): string | null => {
-        if (typeof candidate !== 'string') return null;
-        return /^content\/writing\/[a-z0-9-]+\.mdx$/.test(candidate) ? candidate : null;
-      };
+      if (!token) return json({ configured: false, files: [] }, 200);
 
       try {
         if (request.method === 'GET') {
+          const collection = collectionFor(url.searchParams.get('collection'));
+          if (!collection) return json({ error: 'unknown collection' }, 400);
+
           const wanted = url.searchParams.get('path');
+
           if (wanted === null) {
-            return json({ configured: true, posts: await listPosts(token) }, 200);
+            // A single-file collection has nothing to list, so it reports
+            // itself as its own only entry and the page needs no special case.
+            const files = collection.singleFile
+              ? [{ path: collection.singleFile, sha: '' }]
+              : await listFiles(token, collection.dir, collection.ext);
+            return json({ configured: true, files }, 200);
           }
-          const path = safePath(wanted);
-          if (!path) return json({ error: 'not a writing path' }, 400);
-          return json({ configured: true, post: await readPost(token, path) }, 200);
+
+          const path = pathAllowed(collection, wanted);
+          if (!path) return json({ error: 'not a path in this collection' }, 400);
+          return json({ configured: true, file: await readFile(token, path) }, 200);
         }
 
         if (request.method === 'POST') {
           const body = (await request.json().catch(() => null)) as {
+            collection?: string;
             path?: string;
             title?: string;
             text?: string;
             sha?: string;
+            draft?: boolean;
           } | null;
           if (!body) return json({ error: 'malformed body' }, 400);
 
-          const text = typeof body.text === 'string' ? body.text : '';
+          const collection = collectionFor(body.collection);
+          if (!collection) return json({ error: 'unknown collection' }, 400);
+
+          let text = typeof body.text === 'string' ? body.text : '';
           if (!text.trim()) return json({ error: 'nothing to save' }, 400);
 
-          // An existing post names its own path. A new one is named from its
-          // title, which is the only moment a slug is ever decided — renaming
-          // later would break a published URL.
+          // The draft flag is applied here as well as in the editor, so that
+          // publishing is a property of the save rather than of whether the
+          // page remembered to rewrite the text first.
+          if (typeof body.draft === 'boolean' && collection.ext === '.mdx') {
+            text = setDraft(text, body.draft);
+          }
+
+          // Malformed JSON would commit cleanly and then fail the build, which
+          // leaves the old site up and no obvious cause. Cheaper to refuse.
+          if (collection.ext === '.json') {
+            try {
+              JSON.parse(text);
+            } catch {
+              return json({ error: 'that is not valid JSON' }, 400);
+            }
+          }
+
           const path =
-            safePath(body.path) ??
-            safePath(`${WRITING_DIR}/${slugify(String(body.title ?? ''))}.mdx`);
+            pathAllowed(collection, body.path) ??
+            (collection.singleFile
+              ? null
+              : pathAllowed(
+                  collection,
+                  `${collection.dir}/${slugify(String(body.title ?? ''))}${collection.ext}`,
+                ));
           if (!path) return json({ error: 'need a usable title' }, 400);
 
-          const message = body.sha
-            ? `Update ${path.split('/').pop()}`
-            : `Add ${path.split('/').pop()}`;
+          const name = path.split('/').pop();
+          const message = body.sha ? `Update ${name}` : `Add ${name}`;
 
-          const { commit } = await writePost(token, path, text, message, body.sha);
+          const { commit } = await writeFile(token, path, text, message, body.sha);
           return json({ saved: true, path, commit }, 200);
         }
 
         return json({ error: 'method not allowed' }, 405);
       } catch (error) {
         const message = String(error instanceof Error ? error.message : error);
-        // A conflict is the one failure the page can do something about, so it
-        // gets its own status rather than being lost in a 500.
         return json({ error: message }, message.startsWith('conflict') ? 409 : 502);
       }
+    }
+
+    // --- is what he is looking at live -------------------------------------
+    //
+    // Answers "did the last rebuild land" without a Cloudflare credential.
+    // Every build stamps its commit into /version.json, so comparing that
+    // against the newest commit on main says whether the deployed site is
+    // current — and catches a FAILED build as well as one still running,
+    // which asking Cloudflare for the last build's status would not.
+    if (route === '/work/api/version') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      const token = env.GITHUB_TOKEN;
+
+      // The deployed stamp comes from the asset binding rather than over the
+      // network: this Worker IS the deployment, so its own assets are the
+      // truth about what is live, and a fetch to the public URL could be
+      // answered by a cache.
+      let live: string | null = null;
+      try {
+        const stamp = await env.ASSETS.fetch(
+          new Request(`https://${APEX}/version.json`),
+        );
+        if (stamp.ok) {
+          const parsed = (await stamp.json()) as { commit?: string };
+          live = typeof parsed.commit === 'string' ? parsed.commit : null;
+        }
+      } catch {
+        live = null;
+      }
+
+      let head: string | null = null;
+      if (token) {
+        head = await headCommit(token).catch(() => null);
+      }
+
+      return json(
+        {
+          live,
+          head,
+          // Unknown is its own answer: an older build with no stamp in it
+          // must not read as out of date.
+          current: live !== null && head !== null ? live === head : null,
+        },
+        200,
+      );
     }
 
     // --- rebuild on demand -------------------------------------------------
