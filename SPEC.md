@@ -67,11 +67,17 @@ Arkitecture's content is simply the projects.
 /writing/<slug>
 /about       the ethos, tools, contact
 /rss.xml  /sitemap.xml  /robots.txt
+
+/work        PRIVATE — the back of the house. See The Backend.
+/work/<tool>
 ```
 
 There is no `/contact` page — three links do not fill one, so contact lives at
 the end of About and in the footer. There is no `/shepherds` page either; it is
 one project among several, not a section.
+
+`/work` is the one part of the site that is not public, and the only part with
+a server behind it. Everything else above is a static file.
 
 ## Content Decisions
 
@@ -166,12 +172,94 @@ Three defects from the Astro build were fixed rather than carried across:
 - **overflow-x** was set on `body` alone, which does not stop the root element
   panning sideways. Now on both.
 
+## The Backend
+
+Built 8–9 October 2026. The public site is still a static export; this is a
+private set of tools that lives at `/work` and is served by the same Worker.
+
+**Everything is under `/work` for one reason.** A single Cloudflare Access
+application covers the path `work` as a **prefix**, so every page and every
+endpoint added under it inherits the gate without a new rule — no trip to the
+Zero Trust dashboard per endpoint, and no endpoint that is live before its
+policy is. That is why the content API is at `/work/api/content` rather than
+`/api/content`, and it is the constraint to respect when adding anything.
+
+The check is two lines, repeated on every protected route: a
+`cf-access-jwt-assertion` header, or a hostname that is not the apex (which is
+local development). Anything else falls through to the static assets, so a
+protected URL looks like a 404 rather than a locked door.
+
+### The tools
+
+`/work` itself is a list of ways in and nothing else — it used to be the Trello
+boards, which made the page opened every morning also the longest in the
+backend.
+
+| | What it is |
+|---|---|
+| `/work/boards` | Trello across the account, and the day job |
+| `/work/habits` | A year opens into months, a month into its own days |
+| `/work/reading` | A bookcase of four shelves; a book's notes can become a post |
+| `/work/curriculums` | What is being studied, and how far through it you are |
+| `/work/sketchpad` | Write and draw on one page, saved as one file |
+| `/work/writing` | Posts. Editing one commits it, and the commit publishes it |
+| `/work/projects` | The project pages behind `/projects` |
+| `/work/store` | What each design is, in your own words |
+
+Writing, Projects and Product copy edit files in this repository through the
+GitHub API, so an edit is a commit and the commit triggers the deploy — MDX for
+the first two, the single `content/store/copy.json` for the third. Habits,
+Reading and Curriculums are rows in D1 and change nothing on the public site.
+
+`lib/collections.ts` decides what is editable and currently lists a fourth,
+**Notes** (`notes/`), which has no page yet. The `/work` index carries only
+tools that exist, on the rule that a link to a page which is not built is a bug
+report.
+
+### Storage, and one opinion in the schema
+
+**D1**, database `master-roachi`, migrations in `migrations/`. Also KV for store
+orders and for votes.
+
+**Completion is a date, never a boolean** — habit ticks, reading dates,
+`lessons.done_on`. The reasoning is in `0003_curriculums.sql`: knowing a lesson
+is done is worth less than knowing when, and a boolean cannot be widened into a
+date later without losing every tick already recorded. Dates are
+`YYYY-MM-DD` in Africa/Johannesburg, fixed rather than read from the browser.
+
+Two columns carry decisions worth knowing about:
+
+- **`lessons.on_route`** (`0006`) — a course is not a list you finish, it is a
+  list you take a line through. Odin forks and plenty of its lessons are
+  optional, so the number wanted is "18 of the 41 I am actually doing". An
+  imported outline is on the route until something is taken off it.
+- **`lessons.detail`** (`0007`) — what a lesson actually teaches, in Markdown.
+  Nullable on a rule: a **transcribed** curriculum keeps its substance in the
+  resource, a **designed** one has nowhere else to keep it. So Godot, Drawing,
+  Aseprite and SA politics carry detail; Greek, Japanese and Odin do not.
+
+### Curriculums
+
+Eight, in `scripts/curriculums/`: Aseprite, Drawing, Godot, Greek, Japanese,
+Odin, Piano, South African politics. 708 lessons, 694 on the route.
+
+Each is a `.mjs` that **prints SQL and executes nothing**, with a `.md` beside
+it where the curriculum is designed rather than transcribed. Re-running one
+rebuilds it in place without losing its position — curriculum order is the
+route through all the routes — and deletes its lessons explicitly before its
+modules rather than relying on `ON DELETE CASCADE`, which does nothing wherever
+foreign keys are not enforced.
+
+**Not written down anywhere: how the printed SQL reaches D1.** See Open Items.
+
 ## Tech Stack
 
 **Next.js (App Router) + React, statically exported.** Superseded Astro when the
 brief changed to React.
 
-- Static export to `out/`. No server runtime.
+- Static export to `out/`, served by a Cloudflare Worker. The public site has no
+  server runtime; the Worker exists for the store, the vote endpoint and the
+  private backend at `/work`.
 - Content is MDX on disk, read at build time via `lib/content.ts`. No CMS.
 - The nav is the only client component — but that is **not** the same as
   shipping no JS. The App Router ships its own runtime regardless: seven chunks,
@@ -215,3 +303,15 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       `components/Sigil.tsx`, so it stays a one-file change
 - [ ] Attach the custom domain, then disable the workers.dev route so the site
       is not served from two hostnames
+- [ ] **Write down how a curriculum's SQL reaches D1.** The scripts print it
+      and execute nothing, deliberately — but no npm script, no line in
+      DEPLOY.md and no line in any of the curriculum documents says what to do
+      with the output. It is the one step of the whole system that exists only
+      in his head.
+- [ ] **The Odin backfill.** Five courses and the first NodeJS project are
+      finished and none of it is ticked, because the dates are not recoverable
+      — `odin-projects` stamps 2026-09-03 on twenty of its twenty-four folders,
+      the day it was reorganised. The statement is written out at the foot of
+      `scripts/curriculums/odin.mjs` and wants one date from him.
+- [ ] **README.md and DEPLOY.md are from 2 September** and describe neither the
+      Worker, D1, nor anything under `/work`.

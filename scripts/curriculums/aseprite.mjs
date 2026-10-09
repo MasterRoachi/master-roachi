@@ -25,16 +25,30 @@ const SOURCE = 'scripts/curriculums/aseprite.md';
 // syntax error. JSON needs no escaping and the prose stays editable.
 import detail from './aseprite-detail.json' with { type: 'json' };
 
+/** Every key the lessons below actually asked for, so strays can be found. */
+const asked = new Set();
+
 /** The detail for a lesson, or null where none is written. */
 function detailFor(name) {
+  asked.add(name);
   const text = detail[name];
   if (text === undefined) {
-    // Loud rather than silent: a lesson whose name was edited here and not in
+    // Loud rather than silent: a lesson renamed here and not in
     // the JSON would otherwise quietly lose its substance.
     console.error(`  no detail for: ${name}`);
     return null;
   }
   return text;
+}
+
+/* And the other way round, which nothing used to check.
+ *
+ * A rename leaves the old key behind, and because the build only ever looks
+ * keys UP, a stray sits there indefinitely saying nothing. Piano carried an
+ * empty "— placeholder" entry from drafting for exactly this reason, found by
+ * counting keys against lessons rather than by anything in the build. */
+function strays() {
+  return Object.keys(detail).filter((key) => !asked.has(key));
 }
 
 const stages = [
@@ -189,3 +203,5 @@ console.log(out.join('\n'));
 console.error(
   `modules: ${stages.length}  milestones: ${stages.reduce((n, s) => n + s.lessons.length, 0)}`,
 );
+
+for (const key of strays()) console.error(`  detail for no milestone: ${key}`);
