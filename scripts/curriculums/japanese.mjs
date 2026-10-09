@@ -16,6 +16,14 @@
 // So the placements below are derived from its rules rather than quoted from
 // it, and every one is a single number to move.
 //
+// NO DETAIL, DECIDED 2026-10-09 and not an omission. 0007_lesson_detail.sql
+// draws the line between a transcribed curriculum, whose substance is in the
+// resource, and a designed one, which has nowhere else to keep it — and it
+// uses this curriculum as its own example: "a Japanese session pointing at
+// JFZ1 pp. 68-88 does not need the grammar restated beside it". Godot,
+// Drawing, Aseprite and Piano carry detail because they are designed; this,
+// Greek and Odin do not.
+//
 // Prints SQL. Nothing is executed here — 400 inserts are not something to
 // fire blind at a live database.
 
@@ -204,7 +212,14 @@ const out = [
     `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())}\n` +
     `  where not exists (select 1 from curriculums where name = 'Japanese');`,
   `update curriculums set source = ${q(SOURCE)} where name = 'Japanese';`,
-  // Cascade takes the lessons with them.
+  // Lessons first, then modules. ON DELETE CASCADE covers this wherever foreign
+  // keys are enforced — D1 enforces them — and silently does nothing where they
+  // are not, orphaning every lesson instead of removing it so that a rebuild
+  // quietly adds a second full set nobody can see, because every read joins
+  // through modules. Written out rather than relied upon.
+  `delete from lessons where module_id in\n` +
+    `  (select id from modules where curriculum_id =\n` +
+    `     (select id from curriculums where name = 'Japanese'));`,
   `delete from modules where curriculum_id =\n` +
     `  (select id from curriculums where name = 'Japanese');`,
 ];

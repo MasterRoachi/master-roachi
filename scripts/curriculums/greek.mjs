@@ -17,6 +17,13 @@
 // hour of audio, a GBC unit is eight to twenty-five printed pages with drills.
 // So roughly three GBC units per five sessions rather than one each.
 //
+// NO DETAIL, DECIDED 2026-10-09 and not an omission. 0007_lesson_detail.sql
+// draws the line between a transcribed curriculum, whose substance is in the
+// resource, and a designed one, which has nowhere else to keep it. This is
+// transcribed: a session pointing at Pimsleur and the Basic Course does not
+// need the grammar restated beside it. Godot, Drawing, Aseprite and Piano
+// carry detail because they are designed; this, Japanese and Odin do not.
+//
 // Prints SQL. Nothing is executed here.
 
 const SOURCE =
@@ -182,7 +189,14 @@ const out = [
     `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())}\n` +
     `  where not exists (select 1 from curriculums where name = 'Greek');`,
   `update curriculums set source = ${q(SOURCE)} where name = 'Greek';`,
-  // Cascade takes the lessons with them.
+  // Lessons first, then modules. ON DELETE CASCADE covers this wherever foreign
+  // keys are enforced — D1 enforces them — and silently does nothing where they
+  // are not, orphaning every lesson instead of removing it so that a rebuild
+  // quietly adds a second full set nobody can see, because every read joins
+  // through modules. Written out rather than relied upon.
+  `delete from lessons where module_id in\n` +
+    `  (select id from modules where curriculum_id =\n` +
+    `     (select id from curriculums where name = 'Greek'));`,
   `delete from modules where curriculum_id =\n` +
     `  (select id from curriculums where name = 'Greek');`,
 ];

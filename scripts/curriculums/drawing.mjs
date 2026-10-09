@@ -15,9 +15,35 @@
 // anatomy comes after construction, because anatomy learned without
 // construction is a vocabulary with no grammar.
 //
+// EVERY MILESTONE CARRIES ITS SUBSTANCE. A count on its own is an instruction
+// and not a lesson: "50 ears" says how many and never says that an ear is a C
+// with a Y inside it, or that placement between brow line and nose base is what
+// actually decides whether one reads. The number is the method; the detail is
+// what you are meant to be looking at while you do it that many times.
+//
 // Prints SQL. Nothing is executed here.
 
 const SOURCE = 'scripts/curriculums/drawing.md';
+
+// The substance of each milestone, keyed by its name.
+//
+// In JSON rather than in this file for the same reason as the others: the prose
+// is Markdown full of apostrophes and quotation marks, and every one would need
+// escaping inside a JS template literal. JSON needs none and the prose stays
+// editable.
+import detail from './drawing-detail.json' with { type: 'json' };
+
+/** The detail for a milestone, or null where none is written. */
+function detailFor(name) {
+  const text = detail[name];
+  if (text === undefined) {
+    // Loud rather than silent: a milestone renamed here and not in the JSON
+    // would otherwise quietly lose its substance.
+    console.error(`  no detail for: ${name}`);
+    return null;
+  }
+  return text;
+}
 
 const stages = [
   {
@@ -140,7 +166,14 @@ const out = [
     `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())}\n` +
     `  where not exists (select 1 from curriculums where name = 'Drawing');`,
   `update curriculums set source = ${q(SOURCE)} where name = 'Drawing';`,
-  // Cascade takes the lessons with them.
+  // Lessons first, then modules. ON DELETE CASCADE covers this wherever foreign
+  // keys are enforced — D1 enforces them — and silently does nothing where they
+  // are not, orphaning every lesson instead of removing it so that a rebuild
+  // quietly adds a second full set nobody can see, because every read joins
+  // through modules. Written out rather than relied upon.
+  `delete from lessons where module_id in\n` +
+    `  (select id from modules where curriculum_id =\n` +
+    `     (select id from curriculums where name = 'Drawing'));`,
   `delete from modules where curriculum_id =\n` +
     `  (select id from curriculums where name = 'Drawing');`,
 ];
@@ -151,9 +184,11 @@ stages.forEach((stage, m) => {
       `  values ((select id from curriculums where name = 'Drawing'), ${q(stage.name)}, ${m + 1});`,
   );
   stage.lessons.forEach((lesson, l) => {
+    const text = detailFor(lesson);
     out.push(
-      `insert into lessons (module_id, name, position, on_route)\n` +
-        `  values ((select max(id) from modules), ${q(lesson)}, ${l + 1}, 1);`,
+      `insert into lessons (module_id, name, position, on_route, detail)\n` +
+        `  values ((select max(id) from modules), ${q(lesson)}, ${l + 1}, 1, ` +
+        `${text === null ? 'null' : q(text)});`,
     );
   });
 });

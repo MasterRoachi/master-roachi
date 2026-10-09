@@ -200,7 +200,14 @@ const out = [
     `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())}\n` +
     `  where not exists (select 1 from curriculums where name = 'Piano');`,
   `update curriculums set source = ${q(SOURCE)} where name = 'Piano';`,
-  // Cascade takes the lessons with them.
+  // Lessons first, then modules. ON DELETE CASCADE covers this wherever foreign
+  // keys are enforced — D1 enforces them — and silently does nothing where they
+  // are not, orphaning every lesson instead of removing it so that a rebuild
+  // quietly adds a second full set nobody can see, because every read joins
+  // through modules. Written out rather than relied upon.
+  `delete from lessons where module_id in\n` +
+    `  (select id from modules where curriculum_id =\n` +
+    `     (select id from curriculums where name = 'Piano'));`,
   `delete from modules where curriculum_id =\n` +
     `  (select id from curriculums where name = 'Piano');`,
 ];

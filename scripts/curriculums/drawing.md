@@ -42,6 +42,21 @@ So most entries below are counts. They are deliberately large and deliberately
 boring, and finishing one means finishing it — fifty blocked-in figures is not
 forty.
 
+## Every milestone carries its substance
+
+A count says how many and never says what to look at while you do it. "50 ears"
+is an instruction; it does not say that an ear is a C of the outer rim with a Y
+inside it, that the structure takes ten minutes to learn, or that placement
+between the brow line and the base of the nose is what actually decides whether
+one reads — so that a crudely drawn ear in the right place passes and a
+beautiful one in the wrong place looks like a mistake.
+
+So every one of the 64 milestones has a `detail` written with it: what the
+exercise is for, the specific thing it is training, the named failure to watch
+for, and which book on the shelf says it. In `drawing-detail.json` rather than
+in the script, because the prose is full of apostrophes and quotation marks
+that would each need escaping inside a template literal.
+
 ## What is thin, and worth knowing
 
 Two real gaps in the library, neither worth buying around yet:
