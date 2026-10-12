@@ -2,13 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  BUCKET_LABELS,
-  BUCKET_ORDER,
   CARDS_PER_LIST,
   STALE_DAYS,
   daysSince,
   soonestDue,
-  type BucketKey,
   type WorkBoard,
   type WorkCard,
   type WorkHubPayload,
@@ -39,8 +36,27 @@ type State =
   | { phase: 'error'; message: string }
   | { phase: 'ready'; data: WorkHubPayload };
 
-/** Where a card can go from here, in the order the day runs. */
-const MOVE_ORDER: BucketKey[] = ['week', 'today', 'doing', 'waiting'];
+/**
+ * Lists the page does not draw, whatever board they are on.
+ *
+ * Done and its synonyms are the past. Inbox is uncategorised capture and
+ * showing it turns the hub into a second inbox. Projects is Command's standing
+ * list of project NAMES — Shepherds, Cultus, Terrath, Kame, The Rig — which is
+ * reference rather than anything to do today.
+ *
+ * Matched on the whole name, so a list called "Done thinking" is not swept up
+ * with it.
+ */
+const HIDDEN_LISTS = /^(inbox|done|completed|complete|archive|archived|projects)$/i;
+
+/**
+ * The list that means finished, whatever a board calls it.
+ *
+ * Its own button rather than one option among many, because finishing is the
+ * thing done most and the thing worth one click. Command calls it Done;
+ * North Star calls it Completed.
+ */
+const FINISHED_LIST = /^(done|completed|complete)$/i;
 
 function Card({
   card,
@@ -56,18 +72,21 @@ function Card({
   const idle = daysSince(card.lastActivity);
   const overdue = card.due !== null && Date.parse(card.due) < Date.now() ? card.due : null;
 
-  /* Where this card can be sent: the board's own lists, in the order the day
-   * runs, plus Done. Done is not a bucket — it is the past and the hub does
-   * not show it — but finishing something is just a move into it, so it is the
-   * one non-bucket list the page needs to know the id of. */
-  const targets = MOVE_ORDER.map((key) => {
-    const list = board.lists.find((one) => one.bucket === key);
-    return list && list.bucket !== card.bucket
-      ? { id: list.id, label: BUCKET_LABELS[key] }
-      : null;
-  }).filter(Boolean) as { id: string; label: string }[];
-
-  const done = board.lists.find((one) => /^done$/i.test(one.name));
+  /* Where this card can go: the board's OWN lists, by name.
+   *
+   * Built from the hub's four bucket names first, which gave North Star one
+   * target and no way to finish anything — its lists are Continuing, To Plan,
+   * Next Sprint, Review / Approval and so on, and its finished list is called
+   * Completed. A board's lists are the board's own language, and a move
+   * control that speaks only four words cannot work a board that uses nine.
+   *
+   * Buttons where there are few enough to read at a glance, a select where
+   * there are not: nine buttons under every card is not a control, it is a
+   * wall. */
+  const elsewhere = board.lists.filter((one) => one.name !== card.list);
+  const finished = elsewhere.find((one) => FINISHED_LIST.test(one.name.trim()));
+  const targets = elsewhere.filter((one) => one !== finished);
+  const asButtons = targets.length <= 4;
 
   return (
     <li className={`${styles.card} ${busy ? styles.cardBusy : ''}`}>
@@ -88,26 +107,43 @@ function Card({
 
       {/* The morning shuffle, without opening Trello. */}
       <p className={styles.moves}>
-        {targets.map((target) => (
-          <button
-            key={target.id}
-            type="button"
+        {asButtons ? (
+          targets.map((target) => (
+            <button
+              key={target.id}
+              type="button"
+              disabled={busy}
+              onClick={() => onMove(card, target.id)}
+              title={`Move to ${target.name}`}
+            >
+              {target.name}
+            </button>
+          ))
+        ) : (
+          <select
+            className={styles.moveTo}
+            value=""
             disabled={busy}
-            onClick={() => onMove(card, target.id)}
-            title={`Move to ${target.label}`}
+            aria-label={`Move ${card.name}`}
+            onChange={(event) => event.target.value && onMove(card, event.target.value)}
           >
-            {target.label}
-          </button>
-        ))}
-        {done && (
+            <option value="">move to…</option>
+            {targets.map((target) => (
+              <option key={target.id} value={target.id}>
+                {target.name}
+              </option>
+            ))}
+          </select>
+        )}
+        {finished && (
           <button
             type="button"
             className={styles.finish}
             disabled={busy}
-            onClick={() => onMove(card, done.id)}
-            title="Finish it"
+            onClick={() => onMove(card, finished.id)}
+            title={`Move to ${finished.name}`}
           >
-            Done
+            {finished.name}
           </button>
         )}
       </p>
@@ -259,17 +295,27 @@ export default function WorkHub() {
 
   const { data } = state;
 
-  /* The active board's cards, grouped by the list they are in.
+  /* The active board's cards, grouped by ITS OWN lists, in its own order.
    *
-   * By bucket rather than by raw list name, because two boards call the same
-   * state different things — Shepherds files under Current Focus and In
-   * Progress where Command files under Today and Doing — and the hub's whole
-   * job is to read them as one thing. */
+   * Not by the hub's four bucket names, which was the first attempt and was
+   * wrong in a way worth recording: North Star runs nine lists — Continuing,
+   * Blocked / Waiting, To Plan, Strategic Backlog, Next Sprint, Current
+   * 2-Week Sprint, In Progress, Review / Approval, Completed — and exactly
+   * one of them matches a bucket pattern. Grouping by bucket showed two cards
+   * and silently dropped the rest of the board.
+   *
+   * The buckets still earn their keep: they decide what a card can be MOVED
+   * to, and the morning check-in reads them. They are just the wrong thing to
+   * lay a board out with, because a board's lists are the board's own
+   * language. */
   const groups = board
-    ? BUCKET_ORDER.map((key) => ({
-        heading: BUCKET_LABELS[key],
-        cards: board.cards.filter((card) => card.bucket === key),
-      })).filter((group) => group.cards.length > 0)
+    ? board.lists
+        .filter((list) => !HIDDEN_LISTS.test(list.name.trim()))
+        .map((list) => ({
+          heading: list.name,
+          cards: board.cards.filter((card) => card.list === list.name),
+        }))
+        .filter((group) => group.cards.length > 0)
     : [];
 
   return (
