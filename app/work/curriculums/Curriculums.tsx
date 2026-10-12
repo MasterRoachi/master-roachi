@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  overallNext,
+  overallNextN,
   progressOf,
   type Curriculum,
   type Lesson,
   type Module,
 } from '@/lib/curriculum';
-import { cardFor, stageCardFor } from '@/lib/curriculum-card';
+import { cardFor, scatterFor, stageCardFor } from '@/lib/curriculum-card';
 import styles from './curriculums.module.css';
 
 // A deck of cards, one per curriculum.
@@ -151,24 +151,32 @@ export default function Curriculums() {
     return [...curriculums].sort((a, b) => rank(a) - rank(b));
   }, [curriculums]);
 
-  const upNext = useMemo(() => overallNext(curriculums), [curriculums]);
+  /* The next ten things to do, as their own row above the deck.
+   *
+   * Strictly in route order, which is what curriculum order is for — so with
+   * nothing ticked on the first curriculum all ten come from it. That is a
+   * path rather than a rota, and it is the same rule the single Up next
+   * followed before. */
+  const upNext = useMemo(() => overallNextN(curriculums, 10), [curriculums]);
 
-  /** Every lesson, flattened, for the search. 708 of them and no place to look. */
+  /* Searching ONE curriculum, not all of them.
+   *
+   * Across everything it returned a list where the useful column was which
+   * course a hit belonged to, and the thing being looked for is almost always
+   * inside the course already open — Japanese alone is 118 lessons in four
+   * stages, which is the unscannable part. So the box belongs to the open
+   * card and says so. */
   const hits = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (term.length < 2) return [];
-    const found: { curriculum: Curriculum; module: Module; lesson: Lesson }[] = [];
-    for (const one of curriculums) {
-      for (const module of one.modules) {
-        for (const each of module.lessons) {
-          if (each.name.toLowerCase().includes(term)) {
-            found.push({ curriculum: one, module, lesson: each });
-          }
-        }
+    if (!current || term.length < 2) return [];
+    const found: { module: Module; lesson: Lesson }[] = [];
+    for (const module of current.modules) {
+      for (const each of module.lessons) {
+        if (each.name.toLowerCase().includes(term)) found.push({ module, lesson: each });
       }
     }
     return found.slice(0, 40);
-  }, [curriculums, search]);
+  }, [current, search]);
 
   function openTo(curriculumId: number, moduleId: number, lessonId?: number) {
     setOpenCurriculum(curriculumId);
@@ -200,50 +208,57 @@ export default function Curriculums() {
     <div className={styles.page}>
       {error && <p className={styles.warn}>{error}</p>}
 
-      {/* The route through all the routes: one next thing across everything,
-          in the order the curriculums sit in. The only number on the page
-          that is not a percentage in a ring. */}
-      {upNext && (
-        <button
-          type="button"
-          className={styles.upNext}
-          onClick={() => openTo(upNext.curriculum.id, upNext.module.id, upNext.lesson.id)}
-        >
-          <span className={styles.upNextLabel}>Up next</span>
-          <span className={styles.upNextName}>{upNext.lesson.name}</span>
-          <span className={styles.upNextIn}>
-            {upNext.curriculum.name} › {upNext.module.name}
-          </span>
-        </button>
+      {/* The next ten things to do, as a row of cards above the deck.
+          In route order, so these run down one curriculum until it is finished
+          and only then start the next — which is what the ordering is for. */}
+      {upNext.length > 0 && (
+        <div className={styles.queue}>
+          <p className={styles.queueHead}>Up next</p>
+          <ol className={styles.queueRow}>
+            {upNext.map((step, at) => {
+              const look = cardFor(step.curriculum.name);
+              return (
+                <li key={step.lesson.id}>
+                  <div
+                    className={styles.queueCard}
+                    style={
+                      {
+                        '--card-bg': look.background,
+                        '--card-bg2': look.background2,
+                        '--card-accent': look.accent,
+                      } as React.CSSProperties
+                    }
+                  >
+                    <button
+                      type="button"
+                      className={styles.queueTick}
+                      aria-label={`Mark ${step.lesson.name} done`}
+                      title="Mark it done"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        void act({
+                          action: 'toggle-lesson',
+                          id: step.lesson.id,
+                          ...(tickDay && tickDay !== today ? { day: tickDay } : {}),
+                        });
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className={styles.queueFace}
+                      onClick={() => openTo(step.curriculum.id, step.module.id, step.lesson.id)}
+                    >
+                      <span className={styles.queueAt}>{at + 1}</span>
+                      <span className={styles.queueName}>{step.lesson.name}</span>
+                      <span className={styles.queueIn}>{step.curriculum.name}</span>
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
       )}
-
-      <div className={styles.searchRow}>
-        <input
-          type="search"
-          className={styles.search}
-          value={search}
-          placeholder="Find a lesson"
-          aria-label="Find a lesson"
-          onChange={(event) => setSearch(event.target.value)}
-        />
-        {hits.length > 0 && (
-          <ul className={styles.hits}>
-            {hits.map((hit) => (
-              <li key={hit.lesson.id}>
-                <button
-                  type="button"
-                  onClick={() => openTo(hit.curriculum.id, hit.module.id, hit.lesson.id)}
-                >
-                  <span>{hit.lesson.name}</span>
-                  <span className={styles.hitIn}>
-                    {hit.curriculum.name} › {hit.module.name}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
 
       {/* --- the deck ------------------------------------------------------ */}
       <div className={styles.deck}>
@@ -252,15 +267,31 @@ export default function Curriculums() {
           const progress = progressOf(one);
           const isOpen = one.id === openCurriculum;
 
+          const lie = scatterFor(one.name, at);
+
           return (
             <div
               key={one.id}
               className={`${styles.cardSlot} ${isOpen ? styles.cardSlotOpen : ''}`}
-              // Each card sits slightly right and down of the one in front, so
-              // the stack reads as a deck. Hovering or focusing lifts a card
-              // clear of the ones over it — without that, only the front
-              // card's face is reachable.
-              style={{ '--at': at } as React.CSSProperties}
+              /* A strewn pile, not a cascade.
+               *
+               * The z-index is the fix for the deck reading backwards: with
+               * none set, later elements paint over earlier ones, so the LAST
+               * curriculum sat on top of the first — the back of the deck
+               * facing out. Descending depth puts the front card in front.
+               *
+               * The scatter is derived from the name, so the pile has the same
+               * shape on every visit and a card does not move out from under
+               * the cursor on reload. */
+              style={
+                {
+                  '--at': at,
+                  '--rotate': `${lie.rotate}deg`,
+                  '--dx': `${lie.dx}rem`,
+                  '--dy': `${lie.dy}rem`,
+                  zIndex: deck.length - at,
+                } as React.CSSProperties
+              }
             >
               <div
                 className={`${styles.card} ${one.status !== 'active' ? styles.shelved : ''}`}
@@ -338,9 +369,21 @@ export default function Curriculums() {
           );
         })}
 
-        {/* A blank card at the back of the deck, so adding looks like the
-            thing it adds. */}
-        <div className={styles.cardSlot} style={{ '--at': deck.length } as React.CSSProperties}>
+        {/* A blank card at the back of the pile, so adding looks like the
+            thing it adds. Lowest z-index of all: it is the one card that is
+            never being read. */}
+        <div
+          className={`${styles.cardSlot} ${styles.addSlot}`}
+          style={
+            {
+              '--at': deck.length,
+              '--rotate': '0deg',
+              '--dx': '0rem',
+              '--dy': '0rem',
+              zIndex: 0,
+            } as React.CSSProperties
+          }
+        >
           {adding === 'curriculum' ? (
             <form
               className={`${styles.card} ${styles.addCard}`}
@@ -379,6 +422,37 @@ export default function Curriculums() {
           )}
         </div>
       </div>
+
+      {/* Searching inside the open curriculum. Scoped, because the thing
+          being looked for is almost always in the course already open, and
+          Japanese alone is 118 lessons across four stages. */}
+      {current && (
+        <div className={styles.searchRow}>
+          <input
+            type="search"
+            className={styles.search}
+            value={search}
+            placeholder={`Find a lesson in ${current.name}`}
+            aria-label={`Find a lesson in ${current.name}`}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          {hits.length > 0 && (
+            <ul className={styles.hits}>
+              {hits.map((hit) => (
+                <li key={hit.lesson.id}>
+                  <button
+                    type="button"
+                    onClick={() => openTo(current.id, hit.module.id, hit.lesson.id)}
+                  >
+                    <span>{hit.lesson.name}</span>
+                    <span className={styles.hitIn}>{hit.module.name}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* --- the stages, fanned out from the card that was clicked --------- */}
       {current && (

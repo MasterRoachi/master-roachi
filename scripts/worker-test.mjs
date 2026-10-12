@@ -3690,6 +3690,63 @@ globalThis.fetch = preGh;
   const spread = ['Japanese', 'Piano', 'Greek', 'Godot'].map((n) => cards.cardFor(n).background.split(' ')[0]);
   check('lightness does not vary by name', new Set(spread).size === 1, JSON.stringify(spread));
 
+  /* The pile's shape, which has to be learnable and clickable.
+   *
+   * Placed by angle and radius rather than by two independent offsets: with
+   * two, two of eight cards landed within half a centimetre of dead centre,
+   * which on a 25rem card is no visible edge and nothing to click. */
+  const names = [
+    'Japanese',
+    'Piano',
+    'Greek',
+    'The Odin Project',
+    'Godot',
+    'Aseprite and pixel art',
+    'Drawing',
+    'South African politics',
+  ];
+  const lies = names.map((name, at) => cards.scatterFor(name, at));
+
+  check(
+    'the front card is centred and untilted',
+    lies[0].dx === 0 && lies[0].dy === 0 && lies[0].rotate === 0,
+    JSON.stringify(lies[0]),
+  );
+  check(
+    'every card behind it has an edge to click',
+    lies.slice(1).every((lie) => Math.hypot(lie.dx, lie.dy) >= 3),
+    JSON.stringify(lies.slice(1).map((lie) => +Math.hypot(lie.dx, lie.dy).toFixed(1))),
+  );
+  check(
+    'and none of them walks off the page',
+    lies.every((lie) => Math.abs(lie.dx) <= 9 && Math.abs(lie.dy) <= 7),
+    JSON.stringify(lies.map((lie) => [lie.dx, lie.dy])),
+  );
+  check(
+    'tilts stay within a hand-strewn range',
+    lies.every((lie) => Math.abs(lie.rotate) <= 9),
+    JSON.stringify(lies.map((lie) => lie.rotate)),
+  );
+  check(
+    'the pile is the same shape on every visit',
+    JSON.stringify(cards.scatterFor('Piano', 3)) === JSON.stringify(cards.scatterFor('Piano', 3)),
+    '',
+  );
+  check(
+    'consecutive cards do not peek in the same direction',
+    (() => {
+      for (let at = 2; at < lies.length; at += 1) {
+        const a = Math.atan2(lies[at - 1].dy, lies[at - 1].dx);
+        const b = Math.atan2(lies[at].dy, lies[at].dx);
+        let gap = Math.abs(a - b);
+        if (gap > Math.PI) gap = 2 * Math.PI - gap;
+        if (gap < 0.5) return false;
+      }
+      return true;
+    })(),
+    '',
+  );
+
   const stage0 = cards.stageCardFor('Piano', 0);
   const stage5 = cards.stageCardFor('Piano', 5);
   check('a stage keeps its curriculum’s hue', stage0.hue === cards.cardFor('Piano').hue, '');

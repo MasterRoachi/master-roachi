@@ -138,6 +138,42 @@ export function overallNext(curriculums: Curriculum[]):
 }
 
 /** Whether every lesson is done — distinct from a curriculum marked done by hand. */
+/**
+ * The next several things to do, across everything.
+ *
+ * Strictly in route order, which is the same rule `overallNext` follows and
+ * the reason curriculum order is a decision at all: the curriculums are walked
+ * in their own order, so the next ten steps are the next ten gaps on the first
+ * unfinished route, and only when that route runs out does the next one start.
+ *
+ * The consequence is worth knowing rather than hiding: with nothing ticked on
+ * the first curriculum, all ten come from it. That is what "the route through
+ * all the routes" means — it is a path, not a rota.
+ */
+export function overallNextN(
+  curriculums: Curriculum[],
+  limit: number,
+): { curriculum: Curriculum; module: Module; lesson: Lesson }[] {
+  const out: { curriculum: Curriculum; module: Module; lesson: Lesson }[] = [];
+
+  for (const curriculum of curriculums) {
+    // Paused means not now, so a paused course offers nothing — the same rule
+    // overallNext applies, and pausing one would be pointless otherwise.
+    if (curriculum.status !== 'active') continue;
+    for (const module of curriculum.modules) {
+      for (const lesson of module.lessons) {
+        if (lesson.done_on !== null) continue;
+        // A lesson taken off the route is work already decided against.
+        if (lesson.on_route !== 1) continue;
+        out.push({ curriculum, module, lesson });
+        if (out.length >= limit) return out;
+      }
+    }
+  }
+
+  return out;
+}
+
 export function isComplete(curriculum: Curriculum): boolean {
   const { done, total } = progressOf(curriculum);
   return total > 0 && done === total;

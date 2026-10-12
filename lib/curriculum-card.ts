@@ -61,6 +61,57 @@ export function cardFor(name: string): CardLook {
   };
 }
 
+export interface Scatter {
+  /** Degrees, for the card's own tilt. */
+  rotate: number;
+  /** rem, left and up are negative. */
+  dx: number;
+  dy: number;
+}
+
+/**
+ * Where a card lies in a roughly strewn pile.
+ *
+ * Derived from the name and the depth rather than randomised, for the same
+ * reason the colour is: a pile that re-strews itself on every reload is a pile
+ * you cannot learn the shape of, and the card you were about to click moves
+ * out from under the cursor.
+ *
+ * The FRONT card is dead centre and untilted — it is the one being read, and
+ * a tilted card with a name on it reads worse than a straight one. Everything
+ * behind it scatters further the deeper it sits, which is what makes the lower
+ * cards peek out far enough to be clicked at all.
+ */
+export function scatterFor(name: string, at: number): Scatter {
+  if (at === 0) return { rotate: 0, dx: 0, dy: 0 };
+
+  const h = hash(`${name.trim().toLowerCase()}:${at}`);
+
+  /* Placed by ANGLE and RADIUS rather than by two independent offsets.
+   *
+   * Two independent random offsets put two of eight cards within half a
+   * centimetre of dead centre, which on a 25rem card means no visible edge and
+   * nothing to click. A minimum radius guarantees every card behind the front
+   * one peeks out somewhere, and stepping the angle by the golden angle keeps
+   * consecutive cards from peeking in the same direction — the hash only
+   * jitters it, so the pile looks strewn rather than laid out.
+   */
+  const angle = ((at * 137.5 + (h % 50)) * Math.PI) / 180;
+  // Grows with depth, with a floor so even the second card has an edge, and a
+  // ceiling so a long deck does not walk off the side of the page.
+  const radius = 3.6 + Math.min(1, at / 6) * 4.8;
+
+  const round = (value: number) => Math.round(value * 10) / 10;
+
+  return {
+    rotate: round(((h >>> 16) % 180) / 10 - 9),
+    dx: round(Math.cos(angle) * radius),
+    // Flatter vertically: the cards are tall, so the same radius sideways
+    // shows an edge and downwards mostly shows nothing.
+    dy: round(Math.sin(angle) * radius * 0.7),
+  };
+}
+
 /**
  * A stage's card, a step lighter than its curriculum's.
  *
