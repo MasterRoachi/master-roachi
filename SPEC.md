@@ -210,6 +210,64 @@ Writing, Projects and Product copy edit files in this repository through the
 GitHub API, so an edit is a commit and the commit triggers the deploy — MDX for
 the first two, the single `content/store/copy.json` for the third.
 
+### The backend is its own app shell
+
+Nothing under `/work` wears the site. The nav and the footer hide themselves on
+those paths — a two-line guard in each, rather than lifting every public page
+into a route group to change the chrome on nine of them — and `app/work/layout.tsx`
+supplies one centred row of links instead. Every page lost its "Private"
+eyebrow, its own title and its back link: each one opened by telling you where
+you were, which the header now does once, above a link to a home page that is
+one of those links anyway.
+
+**The shell is exactly `100dvh` and the page never scrolls.** `main` is
+unstyled and `body` is a flex column with `min-height: 100dvh`, so a wrapper of
+exactly the viewport fills it and leaves nothing to scroll. The content wrapper
+scrolls instead — one rule rather than nine stylesheets — and that is the
+honest compromise: an editor with a textarea, a frontmatter form and a preview
+column cannot fit a laptop screen, but it can be stopped from moving the page
+under the cursor. Curriculums and Boards are sized to need neither.
+
+`min-height: 0` on the flex children is what makes all of it work, and is the
+thing that is easy to leave out and impossible to debug by looking: without it
+a flex child grows to fit its content and pushes the shell past the viewport,
+whatever the parent's height says.
+
+### Boards
+
+A pill per board, one open at a time. Every board rendered at once, stacked,
+which made this the longest page in the backend and put the board being read
+somewhere in the middle of four others.
+
+**Cards are grouped by the board's own lists, not by the hub's buckets.** That
+was the first attempt and it was wrong in a way worth recording: North Star
+runs nine lists — Continuing, Blocked / Waiting, To Plan, Strategic Backlog,
+Next Sprint, Current 2-Week Sprint, In Progress, Review / Approval, Completed
+— and exactly one matches a bucket pattern, so grouping by bucket showed two
+cards and silently dropped the rest of the board. The buckets still decide what
+the morning check-in reads; they are just the wrong thing to lay a board out
+with, because a board's lists are the board's own language.
+
+A card is drawn as a chip about three words wide — the glue is dropped rather
+than the title truncated, since truncation spends the width on the words
+carrying least — and clicking one opens it dead centre with the page dimmed.
+Boards are ordered by their soonest due card; one with nothing due sorts last,
+because no deadline is not the same as an imminent one.
+
+`Waiting` is a bucket: blocked on somebody else is the state that goes quiet
+and is forgotten. `Inbox`, `Done` and Command's `Projects` list are not — Inbox
+is uncategorised capture and showing it makes the hub a second inbox, Done is
+the past, and Projects holds twelve cards that are the NAMES of his projects.
+
+**Moving a card is the only thing this site writes to Trello.** The page is
+opened in the morning to decide what today is, and deciding meant going to
+Trello to drag three cards and coming back. Card and list ids are checked
+against 24 hex characters before they reach a URL: a Trello token is a bearer
+credential for an entire account, so an id straight off the wire is how a move
+becomes somebody else's request. Nothing else is written — no creating, no
+labels, no comments, no archiving — because Trello is still where the work is
+written down.
+
 ### Editing frontmatter without losing it
 
 `CollectionEditor` was one textarea holding a whole file, and the comment
@@ -472,6 +530,29 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
+- [ ] **Expand the curricula.** Asked for twice (12 and 13 October), after the
+      backend rework. Which of the eight and how far is his call; it should go
+      through `scripts/curriculums/<name>.mjs` and `-detail.json` so a rebuild
+      keeps it.
+- [ ] **`PRINTFUL_TOKEN` is not set as a Worker secret**, so the store's Sync
+      button reports "not switched on". The feature is built and unreachable
+      until `npx wrangler secret put PRINTFUL_TOKEN` is run.
+- [ ] **Five curriculums have no sources.** Japanese, Greek and Odin carry real
+      ones; Piano, Godot, Aseprite, Drawing and SA politics were carrying the
+      path of the document that DESIGNED them, which is not something he
+      studies from, so those rows were deleted rather than replaced with
+      invented book titles.
+- [ ] **`npm run lint` is broken**, and was before any of this work: Next 16
+      removed `next lint`, and the repo has no eslint config. Fixing it means
+      choosing one.
+- [ ] **Odin reads 112 of 151 now the route is gone.** Its fourteen formerly
+      off-route lessons are the whole Getting Hired course, and they count.
+      Deleting that course is the only way to stop them, and that is a decision
+      rather than a bug.
+- [ ] **Which board holds the unfamiliar Trello cards.** Not North Star and not
+      Sales, by his own check. The folded "can see N boards" line on
+      `/work/boards` names every board the token reaches, including the ones no
+      panel is drawn for.
 - [ ] **Reading holds one book.** *The Odyssey*, marked reading since
       2026-10-08, and nothing else — the shelves are a bookcase with one book
       on it. `~/Media/Books` is 3,586 files filed by author, which is a
