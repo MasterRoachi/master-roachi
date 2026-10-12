@@ -1,0 +1,43 @@
+/* The backend as an app shell: exactly the viewport, and never scrolling.
+   Tokens from app/globals.css.
+
+   "There is never a scroll bar or available scroll" — so the PAGE is pinned to
+   the viewport and anything that genuinely holds more than fits scrolls inside
+   its own pane instead. A text editor cannot be made to fit a laptop screen by
+   wishing; what it can do is never move the page under the cursor. */
+
+.shell {
+  /* dvh, not vh: on a phone the toolbar comes and goes and vh does not know. */
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.content {
+  flex: 1;
+  /* min-height: 0 is what lets a flex child be SMALLER than its content, which
+     is the whole mechanism — without it the child grows to fit and pushes the
+     shell past the viewport. */
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Every work page wraps itself in the site's .shell content-width class, so
+   the constraint is handed down there rather than by editing nine pages. */
+.content :global(.shell) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* THE CONTENT-WIDTH WRAPPER SCROLLS, NOT THE PAGE. One rule rather than a
+     change to nine stylesheets, and it is the honest compromise: a text editor
+     cannot be made to fit a laptop screen, but it can be stopped from moving
+     the page under the cursor. Pages that genuinely fit — the curriculum deck —
+     are sized to fit and never show this scrollbar at all. */
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Room at the foot so a pane's last line is not flush against the edge. */
+  padding-bottom: 1rem;
+}

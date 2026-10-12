@@ -1,9 +1,17 @@
 /* A deck of curriculums, and three layers of drill-down.
    Tokens from app/globals.css; gold is this page's own accent. */
 
+/* Sized to FIT, so this page never shows even the pane's scrollbar.
+   A column: the queue takes what it needs, the deck takes the rest, and the
+   cards are sized from that rather than from a fixed 35rem that overflowed
+   anything shorter than a desktop. */
 .page {
-  margin: 1.5rem 0 4rem;
   --gold: oklch(80% 0.13 85);
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.5rem;
 }
 
 .status,
@@ -22,9 +30,11 @@
    however many active curriculums there are, so there is never a scrollbar
    and every card is the same size. */
 .queue {
+  flex: none;
   /* A clear break before the deck: the row above is today's work and the deck
-     below is the whole of it, and they were reading as one block. */
-  margin: 0 0 5rem;
+     below is the whole of it, and they were reading as one block. Scaled with
+     the viewport, so a short screen gives up the gap before the cards. */
+  margin: 0 0 clamp(1.25rem, 5vh, 5rem);
 }
 
 .queueHead {
@@ -51,7 +61,7 @@
   display: grid;
   place-items: center;
   height: 100%;
-  min-height: 8rem;
+  min-height: clamp(5.5rem, 13vh, 8rem);
   border-radius: 10px;
   border: 1px solid oklch(32% 0 0);
   /* THE GOLD IS THE CARD and the black is a sticker on top of it, which is
@@ -338,6 +348,8 @@
    backwards: with none set, later elements paint over earlier ones and the
    LAST card sat on top of the first. */
 .deckWrap {
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -348,18 +360,26 @@
 
 .deck {
   position: relative;
-  width: 25rem;
-  height: 36rem;
+  /* Takes the height it is given and lets the width follow, so the cards keep
+     their 5:7 and the deck shrinks on a short screen rather than pushing the
+     page past the viewport. */
+  height: 100%;
+  max-height: 36rem;
+  aspect-ratio: 5 / 7;
+  width: auto;
   flex: none;
+  /* The container the cards' own type is measured against. */
+  container-type: size;
 }
 
 .cardSlot {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 25rem;
-  /* 5:7, which is what makes a pile of them read as cards rather than tiles. */
-  height: 35rem;
+  /* The deck's own box, which is already 5:7 — the cards follow the deck
+     rather than carrying a fixed size of their own. */
+  width: 100%;
+  height: 100%;
   transform: translate(calc(-50% + var(--dx, 0rem)), calc(-50% + var(--dy, 0rem)))
     rotate(var(--rotate, 0deg));
   transition: transform 220ms ease-out;
@@ -386,6 +406,8 @@
 
 .addSlot {
   pointer-events: auto;
+  width: 100%;
+  height: 100%;
   /* Behind the whole deck and slightly out, so it is reachable without being
      in the way of the card being read. */
   transform: translate(calc(-50% + 1.4rem), calc(-50% + 1rem)) rotate(2deg);
@@ -413,7 +435,7 @@
   display: grid;
   place-content: center;
   justify-items: center;
-  gap: 1.5rem;
+  gap: clamp(0.5rem, 5cqmin, 1.5rem);
   width: 100%;
   height: 100%;
   padding: 1rem;
@@ -426,10 +448,12 @@
 }
 
 .cardName {
-  font-size: 1.625rem;
+  /* With the card, so a deck shrunk to fit a laptop does not carry
+     desktop-sized type. */
+  font-size: clamp(1rem, 10cqmin, 1.75rem);
   line-height: 1.2;
   text-wrap: balance;
-  max-width: 17rem;
+  max-width: 80%;
 }
 
 .renameOnCard {
@@ -468,8 +492,8 @@
 }
 
 .ring {
-  width: 8.5rem;
-  height: 8.5rem;
+  width: clamp(4rem, 42cqmin, 8.5rem);
+  height: clamp(4rem, 42cqmin, 8.5rem);
 }
 
 .ringTrack {
@@ -568,23 +592,8 @@
 
 @media (max-width: 760px) {
   .deck {
-    width: 100%;
-    max-width: 20rem;
-    height: 29rem;
-  }
-
-  .cardSlot {
-    width: 100%;
-    height: 28rem;
-  }
-
-  .cardName {
-    font-size: 1.25rem;
-  }
-
-  .ring {
-    width: 6.5rem;
-    height: 6.5rem;
+    max-height: none;
+    max-width: 100%;
   }
 }
 
