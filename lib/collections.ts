@@ -125,6 +125,25 @@ cover:
     binary: true,
   },
   {
+    key: 'curriculum-detail',
+    label: 'Lesson detail',
+    // Written by the curriculums dashboard, not by a file editor.
+    //
+    // A lesson's `detail` lives in D1, which is what the page reads — but for
+    // a DESIGNED curriculum the repo owns it: scripts/curriculums/
+    // <name>-detail.json is the source of truth and apply.mjs lets the repo
+    // win, so anything typed at the dashboard was overwritten by the next
+    // rebuild. The fix is to write both, and this is what lets the Worker
+    // write the second one through the same guard as everything else rather
+    // than reaching around it.
+    //
+    // Transcribed curriculums — Greek, Japanese, Odin — have no detail file,
+    // and need none: apply.mjs already preserves dashboard-written detail
+    // wherever the script supplies none.
+    dir: 'scripts/curriculums',
+    exts: ['.json'],
+  },
+  {
     key: 'writing-art',
     label: 'Post images',
     // FLAT, where the covers already on disk are nested — /writing/bioshock/

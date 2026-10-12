@@ -29,12 +29,28 @@ export interface Module {
   lessons: Lesson[];
 }
 
+/**
+ * Where a curriculum is studied from.
+ *
+ * A list, because a real one is studied from several things at once — Greek
+ * runs Pimsleur and the Basic Course in tandem. `curriculums.source` is a
+ * different fact and still there: it records which document DESIGNED the
+ * curriculum, which the build scripts read. See migration 0008.
+ */
+export interface Source {
+  id: number;
+  title: string;
+  url: string | null;
+  note: string | null;
+}
+
 export interface Curriculum {
   id: number;
   name: string;
   source: string | null;
   status: 'active' | 'paused' | 'done';
   modules: Module[];
+  sources?: Source[];
 }
 
 export interface Progress {

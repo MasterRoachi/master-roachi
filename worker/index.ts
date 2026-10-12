@@ -1250,9 +1250,9 @@ export default {
 
       try {
         if (request.method === 'GET') {
-          // Three flat reads assembled here, rather than a join returning one
+          // Four flat reads assembled here, rather than a join returning one
           // row per lesson with its curriculum's name repeated on every one.
-          const [curriculums, modules, lessons] = await Promise.all([
+          const [curriculums, modules, lessons, sources] = await Promise.all([
             db
               .prepare(
                 `select id, name, source, status, position from curriculums
@@ -1278,12 +1278,32 @@ export default {
               on_route: number;
               detail: string | null;
             }>(),
+            db
+              .prepare(
+                `select id, curriculum_id, title, url, note, position from sources
+                 order by position, id`,
+              )
+              .all<{
+              id: number;
+              curriculum_id: number;
+              title: string;
+              url: string | null;
+              note: string | null;
+            }>(),
           ]);
 
           const lessonsByModule = new Map<number, unknown[]>();
           for (const lesson of lessons.results) {
             if (!lessonsByModule.has(lesson.module_id)) lessonsByModule.set(lesson.module_id, []);
             lessonsByModule.get(lesson.module_id)!.push(lesson);
+          }
+
+          const sourcesByCurriculum = new Map<number, unknown[]>();
+          for (const source of sources.results) {
+            if (!sourcesByCurriculum.has(source.curriculum_id)) {
+              sourcesByCurriculum.set(source.curriculum_id, []);
+            }
+            sourcesByCurriculum.get(source.curriculum_id)!.push(source);
           }
 
           const modulesByCurriculum = new Map<number, unknown[]>();
@@ -1303,6 +1323,7 @@ export default {
               curriculums: curriculums.results.map((c) => ({
                 ...c,
                 modules: modulesByCurriculum.get(Number(c.id)) ?? [],
+                sources: sourcesByCurriculum.get(Number(c.id)) ?? [],
               })),
             },
             200,
@@ -1504,19 +1525,132 @@ export default {
             return json({ done: next !== null, day: next }, 200);
           }
 
+          /* Sources: what a curriculum is actually studied from.
+           *
+           * A list rather than the one `curriculums.source` line, because a
+           * real curriculum is studied from several things at once — Greek
+           * runs Pimsleur and the Basic Course in tandem. See migration 0008,
+           * which also explains why that column is still there. */
+          if (action === 'add-source') {
+            const id = Number(body.curriculum_id);
+            const title = text(body.title);
+            if (!Number.isInteger(id)) return json({ error: 'which curriculum' }, 400);
+            if (!title) return json({ error: 'needs a title' }, 400);
+            await db
+              .prepare(
+                `insert into sources (curriculum_id, title, url, note, position)
+                 values (?1, ?2, ?3, ?4,
+                   (select coalesce(max(position), 0) + 1 from sources where curriculum_id = ?1))`,
+              )
+              .bind(id, title, text(body.url, 500) || null, text(body.note, 500) || null)
+              .run();
+            return json({ added: true }, 200);
+          }
+
+          if (action === 'update-source') {
+            const id = Number(body.id);
+            const title = text(body.title);
+            if (!Number.isInteger(id)) return json({ error: 'which source' }, 400);
+            if (!title) return json({ error: 'needs a title' }, 400);
+            await db
+              .prepare(`update sources set title = ?2, url = ?3, note = ?4 where id = ?1`)
+              .bind(id, title, text(body.url, 500) || null, text(body.note, 500) || null)
+              .run();
+            return json({ updated: true }, 200);
+          }
+
+          if (action === 'remove-source') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which source' }, 400);
+            await db.prepare(`delete from sources where id = ?1`).bind(id).run();
+            return json({ removed: true }, 200);
+          }
+
           // The substance of a lesson, which the name only labels. Separate
           // from rename because a name is a line and this is a passage.
           if (action === 'set-detail') {
             const id = Number(body.id);
             if (!Number.isInteger(id)) return json({ error: 'which lesson' }, 400);
             const detail = typeof body.detail === 'string' ? body.detail.slice(0, 8000) : null;
+            const value = detail && detail.trim() ? detail : null;
+
             await db
               .prepare(`update lessons set detail = ?2 where id = ?1`)
               // Empty means cleared, not "leave it alone" — otherwise a note
               // could never be removed once written.
-              .bind(id, detail && detail.trim() ? detail : null)
+              .bind(id, value)
               .run();
-            return json({ updated: true, id }, 200);
+
+            /* AND THE REPO, WHERE THE REPO OWNS IT.
+             *
+             * For a designed curriculum, scripts/curriculums/<name>-detail.json
+             * is the source of truth: apply.mjs lets the repo win wherever it
+             * has detail, so writing only D1 meant anything typed here was
+             * overwritten by the next rebuild — reported, but still lost. So
+             * both are written, and the two cannot disagree.
+             *
+             * A transcribed curriculum has no detail file and needs none:
+             * apply.mjs already preserves dashboard-written detail wherever
+             * the script supplies none. So a missing file is a normal outcome,
+             * not a failure, and the response says which happened.
+             *
+             * The D1 write has already landed by this point, deliberately. If
+             * the commit fails, the dashboard is still correct and the loss is
+             * a future rebuild overwriting it — the same state as before this
+             * existed. Failing the whole action would mean a tick-sized edit
+             * being refused because GitHub was briefly unreachable.
+             */
+            let committed: string | null = null;
+            let repoOwned = false;
+            const token = env.GITHUB_TOKEN;
+
+            if (token) {
+              try {
+                const owner = await db
+                  .prepare(
+                    `select l.name as lesson, c.source as source
+                       from lessons l
+                       join modules m on m.id = l.module_id
+                       join curriculums c on c.id = m.curriculum_id
+                      where l.id = ?1`,
+                  )
+                  .bind(id)
+                  .first<{ lesson: string; source: string | null }>();
+
+                const built = /^scripts\/curriculums\/([a-z0-9-]+)\.md$/.exec(owner?.source ?? '');
+                if (owner && built) {
+                  // Through the same guard as every other write, rather than
+                  // reaching around it — lib/collections.ts is the whole
+                  // write boundary and an endpoint with its own idea of what
+                  // is writable is how that stops being true.
+                  const collection = collectionFor('curriculum-detail');
+                  const target =
+                    collection && pathAllowed(collection, `scripts/curriculums/${built[1]}-detail.json`);
+
+                  if (target) {
+                    const file = await readFile(token, target).catch(() => null);
+                    if (file) {
+                      repoOwned = true;
+                      const json_ = JSON.parse(file.text) as Record<string, unknown>;
+                      if (value === null) delete json_[owner.lesson];
+                      else json_[owner.lesson] = value;
+                      const written = await writeFile(
+                        token,
+                        target,
+                        JSON.stringify(json_, null, 2) + '\n',
+                        `Lesson detail: ${owner.lesson.slice(0, 60)}`,
+                        file.sha,
+                      );
+                      committed = written.commit;
+                    }
+                  }
+                }
+              } catch {
+                // Reported as not committed rather than thrown. See above.
+              }
+            }
+
+            return json({ updated: true, id, repoOwned, committed }, 200);
           }
 
           if (action === 'rename') {

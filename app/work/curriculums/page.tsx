@@ -20,11 +20,7 @@ export const metadata: Metadata = pageMeta({
 export default function WorkCurriculumsPage() {
   return (
     <div className="shell">
-      <PageHeader
-        eyebrow="Private"
-        title="Curriculums"
-        lede="Where you were, and the path from here."
-      />
+      <PageHeader eyebrow="Private" title="Curriculums" />
       <p>
         <Link href="/work/">← Work</Link>
       </p>

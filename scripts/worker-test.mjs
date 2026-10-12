@@ -174,6 +174,17 @@ execFileSync(
 );
 const proseLib = await import(pathToFileURL(proseBundle).href);
 
+// A card's colour is derived from its name rather than stored, so it must be
+// identical on every visit — a deck that reshuffles its colours on reload
+// cannot be read. Same reasoning, and the same palette, as the book spines.
+const cardBundle = path.join(os.tmpdir(), 'master-roachi-card-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/curriculum-card.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${cardBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const cards = await import(pathToFileURL(cardBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -1107,6 +1118,9 @@ function fakeD1() {
   const curriculums = [{ id: 1, name: 'Odin', source: null, status: 'active', position: 1 }];
   const modules = [{ id: 1, curriculum_id: 1, name: 'Foundations', position: 1 }];
   const lessons = [{ id: 1, module_id: 1, name: 'Intro', position: 1, done_on: null, on_route: 1 }];
+  const sources = [
+    { id: 1, curriculum_id: 1, title: 'The Odin Project', url: 'https://theodinproject.com', note: null, position: 1 },
+  ];
   const sqlLog = [];
 
   const statement = (sql) => {
@@ -1122,6 +1136,7 @@ function fakeD1() {
         if (sql.includes('from curriculums')) return { results: curriculums };
         if (sql.includes('from modules')) return { results: modules };
         if (sql.includes('from lessons')) return { results: lessons };
+        if (sql.includes('from sources')) return { results: sources };
         if (sql.includes('from habits')) return { results: habits };
         if (sql.includes('from habit_ticks')) {
           const since = bound[0];
@@ -1203,6 +1218,28 @@ function fakeD1() {
             if (sql.includes('set post_path')) row.post_path = bound[1];
           }
         }
+        if (sql.startsWith('insert into sources')) {
+          sources.push({
+            id: sources.length + 1,
+            curriculum_id: bound[0],
+            title: bound[1],
+            url: bound[2],
+            note: bound[3],
+            position: sources.length + 1,
+          });
+        }
+        if (sql.startsWith('update sources')) {
+          const row = sources.find((one) => one.id === bound[0]);
+          if (row) {
+            row.title = bound[1];
+            row.url = bound[2];
+            row.note = bound[3];
+          }
+        }
+        if (sql.startsWith('delete from sources')) {
+          const at = sources.findIndex((one) => one.id === bound[0]);
+          if (at !== -1) sources.splice(at, 1);
+        }
         if (sql.startsWith('insert into curriculums')) curriculums.push({ id: curriculums.length + 1, name: bound[0], source: bound[1] });
         if (sql.startsWith('insert into modules')) modules.push({ id: modules.length + 1, curriculum_id: bound[0], name: bound[1], position: bound[2] });
         if (sql.startsWith('insert into lessons')) lessons.push({ id: lessons.length + 1, module_id: bound[0], name: bound[1], position: bound[2], done_on: null, on_route: 1 });
@@ -1237,6 +1274,7 @@ function fakeD1() {
   };
 
   return {
+    _sources: sources,
     prepare: statement,
     // The real batch runs the statements; the fake has to as well, or a
     // reorder would silently do nothing in a test and pass.
@@ -3621,6 +3659,239 @@ globalThis.fetch = preGh;
   );
 }
 
+// --- a curriculum's card colour --------------------------------------------
+{
+  const a = cards.cardFor('Japanese');
+  const b = cards.cardFor('Japanese');
+  check('the same name gives the same card', JSON.stringify(a) === JSON.stringify(b), '');
+  check(
+    'case and padding do not change it',
+    cards.cardFor('  japanese  ').hue === a.hue,
+    `${cards.cardFor('  japanese  ').hue} vs ${a.hue}`,
+  );
+  check(
+    'different names mostly differ',
+    new Set(
+      ['Japanese', 'Piano', 'Greek', 'The Odin Project', 'Godot', 'Drawing'].map(
+        (name) => cards.cardFor(name).hue,
+      ),
+    ).size >= 4,
+    JSON.stringify(
+      ['Japanese', 'Piano', 'Greek', 'The Odin Project', 'Godot', 'Drawing'].map((n) => cards.cardFor(n).hue),
+    ),
+  );
+  check(
+    'every colour is oklch, so it sits on the site palette',
+    [a.background, a.background2, a.accent].every((value) => value.startsWith('oklch(')),
+    JSON.stringify(a),
+  );
+  // Lightness and chroma are fixed on purpose: varying them by hash as well is
+  // how a deck ends up with one unreadably dark card and one that glares.
+  const spread = ['Japanese', 'Piano', 'Greek', 'Godot'].map((n) => cards.cardFor(n).background.split(' ')[0]);
+  check('lightness does not vary by name', new Set(spread).size === 1, JSON.stringify(spread));
+
+  const stage0 = cards.stageCardFor('Piano', 0);
+  const stage5 = cards.stageCardFor('Piano', 5);
+  check('a stage keeps its curriculum’s hue', stage0.hue === cards.cardFor('Piano').hue, '');
+  check('later stages are lighter', stage5.background !== stage0.background, `${stage0.background} / ${stage5.background}`);
+}
+
+// --- sources ----------------------------------------------------------------
+//
+// A list rather than the one `curriculums.source` line, because a real
+// curriculum is studied from several things at once. See migration 0008 for
+// why that column is still there.
+{
+  DB = fakeD1();
+  const dbEnv = { ...env, DB };
+
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/curriculums'), dbEnv);
+  body = await res.json();
+  check(
+    'a curriculum carries its sources',
+    body.curriculums?.[0]?.sources?.length === 1 &&
+      body.curriculums[0].sources[0].title === 'The Odin Project',
+    JSON.stringify(body.curriculums?.[0]?.sources),
+  );
+
+  const post = (payload) =>
+    worker.fetch(
+      new Request('https://masterroachi.com/work/api/curriculums', {
+        method: 'POST',
+        headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+      dbEnv,
+    );
+
+  res = await post({ action: 'add-source', curriculum_id: 1 });
+  check('a source needs a title', res.status === 400, String(res.status));
+
+  res = await post({ action: 'add-source', title: 'A book' });
+  check('a source needs a curriculum', res.status === 400, String(res.status));
+
+  res = await post({
+    action: 'add-source',
+    curriculum_id: 1,
+    title: 'Japanese From Zero!',
+    note: 'vol. 1, pp. 68-88',
+  });
+  check('a source with no URL is fine', res.status === 200, String(res.status));
+  check(
+    'a book is stored with its note and no url',
+    DB._sources.some((one) => one.title === 'Japanese From Zero!' && one.url === null && one.note === 'vol. 1, pp. 68-88'),
+    JSON.stringify(DB._sources),
+  );
+
+  res = await post({ action: 'update-source', id: 2, title: 'Japanese From Zero! vol. 1' });
+  check(
+    'a source can be corrected',
+    res.status === 200 && DB._sources.find((one) => one.id === 2)?.title === 'Japanese From Zero! vol. 1',
+    JSON.stringify(DB._sources.find((one) => one.id === 2)),
+  );
+
+  res = await post({ action: 'remove-source', id: 2 });
+  check(
+    'a source can be removed',
+    res.status === 200 && !DB._sources.some((one) => one.id === 2),
+    JSON.stringify(DB._sources),
+  );
+
+  res = await post({ action: 'remove-source' });
+  check('removing needs an id', res.status === 400, String(res.status));
+}
+
+// --- lesson detail, written to D1 AND to the repo --------------------------
+//
+// For a designed curriculum, scripts/curriculums/<name>-detail.json is the
+// source of truth: apply.mjs lets the repo win wherever it has detail, so
+// writing only D1 meant anything typed at the dashboard was overwritten by the
+// next rebuild. Both are written now, and these are the tests that the second
+// one goes to the right file and only when there is one.
+{
+  const detailFiles = {
+    'scripts/curriculums/piano-detail.json': JSON.stringify(
+      { 'Bench height and posture': 'The old text.' },
+      null,
+      2,
+    ),
+  };
+  const written = [];
+
+  globalThis.fetch = async (input, init = {}) => {
+    const url = String(input);
+    const reply = (data, status = 200) =>
+      new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
+
+    for (const [file, text] of Object.entries(detailFiles)) {
+      if (url.includes(`/contents/${file}`) && init.method !== 'PUT') {
+        const raw = new TextEncoder().encode(text);
+        let binary = '';
+        for (const b of raw) binary += String.fromCharCode(b);
+        return reply({ content: btoa(binary), sha: 'detailsha' });
+      }
+    }
+    if (init.method === 'PUT') {
+      const sent = JSON.parse(init.body);
+      written.push({
+        url,
+        text: new TextDecoder().decode(Uint8Array.from(atob(sent.content), (c) => c.charCodeAt(0))),
+      });
+      return reply({ commit: { sha: 'detailcommit' } });
+    }
+    return new Response('{"message":"Not Found"}', { status: 404, headers: { 'content-type': 'application/json' } });
+  };
+
+  const detailEnv = (source) => {
+    const db = fakeD1();
+    // The curriculum's `source` is what says whether the repo owns its detail.
+    db._sql.length = 0;
+    return {
+      ...env,
+      GITHUB_TOKEN: 'ghtok',
+      DB: {
+        ...db,
+        prepare(sql) {
+          const statement = db.prepare(sql);
+          if (sql.includes('select l.name as lesson')) {
+            return {
+              bind: () => ({
+                first: async () => ({ lesson: 'Bench height and posture', source }),
+              }),
+            };
+          }
+          return statement;
+        },
+      },
+    };
+  };
+
+  const setDetail = (source, detail) =>
+    worker.fetch(
+      new Request('https://masterroachi.com/work/api/curriculums', {
+        method: 'POST',
+        headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'set-detail', id: 1, detail }),
+      }),
+      detailEnv(source),
+    );
+
+  written.length = 0;
+  res = await setDetail('scripts/curriculums/piano.md', 'Sit so your forearms run parallel to the floor.');
+  body = await res.json();
+  check(
+    'a designed curriculum commits its detail to the repo',
+    res.status === 200 && body.repoOwned === true && body.committed === 'detailcommit',
+    JSON.stringify(body),
+  );
+  check(
+    'and writes it under the lesson’s own name',
+    written.length === 1 &&
+      JSON.parse(written[0].text)['Bench height and posture'] ===
+        'Sit so your forearms run parallel to the floor.',
+    written[0]?.text,
+  );
+  check(
+    'to the detail json, not to the script beside it',
+    written[0]?.url.includes('piano-detail.json'),
+    written[0]?.url,
+  );
+
+  // Cleared means cleared, in both places.
+  written.length = 0;
+  res = await setDetail('scripts/curriculums/piano.md', '   ');
+  check(
+    'clearing detail removes the key rather than storing empty',
+    written.length === 1 && !('Bench height and posture' in JSON.parse(written[0].text)),
+    written[0]?.text,
+  );
+
+  // A transcribed curriculum has no detail file and needs none: apply.mjs
+  // already preserves dashboard-written detail where the script supplies none.
+  written.length = 0;
+  res = await setDetail('Media/Courses/Languages/Greek/Greek-Language-Curriculum.md', 'Typed by hand.');
+  body = await res.json();
+  check(
+    'a transcribed curriculum writes only D1, and says so',
+    res.status === 200 && body.repoOwned === false && body.committed === null && written.length === 0,
+    JSON.stringify(body),
+  );
+
+  // A path that is not a detail file must never be written, whatever the
+  // `source` column says.
+  written.length = 0;
+  res = await setDetail('scripts/curriculums/../../.github/workflows/x.md', 'Nope.');
+  body = await res.json();
+  check(
+    'a source that is not a curriculum script commits nothing',
+    res.status === 200 && body.committed === null && written.length === 0,
+    JSON.stringify(body),
+  );
+
+  globalThis.fetch = preGh;
+  DB = fakeD1();
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -3645,4 +3916,5 @@ fs.rmSync(fmBundle, { force: true });
 fs.rmSync(colourBundle, { force: true });
 fs.rmSync(fieldsBundle, { force: true });
 fs.rmSync(proseBundle, { force: true });
+fs.rmSync(cardBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

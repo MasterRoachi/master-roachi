@@ -1,32 +1,36 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  isComplete,
-  moduleOnRoute,
-  nextLesson,
   overallNext,
-  overallProgress,
   progressOf,
-  recentlyDone,
   type Curriculum,
+  type Lesson,
   type Module,
 } from '@/lib/curriculum';
-import { outlineSize, parseOutline } from '@/lib/outline';
+import { cardFor, stageCardFor } from '@/lib/curriculum-card';
 import styles from './curriculums.module.css';
 
-// A curriculum is a path, so it is drawn as one: a line down the left with a
-// node per module, filled as the module finishes, and the lessons hanging off
-// it. How far along the line you are is the thing being asked.
+// A deck of cards, one per curriculum.
 //
-// Above that, the headline is NOT the percentage. Opening a course tracker the
-// question is never "how many have I done", it is "where was I" — so the next
-// unfinished lesson is the largest thing on each card, with the tick next to
-// it. Everything else is context for that one line.
+// It was a column of wide cards each carrying a ring, a count, a fortnight
+// figure, a source line and the next lesson. All of that was true and it meant
+// the page answered five questions at once, none of them the one being asked.
+// His design instead: a deck, a card per curriculum showing only its progress
+// and its name, and everything else reached by going INTO it — stages fan out,
+// a stage opens to its lessons, a lesson opens its detail beside it.
+//
+// So the information is the same and the page is a path through it rather than
+// a wall of it. Three levels, three depths of card, and at most two cards
+// side by side at any time.
+//
+// A card's colour comes from its name (lib/curriculum-card.ts), derived rather
+// than stored, so a new curriculum has an identity without anyone choosing one.
 
+/** Playing-card proportions, give or take. The deck reads as a deck or not. */
 const RING = 2 * Math.PI * 20;
 
-function Ring({ percent }: { percent: number }) {
+function Ring({ percent, accent }: { percent: number; accent: string }) {
   return (
     <svg className={styles.ring} viewBox="0 0 48 48" aria-hidden="true">
       <circle cx="24" cy="24" r="20" className={styles.ringTrack} />
@@ -35,8 +39,9 @@ function Ring({ percent }: { percent: number }) {
         cy="24"
         r="20"
         className={styles.ringFill}
-        // Drawn from the top rather than from three o'clock, which is where a
-        // circle starts and nobody reads a dial from.
+        stroke={accent}
+        // From the top, not from three o'clock, which is where a circle starts
+        // and nobody reads a dial from.
         strokeDasharray={`${(percent / 100) * RING} ${RING}`}
         transform="rotate(-90 24 24)"
       />
@@ -47,24 +52,40 @@ function Ring({ percent }: { percent: number }) {
   );
 }
 
+/** Status cycles rather than opening a menu: three values, one button. */
+const NEXT_STATUS: Record<string, 'active' | 'paused' | 'done'> = {
+  active: 'paused',
+  paused: 'done',
+  done: 'active',
+};
+
+const STATUS_MARK: Record<string, string> = {
+  active: '▶',
+  paused: '॥',
+  done: '✓',
+};
+
 export default function Curriculums() {
   const [data, setData] = useState<Curriculum[] | null>(null);
   const [today, setToday] = useState('');
   const [configured, setConfigured] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [name, setName] = useState('');
-  const [source, setSource] = useState('');
-  const [open, setOpen] = useState<Set<number>>(new Set());
-  const [importing, setImporting] = useState<number | null>(null);
-  const [outline, setOutline] = useState('');
+  const [openCurriculum, setOpenCurriculum] = useState<number | null>(null);
+  const [openStage, setOpenStage] = useState<number | null>(null);
+  /** Which lesson's detail card is open beside the stage. */
+  const [detailFor, setDetailFor] = useState<number | null>(null);
+  const [sourcesOpen, setSourcesOpen] = useState(false);
+  const [detailDraft, setDetailDraft] = useState('');
+  const [editingDetail, setEditingDetail] = useState(false);
+  const [search, setSearch] = useState('');
+  /** A tick can be back-dated; the API refuses a day that has not happened. */
+  const [tickDay, setTickDay] = useState('');
   const [renaming, setRenaming] = useState<string | null>(null);
   const [rename, setRename] = useState('');
-  const [addingTo, setAddingTo] = useState<number | null>(null);
-  const [lessonName, setLessonName] = useState('');
-  const [showing, setShowing] = useState<Set<number>>(new Set());
-  const [editingDetail, setEditingDetail] = useState<number | null>(null);
-  const [detailDraft, setDetailDraft] = useState('');
+  const [adding, setAdding] = useState<string | null>(null);
+  const [draft, setDraft] = useState('');
+  const centre = useRef<HTMLDivElement | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -78,8 +99,11 @@ export default function Curriculums() {
       setConfigured(payload.configured);
       setData(payload.curriculums ?? []);
       setToday(payload.today ?? '');
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not read them.');
+      setTickDay((before) => before || payload.today || '');
+      setError(null);
+    } catch (problem) {
+      setError(problem instanceof Error ? problem.message : 'Could not read them.');
+      setData([]);
     }
   }, []);
 
@@ -88,609 +112,763 @@ export default function Curriculums() {
   }, [load]);
 
   async function act(body: Record<string, unknown>) {
-    const response = await fetch('/work/api/curriculums', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!response.ok) {
-      const { error: why } = (await response.json().catch(() => ({}))) as { error?: string };
-      setError(why ?? `Failed (${response.status}).`);
-      return false;
+    try {
+      const response = await fetch('/work/api/curriculums', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        repoOwned?: boolean;
+        committed?: string | null;
+      };
+      if (!response.ok) {
+        setError(result.error ?? `that did not work (${response.status})`);
+        return null;
+      }
+      setError(null);
+      await load();
+      return result;
+    } catch (problem) {
+      setError(problem instanceof Error ? problem.message : 'That did not work.');
+      return null;
     }
-    setError(null);
-    await load();
-    return true;
   }
 
-  if (error && !data) return <p className={styles.status}>{error}</p>;
-  if (!data) return <p className={styles.status}>Reading…</p>;
+  /* Everything is found from the data rather than held in state beside it, so
+   * a reload cannot leave the open card pointing at something that has gone. */
+  const curriculums = data ?? [];
+  const current = curriculums.find((one) => one.id === openCurriculum) ?? null;
+  const stage = current?.modules.find((one) => one.id === openStage) ?? null;
+  const lesson = stage?.lessons.find((one) => one.id === detailFor) ?? null;
+
+  /* Paused and done go to the back of the deck, and are visually distinct.
+   * Within each group the stored order stands — it is the route through all
+   * the routes, and he does not want to reorder it from here. */
+  const deck = useMemo(() => {
+    const rank = (one: Curriculum) => (one.status === 'active' ? 0 : one.status === 'paused' ? 1 : 2);
+    return [...curriculums].sort((a, b) => rank(a) - rank(b));
+  }, [curriculums]);
+
+  const upNext = useMemo(() => overallNext(curriculums), [curriculums]);
+
+  /** Every lesson, flattened, for the search. 708 of them and no place to look. */
+  const hits = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (term.length < 2) return [];
+    const found: { curriculum: Curriculum; module: Module; lesson: Lesson }[] = [];
+    for (const one of curriculums) {
+      for (const module of one.modules) {
+        for (const each of module.lessons) {
+          if (each.name.toLowerCase().includes(term)) {
+            found.push({ curriculum: one, module, lesson: each });
+          }
+        }
+      }
+    }
+    return found.slice(0, 40);
+  }, [curriculums, search]);
+
+  function openTo(curriculumId: number, moduleId: number, lessonId?: number) {
+    setOpenCurriculum(curriculumId);
+    setOpenStage(moduleId);
+    setDetailFor(lessonId ?? null);
+    setSourcesOpen(false);
+    setSearch('');
+    requestAnimationFrame(() => centre.current?.scrollIntoView({ block: 'center' }));
+  }
+
+  function startDetail(target: Lesson) {
+    setDetailFor(target.id);
+    setSourcesOpen(false);
+    setDetailDraft(target.detail ?? '');
+    setEditingDetail(false);
+  }
+
+  if (data === null) return <p className={styles.status}>Reading them…</p>;
+
   if (!configured) {
     return (
       <p className={styles.status}>
-        Not set up — the <code>DB</code> binding is missing.
+        Not connected. The D1 database is not bound — see <code>wrangler.jsonc</code>.
       </p>
     );
   }
-
-  const preview = outline.trim() ? parseOutline(outline) : [];
-  const previewSize = outlineSize(preview);
-
-  /** Inline renaming, which the API has always offered and nothing could reach. */
-  function Name({
-    kind,
-    id,
-    children,
-    className,
-  }: {
-    kind: 'curriculum' | 'module' | 'lesson';
-    id: number;
-    children: string;
-    className?: string;
-  }) {
-    const key = `${kind}:${id}`;
-    if (renaming === key) {
-      return (
-        <input
-          autoFocus
-          className={styles.renameBox}
-          value={rename}
-          aria-label={`Rename ${children}`}
-          onChange={(event) => setRename(event.target.value)}
-          onBlur={() => {
-            if (rename.trim() && rename !== children) {
-              void act({ action: 'rename', kind, id, name: rename });
-            }
-            setRenaming(null);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') event.currentTarget.blur();
-            if (event.key === 'Escape') {
-              setRename(children);
-              setRenaming(null);
-            }
-          }}
-        />
-      );
-    }
-    return (
-      <span
-        className={className}
-        title="Double-click to rename"
-        onDoubleClick={() => {
-          setRename(children);
-          setRenaming(key);
-        }}
-      >
-        {children}
-      </span>
-    );
-  }
-
-  function Lessons({ module }: { module: Module }) {
-    const moduleProgress = progressOf(module);
-    const onRoute = moduleOnRoute(module);
-    return (
-      <div className={onRoute ? styles.module : styles.moduleOff}>
-        <span
-          className={
-            moduleProgress.total > 0 && moduleProgress.done === moduleProgress.total
-              ? styles.nodeDone
-              : styles.node
-          }
-          aria-hidden="true"
-        />
-        <h3>
-          <Name kind="module" id={module.id}>
-            {module.name}
-          </Name>
-          {onRoute ? (
-            <span className={styles.moduleCount}>
-              {moduleProgress.done}/{moduleProgress.total}
-            </span>
-          ) : (
-            <span className={styles.offBadge}>off route</span>
-          )}
-          <span className={styles.moveGroup}>
-            <button
-              type="button"
-              className={styles.tiny}
-              title="Earlier in this course"
-              onClick={() =>
-                void act({ action: 'move', kind: 'module', id: module.id, direction: 'up' })
-              }
-            >
-              ↑
-            </button>
-            <button
-              type="button"
-              className={styles.tiny}
-              title="Later in this course"
-              onClick={() =>
-                void act({ action: 'move', kind: 'module', id: module.id, direction: 'down' })
-              }
-            >
-              ↓
-            </button>
-          </span>
-          {/* A fork in a course is a section, so the whole module goes on or
-              off at once — nobody switches forty lessons one at a time. */}
-          <button
-            type="button"
-            className={styles.tiny}
-            title={onRoute ? 'Take this module off the route' : 'Put this module on the route'}
-            onClick={() =>
-              void act({ action: 'set-route', module_id: module.id, on: !onRoute })
-            }
-          >
-            {onRoute ? '⊘' : '⊕'}
-          </button>
-          <button
-            type="button"
-            className={styles.tiny}
-            title="Add a lesson to this module"
-            onClick={() => {
-              setAddingTo(addingTo === module.id ? null : module.id);
-              setLessonName('');
-            }}
-          >
-            +
-          </button>
-          <button
-            type="button"
-            className={styles.tiny}
-            title="Remove this module and its lessons"
-            onClick={() => {
-              if (confirm(`Remove "${module.name}"?`)) {
-                void act({ action: 'remove', kind: 'module', id: module.id });
-              }
-            }}
-          >
-            ×
-          </button>
-        </h3>
-
-        <ul className={styles.lessons}>
-          {module.lessons.map((lesson) => {
-            const lessonOn = lesson.on_route !== 0;
-            return (
-              <li key={lesson.id} className={lessonOn ? undefined : styles.lessonOff}>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={lesson.done_on !== null}
-                    onChange={() => void act({ action: 'toggle-lesson', id: lesson.id })}
-                  />
-                  <Name
-                    kind="lesson"
-                    id={lesson.id}
-                    className={lesson.done_on ? styles.doneLesson : undefined}
-                  >
-                    {lesson.name}
-                  </Name>
-                </label>
-                {lesson.detail && (
-                  <button
-                    type="button"
-                    className={showing.has(lesson.id) ? styles.detailOn : styles.detailOff}
-                    title="What this teaches"
-                    aria-expanded={showing.has(lesson.id)}
-                    onClick={() => {
-                      const next = new Set(showing);
-                      if (next.has(lesson.id)) next.delete(lesson.id);
-                      else next.add(lesson.id);
-                      setShowing(next);
-                    }}
-                  >
-                    ?
-                  </button>
-                )}
-                {lesson.done_on && <span className={styles.when}>{lesson.done_on}</span>}
-                {/* Skipped work stays visible. Hiding it would make the route
-                    unreviewable — the point is to see what is being left out
-                    and be able to change your mind. */}
-                <button
-                  type="button"
-                  className={styles.tiny}
-                  title={lessonOn ? 'Take off the route' : 'Put on the route'}
-                  onClick={() => void act({ action: 'set-route', id: lesson.id, on: !lessonOn })}
-                >
-                  {lessonOn ? '⊘' : '⊕'}
-                </button>
-                <button
-                  type="button"
-                  className={styles.tiny}
-                  title={lesson.detail ? 'Edit what this teaches' : 'Write what this teaches'}
-                  onClick={() => {
-                    setDetailDraft(lesson.detail ?? '');
-                    setEditingDetail(lesson.id);
-                  }}
-                >
-                  ✎
-                </button>
-                <button
-                  type="button"
-                  className={styles.tiny}
-                  title="Remove this lesson"
-                  onClick={() => void act({ action: 'remove', kind: 'lesson', id: lesson.id })}
-                >
-                  ×
-                </button>
-
-                {/* The substance, under the lesson it belongs to. Opened on
-                    demand rather than always shown: a module of thirty
-                    lessons each carrying a paragraph is unreadable. */}
-                {showing.has(lesson.id) && editingDetail !== lesson.id && (
-                  <p className={styles.detail}>{lesson.detail}</p>
-                )}
-
-                {editingDetail === lesson.id && (
-                  <span className={styles.detailEdit}>
-                    <textarea
-                      autoFocus
-                      value={detailDraft}
-                      placeholder="What this teaches. Markdown."
-                      aria-label={`What ${lesson.name} teaches`}
-                      onChange={(event) => setDetailDraft(event.target.value)}
-                    />
-                    <span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          void act({ action: 'set-detail', id: lesson.id, detail: detailDraft });
-                          setEditingDetail(null);
-                        }}
-                      >
-                        Keep
-                      </button>
-                      <button type="button" onClick={() => setEditingDetail(null)}>
-                        Cancel
-                      </button>
-                    </span>
-                  </span>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* add-lesson: offered by the API from the start, and until now
-            unreachable — the only way a lesson got in was the bulk import. */}
-        {addingTo === module.id && (
-          <form
-            className={styles.inlineAdd}
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (!lessonName.trim()) return;
-              void act({ action: 'add-lesson', module_id: module.id, name: lessonName }).then(
-                (ok) => {
-                  if (ok) setLessonName('');
-                },
-              );
-            }}
-          >
-            <input
-              autoFocus
-              value={lessonName}
-              placeholder="Lesson name"
-              aria-label="Lesson name"
-              onChange={(event) => setLessonName(event.target.value)}
-            />
-            <button type="submit" disabled={!lessonName.trim()}>
-              Add
-            </button>
-            <button type="button" onClick={() => setAddingTo(null)}>
-              Done
-            </button>
-          </form>
-        )}
-      </div>
-    );
-  }
-
-  const active = data.filter((c) => c.status === 'active');
-  const shelved = data.filter((c) => c.status !== 'active');
-
-  function Card({ curriculum }: { curriculum: Curriculum }) {
-    const progress = progressOf(curriculum);
-    const next = nextLesson(curriculum);
-    const complete = isComplete(curriculum);
-    const recent = recentlyDone(curriculum, today);
-    const expanded = open.has(curriculum.id);
-
-    return (
-      <section className={styles.card} data-status={curriculum.status}>
-        <header>
-          <Ring percent={progress.percent} />
-
-          <div className={styles.headText}>
-            <h2>
-              <Name kind="curriculum" id={curriculum.id}>
-                {curriculum.name}
-              </Name>
-            </h2>
-            <p className={styles.meta}>
-              {progress.done} of {progress.total} on route
-              {progress.skipped > 0 && (
-                <span className={styles.skipped}>{progress.skipped} skipped</span>
-              )}
-              {progress.total > 0 && recent > 0 && (
-                <span className={styles.recent}>{recent} in a fortnight</span>
-              )}
-              {progress.total > 0 && recent === 0 && !complete && (
-                <span className={styles.stalled}>nothing in a fortnight</span>
-              )}
-            </p>
-            {curriculum.source && <p className={styles.source}>{curriculum.source}</p>}
-          </div>
-
-          <div className={styles.headControls}>
-            {/* The order of the curriculums IS the route through all of them,
-                so these arrows decide what comes next overall. */}
-            <span className={styles.moveGroup}>
-              <button
-                type="button"
-                className={styles.tiny}
-                title="Earlier in the overall route"
-                onClick={() =>
-                void act({ action: 'move', kind: 'curriculum', id: curriculum.id, direction: 'up' })
-              }
-              >
-                ↑
-              </button>
-              <button
-                type="button"
-                className={styles.tiny}
-                title="Later in the overall route"
-                onClick={() =>
-                void act({ action: 'move', kind: 'curriculum', id: curriculum.id, direction: 'down' })
-              }
-              >
-                ↓
-              </button>
-            </span>
-            <select
-              value={curriculum.status}
-              aria-label={`Status of ${curriculum.name}`}
-              onChange={(event) =>
-                void act({ action: 'set-status', id: curriculum.id, status: event.target.value })
-              }
-            >
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
-              <option value="done">Done</option>
-            </select>
-            <button
-              type="button"
-              className={styles.tiny}
-              title="Remove, with every module and lesson in it"
-              onClick={() => {
-                if (confirm(`Remove "${curriculum.name}" and all ${progress.total} lessons?`)) {
-                  void act({ action: 'remove', kind: 'curriculum', id: curriculum.id });
-                }
-              }}
-            >
-              ×
-            </button>
-          </div>
-        </header>
-
-        {/* The headline. Not the percentage — the question on opening this is
-            "where was I", and this is the answer with the tick beside it. */}
-        {next ? (
-          <div className={styles.next}>
-            <button
-              type="button"
-              className={styles.nextTick}
-              aria-label={`Mark ${next.lesson.name} done`}
-              onClick={() => void act({ action: 'toggle-lesson', id: next.lesson.id })}
-            />
-            <span>
-              <span className={styles.nextLabel}>Next</span>
-              <strong>{next.lesson.name}</strong>
-              <span className={styles.nextIn}>in {next.module.name}</span>
-            </span>
-          </div>
-        ) : (
-          <div className={styles.next}>
-            <span>
-              <strong>
-                {progress.total === 0
-                  ? 'Nothing in it yet — paste an outline below.'
-                  : 'Every lesson done.'}
-              </strong>
-            </span>
-          </div>
-        )}
-
-        <button
-          type="button"
-          className={styles.disclose}
-          aria-expanded={expanded}
-          onClick={() => {
-            const next = new Set(open);
-            if (expanded) next.delete(curriculum.id);
-            else next.add(curriculum.id);
-            setOpen(next);
-          }}
-        >
-          {expanded
-            ? 'Hide the path'
-            : `Show the path — ${curriculum.modules.length} module${
-                curriculum.modules.length === 1 ? '' : 's'
-              }`}
-        </button>
-
-        {expanded && (
-          <div className={styles.path}>
-            {curriculum.modules.map((module) => (
-              <Lessons key={module.id} module={module} />
-            ))}
-
-            {importing === curriculum.id ? (
-              <div className={styles.importer}>
-                <textarea
-                  value={outline}
-                  onChange={(event) => setOutline(event.target.value)}
-                  placeholder={'Paste an outline.\n\nSection\n  - lesson\n  - lesson'}
-                  aria-label="Outline"
-                />
-                <p className={styles.status}>
-                  {preview.length === 0
-                    ? 'Nothing recognised yet.'
-                    : `${previewSize.modules} module${previewSize.modules === 1 ? '' : 's'}, ${previewSize.lessons} lesson${previewSize.lessons === 1 ? '' : 's'}:`}
-                </p>
-                {preview.length > 0 && (
-                  <ul className={styles.preview}>
-                    {preview.map((module, i) => (
-                      <li key={`${i}-${module.name}`}>
-                        <strong>{module.name}</strong>
-                        {module.lessons.length > 0 && <> — {module.lessons.join(', ')}</>}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <p className={styles.importActions}>
-                  <button
-                    type="button"
-                    disabled={preview.length === 0}
-                    onClick={() =>
-                      void act({
-                        action: 'import',
-                        curriculum_id: curriculum.id,
-                        outline,
-                      }).then((ok) => {
-                        if (ok) {
-                          setOutline('');
-                          setImporting(null);
-                        }
-                      })
-                    }
-                  >
-                    Create these
-                  </button>
-                  <button type="button" onClick={() => setImporting(null)}>
-                    Cancel
-                  </button>
-                </p>
-              </div>
-            ) : (
-              <p className={styles.importActions}>
-                <button type="button" onClick={() => setImporting(curriculum.id)}>
-                  Paste an outline
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const moduleName = prompt('Module name');
-                    if (moduleName?.trim()) {
-                      void act({
-                        action: 'add-module',
-                        curriculum_id: curriculum.id,
-                        name: moduleName,
-                      });
-                    }
-                  }}
-                >
-                  Add a module
-                </button>
-              </p>
-            )}
-          </div>
-        )}
-      </section>
-    );
-  }
-
-  const whole = overallProgress(data);
-  const upNext = overallNext(data);
 
   return (
     <div className={styles.page}>
       {error && <p className={styles.warn}>{error}</p>}
 
       {/* The route through all the routes: one next thing across everything,
-          in the order the curriculums are in. */}
-      {data.length > 0 && (
-        <div className={styles.overall}>
-          <p className={styles.overallHead}>
-            <span>Up next</span>
-            <span className={styles.overallCount}>
-              {whole.done} of {whole.total} across {active.length} active
-            </span>
-          </p>
+          in the order the curriculums sit in. The only number on the page
+          that is not a percentage in a ring. */}
+      {upNext && (
+        <button
+          type="button"
+          className={styles.upNext}
+          onClick={() => openTo(upNext.curriculum.id, upNext.module.id, upNext.lesson.id)}
+        >
+          <span className={styles.upNextLabel}>Up next</span>
+          <span className={styles.upNextName}>{upNext.lesson.name}</span>
+          <span className={styles.upNextIn}>
+            {upNext.curriculum.name} › {upNext.module.name}
+          </span>
+        </button>
+      )}
 
-          {upNext ? (
-            <div className={styles.overallNext}>
-              <button
-                type="button"
-                className={styles.nextTick}
-                aria-label={`Mark ${upNext.lesson.name} done`}
-                onClick={() => void act({ action: 'toggle-lesson', id: upNext.lesson.id })}
+      <div className={styles.searchRow}>
+        <input
+          type="search"
+          className={styles.search}
+          value={search}
+          placeholder="Find a lesson"
+          aria-label="Find a lesson"
+          onChange={(event) => setSearch(event.target.value)}
+        />
+        {hits.length > 0 && (
+          <ul className={styles.hits}>
+            {hits.map((hit) => (
+              <li key={hit.lesson.id}>
+                <button
+                  type="button"
+                  onClick={() => openTo(hit.curriculum.id, hit.module.id, hit.lesson.id)}
+                >
+                  <span>{hit.lesson.name}</span>
+                  <span className={styles.hitIn}>
+                    {hit.curriculum.name} › {hit.module.name}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* --- the deck ------------------------------------------------------ */}
+      <div className={styles.deck}>
+        {deck.map((one, at) => {
+          const look = cardFor(one.name);
+          const progress = progressOf(one);
+          const isOpen = one.id === openCurriculum;
+
+          return (
+            <div
+              key={one.id}
+              className={`${styles.cardSlot} ${isOpen ? styles.cardSlotOpen : ''}`}
+              // Each card sits slightly right and down of the one in front, so
+              // the stack reads as a deck. Hovering or focusing lifts a card
+              // clear of the ones over it — without that, only the front
+              // card's face is reachable.
+              style={{ '--at': at } as React.CSSProperties}
+            >
+              <div
+                className={`${styles.card} ${one.status !== 'active' ? styles.shelved : ''}`}
+                style={
+                  {
+                    '--card-bg': look.background,
+                    '--card-bg2': look.background2,
+                    '--card-accent': look.accent,
+                  } as React.CSSProperties
+                }
+              >
+                <button
+                  type="button"
+                  className={styles.cardFace}
+                  aria-expanded={isOpen}
+                  onClick={() => {
+                    setOpenCurriculum(isOpen ? null : one.id);
+                    setOpenStage(null);
+                    setDetailFor(null);
+                    setSourcesOpen(false);
+                  }}
+                >
+                  <Ring percent={progress.percent} accent={look.accent} />
+                  {renaming === `curriculum:${one.id}` ? (
+                    <input
+                      className={styles.renameOnCard}
+                      value={rename}
+                      autoFocus
+                      aria-label={`Rename ${one.name}`}
+                      onClick={(event) => event.stopPropagation()}
+                      onChange={(event) => setRename(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' && rename.trim()) {
+                          void act({ action: 'rename', kind: 'curriculum', id: one.id, name: rename });
+                          setRenaming(null);
+                        }
+                        if (event.key === 'Escape') setRenaming(null);
+                      }}
+                      onBlur={() => setRenaming(null)}
+                    />
+                  ) : (
+                    <span
+                      className={styles.cardName}
+                      onDoubleClick={(event) => {
+                        event.stopPropagation();
+                        setRenaming(`curriculum:${one.id}`);
+                        setRename(one.name);
+                      }}
+                      title="Double-click to rename"
+                    >
+                      {one.name}
+                    </span>
+                  )}
+                </button>
+
+                {/* One button, three states, cycling. */}
+                <button
+                  type="button"
+                  className={styles.statusDot}
+                  aria-label={`${one.name} is ${one.status} — click to change`}
+                  title={`${one.status} → ${NEXT_STATUS[one.status]}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void act({
+                      action: 'set-status',
+                      id: one.id,
+                      status: NEXT_STATUS[one.status] ?? 'active',
+                    });
+                  }}
+                >
+                  {STATUS_MARK[one.status] ?? '▶'}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* A blank card at the back of the deck, so adding looks like the
+            thing it adds. */}
+        <div className={styles.cardSlot} style={{ '--at': deck.length } as React.CSSProperties}>
+          {adding === 'curriculum' ? (
+            <form
+              className={`${styles.card} ${styles.addCard}`}
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!draft.trim()) return;
+                void act({ action: 'add-curriculum', name: draft }).then(() => {
+                  setDraft('');
+                  setAdding(null);
+                });
+              }}
+            >
+              <input
+                value={draft}
+                autoFocus
+                placeholder="Curriculum"
+                aria-label="New curriculum name"
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => event.key === 'Escape' && setAdding(null)}
               />
-              <span>
-                <strong>{upNext.lesson.name}</strong>
-                <span className={styles.nextIn}>
-                  {upNext.curriculum.name} › {upNext.module.name}
-                </span>
-                {upNext.lesson.detail && (
-                  <span className={styles.nextDetail}>{upNext.lesson.detail}</span>
-                )}
-              </span>
-            </div>
+              <button type="submit" disabled={!draft.trim()}>
+                Add
+              </button>
+            </form>
           ) : (
-            <div className={styles.overallNext}>
-              <span>
-                <strong>
-                  {active.length === 0
-                    ? 'Nothing active.'
-                    : 'Every route finished.'}
-                </strong>
-              </span>
-            </div>
+            <button
+              type="button"
+              className={`${styles.card} ${styles.addCard}`}
+              onClick={() => {
+                setAdding('curriculum');
+                setDraft('');
+              }}
+            >
+              +
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* --- the stages, fanned out from the card that was clicked --------- */}
+      {current && (
+        <div className={styles.fan}>
+          {current.modules.map((module, at) => {
+            const look = stageCardFor(current.name, at);
+            const isOpen = module.id === openStage;
+            return (
+              <button
+                key={module.id}
+                type="button"
+                className={`${styles.stageCard} ${isOpen ? styles.stageOpen : ''}`}
+                style={
+                  {
+                    '--card-bg': look.background,
+                    '--card-bg2': look.background2,
+                    '--card-accent': look.accent,
+                    '--at': at,
+                  } as React.CSSProperties
+                }
+                onClick={() => {
+                  setOpenStage(isOpen ? null : module.id);
+                  setDetailFor(null);
+                  setSourcesOpen(false);
+                  if (!isOpen) {
+                    requestAnimationFrame(() =>
+                      centre.current?.scrollIntoView({ block: 'center', behavior: 'smooth' }),
+                    );
+                  }
+                }}
+              >
+                <span className={styles.stageNumber}>{at + 1}</span>
+                <span className={styles.stageName}>{module.name}</span>
+              </button>
+            );
+          })}
+
+          {adding === `module:${current.id}` ? (
+            <form
+              className={`${styles.stageCard} ${styles.addCard}`}
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!draft.trim()) return;
+                void act({ action: 'add-module', curriculum_id: current.id, name: draft }).then(() => {
+                  setDraft('');
+                  setAdding(null);
+                });
+              }}
+            >
+              <input
+                value={draft}
+                autoFocus
+                placeholder="Stage"
+                aria-label="New stage name"
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => event.key === 'Escape' && setAdding(null)}
+              />
+              <button type="submit" disabled={!draft.trim()}>
+                Add
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className={`${styles.stageCard} ${styles.addCard}`}
+              onClick={() => {
+                setAdding(`module:${current.id}`);
+                setDraft('');
+              }}
+            >
+              +
+            </button>
           )}
         </div>
       )}
 
-      {active.map((curriculum) => (
-        <Card key={curriculum.id} curriculum={curriculum} />
-      ))}
-
-      {shelved.length > 0 && (
-        <>
-          <h2 className={styles.shelvedHead}>Paused and finished</h2>
-          {shelved.map((curriculum) => (
-            <Card key={curriculum.id} curriculum={curriculum} />
-          ))}
-        </>
-      )}
-
-      {data.length === 0 && (
-        <p className={styles.empty}>
-          Nothing being studied yet. Add a curriculum below, then open it and paste the course
-          outline — a section per line with its lessons indented under it.
-        </p>
-      )}
-
-      <form
-        className={styles.add}
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!name.trim()) return;
-          void act({ action: 'add-curriculum', name, source }).then((ok) => {
-            if (ok) {
-              setName('');
-              setSource('');
+      {/* --- the open stage, centred, with its lessons --------------------- */}
+      <div className={styles.centre} ref={centre}>
+        {current && stage && (
+          <section
+            className={styles.open}
+            style={
+              {
+                '--card-accent': cardFor(current.name).accent,
+              } as React.CSSProperties
             }
-          });
-        }}
-      >
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Curriculum" aria-label="Curriculum name" />
-        <input value={source} onChange={(e) => setSource(e.target.value)} placeholder="Source — a URL, a book, a syllabus" aria-label="Source" />
-        <button type="submit" disabled={!name.trim()}>
-          Add
-        </button>
-      </form>
+          >
+            <header className={styles.openHead}>
+              <h2>
+                {renaming === `module:${stage.id}` ? (
+                  <input
+                    className={styles.renameInline}
+                    value={rename}
+                    autoFocus
+                    aria-label={`Rename ${stage.name}`}
+                    onChange={(event) => setRename(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' && rename.trim()) {
+                        void act({ action: 'rename', kind: 'module', id: stage.id, name: rename });
+                        setRenaming(null);
+                      }
+                      if (event.key === 'Escape') setRenaming(null);
+                    }}
+                    onBlur={() => setRenaming(null)}
+                  />
+                ) : (
+                  <span
+                    onDoubleClick={() => {
+                      setRenaming(`module:${stage.id}`);
+                      setRename(stage.name);
+                    }}
+                    title="Double-click to rename"
+                  >
+                    {stage.name}
+                  </span>
+                )}
+              </h2>
+              <button
+                type="button"
+                className={styles.closeOpen}
+                onClick={() => {
+                  setOpenStage(null);
+                  setDetailFor(null);
+                  setSourcesOpen(false);
+                }}
+              >
+                Close
+              </button>
+            </header>
+
+            {/* Ticking can be back-dated, which is what a date column is for.
+                The API refuses a day that has not happened. */}
+            <p className={styles.dayRow}>
+              <label htmlFor="tick-day">Ticking as</label>
+              <input
+                id="tick-day"
+                type="date"
+                value={tickDay}
+                max={today}
+                onChange={(event) => setTickDay(event.target.value || today)}
+              />
+              {tickDay !== today && (
+                <button type="button" onClick={() => setTickDay(today)}>
+                  today
+                </button>
+              )}
+            </p>
+
+            <ul className={styles.lessons}>
+              {stage.lessons.map((each) => (
+                <li
+                  key={each.id}
+                  className={`${each.done_on ? styles.doneLesson : ''} ${
+                    each.on_route ? '' : styles.offRoute
+                  }`}
+                >
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={each.done_on !== null}
+                      onChange={() =>
+                        void act({
+                          action: 'toggle-lesson',
+                          id: each.id,
+                          ...(tickDay && tickDay !== today ? { day: tickDay } : {}),
+                        })
+                      }
+                    />
+                    {renaming === `lesson:${each.id}` ? (
+                      <input
+                        className={styles.renameInline}
+                        value={rename}
+                        autoFocus
+                        aria-label={`Rename ${each.name}`}
+                        onChange={(event) => setRename(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' && rename.trim()) {
+                            void act({ action: 'rename', kind: 'lesson', id: each.id, name: rename });
+                            setRenaming(null);
+                          }
+                          if (event.key === 'Escape') setRenaming(null);
+                        }}
+                        onBlur={() => setRenaming(null)}
+                      />
+                    ) : (
+                      <span
+                        onDoubleClick={() => {
+                          setRenaming(`lesson:${each.id}`);
+                          setRename(each.name);
+                        }}
+                        title="Double-click to rename"
+                      >
+                        {each.name}
+                      </span>
+                    )}
+                  </label>
+
+                  <span className={styles.lessonButtons}>
+                    <button
+                      type="button"
+                      className={each.id === detailFor && !sourcesOpen ? styles.activeButton : undefined}
+                      onClick={() => startDetail(each)}
+                    >
+                      details
+                    </button>
+                    <button
+                      type="button"
+                      className={sourcesOpen ? styles.activeButton : undefined}
+                      onClick={() => {
+                        setSourcesOpen(true);
+                        setDetailFor(null);
+                      }}
+                    >
+                      sources
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.removeButton}
+                      onClick={() => {
+                        if (!confirm(`Delete “${each.name}”? Its tick goes with it.`)) return;
+                        if (detailFor === each.id) setDetailFor(null);
+                        void act({ action: 'remove', kind: 'lesson', id: each.id });
+                      }}
+                    >
+                      delete
+                    </button>
+                  </span>
+                </li>
+              ))}
+
+              <li className={styles.addLesson}>
+                <form
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    if (!draft.trim()) return;
+                    void act({ action: 'add-lesson', module_id: stage.id, name: draft }).then(() =>
+                      setDraft(''),
+                    );
+                  }}
+                >
+                  <input
+                    value={adding === `lesson:${stage.id}` ? draft : ''}
+                    placeholder="+ Add a lesson"
+                    aria-label="New lesson name"
+                    onFocus={() => setAdding(`lesson:${stage.id}`)}
+                    onChange={(event) => setDraft(event.target.value)}
+                  />
+                </form>
+              </li>
+            </ul>
+          </section>
+        )}
+
+        {/* --- the detail card, equal size, to the right ------------------- */}
+        {current && stage && lesson && !sourcesOpen && (
+          <section className={styles.open}>
+            <header className={styles.openHead}>
+              <h2>{lesson.name}</h2>
+              <button type="button" className={styles.closeOpen} onClick={() => setDetailFor(null)}>
+                Close
+              </button>
+            </header>
+
+            {editingDetail ? (
+              <>
+                <textarea
+                  className={styles.detailEditor}
+                  value={detailDraft}
+                  autoFocus
+                  aria-label={`What ${lesson.name} teaches`}
+                  placeholder="What this teaches. Markdown — ## headings, - bullets, **bold**."
+                  onChange={(event) => setDetailDraft(event.target.value)}
+                />
+                <p className={styles.detailButtons}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void act({ action: 'set-detail', id: lesson.id, detail: detailDraft }).then(
+                        (result) => {
+                          setEditingDetail(false);
+                          if (result?.repoOwned) {
+                            setError(
+                              result.committed
+                                ? null
+                                : 'Saved here, but the repo copy did not commit — the next rebuild will overwrite it.',
+                            );
+                          }
+                        },
+                      );
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button type="button" onClick={() => setEditingDetail(false)}>
+                    Cancel
+                  </button>
+                </p>
+              </>
+            ) : (
+              <>
+                <div className={styles.detailBody}>
+                  {lesson.detail ? (
+                    <Markdown source={lesson.detail} />
+                  ) : (
+                    <p className={styles.nothingYet}>
+                      Nothing written. For a transcribed curriculum that is correct — the substance
+                      is in the resource, and the Sources card is where it lives.
+                    </p>
+                  )}
+                </div>
+                <p className={styles.detailButtons}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDetailDraft(lesson.detail ?? '');
+                      setEditingDetail(true);
+                    }}
+                  >
+                    {lesson.detail ? 'Edit' : 'Write it'}
+                  </button>
+                  {/* The route decision lives with the lesson's substance
+                      rather than on a row pressed constantly. */}
+                  <label className={styles.routeSwitch}>
+                    <input
+                      type="checkbox"
+                      checked={lesson.on_route === 1}
+                      onChange={() =>
+                        void act({
+                          action: 'set-route',
+                          id: lesson.id,
+                          on: lesson.on_route !== 1,
+                        })
+                      }
+                    />
+                    on the route
+                  </label>
+                </p>
+              </>
+            )}
+          </section>
+        )}
+
+        {/* --- the sources card, the same size ----------------------------- */}
+        {current && stage && sourcesOpen && (
+          <section className={styles.open}>
+            <header className={styles.openHead}>
+              <h2>{current.name} — sources</h2>
+              <button type="button" className={styles.closeOpen} onClick={() => setSourcesOpen(false)}>
+                Close
+              </button>
+            </header>
+
+            <div className={styles.detailBody}>
+              {current.sources && current.sources.length > 0 ? (
+                <ul className={styles.sourceList}>
+                  {current.sources.map((source) => (
+                    <li key={source.id}>
+                      <span className={styles.sourceTitle}>
+                        {source.url ? (
+                          <a href={source.url} target="_blank" rel="noreferrer">
+                            {source.title}
+                          </a>
+                        ) : (
+                          source.title
+                        )}
+                      </span>
+                      {source.note && <span className={styles.sourceNote}>{source.note}</span>}
+                      <button
+                        type="button"
+                        className={styles.removeButton}
+                        onClick={() => {
+                          if (!confirm(`Remove “${source.title}”?`)) return;
+                          void act({ action: 'remove-source', id: source.id });
+                        }}
+                      >
+                        remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className={styles.nothingYet}>Nothing recorded yet.</p>
+              )}
+            </div>
+
+            <form
+              className={styles.addSource}
+              onSubmit={(event) => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                const title = (form.elements.namedItem('title') as HTMLInputElement).value.trim();
+                const url = (form.elements.namedItem('url') as HTMLInputElement).value.trim();
+                const note = (form.elements.namedItem('note') as HTMLInputElement).value.trim();
+                if (!title) return;
+                void act({ action: 'add-source', curriculum_id: current.id, title, url, note }).then(
+                  () => form.reset(),
+                );
+              }}
+            >
+              <input name="title" placeholder="Title — a book, a course, a syllabus" aria-label="Source title" />
+              <input name="url" placeholder="URL, if it has one" aria-label="Source URL" />
+              <input name="note" placeholder="Note — an edition, a volume, a shelf" aria-label="Source note" />
+              <button type="submit">Add source</button>
+            </form>
+          </section>
+        )}
+      </div>
     </div>
   );
+}
+
+/**
+ * Lesson detail, rendered.
+ *
+ * It is authored as Markdown — bullets, headings, the odd code span — and the
+ * page used to print the string raw, which made the substance of a lesson a
+ * wall of asterisks. That is the opposite of the point: the whole reason
+ * `detail` exists is that a name "tells me what is learned conceptually, but
+ * what wrist level means, what posture to use is a mystery".
+ *
+ * Rendered here rather than with the site's MDX pipeline, which is a server
+ * component compiled at build and cannot run in the browser. A small subset is
+ * enough for what these actually contain, and anything it does not understand
+ * comes out as its own paragraph rather than as nothing.
+ */
+function Markdown({ source }: { source: string }) {
+  const blocks = source.split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+
+  return (
+    <>
+      {blocks.map((block, at) => {
+        const heading = /^(#{1,4})\s+(.*)$/.exec(block);
+        if (heading) {
+          const level = Math.min(6, heading[1].length + 2);
+          const Tag = `h${level}` as 'h3';
+          return (
+            <Tag key={at} className={styles.detailHeading}>
+              {inline(heading[2])}
+            </Tag>
+          );
+        }
+
+        // A list, where every line of the block is a bullet.
+        const lines = block.split('\n');
+        if (lines.every((line) => /^\s*[-*]\s+/.test(line))) {
+          return (
+            <ul key={at} className={styles.detailList}>
+              {lines.map((line, index) => (
+                <li key={index}>{inline(line.replace(/^\s*[-*]\s+/, ''))}</li>
+              ))}
+            </ul>
+          );
+        }
+        if (lines.every((line) => /^\s*\d+[.)]\s+/.test(line))) {
+          return (
+            <ol key={at} className={styles.detailList}>
+              {lines.map((line, index) => (
+                <li key={index}>{inline(line.replace(/^\s*\d+[.)]\s+/, ''))}</li>
+              ))}
+            </ol>
+          );
+        }
+
+        return <p key={at}>{inline(block)}</p>;
+      })}
+    </>
+  );
+}
+
+/**
+ * Bold, italic and code within a line.
+ *
+ * Split rather than replaced into HTML: building a string and injecting it
+ * would mean trusting this text, and although it is his own, a renderer that
+ * cannot inject is simply a better renderer.
+ */
+function inline(text: string): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  let at = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > at) out.push(text.slice(at, match.index));
+    const token = match[0];
+    if (token.startsWith('**')) out.push(<strong key={match.index}>{token.slice(2, -2)}</strong>);
+    else if (token.startsWith('`')) out.push(<code key={match.index}>{token.slice(1, -1)}</code>);
+    else out.push(<em key={match.index}>{token.slice(1, -1)}</em>);
+    at = match.index + token.length;
+  }
+  if (at < text.length) out.push(text.slice(at));
+  return out;
 }

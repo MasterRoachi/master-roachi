@@ -315,6 +315,57 @@ Two columns carry decisions worth knowing about:
   resource, a **designed** one has nowhere else to keep it. So Godot, Drawing,
   Aseprite and SA politics carry detail; Greek, Japanese and Odin do not.
 
+### The curriculums dashboard
+
+**A deck of cards.** It was a column of wide cards each carrying a ring, a
+count, a fortnight figure, a source line and the next lesson — all true, and it
+meant the page answered five questions at once, none of them the one being
+asked. Now a card per curriculum shows its progress and its name and nothing
+else, and everything further is reached by going into it: stages fan out, a
+stage opens to its lessons, a lesson opens its detail beside it. Three levels,
+three depths of card, at most two side by side.
+
+**The only number on the page is a percentage in a ring.** No counts, no
+fortnight figure, no "N of M" — except the one Up next line, which is the route
+through all the routes and the reason curriculum order exists.
+
+A card's colour is **derived from its name** (`lib/curriculum-card.ts`), using
+the book spines' own palette and hash, so a new curriculum has an identity with
+nothing to choose and renaming one changes its colour. Lightness and chroma are
+fixed: varying them by hash as well is how a deck ends up with one unreadably
+dark card and one that glares. Status is one round button cycling
+active → paused → done, because three values do not need a menu, and paused and
+done sit at the back of the deck, greyed.
+
+**`detail` is written to D1 and to the repo.** For a designed curriculum
+`scripts/curriculums/<name>-detail.json` is the source of truth — `apply.mjs`
+lets the repo win wherever it has detail — so writing only D1 meant anything
+typed at the dashboard was overwritten by the next rebuild. Both are written
+now, through the same `lib/collections.ts` guard as every other write; the D1
+write lands first, deliberately, so a GitHub outage costs a future overwrite
+rather than refusing the edit. A transcribed curriculum has no detail file and
+needs none: `apply.mjs` already preserves dashboard-written detail wherever the
+script supplies none, and the response says which of the two happened.
+
+**Detail is rendered, not printed.** It is authored as Markdown and the page
+used to emit the string raw, which made the substance of a lesson a wall of
+asterisks — the opposite of the point, since `detail` exists because a name
+"tells me what is learned conceptually, but what wrist level means, what
+posture to use is a mystery". Rendered by a small subset renderer in the
+component, because the site's MDX pipeline is a server component compiled at
+build and cannot run in a browser.
+
+**`sources` is a table** (`0008`), not the one `curriculums.source` line: Greek
+runs Pimsleur and the Basic Course in tandem. That column still exists and
+records which document *designed* a curriculum, which the build scripts read —
+a different fact, and dropping a column in SQLite rewrites the table.
+
+Taking a lesson off the route lives on its detail card rather than on the
+lesson row, so a decision made rarely is not sitting next to one pressed
+constantly. There is no outline import and no reordering from the page: every
+curriculum is built through this UI from now on, which is what the blank card
+at the back of each deck is for.
+
 ### Curriculums
 
 Eight, in `scripts/curriculums/`. 708 lessons, 694 on the route, 341 carrying
