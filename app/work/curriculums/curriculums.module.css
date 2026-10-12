@@ -54,22 +54,28 @@
   min-height: 8rem;
   border-radius: 10px;
   border: 1px solid oklch(32% 0 0);
-  background: linear-gradient(165deg, oklch(18% 0 0), oklch(10% 0 0));
+  /* THE GOLD IS THE CARD and the black is a sticker on top of it, which is
+     the way round it has to be for a peel to reveal anything.
+     It was the other way first — gold as the ::before over a black
+     background — so the overlay covered the card and every one of them read
+     gold, inset inside its own border like a box dropped on the card. */
+  background: linear-gradient(145deg, oklch(84% 0.12 88), oklch(66% 0.13 82));
   overflow: hidden;
-  /* The gold beneath the sticker. It is always there; the peel is what
-     uncovers it, which is why finishing does not change the background. */
   isolation: isolate;
 }
 
-/* The sticker: the black face, which peels off to leave the gold behind.
-   A layer of its own rather than the card's own background, because the thing
-   being torn away has to be able to move while the card stays put. */
+/* The sticker: the black face, which peels away to leave the gold behind.
+   A layer of its own rather than the card's background, because the thing
+   being torn off has to move while the card stays put.
+   Inset past the border, so there is no ring of gold around the face at
+   rest — that seam is what read as a box within the card. */
 .queueCard::before {
   content: '';
   position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: linear-gradient(145deg, oklch(84% 0.12 88), oklch(66% 0.13 82));
+  inset: -1px;
+  z-index: 1;
+  border-radius: inherit;
+  background: linear-gradient(165deg, oklch(18% 0 0), oklch(10% 0 0));
 }
 
 .queueBody,
@@ -90,13 +96,15 @@
   animation: fade-away 900ms 420ms ease-out forwards;
 }
 
+/* The black face comes away towards the corner the gold fold is on. */
 .queueDone::before {
   animation: lift 420ms ease-in forwards;
+  transform-origin: 100% 100%;
 }
 
 @keyframes lift {
   to {
-    transform: translate(42%, 42%) rotate(14deg);
+    transform: translate(38%, 38%) rotate(12deg);
     opacity: 0;
   }
 }
