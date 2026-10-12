@@ -10,13 +10,12 @@
   --gold: oklch(80% 0.13 85);
 }
 
+/* The pills and nothing else. The account, the read time and a Refresh button
+   were here: the account was a diagnostic that has done its job, the time was
+   a number nobody acts on, and reloading re-reads Trello anyway. */
 .head {
   flex: none;
   display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
   min-width: 0;
 }
 
@@ -86,11 +85,6 @@
 
 .warn {
   color: oklch(82% 0.16 85);
-}
-
-.head .status {
-  flex: none;
-  white-space: nowrap;
 }
 
 .status button {
@@ -424,13 +418,6 @@
    nothing else does — it is a layer the page opened, not the page. */
 .detail .chips {
   overflow-y: auto;
-}
-
-/* Which Trello login the Worker's token is, which nothing else can tell you. */
-.account {
-  margin-right: 0.5rem;
-  color: var(--gold);
-  font-variant-numeric: tabular-nums;
 }
 
 .seen {

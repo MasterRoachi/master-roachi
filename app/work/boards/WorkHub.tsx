@@ -282,7 +282,11 @@ export default function WorkHub() {
   return (
     <div className={styles.page}>
       <div className={styles.head}>
-        {/* A pill per board, one open at a time. */}
+        {/* A pill per board, one open at a time, and nothing else.
+            The account, the read time and a Refresh button sat here: the
+            account was a diagnostic that has done its job, the time was a
+            number nobody acts on, and reloading the page re-reads Trello
+            because the fetch runs on mount. */}
         <nav className={styles.pills} aria-label="Boards">
           {boards.map((one) => (
             <button
@@ -297,22 +301,7 @@ export default function WorkHub() {
           ))}
         </nav>
 
-        <p className={styles.status}>
-          {/* WHICH ACCOUNT. There is no way to tell from the outside which
-              Trello login a key and token authenticate as, and that turned out
-              to matter: a board full of sample cards is either a stale board
-              on the right account or the right board on the wrong one, and
-              those have opposite fixes. */}
-          {data.account && (
-            <span className={styles.account} title={data.account.email ?? undefined}>
-              @{data.account.username}
-            </span>
-          )}
-          {new Date(data.fetchedAt).toLocaleTimeString('en-ZA')}{' '}
-          <button type="button" onClick={() => setNonce((n) => n + 1)}>
-            Refresh
-          </button>
-        </p>
+
       </div>
 
       {/* Trello and the rest fail independently, so a missing token costs the
