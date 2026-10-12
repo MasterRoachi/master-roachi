@@ -152,7 +152,10 @@
   inset: 0;
   z-index: 55;
   background: color-mix(in oklch, var(--bg) 78%, black);
-  animation: dim 940ms ease-out both;
+  /* Eased in over the peel and the travel, and held — it is removed only
+     after the layer is up, so the overlay's own fade has something behind
+     it and the page never shows through bright. */
+  animation: dim 700ms ease-out both;
   pointer-events: none;
 }
 
@@ -168,7 +171,10 @@
   border-radius: 10px;
   background: linear-gradient(145deg, oklch(99% 0 0), oklch(88% 0 0));
   box-shadow: 0 20px 60px rgb(0 0 0 / 0.55);
-  animation: travel 520ms 420ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  /* 940ms, up from 520: the card was arriving before the eye had followed it.
+     Matches ZOOM in Curriculums.tsx, which waits this out before mounting the
+     layer — change one, change the other. */
+  animation: travel 940ms 420ms cubic-bezier(0.32, 0, 0.2, 1) both;
   pointer-events: none;
 }
 
@@ -179,7 +185,9 @@
     width: calc(100vw - 100px);
     height: calc(100vh - 100px);
     border-radius: 14px;
-    opacity: 0.12;
+    /* Stays OPAQUE. Fading to 0.12 at the end meant the stand-in was almost
+       gone at the moment it had to cover the overlay's own fade-in, which is
+       half of why that handover flashed. */
   }
 }
 

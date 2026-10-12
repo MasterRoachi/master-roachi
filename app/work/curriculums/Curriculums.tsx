@@ -80,7 +80,17 @@ const PEEL = 420;
 const FADE = 900;
 const ARRIVE = 700;
 /** How long the opening card takes to reach the centre. */
-const ZOOM = 520;
+const ZOOM = 940;
+/**
+ * How long the travelling card stays up after the layer is mounted.
+ *
+ * Without the overlap there is a flash: the opening dim is removed and the
+ * overlay starts its OWN backdrop fade from transparent, so one frame of
+ * undimmed page shows through between the two. Holding the stand-in and its
+ * dim over that fade covers it, and the stand-in is already the same white
+ * rectangle in the same place, so the handover is invisible.
+ */
+const HANDOVER = 200;
 
 export default function Curriculums() {
   const [data, setData] = useState<Curriculum[] | null>(null);
@@ -302,7 +312,9 @@ export default function Curriculums() {
       setDetailDraft(step.lesson.detail ?? '');
       setEditingDetail(false);
       setLayer('detail');
-      setOpening(null);
+      // And only then let go of the stand-in, which is covering the overlay's
+      // own fade-in. See HANDOVER.
+      window.setTimeout(() => setOpening(null), HANDOVER);
     }, PEEL + ZOOM);
   }
 
