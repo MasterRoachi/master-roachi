@@ -1267,7 +1267,7 @@ export default {
               .all<{ id: number; curriculum_id: number; name: string }>(),
             db
               .prepare(
-                `select id, module_id, name, position, done_on, on_route, detail
+                `select id, module_id, name, position, done_on, detail
                  from lessons order by position, id`,
               )
               .all<{
@@ -1275,7 +1275,6 @@ export default {
               module_id: number;
               name: string;
               done_on: string | null;
-              on_route: number;
               detail: string | null;
             }>(),
             db
@@ -1425,31 +1424,6 @@ export default {
             }
 
             return json({ imported: true, ...size }, 200);
-          }
-
-          // Taking work on or off the route. A whole module at once, because
-          // a fork in a course is a section and switching forty lessons off
-          // one at a time is not a thing anyone would do.
-          if (action === 'set-route') {
-            const on = body.on === true ? 1 : 0;
-
-            if (body.module_id !== undefined) {
-              const moduleId = Number(body.module_id);
-              if (!Number.isInteger(moduleId)) return json({ error: 'which module' }, 400);
-              await db
-                .prepare(`update lessons set on_route = ?2 where module_id = ?1`)
-                .bind(moduleId, on)
-                .run();
-              return json({ updated: true, module_id: moduleId, on: on === 1 }, 200);
-            }
-
-            const id = Number(body.id);
-            if (!Number.isInteger(id)) return json({ error: 'which lesson' }, 400);
-            await db
-              .prepare(`update lessons set on_route = ?2 where id = ?1`)
-              .bind(id, on)
-              .run();
-            return json({ updated: true, id, on: on === 1 }, 200);
           }
 
           // The order of the curriculums IS the route through all of them, so

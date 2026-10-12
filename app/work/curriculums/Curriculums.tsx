@@ -79,6 +79,8 @@ type Layer = 'stages' | 'grid' | 'detail';
 const PEEL = 420;
 const FADE = 900;
 const ARRIVE = 700;
+/** How long the opening card takes to reach the centre. */
+const ZOOM = 520;
 
 export default function Curriculums() {
   const [data, setData] = useState<Curriculum[] | null>(null);
@@ -113,6 +115,21 @@ export default function Curriculums() {
   const [finishing, setFinishing] = useState<Set<number>>(new Set());
   /** Cards that have just arrived, so they can slide in rather than appear. */
   const [arriving, setArriving] = useState<Set<number>>(new Set());
+  /**
+   * The card being opened, and the box it started in.
+   *
+   * Opening is the same peel as finishing, in white, and then the card itself
+   * travels to the centre and grows to the size of the layer it is becoming.
+   * That needs the card's own position, which only the DOM knows — so it is
+   * measured at the click and handed to a fixed-position stand-in, because an
+   * element inside a scrolling grid cannot animate to the middle of the
+   * viewport without leaving its parent.
+   */
+  const [opening, setOpening] = useState<{
+    lessonId: number;
+    name: string;
+    from: { top: number; left: number; width: number; height: number };
+  } | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -182,8 +199,13 @@ export default function Curriculums() {
   }, [deck, front]);
 
   const current = curriculums.find((one) => one.id === openCurriculum) ?? null;
-  const stage = current?.modules.find((one) => one.id === openStage) ?? null;
-  const lesson = stage?.lessons.find((one) => one.id === openLesson) ?? null;
+  const stageAt = current ? current.modules.findIndex((one) => one.id === openStage) : -1;
+  const stage = stageAt >= 0 ? current!.modules[stageAt] : null;
+  /* Positions rather than names, for "Japanese › module 2 › lesson 12". The
+     breadcrumb is where you are, and a stage's name is already the heading of
+     the layer you came through. */
+  const lessonAt = stage ? stage.lessons.findIndex((one) => one.id === openLesson) : -1;
+  const lesson = lessonAt >= 0 ? stage!.lessons[lessonAt] : null;
 
   /** Seed the queue once there is data, and whenever the row runs dry. */
   useEffect(() => {
@@ -260,6 +282,28 @@ export default function Curriculums() {
       id: step.lesson.id,
       ...(tickDay && tickDay !== today ? { day: tickDay } : {}),
     });
+  }
+
+  /**
+   * Open a lesson from the Up next row.
+   *
+   * The white sticker peels, then the card travels to the centre and grows to
+   * the size of the layer it is turning into, and only then does the layer
+   * itself appear. Measured from the card's real box so the move starts where
+   * the card actually is rather than from an assumed position.
+   */
+  function openCard(step: Step, from: { top: number; left: number; width: number; height: number }) {
+    setOpening({ lessonId: step.lesson.id, name: step.curriculum.name, from });
+
+    window.setTimeout(() => {
+      setOpenCurriculum(step.curriculum.id);
+      setOpenStage(step.module.id);
+      setOpenLesson(step.lesson.id);
+      setDetailDraft(step.lesson.detail ?? '');
+      setEditingDetail(false);
+      setLayer('detail');
+      setOpening(null);
+    }, PEEL + ZOOM);
   }
 
   /* Searching ONE curriculum, not all of them: the thing being looked for is
@@ -356,7 +400,9 @@ export default function Curriculums() {
                 <div
                   className={`${styles.queueCard} ${
                     finishing.has(step.lesson.id) ? styles.queueDone : ''
-                  } ${arriving.has(step.lesson.id) ? styles.queueArriving : ''}`}
+                  } ${arriving.has(step.lesson.id) ? styles.queueArriving : ''} ${
+                    opening?.lessonId === step.lesson.id ? styles.queueOpening : ''
+                  }`}
                 >
                   {/* Two dog-ears, and the card body itself does nothing.
                       A card that completed a lesson anywhere you clicked it
@@ -366,13 +412,16 @@ export default function Curriculums() {
                     className={styles.foldOpen}
                     title={`Open ${step.lesson.name}`}
                     aria-label={`Open ${step.lesson.name}`}
-                    onClick={() => {
-                      setOpenCurriculum(step.curriculum.id);
-                      setOpenStage(step.module.id);
-                      setOpenLesson(step.lesson.id);
-                      setDetailDraft(step.lesson.detail ?? '');
-                      setEditingDetail(false);
-                      setLayer('detail');
+                    onClick={(event) => {
+                      const card = event.currentTarget.parentElement;
+                      if (!card) return;
+                      const box = card.getBoundingClientRect();
+                      openCard(step, {
+                        top: box.top,
+                        left: box.left,
+                        width: box.width,
+                        height: box.height,
+                      });
                     }}
                   />
                   <button
@@ -571,6 +620,29 @@ export default function Curriculums() {
         </p>
       )}
 
+      {/* The card on its way to becoming a layer.
+          A fixed stand-in rather than the card itself: the card lives in a
+          grid track and cannot travel to the middle of the viewport without
+          leaving its parent, and taking it out of the row would collapse the
+          row while it moved. */}
+      {opening && (
+        <>
+          <div className={styles.openingDim} />
+          <div
+            className={styles.travelling}
+            style={
+              {
+                '--from-top': `${opening.from.top}px`,
+                '--from-left': `${opening.from.left}px`,
+                '--from-width': `${opening.from.width}px`,
+                '--from-height': `${opening.from.height}px`,
+              } as React.CSSProperties
+            }
+            aria-hidden="true"
+          />
+        </>
+      )}
+
       {/* --- layer one: the stages, dead centre --------------------------- */}
       {layer === 'stages' && current && (
         <Overlay onClose={close} label={`${current.name} stages`}>
@@ -694,9 +766,7 @@ export default function Curriculums() {
               <li key={each.id}>
                 <button
                   type="button"
-                  className={`${styles.cell} ${each.done_on ? styles.cellDone : ''} ${
-                    each.on_route ? '' : styles.cellOff
-                  }`}
+                  className={`${styles.cell} ${each.done_on ? styles.cellDone : ''}`}
                   title={each.name}
                   onClick={() =>
                     flashTo('detail', () => {
@@ -732,213 +802,217 @@ export default function Curriculums() {
         <Overlay
           onClose={close}
           label={lesson.name}
+          full
           onBack={() => {
             setLayer('grid');
             setOpenLesson(null);
           }}
         >
-          <div className={styles.detailCard}>
-            <header className={styles.detailHead}>
-              {/* The stage's name is renameable HERE because the grid's
-                  header is gone and that is where it used to be. On the stage
-                  card it would fight the click that opens the grid; on a
-                  breadcrumb nothing else wants the gesture. */}
-              <p className={styles.overlayEyebrow}>
-                {current.name} ›{' '}
-                {renaming === `module:${stage.id}` ? (
-                  <input
-                    className={styles.renameEyebrow}
-                    value={rename}
-                    autoFocus
-                    aria-label={`Rename ${stage.name}`}
-                    onChange={(event) => setRename(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' && rename.trim()) {
-                        void act({ action: 'rename', kind: 'module', id: stage.id, name: rename });
-                        setRenaming(null);
-                      }
-                      if (event.key === 'Escape') setRenaming(null);
-                    }}
-                    onBlur={() => setRenaming(null)}
-                  />
-                ) : (
-                  <span
-                    onDoubleClick={() => {
-                      setRenaming(`module:${stage.id}`);
-                      setRename(stage.name);
-                    }}
-                    title="Double-click to rename the stage"
-                  >
-                    {stage.name}
-                  </span>
-                )}
-              </p>
-              <h2>
-                {renaming === `lesson:${lesson.id}` ? (
-                  <input
-                    className={styles.renameInline}
-                    value={rename}
-                    autoFocus
-                    aria-label={`Rename ${lesson.name}`}
-                    onChange={(event) => setRename(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' && rename.trim()) {
-                        void act({ action: 'rename', kind: 'lesson', id: lesson.id, name: rename });
-                        setRenaming(null);
-                      }
-                      if (event.key === 'Escape') setRenaming(null);
-                    }}
-                    onBlur={() => setRenaming(null)}
-                  />
-                ) : (
-                  <span
-                    onDoubleClick={() => {
-                      setRenaming(`lesson:${lesson.id}`);
-                      setRename(lesson.name);
-                    }}
-                    title="Double-click to rename"
-                  >
-                    {lesson.name}
-                  </span>
-                )}
-              </h2>
-            </header>
-
-            {editingDetail ? (
-              <>
-                <textarea
-                  className={styles.detailEditor}
-                  value={detailDraft}
+          <article className={styles.lessonPane}>
+            {/* Where you are, top left. The STAGE is renameable here because
+                the grid's header is gone and that is where it used to be; on a
+                stage card it would fight the click that opens the grid. */}
+            <p className={styles.lessonWhere}>
+              {current.name} <span className={styles.chev}>›</span>{' '}
+              {renaming === `module:${stage.id}` ? (
+                <input
+                  className={styles.renameEyebrow}
+                  value={rename}
                   autoFocus
-                  aria-label={`What ${lesson.name} teaches`}
-                  placeholder="What this teaches. Markdown — ## headings, - bullets, **bold**."
-                  onChange={(event) => setDetailDraft(event.target.value)}
-                />
-                <p className={styles.detailButtons}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      void act({ action: 'set-detail', id: lesson.id, detail: detailDraft }).then(
-                        (result) => {
-                          setEditingDetail(false);
-                          if (result?.repoOwned && !result.committed) {
-                            setError(
-                              'Saved here, but the repo copy did not commit — the next rebuild will overwrite it.',
-                            );
-                          }
-                        },
-                      );
-                    }}
-                  >
-                    Save
-                  </button>
-                  <button type="button" onClick={() => setEditingDetail(false)}>
-                    Cancel
-                  </button>
-                </p>
-              </>
-            ) : (
-              <>
-                <div className={styles.detailBody}>
-                  {lesson.detail ? (
-                    <Markdown source={lesson.detail} />
-                  ) : (
-                    <p className={styles.nothingYet}>
-                      Nothing written. For a transcribed curriculum that is correct — the substance
-                      is in the resource, and the sources below are where it lives.
-                    </p>
-                  )}
-                </div>
-
-                {current.sources && current.sources.length > 0 && (
-                  <div className={styles.sourceBlock}>
-                    <p className={styles.sourceHead}>Sources</p>
-                    <ul className={styles.sourceList}>
-                      {current.sources.map((source) => (
-                        <li key={source.id}>
-                          {source.url ? (
-                            <a href={source.url} target="_blank" rel="noreferrer">
-                              {source.title}
-                            </a>
-                          ) : (
-                            source.title
-                          )}
-                          {source.note && <span className={styles.sourceNote}>{source.note}</span>}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                <p className={styles.detailButtons}>
-                  {/* Back-dating lives here now: it was in the grid's header,
-                      and the header is gone. This is where marking done
-                      happens, so it is where the day belongs. */}
-                  <label className={styles.dayPick}>
-                    <span>on</span>
-                    <input
-                      type="date"
-                      value={tickDay}
-                      max={today}
-                      aria-label="The day to mark it done"
-                      onChange={(event) => setTickDay(event.target.value || today)}
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    className={lesson.done_on ? styles.goldButton : undefined}
-                    onClick={() =>
-                      void act({
-                        action: 'toggle-lesson',
-                        id: lesson.id,
-                        ...(tickDay && tickDay !== today ? { day: tickDay } : {}),
-                      })
+                  aria-label={`Rename ${stage.name}`}
+                  onChange={(event) => setRename(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && rename.trim()) {
+                      void act({ action: 'rename', kind: 'module', id: stage.id, name: rename });
+                      setRenaming(null);
                     }
-                  >
-                    {lesson.done_on ? 'Done — undo' : 'Mark done'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDetailDraft(lesson.detail ?? '');
-                      setEditingDetail(true);
-                    }}
-                  >
-                    {lesson.detail ? 'Edit detail' : 'Write detail'}
-                  </button>
-                  {/* The route decision lives with the lesson's substance
-                      rather than on a grid pressed constantly. */}
-                  <label className={styles.routeSwitch}>
-                    <input
-                      type="checkbox"
-                      checked={lesson.on_route === 1}
-                      onChange={() =>
-                        void act({
-                          action: 'set-route',
-                          id: lesson.id,
-                          on: lesson.on_route !== 1,
-                        })
-                      }
-                    />
-                    on the route
-                  </label>
-                  <button
-                    type="button"
-                    className={styles.removeButton}
-                    onClick={() => {
-                      if (!confirm(`Delete “${lesson.name}”? Its tick goes with it.`)) return;
-                      void act({ action: 'remove', kind: 'lesson', id: lesson.id }).then(() => {
-                        setLayer('grid');
-                        setOpenLesson(null);
-                      });
-                    }}
-                  >
-                    delete
-                  </button>
-                </p>
-              </>
+                    if (event.key === 'Escape') setRenaming(null);
+                  }}
+                  onBlur={() => setRenaming(null)}
+                />
+              ) : (
+                <span
+                  onDoubleClick={() => {
+                    setRenaming(`module:${stage.id}`);
+                    setRename(stage.name);
+                  }}
+                  title="Double-click to rename the stage"
+                >
+                  module {stageAt + 1}
+                </span>
+              )}{' '}
+              <span className={styles.chev}>›</span> lesson {lessonAt + 1}
+            </p>
+
+            <h2 className={styles.lessonTitle}>
+              {renaming === `lesson:${lesson.id}` ? (
+                <input
+                  className={styles.renameTitle}
+                  value={rename}
+                  autoFocus
+                  aria-label={`Rename ${lesson.name}`}
+                  onChange={(event) => setRename(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && rename.trim()) {
+                      void act({ action: 'rename', kind: 'lesson', id: lesson.id, name: rename });
+                      setRenaming(null);
+                    }
+                    if (event.key === 'Escape') setRenaming(null);
+                  }}
+                  onBlur={() => setRenaming(null)}
+                />
+              ) : (
+                <span
+                  onDoubleClick={() => {
+                    setRenaming(`lesson:${lesson.id}`);
+                    setRename(lesson.name);
+                  }}
+                  title="Double-click to rename"
+                >
+                  {lesson.name}
+                </span>
+              )}
+            </h2>
+
+            <div className={styles.lessonBody}>
+              {editingDetail ? (
+                <>
+                  <textarea
+                    className={styles.detailEditor}
+                    value={detailDraft}
+                    autoFocus
+                    aria-label={`What ${lesson.name} teaches`}
+                    placeholder="What this teaches. Markdown — ## headings, - bullets, **bold**, ![](/image.webp)."
+                    onChange={(event) => setDetailDraft(event.target.value)}
+                  />
+                  <p className={styles.editButtons}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void act({ action: 'set-detail', id: lesson.id, detail: detailDraft }).then(
+                          (result) => {
+                            setEditingDetail(false);
+                            if (result?.repoOwned && !result.committed) {
+                              setError(
+                                'Saved here, but the repo copy did not commit — the next rebuild will overwrite it.',
+                              );
+                            }
+                          },
+                        );
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button type="button" onClick={() => setEditingDetail(false)}>
+                      Cancel
+                    </button>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <section className={styles.lessonSection}>
+                    <h3>Details</h3>
+                    {lesson.detail ? (
+                      <Markdown source={lesson.detail} />
+                    ) : (
+                      <p className={styles.nothingYet}>
+                        Nothing written. For a transcribed curriculum that is correct — the
+                        substance is in the resource, and the sources below are where it lives.
+                      </p>
+                    )}
+                  </section>
+
+                  <section className={styles.lessonSection}>
+                    <h3>Sources</h3>
+                    {current.sources && current.sources.length > 0 ? (
+                      <ul className={styles.sourceList}>
+                        {current.sources.map((source) => (
+                          <li key={source.id}>
+                            {source.url ? (
+                              <a href={source.url} target="_blank" rel="noreferrer">
+                                {source.title}
+                              </a>
+                            ) : (
+                              source.title
+                            )}
+                            {source.note && <span className={styles.sourceNote}>{source.note}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className={styles.nothingYet}>Nothing recorded for this curriculum yet.</p>
+                    )}
+                  </section>
+
+                  {/* Visual examples, where applicable — which means where the
+                      detail has images in it. Nothing else on a lesson carries
+                      a picture, so "applicable" is literally "there are some",
+                      and a heading over an empty space on every other lesson
+                      would be worse than no heading. */}
+                  {imagesIn(lesson.detail).length > 0 && (
+                    <section className={styles.lessonSection}>
+                      <h3>Visual examples</h3>
+                      <div className={styles.visuals}>
+                        {imagesIn(lesson.detail).map((image) => (
+                          <figure key={image.src}>
+                            <img src={image.src} alt={image.alt} loading="lazy" />
+                            {image.alt && <figcaption>{image.alt}</figcaption>}
+                          </figure>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </>
+              )}
+            </div>
+
+            {!editingDetail && (
+              <footer className={styles.lessonActions}>
+                <button
+                  type="button"
+                  className={`${styles.roundButton} ${lesson.done_on ? styles.roundDone : ''}`}
+                  title={lesson.done_on ? 'Done — click to undo' : 'Mark done'}
+                  aria-label={lesson.done_on ? 'Mark not done' : 'Mark done'}
+                  onClick={() =>
+                    void act({
+                      action: 'toggle-lesson',
+                      id: lesson.id,
+                      ...(tickDay && tickDay !== today ? { day: tickDay } : {}),
+                    })
+                  }
+                >
+                  ✓
+                </button>
+                <button
+                  type="button"
+                  className={styles.roundButton}
+                  title={lesson.detail ? 'Edit the detail' : 'Write the detail'}
+                  aria-label="Edit"
+                  onClick={() => {
+                    setDetailDraft(lesson.detail ?? '');
+                    setEditingDetail(true);
+                  }}
+                >
+                  ✎
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.roundButton} ${styles.roundDelete}`}
+                  title="Delete this lesson"
+                  aria-label="Delete"
+                  onClick={() => {
+                    if (!confirm(`Delete “${lesson.name}”? Its tick goes with it.`)) return;
+                    void act({ action: 'remove', kind: 'lesson', id: lesson.id }).then(() => {
+                      setLayer('grid');
+                      setOpenLesson(null);
+                    });
+                  }}
+                >
+                  ×
+                </button>
+              </footer>
             )}
-          </div>
+          </article>
         </Overlay>
       )}
     </div>
@@ -1001,6 +1075,23 @@ function Chevron({ direction }: { direction: 'left' | 'right' }) {
 }
 
 /**
+ * The images in a lesson's detail, which is where a visual example can come
+ * from — nothing else on a lesson carries a picture.
+ *
+ * Markdown image syntax, so writing one is `![what it shows](/path.webp)` in
+ * the detail box. They are pulled OUT of the prose and shown together under
+ * their own heading rather than left inline, because an example belongs beside
+ * the other examples and not in the middle of a sentence about wrist height.
+ */
+function imagesIn(detail: string | null): { src: string; alt: string }[] {
+  if (!detail) return [];
+  return [...detail.matchAll(/!\[([^\]]*)\]\(([^)\s]+)\)/g)].map((match) => ({
+    alt: match[1],
+    src: match[2],
+  }));
+}
+
+/**
  * Lesson detail, rendered.
  *
  * It is authored as Markdown and the page used to print the string raw, which
@@ -1022,6 +1113,12 @@ function Markdown({ source }: { source: string }) {
   return (
     <>
       {blocks.map((block, at) => {
+        // Images are lifted out into Visual examples, so a block that is only
+        // an image renders as nothing here rather than as its own markup.
+        const withoutImages = block.replace(/!\[[^\]]*\]\([^)\s]+\)/g, '').trim();
+        if (withoutImages === '') return null;
+        block = withoutImages;
+
         const heading = /^(#{1,4})\s+(.*)$/.exec(block);
         if (heading) {
           return (

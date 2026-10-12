@@ -96,15 +96,18 @@
   animation: fade-away 900ms 420ms ease-out forwards;
 }
 
-/* The black face comes away towards the corner the gold fold is on. */
+/* The face goes, in place.
+   It used to slide and rotate away, which is what a peeled sticker does and
+   what it looked like was a black box moving around inside the card — the
+   card clips to its own rounded rectangle, so a translating child reads as a
+   rectangle sliding behind a window rather than as paper coming off. Fading
+   where it stands reveals the same gold and reads as the face dissolving. */
 .queueDone::before {
-  animation: lift 420ms ease-in forwards;
-  transform-origin: 100% 100%;
+  animation: uncover 420ms ease-in forwards;
 }
 
-@keyframes lift {
+@keyframes uncover {
   to {
-    transform: translate(38%, 38%) rotate(12deg);
     opacity: 0;
   }
 }
@@ -113,6 +116,77 @@
   to {
     opacity: 0;
     transform: scale(0.96);
+  }
+}
+
+/* --- opening: the same peel, in white --------------------------------- */
+.queueOpening {
+  /* The card beneath the sticker is white for this, not gold: the two
+     corners promise different things and the reveal has to match the corner
+     that was pulled. */
+  background: linear-gradient(145deg, oklch(99% 0 0), oklch(88% 0 0));
+}
+
+.queueOpening::before {
+  animation: uncover 420ms ease-in forwards;
+}
+
+.queueOpening .foldDone {
+  opacity: 0;
+}
+
+.queueOpening .foldOpen {
+  width: 170%;
+  height: 170%;
+  transition: width 420ms ease-in, height 420ms ease-in;
+}
+
+.queueOpening .queueWhat,
+.queueOpening .queueWhere {
+  color: oklch(20% 0 0);
+}
+
+/* The page going quiet behind the card on its way in. */
+.openingDim {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: color-mix(in oklch, var(--bg) 78%, black);
+  animation: dim 940ms ease-out both;
+  pointer-events: none;
+}
+
+/* The card itself, travelling to the centre and growing into the layer it is
+   becoming — the same 50px inset the lesson layer uses. */
+.travelling {
+  position: fixed;
+  z-index: 56;
+  top: var(--from-top);
+  left: var(--from-left);
+  width: var(--from-width);
+  height: var(--from-height);
+  border-radius: 10px;
+  background: linear-gradient(145deg, oklch(99% 0 0), oklch(88% 0 0));
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.55);
+  animation: travel 520ms 420ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  pointer-events: none;
+}
+
+@keyframes travel {
+  to {
+    top: 50px;
+    left: 50px;
+    width: calc(100vw - 100px);
+    height: calc(100vh - 100px);
+    border-radius: 14px;
+    opacity: 0.12;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .openingDim,
+  .travelling {
+    animation-duration: 1ms;
   }
 }
 
@@ -573,14 +647,6 @@
   color: var(--gold);
 }
 
-.overlayEyebrow {
-  margin: 0 0 0.2rem;
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
 /* --- layer one: the stages ---------------------------------------------- */
 .stageCentre {
   width: min(100%, 60rem);
@@ -795,11 +861,6 @@
   color: oklch(24% 0.03 85);
 }
 
-.cellOff {
-  opacity: 0.4;
-  font-style: italic;
-}
-
 .cellAdd {
   border-style: dashed;
   color: var(--muted);
@@ -811,59 +872,80 @@
   }
 }
 
-/* --- layer three: one lesson ------------------------------------------- */
-.detailCard {
-  width: min(100%, 40rem);
-  max-height: 100%;
-  overflow-y: auto;
+/* --- layer three: one lesson -------------------------------------------
+   Where you are, top left. The lesson's name as the heading. Details, then
+   sources, then visual examples where there are any. Three round buttons at
+   the foot, centred. */
+.lessonPane {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 1rem;
   background: var(--bg-raised);
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 1.25rem 1.4rem 1.4rem;
+  padding: 1.25rem 1.5rem 1.5rem;
 }
 
-.detailHead {
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 0.9rem;
-}
-
-.detailHead h2 {
+.lessonWhere {
   margin: 0;
-  font-size: 1.1875rem;
-  font-weight: 500;
-  line-height: 1.35;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
-.renameEyebrow {
+.chev {
+  color: color-mix(in oklch, var(--muted) 55%, transparent);
+  margin: 0 0.1rem;
+}
+
+.lessonTitle {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.renameTitle {
+  width: min(100%, 40rem);
   background: var(--bg);
   border: 1px solid var(--gold);
-  border-radius: 5px;
+  border-radius: 8px;
   color: var(--ink);
-  padding: 0.05rem 0.3rem;
+  padding: 0.3rem 0.6rem;
   font: inherit;
+  text-align: center;
+}
+
+.lessonBody {
+  overflow-y: auto;
+  display: grid;
+  gap: 1.5rem;
+  align-content: start;
+  /* Readable width, centred, rather than a line of text as wide as a
+     1900px screen. */
+  width: min(100%, 46rem);
+  margin: 0 auto;
+}
+
+.lessonSection h3 {
+  margin: 0 0 0.5rem;
   font-size: 0.6875rem;
-  text-transform: none;
-  letter-spacing: normal;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
 }
 
-.renameInline {
-  background: var(--bg);
-  border: 1px solid var(--gold);
-  border-radius: 6px;
-  color: var(--ink);
-  padding: 0.2rem 0.4rem;
-  font: inherit;
-  width: 100%;
-}
-
-.detailBody {
+.lessonSection p,
+.lessonSection ul,
+.lessonSection ol {
   font-size: 0.9375rem;
   line-height: 1.65;
-}
-
-.detailBody p {
-  margin: 0 0 0.8rem;
 }
 
 .detailHeading {
@@ -872,7 +954,7 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--gold);
+  color: var(--ink);
 }
 
 .detailHeading:first-child {
@@ -886,119 +968,35 @@
   gap: 0.3rem;
 }
 
-.detailBody code {
+.lessonSection code {
   background: var(--bg);
   border-radius: 4px;
   padding: 0.05rem 0.25rem;
   font-size: 0.875em;
 }
 
-.detailEditor {
+/* Visual examples, which are the images in the detail pulled out of the
+   prose and shown together. */
+.visuals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem;
+}
+
+.visuals figure {
+  margin: 0;
+}
+
+.visuals img {
   width: 100%;
-  min-height: 18rem;
-  background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 8px;
-  color: var(--ink);
-  padding: 0.7rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  resize: vertical;
 }
 
-.detailEditor:focus {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.detailButtons {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 1rem 0 0;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--line);
-}
-
-.detailButtons button {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  color: var(--ink);
-  padding: 0.35rem 0.75rem;
-  font: inherit;
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
-
-.detailButtons button:hover {
-  border-color: var(--gold);
-}
-
-.goldButton {
-  border-color: var(--gold) !important;
-  color: var(--gold) !important;
-}
-
-/* Back-dating, which used to sit in the grid's header. */
-.dayPick {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
+.visuals figcaption {
+  margin-top: 0.3rem;
   font-size: 0.75rem;
-  color: var(--muted);
-}
-
-.dayPick input {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--ink);
-  padding: 0.2rem 0.35rem;
-  font: inherit;
-  font-size: 0.75rem;
-}
-
-.routeSwitch {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.75rem;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.removeButton {
-  margin-left: auto;
-  color: var(--muted) !important;
-}
-
-.removeButton:hover {
-  border-color: oklch(70% 0.18 25) !important;
-  color: oklch(70% 0.18 25) !important;
-}
-
-.nothingYet {
-  margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: var(--muted);
-}
-
-/* The curriculum's sources, on the lesson that sent you looking for them. */
-.sourceBlock {
-  margin-top: 1rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid var(--line);
-}
-
-.sourceHead {
-  margin: 0 0 0.4rem;
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  line-height: 1.45;
   color: var(--muted);
 }
 
@@ -1008,7 +1006,7 @@
   padding: 0;
   display: grid;
   gap: 0.4rem;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
 }
 
 .sourceList a {
@@ -1017,7 +1015,105 @@
 
 .sourceNote {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+.nothingYet {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* The three, centred at the foot. */
+.lessonActions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.roundButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 140ms ease-out, color 140ms ease-out;
+}
+
+.roundButton:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* Already done, so the button is the state as well as the switch. */
+.roundDone {
+  border-color: var(--gold);
+  background: linear-gradient(160deg, oklch(84% 0.12 88), oklch(70% 0.13 82));
+  color: oklch(24% 0.03 85);
+}
+
+.roundDelete:hover {
+  border-color: oklch(70% 0.18 25);
+  color: oklch(70% 0.18 25);
+}
+
+.detailEditor {
+  width: 100%;
+  min-height: 20rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.detailEditor:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.editButtons {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0.8rem 0 0;
+}
+
+.editButtons button {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  padding: 0.35rem 0.9rem;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.editButtons button:hover {
+  border-color: var(--gold);
+}
+
+.renameEyebrow {
+  background: var(--bg);
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  color: var(--ink);
+  padding: 0.05rem 0.3rem;
+  font: inherit;
+  font-size: 0.75rem;
 }

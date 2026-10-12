@@ -2421,15 +2421,7 @@ globalThis.fetch = preGh;
 // --- curriculum progress and what is next ----------------------------------
 
 {
-  // on_route is explicit in every fixture. Leaving it undefined made the
-  // earlier tests pass for the wrong reason: `undefined !== 0` is true, so
-  // every lesson counted as on-route and none of the route logic was exercised.
-  const lesson = (id, done = null, onRoute = 1) => ({
-    id,
-    name: `L${id}`,
-    done_on: done,
-    on_route: onRoute,
-  });
+  const lesson = (id, done = null) => ({ id, name: `L${id}`, done_on: done });
   const make = (modules) => ({ id: 1, name: 'Odin', source: null, status: 'active', modules });
 
   const course = make([
@@ -2505,12 +2497,7 @@ globalThis.fetch = preGh;
 // numbers have to be about the line.
 
 {
-  const lesson = (id, done = null, onRoute = 1) => ({
-    id,
-    name: `L${id}`,
-    done_on: done,
-    on_route: onRoute,
-  });
+  const lesson = (id, done = null) => ({ id, name: `L${id}`, done_on: done });
   const make = (modules, status = 'active', id = 1, name = 'C') => ({
     id,
     name,
@@ -2519,62 +2506,42 @@ globalThis.fetch = preGh;
     modules,
   });
 
+  /* The route is gone, at his word, so progress is the whole course.
+   *
+   * It existed for a fork like Odin's Ruby section: 14 of 151 lessons decided
+   * against, so 112 of 137 rather than of 151. One flag, three derived
+   * numbers, a switch on every lesson and a filter in every "what is next" —
+   * all to say "I am not doing these", which deleting them also says. */
   const forked = make([
     { id: 1, name: 'Foundations', lessons: [lesson(1, '2026-09-01'), lesson(2)] },
-    // A whole section off the route — Odin's Ruby fork, in miniature.
-    { id: 2, name: 'Ruby', lessons: [lesson(3, null, 0), lesson(4, null, 0)] },
+    { id: 2, name: 'Ruby', lessons: [lesson(3), lesson(4)] },
     { id: 3, name: 'NodeJS', lessons: [lesson(5)] },
   ]);
 
   let p = curriculum.progressOf(forked);
   check(
-    'progress counts the route, not the course',
-    p.done === 1 && p.total === 3 && p.percent === 33,
-    JSON.stringify(p),
-  );
-  check('and says how much is being skipped', p.skipped === 2, JSON.stringify(p));
-
-  // Work done off the route was still done, but must not inflate the route —
-  // counting it could put a route over 100%.
-  const strayed = make([
-    { id: 1, name: 'm', lessons: [lesson(1, '2026-09-01'), lesson(2, '2026-09-02', 0)] },
-  ]);
-  p = curriculum.progressOf(strayed);
-  check(
-    'a lesson done off the route does not count towards it',
-    p.done === 1 && p.total === 1 && p.percent === 100 && p.doneOffRoute === 1,
+    'progress counts every lesson in the course',
+    p.done === 1 && p.total === 5 && p.percent === 20,
     JSON.stringify(p),
   );
 
-  // A course entirely off the route is 0%, not 100% — every lesson "done" of
-  // zero would otherwise be a full ring.
-  p = curriculum.progressOf(make([{ id: 1, name: 'm', lessons: [lesson(1, null, 0)] }]));
-  check('a course with nothing on its route is 0%', p.percent === 0 && p.total === 0, JSON.stringify(p));
+  // An empty course is 0%, not 100% and not NaN — dividing by zero here would
+  // render a full ring on a course with nothing in it.
+  p = curriculum.progressOf(make([{ id: 1, name: 'm', lessons: [] }]));
+  check('an empty course is 0%, not a full ring', p.percent === 0 && p.total === 0, JSON.stringify(p));
 
   check(
-    'the next lesson skips the off-route section',
+    'the next lesson is the first gap, wherever it is',
     curriculum.nextLesson(forked)?.lesson.id === 2,
     JSON.stringify(curriculum.nextLesson(forked)),
   );
-  const onlyOff = make([
-    { id: 1, name: 'm', lessons: [lesson(1, '2026-01-01'), lesson(2, null, 0)] },
-  ]);
+  const finished = make([{ id: 1, name: 'm', lessons: [lesson(1, '2026-01-01')] }]);
   check(
-    'an off-route lesson is never offered as next',
-    curriculum.nextLesson(onlyOff) === null,
-    JSON.stringify(curriculum.nextLesson(onlyOff)),
+    'a finished course offers nothing',
+    curriculum.nextLesson(finished) === null,
+    JSON.stringify(curriculum.nextLesson(finished)),
   );
 
-  check(
-    'a module is off the route when all of its lessons are',
-    !curriculum.moduleOnRoute(forked.modules[1]) && curriculum.moduleOnRoute(forked.modules[0]),
-    'wrong',
-  );
-  check(
-    'and on the route if even one lesson is',
-    curriculum.moduleOnRoute({ id: 9, name: 'm', lessons: [lesson(1, null, 0), lesson(2)] }),
-    'expected true',
-  );
 
   // --- the route through all the routes ---
   const first = make([{ id: 1, name: 'm', lessons: [lesson(1, '2026-01-01')] }], 'active', 1, 'Done one');
@@ -2615,42 +2582,11 @@ globalThis.fetch = preGh;
   );
 }
 
-// --- set-route and move, through the endpoint ------------------------------
-
-DB = fakeD1();
-res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
-    action: 'set-route',
-    id: 1,
-    on: false,
-  }),
-  dbEnv(),
-);
-check(
-  'a lesson can be taken off the route',
-  res.status === 200 && DB._lessons[0].on_route === 0,
-  JSON.stringify(DB._lessons[0]),
-);
-
-res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
-    action: 'set-route',
-    module_id: 1,
-    on: true,
-  }),
-  dbEnv(),
-);
-check(
-  'and a whole module at once, because a fork is a section',
-  res.status === 200 && DB._lessons.every((l) => l.module_id !== 1 || l.on_route === 1),
-  JSON.stringify(DB._lessons),
-);
-
-res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'set-route', on: false }),
-  dbEnv(),
-);
-check('set-route with nothing named is refused', res.status === 400, String(res.status));
+// --- move, through the endpoint -------------------------------------------
+//
+// set-route went with the route itself: one flag, three derived numbers, a
+// switch on every lesson and a filter in every "what is next", all to say "I
+// am not doing these" — which deleting the lesson also says.
 
 // Reordering, which decides the route through all the routes. position has
 // existed since the first migration and nothing could change it.
@@ -3824,12 +3760,11 @@ globalThis.fetch = preGh;
     status,
     modules: [{ id: name.length * 100, name: 'Stage one', lessons }],
   });
-  const lesson = (id, done = null, onRoute = 1) => ({
+  const lesson = (id, done = null) => ({
     id,
     name: `Lesson ${id}`,
     done_on: done,
     detail: null,
-    on_route: onRoute,
   });
 
   const all = [
@@ -3868,12 +3803,6 @@ globalThis.fetch = preGh;
     '',
   );
 
-  const offRoute = build('Drawing', 'active', [lesson(41, null, 0), lesson(42)]);
-  check(
-    'a lesson off the route is never offered',
-    curriculum.nextStep(offRoute)?.lesson.id === 42,
-    String(curriculum.nextStep(offRoute)?.lesson.id),
-  );
 }
 
 // --- sources ----------------------------------------------------------------

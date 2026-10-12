@@ -293,7 +293,6 @@ const courses = [
     ],
   },
   {
-    // OFF THE ROUTE. See OFF_ROUTE below.
     course: 'Getting Hired',
     sections: [
       {
@@ -324,24 +323,21 @@ const courses = [
   },
 ];
 
-/* Courses that are on the path and not on the route.
+/* THE ROUTE IS GONE, and Getting Hired is the course it existed for.
  *
- * This is the column 0006_routes.sql was added for: "what is being asked is
- * '18 of the 41 I am actually doing'". Without something switched off it does
- * nothing, and the honest answer for this path is one whole course.
+ * `on_route` was added by 0006 for exactly this path — "what is being asked is
+ * '18 of the 41 I am actually doing'" — and the honest answer here was one
+ * whole course switched off: fourteen lessons about networking, job leads, a
+ * CV and interviewing, which SPEC.md already settles for the site ("a personal
+ * brand site, not a portfolio for job applications ... That framing is dead").
  *
- * GETTING HIRED. Fourteen lessons about networking, job leads, a CV and
- * interviewing. SPEC.md settles the question for the site and the same answer
- * holds here: "This is a personal brand site, not a portfolio for job
- * applications ... That framing is dead." A course whose deliverables are a
- * resume and a personal website built to be hired with is not work he is
- * doing.
- *
- * It stays in the curriculum rather than being deleted, because it is really
- * on the path and a reader should see that the choice was made rather than
- * that the course does not exist. One toggle per lesson in the dashboard puts
- * it back. */
-const OFF_ROUTE = new Set(['Getting Hired']);
+ * He has since removed the whole dynamic: "get rid of the entire on the route
+ * dynamic it's not necessary, even for odin". So those fourteen lessons now
+ * COUNT, and Odin reads 112 of 151 rather than 112 of 137. The course stays in
+ * the curriculum because it really is on the path; the only way to stop it
+ * counting now is to delete it, which is his call and not a thing a build
+ * script should decide.
+ */
 
 /** SQL single-quoted string. An apostrophe in a title ends the literal early. */
 const q = (value) => `'${String(value).replace(/'/g, "''")}'`;
@@ -374,10 +370,8 @@ const out = [
 
 let modules = 0;
 let lessons = 0;
-let off = 0;
 
 for (const { course, sections } of courses) {
-  const onRoute = OFF_ROUTE.has(course) ? 0 : 1;
 
   for (const section of sections) {
     modules += 1;
@@ -389,10 +383,9 @@ for (const { course, sections } of courses) {
 
     section.lessons.forEach((lesson, l) => {
       lessons += 1;
-      if (!onRoute) off += 1;
       out.push(
-        `insert into lessons (module_id, name, position, on_route)\n` +
-          `  values ((select max(id) from modules), ${q(lesson)}, ${l + 1}, ${onRoute});`,
+        `insert into lessons (module_id, name, position)\n` +
+          `  values ((select max(id) from modules), ${q(lesson)}, ${l + 1});`,
       );
     });
   }
@@ -432,9 +425,9 @@ for (const { course, sections } of courses) {
  *               and module_id in (select id from modules where curriculum_id =
  *                     (select id from curriculums where name = 'The Odin Project')));
  *
- * `on_route = 1` guards it. None of the 14 off-route lessons fall inside that
- * range today, but a lesson taken off the route was not done, and a later
- * route change could put one there.
+ * `on_route = 1` was a guard on that statement when the route existed. The
+ * route is gone and every row is 1, so the clause is now a no-op kept only
+ * because this is the record of what was actually run.
  *
  * Those 112 ticks SURVIVE A REBUILD, which was not true when this comment
  * first said the backfill was waiting. apply.mjs reads done_on and on_route
@@ -447,6 +440,5 @@ for (const { course, sections } of courses) {
 
 console.log(out.join('\n'));
 console.error(
-  `modules: ${modules}  lessons: ${lessons}  ` +
-    `on route: ${lessons - off}  off route: ${off}`,
+  `modules: ${modules}  lessons: ${lessons}`,
 );

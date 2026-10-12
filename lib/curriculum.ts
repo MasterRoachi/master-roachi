@@ -14,13 +14,6 @@ export interface Lesson {
    * lives in the resource instead — see migrations/0007_lesson_detail.sql.
    */
   detail: string | null;
-  /**
-   * 1 when the lesson is on the route being taken, 0 when it is being skipped.
-   *
-   * A number rather than a boolean because that is what SQLite stores, and
-   * converting it on the way through would mean two shapes for one fact.
-   */
-  on_route: number;
 }
 
 export interface Module {
@@ -53,46 +46,37 @@ export interface Curriculum {
   sources?: Source[];
 }
 
+/* THE ROUTE IS GONE, deliberately and at his word: "get rid of the entire
+ * on the route dynamic it's not necessary, even for odin".
+ *
+ * It existed for Odin, which forks into Full Stack JavaScript or Ruby — the
+ * idea being that 14 of its 151 lessons were decided against, so its progress
+ * should read 112 of 137 rather than of 151. One flag, three derived numbers
+ * (`skipped`, `doneOffRoute`, `moduleOnRoute`), a switch on every lesson, a
+ * dimmed state in the grid, and a filter in every "what is next" — all to
+ * express "I am not doing these", which deleting the lesson also expresses.
+ *
+ * So progress is done over total, and nothing is excluded from anything. The
+ * `lessons.on_route` COLUMN is still there and every row is now 1: dropping a
+ * column in SQLite rewrites the table, which is not worth doing to tidy away a
+ * number nothing reads. Migration 0006 stays as the record of why it was once
+ * a good idea.
+ */
 export interface Progress {
   done: number;
-  /** Lessons on the route. The denominator that matters. */
   total: number;
   /** 0–100, and 0 for an empty curriculum rather than NaN. */
   percent: number;
-  /** Lessons being skipped, so the page can say what the route leaves out. */
-  skipped: number;
-  /**
-   * Lessons done that are NOT on the route.
-   *
-   * Kept separate rather than folded into `done`: work done off the route was
-   * still done and its date is still true, but counting it would make a route
-   * read as more complete than it is — and could put it over 100%.
-   */
-  doneOffRoute: number;
 }
 
 export function progressOf(unit: { modules: Module[] } | { lessons: Lesson[] }): Progress {
   const lessons =
     'modules' in unit ? unit.modules.flatMap((module) => module.lessons) : unit.lessons;
-  const onRoute = lessons.filter((lesson) => lesson.on_route !== 0);
-  const done = onRoute.filter((lesson) => lesson.done_on !== null).length;
-  const total = onRoute.length;
-  // A curriculum with no lessons on its route is at 0%, not at 100% and not at
-  // NaN — dividing by zero here would render a full ring on an empty course.
-  return {
-    done,
-    total,
-    percent: total === 0 ? 0 : Math.round((done / total) * 100),
-    skipped: lessons.length - onRoute.length,
-    doneOffRoute: lessons.filter(
-      (lesson) => lesson.on_route === 0 && lesson.done_on !== null,
-    ).length,
-  };
-}
-
-/** Whether a module is on the route at all. Derived, so it cannot disagree. */
-export function moduleOnRoute(module: Module): boolean {
-  return module.lessons.some((lesson) => lesson.on_route !== 0);
+  const done = lessons.filter((lesson) => lesson.done_on !== null).length;
+  const total = lessons.length;
+  // An empty curriculum is at 0%, not at 100% and not at NaN — dividing by
+  // zero here would render a full ring on a course with nothing in it.
+  return { done, total, percent: total === 0 ? 0 : Math.round((done / total) * 100) };
 }
 
 /**
@@ -103,16 +87,13 @@ export function moduleOnRoute(module: Module): boolean {
  * genuinely the next thing to do. Skipping around leaves earlier gaps, and
  * those are what should come back first.
  *
- * Off-route lessons are passed over. A lesson taken off the route is one that
- * is not being done, so offering it as the next thing would be offering the
- * one piece of work already decided against.
  */
 export function nextLesson(
   curriculum: Curriculum,
 ): { module: Module; lesson: Lesson } | null {
   for (const module of curriculum.modules) {
     for (const lesson of module.lessons) {
-      if (lesson.on_route !== 0 && lesson.done_on === null) return { module, lesson };
+      if (lesson.done_on === null) return { module, lesson };
     }
   }
   return null;
@@ -162,8 +143,6 @@ export function nextStep(curriculum: Curriculum, skip: Set<number> = new Set()):
     for (let l = 0; l < module.lessons.length; l += 1) {
       const lesson = module.lessons[l];
       if (lesson.done_on !== null) continue;
-      // A lesson taken off the route is work already decided against.
-      if (lesson.on_route !== 1) continue;
       if (skip.has(lesson.id)) continue;
       return { curriculum, module, lesson, moduleAt: m + 1, lessonAt: l + 1 };
     }
