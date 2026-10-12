@@ -291,6 +291,16 @@ export default function WorkHub() {
         </nav>
 
         <p className={styles.status}>
+          {/* WHICH ACCOUNT. There is no way to tell from the outside which
+              Trello login a key and token authenticate as, and that turned out
+              to matter: a board full of sample cards is either a stale board
+              on the right account or the right board on the wrong one, and
+              those have opposite fixes. */}
+          {data.account && (
+            <span className={styles.account} title={data.account.email ?? undefined}>
+              @{data.account.username}
+            </span>
+          )}
           {new Date(data.fetchedAt).toLocaleTimeString('en-ZA')}{' '}
           <button type="button" onClick={() => setNonce((n) => n + 1)}>
             Refresh
@@ -350,6 +360,19 @@ export default function WorkHub() {
         <p className={styles.unmatched}>
           No Today / Doing / This week list on: {data.unmatched.join(', ')}.
         </p>
+      )}
+
+      {/* Every board this token can reach, named. Without it there is no way
+          to tell "the account has no such board" from "the board was filtered
+          out", which is the exact confusion North Star caused. */}
+      {data.seen.length > 0 && (
+        <details className={styles.seen}>
+          <summary>
+            {data.account ? `@${data.account.username} can see` : 'This token can see'}{' '}
+            {data.seen.length} board{data.seen.length === 1 ? '' : 's'}
+          </summary>
+          <p>{data.seen.join(' · ')}</p>
+        </details>
       )}
     </div>
   );

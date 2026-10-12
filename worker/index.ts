@@ -1,5 +1,5 @@
 import { POLL_ID, pollCandidates } from '../lib/poll';
-import { moveCard, readAccount, type TrelloCreds } from './trello';
+import { moveCard, readAccount, type TrelloCreds, whoAmI } from './trello';
 import {
   headCommit,
   listFiles,
@@ -490,6 +490,8 @@ export default {
       if (!creds) {
         const empty: WorkHubPayload = {
           configured: false,
+          account: null,
+          seen: [],
           boards: [],
           unmatched: [],
           fetchedAt: new Date().toISOString(),
@@ -498,10 +500,19 @@ export default {
         return json(empty, 200);
       }
 
-      const { boards, unmatched, errors } = await readAccount(creds);
+      // Both together: the boards, and who the token is. Asking who costs one
+      // request and settles the question the boards alone cannot — whether a
+      // board full of sample cards is a stale board on the right account or
+      // the right board on the wrong one.
+      const [{ boards, unmatched, errors, seen }, account] = await Promise.all([
+        readAccount(creds),
+        whoAmI(creds).catch(() => null),
+      ]);
 
       const payload: WorkHubPayload = {
         configured: true,
+        account,
+        seen,
         boards,
         unmatched,
         fetchedAt: new Date().toISOString(),

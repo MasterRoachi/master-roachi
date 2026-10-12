@@ -286,3 +286,27 @@
     overflow: visible;
   }
 }
+
+/* Which Trello login the Worker's token is, which nothing else can tell you. */
+.account {
+  margin-right: 0.5rem;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Every board the token can reach — the difference between "no such board"
+   and "filtered out", which is the confusion North Star caused. */
+.seen {
+  flex: none;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.seen summary {
+  cursor: pointer;
+}
+
+.seen p {
+  margin: 0.3rem 0 0;
+  line-height: 1.6;
+}

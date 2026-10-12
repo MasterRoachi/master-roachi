@@ -151,7 +151,7 @@ function hasBuckets(raw: RawBoard): boolean {
  */
 export async function readAccount(
   creds: TrelloCreds,
-): Promise<{ boards: WorkBoard[]; unmatched: string[]; errors: string[] }> {
+): Promise<{ boards: WorkBoard[]; unmatched: string[]; errors: string[]; seen: string[] }> {
   const errors: string[] = [];
 
   const list = await fetchBoardList(creds).catch((error) => {
@@ -159,7 +159,7 @@ export async function readAccount(
     return null;
   });
 
-  if (!list) return { boards: [], unmatched: [], errors };
+  if (!list) return { boards: [], unmatched: [], errors, seen: [] };
 
   const unmatched: string[] = [];
 
@@ -191,6 +191,10 @@ export async function readAccount(
     boards: settled.filter((b): b is WorkBoard => b !== null),
     unmatched: unmatched.sort(),
     errors,
+    // Every board the token can reach, named — including the hidden ones and
+    // the ones with no bucket list. Without it there is no way to tell "the
+    // account has no such board" from "the board was filtered out".
+    seen: list.map((entry) => entry.name).sort(),
   };
 }
 
@@ -221,4 +225,33 @@ export async function moveCard(
   if (!response.ok) {
     throw new Error(`move: ${response.status}`);
   }
+}
+
+/**
+ * Who the token actually is.
+ *
+ * Added because of a question nobody could answer by reading the code: North
+ * Star showed cards that looked like Trello's own sample data, and the obvious
+ * explanation — that this token belongs to a different Trello login than the
+ * one he thinks — could not be checked from either side. The page said which
+ * BOARDS it found and never which ACCOUNT it was looking at.
+ *
+ * One request, and it turns an argument into a fact on screen.
+ */
+export async function whoAmI(
+  creds: TrelloCreds,
+): Promise<{ username: string; fullName: string; email: string | null } | null> {
+  const url = `${API}/members/me?` + qs(creds, { fields: 'username,fullName,email' });
+  const response = await fetch(url, { headers: { accept: 'application/json' } });
+  if (!response.ok) return null;
+  const me = (await response.json()) as {
+    username?: string;
+    fullName?: string;
+    email?: string | null;
+  };
+  return {
+    username: me.username ?? '?',
+    fullName: me.fullName ?? '?',
+    email: me.email ?? null,
+  };
 }

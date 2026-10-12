@@ -188,9 +188,27 @@ export function soonestDue(board: WorkBoard): number {
   return soonest;
 }
 
+/** Which Trello login the Worker's token belongs to. */
+export interface TrelloAccount {
+  username: string;
+  fullName: string;
+  email: string | null;
+}
+
 export interface WorkHubPayload {
   /** False when the Worker has no Trello credentials. The page says so rather than looking broken. */
   configured: boolean;
+  /**
+   * Which Trello login the token belongs to, so the page can say.
+   *
+   * There is no way to tell from the outside which account a key and token
+   * pair authenticate as, and that turned out to matter: a board full of
+   * sample cards is either a stale board on the right account or the right
+   * board on the wrong account, and those have opposite fixes.
+   */
+  account: TrelloAccount | null;
+  /** Every board name the token can see, whether or not it reached the page. */
+  seen: string[];
   /** Only boards with work in a bucket. One panel each. */
   boards: WorkBoard[];
   /**
