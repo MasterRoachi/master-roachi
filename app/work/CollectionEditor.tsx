@@ -6,6 +6,7 @@ import { generatedCoverNames, isDraft } from '@/lib/collections';
 import { fieldsFor, knownKeys, warningsFor } from '@/lib/editor-fields';
 import {
   joinFile,
+  readFlowList,
   readScalar,
   setScalar,
   setUnknownFields,
@@ -14,6 +15,7 @@ import {
   type SplitFile,
 } from '@/lib/frontmatter';
 import { isOklch } from '@/lib/oklch';
+import ProsePanel from './ProsePanel';
 import FrontmatterFields from './FrontmatterFields';
 import styles from './collection.module.css';
 
@@ -58,12 +60,30 @@ export default function CollectionEditor({
   /** Shown as a search-result preview and scored. Public collections only. */
   seo,
   siteName,
+  art,
+  orderable,
+  projects,
+  prose,
 }: {
   collection: string;
   noun: string;
   template?: string;
   seo?: boolean;
   siteName?: string;
+  /**
+   * Where this collection's uploaded images live, if it has any.
+   *
+   * A prop rather than a check on `collection`, which is what this was: two
+   * collections now upload images into two different directories, and a third
+   * would have been a third branch in here instead of a line at the call site.
+   */
+  art?: { collection: string; dir: string };
+  /** Whether the list sets the public order by dragging. Projects only. */
+  orderable?: boolean;
+  /** Real project slugs, for a post pointing at one. */
+  projects?: readonly string[];
+  /** Run the style and grammar checks on the body. Prose collections. */
+  prose?: boolean;
 }) {
   const [entries, setEntries] = useState<Entry[] | null>(null);
   const [configured, setConfigured] = useState(true);
@@ -126,14 +146,15 @@ export default function CollectionEditor({
 
   /* The images this collection may point at.
    *
-   * Only projects has an image collection so far; writing's covers sit in
-   * nested folders that the one-level path guard does not cover, and widening
-   * that guard is not worth doing before the Writing page is worked on. */
+   * Flat, in one directory per collection. Writing's existing covers sit in
+   * nested folders — /writing/bioshock/cover.webp — which the one-level path
+   * guard deliberately will not write to; those keep working and new ones are
+   * <slug>-cover.webp beside them. */
   useEffect(() => {
-    if (collection !== 'projects') return;
+    if (!art) return;
     let live = true;
     (async () => {
-      const response = await fetch('/work/api/content?collection=project-art', {
+      const response = await fetch(`/work/api/content?collection=${art.collection}`, {
         cache: 'no-store',
       });
       if (!response.ok) return;
@@ -144,7 +165,7 @@ export default function CollectionEditor({
     return () => {
       live = false;
     };
-  }, [collection]);
+  }, [art]);
 
   /** Each entry's headline facts, for the list. */
   const summaries = useMemo(() => {
@@ -158,24 +179,33 @@ export default function CollectionEditor({
         kind: readScalar(lines, 'kind'),
         track: readScalar(lines, 'track'),
         weight: Number(readScalar(lines, 'weight') ?? '0') || 0,
+        date: readScalar(lines, 'date') ?? '',
         draft: isDraft(entry.text),
       };
     });
   }, [entries]);
 
-  /* Ordered the way the public grid orders it — highest weight first — rather
-   * than alphabetically by filename, which tells you nothing you care about.
-   * Writing has no weight, so it falls back to newest first. */
+  /* Ordered the way the public side orders it, which is the point: the grid is
+   * highest weight first and the blog is newest first.
+   *
+   * The date fallback is not decoration. Sorting by weight then title put the
+   * Writing list in alphabetical order, because no post has a weight — which
+   * is a worse order than the alphabetical-by-filename it replaced, since at
+   * least that one was stable. A blog listed alphabetically is a blog where
+   * the thing you just wrote is in the middle somewhere. */
   const listed = useMemo(() => {
     const sorted = [...summaries].sort(
-      (a, b) => b.weight - a.weight || a.title.localeCompare(b.title),
+      (a, b) =>
+        b.weight - a.weight ||
+        b.date.localeCompare(a.date) ||
+        a.title.localeCompare(b.title),
     );
     if (!order) return sorted;
     const byPath = new Map(sorted.map((entry) => [entry.path, entry]));
     return order.map((path) => byPath.get(path)).filter((entry): entry is (typeof sorted)[0] => Boolean(entry));
   }, [summaries, order]);
 
-  const ordering = collection === 'projects';
+  const ordering = Boolean(orderable);
 
   const current = entries?.find((entry) => entry.path === openPath) ?? null;
   const lines = draftFile?.frontmatter ?? [];
@@ -187,10 +217,44 @@ export default function CollectionEditor({
     return out;
   }, [fields, lines]);
 
+  /** Every tag already used in this collection, so spellings stay consistent. */
+  const usedTags = useMemo(() => {
+    const all = new Set<string>();
+    for (const entry of entries ?? []) {
+      const split = splitFile(entry.text);
+      if (!split) continue;
+      for (const tag of readFlowList(split.frontmatter, 'tags')) all.add(tag);
+    }
+    return [...all].sort();
+  }, [entries]);
+
   const warnings = useMemo(
-    () => (draftFile ? warningsFor(collection, values, { images, isOklch }) : []),
-    [collection, values, images, draftFile],
+    () => (draftFile ? warningsFor(collection, values, { images, isOklch, projects }) : []),
+    [collection, values, images, draftFile, projects],
   );
+
+  /* Changing the track moves the post between pages, which is not obvious from
+   * a dropdown: /gaming shows gaming, /orthodoxy shows theology, /writing
+   * shows everything. Compared against the SAVED file rather than against the
+   * last render, so it says this only when the change is real and unsaved. */
+  const trackMoved = useMemo(() => {
+    if (!current || !draftFile) return null;
+    const saved = splitFile(current.text);
+    if (!saved) return null;
+    const was = readScalar(saved.frontmatter, 'track');
+    const now = readScalar(draftFile.frontmatter, 'track');
+    return was && now && was !== now ? { was, now } : null;
+  }, [current, draftFile]);
+
+  /* A date in the future withholds the post until a build on or after it.
+   * Worth saying out loud, because the post simply not appearing is otherwise
+   * indistinguishable from a broken deploy. */
+  const scheduled = useMemo(() => {
+    const date = values.date?.trim();
+    if (!date) return null;
+    const today = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    return date > today ? date : null;
+  }, [values.date]);
 
   function openEntry(path: string) {
     if (dirty && !confirm('Discard the unsaved changes?')) return;
@@ -314,6 +378,10 @@ export default function CollectionEditor({
    * the repository — git keeps every version of a binary at full size.
    */
   async function upload(file: File, assignTo: string | null) {
+    if (!art) {
+      setStatus('This collection has nowhere to put an image.');
+      return;
+    }
     if (!slug && !isNew) {
       setStatus('Save the project first, so its images have a name to sit under.');
       return;
@@ -339,11 +407,12 @@ export default function CollectionEditor({
         throw new Error(`still ${(blob.size / 1e6).toFixed(1)}MB after conversion — try a smaller source`);
       }
 
-      // <slug>-hero.webp for the hero, <slug>-<source name> otherwise. Lower
-      // case and hyphens only, because that is all the path guard allows.
+      // <slug>-hero.webp for a hero, <slug>-cover.webp for a cover, and the
+      // source filename otherwise. Lower case and hyphens only, because that
+      // is all the path guard allows.
       const stem =
-        assignTo === 'hero'
-          ? 'hero'
+        assignTo === 'hero' || assignTo === 'cover'
+          ? assignTo
           : (file.name.replace(/\.[^.]+$/, '') || 'image')
               .toLowerCase()
               .replace(/[^a-z0-9]+/g, '-')
@@ -352,14 +421,15 @@ export default function CollectionEditor({
 
       // covers.mjs regenerates three names per project on every build; an
       // upload saved over one of them would survive until the next deploy and
-      // then vanish with nothing to explain why.
-      if (generatedCoverNames(slug).includes(filename)) {
+      // then vanish with nothing to explain why. Writing has no generated
+      // covers, so the guard only applies where something generates.
+      if (art.dir === 'public/projects' && generatedCoverNames(slug).includes(filename)) {
         throw new Error(`${filename} is regenerated on every build — give it another name`);
       }
 
-      const path = `public/projects/${filename}`;
+      const path = `${art.dir}/${filename}`;
       const head = await fetch(
-        `/work/api/content?collection=project-art&path=${encodeURIComponent(path)}`,
+        `/work/api/content?collection=${art.collection}&path=${encodeURIComponent(path)}`,
         { cache: 'no-store' },
       );
       const existing = head.ok
@@ -374,7 +444,7 @@ export default function CollectionEditor({
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          collection: 'project-art',
+          collection: art.collection,
           path,
           content: btoa(binary),
           sha: existing,
@@ -385,7 +455,7 @@ export default function CollectionEditor({
         throw new Error(data.error ?? `Upload failed (${response.status}).`);
       }
 
-      const publicPath = `/projects/${filename}`;
+      const publicPath = `${art.dir.replace(/^public/, '')}/${filename}`;
       setImages((before) => (before.includes(publicPath) ? before : [...before, publicPath]));
       if (assignTo && draftFile) edit({ frontmatter: setScalar(draftFile.frontmatter, assignTo, publicPath) });
       setStatus(
@@ -431,6 +501,7 @@ export default function CollectionEditor({
 
   const draft = draftFile ? readScalar(draftFile.frontmatter, 'draft') === 'true' : false;
   const mine = images.filter((path) => !slug || path.includes(slug));
+  const artPrefix = art ? `${art.dir.replace(/^public/, '')}/` : '/';
 
   return (
     <div className={`${styles.layout} ${draftFile && seo ? '' : styles.layoutPlain}`}>
@@ -519,6 +590,22 @@ export default function CollectionEditor({
               </span>
             </div>
 
+            {trackMoved && (
+              <p className={styles.notice}>
+                Track changed from <strong>{trackMoved.was}</strong> to{' '}
+                <strong>{trackMoved.now}</strong>. Saving moves this post between the pages built
+                from it — /gaming shows gaming, /orthodoxy shows theology, /writing shows all.
+              </p>
+            )}
+
+            {scheduled && (
+              <p className={styles.notice}>
+                Dated {scheduled}, which is in the future, so this post is withheld from every
+                listing, the feed and the sitemap until then. A daily check rebuilds the site on
+                the day it is due.
+              </p>
+            )}
+
             {warnings.length > 0 && (
               <ul className={styles.warnings}>
                 {warnings.map((warning) => (
@@ -532,8 +619,9 @@ export default function CollectionEditor({
               lines={draftFile.frontmatter}
               onChange={(frontmatter) => edit({ frontmatter })}
               images={images}
-              onUpload={collection === 'projects' ? upload : undefined}
+              onUpload={art ? upload : undefined}
               uploading={uploading}
+              dynamicOptions={{ projects, tags: usedTags }}
             />
 
             {/* Everything the schema does not model, as its own text. It
@@ -566,7 +654,7 @@ export default function CollectionEditor({
                 Insert an image:
                 {mine.map((path) => (
                   <button key={path} type="button" onClick={() => insertImage(path)}>
-                    {path.replace('/projects/', '')}
+                    {path.replace(artPrefix, '')}
                   </button>
                 ))}
               </p>
@@ -624,10 +712,53 @@ export default function CollectionEditor({
             ) : (
               <p className={styles.hint}>No hero image — the page opens on the colour field.</p>
             )}
+            <h3 className={styles.previewHead}>The social card</h3>
+            {openPath ? (
+              <>
+                <img
+                  className={styles.ogPreview}
+                  src={`/og/${collection}/${slug}.png`}
+                  alt=""
+                  // A post saved a minute ago has no card until the deploy
+                  // finishes, and a broken frame reads as a bug rather than as
+                  // a thing that is on its way.
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none';
+                  }}
+                />
+                <p className={styles.hint}>
+                  Drawn from the title by scripts/og.mjs at build, not from the cover. It appears
+                  after the next deploy and is redrawn whenever the title changes.
+                </p>
+              </>
+            ) : (
+              <p className={styles.hint}>
+                Generated at the first deploy after this is saved, from the title.
+              </p>
+            )}
+
             <p className={styles.hint}>
               The body is not rendered here: it is MDX, and the components in it only run at build.
             </p>
           </section>
+
+          {prose && (
+            <ProsePanel
+              body={draftFile.body}
+              wordTarget={collection === 'writing' ? 500 : undefined}
+              onSelect={(start, end) => {
+                const area = bodyRef.current;
+                if (!area) return;
+                area.focus();
+                area.setSelectionRange(start, end);
+                // Scroll the selection into view, which setSelectionRange
+                // does not do on its own in any browser.
+                const before = draftFile.body.slice(0, start).split('\n').length;
+                const lineHeight = area.scrollHeight / Math.max(1, draftFile.body.split('\n').length);
+                area.scrollTop = Math.max(0, (before - 3) * lineHeight);
+              }}
+            />
+          )}
 
           <SeoPanel
             input={{

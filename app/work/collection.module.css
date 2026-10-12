@@ -582,3 +582,142 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* A notice, not a warning: nothing is wrong, something is about to happen. */
+.notice {
+  margin: 0.9rem 0 0;
+  padding: 0.7rem 0.85rem;
+  background: color-mix(in oklch, oklch(78% 0.1 255) 8%, transparent);
+  border-left: 2px solid oklch(78% 0.1 255);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+/* Style and grammar notes on the draft. */
+.prosePanel {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.panelLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.readingTime {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.thin {
+  margin: 0.7rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: oklch(82% 0.16 85);
+}
+
+.proseCounts {
+  margin: 0.6rem 0 0;
+  font-size: 0.875rem;
+}
+
+.errorCount {
+  color: oklch(70% 0.18 25);
+}
+
+.clean {
+  color: oklch(78% 0.15 150);
+}
+
+.proseList {
+  list-style: none;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  /* Long enough to be worth scrolling on its own rather than pushing the SEO
+     panel off the bottom of a sticky column. */
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+.proseList button {
+  display: grid;
+  gap: 0.1rem;
+  width: 100%;
+  background: none;
+  border: 0;
+  border-left: 2px solid var(--line);
+  padding: 0.25rem 0 0.25rem 0.6rem;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.proseList button:hover {
+  background: color-mix(in oklch, var(--ink) 5%, transparent);
+}
+
+.proseList li.error button {
+  border-left-color: oklch(70% 0.18 25);
+}
+
+.proseList li.style button {
+  border-left-color: oklch(82% 0.16 85);
+}
+
+.issueLabel {
+  font-size: 0.8125rem;
+}
+
+.issueWhere {
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+.issueSnippet {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.issueFix {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.caveat {
+  margin: 0.9rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.ogPreview {
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}

@@ -62,6 +62,22 @@ The dashboard's output directory is advisory — `wrangler.jsonc` declares
 **a deploy overwrites the dashboard**, which is how `workers.dev` kept coming
 back on after being switched off by hand.
 
+### The daily cron
+
+`wrangler.jsonc` declares one trigger, `10 2 * * *`, and `worker/index.ts`
+answers it in `scheduled()`. It exists for one job: a post dated in the future
+is withheld by whichever build ran, so something has to make a build happen on
+the day it is due. The handler reads `/scheduled.json` — written by the build,
+naming the earliest date it withheld something for — and calls `rebuild()` only
+when that date has arrived.
+
+So it costs one empty commit on the day a post is due and nothing on every
+other day. The nightly `play-data.yml` Action is not a substitute: it pushes
+only when play data actually changed.
+
+Without `GITHUB_TOKEN` the handler returns silently, which is the same
+fail-closed behaviour as everything else here.
+
 ### Secrets
 
 Five, none of them in the repo. `npx wrangler secret list` names them:

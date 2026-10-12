@@ -125,6 +125,18 @@ cover:
     binary: true,
   },
   {
+    key: 'writing-art',
+    label: 'Post images',
+    // FLAT, where the covers already on disk are nested — /writing/bioshock/
+    // cover.webp and /writing/diablo-2/cover.webp. Those stay where they are
+    // and still render; new ones are <slug>-cover.webp beside them, because
+    // the one-level path guard is the write boundary and loosening it to allow
+    // a nested path is not a trade worth making for tidier folders.
+    dir: 'public/writing',
+    exts: ['.webp'],
+    binary: true,
+  },
+  {
     key: 'store-data',
     label: 'Store catalogue',
     // Written by the Sync button, which fetches Printful from the Worker and

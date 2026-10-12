@@ -3,7 +3,7 @@ import { pageMeta } from '@/lib/seo';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Mdx from '@/components/Mdx';
-import { getAnyEntry, getAllSlugs, getProjects } from '@/lib/content';
+import { getAllSlugs, getAnyEntry, getProjects, isScheduled } from '@/lib/content';
 import { formatDate, TRACK_LABEL, TRACK_COLOUR } from '@/lib/format';
 import GlyphField from '@/components/GlyphField';
 import ReadingProgress from '@/components/ReadingProgress';
@@ -32,7 +32,9 @@ export async function generateMetadata({
     imageSize: { width: 1200, height: 630 },
     imageAlt: entry.frontmatter.title,
     type: 'article',
-    noIndex: entry.frontmatter.draft,
+    // A scheduled post is withheld from every listing but still has a page,
+    // so without this a crawler that finds the URL can index it early.
+    noIndex: entry.frontmatter.draft || isScheduled(entry.frontmatter),
   });
   // The publication date is the one thing pageMeta has no opinion about,
   // since only articles have one.

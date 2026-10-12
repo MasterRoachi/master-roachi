@@ -80,7 +80,10 @@ const DESCRIPTION = { min: 70, max: 160 };
 const BODY_MIN: Record<SeoInput['kind'], number> = {
   product: 40,
   project: 80,
-  post: 300,
+  // 500 rather than the 300 this started at, his call. The two finished posts
+  // on the site are 1,601 and 989 words, so 300 was a bar they clear without
+  // telling him anything; 500 is where one of his actually starts.
+  post: 500,
 };
 /** Above this a paragraph is a wall and gets skimmed instead of read. */
 const PARAGRAPH_MAX_WORDS = 90;

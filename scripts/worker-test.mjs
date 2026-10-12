@@ -163,6 +163,17 @@ execFileSync(
 );
 const fields = await import(pathToFileURL(fieldsBundle).href);
 
+// The style and grammar checks. The rules are easy; not firing on code is the
+// hard part, and it was wrong in five ways at once on real posts before the
+// masking used a sentinel instead of spaces.
+const proseBundle = path.join(os.tmpdir(), 'master-roachi-prose-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/prose-check.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${proseBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const proseLib = await import(pathToFileURL(proseBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -3478,6 +3489,30 @@ globalThis.fetch = preGh;
     JSON.stringify(unknownImages),
   );
 
+  const badProject = fields.warningsFor(
+    'writing',
+    { title: 'A post', summary: 'A summary of it.', project: 'not-a-project' },
+    { projects: ['terrath', 'shepherds-we-shall-be'] },
+  );
+  check(
+    'a project slug matching nothing warns',
+    badProject.some((w) => w.key === 'project'),
+    JSON.stringify(badProject),
+  );
+  const goodProject = fields.warningsFor(
+    'writing',
+    { title: 'A post', summary: 'A summary of it.', project: 'terrath' },
+    { projects: ['terrath'] },
+  );
+  check('a real project slug does not warn', goodProject.length === 0, JSON.stringify(goodProject));
+  check(
+    'a runtime-options select is not warned against the static list',
+    !fields
+      .warningsFor('writing', { title: 'x', summary: 'y', project: 'terrath' }, {})
+      .some((w) => w.key === 'project'),
+    '',
+  );
+
   check(
     'weight has no control, because the order is dragged',
     !fields.fieldsFor('projects').some((f) => f.key === 'weight') &&
@@ -3489,6 +3524,100 @@ globalThis.fetch = preGh;
     fields.fieldsFor('projects').find((f) => f.key === 'summary')?.required === true &&
       fields.fieldsFor('writing').find((f) => f.key === 'summary')?.required === true,
     '',
+  );
+}
+
+// --- style and grammar ------------------------------------------------------
+//
+// Most of these are about what must NOT fire. The rules themselves are a page
+// of regexes; the reason this module needed rewriting after its first run on
+// real posts is that masking non-prose with spaces made `[guide](https://x).`
+// read as a space before a full stop, a JSX attribute line read as trailing
+// whitespace, and a URL read as a double space. Eighty-two findings on one
+// post, almost none of them in the prose.
+{
+  const ids = (text) => proseLib.checkProse(text).map((issue) => issue.id);
+
+  // --- things it must catch ---
+  check('catches a doubled word', ids('the the route is long').includes('doubled-word'), JSON.stringify(ids('the the route is long')));
+  check(
+    'allows a legitimate repeat',
+    !ids('the thing that that man said').includes('doubled-word'),
+    JSON.stringify(ids('the thing that that man said')),
+  );
+  check('catches "could of"', ids('I could of gone').includes('misspelling'), '');
+  check('catches a straight apostrophe', ids('Neptune’s and Smuggler\'s').includes('straight-apostrophe'), '');
+  check('catches a straight quote', ids('He said "no" to that').includes('straight-quote'), '');
+  check('catches a hyphen used as a dash', ids('the route - which is long - works').includes('hyphen-as-dash'), '');
+  check('catches filler', ids('in order to win').includes('filler'), '');
+  check('catches a weak qualifier', ids('it is very good').includes('qualifier'), '');
+  check(
+    'catches a long sentence',
+    ids(`${'word '.repeat(45)}.`).includes('long-sentence'),
+    '',
+  );
+  check('catches space before punctuation', ids('He went , then left').includes('space-before-punctuation'), '');
+
+  // --- and what it must leave alone ---
+  const fenced = ['Prose first.', '', '```js', 'const x = "straight";', "const y = 'also';", '```', '', 'Prose after.'].join('\n');
+  check(
+    'a fenced code block is not prose',
+    !ids(fenced).some((id) => id.startsWith('straight')),
+    JSON.stringify(ids(fenced)),
+  );
+
+  const inline = 'Saves live in `Documents\\BioshockHD\\SaveGames`.';
+  check('inline code is not prose', ids(inline).length === 0, JSON.stringify(ids(inline)));
+
+  const link = 'Checked against [the 100% guide](https://steamcommunity.com/sharedfiles/filedetails/?id=2228423965).';
+  check(
+    'a link target is not prose',
+    ids(link).length === 0,
+    JSON.stringify(proseLib.checkProse(link)),
+  );
+
+  const jsx = '<Split src="/writing/bioshock/rapture.webp" alt="The hall." side="right">';
+  check('a JSX attribute is not prose', ids(jsx).length === 0, JSON.stringify(ids(jsx)));
+
+  const bullets = ['- **Irony** — photograph it.', '- **Found** — his apartment.'].join('\n');
+  check(
+    'a list bullet is not a hyphen-dash',
+    !ids(bullets).includes('hyphen-as-dash'),
+    JSON.stringify(ids(bullets)),
+  );
+
+  check('empty text is clean', proseLib.checkProse('').length === 0, '');
+  check('a single clean sentence is clean', proseLib.checkProse('The route works.').length === 0, JSON.stringify(proseLib.checkProse('The route works.')));
+
+  // Offsets must point into the ORIGINAL text, or clicking a note selects the
+  // wrong thing — which is the one way this panel can be actively annoying.
+  {
+    const text = 'A line with `code "here"` and then the the doubled words.';
+    const issue = proseLib.checkProse(text).find((one) => one.id === 'doubled-word');
+    check(
+      'an offset points at the real text, past a masked span',
+      issue && text.slice(issue.start, issue.end) === 'the the',
+      JSON.stringify(issue && text.slice(issue.start, issue.end)),
+    );
+  }
+  {
+    const text = ['First line.', '', 'Third line has in order to in it.'].join('\n');
+    const issue = proseLib.checkProse(text).find((one) => one.id === 'filler');
+    check('line numbers survive blank lines', issue?.line === 3, String(issue?.line));
+  }
+
+  // Severity, because a style note and a mistake are not the same job.
+  const mixed = proseLib.checkProse('I could of said it is very good.');
+  const counts = proseLib.countIssues(mixed);
+  check('a misspelling is an error', counts.errors >= 1, JSON.stringify(counts));
+  check('a qualifier is only a style note', counts.style >= 1, JSON.stringify(counts));
+
+  // And the check that was removed, which must stay removed.
+  const headings = ['## The two you can miss', '', 'and the rest of the sentence.'].join('\n');
+  check(
+    'capitalisation is no longer checked, so a heading is not a finding',
+    !ids(headings).includes('capitalisation'),
+    JSON.stringify(ids(headings)),
   );
 }
 
@@ -3515,4 +3644,5 @@ fs.rmSync(seoBundle, { force: true });
 fs.rmSync(fmBundle, { force: true });
 fs.rmSync(colourBundle, { force: true });
 fs.rmSync(fieldsBundle, { force: true });
+fs.rmSync(proseBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

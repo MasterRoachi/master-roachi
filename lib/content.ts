@@ -117,8 +117,85 @@ function readCollection(collection: string): Entry[] {
 // half-written post can be committed without publishing it.
 const showDrafts = process.env.NODE_ENV === 'development';
 
+/**
+ * Today, as the BUILD sees it.
+ *
+ * Which is the whole subtlety of scheduling on a static site: there is no
+ * "now" at read time, only the moment the export ran. A post dated tomorrow is
+ * therefore withheld by today's build and included by any build that happens
+ * tomorrow or later — see the Worker's scheduled handler, which exists to make
+ * sure such a build actually happens.
+ *
+ * Africa/Johannesburg, fixed, for the same reason the habit ticks are: a date
+ * compared against a different zone's idea of today publishes a post a few
+ * hours early or late with nothing explaining why.
+ */
+function buildDay(): string {
+  return new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+/**
+ * A frontmatter date as 'YYYY-MM-DD', whatever YAML turned it into.
+ *
+ * THIS IS THE WHOLE REASON SCHEDULING DID NOT WORK FIRST TIME. An unquoted
+ * `date: 2027-01-15` is parsed by js-yaml, through gray-matter, into a
+ * JavaScript Date — not a string. A `typeof date === 'string'` guard
+ * therefore matched nothing, the comparison never ran, and a post dated next
+ * year published immediately. Found by dating a real post into 2027 and
+ * watching it appear in the feed anyway.
+ *
+ * The rest of this file gets away with it because `Date.parse()` coerces
+ * either one. A text comparison does not.
+ */
+function dayOf(value: unknown): string | null {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value.toISOString().slice(0, 10);
+  }
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
+  return null;
+}
+
 function publishable(entries: Entry[]): Entry[] {
-  return entries.filter((e) => showDrafts || !e.frontmatter.draft);
+  const today = buildDay();
+  return entries.filter((e) => {
+    if (!showDrafts && e.frontmatter.draft) return false;
+    // A date in the future is a scheduled post. A missing or unreadable date
+    // is not treated as scheduled — it publishes, which is how every entry
+    // behaved before scheduling existed.
+    const day = dayOf(e.frontmatter.date);
+    if (!showDrafts && day && day > today) return false;
+    return true;
+  });
+}
+
+/**
+ * Whether an entry is dated in the future, and so not published yet.
+ *
+ * Exported because the page still has to be GENERATED — static export refuses
+ * a dynamic route that produces zero pages, so a withheld post keeps its URL
+ * exactly as a draft does. Which means it also needs marking noindex, or a
+ * crawler that guesses the URL can index a post before its date. Linked from
+ * nowhere is not the same as not published.
+ */
+export function isScheduled(frontmatter: { date?: unknown }): boolean {
+  const day = dayOf(frontmatter.date);
+  return day !== null && day > buildDay();
+}
+
+/**
+ * The next date on which something currently withheld would go live.
+ *
+ * Read by the Worker's daily check, so a scheduled post triggers exactly one
+ * rebuild on the day it is due rather than a commit a day forever.
+ */
+export function nextScheduled(): string | null {
+  const today = buildDay();
+  const dates = readCollection('writing')
+    .filter((e) => !e.frontmatter.draft)
+    .map((e) => dayOf(e.frontmatter.date))
+    .filter((date): date is string => date !== null && date > today)
+    .sort();
+  return dates[0] ?? null;
 }
 
 function byNewest(a: Entry, b: Entry): number {

@@ -37,6 +37,15 @@ export interface FieldSpec {
   options?: readonly string[];
   /** For `blocklist`: the fields of one entry. */
   entry?: readonly EntryField[];
+  /**
+   * Options that can only be known at runtime.
+   *
+   * `projects` is the real list of project slugs and `tags` the tags already
+   * used across the collection — neither can be a constant here, and both are
+   * the difference between a field that stays consistent and a field where a
+   * typo silently links nothing.
+   */
+  optionsFrom?: 'projects' | 'tags';
   /** Named in the warnings when it is missing. */
   required?: boolean;
 }
@@ -135,10 +144,23 @@ const WRITING_FIELDS: readonly FieldSpec[] = [
     key: 'tags',
     label: 'Tags',
     kind: 'tags',
+    optionsFrom: 'tags',
     hint: 'The form rather than the subject — a post can be a Walkthrough and an Achievement guide at once.',
   },
-  { key: 'project', label: 'Project slug', kind: 'text', hint: 'Points this post at a project page.' },
-  { key: 'cover', label: 'Cover', kind: 'text' },
+  {
+    key: 'project',
+    label: 'Project',
+    kind: 'select',
+    optionsFrom: 'projects',
+    hint: 'Puts this post on that project’s page. A slug that matches nothing links nothing, silently.',
+  },
+  {
+    key: 'cover',
+    label: 'Cover',
+    kind: 'image',
+    hint: 'Shown as a figure under the title. The social card is generated separately, from the title.',
+  },
+  { key: 'coverAlt', label: 'Cover alt text', kind: 'text' },
 ];
 
 export const COLLECTION_FIELDS: Record<string, readonly FieldSpec[]> = {
@@ -174,7 +196,11 @@ export interface Warning {
 export function warningsFor(
   collection: string,
   values: Record<string, string>,
-  options: { images?: readonly string[]; isOklch?: (value: string) => boolean } = {},
+  options: {
+    images?: readonly string[];
+    isOklch?: (value: string) => boolean;
+    projects?: readonly string[];
+  } = {},
 ): Warning[] {
   const out: Warning[] = [];
   const images = options.images ?? [];
@@ -188,7 +214,7 @@ export function warningsFor(
     }
     if (!value) continue;
 
-    if (field.kind === 'select' && field.options && !field.options.includes(value)) {
+    if (field.kind === 'select' && !field.optionsFrom && field.options && !field.options.includes(value)) {
       out.push({
         key: field.key,
         text: `“${value}” is not one of ${field.options.join(', ')} — the page will fall back to its default.`,
@@ -212,6 +238,17 @@ export function warningsFor(
         text: `${field.label} should start with https:// or a leading slash.`,
       });
     }
+  }
+
+  // A `project` pointing at nothing is the quietest failure in this schema:
+  // the post simply never appears on the project page and nothing anywhere
+  // says why.
+  const projectValue = (values.project ?? '').trim();
+  if (projectValue && options.projects && !options.projects.includes(projectValue)) {
+    out.push({
+      key: 'project',
+      text: `There is no project with the slug “${projectValue}”, so this post will not appear on one.`,
+    });
   }
 
   // An image with no alt text is the one accessibility failure this editor can

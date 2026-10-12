@@ -37,6 +37,25 @@
 		// ASSETS.fetch.
 		"run_worker_first": true
 	},
+	// The daily check that publishes a scheduled post.
+	//
+	// A statically exported site has no "now" at read time: a post dated
+	// tomorrow is withheld by today's build and included by any build that runs
+	// tomorrow or later, so something has to make that build happen. Nothing
+	// did — the nightly play-data Action pushes only when play data actually
+	// changed, which is not a publisher.
+	//
+	// 02:10 UTC is 04:10 SAST, so a post dated today is live before he is awake
+	// and the rebuild happens while nothing else is deploying. Not on the hour,
+	// for the same reason the GitHub Action is not: schedulers are busiest then.
+	//
+	// The handler reads /scheduled.json and rebuilds ONLY when a withheld date
+	// has arrived, so this costs one empty commit on the day a post is due
+	// rather than a commit a day forever. See worker/index.ts scheduled().
+	"triggers": {
+		"crons": ["10 2 * * *"]
+	},
+
 	// Routing lives here rather than in the dashboard, because deploys overwrite
 	// the dashboard.
 	//

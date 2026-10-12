@@ -230,6 +230,39 @@ reformat wholesale. `lib/editor-fields.ts` is the schema, and it is
 deliberately not exhaustive: it decides what gets a nice control, never what is
 allowed to exist.
 
+**The style checks are local and there is no fact checking.** `lib/prose-check.ts`
+runs on every keystroke for nothing — doubled words, a straight quote in a site
+written with curly ones, a hyphen standing in for an em dash, filler, a
+forty-word sentence. The hard part is not firing on code, so everything that is
+not prose is masked out first with a sentinel that is neither whitespace nor a
+word character; masking with spaces made `[guide](url).` read as a space before
+a full stop and produced 82 findings on one real post, almost none of them in
+the prose. A capitalisation check was written and then removed: with regex it
+cannot tell a proper noun from a word starting a heading, and it was wrong
+thirty-two times on one post, which buries the findings that are right.
+
+Fact checking is deliberately absent. It cannot be done offline, and done at
+all it can only list claims worth checking rather than return verdicts — so it
+would need a key, a cost per run and a button, and the backend stays
+self-contained instead.
+
+**Scheduling.** A post dated in the future is withheld from every listing, the
+feed and the sitemap, and marked noindex — its page is still generated, because
+static export refuses a dynamic route that produces zero pages, so linked from
+nowhere is not the same as not published. The subtlety is that a static site
+has no "now" at read time: the withholding is a decision made by whichever
+build ran. So the build writes `/scheduled.json` saying the earliest date it
+withheld something for, and a Cloudflare cron on the Worker reads it daily and
+rebuilds only when that date has arrived — one empty commit on the day a post
+is due, rather than a commit a day forever. The nightly play-data Action was
+not a candidate: it pushes only when play data actually changed.
+
+**js-yaml parses an unquoted `date:` into a Date, not a string**, which is worth
+knowing because it made scheduling a no-op first time: a
+`typeof date === 'string'` guard matched nothing and a post dated 2027
+published immediately. The rest of `lib/content.ts` gets away with it because
+`Date.parse()` coerces either; a text comparison does not.
+
 Three things are not fields. **`weight` is dragged**, because it is a sort key
 with no meaning of its own, and `/work/api/reorder` redistributes the existing
 numbers into the new order as ONE commit through the git database — six saves

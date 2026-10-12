@@ -33,7 +33,10 @@ export default function Page() {
         noun="project"
         template={collection.template?.(new Date().toISOString().slice(0, 10))}
         seo
+        prose
+        orderable
         siteName={site.name}
+        art={{ collection: 'project-art', dir: 'public/projects' }}
       />
     </div>
   );

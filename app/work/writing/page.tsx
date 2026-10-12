@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
 import PageHeader from '@/components/PageHeader';
 import { COLLECTIONS } from '@/lib/collections';
+import { getProjects } from '@/lib/content';
+import { site } from '@/lib/site';
 import CollectionEditor from '../CollectionEditor';
 
 // Posts in content/writing, editable from the browser.
@@ -23,7 +25,7 @@ const collection = COLLECTIONS.find((c) => c.key === 'writing')!;
 export default function Page() {
   return (
     <div className="shell">
-      <PageHeader eyebrow="Private" title="Writing" lede="Edit a post and save. Saving commits it, and the commit publishes it." />
+      <PageHeader eyebrow="Private" title="Writing" />
       <p>
         <Link href="/work/">← Work</Link>
       </p>
@@ -31,6 +33,13 @@ export default function Page() {
         collection="writing"
         noun="post"
         template={collection.template?.(new Date().toISOString().slice(0, 10))}
+        seo
+        prose
+        siteName={site.name}
+        art={{ collection: 'writing-art', dir: 'public/writing' }}
+        // The real slugs, so pointing a post at a project is a choice from a
+        // list rather than a string that silently matches nothing.
+        projects={getProjects().map((project) => project.slug)}
       />
     </div>
   );

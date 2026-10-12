@@ -44,6 +44,25 @@ interface KVListResult {
   cursor?: string;
 }
 
+/**
+ * The two members the cron handler uses, declared for the same reason as the
+ * KV ones above: @cloudflare/workers-types installs globals that collide with
+ * the DOM lib this repo compiles against everywhere else.
+ *
+ * `waitUntil` is the one that matters — a scheduled handler that returns
+ * before its work finishes has its work cancelled, and the symptom would be a
+ * post that publishes only sometimes.
+ */
+interface ScheduledEvent {
+  scheduledTime: number;
+  cron: string;
+}
+
+interface ExecutionContext {
+  waitUntil(promise: Promise<unknown>): void;
+  passThroughOnException(): void;
+}
+
 interface KVNamespace {
   get(key: string): Promise<string | null>;
   put(
@@ -1631,5 +1650,54 @@ export default {
     }
 
     return json({ error: 'Method not allowed.' }, 405);
+  },
+
+  /**
+   * The daily check that publishes a scheduled post.
+   *
+   * A statically exported site has no "now" at read time, so a post dated
+   * tomorrow is withheld by today's build and included by any build that runs
+   * tomorrow or later — and until this existed, nothing guaranteed such a
+   * build happened. The nightly play-data Action pushes only when play data
+   * actually changed, so it is not a publisher.
+   *
+   * The build writes /scheduled.json saying the earliest date it withheld
+   * something for. This reads it once a day and rebuilds ONLY when that date
+   * has arrived, so the cost is one empty commit on the day a post is due
+   * rather than a commit a day forever.
+   *
+   * Africa/Johannesburg, fixed, matching buildDay() in lib/content.ts. A cron
+   * firing at 02:10 UTC is the previous day in UTC terms but already the new
+   * day locally, and publishing a day late is the failure that would be
+   * blamed on anything but the time zone.
+   */
+  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(
+      (async () => {
+        const token = env.GITHUB_TOKEN;
+        if (!token) return;
+
+        try {
+          const response = await env.ASSETS.fetch(
+            new Request(`https://${APEX}/scheduled.json`),
+          );
+          if (!response.ok) return;
+          const { next } = (await response.json()) as { next: string | null };
+          if (!next) return;
+
+          const today = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
+          if (next > today) return;
+
+          // An empty commit: a new sha pointing at the same tree, which is a
+          // push, which is a build. See rebuild() for why that is the only
+          // trigger available.
+          await rebuild(token, `Publish what was scheduled for ${next}`);
+        } catch {
+          // A failed check is tomorrow's problem. Throwing here would only
+          // fill the Worker's logs with something nobody reads, and the post
+          // goes out on the next deploy for any other reason regardless.
+        }
+      })(),
+    );
   },
 };

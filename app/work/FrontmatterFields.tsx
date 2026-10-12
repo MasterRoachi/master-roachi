@@ -33,6 +33,7 @@ export default function FrontmatterFields({
   images,
   onUpload,
   uploading,
+  dynamicOptions,
 }: {
   fields: readonly FieldSpec[];
   lines: string[];
@@ -41,6 +42,11 @@ export default function FrontmatterFields({
   images: readonly string[];
   onUpload?: (file: File, assignTo: string | null) => void;
   uploading?: boolean;
+  /**
+   * Options only knowable at runtime — the real project slugs, and the tags
+   * already in use. See `optionsFrom` in lib/editor-fields.ts.
+   */
+  dynamicOptions?: { projects?: readonly string[]; tags?: readonly string[] };
 }) {
   const id = useId();
   const set = (key: string, value: string | null) => onChange(setScalar(lines, key, value));
@@ -50,6 +56,8 @@ export default function FrontmatterFields({
       {fields.map((field) => {
         const name = `${id}-${field.key}`;
         const value = readScalar(lines, field.key) ?? '';
+        const runtime = field.optionsFrom ? (dynamicOptions?.[field.optionsFrom] ?? []) : null;
+        const options = runtime ?? field.options ?? [];
 
         return (
           <div key={field.key} className={styles.field} data-kind={field.kind}>
@@ -92,37 +100,56 @@ export default function FrontmatterFields({
                 {/* Absent stays absent: the first option removes the key
                     rather than writing a default the author never chose. */}
                 <option value="">— not set —</option>
-                {field.options?.map((option) => (
+                {options.map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>
                 ))}
                 {/* A value already in the file that is not in the list stays
                     selectable, so opening the editor cannot silently change
-                    it just by rendering. */}
-                {value && !field.options?.includes(value) && (
-                  <option value={value}>{value} (not a known value)</option>
+                    it just by rendering — and for a runtime list, so a post
+                    pointing at a project that has not loaded yet is not
+                    quietly unset by opening it. */}
+                {value && !options.includes(value) && (
+                  <option value={value}>{value} (not in the list)</option>
                 )}
               </select>
             )}
 
             {field.kind === 'tags' && (
-              <input
-                id={name}
-                className={styles.fieldInput}
-                type="text"
-                value={readFlowList(lines, field.key).join(', ')}
-                placeholder="Godot, Python"
-                onChange={(event) =>
-                  onChange(
-                    setFlowList(
-                      lines,
-                      field.key,
-                      event.target.value.split(',').map((item) => item.trim()),
-                    ),
-                  )
-                }
-              />
+              <>
+                <input
+                  id={name}
+                  className={styles.fieldInput}
+                  type="text"
+                  // A datalist rather than a picker: tags are a free list and
+                  // always will be, but offering the ones already in use is
+                  // what stops two spellings of one tag, which is how a tag
+                  // list stops being worth having.
+                  list={runtime && runtime.length > 0 ? `${name}-used` : undefined}
+                  value={readFlowList(lines, field.key).join(', ')}
+                  placeholder="Godot, Python"
+                  onChange={(event) =>
+                    onChange(
+                      setFlowList(
+                        lines,
+                        field.key,
+                        event.target.value.split(',').map((item) => item.trim()),
+                      ),
+                    )
+                  }
+                />
+                {runtime && runtime.length > 0 && (
+                  <>
+                    <datalist id={`${name}-used`}>
+                      {runtime.map((option) => (
+                        <option key={option} value={option} />
+                      ))}
+                    </datalist>
+                    <p className={styles.hint}>Already in use: {runtime.join(', ')}</p>
+                  </>
+                )}
+              </>
             )}
 
             {field.kind === 'color' && (
