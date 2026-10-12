@@ -240,17 +240,54 @@ Two columns carry decisions worth knowing about:
 
 ### Curriculums
 
-Eight, in `scripts/curriculums/`: Aseprite, Drawing, Godot, Greek, Japanese,
-Odin, Piano, South African politics. 708 lessons, 694 on the route.
+Eight, in `scripts/curriculums/`. 708 lessons, 694 on the route, 341 carrying
+detail. In order, because **the order of the curriculums is the route through
+all of them**: Japanese, Piano, Greek, Odin, Godot, Aseprite, Drawing, South
+African politics. That is the order he asked for, set on 2026-10-12; until then
+they sat in the order they happened to be built in.
 
 Each is a `.mjs` that **prints SQL and executes nothing**, with a `.md` beside
 it where the curriculum is designed rather than transcribed. Re-running one
-rebuilds it in place without losing its position — curriculum order is the
-route through all the routes — and deletes its lessons explicitly before its
-modules rather than relying on `ON DELETE CASCADE`, which does nothing wherever
-foreign keys are not enforced.
+rebuilds it in place without losing its position, and deletes its lessons
+explicitly before its modules rather than relying on `ON DELETE CASCADE`, which
+does nothing wherever foreign keys are not enforced.
 
-**Not written down anywhere: how the printed SQL reaches D1.** See Open Items.
+**How the SQL reaches D1: `npm run curriculum <name>`, and nothing else.**
+Printing and not executing is the right default, but it left the last step
+written down nowhere, and the cost was visible in the data — Odin sat finished
+in the repo and absent from the site, and Drawing's 64 lessons were live with
+every `detail` null, a week after the detail was written and committed. Work
+that is generated and never applied is work that did not happen.
+
+It is a script rather than a documented `wrangler` line because a rebuild
+deletes and re-inserts every lesson, and so throws away everything the
+dashboard writes and the script cannot know: `done_on`, `on_route`, detail
+typed into the editor, rows added by hand. Documenting
+`wrangler d1 execute --file` would have been documenting a way to lose them,
+and it would have looked safe for exactly as long as nothing was ticked.
+`apply.mjs` reads that state out first, matched on module name + lesson name —
+ids are new after a rebuild and names are the only identity that survives —
+rebuilds, and writes it back. It also rehearses the SQL against a throwaway
+SQLite database built from `migrations/` before touching the remote, which is
+where the new lesson set comes from rather than from parsing the script's own
+output.
+
+**Detail is the one field the repo wins**, because `<name>-detail.json` is the
+source of truth and editing it has to be able to change a lesson. Where the
+script supplies none, dashboard-written detail is kept; where it differs, the
+lesson is named before it is overwritten. Comparing the text and not merely its
+presence is the whole point — a warning that fires on all 64 lessons every
+rebuild hides the one edit it exists to catch.
+
+Rows that exist only in the database are **reported and then deleted**, his
+call, with the SQL that would re-create them written out beside the apply so
+that "warn and continue" does not mean "gone".
+
+Odin carries the system's only real progress: **112 of 137**, backfilled
+2026-09-03 — the day its repository was reorganised, so the day the work was
+provably already finished rather than the day it happened. The alternative was
+leaving 112 lessons untickable. Those ticks survived a rebuild of the live
+database, which is how the preservation was verified.
 
 ## Tech Stack
 
@@ -301,17 +338,7 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
-- [ ] Attach the custom domain, then disable the workers.dev route so the site
-      is not served from two hostnames
-- [ ] **Write down how a curriculum's SQL reaches D1.** The scripts print it
-      and execute nothing, deliberately — but no npm script, no line in
-      DEPLOY.md and no line in any of the curriculum documents says what to do
-      with the output. It is the one step of the whole system that exists only
-      in his head.
-- [ ] **The Odin backfill.** Five courses and the first NodeJS project are
-      finished and none of it is ticked, because the dates are not recoverable
-      — `odin-projects` stamps 2026-09-03 on twenty of its twenty-four folders,
-      the day it was reorganised. The statement is written out at the foot of
-      `scripts/curriculums/odin.mjs` and wants one date from him.
-- [ ] **README.md and DEPLOY.md are from 2 September** and describe neither the
-      Worker, D1, nor anything under `/work`.
+- [ ] **Habits and reading are styled and empty.** Both pages are built, both
+      schemas are migrated (`0001`, `0002`, `0004`, `0005`), and neither holds
+      real data — so the backend's two daily surfaces show nothing. The next
+      thing worth doing on it.

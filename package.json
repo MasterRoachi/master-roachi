@@ -22,6 +22,7 @@
     "logo": "node scripts/logo.mjs",
     "tool-icons": "node scripts/tool-icons.mjs",
     "test:worker": "node scripts/worker-test.mjs",
+    "curriculum": "node scripts/curriculums/apply.mjs",
     "trello-auth": "node scripts/trello-auth.mjs",
     "github-auth": "node scripts/github-auth.mjs",
     "version": "node scripts/version.mjs"
