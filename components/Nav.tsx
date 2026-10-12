@@ -14,6 +14,7 @@ export default function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+
   // Close the menu on navigation, so tapping a link does not leave the panel
   // hanging open over the new page.
   useEffect(() => {
@@ -29,6 +30,19 @@ export default function Nav() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
+
+  /* The backend wears its own header and no site nav.
+   *
+   * BELOW every hook on purpose. Returning early above one changes the hook
+   * count when a client navigation moves from /work to a public page, and
+   * React throws "rendered fewer hooks than expected" — which is how this was
+   * written the first time.
+   *
+   * Hidden here rather than by lifting every public page into a route group:
+   * that is the tidier Next answer and it would mean moving every page in the
+   * repository to change the chrome on nine of them. /work is not part of the
+   * site being navigated; it is the thing the site is edited from. */
+  if (pathname.startsWith('/work')) return null;
 
   // The same tracked light the hero buttons use, so the nav answers the cursor
   // the way the rest of the page does. Written to CSS custom properties rather

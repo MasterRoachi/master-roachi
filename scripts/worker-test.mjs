@@ -185,6 +185,17 @@ execFileSync(
 );
 const cards = await import(pathToFileURL(cardBundle).href);
 
+// Which icon each curriculum gets. Pure, and split out of the component for
+// exactly this: a test that had to bundle JSX to ask what Piano resolves to
+// would be testing the wrong thing.
+const iconKeyBundle = path.join(os.tmpdir(), 'master-roachi-iconkey-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/curriculum-icons.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${iconKeyBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const curriculumIcons = await import(pathToFileURL(iconKeyBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -3719,14 +3730,16 @@ globalThis.fetch = preGh;
     lies[0].dx === 0 && lies[0].dy === 0 && lies[0].rotate === 0,
     JSON.stringify(lies[0]),
   );
+  /* Neater twice over, because he asked twice. A squared-up deck with a
+   * hand's worth of untidiness, not a scatter. */
   check(
     'the pile is neat — nothing strays far',
-    lies.every((lie) => Math.hypot(lie.dx, lie.dy) <= 3 && Math.abs(lie.rotate) <= 5),
-    JSON.stringify(lies.map((lie) => [lie.dx, lie.dy, lie.rotate])),
+    lies.every((lie) => Math.hypot(lie.dx, lie.dy) <= 1.5 && Math.abs(lie.rotate) <= 2.5),
+    JSON.stringify(lies.map((lie) => [+Math.hypot(lie.dx, lie.dy).toFixed(2), lie.rotate])),
   );
   check(
     'but every card behind the front one is still offset',
-    lies.slice(1).every((lie) => Math.hypot(lie.dx, lie.dy) > 0.5),
+    lies.slice(1).every((lie) => Math.hypot(lie.dx, lie.dy) > 0.3),
     JSON.stringify(lies.slice(1).map((lie) => +Math.hypot(lie.dx, lie.dy).toFixed(2))),
   );
   check(
@@ -3747,6 +3760,53 @@ globalThis.fetch = preGh;
       return true;
     })(),
     '',
+  );
+}
+
+// --- an icon per curriculum ------------------------------------------------
+//
+// Matched on keywords rather than stored, so a new curriculum looks like
+// something without anyone choosing an icon for it.
+{
+  const pairs = [
+    ['Piano', 'piano'],
+    ['Japanese', 'torii'],
+    ['Greek', 'column'],
+    ['The Odin Project', 'raven'],
+    ['Godot', 'controller'],
+    ['Aseprite and pixel art', 'pixels'],
+    ['Drawing', 'pencil'],
+    ['South African politics', 'protea'],
+  ];
+  for (const [name, key] of pairs) {
+    check(
+      `${name} gets the ${key}`,
+      curriculumIcons.iconFor(name) === key,
+      curriculumIcons.iconFor(name),
+    );
+  }
+
+  check(
+    'something unrecognised gets a book rather than nothing',
+    curriculumIcons.iconFor('Beekeeping') === 'book',
+    curriculumIcons.iconFor('Beekeeping'),
+  );
+  check(
+    'matching ignores case',
+    curriculumIcons.iconFor('PIANO PRACTICE') === 'piano',
+    curriculumIcons.iconFor('PIANO PRACTICE'),
+  );
+  check(
+    'every key has a title, so no icon is unlabelled',
+    pairs.every(([, key]) => typeof curriculumIcons.ICON_TITLES[key] === 'string') &&
+      typeof curriculumIcons.ICON_TITLES.book === 'string',
+    JSON.stringify(curriculumIcons.ICON_TITLES),
+  );
+  // The eight real curriculums must not collide on one icon.
+  check(
+    'the eight on the site get eight different icons',
+    new Set(pairs.map(([name]) => curriculumIcons.iconFor(name))).size === 8,
+    JSON.stringify(pairs.map(([name]) => curriculumIcons.iconFor(name))),
   );
 }
 
@@ -4037,4 +4097,5 @@ fs.rmSync(colourBundle, { force: true });
 fs.rmSync(fieldsBundle, { force: true });
 fs.rmSync(proseBundle, { force: true });
 fs.rmSync(cardBundle, { force: true });
+fs.rmSync(iconKeyBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

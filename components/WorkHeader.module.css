@@ -1,0 +1,33 @@
+/* The backend's only chrome. Tokens from app/globals.css. */
+
+.header {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1.5rem;
+  padding: 0.9rem 1rem;
+}
+
+.header ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1.1rem;
+}
+
+.header a {
+  color: var(--muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.header a:hover {
+  color: var(--ink);
+}
+
+/* Which page you are on, which is the only thing the header has to say
+   beyond where you can go. */
+.here {
+  color: var(--ink) !important;
+}

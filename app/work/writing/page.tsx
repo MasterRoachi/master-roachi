@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
-import PageHeader from '@/components/PageHeader';
 import { COLLECTIONS } from '@/lib/collections';
 import { getProjects } from '@/lib/content';
 import { site } from '@/lib/site';
@@ -25,10 +23,6 @@ const collection = COLLECTIONS.find((c) => c.key === 'writing')!;
 export default function Page() {
   return (
     <div className="shell">
-      <PageHeader eyebrow="Private" title="Writing" />
-      <p>
-        <Link href="/work/">← Work</Link>
-      </p>
       <CollectionEditor
         collection="writing"
         noun="post"

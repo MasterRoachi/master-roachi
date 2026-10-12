@@ -22,7 +22,9 @@
    however many active curriculums there are, so there is never a scrollbar
    and every card is the same size. */
 .queue {
-  margin: 0 0 2rem;
+  /* A clear break before the deck: the row above is today's work and the deck
+     below is the whole of it, and they were reading as one block. */
+  margin: 0 0 5rem;
 }
 
 .queueHead {
@@ -46,24 +48,26 @@
 
 .queueCard {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  place-items: center;
   height: 100%;
-  min-height: 7.5rem;
+  min-height: 8rem;
   border-radius: 10px;
   border: 1px solid oklch(32% 0 0);
   background: linear-gradient(165deg, oklch(18% 0 0), oklch(10% 0 0));
   overflow: hidden;
-  transition: opacity 220ms ease-out, transform 220ms ease-out, background 180ms ease-out;
+  /* Slower than it was: 220ms made the gold a flicker rather than a
+     flourish, and the thing being marked finished is worth a beat. */
+  transition: opacity 620ms ease-in, transform 620ms ease-in, background 380ms ease-out,
+    border-color 380ms ease-out;
 }
 
-/* Gold, then gone — the flourish for finishing one. The row refills from the
-   end once this has run. */
+/* Gold, then gone. The row refills from the end once this has run. */
 .queueDone {
   background: linear-gradient(165deg, oklch(84% 0.12 88), oklch(70% 0.13 82));
   border-color: oklch(90% 0.08 88);
   opacity: 0;
-  transform: translateY(-0.6rem) scale(0.96);
+  transform: translateY(-0.9rem) scale(0.94);
 }
 
 .queueDone .queueWhat,
@@ -73,56 +77,87 @@
 
 @media (prefers-reduced-motion: reduce) {
   .queueCard {
-    transition: none;
+    transition: opacity 200ms linear;
   }
 }
 
-.queueFace {
+.queueBody {
   display: grid;
-  align-content: start;
-  gap: 0.3rem;
-  flex: 1;
-  width: 100%;
-  padding: 0.6rem 0.6rem 0.3rem;
-  background: none;
-  border: 0;
-  text-align: left;
-  font: inherit;
-  cursor: pointer;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: 0.5rem;
+  text-align: center;
+  pointer-events: none;
 }
 
+/* The heading font the site already self-hosts, which is the one thing on
+   this page that is allowed to be ornamental. */
 .queueWhat {
-  font-size: 0.8125rem;
-  line-height: 1.25;
-  color: oklch(92% 0 0);
-  /* Two lines at most: "Aseprite and pixel art" is the long one. */
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.15;
+  color: oklch(94% 0 0);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+/* "3:2" — stage and lesson, which is all the position anyone needs. */
 .queueWhere {
-  font-size: 0.6875rem;
-  line-height: 1.35;
-  color: oklch(62% 0 0);
+  font-size: 0.8125rem;
+  color: oklch(60% 0 0);
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
 }
 
-.queueOpen {
-  margin: 0 0.45rem 0.45rem;
-  padding: 0.15rem 0;
-  background: none;
-  border: 1px solid oklch(38% 0 0);
-  border-radius: 6px;
-  color: var(--gold);
-  font: inherit;
-  font-size: 0.6875rem;
+/* --- the two dog-ears ----------------------------------------------------
+   A corner that lifts under the cursor and tears off when clicked. Both are
+   clipped triangles rather than rotated squares, so the diagonal stays crisp
+   at any size and nothing overflows the card's rounded corner. */
+.foldOpen,
+.foldDone {
+  position: absolute;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 0;
+  padding: 0;
   cursor: pointer;
+  transition: width 160ms ease-out, height 160ms ease-out, filter 160ms ease-out;
+  z-index: 2;
 }
 
-.queueOpen:hover {
-  border-color: var(--gold);
+/* Top left, white: open it. */
+.foldOpen {
+  top: 0;
+  left: 0;
+  background: linear-gradient(135deg, oklch(97% 0 0), oklch(82% 0 0));
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* Bottom right, gold: tear it off and it is done. */
+.foldDone {
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(315deg, oklch(84% 0.12 88), oklch(66% 0.13 82));
+  clip-path: polygon(100% 100%, 100% 0, 0 100%);
+}
+
+.foldOpen:hover,
+.foldOpen:focus-visible,
+.foldDone:hover,
+.foldDone:focus-visible {
+  width: 2.6rem;
+  height: 2.6rem;
+  filter: brightness(1.12);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .foldOpen,
+  .foldDone {
+    transition: none;
+  }
 }
 
 @media (max-width: 760px) {
@@ -146,7 +181,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  /* Well clear of the cards. At half a rem they read as part of the card's
+     edge rather than as controls for the deck. */
+  gap: 3.5rem;
 }
 
 .deck {
@@ -443,9 +480,19 @@
 }
 
 .overlayTitle {
-  margin: 0 0 1rem;
+  margin: 0 0 1.25rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
   text-align: center;
-  font-size: 1.5rem;
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-size: 1.625rem;
+}
+
+/* Matched on the curriculum's name rather than stored — see
+   components/CurriculumIcon.tsx. */
+.titleIcon {
+  color: var(--gold);
 }
 
 .overlayEyebrow {
@@ -605,62 +652,12 @@
   color: var(--muted);
 }
 
-/* --- layer two: the lessons as a grid of numbers ------------------------ */
-.gridPane {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 1.25rem 1.5rem 1.5rem;
-}
-
-.gridHead {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 1px solid var(--line);
-}
-
-.gridHead h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-.gridHeadRight {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-.gridHeadRight input {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--ink);
-  padding: 0.2rem 0.4rem;
-  font: inherit;
-  font-size: 0.75rem;
-}
-
-.back {
-  background: none;
-  border: 0;
-  color: var(--gold);
-  font: inherit;
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
+/* --- layer two: the lessons, as nothing but blocks ----------------------
+   No header, no key, no panel behind them. The header named the curriculum
+   and the stage — both of which you clicked twice to get here — and carried a
+   stages button that the backdrop and Escape already do. The key explained
+   three colours that are gold, grey and faded. All furniture around the only
+   thing on the layer.
 
 /* Numbers, not names: a stage of thirty lessons is a wall of text, and a grid
    of thirty numbers is a shape with visible gaps. */
@@ -668,25 +665,42 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  flex: 1;
-  overflow-y: auto;
+  /* Fills the 50px-inset overlay. The overlay is a grid with place-items
+     centre, so the only way a child takes the whole box is to say so. */
+  width: 100%;
+  height: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr));
-  gap: 0.5rem;
-  align-content: start;
+  /* As many columns as fit, and as many rows as there are — both tracks
+     stretch, so the blocks grow to use whatever is left rather than sitting
+     square in the top corner. A stage of four lessons gets four big blocks
+     and one of thirty gets thirty smaller ones. */
+  grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+  grid-auto-rows: minmax(4rem, 1fr);
+  gap: 0.6rem;
+}
+
+.numberGrid > li {
+  display: grid;
+  /* The container the cell's font size is measured against.
+     Declared on the WRAPPER, not on the cell: an element with container-type
+     cannot query itself, so `cqmin` inside .cell resolved against some outer
+     container instead of the block it was sizing text for. */
+  container-type: size;
 }
 
 .cell {
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid oklch(34% 0 0);
   background: oklch(22% 0 0);
   color: var(--ink);
   font: inherit;
-  font-size: 1rem;
+  /* Scales with the block, so four blocks carry big numbers and thirty carry
+     small ones without two sets of rules. */
+  font-size: clamp(1rem, 34cqmin, 2.75rem);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition: transform 120ms ease-out, border-color 120ms ease-out;
@@ -719,40 +733,6 @@
   }
 }
 
-.gridKey {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0;
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-.gridKey span {
-  width: 0.85rem;
-  height: 0.85rem;
-  border-radius: 4px;
-  border: 1px solid oklch(34% 0 0);
-  margin-left: 0.6rem;
-}
-
-.gridKey span:first-child {
-  margin-left: 0;
-}
-
-.keyDone {
-  background: linear-gradient(160deg, oklch(84% 0.12 88), oklch(70% 0.13 82));
-}
-
-.keyOpen {
-  background: oklch(22% 0 0);
-}
-
-.keyOff {
-  background: oklch(22% 0 0);
-  opacity: 0.4;
-}
-
 /* --- layer three: one lesson ------------------------------------------- */
 .detailCard {
   width: min(100%, 40rem);
@@ -775,6 +755,18 @@
   font-size: 1.1875rem;
   font-weight: 500;
   line-height: 1.35;
+}
+
+.renameEyebrow {
+  background: var(--bg);
+  border: 1px solid var(--gold);
+  border-radius: 5px;
+  color: var(--ink);
+  padding: 0.05rem 0.3rem;
+  font: inherit;
+  font-size: 0.6875rem;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .renameInline {
@@ -870,6 +862,25 @@
 .goldButton {
   border-color: var(--gold) !important;
   color: var(--gold) !important;
+}
+
+/* Back-dating, which used to sit in the grid's header. */
+.dayPick {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.dayPick input {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  padding: 0.2rem 0.35rem;
+  font: inherit;
+  font-size: 0.75rem;
 }
 
 .routeSwitch {

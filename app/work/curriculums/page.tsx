@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
-import PageHeader from '@/components/PageHeader';
 import Curriculums from './Curriculums';
 
 // The control dashboard for what he is studying: curriculum, module, lesson.
@@ -20,10 +18,6 @@ export const metadata: Metadata = pageMeta({
 export default function WorkCurriculumsPage() {
   return (
     <div className="shell">
-      <PageHeader eyebrow="Private" title="Curriculums" />
-      <p>
-        <Link href="/work/">← Work</Link>
-      </p>
       <Curriculums />
     </div>
   );

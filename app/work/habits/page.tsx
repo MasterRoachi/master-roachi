@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
-import PageHeader from '@/components/PageHeader';
 import Habits from './Habits';
 
 // The habit tracker.
@@ -20,14 +18,6 @@ export const metadata: Metadata = pageMeta({
 export default function WorkHabitsPage() {
   return (
     <div className="shell">
-      <PageHeader
-        eyebrow="Private"
-        title="Habits"
-        lede="A year opens into months. A month shows its days."
-      />
-      <p>
-        <Link href="/work/">← Work</Link>
-      </p>
       <Habits />
     </div>
   );

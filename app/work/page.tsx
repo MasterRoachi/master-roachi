@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
-import PageHeader from '@/components/PageHeader';
 import SiteActions from './SiteActions';
+import { WORK_TOOLS } from '@/lib/work-tools';
 import styles from './nav.module.css';
 
 // The backend's front door.
@@ -23,57 +23,12 @@ export const metadata: Metadata = pageMeta({
   noIndex: true,
 });
 
-/** Only what exists. A link to a page that is not built is a bug report. */
-const TOOLS = [
-  {
-    href: '/work/boards/',
-    name: 'Boards',
-    what: 'What is next across Trello, and the day job.',
-  },
-  {
-    href: '/work/habits/',
-    name: 'Habits',
-    what: 'What got done, and what did not.',
-  },
-  {
-    href: '/work/reading/',
-    name: 'Reading',
-    what: 'What is open, what is next, and what was put down.',
-  },
-  {
-    href: '/work/curriculums/',
-    name: 'Curriculums',
-    what: 'What is being studied, and how far through it you are.',
-  },
-  {
-    href: '/work/sketchpad/',
-    name: 'Sketchpad',
-    what: 'Write and draw on one page. Saved as one file.',
-  },
-  {
-    href: '/work/writing/',
-    name: 'Writing',
-    what: 'Posts. Editing one commits it, and the commit publishes it.',
-  },
-  {
-    href: '/work/projects/',
-    name: 'Projects',
-    what: 'The project pages behind /projects.',
-  },
-  {
-    href: '/work/store/',
-    name: 'Product copy',
-    what: 'What each design is, in your own words.',
-  },
-];
 
 export default function WorkPage() {
   return (
     <div className="shell">
-      <PageHeader eyebrow="Private" title="Work" lede="The back of the house." />
-
       <ul className={styles.tools}>
-        {TOOLS.map((tool) => (
+        {WORK_TOOLS.map((tool) => (
           <li key={tool.href}>
             <Link href={tool.href}>{tool.name}</Link>
             <span>{tool.what}</span>

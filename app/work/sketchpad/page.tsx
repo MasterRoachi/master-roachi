@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
-import PageHeader from '@/components/PageHeader';
 import Sketchpad from './Sketchpad';
 
 // One page to write and draw on, saved as one file.
@@ -20,14 +18,6 @@ export const metadata: Metadata = pageMeta({
 export default function WorkScratchpadPage() {
   return (
     <div className="shell">
-      <PageHeader
-        eyebrow="Private"
-        title="Sketchpad"
-        lede="Pen, text, and select. Saving keeps one file that looks like what you left."
-      />
-      <p>
-        <Link href="/work/">← Work</Link>
-      </p>
       <Sketchpad />
     </div>
   );

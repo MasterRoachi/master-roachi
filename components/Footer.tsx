@@ -15,6 +15,16 @@ export default function Footer() {
   const { contactEmail, socials } = site;
   const pathname = usePathname();
 
+  /* The backend wears its own header and no footer.
+   *
+   * Hidden here rather than by lifting every public page into a route group:
+   * that is the tidier Next answer and it would mean moving every page in the
+   * repository to change the chrome on nine of them. /work is not part of the
+   * site being navigated — it is the thing the site is edited from — so the
+   * site nav and an RSS link under a lesson grid are both furniture. */
+  if (pathname.startsWith('/work')) return null;
+
+
   // The footer sits outside every page's own wrapper, so it cannot inherit the
   // accent those wrappers set. It works it out from the route instead, which
   // is what lets the closing rule match the page it is closing. The longest

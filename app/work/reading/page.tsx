@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
-import PageHeader from '@/components/PageHeader';
 import Reading from './Reading';
 
 // The reading tracker, as a bookcase. On D1, beside the habits, for the same
@@ -27,14 +25,6 @@ export const metadata: Metadata = pageMeta({
 export default function WorkReadingPage() {
   return (
     <div className="shell">
-      <PageHeader
-        eyebrow="Private"
-        title="Reading"
-        lede="Take a book off the shelf to read what you thought of it."
-      />
-      <p>
-        <Link href="/work/">← Work</Link>
-      </p>
       <Reading />
     </div>
   );

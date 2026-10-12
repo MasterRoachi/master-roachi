@@ -107,12 +107,15 @@ export function scatterFor(name: string, at: number): Scatter {
   // around the front one instead of clustering at the centre. Stepped by the
   // golden angle so consecutive cards do not lie in the same direction.
   const angle = ((at * 137.5 + (h % 40)) * Math.PI) / 180;
-  const radius = 1.1 + Math.min(1, at / 6) * 1.6;
+  // Neater again, asked for twice: a squared-up deck with a hand's worth of
+  // untidiness, not a scatter. Half the reach and half the tilt of the last
+  // pass, which itself was a third of the first.
+  const radius = 0.55 + Math.min(1, at / 6) * 0.75;
 
   const round = (value: number) => Math.round(value * 10) / 10;
 
   return {
-    rotate: round(((h >>> 16) % 90) / 10 - 4.5),
+    rotate: round(((h >>> 16) % 46) / 10 - 2.3),
     dx: round(Math.cos(angle) * radius),
     // Flatter vertically: the cards are tall, so the same radius sideways
     // shows an edge and downwards mostly shows nothing.

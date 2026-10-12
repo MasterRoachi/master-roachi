@@ -10,6 +10,7 @@ import {
   type Module,
   type Step,
 } from '@/lib/curriculum';
+import CurriculumIcon from '@/components/CurriculumIcon';
 import { GOLD, scatterFor, statusLook } from '@/lib/curriculum-card';
 import styles from './curriculums.module.css';
 
@@ -246,6 +247,22 @@ export default function Curriculums() {
     return found.slice(0, 40);
   }, [current, search]);
 
+  /**
+   * Go in a layer with a glimpse of the deck on the way.
+   *
+   * Asked for as "flashes to the curriculum home screen and then brings up
+   * the grid". It is a beat of the page underneath between two overlays, which
+   * is what stops a dimmed card being replaced by a different dimmed card with
+   * nothing to say one closed and another opened.
+   */
+  function flashTo(next: Layer, set?: () => void) {
+    setLayer(null);
+    window.setTimeout(() => {
+      set?.();
+      setLayer(next);
+    }, 190);
+  }
+
   function close() {
     setLayer(null);
     setOpenCurriculum(null);
@@ -311,25 +328,14 @@ export default function Curriculums() {
                     finishing.has(step.lesson.id) ? styles.queueDone : ''
                   }`}
                 >
-                  {/* The card itself finishes the lesson — the common case,
-                      and the one worth making a single click. */}
+                  {/* Two dog-ears, and the card body itself does nothing.
+                      A card that completed a lesson anywhere you clicked it
+                      was one misclick from a tick you did not mean. */}
                   <button
                     type="button"
-                    className={styles.queueFace}
-                    title={step.lesson.name}
-                    aria-label={`Finish ${step.lesson.name}`}
-                    onClick={() => finish(step)}
-                  >
-                    <span className={styles.queueWhat}>{step.curriculum.name}</span>
-                    <span className={styles.queueWhere}>
-                      module {step.moduleAt}
-                      <br />
-                      lesson {step.lessonAt}
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.queueOpen}
+                    className={styles.foldOpen}
+                    title={`Open ${step.lesson.name}`}
+                    aria-label={`Open ${step.lesson.name}`}
                     onClick={() => {
                       setOpenCurriculum(step.curriculum.id);
                       setOpenStage(step.module.id);
@@ -338,9 +344,20 @@ export default function Curriculums() {
                       setEditingDetail(false);
                       setLayer('detail');
                     }}
-                  >
-                    open
-                  </button>
+                  />
+                  <button
+                    type="button"
+                    className={styles.foldDone}
+                    title={`Mark ${step.lesson.name} done`}
+                    aria-label={`Mark ${step.lesson.name} done`}
+                    onClick={() => finish(step)}
+                  />
+                  <div className={styles.queueBody} title={step.lesson.name}>
+                    <span className={styles.queueWhat}>{step.curriculum.name}</span>
+                    <span className={styles.queueWhere}>
+                      {step.moduleAt}:{step.lessonAt}
+                    </span>
+                  </div>
                 </div>
               </li>
             ))}
@@ -528,7 +545,10 @@ export default function Curriculums() {
       {layer === 'stages' && current && (
         <Overlay onClose={close} label={`${current.name} stages`}>
           <div className={styles.stageCentre}>
-            <p className={styles.overlayTitle}>{current.name}</p>
+            <p className={styles.overlayTitle}>
+              <CurriculumIcon name={current.name} className={styles.titleIcon} size={46} />
+              <span>{current.name}</span>
+            </p>
 
             <div className={styles.searchRow}>
               <input
@@ -573,10 +593,7 @@ export default function Curriculums() {
                     key={module.id}
                     type="button"
                     className={styles.stageCard}
-                    onClick={() => {
-                      setOpenStage(module.id);
-                      setLayer('grid');
-                    }}
+                    onClick={() => flashTo('grid', () => setOpenStage(module.id))}
                   >
                     <span className={styles.stageNumber}>{at + 1}</span>
                     <span className={styles.stageName}>{module.name}</span>
@@ -636,105 +653,47 @@ export default function Curriculums() {
             setOpenStage(null);
           }}
         >
-          <div className={styles.gridPane}>
-            <header className={styles.gridHead}>
-              <div>
-                <p className={styles.overlayEyebrow}>{current.name}</p>
-                <h2>
-                  {renaming === `module:${stage.id}` ? (
-                    <input
-                      className={styles.renameInline}
-                      value={rename}
-                      autoFocus
-                      aria-label={`Rename ${stage.name}`}
-                      onChange={(event) => setRename(event.target.value)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' && rename.trim()) {
-                          void act({ action: 'rename', kind: 'module', id: stage.id, name: rename });
-                          setRenaming(null);
-                        }
-                        if (event.key === 'Escape') setRenaming(null);
-                      }}
-                      onBlur={() => setRenaming(null)}
-                    />
-                  ) : (
-                    <span
-                      onDoubleClick={() => {
-                        setRenaming(`module:${stage.id}`);
-                        setRename(stage.name);
-                      }}
-                      title="Double-click to rename"
-                    >
-                      {stage.name}
-                    </span>
-                  )}
-                </h2>
-              </div>
-              <span className={styles.gridHeadRight}>
-                <label htmlFor="tick-day">Ticking as</label>
-                <input
-                  id="tick-day"
-                  type="date"
-                  value={tickDay}
-                  max={today}
-                  onChange={(event) => setTickDay(event.target.value || today)}
-                />
+          {/* Nothing but the blocks.
+              The header said the curriculum and the stage, which are what you
+              clicked twice to get here, and carried a stages button that the
+              backdrop and Escape both already do. The key explained three
+              colours that are gold, grey and faded. All of it was furniture
+              around the only thing on the layer. */}
+          <ol className={styles.numberGrid}>
+            {stage.lessons.map((each, at) => (
+              <li key={each.id}>
                 <button
                   type="button"
-                  className={styles.back}
-                  onClick={() => {
-                    setLayer('stages');
-                    setOpenStage(null);
-                  }}
-                >
-                  ← stages
-                </button>
-              </span>
-            </header>
-
-            {/* Numbers, not names. A stage of thirty lessons is a wall of text
-                and a grid of thirty numbers is a shape with visible gaps. */}
-            <ol className={styles.numberGrid}>
-              {stage.lessons.map((each, at) => (
-                <li key={each.id}>
-                  <button
-                    type="button"
-                    className={`${styles.cell} ${each.done_on ? styles.cellDone : ''} ${
-                      each.on_route ? '' : styles.cellOff
-                    }`}
-                    title={each.name}
-                    onClick={() => {
+                  className={`${styles.cell} ${each.done_on ? styles.cellDone : ''} ${
+                    each.on_route ? '' : styles.cellOff
+                  }`}
+                  title={each.name}
+                  onClick={() =>
+                    flashTo('detail', () => {
                       setOpenLesson(each.id);
                       setDetailDraft(each.detail ?? '');
                       setEditingDetail(false);
-                      setLayer('detail');
-                    }}
-                  >
-                    {at + 1}
-                  </button>
-                </li>
-              ))}
-              <li>
-                <button
-                  type="button"
-                  className={`${styles.cell} ${styles.cellAdd}`}
-                  title="Add a lesson"
-                  onClick={() => {
-                    const name = prompt('Lesson name');
-                    if (name?.trim()) void act({ action: 'add-lesson', module_id: stage.id, name });
-                  }}
+                    })
+                  }
                 >
-                  +
+                  {at + 1}
                 </button>
               </li>
-            </ol>
-
-            <p className={styles.gridKey}>
-              <span className={styles.keyDone} /> done
-              <span className={styles.keyOpen} /> to do
-              <span className={styles.keyOff} /> off the route
-            </p>
-          </div>
+            ))}
+            <li>
+              <button
+                type="button"
+                className={`${styles.cell} ${styles.cellAdd}`}
+                title="Add a lesson"
+                onClick={() => {
+                  const name = prompt('Lesson name');
+                  if (name?.trim()) void act({ action: 'add-lesson', module_id: stage.id, name });
+                }}
+              >
+                +
+              </button>
+            </li>
+          </ol>
         </Overlay>
       )}
 
@@ -750,8 +709,39 @@ export default function Curriculums() {
         >
           <div className={styles.detailCard}>
             <header className={styles.detailHead}>
+              {/* The stage's name is renameable HERE because the grid's
+                  header is gone and that is where it used to be. On the stage
+                  card it would fight the click that opens the grid; on a
+                  breadcrumb nothing else wants the gesture. */}
               <p className={styles.overlayEyebrow}>
-                {current.name} › {stage.name}
+                {current.name} ›{' '}
+                {renaming === `module:${stage.id}` ? (
+                  <input
+                    className={styles.renameEyebrow}
+                    value={rename}
+                    autoFocus
+                    aria-label={`Rename ${stage.name}`}
+                    onChange={(event) => setRename(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' && rename.trim()) {
+                        void act({ action: 'rename', kind: 'module', id: stage.id, name: rename });
+                        setRenaming(null);
+                      }
+                      if (event.key === 'Escape') setRenaming(null);
+                    }}
+                    onBlur={() => setRenaming(null)}
+                  />
+                ) : (
+                  <span
+                    onDoubleClick={() => {
+                      setRenaming(`module:${stage.id}`);
+                      setRename(stage.name);
+                    }}
+                    title="Double-click to rename the stage"
+                  >
+                    {stage.name}
+                  </span>
+                )}
               </p>
               <h2>
                 {renaming === `lesson:${lesson.id}` ? (
@@ -851,6 +841,19 @@ export default function Curriculums() {
                 )}
 
                 <p className={styles.detailButtons}>
+                  {/* Back-dating lives here now: it was in the grid's header,
+                      and the header is gone. This is where marking done
+                      happens, so it is where the day belongs. */}
+                  <label className={styles.dayPick}>
+                    <span>on</span>
+                    <input
+                      type="date"
+                      value={tickDay}
+                      max={today}
+                      aria-label="The day to mark it done"
+                      onChange={(event) => setTickDay(event.target.value || today)}
+                    />
+                  </label>
                   <button
                     type="button"
                     className={lesson.done_on ? styles.goldButton : undefined}

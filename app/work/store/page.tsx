@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
-import PageHeader from '@/components/PageHeader';
 import { site } from '@/lib/site';
 import { getStore, garmentLabel, priceSummary, productPath } from '@/lib/store';
 import StoreCopyEditor, { type EditorProduct } from './StoreCopyEditor';
@@ -65,10 +63,6 @@ export default function WorkStorePage() {
 
   return (
     <div className="shell">
-      <PageHeader eyebrow="Private" title="Product copy" />
-      <p>
-        <Link href="/work/">← Work</Link>
-      </p>
       <StoreCopyEditor
         products={[...synced, ...planned]}
         fetchedAt={fetchedAt ?? null}
