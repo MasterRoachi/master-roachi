@@ -56,32 +56,80 @@
   border: 1px solid oklch(32% 0 0);
   background: linear-gradient(165deg, oklch(18% 0 0), oklch(10% 0 0));
   overflow: hidden;
-  /* Slower than it was: 220ms made the gold a flicker rather than a
-     flourish, and the thing being marked finished is worth a beat. */
-  transition: opacity 620ms ease-in, transform 620ms ease-in, background 380ms ease-out,
-    border-color 380ms ease-out;
+  /* The gold beneath the sticker. It is always there; the peel is what
+     uncovers it, which is why finishing does not change the background. */
+  isolation: isolate;
 }
 
-/* Gold, then gone. The row refills from the end once this has run. */
+/* The sticker: the black face, which peels off to leave the gold behind.
+   A layer of its own rather than the card's own background, because the thing
+   being torn away has to be able to move while the card stays put. */
+.queueCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(145deg, oklch(84% 0.12 88), oklch(66% 0.13 82));
+}
+
+.queueBody,
+.foldOpen,
+.foldDone {
+  z-index: 2;
+}
+
+/* --- finishing: peel, then fade all the way out ------------------------
+   PEEL 420ms then FADE 900ms, which are the same numbers Curriculums.tsx
+   waits for before swapping the card out. They disagreed once — the card was
+   pulled from the DOM 100ms into its own fade and the row jumped — so if one
+   changes the other has to. */
 .queueDone {
-  background: linear-gradient(165deg, oklch(84% 0.12 88), oklch(70% 0.13 82));
-  border-color: oklch(90% 0.08 88);
-  opacity: 0;
-  transform: translateY(-0.9rem) scale(0.94);
+  /* The fade waits out the peel rather than a second animation timing it:
+     a keyframe that only set a custom property nobody read was doing nothing
+     but holding the delay the delay already holds. */
+  animation: fade-away 900ms 420ms ease-out forwards;
 }
 
-.queueDone .queueWhat,
-.queueDone .queueWhere {
-  color: oklch(24% 0.03 85);
+.queueDone::before {
+  animation: lift 420ms ease-in forwards;
+}
+
+@keyframes lift {
+  to {
+    transform: translate(42%, 42%) rotate(14deg);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-away {
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* --- arriving: in from the right, slowly ------------------------------- */
+.queueArriving {
+  animation: slide-in 700ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .queueCard {
-    transition: opacity 200ms linear;
+  .queueDone,
+  .queueDone::before,
+  .queueArriving {
+    animation-duration: 1ms;
   }
 }
 
 .queueBody {
+  position: relative;
   display: grid;
   justify-items: center;
   gap: 0.2rem;
@@ -91,7 +139,7 @@
 }
 
 /* The heading font the site already self-hosts, which is the one thing on
-   this page that is allowed to be ornamental. */
+   this page allowed to be ornamental. */
 .queueWhat {
   font-family: var(--font-display), var(--font-sans), sans-serif;
   font-size: 0.9375rem;
@@ -111,46 +159,68 @@
   letter-spacing: 0.04em;
 }
 
+.queueDone .queueWhat,
+.queueDone .queueWhere {
+  color: oklch(24% 0.03 85);
+}
+
 /* --- the two dog-ears ----------------------------------------------------
-   A corner that lifts under the cursor and tears off when clicked. Both are
-   clipped triangles rather than rotated squares, so the diagonal stays crisp
-   at any size and nothing overflows the card's rounded corner. */
+   Little folds of paper: a lifted triangle with the underside catching the
+   light along the crease and a shadow falling on the card beneath it. Clipped
+   triangles rather than rotated squares, so the diagonal stays crisp and
+   nothing escapes the card's rounded corner. */
 .foldOpen,
 .foldDone {
   position: absolute;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.7rem;
+  height: 1.7rem;
   border: 0;
   padding: 0;
   cursor: pointer;
-  transition: width 160ms ease-out, height 160ms ease-out, filter 160ms ease-out;
-  z-index: 2;
+  transition: width 260ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    height 260ms cubic-bezier(0.22, 0.61, 0.36, 1), filter 260ms ease-out;
 }
 
-/* Top left, white: open it. */
+/* Top left, white underside: open it. The second gradient stop is the crease,
+   where a folded sheet catches the light. */
 .foldOpen {
   top: 0;
   left: 0;
-  background: linear-gradient(135deg, oklch(97% 0 0), oklch(82% 0 0));
+  background: linear-gradient(135deg, oklch(99% 0 0) 0%, oklch(92% 0 0) 55%, oklch(74% 0 0) 100%);
   clip-path: polygon(0 0, 100% 0, 0 100%);
+  filter: drop-shadow(1px 1px 2px rgb(0 0 0 / 0.55));
 }
 
-/* Bottom right, gold: tear it off and it is done. */
+/* Bottom right, gold underside: peel it off and it is done. */
 .foldDone {
   bottom: 0;
   right: 0;
-  background: linear-gradient(315deg, oklch(84% 0.12 88), oklch(66% 0.13 82));
+  background: linear-gradient(315deg, oklch(90% 0.1 88) 0%, oklch(80% 0.13 85) 55%, oklch(58% 0.12 82) 100%);
   clip-path: polygon(100% 100%, 100% 0, 0 100%);
+  filter: drop-shadow(-1px -1px 2px rgb(0 0 0 / 0.55));
 }
 
+/* Curling further under the cursor, which is the whole tell that it lifts. */
 .foldOpen:hover,
 .foldOpen:focus-visible,
 .foldDone:hover,
 .foldDone:focus-visible {
-  width: 2.6rem;
-  height: 2.6rem;
-  filter: brightness(1.12);
+  width: 3.2rem;
+  height: 3.2rem;
+  filter: drop-shadow(2px 2px 5px rgb(0 0 0 / 0.6)) brightness(1.06);
   outline: none;
+}
+
+/* Mid-peel the gold corner opens right out, so the click reads as the sticker
+   coming away rather than as the card changing colour. */
+.queueDone .foldDone {
+  width: 170%;
+  height: 170%;
+  transition: width 420ms ease-in, height 420ms ease-in;
+}
+
+.queueDone .foldOpen {
+  opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

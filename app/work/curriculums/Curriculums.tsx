@@ -69,6 +69,17 @@ const STATUS_MARK: Record<string, string> = { active: '▶', paused: '॥', done
 
 type Layer = 'stages' | 'grid' | 'detail';
 
+/* How long the finishing flourish takes, in milliseconds.
+ *
+ * Declared here AND in the stylesheet, which is a duplication worth having:
+ * the swap has to happen after the fade has finished, and the bug it fixes was
+ * exactly those two numbers disagreeing — the card left the DOM at 520ms into
+ * a 620ms fade and the row jumped. Change one, change the other; the CSS
+ * carries the same note. */
+const PEEL = 420;
+const FADE = 900;
+const ARRIVE = 700;
+
 export default function Curriculums() {
   const [data, setData] = useState<Curriculum[] | null>(null);
   const [today, setToday] = useState('');
@@ -98,8 +109,10 @@ export default function Curriculums() {
    * behaviour asked for and the reason this is state rather than derived:
    * derived, the replacement would appear where the old one was. */
   const [queue, setQueue] = useState<number[] | null>(null);
-  /** Cards mid-flourish: gold, then gone. */
+  /** Cards mid-peel: gold spreading, then fading out. */
   const [finishing, setFinishing] = useState<Set<number>>(new Set());
+  /** Cards that have just arrived, so they can slide in rather than appear. */
+  const [arriving, setArriving] = useState<Set<number>>(new Set());
 
   const load = useCallback(async () => {
     try {
@@ -204,9 +217,14 @@ export default function Curriculums() {
   /**
    * Finish a lesson from the Up next row.
    *
-   * The card goes gold, fades, and that curriculum's next lesson is appended
-   * to the end of the row. The swap waits for the flourish so it is not cut
-   * short by the list re-rendering under it.
+   * The sticker peels, the card fades out all the way, and only then is it
+   * taken out of the row and the replacement appended — which slides in from
+   * the right.
+   *
+   * THE TIMING MATTERED AND WAS WRONG. The swap fired at 520ms against a
+   * 620ms fade, so the card was pulled out of the DOM while still visible and
+   * the row jumped. PEEL + FADE below is the CSS duration, and nothing moves
+   * until it has run.
    */
   function finish(step: Step) {
     setFinishing((before) => new Set(before).add(step.lesson.id));
@@ -223,7 +241,19 @@ export default function Curriculums() {
         next.delete(step.lesson.id);
         return next;
       });
-    }, 520);
+      if (replacement) {
+        // Marked as arriving so it slides in; cleared once the slide is over,
+        // or it would slide again on the next render.
+        setArriving((before) => new Set(before).add(replacement.lesson.id));
+        window.setTimeout(() => {
+          setArriving((before) => {
+            const next = new Set(before);
+            next.delete(replacement.lesson.id);
+            return next;
+          });
+        }, ARRIVE);
+      }
+    }, PEEL + FADE);
 
     void act({
       action: 'toggle-lesson',
@@ -326,7 +356,7 @@ export default function Curriculums() {
                 <div
                   className={`${styles.queueCard} ${
                     finishing.has(step.lesson.id) ? styles.queueDone : ''
-                  }`}
+                  } ${arriving.has(step.lesson.id) ? styles.queueArriving : ''}`}
                 >
                   {/* Two dog-ears, and the card body itself does nothing.
                       A card that completed a lesson anywhere you clicked it

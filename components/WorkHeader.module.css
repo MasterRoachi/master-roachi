@@ -1,7 +1,6 @@
 /* The backend's only chrome. Tokens from app/globals.css. */
 
 .header {
-  border-bottom: 1px solid var(--line);
   margin-bottom: 1.5rem;
   padding: 0.9rem 1rem;
 }
