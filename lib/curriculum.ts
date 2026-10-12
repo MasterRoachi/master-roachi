@@ -138,39 +138,55 @@ export function overallNext(curriculums: Curriculum[]):
 }
 
 /** Whether every lesson is done — distinct from a curriculum marked done by hand. */
-/**
- * The next several things to do, across everything.
- *
- * Strictly in route order, which is the same rule `overallNext` follows and
- * the reason curriculum order is a decision at all: the curriculums are walked
- * in their own order, so the next ten steps are the next ten gaps on the first
- * unfinished route, and only when that route runs out does the next one start.
- *
- * The consequence is worth knowing rather than hiding: with nothing ticked on
- * the first curriculum, all ten come from it. That is what "the route through
- * all the routes" means — it is a path, not a rota.
- */
-export function overallNextN(
-  curriculums: Curriculum[],
-  limit: number,
-): { curriculum: Curriculum; module: Module; lesson: Lesson }[] {
-  const out: { curriculum: Curriculum; module: Module; lesson: Lesson }[] = [];
+/** Where a lesson sits, for a label like "Japanese module 2 lesson 12". */
+export interface Step {
+  curriculum: Curriculum;
+  module: Module;
+  lesson: Lesson;
+  /** 1-based position of the module within its curriculum. */
+  moduleAt: number;
+  /** 1-based position of the lesson within its module. */
+  lessonAt: number;
+}
 
-  for (const curriculum of curriculums) {
-    // Paused means not now, so a paused course offers nothing — the same rule
-    // overallNext applies, and pausing one would be pointless otherwise.
-    if (curriculum.status !== 'active') continue;
-    for (const module of curriculum.modules) {
-      for (const lesson of module.lessons) {
-        if (lesson.done_on !== null) continue;
-        // A lesson taken off the route is work already decided against.
-        if (lesson.on_route !== 1) continue;
-        out.push({ curriculum, module, lesson });
-        if (out.length >= limit) return out;
-      }
+/**
+ * The next thing to do in one curriculum, with its position.
+ *
+ * `skip` walks past lessons already queued, which is what lets the Up next row
+ * refill itself: when a card is finished and fades, the next one from the same
+ * curriculum is appended, and that is the one after the one just taken.
+ */
+export function nextStep(curriculum: Curriculum, skip: Set<number> = new Set()): Step | null {
+  for (let m = 0; m < curriculum.modules.length; m += 1) {
+    const module = curriculum.modules[m];
+    for (let l = 0; l < module.lessons.length; l += 1) {
+      const lesson = module.lessons[l];
+      if (lesson.done_on !== null) continue;
+      // A lesson taken off the route is work already decided against.
+      if (lesson.on_route !== 1) continue;
+      if (skip.has(lesson.id)) continue;
+      return { curriculum, module, lesson, moduleAt: m + 1, lessonAt: l + 1 };
     }
   }
+  return null;
+}
 
+/**
+ * One next lesson per ACTIVE curriculum.
+ *
+ * Not the next ten on the route, which is what this was: in route order those
+ * all come from whichever curriculum is first, so the row answered "what is
+ * the path" when the question it is asked every morning is "what is there to
+ * do today" — and the answer to that is one thing from each course being
+ * studied. Paused and done contribute nothing, which is what pausing is for.
+ */
+export function nextPerCurriculum(curriculums: Curriculum[]): Step[] {
+  const out: Step[] = [];
+  for (const curriculum of curriculums) {
+    if (curriculum.status !== 'active') continue;
+    const step = nextStep(curriculum);
+    if (step) out.push(step);
+  }
   return out;
 }
 

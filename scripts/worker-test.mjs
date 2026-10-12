@@ -3659,42 +3659,49 @@ globalThis.fetch = preGh;
   );
 }
 
-// --- a curriculum's card colour --------------------------------------------
+// --- a curriculum's card look, and where it lies ---------------------------
+//
+// The colour used to be derived from the name, which gave every curriculum its
+// own hue and meant the one thing a glance at the deck could NOT tell you was
+// which courses were running. It is the status now, and nothing else.
 {
-  const a = cards.cardFor('Japanese');
-  const b = cards.cardFor('Japanese');
-  check('the same name gives the same card', JSON.stringify(a) === JSON.stringify(b), '');
+  const active = cards.statusLook('active');
+  const done = cards.statusLook('done');
+  const paused = cards.statusLook('paused');
+
+  check('active is white', active.background.startsWith('oklch(97%'), active.background);
+  check('done is gold', /oklch\(8[0-9]%/.test(done.background) && done.background.includes('88'), done.background);
+  check('paused is black', paused.background.startsWith('oklch(18%'), paused.background);
+
+  // White and gold need dark ink, black needs light — which is the reason the
+  // three are written out rather than derived from one hue.
+  const lightness = (value) => Number(/oklch\((\d+(?:\.\d+)?)%/.exec(value)[1]);
   check(
-    'case and padding do not change it',
-    cards.cardFor('  japanese  ').hue === a.hue,
-    `${cards.cardFor('  japanese  ').hue} vs ${a.hue}`,
-  );
-  check(
-    'different names mostly differ',
-    new Set(
-      ['Japanese', 'Piano', 'Greek', 'The Odin Project', 'Godot', 'Drawing'].map(
-        (name) => cards.cardFor(name).hue,
-      ),
-    ).size >= 4,
-    JSON.stringify(
-      ['Japanese', 'Piano', 'Greek', 'The Odin Project', 'Godot', 'Drawing'].map((n) => cards.cardFor(n).hue),
-    ),
+    'ink contrasts with its own card',
+    lightness(active.ink) < 40 && lightness(done.ink) < 40 && lightness(paused.ink) > 60,
+    JSON.stringify([active.ink, done.ink, paused.ink]),
   );
   check(
     'every colour is oklch, so it sits on the site palette',
-    [a.background, a.background2, a.accent].every((value) => value.startsWith('oklch(')),
-    JSON.stringify(a),
+    [active, done, paused].every((look) =>
+      [look.background, look.background2, look.ink, look.accent, look.line].every((value) =>
+        value.startsWith('oklch('),
+      ),
+    ),
+    '',
   );
-  // Lightness and chroma are fixed on purpose: varying them by hash as well is
-  // how a deck ends up with one unreadably dark card and one that glares.
-  const spread = ['Japanese', 'Piano', 'Greek', 'Godot'].map((n) => cards.cardFor(n).background.split(' ')[0]);
-  check('lightness does not vary by name', new Set(spread).size === 1, JSON.stringify(spread));
+  check(
+    'an unknown status is treated as active, not left blank',
+    cards.statusLook('something-new').background === active.background,
+    cards.statusLook('something-new').background,
+  );
+  check('the gold is one value, shared', cards.GOLD.startsWith('oklch('), cards.GOLD);
 
-  /* The pile's shape, which has to be learnable and clickable.
+  /* The pile's shape, which has to be learnable.
    *
-   * Placed by angle and radius rather than by two independent offsets: with
-   * two, two of eight cards landed within half a centimetre of dead centre,
-   * which on a 25rem card is no visible edge and nothing to click. */
+   * Neater than the first attempt: the deck has arrows now and only the front
+   * card is interactive, so the cards behind are texture rather than targets
+   * and no longer each need a wide, visible edge. */
   const names = [
     'Japanese',
     'Piano',
@@ -3713,19 +3720,14 @@ globalThis.fetch = preGh;
     JSON.stringify(lies[0]),
   );
   check(
-    'every card behind it has an edge to click',
-    lies.slice(1).every((lie) => Math.hypot(lie.dx, lie.dy) >= 3),
-    JSON.stringify(lies.slice(1).map((lie) => +Math.hypot(lie.dx, lie.dy).toFixed(1))),
+    'the pile is neat — nothing strays far',
+    lies.every((lie) => Math.hypot(lie.dx, lie.dy) <= 3 && Math.abs(lie.rotate) <= 5),
+    JSON.stringify(lies.map((lie) => [lie.dx, lie.dy, lie.rotate])),
   );
   check(
-    'and none of them walks off the page',
-    lies.every((lie) => Math.abs(lie.dx) <= 9 && Math.abs(lie.dy) <= 7),
-    JSON.stringify(lies.map((lie) => [lie.dx, lie.dy])),
-  );
-  check(
-    'tilts stay within a hand-strewn range',
-    lies.every((lie) => Math.abs(lie.rotate) <= 9),
-    JSON.stringify(lies.map((lie) => lie.rotate)),
+    'but every card behind the front one is still offset',
+    lies.slice(1).every((lie) => Math.hypot(lie.dx, lie.dy) > 0.5),
+    JSON.stringify(lies.slice(1).map((lie) => +Math.hypot(lie.dx, lie.dy).toFixed(2))),
   );
   check(
     'the pile is the same shape on every visit',
@@ -3733,7 +3735,7 @@ globalThis.fetch = preGh;
     '',
   );
   check(
-    'consecutive cards do not peek in the same direction',
+    'consecutive cards do not lie in the same direction',
     (() => {
       for (let at = 2; at < lies.length; at += 1) {
         const a = Math.atan2(lies[at - 1].dy, lies[at - 1].dx);
@@ -3746,11 +3748,72 @@ globalThis.fetch = preGh;
     })(),
     '',
   );
+}
 
-  const stage0 = cards.stageCardFor('Piano', 0);
-  const stage5 = cards.stageCardFor('Piano', 5);
-  check('a stage keeps its curriculum’s hue', stage0.hue === cards.cardFor('Piano').hue, '');
-  check('later stages are lighter', stage5.background !== stage0.background, `${stage0.background} / ${stage5.background}`);
+// --- what is up next -------------------------------------------------------
+//
+// One per ACTIVE curriculum, not the next ten on the route: in route order
+// those all come from whichever curriculum is first, so the row answered "what
+// is the path" when the question it is asked every morning is "what is there
+// to do today".
+{
+  const build = (name, status, lessons) => ({
+    id: name.length,
+    name,
+    source: null,
+    status,
+    modules: [{ id: name.length * 100, name: 'Stage one', lessons }],
+  });
+  const lesson = (id, done = null, onRoute = 1) => ({
+    id,
+    name: `Lesson ${id}`,
+    done_on: done,
+    detail: null,
+    on_route: onRoute,
+  });
+
+  const all = [
+    build('Japanese', 'active', [lesson(1), lesson(2), lesson(3)]),
+    build('Piano', 'active', [lesson(11, '2026-10-01'), lesson(12)]),
+    build('Greek', 'paused', [lesson(21)]),
+    build('Godot', 'done', [lesson(31)]),
+  ];
+
+  const row = curriculum.nextPerCurriculum(all);
+  check(
+    'one card per active curriculum, and none for the rest',
+    row.length === 2 && row[0].curriculum.name === 'Japanese' && row[1].curriculum.name === 'Piano',
+    JSON.stringify(row.map((step) => [step.curriculum.name, step.lesson.id])),
+  );
+  check(
+    'it skips what is already done',
+    row[1].lesson.id === 12 && row[1].lessonAt === 2,
+    JSON.stringify(row[1] && { id: row[1].lesson.id, at: row[1].lessonAt }),
+  );
+  check(
+    'and carries the position, for "module 1 lesson 2"',
+    row[0].moduleAt === 1 && row[0].lessonAt === 1,
+    JSON.stringify({ moduleAt: row[0].moduleAt, lessonAt: row[0].lessonAt }),
+  );
+
+  /* The refill: finishing a card appends that curriculum's NEXT lesson, which
+   * is the one after the one just taken — hence the skip set. */
+  const after = curriculum.nextStep(all[0], new Set([1]));
+  check('the replacement is the one after it', after?.lesson.id === 2, String(after?.lesson.id));
+  const afterTwo = curriculum.nextStep(all[0], new Set([1, 2]));
+  check('and then the one after that', afterTwo?.lesson.id === 3, String(afterTwo?.lesson.id));
+  check(
+    'a curriculum with nothing left offers nothing',
+    curriculum.nextStep(all[0], new Set([1, 2, 3])) === null,
+    '',
+  );
+
+  const offRoute = build('Drawing', 'active', [lesson(41, null, 0), lesson(42)]);
+  check(
+    'a lesson off the route is never offered',
+    curriculum.nextStep(offRoute)?.lesson.id === 42,
+    String(curriculum.nextStep(offRoute)?.lesson.id),
+  );
 }
 
 // --- sources ----------------------------------------------------------------
