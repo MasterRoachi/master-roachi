@@ -130,6 +130,39 @@ execFileSync(
 );
 const seo = await import(pathToFileURL(seoBundle).href);
 
+// Frontmatter surgery is THE module here that can lose work: it is what the
+// projects editor writes every field through, and the failure it exists to
+// prevent — a key the form does not model being dropped on save — is quiet,
+// committed and self-deploying.
+const fmBundle = path.join(os.tmpdir(), 'master-roachi-fm-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/frontmatter.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${fmBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const fmLib = await import(pathToFileURL(fmBundle).href);
+
+// The colour conversion moved out of scripts/oklch.mjs so the editor's pickers
+// and the card generators share one copy. A drift here recolours every
+// generated card on the next build.
+const colourBundle = path.join(os.tmpdir(), 'master-roachi-colour-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/oklch.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${colourBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const colour = await import(pathToFileURL(colourBundle).href);
+
+// And what the editor warns about, which is pure and worth pinning: a warning
+// that stops firing is indistinguishable from a file that is fine.
+const fieldsBundle = path.join(os.tmpdir(), 'master-roachi-fields-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/editor-fields.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${fieldsBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const fields = await import(pathToFileURL(fieldsBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -3089,6 +3122,376 @@ globalThis.fetch = preGh;
   check('the score is never above 100', good.score <= 100 && wall.score <= 100, `${good.score}/${wall.score}`);
 }
 
+// --- reordering, as one commit ---------------------------------------------
+//
+// `weight` lives in each project's own frontmatter, so a new order changes
+// several files. Six saves would be six commits and six two-minute deploys for
+// one decision, so this goes through the git database instead. What the tests
+// care about: one commit, the existing numbers redistributed rather than
+// renumbered, only the files that moved rewritten, and the path guard still
+// standing.
+{
+  const projectFile = (title, weight) =>
+    ['---', `title: ${title}`, 'summary: A thing.', `weight: ${weight}`, 'status: building', '---', '', 'Body.', ''].join('\n');
+
+  const repo = {
+    'content/projects/a.mdx': projectFile('A', 100),
+    'content/projects/b.mdx': projectFile('B', 95),
+    'content/projects/c.mdx': projectFile('C', 40),
+  };
+
+  let committedTree = null;
+  let commitCount = 0;
+  const blobs = new Map();
+
+  globalThis.fetch = async (input, init = {}) => {
+    const url = String(input);
+    const reply = (data, status = 200) =>
+      new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
+
+    for (const [path, text] of Object.entries(repo)) {
+      if (url.includes(`/contents/${path}`) && init.method !== 'PUT') {
+        const raw = new TextEncoder().encode(text);
+        let binary = '';
+        for (const b of raw) binary += String.fromCharCode(b);
+        return reply({ content: btoa(binary), sha: `sha-${path}` });
+      }
+    }
+    if (url.endsWith('/git/ref/heads/main')) return reply({ object: { sha: 'headsha' } });
+    if (url.includes('/git/commits/headsha')) return reply({ tree: { sha: 'treesha' } });
+    if (url.endsWith('/git/blobs')) {
+      const body = JSON.parse(init.body);
+      const id = `blob${blobs.size}`;
+      blobs.set(id, new TextDecoder().decode(Uint8Array.from(atob(body.content), (c) => c.charCodeAt(0))));
+      return reply({ sha: id });
+    }
+    if (url.endsWith('/git/trees')) {
+      const body = JSON.parse(init.body);
+      committedTree = body.tree.map((entry) => ({ path: entry.path, text: blobs.get(entry.sha) }));
+      return reply({ sha: 'newtree' });
+    }
+    if (url.endsWith('/git/commits')) {
+      commitCount += 1;
+      return reply({ sha: 'newcommit' });
+    }
+    if (url.includes('/git/refs/heads/main')) return reply({ object: { sha: 'newcommit' } });
+    return new Response('nope', { status: 404 });
+  };
+
+  const reorder = (order, env = ghEnv) =>
+    worker.fetch(
+      new Request('https://masterroachi.com/work/api/reorder', {
+        method: 'POST',
+        headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+        body: JSON.stringify({ collection: 'projects', order }),
+      }),
+      env,
+    );
+
+  res = await worker.fetch(
+    new Request('https://masterroachi.com/work/api/reorder', { method: 'POST' }),
+    ghEnv,
+  );
+  check('reorder without Access serves the 404 page', (await res.text()) === '404 page', String(res.status));
+
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/reorder'), ghEnv);
+  check('reorder refuses GET', res.status === 405, String(res.status));
+
+  res = await reorder(['content/projects/a.mdx', '.github/workflows/x.mdx']);
+  check('reorder refuses a path outside the collection', res.status === 400, String(res.status));
+
+  res = await reorder([]);
+  check('reorder refuses an empty order', res.status === 400, String(res.status));
+
+  // C to the front: the weights 100/95/40 redistribute as C=100, A=95, B=40,
+  // so all three move and all three are written — in ONE commit.
+  committedTree = null;
+  commitCount = 0;
+  res = await reorder([
+    'content/projects/c.mdx',
+    'content/projects/a.mdx',
+    'content/projects/b.mdx',
+  ]);
+  body = await res.json();
+  check('reorder succeeds', res.status === 200 && body.reordered === true, JSON.stringify(body));
+  check('it is one commit, not one per file', commitCount === 1, String(commitCount));
+  check('it wrote the three that moved', body.written === 3, JSON.stringify(body));
+  check(
+    'the existing numbers are redistributed, not renumbered',
+    (() => {
+      const byPath = new Map(committedTree.map((f) => [f.path, f.text]));
+      const weightOf = (path) => /weight: (\d+)/.exec(byPath.get(path) ?? '')?.[1];
+      return (
+        weightOf('content/projects/c.mdx') === '100' &&
+        weightOf('content/projects/a.mdx') === '95' &&
+        weightOf('content/projects/b.mdx') === '40'
+      );
+    })(),
+    JSON.stringify(committedTree?.map((f) => [f.path, /weight: (\d+)/.exec(f.text)?.[1]])),
+  );
+  check(
+    'and nothing else in those files changed',
+    committedTree.every((f) => f.text.includes('summary: A thing.') && f.text.endsWith('Body.\n')),
+    '',
+  );
+
+  // The order it already has: nothing to write, and no deploy.
+  committedTree = null;
+  commitCount = 0;
+  res = await reorder([
+    'content/projects/a.mdx',
+    'content/projects/b.mdx',
+    'content/projects/c.mdx',
+  ]);
+  body = await res.json();
+  check(
+    'reordering to the order it already has writes nothing',
+    res.status === 200 && body.written === 0 && commitCount === 0,
+    JSON.stringify(body),
+  );
+
+  res = await reorder(['content/projects/a.mdx'], env);
+  body = await res.json();
+  check('reorder without a GitHub token reports it', body.configured === false, JSON.stringify(body));
+
+  globalThis.fetch = preGh;
+}
+
+// --- frontmatter surgery ---------------------------------------------------
+//
+// The module the projects editor writes every field through. What it must
+// never do is lose a key it does not model, so most of this is about what
+// stays the same rather than what changes.
+{
+  const file = [
+    '---',
+    'title: The Odin Project',
+    'summary: Twenty-four exercises.',
+    'date: 2025-08-01',
+    'status: ongoing',
+    'weight: 40',
+    'accent: "oklch(84% 0.16 92)"',
+    'stack: ["HTML", "CSS", "JavaScript"]',
+    'strangeKey: something nothing models',
+    'pieces:',
+    '  - title: Odin Recipes',
+    '    summary: A three-page recipe site.',
+    '    demo: https://example.test/recipes/',
+    '    tags: ["HTML"]',
+    '  - title: Landing Page',
+    '    summary: A personal landing page.',
+    '    tags: ["Flexbox"]',
+    '---',
+    '',
+    'The body, which has --- in it as a rule and must survive.',
+    '',
+  ].join('\n');
+
+  const split = fmLib.splitFile(file);
+  check('frontmatter splits', split !== null && split.frontmatter.length === 16, String(split?.frontmatter.length));
+  check('a file round-trips byte-identically', fmLib.joinFile(split) === file, '');
+  check(
+    'the body keeps a later --- rather than being cut at it',
+    split.body.includes('--- in it as a rule'),
+    JSON.stringify(split.body.slice(0, 40)),
+  );
+
+  check('reads a bare scalar', fmLib.readScalar(split.frontmatter, 'title') === 'The Odin Project', '');
+  check(
+    'reads a quoted scalar unquoted',
+    fmLib.readScalar(split.frontmatter, 'accent') === 'oklch(84% 0.16 92)',
+    String(fmLib.readScalar(split.frontmatter, 'accent')),
+  );
+  check(
+    'reads a flow list',
+    JSON.stringify(fmLib.readFlowList(split.frontmatter, 'stack')) === '["HTML","CSS","JavaScript"]',
+    JSON.stringify(fmLib.readFlowList(split.frontmatter, 'stack')),
+  );
+  check('a missing field reads as null', fmLib.readScalar(split.frontmatter, 'nope') === null, '');
+
+  // One field, one line.
+  const reweighted = fmLib.setScalar(split.frontmatter, 'weight', '85');
+  const moved = split.frontmatter.filter((line, at) => line !== reweighted[at]);
+  check('setting a field changes exactly one line', moved.length === 1 && moved[0] === 'weight: 40', JSON.stringify(moved));
+  check(
+    'and leaves the key it does not model alone',
+    reweighted.includes('strangeKey: something nothing models'),
+    '',
+  );
+  check(
+    'and does not reorder anything',
+    fmLib.keysOf(reweighted).join(',') === fmLib.keysOf(split.frontmatter).join(','),
+    fmLib.keysOf(reweighted).join(','),
+  );
+
+  // The quoting style the file already chose is kept, both ways.
+  const recoloured = fmLib.setScalar(split.frontmatter, 'accent', 'oklch(50% 0.1 200)');
+  check(
+    'a quoted field stays quoted',
+    recoloured.includes('accent: "oklch(50% 0.1 200)"'),
+    recoloured.find((l) => l.startsWith('accent:')),
+  );
+  const retitled = fmLib.setScalar(split.frontmatter, 'title', 'Something Else');
+  check(
+    'a bare field stays bare',
+    retitled.includes('title: Something Else'),
+    retitled.find((l) => l.startsWith('title:')),
+  );
+  // And quoted when YAML would otherwise read it as something else.
+  for (const [value, why] of [
+    ['yes', 'a bare yes is a boolean'],
+    ['a: b', 'a colon-space starts a mapping'],
+    [' padded', 'leading space is lost'],
+    ['- dash', 'a leading dash is a list item'],
+  ]) {
+    const out = fmLib.setScalar(split.frontmatter, 'kind', value);
+    const line = out.find((l) => l.startsWith('kind:'));
+    check(`quotes a value where ${why}`, /^kind: "/.test(line), line);
+  }
+
+  // Removing, and adding.
+  const removed = fmLib.setScalar(split.frontmatter, 'status', null);
+  check('null removes a field', !fmLib.keysOf(removed).includes('status'), fmLib.keysOf(removed).join(','));
+  const added = fmLib.setScalar(split.frontmatter, 'hero', '/projects/x-hero.webp');
+  check(
+    'a new field is appended rather than inserted',
+    added[added.length - 1] === 'hero: /projects/x-hero.webp',
+    added[added.length - 1],
+  );
+
+  // A block list is ONE field, not twenty-four stray lines.
+  const range = fmLib.fieldRange(split.frontmatter, 'pieces');
+  // 'pieces:' plus its seven indented lines, counted as a single field.
+  check('a nested block is one field', range.end - range.start === 8, JSON.stringify(range));
+  const pieces = fmLib.readBlockList(split.frontmatter, 'pieces');
+  check('reads every entry of a block list', pieces.length === 2, String(pieces.length));
+  check('reads an entry’s fields', pieces[0].title === 'Odin Recipes' && pieces[0].tags === '["HTML"]', JSON.stringify(pieces[0]));
+  check(
+    'a block list rebuilds byte-identically',
+    fmLib.joinFile({ ...split, frontmatter: fmLib.setBlockList(split.frontmatter, 'pieces', pieces) }) === file,
+    '',
+  );
+  check(
+    'an entry can be dropped',
+    fmLib.readBlockList(fmLib.setBlockList(split.frontmatter, 'pieces', [pieces[1]]), 'pieces').length === 1,
+    '',
+  );
+  check(
+    'setting a block list leaves the fields around it alone',
+    fmLib.setBlockList(split.frontmatter, 'pieces', pieces).includes('strangeKey: something nothing models'),
+    '',
+  );
+
+  // The unknown-fields box.
+  const known = ['title', 'summary', 'date', 'status', 'weight', 'accent', 'stack', 'pieces'];
+  check(
+    'unknown fields are collected for the raw box',
+    fmLib.unknownFields(split.frontmatter, known) === 'strangeKey: something nothing models',
+    JSON.stringify(fmLib.unknownFields(split.frontmatter, known)),
+  );
+  const rewritten = fmLib.setUnknownFields(split.frontmatter, known, 'strangeKey: edited by hand\nanother: one');
+  check(
+    'editing the raw box replaces only the unknown fields',
+    rewritten.includes('strangeKey: edited by hand') &&
+      rewritten.includes('another: one') &&
+      rewritten.includes('title: The Odin Project') &&
+      fmLib.readBlockList(rewritten, 'pieces').length === 2,
+    JSON.stringify(fmLib.keysOf(rewritten)),
+  );
+  check(
+    'emptying the raw box removes them and nothing else',
+    (() => {
+      const out = fmLib.setUnknownFields(split.frontmatter, known, '');
+      return !fmLib.keysOf(out).includes('strangeKey') && fmLib.keysOf(out).includes('pieces');
+    })(),
+    '',
+  );
+
+  // A file with no frontmatter must come back as "leave this alone".
+  check('a file with no frontmatter splits to null', fmLib.splitFile('# just markdown') === null, '');
+  check('an unterminated fence splits to null', fmLib.splitFile('---\ntitle: x\n') === null, '');
+  check('empty text splits to null', fmLib.splitFile('') === null, '');
+}
+
+// --- oklch, both ways ------------------------------------------------------
+{
+  check('a grey round-trips exactly', colour.hexToOklch(colour.oklchToHex('oklch(97% 0 0)')) === 'oklch(97% 0 0)', colour.hexToOklch(colour.oklchToHex('oklch(97% 0 0)')));
+  check(
+    'an in-gamut colour round-trips to within a rounding',
+    (() => {
+      const back = colour.hexToOklch(colour.oklchToHex('oklch(86% 0.2 135)'));
+      const m = /oklch\(([\d.]+)% ([\d.]+) (\d+)\)/.exec(back);
+      return m && Math.abs(+m[1] - 86) < 1 && Math.abs(+m[2] - 0.2) < 0.02 && Math.abs(+m[3] - 135) < 2;
+    })(),
+    colour.hexToOklch(colour.oklchToHex('oklch(86% 0.2 135)')),
+  );
+  check('nonsense gives a usable grey, not a crash', colour.oklchToHex('not a colour') === '#888888', '');
+  check('nonsense hex gives a usable oklch', colour.hexToOklch('nope') === 'oklch(50% 0 0)', colour.hexToOklch('nope'));
+  check('a three-digit hex is understood', colour.hexToOklch('#fff').startsWith('oklch(100%'), colour.hexToOklch('#fff'));
+  check(
+    'the lightness floor still lifts a dark accent',
+    colour.oklchToHex('oklch(40% 0.075 158)', 0.66) !== colour.oklchToHex('oklch(40% 0.075 158)'),
+    '',
+  );
+  check('isOklch accepts what the files hold', colour.isOklch('oklch(84% 0.16 92)') === true, '');
+  check('isOklch rejects hex', colour.isOklch('#ff0000') === false, '');
+}
+
+// --- what the editor warns about -------------------------------------------
+{
+  const clean = {
+    title: 'Terrath',
+    summary: 'A world sung into being.',
+    status: 'ongoing',
+    accent: 'oklch(40% 0.075 158)',
+    hero: '/projects/terrath-hero.webp',
+    heroAlt: 'A map of Terrath',
+  };
+  const opts = { images: ['/projects/terrath-hero.webp'], isOklch: colour.isOklch };
+
+  check('a clean project warns about nothing', fields.warningsFor('projects', clean, opts).length === 0, JSON.stringify(fields.warningsFor('projects', clean, opts)));
+
+  const noTitle = fields.warningsFor('projects', { ...clean, title: '' }, opts);
+  check('an empty required field warns', noTitle.some((w) => w.key === 'title'), JSON.stringify(noTitle));
+
+  const badStatus = fields.warningsFor('projects', { ...clean, status: 'retired' }, opts);
+  check('an unknown status warns', badStatus.some((w) => w.key === 'status'), JSON.stringify(badStatus));
+
+  const badColour = fields.warningsFor('projects', { ...clean, accent: '#ff0000' }, opts);
+  check('a non-oklch accent warns', badColour.some((w) => w.key === 'accent'), JSON.stringify(badColour));
+
+  const missingImage = fields.warningsFor('projects', { ...clean, hero: '/projects/gone.webp' }, opts);
+  check('a hero pointing at nothing warns', missingImage.some((w) => w.key === 'hero'), JSON.stringify(missingImage));
+
+  const noAlt = fields.warningsFor('projects', { ...clean, heroAlt: '' }, opts);
+  check('an image with no alt text warns', noAlt.some((w) => w.key === 'heroAlt'), JSON.stringify(noAlt));
+
+  const badUrl = fields.warningsFor('projects', { ...clean, repo: 'github.com/x' }, opts);
+  check('a bare-domain link warns', badUrl.some((w) => w.key === 'repo'), JSON.stringify(badUrl));
+
+  // Images are only checked when the list is known; an unloaded list must not
+  // declare every image missing.
+  const unknownImages = fields.warningsFor('projects', clean, { isOklch: colour.isOklch });
+  check(
+    'with no image list, images are not called missing',
+    !unknownImages.some((w) => w.key === 'hero'),
+    JSON.stringify(unknownImages),
+  );
+
+  check(
+    'weight has no control, because the order is dragged',
+    !fields.fieldsFor('projects').some((f) => f.key === 'weight') &&
+      fields.knownKeys('projects').includes('weight'),
+    '',
+  );
+  check(
+    'summary is marked required on both public collections',
+    fields.fieldsFor('projects').find((f) => f.key === 'summary')?.required === true &&
+      fields.fieldsFor('writing').find((f) => f.key === 'summary')?.required === true,
+    '',
+  );
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -3109,4 +3512,7 @@ fs.rmSync(curriculumBundle, { force: true });
 fs.rmSync(printfulBundle, { force: true });
 fs.rmSync(metaBundle, { force: true });
 fs.rmSync(seoBundle, { force: true });
+fs.rmSync(fmBundle, { force: true });
+fs.rmSync(colourBundle, { force: true });
+fs.rmSync(fieldsBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

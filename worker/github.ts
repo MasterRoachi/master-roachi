@@ -216,6 +216,100 @@ export async function writeBytes(
 }
 
 /**
+ * Write several text files as ONE commit.
+ *
+ * Reordering the projects is why this exists. `weight` lives in each
+ * project's own frontmatter, so dragging six projects into a new order changes
+ * six files — and six calls to writeFile() is six commits, six pushes and six
+ * two-minute deploys for one decision. The contents API cannot express a
+ * multi-file commit; the git database can, which is the same reason rebuild()
+ * is written against it.
+ *
+ * Four steps: a blob per file, one tree on top of the current one, a commit,
+ * then move the branch. Unchanged files are not mentioned — the tree is built
+ * with `base_tree`, so everything not listed is inherited rather than deleted.
+ *
+ * Not forced, for the same reason as rebuild(): if anything landed on the
+ * branch in between, this is no longer a fast-forward and GitHub refuses it.
+ * The nightly play-data Action commits to this branch, so that is a real
+ * collision and losing it to a force push would be worse than failing.
+ */
+export async function writeFiles(
+  token: string,
+  files: { path: string; text: string }[],
+  message: string,
+): Promise<{ commit: string; written: number }> {
+  if (files.length === 0) return { commit: '', written: 0 };
+
+  const base = `${API}/repos/${OWNER}/${REPO}/git`;
+  const h = headers(token);
+  const json = { ...h, 'content-type': 'application/json' };
+
+  const refResponse = await fetch(`${base}/ref/heads/${BRANCH}`, { headers: h });
+  if (!refResponse.ok) throw new Error(`ref: ${refResponse.status}`);
+  const { object } = (await refResponse.json()) as { object: { sha: string } };
+
+  const headResponse = await fetch(`${base}/commits/${object.sha}`, { headers: h });
+  if (!headResponse.ok) throw new Error(`head: ${headResponse.status}`);
+  const head = (await headResponse.json()) as { tree: { sha: string } };
+
+  // A blob each. Sent as base64 rather than as utf-8 so that a file with a
+  // non-ASCII character in it — which is most of them, this site is full of
+  // em dashes — cannot be mangled by the API guessing an encoding.
+  const blobs: { path: string; sha: string }[] = [];
+  for (const file of files) {
+    const made = await fetch(`${base}/blobs`, {
+      method: 'POST',
+      headers: json,
+      body: JSON.stringify({ content: toBase64(file.text), encoding: 'base64' }),
+    });
+    if (!made.ok) throw new Error(`blob ${file.path}: ${made.status}`);
+    const blob = (await made.json()) as { sha: string };
+    blobs.push({ path: file.path, sha: blob.sha });
+  }
+
+  const tree = await fetch(`${base}/trees`, {
+    method: 'POST',
+    headers: json,
+    body: JSON.stringify({
+      base_tree: head.tree.sha,
+      tree: blobs.map((blob) => ({
+        path: blob.path,
+        mode: '100644',
+        type: 'blob',
+        sha: blob.sha,
+      })),
+    }),
+  });
+  if (!tree.ok) throw new Error(`tree: ${tree.status}`);
+  const built = (await tree.json()) as { sha: string };
+
+  const commit = await fetch(`${base}/commits`, {
+    method: 'POST',
+    headers: json,
+    body: JSON.stringify({
+      message: safeMessage(message),
+      tree: built.sha,
+      parents: [object.sha],
+    }),
+  });
+  if (!commit.ok) throw new Error(`commit: ${commit.status}`);
+  const made = (await commit.json()) as { sha: string };
+
+  const moved = await fetch(`${base}/refs/heads/${BRANCH}`, {
+    method: 'PATCH',
+    headers: json,
+    body: JSON.stringify({ sha: made.sha, force: false }),
+  });
+  if (moved.status === 409 || moved.status === 422) {
+    throw new Error('conflict: the branch moved while this was being written');
+  }
+  if (!moved.ok) throw new Error(`ref update: ${moved.status}`);
+
+  return { commit: made.sha, written: files.length };
+}
+
+/**
  * Make the site rebuild, by giving Workers Builds a push to build.
  *
  * Several things on this site only change at build time — the store comes

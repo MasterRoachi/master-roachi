@@ -9,6 +9,7 @@ import {
   statFile,
   writeBytes,
   writeFile,
+  writeFiles,
 } from './github';
 import { collectionFor, newPath, pathAllowed, setDraft } from '../lib/collections';
 import { isDay, isMonth, localDay, monthDays, type D1Database } from './db';
@@ -17,6 +18,7 @@ import { validIconName } from '../lib/habit-icons';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
+import { joinFile, readScalar, setScalar, splitFile } from '../lib/frontmatter';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -606,6 +608,91 @@ export default {
         }
 
         return json({ error: 'method not allowed' }, 405);
+      } catch (error) {
+        const message = String(error instanceof Error ? error.message : error);
+        return json({ error: message }, message.startsWith('conflict') ? 409 : 502);
+      }
+    }
+
+    // --- reordering a collection --------------------------------------------
+    //
+    // `weight` is what orders the projects grid, and it lives in each
+    // project's own frontmatter. So putting six projects in a new order
+    // changes six files, and six saves would be six commits, six pushes and
+    // six two-minute deploys for one decision. One commit instead.
+    //
+    // The EXISTING weights are redistributed into the new order rather than
+    // renumbered from scratch. Renumbering would rewrite every file the first
+    // time anything moved and throw away the numbers he chose; this way,
+    // swapping two neighbours swaps two numbers and writes two files.
+    if (route === '/work/api/reorder') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (request.method !== 'POST') return json({ error: 'method not allowed' }, 405);
+
+      const token = env.GITHUB_TOKEN;
+      if (!token) return json({ configured: false }, 200);
+
+      const body = (await request.json().catch(() => null)) as {
+        collection?: string;
+        order?: unknown;
+      } | null;
+      if (!body) return json({ error: 'malformed body' }, 400);
+
+      const collection = collectionFor(body.collection);
+      if (!collection) return json({ error: 'unknown collection' }, 400);
+
+      const order = Array.isArray(body.order) ? body.order : null;
+      if (!order || order.length === 0) return json({ error: 'nothing to order' }, 400);
+      // Every path through the same guard as any other write. An ordering is
+      // still a list of files being rewritten.
+      const paths = order.map((candidate) => pathAllowed(collection, candidate));
+      if (paths.some((path) => path === null)) {
+        return json({ error: 'not a path in this collection' }, 400);
+      }
+
+      try {
+        const files = await Promise.all(
+          (paths as string[]).map(async (path) => {
+            const file = await readFile(token, path);
+            const split = splitFile(file.text);
+            return { path, file, split };
+          }),
+        );
+
+        // A file with no frontmatter has no weight to set, and inventing one
+        // would be writing a field into a file that does not use them.
+        if (files.some((entry) => entry.split === null)) {
+          return json({ error: 'one of those files has no frontmatter' }, 400);
+        }
+
+        const weights = files
+          .map((entry) => Number(readScalar(entry.split!.frontmatter, 'weight')))
+          .map((weight) => (Number.isFinite(weight) ? weight : 0))
+          .sort((a, b) => b - a);
+
+        const changed: { path: string; text: string }[] = [];
+        files.forEach((entry, at) => {
+          const want = String(weights[at]);
+          if (readScalar(entry.split!.frontmatter, 'weight') === want) return;
+          changed.push({
+            path: entry.path,
+            text: joinFile({
+              ...entry.split!,
+              frontmatter: setScalar(entry.split!.frontmatter, 'weight', want),
+            }),
+          });
+        });
+
+        if (changed.length === 0) return json({ reordered: true, written: 0, commit: '' }, 200);
+
+        const { commit, written } = await writeFiles(
+          token,
+          changed,
+          `Reorder ${collection.label.toLowerCase()}`,
+        );
+        return json({ reordered: true, written, commit }, 200);
       } catch (error) {
         const message = String(error instanceof Error ? error.message : error);
         return json({ error: message }, message.startsWith('conflict') ? 409 : 502);

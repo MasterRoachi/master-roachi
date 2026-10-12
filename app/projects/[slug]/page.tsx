@@ -91,6 +91,18 @@ export default async function ProjectPage({
             ← Projects
           </Link>
 
+          {/* The project's own image, leading its page. Absent is a supported
+              state and always has been — a project with nothing to show gets
+              the colour field behind it and no broken frame. */}
+          {fm.hero && (
+            <img
+              className={styles.hero}
+              src={fm.hero}
+              alt={fm.heroAlt ?? ''}
+              loading="eager"
+            />
+          )}
+
           <div className={styles.badges}>
             {fm.kind && <span className={styles.kind}>{fm.kind}</span>}
             <span className={styles.status} data-status={status}>

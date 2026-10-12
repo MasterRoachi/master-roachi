@@ -51,6 +51,18 @@ export interface Frontmatter {
   /** What the cover shows, for anyone who cannot see it. */
   coverAlt?: string;
   /**
+   * The image leading the project's own page, as a path under public/.
+   *
+   * Distinct from `cover`, which is the card in the grid and the face in the
+   * homepage deck. A card wants something that reads at thumbnail size; the
+   * top of a page wants something wide. They were one field until the page
+   * grew a hero, and sharing one would have meant choosing which of the two
+   * jobs to do badly.
+   */
+  hero?: string;
+  /** What the hero shows, for anyone who cannot see it. */
+  heroAlt?: string;
+  /**
    * Where this card goes, when the project already lives on another page.
    * Fabled Threads is the Store, so it has no second home under /projects/.
    */

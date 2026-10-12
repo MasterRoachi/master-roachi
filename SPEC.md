@@ -208,8 +208,45 @@ backend.
 
 Writing, Projects and Product copy edit files in this repository through the
 GitHub API, so an edit is a commit and the commit triggers the deploy — MDX for
-the first two, the single `content/store/copy.json` for the third. Habits,
+the first two, the single `content/store/copy.json` for the third.
+
+### Editing frontmatter without losing it
+
+`CollectionEditor` was one textarea holding a whole file, and the comment
+defending that was right about the danger: a field-per-key form means
+modelling every frontmatter key and silently dropping the ones it does not
+know, and losing a field on save is the worst failure this tool can have —
+quiet, committed and self-deploying. It is now a form anyway, because Odin's
+file is 106 lines of YAML before a word of prose, two thirds of it a nested
+`pieces` list, and hand-editing that is how a stray indent fails a build two
+minutes later.
+
+What makes it safe is that **nothing parses and reserialises a document**.
+`lib/frontmatter.ts` holds frontmatter as its own lines; a control replaces one
+field's lines; a key with no control is untouched, unreordered and shown as raw
+text in a box of its own. Setting one field changes exactly one line, and the
+quoting style the file already chose is kept, so a touched file does not
+reformat wholesale. `lib/editor-fields.ts` is the schema, and it is
+deliberately not exhaustive: it decides what gets a nice control, never what is
+allowed to exist.
+
+Three things are not fields. **`weight` is dragged**, because it is a sort key
+with no meaning of its own, and `/work/api/reorder` redistributes the existing
+numbers into the new order as ONE commit through the git database — six saves
+would be six deploys for one decision. **`draft` is a button**, and distinct
+from `status`: one asks whether the page is on the site, the other what stage
+the work is at, and no project has ever used `draft`. **Images are uploaded**,
+converted to WebP in the browser and capped, into `public/projects/` — where
+`generatedCoverNames()` names the three files `covers.mjs` rewrites on every
+build, which an upload must never be saved over. Habits,
 Reading and Curriculums are rows in D1 and change nothing on the public site.
+
+A project page's `hero` is a second image and not the `cover` reused: a card in
+the grid wants something that reads at thumbnail size and the top of a page
+wants something wide, and sharing one field would mean choosing which of the
+two to do badly. `summary` is the page's meta description, so editing it is an
+SEO change — which is why the projects editor carries the same live checklist
+as product copy.
 
 `lib/collections.ts` decides what is editable and currently lists a fourth,
 **Notes** (`notes/`), which has no page yet. The `/work` index carries only
@@ -335,12 +372,18 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 ## Open Items
 
 - [ ] **Terrath, Fabled Threads and Cultus Botanicus descriptions** are
-      placeholders written from one line each. Each carries a TODO comment
-      marking what to replace. Terrath is the thinnest.
+      placeholders written from one line each. Terrath is the thinnest. The
+      TODO comments this item used to point at do not exist — there is no TODO
+      anywhere in `content/` or `lib/`, so the only record of which three are
+      thin is this line.
 - [ ] **Fabled Threads storefront URL**, and confirm whether it is actually
       building or already open
 - [ ] **Cultus Botanicus engine/stack** — the name itself is now settled
 - [ ] **lib/pursuits.ts needs confirming** — seeded from July 2026 data
+- [ ] **Sprite-acus needs rewriting, not just parking.** Set to
+      `status: parked` on 2026-10-12 so it stops reading as live work; its
+      summary still says "Built because I cannot draw", which stopped being the
+      story when the Shepherds art went fully hand-drawn in September.
 - [ ] Finished games, tier list, RetroAchievements URL
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through

@@ -65,11 +65,7 @@ export default function WorkStorePage() {
 
   return (
     <div className="shell">
-      <PageHeader
-        eyebrow="Private"
-        title="Product copy"
-        lede="One paragraph per line. Blank lines are ignored, and a product with nothing here shows no section at all — but its description then falls back to the supplier's own words about the blank."
-      />
+      <PageHeader eyebrow="Private" title="Product copy" />
       <p>
         <Link href="/work/">← Work</Link>
       </p>

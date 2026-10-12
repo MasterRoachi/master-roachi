@@ -245,7 +245,9 @@
 
 .productText {
   width: 100%;
-  min-height: 7rem;
+  /* Room to see a whole description at once rather than three lines of one.
+     Still resizable, so a long one can be dragged taller. */
+  min-height: 18rem;
   background: var(--bg-raised);
   border: 1px solid var(--line);
   border-radius: 8px;

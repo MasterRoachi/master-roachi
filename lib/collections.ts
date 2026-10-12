@@ -107,6 +107,24 @@ cover:
     binary: true,
   },
   {
+    key: 'project-art',
+    label: 'Project images',
+    // Flat, like everything else in public/projects/ — the generated cards
+    // already live here as <slug>.webp and <slug>-a.webp. Keeping uploads flat
+    // means pathAllowed's one-level pattern covers them with no change to the
+    // guard, which is not a corner worth loosening for tidier folders.
+    //
+    // covers.mjs owns exactly three names per project — <slug>.webp,
+    // <slug>-a.webp and <slug>-b.webp — and regenerates them on every build.
+    // An upload saved over one of those would survive until the next deploy
+    // and then vanish, which is the mistake that was nearly made with the
+    // product art, so GENERATED_COVER_NAMES below is what the editor refuses.
+    // A hero is <slug>-hero.webp; anything else is <slug>-<name>.webp.
+    dir: 'public/projects',
+    exts: ['.webp'],
+    binary: true,
+  },
+  {
     key: 'store-data',
     label: 'Store catalogue',
     // Written by the Sync button, which fetches Printful from the Worker and
@@ -133,6 +151,18 @@ cover:
     exts: ['.svg'],
   },
 ];
+
+/**
+ * The three image names per project that scripts/covers.mjs regenerates.
+ *
+ * Exported so the editor can refuse an upload that would be overwritten by the
+ * next build rather than letting it look like it worked. A generated card is
+ * recreated from the project's accents on every deploy; a file sitting at one
+ * of these paths is temporary and nothing says so.
+ */
+export function generatedCoverNames(slug: string): string[] {
+  return [`${slug}.webp`, `${slug}-a.webp`, `${slug}-b.webp`];
+}
 
 /** What a new file in this collection is called. */
 export function newPath(collection: Collection, slug: string): string {

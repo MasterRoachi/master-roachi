@@ -1,0 +1,584 @@
+/* The collection editor: list, fields and body, and what it will look like.
+   Tokens from app/globals.css. */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr) minmax(300px, 370px);
+  gap: 1.75rem;
+  margin: 1.5rem 0 4rem;
+  align-items: start;
+}
+
+/* Three columns need a wide screen; two is the sensible middle, and one is
+   what a phone can actually use. */
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: minmax(160px, 210px) minmax(0, 1fr);
+  }
+
+  .aside {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.list ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.list li {
+  border-radius: 6px;
+}
+
+.list button {
+  display: grid;
+  gap: 0.15rem;
+  width: 100%;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  padding: 0.4rem 0.45rem;
+  color: var(--muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.list button:hover {
+  background: var(--bg-raised);
+  color: var(--ink);
+}
+
+.current {
+  background: var(--bg-raised);
+  color: var(--ink) !important;
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.entryTitle {
+  display: block;
+  font-size: 0.9375rem;
+  line-height: 1.3;
+}
+
+.entryMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* The status reads at a glance, which is the reason the list is not
+   alphabetical any more. */
+.entryMeta [data-status='parked'],
+.entryMeta [data-status='concept'] {
+  color: oklch(70% 0.02 260);
+}
+
+.entryMeta [data-status='building'],
+.entryMeta [data-status='ongoing'] {
+  color: oklch(82% 0.16 85);
+}
+
+.entryMeta [data-status='released'] {
+  color: oklch(78% 0.15 150);
+}
+
+.draggingRow {
+  opacity: 0.5;
+}
+
+.listNote {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.listNote button,
+.new {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.listNote button:hover,
+.new:hover {
+  border-color: var(--accent);
+}
+
+.main {
+  min-width: 0;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.barName {
+  font-size: 0.9375rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.barButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.barButtons button {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.35rem 0.75rem;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.barButtons button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.barButtons button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.quiet {
+  color: var(--muted) !important;
+}
+
+.draftTag,
+.dirty {
+  margin-left: 0.5rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.draftTag {
+  color: var(--muted);
+}
+
+.dirty {
+  color: oklch(82% 0.16 85);
+}
+
+/* Warnings, not errors: everything here still saves. */
+.warnings {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0.7rem 0.85rem;
+  display: grid;
+  gap: 0.3rem;
+  background: color-mix(in oklch, oklch(82% 0.16 85) 8%, transparent);
+  border-left: 2px solid oklch(82% 0.16 85);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.fields {
+  display: grid;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.field > label {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.fieldInput,
+.fieldText {
+  width: 100%;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.5rem 0.6rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.fieldText {
+  resize: vertical;
+}
+
+.fieldInput:focus,
+.fieldText:focus,
+.body:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* A text box for the exact value, and a picker beside it. The picker is sRGB
+   and the stored value is oklch, so the box is the precise one. */
+.colour {
+  display: grid;
+  grid-template-columns: 1fr 2.5rem;
+  gap: 0.5rem;
+}
+
+.swatch {
+  width: 100%;
+  height: 100%;
+  min-height: 2.25rem;
+  padding: 2px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.image {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.imageRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (max-width: 620px) {
+  .imageRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.uploadButton {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  padding: 0.45rem 0.7rem;
+  background: var(--bg-raised);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.uploadButton:hover {
+  border-color: var(--accent);
+}
+
+.uploadButton input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.imagePreview {
+  max-width: 220px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+/* The repeating editor — `pieces`, which is most of the Odin file. */
+.blocks {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.block {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  background: color-mix(in oklch, var(--bg-raised) 55%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.blockHead {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.blockNumber {
+  margin-right: auto;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.blockHead button,
+.blockAdd {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  padding: 0.2rem 0.5rem;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.blockHead button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.blockRemove {
+  color: oklch(70% 0.18 25) !important;
+}
+
+.blockAdd {
+  justify-self: start;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8125rem;
+}
+
+.blockField {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.blockField > span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.blockRaw {
+  margin: 0;
+  padding: 0.4rem 0.5rem;
+  background: var(--bg);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  overflow-x: auto;
+  color: var(--muted);
+}
+
+.other {
+  margin: 0.5rem 0 1.25rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.other summary {
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.bodyLabel {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.insertRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.insertRow button {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  padding: 0.15rem 0.45rem;
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.insertRow button:hover {
+  border-color: var(--accent);
+}
+
+.body {
+  width: 100%;
+  min-height: 28rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.85rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.status,
+.message {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 1rem 0;
+}
+
+/* The right-hand column. */
+.aside {
+  display: grid;
+  gap: 1rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .aside {
+    position: static;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+.preview {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.previewHead {
+  margin: 0 0 0.6rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.preview h3.previewHead {
+  margin-top: 1.4rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.cardNoCover {
+  margin: 0;
+  padding: 1.2rem 0.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+}
+
+.cardMeta {
+  margin: 0.2rem 0 0;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.cardSummary {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.resultTitle {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+  color: oklch(78% 0.1 255);
+}
+
+.resultUrl {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.resultDesc {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.heroPreview {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 0.6rem;
+}
+
+/* No preview column — Writing, until its own turn comes. Without this the
+   third track still takes its share and the body column is squeezed for a
+   column that is not there. */
+.layoutPlain {
+  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr);
+}
+
+@media (max-width: 760px) {
+  .layoutPlain {
+    grid-template-columns: 1fr;
+  }
+}

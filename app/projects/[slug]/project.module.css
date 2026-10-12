@@ -256,3 +256,16 @@
   margin-bottom: clamp(24px, 3.5vw, 36px);
 }
 
+
+/* The image leading the page, above the badges and the title.
+   Capped rather than full-bleed: the colour field behind it is part of the
+   page, and an edge-to-edge picture covers the thing it is sitting on. */
+.hero {
+  display: block;
+  width: 100%;
+  max-height: min(52vh, 460px);
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin: 1.25rem 0 0.25rem;
+}

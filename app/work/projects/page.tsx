@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
 import PageHeader from '@/components/PageHeader';
 import { COLLECTIONS } from '@/lib/collections';
+import { site } from '@/lib/site';
 import CollectionEditor from '../CollectionEditor';
 
 // Project pages in content/projects, editable from the browser.
@@ -23,7 +24,7 @@ const collection = COLLECTIONS.find((c) => c.key === 'projects')!;
 export default function Page() {
   return (
     <div className="shell">
-      <PageHeader eyebrow="Private" title="Projects" lede="Edit a project page. Weight orders the grid; the accents colour its card." />
+      <PageHeader eyebrow="Private" title="Projects" />
       <p>
         <Link href="/work/">← Work</Link>
       </p>
@@ -31,6 +32,8 @@ export default function Page() {
         collection="projects"
         noun="project"
         template={collection.template?.(new Date().toISOString().slice(0, 10))}
+        seo
+        siteName={site.name}
       />
     </div>
   );
