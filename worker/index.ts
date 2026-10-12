@@ -1,5 +1,5 @@
 import { POLL_ID, pollCandidates } from '../lib/poll';
-import { readAccount, type TrelloCreds } from './trello';
+import { moveCard, readAccount, type TrelloCreds } from './trello';
 import {
   headCommit,
   listFiles,
@@ -446,6 +446,41 @@ export default {
       const throughAccess = request.headers.has('cf-access-jwt-assertion');
       const local = url.hostname !== APEX;
       if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      /* Moving a card, which is the hub's only write.
+       *
+       * On the same route as the read rather than a route of its own: it is
+       * the same resource and the same credentials, and every endpoint added
+       * under /work has to be covered by the Access policy, which matches on
+       * the path prefix. One fewer path is one fewer thing to get wrong.
+       */
+      if (request.method === 'POST') {
+        const creds =
+          env.TRELLO_KEY && env.TRELLO_TOKEN
+            ? { key: env.TRELLO_KEY, token: env.TRELLO_TOKEN }
+            : null;
+        if (!creds) return json({ error: 'no Trello credentials' }, 200);
+
+        const body = (await request.json().catch(() => null)) as {
+          card?: unknown;
+          list?: unknown;
+        } | null;
+        // Trello ids are 24 hex characters. Checked rather than passed
+        // through: this is a bearer credential for a whole account, and an
+        // id straight off the wire into a URL is how that becomes somebody
+        // else's request.
+        const isId = (value: unknown) => typeof value === 'string' && /^[0-9a-f]{24}$/i.test(value);
+        if (!body || !isId(body.card) || !isId(body.list)) {
+          return json({ error: 'needs a card and a list' }, 400);
+        }
+
+        try {
+          await moveCard(body.card as string, body.list as string, creds);
+          return json({ moved: true }, 200);
+        } catch (error) {
+          return json({ error: String(error instanceof Error ? error.message : error) }, 502);
+        }
+      }
 
       const creds: TrelloCreds | null =
         env.TRELLO_KEY && env.TRELLO_TOKEN

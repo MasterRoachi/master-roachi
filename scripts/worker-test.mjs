@@ -196,6 +196,17 @@ execFileSync(
 );
 const curriculumIcons = await import(pathToFileURL(iconKeyBundle).href);
 
+// What the boards page decides: which list is which bucket, and which board
+// leads. Matched on list NAMES, so a rename silently drops a board out — which
+// is why the API reports what it could not match rather than showing nothing.
+const hubBundle = path.join(os.tmpdir(), 'master-roachi-hub-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/work-hub.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${hubBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const hub = await import(pathToFileURL(hubBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -4001,6 +4012,159 @@ globalThis.fetch = preGh;
   DB = fakeD1();
 }
 
+// --- the boards page --------------------------------------------------------
+{
+  // Matched by NAME, deliberately: a board made today appears without anyone
+  // adding its list ids anywhere. The cost is the opposite failure — rename
+  // Today to Now and it drops out — which is why unmatched boards are named.
+  check('Today is a bucket', hub.bucketFor('Today') === 'today', String(hub.bucketFor('Today')));
+  check(
+    'and so is Shepherds’ Current Focus',
+    hub.bucketFor('Current Focus') === 'today',
+    String(hub.bucketFor('Current Focus')),
+  );
+  check('Doing is doing', hub.bucketFor('Doing') === 'doing', String(hub.bucketFor('Doing')));
+  check(
+    'In Progress and Review / Test are both doing',
+    hub.bucketFor('In Progress') === 'doing' && hub.bucketFor('Review / Test') === 'doing',
+    '',
+  );
+  check('This week is week', hub.bucketFor('This week') === 'week', String(hub.bucketFor('This week')));
+
+  // Waiting is new: blocked on somebody else is the state that goes quiet.
+  check('Waiting is a bucket now', hub.bucketFor('Waiting') === 'waiting', String(hub.bucketFor('Waiting')));
+  check(
+    'and so are Blocked and On hold',
+    hub.bucketFor('Blocked') === 'waiting' && hub.bucketFor('On hold') === 'waiting',
+    '',
+  );
+  check('it is in the order, last', hub.BUCKET_ORDER[3] === 'waiting', JSON.stringify(hub.BUCKET_ORDER));
+  check(
+    'every bucket has a label',
+    hub.BUCKET_ORDER.every((key) => typeof hub.BUCKET_LABELS[key] === 'string'),
+    JSON.stringify(hub.BUCKET_LABELS),
+  );
+
+  // Inbox, Done and Command's Projects list are deliberately not buckets.
+  for (const name of ['Inbox', 'Done', 'Projects', 'Backlog']) {
+    check(`${name} is not a bucket`, hub.bucketFor(name) === null, String(hub.bucketFor(name)));
+  }
+
+  // Whitespace and case, because a list named " today " is the same list.
+  check('matching ignores case and padding', hub.bucketFor('  TODAY  ') === 'today', '');
+
+  /* Boards lead by their soonest due card, his call. A board with nothing due
+   * sorts LAST — no deadline is not the same as an imminent one. */
+  const board = (name, dues) => ({
+    id: name,
+    name,
+    url: '',
+    scope: 'mine',
+    lists: [],
+    cards: dues.map((due, at) => ({
+      id: `${name}-${at}`,
+      name: 'c',
+      url: '',
+      list: 'Today',
+      bucket: 'today',
+      labels: [],
+      due,
+      lastActivity: null,
+    })),
+  });
+
+  const soon = board('Soon', ['2026-10-14T00:00:00.000Z']);
+  const later = board('Later', ['2026-12-01T00:00:00.000Z']);
+  const never = board('Never', [null, null]);
+  const empty = board('Empty', []);
+
+  check('the soonest due board sorts first', hub.soonestDue(soon) < hub.soonestDue(later), '');
+  check(
+    'a board with no due dates sorts last',
+    hub.soonestDue(never) === Infinity && hub.soonestDue(empty) === Infinity,
+    `${hub.soonestDue(never)} / ${hub.soonestDue(empty)}`,
+  );
+  check(
+    'the soonest is the earliest card, not the first',
+    hub.soonestDue(board('Mixed', ['2026-12-01T00:00:00.000Z', '2026-10-14T00:00:00.000Z'])) ===
+      Date.parse('2026-10-14T00:00:00.000Z'),
+    '',
+  );
+  check(
+    'and the whole row sorts without reshuffling on a tie',
+    [never, soon, later]
+      .sort((a, b) => hub.soonestDue(a) - hub.soonestDue(b) || a.name.localeCompare(b.name))
+      .map((one) => one.name)
+      .join(',') === 'Soon,Later,Never',
+    '',
+  );
+}
+
+// --- moving a card, which is the hub's only write --------------------------
+{
+  const moves = [];
+  globalThis.fetch = async (input, init = {}) => {
+    moves.push({ url: String(input), method: init.method });
+    return new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } });
+  };
+
+  const trelloEnv = { ...env, TRELLO_KEY: 'k', TRELLO_TOKEN: 't' };
+  const post = (body, useEnv = trelloEnv) =>
+    worker.fetch(
+      new Request('https://masterroachi.com/api/work', {
+        method: 'POST',
+        headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      }),
+      useEnv,
+    );
+
+  res = await worker.fetch(
+    new Request('https://masterroachi.com/api/work', { method: 'POST' }),
+    trelloEnv,
+  );
+  check('a move without Access serves the 404 page', (await res.text()) === '404 page', String(res.status));
+
+  /* The id guard. A Trello token is a bearer credential for a whole account,
+   * so an id straight off the wire into a URL is how a move becomes somebody
+   * else's request — path traversal, a query string, another endpoint. */
+  moves.length = 0;
+  for (const bad of [
+    { card: '../../members/me', list: 'a'.repeat(24) },
+    { card: 'a'.repeat(24), list: 'x?key=stolen' },
+    { card: 'a'.repeat(23), list: 'a'.repeat(24) },
+    { card: 'A'.repeat(25), list: 'a'.repeat(24) },
+    { card: 'zzzzzzzzzzzzzzzzzzzzzzzz', list: 'a'.repeat(24) },
+    { card: 'a'.repeat(24) },
+    {},
+  ]) {
+    res = await post(bad);
+    check(`a move refuses ${JSON.stringify(bad).slice(0, 40)}`, res.status === 400, String(res.status));
+  }
+  check('and none of them reached Trello', moves.length === 0, JSON.stringify(moves));
+
+  moves.length = 0;
+  res = await post({ card: 'a'.repeat(24), list: 'b'.repeat(24) });
+  body = await res.json();
+  check('a real move is made', res.status === 200 && body.moved === true, JSON.stringify(body));
+  check(
+    'it is a PUT that names the list',
+    moves.length === 1 && moves[0].method === 'PUT' && moves[0].url.includes(`idList=${'b'.repeat(24)}`),
+    JSON.stringify(moves[0]),
+  );
+  check(
+    'and drops it at the top, where it can be found again',
+    moves[0].url.includes('pos=top'),
+    moves[0].url,
+  );
+
+  res = await post({ card: 'a'.repeat(24), list: 'b'.repeat(24) }, env);
+  body = await res.json();
+  check('no Trello credentials reports rather than throws', body.error === 'no Trello credentials', JSON.stringify(body));
+
+  globalThis.fetch = preGh;
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -4027,4 +4191,5 @@ fs.rmSync(fieldsBundle, { force: true });
 fs.rmSync(proseBundle, { force: true });
 fs.rmSync(cardBundle, { force: true });
 fs.rmSync(iconKeyBundle, { force: true });
+fs.rmSync(hubBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

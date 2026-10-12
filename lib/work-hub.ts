@@ -28,7 +28,22 @@ const BUCKETS = [
     label: 'This week',
     patterns: [/^this week$/i, /^ready$/i],
   },
+  {
+    key: 'waiting' as const,
+    label: 'Waiting',
+    // Blocked on somebody else, which is the state that goes quiet and is
+    // forgotten — a card nobody is waiting on moves, and a card you are
+    // waiting on just sits there looking like everything else.
+    patterns: [/^waiting$/i, /^blocked$/i, /^on hold$/i],
+  },
 ];
+
+/* Inbox, Done and Command's Projects list are deliberately NOT buckets.
+ *
+ * Inbox is uncategorised capture and showing it turns the hub into a second
+ * inbox. Done is the past. Projects holds twelve cards that are the names of
+ * his projects — Shepherds, Cultus, Terrath, Kame, The Rig — which is a
+ * standing reference list rather than anything to do today. */
 
 export type BucketKey = (typeof BUCKETS)[number]['key'];
 
@@ -80,28 +95,22 @@ export function isHiddenBoard(name: string): boolean {
  * not listed falls to the end in alphabetical order, so a new board appears
  * without an edit here and can then be placed.
  */
-const BOARD_ORDER = [
-  'Command',
-  'Shepherds We Shall Be — Production',
-  'The Lost Sheep: Black Pastures',
-  'Cultus Botanicus',
-  'North Star',
-  'Sales',
-];
+/* BOARD_ORDER is gone, with boardRank.
+ *
+ * The boards were hand-ordered — Command, then the games, then the day job —
+ * which is a list to maintain every time a board is made. They sort by their
+ * soonest due card now, his call, so the board with the most urgent thing on
+ * it leads and nothing has to be kept in step. See soonestDue below. */
 
-/** Sort key for a board name: its place in BOARD_ORDER, or the end. */
-export function boardRank(name: string): number {
-  const at = BOARD_ORDER.findIndex((entry) => entry.toLowerCase() === name.trim().toLowerCase());
-  return at === -1 ? BOARD_ORDER.length : at;
-}
 
 /** The order the hub reads in: what I am on, then what is live, then what is queued. */
-export const BUCKET_ORDER: BucketKey[] = ['today', 'doing', 'week'];
+export const BUCKET_ORDER: BucketKey[] = ['today', 'doing', 'week', 'waiting'];
 
 export const BUCKET_LABELS: Record<BucketKey, string> = {
   today: 'Today',
   doing: 'Doing',
   week: 'This week',
+  waiting: 'Waiting',
 };
 
 /**
@@ -151,6 +160,32 @@ export interface WorkBoard {
    */
   scope: 'mine' | 'day-job';
   cards: WorkCard[];
+  /**
+   * The board's own lists, so a card can be moved from the page.
+   *
+   * Sent with the board rather than looked up when a move happens: Trello
+   * needs a list id, the page only ever knew list NAMES, and a round trip to
+   * find the id of the list sitting two inches away is a round trip for
+   * nothing.
+   */
+  lists: { id: string; name: string; bucket: BucketKey | null }[];
+}
+
+/**
+ * The soonest due date on a board, for ordering them.
+ *
+ * Boards have no due date of their own, so the useful proxy is the most
+ * urgent thing on them. A board with nothing due sorts last rather than
+ * first — no deadline is not the same as an imminent one.
+ */
+export function soonestDue(board: WorkBoard): number {
+  let soonest = Number.POSITIVE_INFINITY;
+  for (const card of board.cards) {
+    if (!card.due) continue;
+    const at = Date.parse(card.due);
+    if (Number.isFinite(at) && at < soonest) soonest = at;
+  }
+  return soonest;
 }
 
 export interface WorkHubPayload {

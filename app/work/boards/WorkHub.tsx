@@ -1,66 +1,114 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   BUCKET_LABELS,
   BUCKET_ORDER,
   CARDS_PER_LIST,
-  boardRank,
   STALE_DAYS,
   daysSince,
+  soonestDue,
   type BucketKey,
   type WorkBoard,
+  type WorkCard,
   type WorkHubPayload,
 } from '@/lib/work-hub';
 import styles from './boards.module.css';
 
-// The hub's only moving part.
+// One board at a time, chosen by a pill.
 //
-// Fetches /api/work/ once on mount and renders a column per board. No polling:
-// the page is opened in the morning, read, and closed, and a timer that
-// re-fetched every minute would spend Trello's rate limit on a tab nobody is
-// looking at. Reopening it is the refresh, and the button below is there for
-// when he has just moved a card and wants to see it land.
+// Every board used to render at once, stacked, which made the page the longest
+// thing in the backend and meant the board being looked at was somewhere in
+// the middle of four others. A pill each and one on screen fits, which is the
+// rule for the whole backend now, and reading one board is what anyone
+// actually does with it.
+//
+// Fetches /api/work/ once on mount. No polling: the page is opened in the
+// morning, read, and closed, and a timer re-fetching every minute would spend
+// Trello's rate limit on a tab nobody is looking at. The button is there for
+// when a card has just been moved.
 //
 // Fetched with the trailing slash. next.config.mjs sets trailingSlash: true,
 // so the dev server normalises /api/work to /api/work/ and the Worker strips
 // trailing slashes before matching — both forms reach the same route, and
 // writing the slashed one means dev and production take the same path rather
-// than production working by luck. That exact trap is documented on the vote
-// endpoint in worker/index.ts.
+// than production working by luck.
 
 type State =
   | { phase: 'loading' }
   | { phase: 'error'; message: string }
   | { phase: 'ready'; data: WorkHubPayload };
 
-function Card({ card }: { card: WorkBoard['cards'][number] }) {
+/** Where a card can go from here, in the order the day runs. */
+const MOVE_ORDER: BucketKey[] = ['week', 'today', 'doing', 'waiting'];
+
+function Card({
+  card,
+  board,
+  onMove,
+  busy,
+}: {
+  card: WorkCard;
+  board: WorkBoard;
+  onMove: (card: WorkCard, listId: string) => void;
+  busy: boolean;
+}) {
   const idle = daysSince(card.lastActivity);
-  const overdue =
-    card.due !== null && Date.parse(card.due) < Date.now() ? card.due : null;
+  const overdue = card.due !== null && Date.parse(card.due) < Date.now() ? card.due : null;
+
+  /* Where this card can be sent: the board's own lists, in the order the day
+   * runs, plus Done. Done is not a bucket — it is the past and the hub does
+   * not show it — but finishing something is just a move into it, so it is the
+   * one non-bucket list the page needs to know the id of. */
+  const targets = MOVE_ORDER.map((key) => {
+    const list = board.lists.find((one) => one.bucket === key);
+    return list && list.bucket !== card.bucket
+      ? { id: list.id, label: BUCKET_LABELS[key] }
+      : null;
+  }).filter(Boolean) as { id: string; label: string }[];
+
+  const done = board.lists.find((one) => /^done$/i.test(one.name));
 
   return (
-    <li className={styles.card}>
+    <li className={`${styles.card} ${busy ? styles.cardBusy : ''}`}>
       <a href={card.url} target="_blank" rel="noreferrer" className={styles.cardName}>
         {card.name}
       </a>
       <p className={styles.meta}>
-        {/* Review / Test is a different thing from In Progress even though both
-            read as Doing, so the real list is named — but not on a day-job
-            board, where the list is already the heading above it. */}
-        {card.bucket !== null && <span className={styles.list}>{card.list}</span>}
         {card.labels.map((label) => (
           <span key={label} className={styles.label}>
             {label}
           </span>
         ))}
         {overdue && (
-          <span className={styles.overdue}>
-            due {new Date(overdue).toLocaleDateString('en-ZA')}
-          </span>
+          <span className={styles.overdue}>due {new Date(overdue).toLocaleDateString('en-ZA')}</span>
         )}
-        {idle !== null && idle >= STALE_DAYS && (
-          <span className={styles.stale}>{idle}d still</span>
+        {idle !== null && idle >= STALE_DAYS && <span className={styles.stale}>{idle}d still</span>}
+      </p>
+
+      {/* The morning shuffle, without opening Trello. */}
+      <p className={styles.moves}>
+        {targets.map((target) => (
+          <button
+            key={target.id}
+            type="button"
+            disabled={busy}
+            onClick={() => onMove(card, target.id)}
+            title={`Move to ${target.label}`}
+          >
+            {target.label}
+          </button>
+        ))}
+        {done && (
+          <button
+            type="button"
+            className={styles.finish}
+            disabled={busy}
+            onClick={() => onMove(card, done.id)}
+            title="Finish it"
+          >
+            Done
+          </button>
         )}
       </p>
     </li>
@@ -70,70 +118,48 @@ function Card({ card }: { card: WorkBoard['cards'][number] }) {
 /**
  * One list, capped.
  *
- * North Star has a backlog on it and rendering all of it pushed every other
- * board off the screen. The count is always shown, so a long list reads as
- * long rather than as five cards, and one click gives the rest — nothing here
- * is hidden, only folded.
+ * The count is always shown, so a long list reads as long rather than as five
+ * cards, and one click gives the rest — nothing here is hidden, only folded.
  */
-function Group({ heading, cards }: { heading: string; cards: WorkBoard['cards'] }) {
+function Group({
+  heading,
+  cards,
+  board,
+  onMove,
+  busyCard,
+}: {
+  heading: string;
+  cards: WorkCard[];
+  board: WorkBoard;
+  onMove: (card: WorkCard, listId: string) => void;
+  busyCard: string | null;
+}) {
   const [open, setOpen] = useState(false);
   const hidden = cards.length - CARDS_PER_LIST;
   const shown = open ? cards : cards.slice(0, CARDS_PER_LIST);
 
   return (
-    <div className={styles.bucket}>
+    <section className={styles.bucket}>
       <h3 className={styles.bucketName}>
         {heading}
-        {cards.length > CARDS_PER_LIST && (
-          <span className={styles.count}>{cards.length}</span>
-        )}
+        {cards.length > CARDS_PER_LIST && <span className={styles.count}>{cards.length}</span>}
       </h3>
       <ul className={styles.cards}>
         {shown.map((card) => (
-          <Card key={card.id} card={card} />
+          <Card
+            key={card.id}
+            card={card}
+            board={board}
+            onMove={onMove}
+            busy={busyCard === card.id}
+          />
         ))}
       </ul>
       {hidden > 0 && (
         <button type="button" className={styles.more} onClick={() => setOpen(!open)}>
-          {open ? 'show fewer' : `${hidden} more`}
+          {open ? 'Show fewer' : `${hidden} more`}
         </button>
       )}
-    </div>
-  );
-}
-
-function Board({ board }: { board: WorkBoard }) {
-  // His own boards group by bucket, in bucket order. A day-job board has no
-  // buckets — the cards are his because they are assigned to him — so they
-  // group by the list they actually sit in, which is the team's own language.
-  const groups =
-    board.scope === 'mine'
-      ? BUCKET_ORDER.map((key) => ({
-          heading: BUCKET_LABELS[key as BucketKey],
-          cards: board.cards.filter((c) => c.bucket === key),
-        })).filter((g) => g.cards.length > 0)
-      : [...new Set(board.cards.map((c) => c.list))].map((list) => ({
-          heading: list,
-          cards: board.cards.filter((c) => c.list === list),
-        }));
-
-  return (
-    <section className={styles.board} data-scope={board.scope}>
-      <h2 className={styles.boardName}>
-        <a href={board.url} target="_blank" rel="noreferrer">
-          {board.name}
-        </a>
-      </h2>
-
-      {groups.length === 0 && (
-        <p className={styles.clear}>
-          {board.scope === 'mine' ? 'Nothing queued.' : 'Nothing assigned to you.'}
-        </p>
-      )}
-
-      {groups.map(({ heading, cards }) => (
-        <Group key={heading} heading={heading} cards={cards} />
-      ))}
     </section>
   );
 }
@@ -141,6 +167,8 @@ function Board({ board }: { board: WorkBoard }) {
 export default function WorkHub() {
   const [state, setState] = useState<State>({ phase: 'loading' });
   const [nonce, setNonce] = useState(0);
+  const [active, setActive] = useState<string | null>(null);
+  const [busyCard, setBusyCard] = useState<string | null>(null);
 
   useEffect(() => {
     let live = true;
@@ -149,8 +177,7 @@ export default function WorkHub() {
       try {
         const response = await fetch('/api/work/', { cache: 'no-store' });
         // Access returns its own login page as HTML when a session has
-        // expired, and parsing that as JSON throws something unhelpful. Say
-        // the useful thing instead.
+        // expired, and parsing that as JSON throws something unhelpful.
         if (!response.ok) {
           throw new Error(
             response.status === 404
@@ -164,8 +191,7 @@ export default function WorkHub() {
         if (live) {
           setState({
             phase: 'error',
-            message:
-              error instanceof Error ? error.message : 'Something went wrong.',
+            message: error instanceof Error ? error.message : 'Something went wrong.',
           });
         }
       }
@@ -175,6 +201,46 @@ export default function WorkHub() {
       live = false;
     };
   }, [nonce]);
+
+  /* Boards by soonest due card, his call: the board with the most urgent thing
+   * on it leads. A board with nothing due sorts last — no deadline is not the
+   * same as an imminent one — and ties break on the name so the row does not
+   * reshuffle itself between reads. */
+  const boards = useMemo(() => {
+    if (state.phase !== 'ready') return [];
+    return [...state.data.boards].sort(
+      (a, b) => soonestDue(a) - soonestDue(b) || a.name.localeCompare(b.name),
+    );
+  }, [state]);
+
+  const board = boards.find((one) => one.id === active) ?? boards[0] ?? null;
+
+  async function move(card: WorkCard, listId: string) {
+    setBusyCard(card.id);
+    try {
+      const response = await fetch('/api/work/', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ card: card.id, list: listId }),
+      });
+      const result = (await response.json().catch(() => ({}))) as { error?: string };
+      if (!response.ok || result.error) {
+        setState({ phase: 'error', message: result.error ?? `Could not move it (${response.status}).` });
+        return;
+      }
+      // Re-read rather than patch the card in place: the move may have been
+      // one of several, and Trello is the thing that knows where everything
+      // is now.
+      setNonce((n) => n + 1);
+    } catch (error) {
+      setState({
+        phase: 'error',
+        message: error instanceof Error ? error.message : 'Could not move it.',
+      });
+    } finally {
+      setBusyCard(null);
+    }
+  }
 
   if (state.phase === 'loading') {
     return <p className={styles.status}>Reading the boards…</p>;
@@ -193,23 +259,51 @@ export default function WorkHub() {
 
   const { data } = state;
 
-  return (
-    <>
-      <p className={styles.status}>
-        Read {new Date(data.fetchedAt).toLocaleTimeString('en-ZA')}{' '}
-        <button type="button" onClick={() => setNonce((n) => n + 1)}>
-          Refresh
-        </button>
-      </p>
+  /* The active board's cards, grouped by the list they are in.
+   *
+   * By bucket rather than by raw list name, because two boards call the same
+   * state different things — Shepherds files under Current Focus and In
+   * Progress where Command files under Today and Doing — and the hub's whole
+   * job is to read them as one thing. */
+  const groups = board
+    ? BUCKET_ORDER.map((key) => ({
+        heading: BUCKET_LABELS[key],
+        cards: board.cards.filter((card) => card.bucket === key),
+      })).filter((group) => group.cards.length > 0)
+    : [];
 
+  return (
+    <div className={styles.page}>
+      <div className={styles.head}>
+        {/* A pill per board, one open at a time. */}
+        <nav className={styles.pills} aria-label="Boards">
+          {boards.map((one) => (
+            <button
+              key={one.id}
+              type="button"
+              className={one.id === board?.id ? styles.pillOn : styles.pill}
+              aria-current={one.id === board?.id}
+              onClick={() => setActive(one.id)}
+            >
+              {one.name}
+            </button>
+          ))}
+        </nav>
+
+        <p className={styles.status}>
+          {new Date(data.fetchedAt).toLocaleTimeString('en-ZA')}{' '}
+          <button type="button" onClick={() => setNonce((n) => n + 1)}>
+            Refresh
+          </button>
+        </p>
+      </div>
 
       {/* Trello and the rest fail independently, so a missing token costs the
           boards and not the page. */}
       {!data.configured && (
         <p className={styles.warn}>
-          No Trello credentials on the Worker, so the boards are missing. Set{' '}
-          <code>TRELLO_KEY</code> and <code>TRELLO_TOKEN</code> with{' '}
-          <code>npx wrangler secret put</code>.
+          No Trello credentials on the Worker, so the boards are missing. Set <code>TRELLO_KEY</code>{' '}
+          and <code>TRELLO_TOKEN</code> with <code>npx wrangler secret put</code>.
         </p>
       )}
 
@@ -221,36 +315,42 @@ export default function WorkHub() {
         </ul>
       )}
 
-      {/* His own work first now. The day-job boards are the long ones, and
-          putting them at the top meant scrolling past someone else's backlog
-          to reach his own. Both groups sort by BOARD_ORDER rather than by
-          whatever Trello returned. */}
-      {(['mine', 'day-job'] as const).map((scope) => {
-        const boards = data.boards
-          .filter((board) => board.scope === scope)
-          .sort((a, b) => boardRank(a.name) - boardRank(b.name) || a.name.localeCompare(b.name));
-        if (boards.length === 0) return null;
+      {board && (
+        <div className={styles.boardPane}>
+          <h2 className={styles.boardName}>
+            <a href={board.url} target="_blank" rel="noreferrer">
+              {board.name} ↗
+            </a>
+          </h2>
 
-        return (
-          <section key={scope}>
-            <h2 className={styles.group}>{scope === 'mine' ? 'Mine' : 'The day job'}</h2>
-            <div className={styles.boards}>
-              {boards.map((board) => (
-                <Board key={board.id} board={board} />
+          {groups.length === 0 ? (
+            <p className={styles.clear}>
+              {board.scope === 'mine' ? 'Nothing queued.' : 'Nothing assigned to you.'}
+            </p>
+          ) : (
+            <div className={styles.buckets}>
+              {groups.map(({ heading, cards }) => (
+                <Group
+                  key={heading}
+                  heading={heading}
+                  cards={cards}
+                  board={board}
+                  onMove={move}
+                  busyCard={busyCard}
+                />
               ))}
             </div>
-          </section>
-        );
-      })}
+          )}
+        </div>
+      )}
 
       {/* Named, not drawn. If one of these is a board of his whose Today list
-          got renamed, this line is how he finds out; the rest is just what the
-          token can see. */}
+          got renamed, this line is how he finds out. */}
       {data.unmatched.length > 0 && (
         <p className={styles.unmatched}>
           No Today / Doing / This week list on: {data.unmatched.join(', ')}.
         </p>
       )}
-    </>
+    </div>
   );
 }

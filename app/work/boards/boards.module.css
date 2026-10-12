@@ -1,238 +1,288 @@
-/* The hub is read, not browsed.
- *
- * One glance has to answer "what am I doing today" across four or five
- * projects, so the boards sit side by side rather than stacked — stacking
- * would mean scrolling past Shepherds to find out whether SensusAir needs
- * anything, which is exactly the question the page exists to answer.
- *
- * Tokens come from app/globals.css; nothing here invents a colour. */
+/* One board at a time, inside the viewport. Tokens from app/globals.css. */
 
-.boards {
-  display: grid;
-  /* auto-fit rather than a fixed count: the number of boards is whatever
-     Trello returns, and a fourth game should not need this file edited. */
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-  margin: 2rem 0 4rem;
+.page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  --gold: oklch(80% 0.13 85);
 }
 
-.board {
+.head {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+/* A pill per board, one open at a time. Every board rendering at once made
+   this the longest page in the backend and put the one being read somewhere
+   in the middle of four others. */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.pill,
+.pillOn {
+  background: none;
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 1.25rem;
-  background: var(--bg-raised);
+  border-radius: 999px;
+  color: var(--muted);
+  padding: 0.3rem 0.85rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-/* Work is somebody else's board on a personal page. The left edge says so at
-   a glance, without a second colour scheme. */
-.board[data-source='work'] {
-  border-left: 3px solid var(--accent);
+.pill:hover {
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+.pillOn {
+  border-color: var(--gold);
+  background: color-mix(in oklch, var(--gold) 14%, transparent);
+  color: var(--ink);
+}
+
+.status,
+.warn,
+.clear,
+.unmatched {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.warn {
+  color: oklch(82% 0.16 85);
+}
+
+.status button {
+  margin-left: 0.4rem;
+  background: none;
+  border: 0;
+  color: var(--gold);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.errors {
+  flex: none;
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in oklch, oklch(70% 0.18 25) 10%, transparent);
+  border-left: 2px solid oklch(70% 0.18 25);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.8125rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+/* The board fills what is left, and its columns scroll rather than the page. */
+.boardPane {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .boardName {
-  font-size: var(--step-sub);
-  margin: 0 0 1rem;
-  line-height: 1.2;
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.boardName a {
-  color: var(--ink);
-  text-decoration: none;
+  flex: none;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
 }
 
 .boardName a:hover {
-  text-decoration: underline;
+  color: var(--gold);
 }
 
-.badge {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  padding: 0.1rem 0.45rem;
+.buckets {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  /* A column per bucket, as wide as they need and no wider. Four of them —
+     Today, Doing, This week, Waiting — so they fit side by side on anything
+     wider than a tablet and stack below that. */
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+  align-items: start;
+  overflow: hidden;
 }
 
 .bucket {
-  margin-bottom: 1.25rem;
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in oklch, var(--bg-raised) 55%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.6rem 0.65rem 0.7rem;
 }
 
 .bucketName {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
   margin: 0 0 0.5rem;
-  padding-bottom: 0.3rem;
-  border-bottom: 1px solid var(--line);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
 }
 
+.count {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The cards scroll inside their own column, so a long list never moves the
+   page — which is the rule for the whole backend. */
 .cards {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: 0.4rem;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .card {
-  font-size: 0.9375rem;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem 0.55rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  transition: opacity 140ms ease-out;
+}
+
+/* Mid-move: dimmed and inert until Trello has answered. */
+.cardBusy {
+  opacity: 0.45;
+  pointer-events: none;
 }
 
 .cardName {
-  color: var(--ink);
-  text-decoration: none;
-  display: block;
+  font-size: 0.875rem;
   line-height: 1.35;
 }
 
 .cardName:hover {
-  color: var(--accent);
+  color: var(--gold);
 }
 
 .meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 0.3rem 0 0;
-  font-size: 0.7rem;
-  color: var(--muted);
-}
-
-.list {
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  font-size: 0.6875rem;
 }
 
 .label {
-  border: 1px solid var(--line-bright);
-  border-radius: 3px;
-  padding: 0 0.3rem;
-}
-
-/* The two things that mean act now. Both borrow the accent rather than
-   introducing red, which on this palette would be the only pure hue on the
-   site and would shout across every other page. */
-.overdue,
-.stale {
-  color: var(--accent);
-  background: var(--accent-dim);
-  border-radius: 3px;
-  padding: 0 0.3rem;
-}
-
-.status {
   color: var(--muted);
-  font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0 0.25rem;
 }
 
-.status button {
+.overdue {
+  color: oklch(70% 0.18 25);
+}
+
+.stale {
+  color: oklch(82% 0.16 85);
+}
+
+/* Where this card can go next. The morning shuffle, without opening Trello. */
+.moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: 0.15rem 0 0;
+}
+
+.moves button {
   background: none;
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--muted);
   font: inherit;
-  padding: 0.15rem 0.6rem;
+  font-size: 0.6875rem;
+  padding: 0.05rem 0.35rem;
   cursor: pointer;
 }
 
-.status button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.moves button:hover:not(:disabled) {
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
-/* Something is wrong and the page has to say so, because the failure mode
-   being guarded against is a column that looks calm and is actually blind. */
-.warn {
-  border: 1px solid var(--accent);
-  background: var(--accent-dim);
-  border-radius: 6px;
-  padding: 0.6rem 0.8rem;
-  font-size: 0.8125rem;
-  margin: 0 0 1rem;
+.moves button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
-.errors {
-  color: var(--muted);
-  font-size: 0.8125rem;
-  padding-left: 1.2rem;
-}
-
-.clear {
-  color: var(--muted);
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-/* SensusAir is not one of the games and should not read as one. It leads the
-   row because it is the only panel whose work belongs to someone else, and it
-   is the only panel that can be out of date. */
-.sensus {
-  border-left: 3px solid var(--accent);
-}
-
-/* The boards the hub can see and cannot read. Quiet on purpose — this is a
-   footnote that occasionally turns out to be a bug report. */
-.unmatched {
-  color: var(--muted);
-  font-size: 0.75rem;
-  border-top: 1px solid var(--line);
-  padding-top: 0.75rem;
-  margin: 0 0 3rem;
-}
-
-/* Two headings, because whose work it is matters more than which project. */
-.group {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--muted);
-  margin: 2.5rem 0 0;
-}
-
-/* A day-job board is someone else's priority wearing his time. Marked the same
-   way as the SensusAir panel, which belongs to the same half of the page. */
-.board[data-scope='day-job'] {
-  border-left: 3px solid var(--accent);
-}
-
-/* How many a folded list is really holding. */
-.count {
-  margin-left: 0.4rem;
-  color: var(--accent);
-  letter-spacing: 0;
+.finish {
+  color: var(--gold) !important;
+  border-color: color-mix(in oklch, var(--gold) 35%, transparent) !important;
 }
 
 .more {
+  flex: none;
+  margin-top: 0.4rem;
   background: none;
   border: 0;
-  padding: 0.35rem 0;
   color: var(--muted);
   font: inherit;
-  font-size: 0.7rem;
+  font-size: 0.6875rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   cursor: pointer;
+  text-align: left;
+  padding: 0;
 }
 
 .more:hover {
-  color: var(--accent);
+  color: var(--gold);
 }
 
-/* The way in to the editors. A row, because there are three of them and a
-   sidebar for three links is furniture. */
-.tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin: 1.5rem 0 0;
-  font-size: 0.9375rem;
+.unmatched {
+  flex: none;
+}
+
+@media (max-width: 760px) {
+  .buckets {
+    /* Stacked, and the whole set scrolls rather than each column. */
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .bucket {
+    max-height: none;
+  }
+
+  .cards {
+    overflow: visible;
+  }
 }

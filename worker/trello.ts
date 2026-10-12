@@ -120,7 +120,20 @@ function shape(raw: RawBoard, scope: 'mine' | 'day-job'): WorkBoard {
     });
   }
 
-  return { id: raw.id, name: raw.name, url: raw.url, scope, cards };
+  return {
+    id: raw.id,
+    name: raw.name,
+    url: raw.url,
+    scope,
+    cards,
+    // Every list, bucket or not: moving a card to Done needs Done's id, and
+    // Done is deliberately not a bucket.
+    lists: (raw.lists ?? []).map((list) => ({
+      id: list.id,
+      name: list.name,
+      bucket: bucketFor(list.name),
+    })),
+  };
 }
 
 /** Whether any list on the board is a bucket at all. */
@@ -179,4 +192,33 @@ export async function readAccount(
     unmatched: unmatched.sort(),
     errors,
   };
+}
+
+/**
+ * Move a card to another list.
+ *
+ * The one write this hub does, and the reason it exists: the page is opened in
+ * the morning to decide what today is, and deciding meant going to Trello to
+ * drag three cards and coming back. "Move and finish" — This week to Today to
+ * Doing to Waiting to Done — is that whole shuffle, and finishing is just a
+ * move to Done.
+ *
+ * `pos: 'top'` because a card moved deliberately is the one being thought
+ * about, and dropping it at the bottom of a list of twenty is how you move a
+ * card and then cannot find it.
+ *
+ * Nothing else is written. No creating, no labels, no comments, no archiving:
+ * Trello is still where the work is written down, and a second half-complete
+ * editor for it would be a thing to keep in step with their API for no gain.
+ */
+export async function moveCard(
+  cardId: string,
+  listId: string,
+  creds: TrelloCreds,
+): Promise<void> {
+  const url = `${API}/cards/${cardId}?` + qs(creds, { idList: listId, pos: 'top' });
+  const response = await fetch(url, { method: 'PUT', headers: { accept: 'application/json' } });
+  if (!response.ok) {
+    throw new Error(`move: ${response.status}`);
+  }
 }
