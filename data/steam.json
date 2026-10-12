@@ -1,10 +1,10 @@
 {
-  "fetchedAt": "2026-10-06T11:57:47.782Z",
+  "fetchedAt": "2026-10-12T13:02:59.618Z",
   "current": {
     "appid": 431730,
     "title": "Aseprite",
     "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-    "minutesTwoWeeks": 1,
+    "minutesTwoWeeks": 0,
     "minutesTotal": 4302
   },
   "recent": [
@@ -12,7 +12,7 @@
       "appid": 431730,
       "title": "Aseprite",
       "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-      "minutesTwoWeeks": 1,
+      "minutesTwoWeeks": 0,
       "minutesTotal": 4302
     },
     {
@@ -141,16 +141,6 @@
       "total": 65,
       "minutesTotal": 4912,
       "shared": false
-    },
-    {
-      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2062430/a157aa8de4bd9070194ddffb27c31636355dca05/header.jpg?t=1790869056",
-      "appid": 2062430,
-      "title": "BALL x PIT",
-      "icon": null,
-      "unlocked": 63,
-      "total": 63,
-      "minutesTotal": 2340,
-      "shared": true
     },
     {
       "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/629820/header.jpg?t=1774541534",
@@ -2175,9 +2165,8 @@
       "minutes": 2340,
       "icon": null,
       "unlocked": 63,
-      "total": 63,
-      "shared": true,
-      "header": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2062430/a157aa8de4bd9070194ddffb27c31636355dca05/header.jpg?t=1790869056"
+      "total": 82,
+      "shared": true
     },
     "2134770": {
       "name": "SteamWorld Build",
