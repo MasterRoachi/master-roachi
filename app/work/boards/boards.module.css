@@ -13,19 +13,29 @@
 .head {
   flex: none;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
+  min-width: 0;
 }
 
 /* A pill per board, one open at a time. Every board rendering at once made
    this the longest page in the backend and put the one being read somewhere
-   in the middle of four others. */
+   in the middle of four others.
+
+   ONE ROW, NEVER WRAPPING. Which means the pills have to give way instead:
+   they shrink and their names truncate rather than the row breaking or
+   scrolling sideways — "Shepherds We Shall Be — Production" and "The Lost
+   Sheep: Black Pastures" are long enough that seven of them will not fit at
+   full width on anything. The whole name is on the tooltip, and the one that
+   is open never truncates, because that is the one being read. */
 .pills {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.4rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .pill,
@@ -38,7 +48,19 @@
   font: inherit;
   font-size: 0.8125rem;
   cursor: pointer;
+  /* Shrinks to share the row, and cuts its own name rather than breaking it
+     across two lines. */
+  min-width: 0;
+  flex: 0 1 auto;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The open one keeps its whole name: it is the one being read, and a board
+   you cannot name is a board you cannot be sure you are looking at. */
+.pillOn {
+  flex: 0 0 auto;
 }
 
 .pill:hover {
@@ -50,6 +72,7 @@
   border-color: var(--gold);
   background: color-mix(in oklch, var(--gold) 14%, transparent);
   color: var(--ink);
+  flex: 0 0 auto;
 }
 
 .status,
@@ -63,6 +86,11 @@
 
 .warn {
   color: oklch(82% 0.16 85);
+}
+
+.head .status {
+  flex: none;
+  white-space: nowrap;
 }
 
 .status button {
