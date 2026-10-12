@@ -4053,6 +4053,48 @@ globalThis.fetch = preGh;
   // Whitespace and case, because a list named " today " is the same list.
   check('matching ignores case and padding', hub.bucketFor('  TODAY  ') === 'today', '');
 
+  /* A card is drawn as a chip about three words wide, so the title has to be
+   * cut somewhere. Truncation spends the width on the words carrying least —
+   * "CRM: Define what a…" — so the glue goes and the subject stays. */
+  check(
+    'keywords keep the subject and drop the glue',
+    hub.keywordsOf('Metis: Create what plant customers need to be contacted') ===
+      'Metis: Create plant',
+    hub.keywordsOf('Metis: Create what plant customers need to be contacted'),
+  );
+  check(
+    'a prefix survives, because it is the most useful word on the card',
+    hub.keywordsOf('CRM: Define review request point').startsWith('CRM:'),
+    hub.keywordsOf('CRM: Define review request point'),
+  );
+  check(
+    'case is kept — CRM is not crm',
+    hub.keywordsOf('#embraceremote campaign update') === '#embraceremote campaign update',
+    hub.keywordsOf('#embraceremote campaign update'),
+  );
+  check(
+    'a stranded colon is trimmed, so it does not read as unfinished',
+    hub.keywordsOf('Strategic Influence At Work: Bootcamp Takeaways') ===
+      'Strategic Influence Work',
+    hub.keywordsOf('Strategic Influence At Work: Bootcamp Takeaways'),
+  );
+  check(
+    'a trailing arrow goes with it',
+    !hub.keywordsOf('Move cards over after they are discussed ------>').includes('-'),
+    hub.keywordsOf('Move cards over after they are discussed ------>'),
+  );
+  check(
+    'a title that is all glue comes back as itself, not empty',
+    hub.keywordsOf('What to do with this').length > 0,
+    hub.keywordsOf('What to do with this'),
+  );
+  check('and nothing at all is not a crash', hub.keywordsOf('') === '', JSON.stringify(hub.keywordsOf('')));
+  check(
+    'the count is capped',
+    hub.keywordsOf('one two three four five six seven').split(' ').length === 3,
+    hub.keywordsOf('one two three four five six seven'),
+  );
+
   /* Boards lead by their soonest due card, his call. A board with nothing due
    * sorts LAST — no deadline is not the same as an imminent one. */
   const board = (name, dues) => ({

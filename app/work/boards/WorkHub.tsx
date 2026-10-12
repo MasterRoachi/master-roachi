@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   CARDS_PER_LIST,
+  keywordsOf,
   STALE_DAYS,
   daysSince,
   soonestDue,
@@ -58,144 +59,85 @@ const HIDDEN_LISTS = /^(inbox|done|completed|complete|archive|archived|projects)
  */
 const FINISHED_LIST = /^(done|completed|complete)$/i;
 
-function Card({
+function Chip({
   card,
-  board,
-  onMove,
+  onOpen,
   busy,
 }: {
   card: WorkCard;
-  board: WorkBoard;
-  onMove: (card: WorkCard, listId: string) => void;
+  onOpen: (card: WorkCard) => void;
   busy: boolean;
 }) {
   const idle = daysSince(card.lastActivity);
-  const overdue = card.due !== null && Date.parse(card.due) < Date.now() ? card.due : null;
-
-  /* Where this card can go: the board's OWN lists, by name.
-   *
-   * Built from the hub's four bucket names first, which gave North Star one
-   * target and no way to finish anything — its lists are Continuing, To Plan,
-   * Next Sprint, Review / Approval and so on, and its finished list is called
-   * Completed. A board's lists are the board's own language, and a move
-   * control that speaks only four words cannot work a board that uses nine.
-   *
-   * Buttons where there are few enough to read at a glance, a select where
-   * there are not: nine buttons under every card is not a control, it is a
-   * wall. */
-  const elsewhere = board.lists.filter((one) => one.name !== card.list);
-  const finished = elsewhere.find((one) => FINISHED_LIST.test(one.name.trim()));
-  const targets = elsewhere.filter((one) => one !== finished);
-  const asButtons = targets.length <= 4;
+  const overdue = card.due !== null && Date.parse(card.due) < Date.now();
 
   return (
-    <li className={`${styles.card} ${busy ? styles.cardBusy : ''}`}>
-      <a href={card.url} target="_blank" rel="noreferrer" className={styles.cardName}>
-        {card.name}
-      </a>
-      <p className={styles.meta}>
-        {card.labels.map((label) => (
-          <span key={label} className={styles.label}>
-            {label}
-          </span>
-        ))}
-        {overdue && (
-          <span className={styles.overdue}>due {new Date(overdue).toLocaleDateString('en-ZA')}</span>
-        )}
-        {idle !== null && idle >= STALE_DAYS && <span className={styles.stale}>{idle}d still</span>}
-      </p>
-
-      {/* The morning shuffle, without opening Trello. */}
-      <p className={styles.moves}>
-        {asButtons ? (
-          targets.map((target) => (
-            <button
-              key={target.id}
-              type="button"
-              disabled={busy}
-              onClick={() => onMove(card, target.id)}
-              title={`Move to ${target.name}`}
-            >
-              {target.name}
-            </button>
-          ))
-        ) : (
-          <select
-            className={styles.moveTo}
-            value=""
-            disabled={busy}
-            aria-label={`Move ${card.name}`}
-            onChange={(event) => event.target.value && onMove(card, event.target.value)}
-          >
-            <option value="">move to…</option>
-            {targets.map((target) => (
-              <option key={target.id} value={target.id}>
-                {target.name}
-              </option>
-            ))}
-          </select>
-        )}
-        {finished && (
-          <button
-            type="button"
-            className={styles.finish}
-            disabled={busy}
-            onClick={() => onMove(card, finished.id)}
-            title={`Move to ${finished.name}`}
-          >
-            {finished.name}
-          </button>
-        )}
-      </p>
+    <li>
+      <button
+        type="button"
+        className={`${styles.chip} ${busy ? styles.chipBusy : ''}`}
+        title={card.name}
+        onClick={() => onOpen(card)}
+      >
+        <span className={styles.chipName}>{keywordsOf(card.name)}</span>
+        {/* Two marks and no more. A chip is three words wide and a row of
+            labels on it would be the whole chip. */}
+        <span className={styles.marks}>
+          {overdue && <span className={styles.overdue} title="Overdue" />}
+          {idle !== null && idle >= STALE_DAYS && (
+            <span className={styles.stale} title={`${idle} days still`} />
+          )}
+        </span>
+      </button>
     </li>
   );
 }
 
 /**
- * One list, capped.
+ * One list, as chips, capped at what fits.
  *
- * The count is always shown, so a long list reads as long rather than as five
- * cards, and one click gives the rest — nothing here is hidden, only folded.
+ * Nothing scrolls — that is the rule for the whole backend — so a list longer
+ * than its column shows what it can and offers the rest. The count is always
+ * on the heading, so a long list reads as long rather than as eight cards.
  */
 function Group({
   heading,
   cards,
-  board,
-  onMove,
+  onOpen,
+  onOverflow,
   busyCard,
 }: {
   heading: string;
   cards: WorkCard[];
-  board: WorkBoard;
-  onMove: (card: WorkCard, listId: string) => void;
+  onOpen: (card: WorkCard) => void;
+  onOverflow: (heading: string, cards: WorkCard[]) => void;
   busyCard: string | null;
 }) {
-  const [open, setOpen] = useState(false);
   const hidden = cards.length - CARDS_PER_LIST;
-  const shown = open ? cards : cards.slice(0, CARDS_PER_LIST);
+  const shown = hidden > 0 ? cards.slice(0, CARDS_PER_LIST) : cards;
 
   return (
     <section className={styles.bucket}>
       <h3 className={styles.bucketName}>
         {heading}
-        {cards.length > CARDS_PER_LIST && <span className={styles.count}>{cards.length}</span>}
+        <span className={styles.count}>{cards.length}</span>
       </h3>
-      <ul className={styles.cards}>
+      <ul className={styles.chips}>
         {shown.map((card) => (
-          <Card
-            key={card.id}
-            card={card}
-            board={board}
-            onMove={onMove}
-            busy={busyCard === card.id}
-          />
+          <Chip key={card.id} card={card} onOpen={onOpen} busy={busyCard === card.id} />
         ))}
+        {hidden > 0 && (
+          <li>
+            <button
+              type="button"
+              className={`${styles.chip} ${styles.moreChip}`}
+              onClick={() => onOverflow(heading, cards)}
+            >
+              +{hidden} more
+            </button>
+          </li>
+        )}
       </ul>
-      {hidden > 0 && (
-        <button type="button" className={styles.more} onClick={() => setOpen(!open)}>
-          {open ? 'Show fewer' : `${hidden} more`}
-        </button>
-      )}
     </section>
   );
 }
@@ -205,6 +147,22 @@ export default function WorkHub() {
   const [nonce, setNonce] = useState(0);
   const [active, setActive] = useState<string | null>(null);
   const [busyCard, setBusyCard] = useState<string | null>(null);
+  /** The card being read, dead centre with the page dimmed behind it. */
+  const [openCard, setOpenCard] = useState<WorkCard | null>(null);
+  /** A list that did not fit, shown in full rather than scrolled to. */
+  const [overflow, setOverflow] = useState<{ heading: string; cards: WorkCard[] } | null>(null);
+
+  /* Escape closes the layer, which is what everyone tries first. */
+  useEffect(() => {
+    if (!openCard && !overflow) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setOpenCard(null);
+      setOverflow(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [openCard, overflow]);
 
   useEffect(() => {
     let live = true;
@@ -266,7 +224,10 @@ export default function WorkHub() {
       }
       // Re-read rather than patch the card in place: the move may have been
       // one of several, and Trello is the thing that knows where everything
-      // is now.
+      // is now. The open card goes with it — it has just moved, so the panel
+      // describing where it was is the one thing that is certainly wrong.
+      setOpenCard(null);
+      setOverflow(null);
       setNonce((n) => n + 1);
     } catch (error) {
       setState({
@@ -390,13 +351,120 @@ export default function WorkHub() {
                   key={heading}
                   heading={heading}
                   cards={cards}
-                  board={board}
-                  onMove={move}
+                  onOpen={setOpenCard}
+                  onOverflow={(name, all) => setOverflow({ heading: name, cards: all })}
                   busyCard={busyCard}
                 />
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* --- one card, dead centre, with the page dimmed behind it ------- */}
+      {openCard && board && (
+        <div
+          className={styles.overlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label={openCard.name}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setOpenCard(null);
+          }}
+        >
+          <article className={styles.detail}>
+            <p className={styles.detailWhere}>
+              {board.name} <span className={styles.chev}>›</span> {openCard.list}
+            </p>
+            <h2 className={styles.detailName}>{openCard.name}</h2>
+
+            <p className={styles.detailMeta}>
+              {openCard.labels.map((label) => (
+                <span key={label} className={styles.label}>
+                  {label}
+                </span>
+              ))}
+              {openCard.due && (
+                <span
+                  className={
+                    Date.parse(openCard.due) < Date.now() ? styles.dueLate : styles.due
+                  }
+                >
+                  due {new Date(openCard.due).toLocaleDateString('en-ZA')}
+                </span>
+              )}
+              {(() => {
+                const idle = daysSince(openCard.lastActivity);
+                return idle !== null && idle >= STALE_DAYS ? (
+                  <span className={styles.staleText}>{idle} days still</span>
+                ) : null;
+              })()}
+            </p>
+
+            {/* The move, which is the whole reason the page writes anything. */}
+            <div className={styles.detailMoves}>
+              {board.lists
+                .filter((list) => list.name !== openCard.list)
+                .map((list) => (
+                  <button
+                    key={list.id}
+                    type="button"
+                    className={FINISHED_LIST.test(list.name.trim()) ? styles.finish : undefined}
+                    disabled={busyCard === openCard.id}
+                    onClick={() => void move(openCard, list.id)}
+                  >
+                    {list.name}
+                  </button>
+                ))}
+            </div>
+
+            <p className={styles.detailFoot}>
+              <a href={openCard.url} target="_blank" rel="noreferrer">
+                Open in Trello ↗
+              </a>
+              <button type="button" onClick={() => setOpenCard(null)}>
+                Close
+              </button>
+            </p>
+          </article>
+        </div>
+      )}
+
+      {/* --- a list that did not fit, in full ----------------------------- */}
+      {overflow && (
+        <div
+          className={styles.overlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label={overflow.heading}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setOverflow(null);
+          }}
+        >
+          <article className={styles.detail}>
+            <p className={styles.detailWhere}>{board?.name}</p>
+            <h2 className={styles.detailName}>
+              {overflow.heading} <span className={styles.count}>{overflow.cards.length}</span>
+            </h2>
+            <ul className={styles.chips}>
+              {overflow.cards.map((card) => (
+                <Chip
+                  key={card.id}
+                  card={card}
+                  busy={busyCard === card.id}
+                  onOpen={(one) => {
+                    setOverflow(null);
+                    setOpenCard(one);
+                  }}
+                />
+              ))}
+            </ul>
+            <p className={styles.detailFoot}>
+              <button type="button" onClick={() => setOverflow(null)}>
+                Close
+              </button>
+            </p>
+          </article>
         </div>
       )}
 

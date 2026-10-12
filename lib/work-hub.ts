@@ -247,3 +247,40 @@ export const STALE_DAYS = 7;
  * and opens on a click. The point is that the page fits on a screen again.
  */
 export const CARDS_PER_LIST = 5;
+
+/**
+ * The few words that say what a card is, for a chip too small for its title.
+ *
+ * The page draws every card as a small chip inside its list, so "CRM: Define
+ * what a review request point looks like" has to read at about three words.
+ * Truncation gives "CRM: Define what a…", which spends its whole width on the
+ * words carrying least — so the glue goes first and what is left is the
+ * subject.
+ *
+ * Original case and punctuation are kept on the words that survive: "CRM" is
+ * not "crm", and a prefix like "Metis:" is the most useful word on the card.
+ */
+const GLUE = new Set([
+  'a', 'an', 'and', 'are', 'as', 'at', 'be', 'been', 'but', 'by', 'can', 'do',
+  'for', 'from', 'get', 'has', 'have', 'how', 'in', 'into', 'is', 'it', 'its',
+  'of', 'on', 'or', 'our', 'out', 'over', 'per', 'so', 'that', 'the', 'their',
+  'them', 'then', 'there', 'these', 'they', 'this', 'to', 'up', 'was', 'we',
+  'were', 'what', 'when', 'which', 'who', 'will', 'with', 'you', 'your',
+]);
+
+export function keywordsOf(name: string, most = 3): string {
+  const words = String(name ?? '')
+    .replace(/[—–-]+>?\s*$/, '')
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter(Boolean);
+
+  const kept = words.filter((word) => !GLUE.has(word.toLowerCase().replace(/[^a-z]/gi, '')));
+  // A card whose every word is glue — "What to do with this" — would come back
+  // empty, which is worse than the words it started with.
+  const chosen = (kept.length > 0 ? kept : words).slice(0, most);
+  // A trailing colon or comma is punctuation pointing at words that were
+  // dropped — "Strategic Influence Work:" reads as unfinished rather than as
+  // short.
+  return chosen.join(' ').replace(/[:,;·—–-]+$/, '').trim();
+}

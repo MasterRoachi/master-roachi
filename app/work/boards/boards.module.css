@@ -111,41 +111,47 @@
   color: var(--gold);
 }
 
+/* NOTHING SCROLLS. The columns share the height that is left, the cards
+   inside them are chips, and a list with more than fits offers the rest in a
+   layer rather than a scrollbar. */
 .buckets {
   flex: 1;
   min-height: 0;
   display: grid;
-  /* A column per bucket, as wide as they need and no wider. Four of them —
-     Today, Doing, This week, Waiting — so they fit side by side on anything
-     wider than a tablet and stack below that. */
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 0.75rem;
-  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.6rem;
+  align-content: start;
   overflow: hidden;
 }
 
 .bucket {
   min-height: 0;
-  max-height: 100%;
   display: flex;
   flex-direction: column;
+  gap: 0.4rem;
   background: color-mix(in oklch, var(--bg-raised) 55%, transparent);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 0.6rem 0.65rem 0.7rem;
+  padding: 0.55rem 0.6rem 0.65rem;
+  overflow: hidden;
 }
 
 .bucketName {
   flex: none;
   display: flex;
   align-items: baseline;
-  gap: 0.4rem;
-  margin: 0 0 0.5rem;
-  font-size: 0.6875rem;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.625rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--gold);
+  /* A long list name is the one thing here allowed to be cut: the column is
+     narrow and the cards matter more than the heading. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .count {
@@ -153,92 +159,206 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The cards scroll inside their own column, so a long list never moves the
-   page — which is the rule for the whole backend. */
-.cards {
+.chips {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.4rem;
-  overflow-y: auto;
+  gap: 0.3rem;
+  align-content: start;
   min-height: 0;
+  overflow: hidden;
 }
 
-.card {
-  display: grid;
-  gap: 0.25rem;
-  padding: 0.5rem 0.55rem;
+/* A card, at three words. The whole title is on the tooltip and in the layer
+   it opens — truncating a title spends the width on the words carrying least,
+   so the glue is dropped instead and the subject survives. */
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: 100%;
+  text-align: left;
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: 8px;
-  transition: opacity 140ms ease-out;
+  border-radius: 7px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  padding: 0.35rem 0.45rem;
+  cursor: pointer;
+  transition: border-color 120ms ease-out, transform 120ms ease-out;
 }
 
-/* Mid-move: dimmed and inert until Trello has answered. */
-.cardBusy {
+.chip:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.chipBusy {
   opacity: 0.45;
   pointer-events: none;
 }
 
-.cardName {
-  font-size: 0.875rem;
+.chipName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Two dots, not a row of labels: a chip is three words wide. */
+.marks {
+  flex: none;
+  display: flex;
+  gap: 0.2rem;
+}
+
+.overdue,
+.stale {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+}
+
+.overdue {
+  background: oklch(70% 0.18 25);
+}
+
+.stale {
+  background: oklch(82% 0.16 85);
+}
+
+.moreChip {
+  justify-content: center;
+  border-style: dashed;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip {
+    transition: none;
+  }
+}
+
+.unmatched,
+.seen {
+  flex: none;
+}
+
+/* --- a card, dead centre, with the page dimmed behind it --------------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background: color-mix(in oklch, var(--bg) 78%, black);
+  backdrop-filter: blur(3px);
+  animation: dim 160ms ease-out;
+}
+
+@keyframes dim {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    animation: none;
+  }
+}
+
+.detail {
+  width: min(100%, 34rem);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.1rem 1.2rem 1.2rem;
+}
+
+.detailWhere {
+  margin: 0;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.chev {
+  color: color-mix(in oklch, var(--muted) 55%, transparent);
+}
+
+.detailName {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
   line-height: 1.35;
 }
 
-.cardName:hover {
-  color: var(--gold);
-}
-
-.meta {
+.detailMeta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
   margin: 0;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
 }
 
 .label {
   color: var(--muted);
   border: 1px solid var(--line);
   border-radius: 4px;
-  padding: 0 0.25rem;
+  padding: 0 0.3rem;
 }
 
-.overdue {
+.due {
+  color: var(--muted);
+}
+
+.dueLate {
   color: oklch(70% 0.18 25);
 }
 
-.stale {
+.staleText {
   color: oklch(82% 0.16 85);
 }
 
-/* Where this card can go next. The morning shuffle, without opening Trello. */
-.moves {
+/* Every list on the board, by its own name. The buckets' four words cannot
+   work a board that runs nine lists. */
+.detailMoves {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
-  margin: 0.15rem 0 0;
+  gap: 0.35rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
 }
 
-.moves button {
-  background: none;
+.detailMoves button {
+  background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: 6px;
   color: var(--muted);
   font: inherit;
-  font-size: 0.6875rem;
-  padding: 0.05rem 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
   cursor: pointer;
 }
 
-.moves button:hover:not(:disabled) {
+.detailMoves button:hover:not(:disabled) {
   border-color: var(--gold);
   color: var(--gold);
 }
 
-.moves button:disabled {
+.detailMoves button:disabled {
   opacity: 0.4;
   cursor: default;
 }
@@ -248,43 +368,34 @@
   border-color: color-mix(in oklch, var(--gold) 35%, transparent) !important;
 }
 
-.more {
-  flex: none;
-  margin-top: 0.4rem;
+.detailFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin: 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.8125rem;
+}
+
+.detailFoot a {
+  color: var(--gold);
+}
+
+.detailFoot button {
   background: none;
   border: 0;
   color: var(--muted);
   font: inherit;
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 0.8125rem;
   cursor: pointer;
-  text-align: left;
-  padding: 0;
 }
 
-.more:hover {
-  color: var(--gold);
-}
-
-.unmatched {
-  flex: none;
-}
-
-@media (max-width: 760px) {
-  .buckets {
-    /* Stacked, and the whole set scrolls rather than each column. */
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-
-  .bucket {
-    max-height: none;
-  }
-
-  .cards {
-    overflow: visible;
-  }
+/* The overflow layer holds a whole list, so its chips may scroll where
+   nothing else does — it is a layer the page opened, not the page. */
+.detail .chips {
+  overflow-y: auto;
 }
 
 /* Which Trello login the Worker's token is, which nothing else can tell you. */
@@ -294,10 +405,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Every board the token can reach — the difference between "no such board"
-   and "filtered out", which is the confusion North Star caused. */
 .seen {
-  flex: none;
   font-size: 0.75rem;
   color: var(--muted);
 }
@@ -311,20 +419,8 @@
   line-height: 1.6;
 }
 
-/* Where a card goes, on a board with too many lists for buttons. */
-.moveTo {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.6875rem;
-  padding: 0.05rem 0.2rem;
-  cursor: pointer;
-  max-width: 100%;
-}
-
-.moveTo:hover:not(:disabled) {
-  border-color: var(--gold);
-  color: var(--gold);
+@media (max-width: 760px) {
+  .buckets {
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  }
 }
