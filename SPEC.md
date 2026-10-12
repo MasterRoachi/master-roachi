@@ -227,6 +227,13 @@ is done is worth less than knowing when, and a boolean cannot be widened into a
 date later without losing every tick already recorded. Dates are
 `YYYY-MM-DD` in Africa/Johannesburg, fixed rather than read from the browser.
 
+**Habits are one per practice, not one broad "studied".** Four, seeded
+2026-10-12, in the same order as the curriculum route: Japanese, Piano, Greek,
+Drawing. The trade was deliberate — four streaks to keep alive, against one
+streak that survives a day of Greek instead of piano. The two archived `asd`
+rows from 8 October are test habits, moved to the end of the order rather than
+deleted, because archived-never-deleted is the schema's own rule.
+
 Two columns carry decisions worth knowing about:
 
 - **`lessons.on_route`** (`0006`) — a course is not a list you finish, it is a
@@ -338,7 +345,8 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
-- [ ] **Habits and reading are styled and empty.** Both pages are built, both
-      schemas are migrated (`0001`, `0002`, `0004`, `0005`), and neither holds
-      real data — so the backend's two daily surfaces show nothing. The next
-      thing worth doing on it.
+- [ ] **Reading holds one book.** *The Odyssey*, marked reading since
+      2026-10-08, and nothing else — the shelves are a bookcase with one book
+      on it. `~/Media/Books` is 3,586 files filed by author, which is a
+      library and not a reading list, so it is the wrong thing to seed from:
+      the shelves want what he is actually reading.

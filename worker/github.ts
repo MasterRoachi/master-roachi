@@ -154,6 +154,68 @@ export async function writeFile(
 }
 
 /**
+ * The sha of a file, without its contents.
+ *
+ * For a binary collection, which is the whole reason this exists: reading a
+ * WebP through readFile() would push it through fromBase64() and a
+ * TextDecoder, and hand back a mangled string that nothing can use. All the
+ * uploader actually needs is whether the file is there and which version it
+ * is replacing.
+ *
+ * Null for a file that does not exist yet, which is the normal state for a
+ * product nobody has uploaded art for.
+ */
+export async function statFile(token: string, path: string): Promise<string | null> {
+  const response = await fetch(
+    `${API}/repos/${OWNER}/${REPO}/contents/${encodeURI(path)}?ref=${BRANCH}`,
+    { headers: headers(token) },
+  );
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`stat: ${response.status}`);
+  const file = (await response.json()) as { sha?: string };
+  return file.sha ?? null;
+}
+
+/**
+ * Create or replace a file from bytes the browser already encoded.
+ *
+ * Deliberately not writeFile with a different argument: that one takes text
+ * and encodes it, and the two must not be confusable, because passing a
+ * base64 string to it would base64 it a second time and commit something that
+ * looks like a successful upload and is not an image.
+ *
+ * The content is passed through untouched and never decoded here. The Worker
+ * has no business parsing a WebP; it checks the size and the extension, and
+ * the browser is what produced the bytes.
+ */
+export async function writeBytes(
+  token: string,
+  path: string,
+  base64: string,
+  message: string,
+  sha?: string,
+): Promise<{ commit: string }> {
+  const response = await fetch(`${API}/repos/${OWNER}/${REPO}/contents/${encodeURI(path)}`, {
+    method: 'PUT',
+    headers: { ...headers(token), 'content-type': 'application/json' },
+    body: JSON.stringify({
+      message: safeMessage(message),
+      content: base64,
+      branch: BRANCH,
+      ...(sha ? { sha } : {}),
+    }),
+  });
+
+  if (response.status === 409 || response.status === 422) {
+    throw new Error('conflict: the file changed since it was loaded');
+  }
+  if (!response.ok) throw new Error(`write: ${response.status}`);
+
+  const result = (await response.json()) as { commit?: { sha?: string } };
+  return { commit: result.commit?.sha ?? '' };
+}
+
+/**
  * Make the site rebuild, by giving Workers Builds a push to build.
  *
  * Several things on this site only change at build time — the store comes

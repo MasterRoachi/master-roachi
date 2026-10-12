@@ -1,0 +1,180 @@
+/* The live SEO readout. Tokens from app/globals.css. */
+
+.panel {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.score {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.outOf {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+/* Three bands rather than a gradient, so the colour means something you can
+   say out loud: good, fair, poor. */
+.good {
+  color: oklch(78% 0.15 150);
+}
+
+.fair {
+  color: oklch(82% 0.16 85);
+}
+
+.poor {
+  color: oklch(70% 0.18 25);
+}
+
+.meter {
+  margin: 0.6rem 0 0.5rem;
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in oklch, var(--ink) 12%, transparent);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: currentColor;
+  transition: width 140ms ease-out;
+}
+
+.counts {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.subhead {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.todo,
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.todo li {
+  display: grid;
+  gap: 0.15rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--line);
+  font-size: 0.875rem;
+}
+
+/* A warning and a failure are different jobs, so they do not look alike. */
+.todo li.fail {
+  border-left-color: oklch(70% 0.18 25);
+}
+
+.todo li.warn {
+  border-left-color: oklch(82% 0.16 85);
+}
+
+.checkLabel {
+  display: block;
+}
+
+.detail {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.fix {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.clear {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.all {
+  margin-top: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+}
+
+.all summary {
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.list {
+  margin-top: 0.75rem;
+  gap: 0.35rem;
+}
+
+.list li {
+  display: grid;
+  grid-template-columns: 1.1rem 1fr auto;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: 0.8125rem;
+}
+
+.mark {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.list li.pass .mark {
+  color: oklch(78% 0.15 150);
+}
+
+.list li.warn .mark {
+  color: oklch(82% 0.16 85);
+}
+
+.list li.fail .mark {
+  color: oklch(70% 0.18 25);
+}
+
+.list li.skip {
+  color: var(--muted);
+}
+
+.caveat {
+  margin: 0.9rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--muted);
+}

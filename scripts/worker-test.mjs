@@ -96,6 +96,40 @@ execFileSync(
 );
 const curriculum = await import(pathToFileURL(curriculumBundle).href);
 
+// The Printful shaping is now shared between this Worker and
+// scripts/printful.mjs, and the merge is the part that can lose data: a sync
+// that forgot to carry `art` and `artwork` across would silently strip the
+// artwork off every product in the catalogue.
+const printfulBundle = path.join(os.tmpdir(), 'master-roachi-printful-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/printful.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${printfulBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const printful = await import(pathToFileURL(printfulBundle).href);
+
+// The meta description is composed in two places that must agree exactly — the
+// product page at build time and the editor on every keystroke — so a change
+// to it that only one of them makes is the failure to catch.
+const metaBundle = path.join(os.tmpdir(), 'master-roachi-meta-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/product-meta.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${metaBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const meta = await import(pathToFileURL(metaBundle).href);
+
+// The SEO checklist, which is scored arithmetic over strings: a weight that
+// stops counting, or a skipped check that quietly costs marks, would move the
+// number with nothing on screen explaining why.
+const seoBundle = path.join(os.tmpdir(), 'master-roachi-seo-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/seo-score.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${seoBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const seo = await import(pathToFileURL(seoBundle).href);
+
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
@@ -792,6 +826,99 @@ res = await worker.fetch(
 );
 body = await res.json();
 check('valid JSON saves', body.saved === true, JSON.stringify(body));
+
+// --- uploading art, which is the first thing the backend writes as bytes ----
+//
+// The whole risk here is confusing the two write paths. A base64 string handed
+// to the text path gets encoded a second time and commits something that looks
+// like a successful upload and is not an image — so the test that matters is
+// that what arrives at GitHub is byte-identical to what the browser sent.
+const tinyWebp =
+  'UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAQAcJaQAA3AA/v3AgAA=';
+
+for (const bad of [
+  'public/store/../../.github/workflows/x.webp',
+  'public/store/nested/art.webp',
+  'public/store/UPPER-art.webp',
+  'public/store/art.png',
+  'content/writing/the-road-in.mdx',
+]) {
+  res = await worker.fetch(
+    postContent({ collection: 'store-art', path: bad, content: tinyWebp }),
+    ghEnv,
+  );
+  check(`upload refuses ${bad}`, res.status === 400, String(res.status));
+}
+
+res = await worker.fetch(
+  postContent({
+    collection: 'store-art',
+    path: 'public/store/464722916-art.webp',
+    content: 'not base64 at all!!',
+  }),
+  ghEnv,
+);
+check('upload refuses content that is not base64', res.status === 400, String(res.status));
+
+res = await worker.fetch(
+  postContent({
+    collection: 'store-art',
+    path: 'public/store/464722916-art.webp',
+    // 4 base64 chars per 3 bytes, so this is about 3MB — over the 2MB cap.
+    content: 'A'.repeat(4_000_000),
+  }),
+  ghEnv,
+);
+body = await res.json();
+check(
+  'upload refuses anything over the size cap',
+  res.status === 400 && /too big/.test(body.error ?? ''),
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(
+  postContent({ collection: 'store-art', path: 'public/store/464722916-art.webp', content: '' }),
+  ghEnv,
+);
+check('upload refuses an empty body', res.status === 400, String(res.status));
+
+commits.length = 0;
+res = await worker.fetch(
+  postContent({
+    collection: 'store-art',
+    path: 'public/store/464722916-art.webp',
+    content: tinyWebp,
+  }),
+  ghEnv,
+);
+body = await res.json();
+check('an upload saves', res.status === 200 && body.saved === true, JSON.stringify(body));
+check(
+  'the bytes reach GitHub exactly as sent, not re-encoded',
+  commits.length === 1 && commits[0].content === tinyWebp,
+  commits[0]?.content?.slice(0, 40),
+);
+check(
+  'the upload lands on its own filename, never store-art.mjs’s',
+  commits[0]?.url.includes('public/store/464722916-art.webp'),
+  commits[0]?.url,
+);
+
+// A binary read reports existence and version, never contents: pushing a WebP
+// through a TextDecoder hands back a mangled string nothing can use.
+res = await worker.fetch(
+  viaAccess(
+    'https://masterroachi.com/work/api/content?collection=store-art&path=public/store/missing-art.webp',
+  ),
+  ghEnv,
+);
+body = await res.json();
+check(
+  'a binary read of a missing file is null, not an error',
+  res.status === 200 && body.file === null,
+  JSON.stringify(body),
+);
+
 
 // --- the draft flag --------------------------------------------------------
 commits.length = 0;
@@ -2512,6 +2639,456 @@ check(
   JSON.stringify(body),
 );
 
+// --- syncing the store from Printful ---------------------------------------
+//
+// The catalogue is baked at build time and the build has never had
+// PRINTFUL_TOKEN, so this endpoint is the only thing that can refresh it. The
+// test that earns its keep is the merge: `art`, `print`, `fabric` and
+// `artwork` are hung off these same products by store-art.mjs and by an
+// upload, none of it from Printful, and a sync that wrote its own object
+// wholesale would strip the artwork off the whole store.
+
+/** What is committed, as the catalogue the next build would read. */
+let committedStore = null;
+
+const printfulFetch = async (input, init = {}) => {
+  const url = String(input);
+  const reply = (data, status = 200) =>
+    new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
+
+  // --- GitHub ---
+  if (url.includes('/contents/data/store.json')) {
+    if (init.method === 'PUT') {
+      const sent = JSON.parse(init.body);
+      const bytes = atob(sent.content);
+      committedStore = JSON.parse(bytes);
+      return reply({ commit: { sha: 'synced123' } });
+    }
+    // What is already committed: one product carrying artwork the sync must
+    // not touch, and a stale name the sync must correct.
+    const existing = {
+      fetchedAt: '2026-09-07T10:08:21.766Z',
+      store: null,
+      products: [
+        {
+          id: 464722916,
+          externalId: 'old',
+          slug: 'old-slug',
+          name: 'An Old Name',
+          thumbnail: 'https://printful.test/old.png',
+          variantCount: 1,
+          from: { amount: 99, currency: 'USD' },
+          garment: null,
+          sizeGuide: null,
+          colors: [],
+          variants: [],
+          art: '/store/464722916.webp',
+          artwork: '/store/464722916-art.webp',
+          fabric: '#232323',
+          print: { src: '/store/464722916-print.webp', x: 0.6, y: 0.3, width: 0.2 },
+        },
+      ],
+    };
+    const text = JSON.stringify(existing, null, 2);
+    const raw = new TextEncoder().encode(text);
+    let binary = '';
+    for (const b of raw) binary += String.fromCharCode(b);
+    return reply({ content: btoa(binary), sha: 'storesha' });
+  }
+
+  // --- Printful ---
+  if (url.endsWith('api.printful.com/store')) {
+    return reply({ result: { type: 'manual', name: 'Fabled Threads', website: null } });
+  }
+  if (url.endsWith('/store/products')) {
+    return reply({
+      result: [
+        {
+          id: 464722916,
+          external_id: '6a993d1c71c041',
+          name: 'Roachi Shirt',
+          thumbnail_url: 'https://printful.test/new.png',
+          variants: 9,
+          is_ignored: false,
+        },
+        // Ignored products are not for sale and must not reach the catalogue.
+        { id: 999, name: 'Hidden', is_ignored: true },
+      ],
+    });
+  }
+  if (url.includes('/store/products/464722916')) {
+    return reply({
+      result: {
+        sync_variants: [
+          {
+            size: 'S',
+            color: 'Black Heather',
+            retail_price: '16.00',
+            currency: 'USD',
+            availability_status: 'active',
+            product: { product_id: 71 },
+          },
+          {
+            size: 'M',
+            color: 'Black Heather',
+            retail_price: '18.00',
+            currency: 'USD',
+            availability_status: 'active',
+            product: { product_id: 71 },
+          },
+        ],
+      },
+    });
+  }
+  if (url.includes('/products/71/sizes')) {
+    return reply({
+      result: {
+        size_tables: [
+          {
+            type: 'product_measure',
+            measurements: [
+              { type_label: 'Length', values: [{ size: 'S', value: '71.12' }] },
+            ],
+          },
+        ],
+      },
+    });
+  }
+  if (url.includes('/products/71')) {
+    return reply({
+      result: {
+        product: {
+          brand: 'Bella + Canvas',
+          model: '3001',
+          title: 'Unisex Staple T-Shirt | Bella + Canvas 3001',
+          description: 'Marketing waffle here.\n• 100% cotton\n• Light fabric\nDisclaimer: slightly sheer.',
+        },
+        variants: [{ color: 'Black Heather', color_code: '#0b0b0b' }],
+      },
+    });
+  }
+  return new Response('nope', { status: 404 });
+};
+
+globalThis.fetch = printfulFetch;
+
+const syncEnv = { ...ghEnv, PRINTFUL_TOKEN: 'pftok' };
+
+res = await worker.fetch(
+  new Request('https://masterroachi.com/work/api/store-sync', { method: 'POST' }),
+  syncEnv,
+);
+check(
+  'sync without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/store-sync'), syncEnv);
+check('sync refuses GET', res.status === 405, String(res.status));
+
+res = await worker.fetch(
+  new Request('https://masterroachi.com/work/api/store-sync', {
+    method: 'POST',
+    headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
+  }),
+  ghEnv,
+);
+body = await res.json();
+check(
+  'no Printful token reports what is missing rather than failing',
+  res.status === 200 && body.configured === false && body.needs.includes('PRINTFUL_TOKEN'),
+  JSON.stringify(body),
+);
+
+committedStore = null;
+res = await worker.fetch(
+  new Request('https://masterroachi.com/work/api/store-sync', {
+    method: 'POST',
+    headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
+  }),
+  syncEnv,
+);
+body = await res.json();
+check(
+  'a sync that found changes commits them',
+  res.status === 200 && body.synced === true && body.changed === true && body.products === 1,
+  JSON.stringify(body),
+);
+check(
+  'an ignored product never reaches the catalogue',
+  committedStore?.products.length === 1,
+  JSON.stringify(committedStore?.products.map((p) => p.id)),
+);
+
+const synced = committedStore?.products[0] ?? {};
+check('the sync corrects the name', synced.name === 'Roachi Shirt', String(synced.name));
+check('the sync rebuilds the slug', synced.slug === 'roachi-shirt', String(synced.slug));
+check(
+  'the from-price is the cheapest variant',
+  synced.from?.amount === 16,
+  JSON.stringify(synced.from),
+);
+check(
+  'the garment comes out of the catalogue, brand not repeated',
+  synced.garment?.title === 'Unisex Staple T-Shirt' && synced.garment?.brand === 'Bella + Canvas',
+  JSON.stringify(synced.garment),
+);
+check(
+  'the spec keeps the bullets and drops the waffle',
+  synced.garment?.spec.length === 2 && !synced.garment.spec.join(' ').includes('waffle'),
+  JSON.stringify(synced.garment?.spec),
+);
+check(
+  'the disclaimer is pulled out rather than buried',
+  synced.garment?.disclaimer === 'slightly sheer.',
+  String(synced.garment?.disclaimer),
+);
+check('the swatch hex survives', synced.colors?.[0]?.hex === '#0b0b0b', JSON.stringify(synced.colors));
+
+// The reason this endpoint has tests at all.
+check(
+  'a sync preserves uploaded artwork',
+  synced.artwork === '/store/464722916-art.webp',
+  String(synced.artwork),
+);
+check(
+  'a sync preserves the generated cut-out and print',
+  synced.art === '/store/464722916.webp' && synced.print?.src === '/store/464722916-print.webp',
+  JSON.stringify({ art: synced.art, print: synced.print }),
+);
+check('a sync preserves the fabric colour', synced.fabric === '#232323', String(synced.fabric));
+
+/* And the second press, which must not commit.
+ *
+ * fetchedAt always moves, so comparing the whole object would make every press
+ * a commit and every commit a two-minute deploy. The stub now returns what was
+ * just committed, so nothing has changed. */
+const beforeSecond = committedStore;
+const previous = printfulFetch;
+globalThis.fetch = async (input, init = {}) => {
+  const url = String(input);
+  if (url.includes('/contents/data/store.json') && init.method !== 'PUT') {
+    const text = JSON.stringify(beforeSecond, null, 2);
+    const raw = new TextEncoder().encode(text);
+    let binary = '';
+    for (const b of raw) binary += String.fromCharCode(b);
+    return new Response(JSON.stringify({ content: btoa(binary), sha: 'storesha2' }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+  return previous(input, init);
+};
+
+committedStore = null;
+res = await worker.fetch(
+  new Request('https://masterroachi.com/work/api/store-sync', {
+    method: 'POST',
+    headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
+  }),
+  syncEnv,
+);
+body = await res.json();
+check(
+  'a sync that found nothing new does not commit',
+  res.status === 200 && body.synced === true && body.changed === false && committedStore === null,
+  JSON.stringify(body),
+);
+
+globalThis.fetch = preGh;
+
+// --- the merge, directly ---------------------------------------------------
+{
+  const fresh = {
+    fetchedAt: 'now',
+    store: null,
+    products: [{ id: 1, name: 'New name', slug: 'new-name' }],
+  };
+  const existing = {
+    products: [{ id: 1, name: 'Old name', slug: 'old', art: '/a.webp', artwork: '/b.webp', odd: 42 }],
+  };
+  const merged = printful.mergeCatalogue(fresh, existing);
+  check(
+    'merge: synced keys win',
+    merged.products[0].name === 'New name' && merged.products[0].slug === 'new-name',
+    JSON.stringify(merged.products[0]),
+  );
+  check(
+    'merge: foreign keys are kept without being named',
+    merged.products[0].art === '/a.webp' &&
+      merged.products[0].artwork === '/b.webp' &&
+      merged.products[0].odd === 42,
+    JSON.stringify(merged.products[0]),
+  );
+
+  const gone = printful.mergeCatalogue(
+    { fetchedAt: 'now', store: null, products: [] },
+    { products: [{ id: 1, art: '/a.webp' }] },
+  );
+  check(
+    'merge: a product pulled from Printful goes from the catalogue too',
+    gone.products.length === 0,
+    JSON.stringify(gone.products),
+  );
+
+  const fromNothing = printful.mergeCatalogue(fresh, null);
+  check(
+    'merge: an empty database is not an error',
+    fromNothing.products[0].name === 'New name',
+    JSON.stringify(fromNothing.products[0]),
+  );
+}
+
+// --- the meta description, composed identically in two places --------------
+{
+  const facts = {
+    name: 'Roachi Shirt',
+    storeName: 'Fabled Threads',
+    garment: 'Bella + Canvas 3001 Unisex Staple T-Shirt.',
+    price: 'From $16',
+  };
+
+  const bare = meta.productMetaDescription(facts);
+  check(
+    'no copy falls back to the supplier facts',
+    bare.startsWith('Roachi Shirt from Fabled Threads.') && bare.includes('From $16'),
+    bare,
+  );
+
+  const written = meta.productMetaDescription({
+    ...facts,
+    blurb: [
+      'That’s my face.',
+      'It went first because it’s the one I finished first — there was no plan. Wear it if you think it looks cool, which is the entire qualification.',
+    ],
+  });
+  check('his own words win where there are any', written.startsWith('That’s my face.'), written);
+  check('the description stays inside the snippet', written.length <= 160, String(written.length));
+  check(
+    'it does not end mid-word',
+    !/\s\S{1,2}$/.test(written) && /[.!?]$/.test(written),
+    written.slice(-30),
+  );
+
+  const short = meta.productMetaDescription({ ...facts, blurb: ['Short.'] });
+  check(
+    'a fragment is topped up with the facts rather than left as four words',
+    short.length > 40 && short.includes('Short.') && short.includes('Fabled Threads'),
+    short,
+  );
+
+  const blank = meta.productMetaDescription({ ...facts, blurb: ['', '   '] });
+  check('blank paragraphs count as no copy', blank.startsWith('Roachi Shirt from'), blank);
+}
+
+// --- the SEO checklist -----------------------------------------------------
+{
+  const empty = seo.scoreSeo({
+    kind: 'product',
+    title: 'Roachi Shirt — Master Roachi',
+    description: '',
+    body: '',
+  });
+  check('nothing written scores badly', empty.score < 50, String(empty.score));
+  check('nothing written says what to do', empty.todo.length > 0, String(empty.todo.length));
+  check(
+    'an empty body is a failure and not a warning',
+    empty.checks.find((c) => c.id === 'body-length')?.state === 'fail',
+    JSON.stringify(empty.checks.find((c) => c.id === 'body-length')),
+  );
+
+  const good = seo.scoreSeo({
+    kind: 'product',
+    title: 'Roachi Shirt — Master Roachi',
+    description:
+      'That’s my face on a Roachi Shirt. It went first because it is the one I finished first — wear it if you think it looks cool. From $16.',
+    body:
+      'That’s my face.\n\nThe Roachi Shirt went first because it is the one I finished first — there was no plan at all.\n\nWear it if you think it looks cool, which is the entire qualification for owning one, and the only one there has ever been.',
+    focus: 'Roachi Shirt',
+    images: [{ alt: 'Roachi Shirt — the print' }],
+  });
+  check('real copy scores well', good.score >= 85, String(good.score));
+  check('real copy is graded good', good.grade === 'good', good.grade);
+  check('paragraphs are counted as the save splits them', good.paragraphs === 3, String(good.paragraphs));
+
+  const missingAlt = seo.scoreSeo({
+    kind: 'product',
+    title: 'Roachi Shirt',
+    description: 'A description long enough to clear the minimum for the snippet, comfortably.',
+    body: 'Roachi Shirt copy, written out at enough length to pass the body check for a product page.',
+    images: [{ alt: '' }, { alt: 'fine' }],
+  });
+  check(
+    'a missing alt is reported as a failure',
+    missingAlt.checks.find((c) => c.id === 'alt-text')?.state === 'fail',
+    JSON.stringify(missingAlt.checks.find((c) => c.id === 'alt-text')),
+  );
+
+  // A product with no images must not be marked down for having none.
+  const noImages = seo.scoreSeo({
+    kind: 'product',
+    title: 'Roachi Shirt — Master Roachi',
+    description:
+      'That’s my face on a Roachi Shirt. It went first because it is the one I finished first — wear it if you like it. From $16.',
+    body:
+      'That’s my face.\n\nThe Roachi Shirt went first because it is the one I finished first — there was no plan at all.\n\nWear it if you think it looks cool, which is the entire qualification for owning one, and the only one there has ever been.',
+    focus: 'Roachi Shirt',
+  });
+  /* A skipped check leaves the denominator rather than scoring zero.
+   *
+   * Not asserted as "scores at least as well as the one with images": a skip
+   * removes the check's weight from both sides of the fraction, so the score
+   * is renormalised over what is left and can move either way. What must be
+   * true is that it is not counted as a failure — a product with no images is
+   * not a product with bad images. */
+  const asFail = noImages.checks.find((c) => c.id === 'alt-text');
+  check(
+    'a product with no images is skipped, not failed',
+    asFail?.state === 'skip' && !noImages.todo.some((c) => c.id === 'alt-text'),
+    JSON.stringify(asFail),
+  );
+  check(
+    'and it is still graded good',
+    noImages.grade === 'good',
+    `${noImages.score} ${noImages.grade}`,
+  );
+
+  const stuffed = seo.scoreSeo({
+    kind: 'product',
+    title: 'Roachi Shirt — Master Roachi',
+    description: 'Roachi Shirt. Buy the Roachi Shirt, the best Roachi Shirt for any Roachi Shirt fan.',
+    // Past the density floor on purpose: under 80 words the check skips, and
+    // a test that passed because the check never ran would be worthless.
+    body: ('Roachi Shirt. ').repeat(45),
+    focus: 'Roachi Shirt',
+  });
+  check(
+    'stuffing the name is flagged, not rewarded',
+    stuffed.checks.find((c) => c.id === 'density')?.state === 'warn',
+    JSON.stringify(stuffed.checks.find((c) => c.id === 'density')),
+  );
+
+  const wall = seo.scoreSeo({
+    kind: 'post',
+    title: 'A post — Master Roachi',
+    description: 'A description of the right sort of length to clear the snippet minimum here.',
+    body: 'word '.repeat(400),
+  });
+  check(
+    'a wall of text is flagged',
+    wall.checks.find((c) => c.id === 'paragraph-length')?.state === 'warn',
+    JSON.stringify(wall.checks.find((c) => c.id === 'paragraph-length')),
+  );
+  check(
+    'a post is asked about internal links and a product is not',
+    Boolean(wall.checks.find((c) => c.id === 'internal-links')) &&
+      !good.checks.find((c) => c.id === 'internal-links'),
+    '',
+  );
+  check('the score is never above 100', good.score <= 100 && wall.score <= 100, `${good.score}/${wall.score}`);
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -2529,4 +3106,7 @@ fs.rmSync(iconBundle, { force: true });
 fs.rmSync(spineBundle, { force: true });
 fs.rmSync(postBundle, { force: true });
 fs.rmSync(curriculumBundle, { force: true });
+fs.rmSync(printfulBundle, { force: true });
+fs.rmSync(metaBundle, { force: true });
+fs.rmSync(seoBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

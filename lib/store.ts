@@ -73,6 +73,15 @@ export interface StoreProduct {
    */
   art?: string | null;
   /**
+   * Art uploaded by hand from /work/store, which beats everything above it.
+   *
+   * A separate field and a separate filename on purpose: store-art.mjs
+   * rewrites `art` from Printful's mockup on every build, so an upload stored
+   * there would survive until the next deploy and then vanish with nothing to
+   * explain why. Nothing generated ever writes this one.
+   */
+  artwork?: string | null;
+  /**
    * The printed design on its own, lifted off the mockup by the same script,
    * with where on the garment it sits. This is what the 3D viewer needs: the
    * shirt it draws is modelled, so the only thing it wants from the photograph
@@ -371,7 +380,18 @@ export function blurbOf(product: StoreProduct): string[] {
 
 /** Something to show in the stage, turnable or not. */
 export function hasArtwork(product: StoreProduct): boolean {
-  return Boolean(product.art || product.thumbnail);
+  return Boolean(product.artwork || product.art || product.thumbnail);
+}
+
+/**
+ * The image a product leads with.
+ *
+ * Uploaded art first, because it was chosen deliberately; then the generated
+ * cut-out; then Printful's own mockup, which is the one with the white sheet
+ * still on it and so the last resort.
+ */
+export function productImage(product: StoreProduct): string | null {
+  return product.artwork ?? product.art ?? product.thumbnail ?? null;
 }
 
 /** Nothing left in stock, as opposed to nothing ever synced. */

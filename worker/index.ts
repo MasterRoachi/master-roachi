@@ -6,6 +6,8 @@ import {
   readFile,
   rebuild,
   slugify,
+  statFile,
+  writeBytes,
   writeFile,
 } from './github';
 import { collectionFor, newPath, pathAllowed, setDraft } from '../lib/collections';
@@ -14,6 +16,7 @@ import { outlineSize, parseOutline } from '../lib/outline';
 import { validIconName } from '../lib/habit-icons';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
+import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -96,6 +99,23 @@ interface Env {
   TRELLO_TOKEN?: string;
 
   /**
+   * Printful, for the Sync button on /work/store.
+   *
+   * The build script reads the same token from .env.local, but the build has
+   * never had it — data/store.json sat committed and a month stale while
+   * every deploy politely bailed with "PRINTFUL_TOKEN not set". So the sync
+   * had to be something the Worker could do on its own.
+   *
+   *   npx wrangler secret put PRINTFUL_TOKEN
+   *   npx wrangler secret put PRINTFUL_STORE_ID   # account-level tokens only
+   *
+   * Read-only in practice: it lists products and prices. Missing it makes the
+   * Sync button report that it is not configured rather than fail.
+   */
+  PRINTFUL_TOKEN?: string;
+  PRINTFUL_STORE_ID?: string;
+
+  /**
    * Commits content to the repo, which publishes it.
    *
    * The most powerful secret here by a distance: Workers Builds deploys on
@@ -131,6 +151,17 @@ const VOTE_TTL = 60 * 60 * 24 * 180;
  * has to stay true.
  */
 const ORDER_TTL = 60 * 60 * 24 * 180;
+
+/**
+ * How big an uploaded image may be.
+ *
+ * The bytes cross the Worker and then the GitHub API, and land in the repo
+ * forever — git keeps every version of a binary at full size, so a habit of
+ * replacing an 8MB mockup is a repository nobody wants to clone. The browser
+ * converts to WebP before sending, which puts a product mockup comfortably
+ * under this.
+ */
+const UPLOAD_LIMIT = 2_000_000;
 
 /** Caps on what an order may contain, so the store cannot be filled with junk. */
 const FIELD_MAX = 200;
@@ -466,6 +497,16 @@ export default {
 
           const path = pathAllowed(collection, wanted);
           if (!path) return json({ error: 'not a path in this collection' }, 400);
+
+          // A binary file reports whether it is there and which version it
+          // is, and never its contents: pushing a WebP through fromBase64()
+          // and a TextDecoder hands back a mangled string, and the uploader
+          // has no use for the bytes it just sent anyway.
+          if (collection.binary) {
+            const sha = await statFile(token, path);
+            return json({ configured: true, file: sha ? { path, sha } : null }, 200);
+          }
+
           return json({ configured: true, file: await readFile(token, path) }, 200);
         }
 
@@ -475,6 +516,8 @@ export default {
             path?: string;
             title?: string;
             text?: string;
+            /** base64, for a binary collection. Never both this and text. */
+            content?: string;
             sha?: string;
             draft?: boolean;
           } | null;
@@ -482,6 +525,50 @@ export default {
 
           const collection = collectionFor(body.collection);
           if (!collection) return json({ error: 'unknown collection' }, 400);
+
+          /* An upload, which is a different shape of save.
+           *
+           * Handled before anything text-related so the two paths cannot mix:
+           * a base64 string handed to writeFile() would be encoded a second
+           * time and commit something that looks like a successful upload and
+           * is not an image.
+           *
+           * The Worker does not decode or parse the bytes. It checks the path
+           * against the allow-list, checks the size, and trusts the browser
+           * for the rest — a corrupt image is a broken picture on one page,
+           * while decoding arbitrary uploads in the Worker is a much worse
+           * class of problem.
+           */
+          if (collection.binary) {
+            const content = typeof body.content === 'string' ? body.content.replace(/\s/g, '') : '';
+            if (!content) return json({ error: 'nothing to upload' }, 400);
+            if (!/^[A-Za-z0-9+/]+={0,2}$/.test(content)) {
+              return json({ error: 'that is not base64' }, 400);
+            }
+            // 4 base64 characters carry 3 bytes. Capped because the whole file
+            // crosses the Worker and then the GitHub API, and because an
+            // 8MB mockup helps nobody on a product page.
+            const bytes = Math.floor((content.length * 3) / 4);
+            if (bytes > UPLOAD_LIMIT) {
+              return json(
+                { error: `too big — ${(bytes / 1e6).toFixed(1)}MB, limit is ${UPLOAD_LIMIT / 1e6}MB` },
+                400,
+              );
+            }
+
+            const target = pathAllowed(collection, body.path);
+            if (!target) return json({ error: 'not a path in this collection' }, 400);
+
+            const name = target.split('/').pop();
+            const { commit } = await writeBytes(
+              token,
+              target,
+              content,
+              body.sha ? `Replace ${name}` : `Add ${name}`,
+              body.sha,
+            );
+            return json({ saved: true, path: target, commit, bytes }, 200);
+          }
 
           let text = typeof body.text === 'string' ? body.text : '';
           if (!text.trim()) return json({ error: 'nothing to save' }, 400);
@@ -522,6 +609,99 @@ export default {
       } catch (error) {
         const message = String(error instanceof Error ? error.message : error);
         return json({ error: message }, message.startsWith('conflict') ? 409 : 502);
+      }
+    }
+
+    // --- syncing the store from Printful ------------------------------------
+    //
+    // The catalogue is baked at build time, and the build cannot refresh it:
+    // scripts/printful.mjs needs PRINTFUL_TOKEN and the build has never had
+    // it, so every deploy bailed with "keeping the committed data/store.json"
+    // and the committed file went a month stale. This is the Sync button, and
+    // it is why the shaping moved to lib/printful.ts — the same code the build
+    // script runs, so the two cannot drift.
+    //
+    // It commits data/store.json and the push rebuilds the site, which is the
+    // same route every other edit in this backend takes.
+    if (route === '/work/api/store-sync') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (request.method !== 'POST') return json({ error: 'method not allowed' }, 405);
+
+      const token = env.GITHUB_TOKEN;
+      const printful = env.PRINTFUL_TOKEN;
+      // Reported rather than failed, so the button can explain itself: a
+      // missing secret is a setup step, not a breakage.
+      if (!token || !printful) {
+        return json(
+          {
+            configured: false,
+            needs: [!printful && 'PRINTFUL_TOKEN', !token && 'GITHUB_TOKEN'].filter(Boolean),
+          },
+          200,
+        );
+      }
+
+      const log: string[] = [];
+      try {
+        const fresh = await fetchCatalogue({
+          token: printful,
+          storeId: env.PRINTFUL_STORE_ID ?? null,
+          log: (line) => log.push(line),
+        });
+
+        // What is committed now, both to merge onto and to compare against.
+        const current = await readFile(token, 'data/store.json').catch(() => null);
+        const existing = current ? (JSON.parse(current.text) as Record<string, unknown>) : null;
+        const payload = mergeCatalogue(fresh, existing as any);
+
+        /* Compared on the synced keys only, and with fetchedAt ignored.
+         *
+         * Otherwise every press commits — the timestamp always moves — and a
+         * commit is a deploy, so a button that reported "synced" would cost
+         * two minutes of build every time it was pressed out of curiosity.
+         * Same reasoning as writeSnapshot() on the build side, and the same
+         * key list, so the two agree about what a change is. */
+        const settle = (snap: any) =>
+          JSON.stringify({
+            store: snap?.store ?? null,
+            products: (snap?.products ?? []).map((product: any) =>
+              Object.fromEntries(SYNCED_KEYS.map((k) => [k, product[k] ?? null])),
+            ),
+          });
+
+        const changed = settle(existing) !== settle(payload);
+        let commit = '';
+        if (changed) {
+          const written = await writeFile(
+            token,
+            'data/store.json',
+            JSON.stringify(payload, null, 2) + '\n',
+            `Sync the store: ${payload.products.length} products`,
+            current?.sha,
+          );
+          commit = written.commit;
+        }
+
+        return json(
+          {
+            configured: true,
+            synced: true,
+            changed,
+            commit,
+            products: payload.products.length,
+            fetchedAt: payload.fetchedAt,
+            log,
+          },
+          200,
+        );
+      } catch (error) {
+        const message = String(error instanceof Error ? error.message : error);
+        return json(
+          { configured: true, synced: false, error: message, log },
+          message.startsWith('conflict') ? 409 : 502,
+        );
       }
     }
 

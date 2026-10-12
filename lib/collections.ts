@@ -33,6 +33,15 @@ export interface Collection {
   singleFile?: string;
   /** Starting text for something new. Absent for single-file collections. */
   template?: (today: string) => string;
+  /**
+   * Written as bytes rather than as text.
+   *
+   * The content API base64-encodes a UTF-8 string, which is right for MDX and
+   * JSON and destroys a WebP. A binary collection is sent already-encoded by
+   * the browser and is never read back as text, so nothing can mangle it by
+   * round-tripping it through a string.
+   */
+  binary?: boolean;
 }
 
 export const COLLECTIONS: Collection[] = [
@@ -80,6 +89,34 @@ cover:
     dir: 'content/store',
     exts: ['.json'],
     singleFile: 'content/store/copy.json',
+  },
+  {
+    key: 'store-art',
+    label: 'Product art',
+    // public/ and not content/, because this is what the site serves rather
+    // than what it reads — the store page loads /store/<id>-art.webp directly.
+    //
+    // A SEPARATE FILENAME from store-art.mjs's own output, which is the whole
+    // point. That script rewrites public/store/<id>.webp from Printful's
+    // mockup on every build, so an upload saved over it would survive exactly
+    // until the next deploy and then vanish with nothing to explain why.
+    // `-art` is never generated, so an upload is never overwritten, and the
+    // store page prefers it where it exists.
+    dir: 'public/store',
+    exts: ['.webp'],
+    binary: true,
+  },
+  {
+    key: 'store-data',
+    label: 'Store catalogue',
+    // Written by the Sync button, which fetches Printful from the Worker and
+    // commits the result. Widening the allow-list to a generated file is worth
+    // being deliberate about: the blast radius of a stolen Access session here
+    // is a wrong product list for one deploy, recoverable by syncing again —
+    // not arbitrary CI, which is why .github/ is and stays unreachable.
+    dir: 'data',
+    exts: ['.json'],
+    singleFile: 'data/store.json',
   },
   {
     key: 'notes',

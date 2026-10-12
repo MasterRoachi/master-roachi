@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { pageMeta } from '@/lib/seo';
+import { productMetaDescription } from '@/lib/product-meta';
 import HalftoneField from '@/components/HalftoneField';
 import ShirtViewerMount from '@/components/ShirtViewerMount';
 import Swatches from '@/components/Swatches';
@@ -50,13 +51,16 @@ export async function generateMetadata({
   return pageMeta({
     path: `/store/${slug}/`,
     title: product.name,
-    description: [
-      `${product.name} from ${site.store.name}.`,
+    // His own words where there are any, the facts where there are not. See
+    // lib/product-meta.ts: the facts alone are what every other listing of
+    // the same blank says, because all of them come from the supplier.
+    description: productMetaDescription({
+      name: product.name,
+      storeName: site.store.name,
       garment,
-      price && `${price}.`,
-    ]
-      .filter(Boolean)
-      .join(' '),
+      price,
+      blurb: blurbOf(product),
+    }),
     // A card built for this product by scripts/og.mjs — the garment on the
     // site's ground with its name and price, at the 1200x630 every platform
     // crops to. Pointing this at the cut-out mockup instead, as it first did,
