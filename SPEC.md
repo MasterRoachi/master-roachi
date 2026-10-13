@@ -863,8 +863,8 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
 - [ ] **Japanese: the kanji track.** All eleven stages are written and live —
-      376 lessons, 392 lesson sources, 426 cards — but the kanji track is 119
-      of 2,136. Three modules of eight-character sets exist; roughly 250 more
+      381 lessons, 397 lesson sources, 466 cards — but the kanji track is 159
+      of 2,136. Four modules of eight-character sets exist; roughly 250 more
       lessons would finish it, frequency-ordered, each set taught through the
       words its readings appear in. That is the only part of
       `scripts/curriculums/japanese.md` still outstanding.

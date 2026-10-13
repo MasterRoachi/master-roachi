@@ -173,7 +173,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | 9 | Living in Japanese | **12 — written** |
 | 10 | Classical Japanese | **11 — written** |
 | 11 | Ad astra | **3 — written**, and open |
-| — | Kanji track, its own modules | ~250 (**119 written**) |
+| — | Kanji track, its own modules | ~250 (**159 written**) |
 
 **All eleven stages are now written, at 376 lessons rather than the 850–900
 first estimated.** The estimate assumed a lesson per grammar point; in practice

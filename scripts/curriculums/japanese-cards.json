@@ -2636,5 +2636,295 @@
       "back": "to notice",
       "reading": "きがつく"
     }
+  ],
+  "Kanji 16 · 思 考 変 動 働 遊 泳 走": [
+    {
+      "kind": "kanji",
+      "front": "思",
+      "back": "to think",
+      "reading": "シ / おも-う",
+      "extra": "[思う]{おもう} to think · [思い出]{おもいで} a memory · [不思議]{ふしぎ} mysterious\n\n9 strokes. 田 over 心."
+    },
+    {
+      "kind": "kanji",
+      "front": "考",
+      "back": "to consider",
+      "reading": "コウ / かんが-える",
+      "extra": "[考える]{かんがえる} to consider · [考え方]{かんがえかた} way of thinking · [参考]{さんこう} reference\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "変",
+      "back": "to change · strange",
+      "reading": "ヘン / か-わる・か-える",
+      "extra": "[変わる]{かわる} it changes · [変える]{かえる} to change it · [大変]{たいへん} very, awful · [変]{へん} odd\n\n9 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "動",
+      "back": "to move",
+      "reading": "ドウ / うご-く",
+      "extra": "[動く]{うごく} to move · [運動]{うんどう} exercise · [自動車]{じどうしゃ} car\n\n11 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "働",
+      "back": "to work",
+      "reading": "ドウ / はたら-く",
+      "extra": "[働く]{はたらく} to work · [労働]{ろうどう} labour\n\n13 strokes. A 国字 — invented in Japan."
+    },
+    {
+      "kind": "kanji",
+      "front": "遊",
+      "back": "to play",
+      "reading": "ユウ / あそ-ぶ",
+      "extra": "[遊ぶ]{あそぶ} to play · [遊園地]{ゆうえんち} amusement park\n\n12 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "泳",
+      "back": "to swim",
+      "reading": "エイ / およ-ぐ",
+      "extra": "[泳ぐ]{およぐ} to swim · [水泳]{すいえい} swimming\n\n8 strokes. 氵 is water."
+    },
+    {
+      "kind": "kanji",
+      "front": "走",
+      "back": "to run",
+      "reading": "ソウ / はし-る",
+      "extra": "[走る]{はしる} to run · [競走]{きょうそう} a race\n\n7 strokes."
+    }
+  ],
+  "Kanji 17 · 乗 降 着 送 受 返 貸 借": [
+    {
+      "kind": "kanji",
+      "front": "乗",
+      "back": "to ride · to board",
+      "reading": "ジョウ / の-る",
+      "extra": "[乗る]{のる} to board · [乗り換え]{のりかえ} transfer · [乗客]{じょうきゃく} passenger\n\n9 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "降",
+      "back": "to get off · to fall",
+      "reading": "コウ / お-りる・ふ-る",
+      "extra": "[降りる]{おりる} to alight · [降る]{ふる} to fall (rain) · [乗降]{じょうこう} boarding and alighting\n\n10 strokes. Two kun readings, two meanings."
+    },
+    {
+      "kind": "kanji",
+      "front": "着",
+      "back": "to wear · to arrive",
+      "reading": "チャク / き-る・つ-く",
+      "extra": "[着る]{きる} to wear · [着く]{つく} to arrive · [到着]{とうちゃく} arrival\n\n12 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "送",
+      "back": "to send",
+      "reading": "ソウ / おく-る",
+      "extra": "[送る]{おくる} to send · [送料]{そうりょう} postage · [放送]{ほうそう} broadcast\n\n9 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "受",
+      "back": "to receive",
+      "reading": "ジュ / う-ける",
+      "extra": "[受ける]{うける} to receive · [受付]{うけつけ} reception · [受験]{じゅけん} sitting an exam\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "返",
+      "back": "to return something",
+      "reading": "ヘン / かえ-す",
+      "extra": "[返す]{かえす} to give back · [返事]{へんじ} a reply · [返品]{へんぴん} a return\n\n7 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "貸",
+      "back": "to lend",
+      "reading": "タイ / か-す",
+      "extra": "[貸す]{かす} to lend — it goes out · [貸出]{かしだし} lending\n\n12 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "借",
+      "back": "to borrow",
+      "reading": "シャク / か-りる",
+      "extra": "[借りる]{かりる} to borrow — it comes in · [借金]{しゃっきん} debt\n\n10 strokes."
+    }
+  ],
+  "Kanji 18 · 楽 悲 強 弱 近 遠 広 早": [
+    {
+      "kind": "kanji",
+      "front": "楽",
+      "back": "enjoyable · music · ease",
+      "reading": "ガク・ラク / たの-しい",
+      "extra": "[楽しい]{たのしい} enjoyable · [音楽]{おんがく} music · [楽]{らく} easy, comfortable\n\n13 strokes. Two on readings, two senses."
+    },
+    {
+      "kind": "kanji",
+      "front": "悲",
+      "back": "sad",
+      "reading": "ヒ / かな-しい",
+      "extra": "[悲しい]{かなしい} sad · [悲劇]{ひげき} tragedy\n\n12 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "強",
+      "back": "strong",
+      "reading": "キョウ / つよ-い",
+      "extra": "[強い]{つよい} strong · [勉強]{べんきょう} study · [強調]{きょうちょう} emphasis\n\n11 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "弱",
+      "back": "weak",
+      "reading": "ジャク / よわ-い",
+      "extra": "[弱い]{よわい} weak · [弱点]{じゃくてん} a weak point\n\n10 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "近",
+      "back": "near",
+      "reading": "キン / ちか-い",
+      "extra": "[近い]{ちかい} near · [近所]{きんじょ} neighbourhood · [最近]{さいきん} recently\n\n7 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "遠",
+      "back": "far",
+      "reading": "エン / とお-い",
+      "extra": "[遠い]{とおい} far · [遠慮]{えんりょ} reserve, holding back · [永遠]{えいえん} eternity\n\n13 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "広",
+      "back": "wide",
+      "reading": "コウ / ひろ-い",
+      "extra": "[広い]{ひろい} wide · [広告]{こうこく} advertisement · [広場]{ひろば} a square\n\n5 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "早",
+      "back": "early",
+      "reading": "ソウ / はや-い",
+      "extra": "[早い]{はやい} early · [早朝]{そうちょう} early morning · [お早う]{おはよう}\n\n6 strokes. Early in time — [速い]{はやい} is fast in speed."
+    }
+  ],
+  "Kanji 19 · 肉 魚 米 茶 酒 薬 服 物": [
+    {
+      "kind": "kanji",
+      "front": "肉",
+      "back": "meat",
+      "reading": "ニク",
+      "extra": "[肉]{にく} meat · [牛肉]{ぎゅうにく} beef · [筋肉]{きんにく} muscle\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "魚",
+      "back": "fish",
+      "reading": "ギョ / さかな",
+      "extra": "[魚]{さかな} fish · [金魚]{きんぎょ} goldfish\n\n11 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "米",
+      "back": "rice · America",
+      "reading": "ベイ・マイ / こめ",
+      "extra": "[米]{こめ} uncooked rice · [米国]{べいこく} the USA · [新米]{しんまい} new rice, a novice\n\n6 strokes. America from 亜米利加."
+    },
+    {
+      "kind": "kanji",
+      "front": "茶",
+      "back": "tea",
+      "reading": "チャ・サ",
+      "extra": "[お茶]{おちゃ} tea · [喫茶店]{きっさてん} coffee house · [茶色]{ちゃいろ} brown\n\n9 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "酒",
+      "back": "alcohol",
+      "reading": "シュ / さけ",
+      "extra": "[お酒]{おさけ} alcohol · [日本酒]{にほんしゅ} sake · [居酒屋]{いざかや} izakaya\n\n10 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "薬",
+      "back": "medicine",
+      "reading": "ヤク / くすり",
+      "extra": "[薬]{くすり} medicine · [薬局]{やっきょく} pharmacy · [風邪薬]{かぜぐすり} cold medicine\n\n16 strokes. 艹 grass over 楽 ease."
+    },
+    {
+      "kind": "kanji",
+      "front": "服",
+      "back": "clothes",
+      "reading": "フク",
+      "extra": "[服]{ふく} clothes · [洋服]{ようふく} Western clothes · [服装]{ふくそう} attire\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "物",
+      "back": "thing",
+      "reading": "ブツ・モツ / もの",
+      "extra": "[物]{もの} thing · [動物]{どうぶつ} animal · [買い物]{かいもの} shopping · [荷物]{にもつ} luggage\n\n8 strokes."
+    }
+  ],
+  "Kanji 20 · 問 題 答 意 味 用 理 由": [
+    {
+      "kind": "kanji",
+      "front": "問",
+      "back": "question · to ask",
+      "reading": "モン / と-う",
+      "extra": "[問題]{もんだい} problem · [質問]{しつもん} a question · [問う]{とう} to ask\n\n11 strokes. A mouth 口 in a gate 門."
+    },
+    {
+      "kind": "kanji",
+      "front": "題",
+      "back": "topic · title",
+      "reading": "ダイ",
+      "extra": "[問題]{もんだい} problem · [題名]{だいめい} title · [宿題]{しゅくだい} homework\n\n18 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "答",
+      "back": "to answer",
+      "reading": "トウ / こた-える",
+      "extra": "[答える]{こたえる} to answer · [答え]{こたえ} an answer · [回答]{かいとう} a reply\n\n12 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "意",
+      "back": "mind · intention",
+      "reading": "イ",
+      "extra": "[意味]{いみ} meaning · [意見]{いけん} opinion · [注意]{ちゅうい} caution · [用意]{ようい} preparation\n\n13 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "味",
+      "back": "taste",
+      "reading": "ミ / あじ",
+      "extra": "[味]{あじ} taste · [意味]{いみ} meaning · [趣味]{しゅみ} hobby · [味噌]{みそ} miso\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "用",
+      "back": "use · business",
+      "reading": "ヨウ / もち-いる",
+      "extra": "[用事]{ようじ} an errand · [使用]{しよう} use · [用意]{ようい} preparation\n\n5 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "理",
+      "back": "reason · logic",
+      "reading": "リ",
+      "extra": "[理由]{りゆう} reason · [料理]{りょうり} cooking · [無理]{むり} impossible · [理解]{りかい} understanding\n\n11 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "由",
+      "back": "reason · origin",
+      "reading": "ユ・ユウ / よし",
+      "extra": "[理由]{りゆう} reason · [自由]{じゆう} freedom\n\n5 strokes. 自由 is a Meiji translation."
+    }
   ]
 }

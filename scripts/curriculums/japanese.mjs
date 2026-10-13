@@ -531,6 +531,16 @@ const stages = [
     ['Kanji 15 · 店 駅 道 車 電 社 事 方', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
     ],
   },
+  {
+    name: 'Kanji 4 · Doing, going and the abstract',
+    lessons: [
+    ['Kanji 16 · 思 考 変 動 働 遊 泳 走', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ['Kanji 17 · 乗 降 着 送 受 返 貸 借', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ['Kanji 18 · 楽 悲 強 弱 近 遠 広 早', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ['Kanji 19 · 肉 魚 米 茶 酒 薬 服 物', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ['Kanji 20 · 問 題 答 意 味 用 理 由', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ],
+  },
 ];
 
 const out = [
