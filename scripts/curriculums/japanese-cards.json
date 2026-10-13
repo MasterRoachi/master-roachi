@@ -849,5 +849,539 @@
       "front": "ジェ",
       "back": "je"
     }
+  ],
+  "Kanji 1 · 日 一 人 大 年 国 中 本": [
+    {
+      "kind": "kanji",
+      "front": "日",
+      "back": "day · sun · Japan",
+      "reading": "ニチ・ジツ / ひ・び・か",
+      "extra": "[日本]{にほん} Japan · [今日]{きょう} today · [日曜日]{にちようび} Sunday\n\n4 strokes. [今日]{きょう} is irregular."
+    },
+    {
+      "kind": "kanji",
+      "front": "一",
+      "back": "one",
+      "reading": "イチ・イツ / ひと",
+      "extra": "[一つ]{ひとつ} one thing · [一人]{ひとり} one person · [一月]{いちがつ} January\n\n1 stroke."
+    },
+    {
+      "kind": "kanji",
+      "front": "人",
+      "back": "person",
+      "reading": "ジン・ニン / ひと",
+      "extra": "[人]{ひと} person · [日本人]{にほんじん} a Japanese person · [三人]{さんにん} three people · [大人]{おとな} adult\n\n2 strokes. [大人]{おとな} is irregular."
+    },
+    {
+      "kind": "kanji",
+      "front": "大",
+      "back": "big · great",
+      "reading": "ダイ・タイ / おお",
+      "extra": "[大きい]{おおきい} big · [大学]{だいがく} university · [大人]{おとな} adult\n\n3 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "年",
+      "back": "year",
+      "reading": "ネン / とし",
+      "extra": "[一年]{いちねん} one year · [去年]{きょねん} last year · [今年]{ことし} this year\n\n6 strokes. [今年]{ことし} is irregular."
+    },
+    {
+      "kind": "kanji",
+      "front": "国",
+      "back": "country",
+      "reading": "コク / くに",
+      "extra": "[国]{くに} country · [中国]{ちゅうごく} China · [外国]{がいこく} a foreign country\n\n8 strokes. The box closes last."
+    },
+    {
+      "kind": "kanji",
+      "front": "中",
+      "back": "middle · inside",
+      "reading": "チュウ / なか",
+      "extra": "[中]{なか} inside · [中国]{ちゅうごく} China · [中学校]{ちゅうがっこう} middle school\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "本",
+      "back": "book · origin",
+      "reading": "ホン / もと",
+      "extra": "[本]{ほん} book · [日本]{にほん} Japan · [本当]{ほんとう} really\n\n5 strokes."
+    }
+  ],
+  "Kanji 2 · 二 三 四 五 六 七 八 九": [
+    {
+      "kind": "kanji",
+      "front": "二",
+      "back": "two",
+      "reading": "ニ / ふた",
+      "extra": "[二つ]{ふたつ} two things · [二人]{ふたり} two people · [二月]{にがつ} February\n\n2 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "三",
+      "back": "three",
+      "reading": "サン / み",
+      "extra": "[三つ]{みっつ} · [三人]{さんにん} · [三月]{さんがつ}\n\n3 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "四",
+      "back": "four",
+      "reading": "シ / よん・よ",
+      "extra": "[四つ]{よっつ} · [四人]{よにん} · [四月]{しがつ} · [四時]{よじ}\n\n5 strokes. Three readings, fixed per word."
+    },
+    {
+      "kind": "kanji",
+      "front": "五",
+      "back": "five",
+      "reading": "ゴ / いつ",
+      "extra": "[五つ]{いつつ} · [五月]{ごがつ} · [五時]{ごじ}\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "六",
+      "back": "six",
+      "reading": "ロク / む",
+      "extra": "[六つ]{むっつ} · [六月]{ろくがつ} · [六時]{ろくじ}\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "七",
+      "back": "seven",
+      "reading": "シチ / なな",
+      "extra": "[七つ]{ななつ} · [七月]{しちがつ} · [七時]{しちじ}\n\n2 strokes. Months and times take しち."
+    },
+    {
+      "kind": "kanji",
+      "front": "八",
+      "back": "eight",
+      "reading": "ハチ / や",
+      "extra": "[八つ]{やっつ} · [八月]{はちがつ} · [八時]{はちじ}\n\n2 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "九",
+      "back": "nine",
+      "reading": "キュウ・ク / ここの",
+      "extra": "[九つ]{ここのつ} · [九月]{くがつ} · [九時]{くじ}\n\n2 strokes. Months and times take く."
+    }
+  ],
+  "Kanji 3 · 十 百 千 万 円 時 分 半": [
+    {
+      "kind": "kanji",
+      "front": "十",
+      "back": "ten",
+      "reading": "ジュウ・ジッ / とお",
+      "extra": "[十]{じゅう} · [十日]{とおか} the 10th · [十分]{じゅっぷん} ten minutes\n\n2 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "百",
+      "back": "hundred",
+      "reading": "ヒャク",
+      "extra": "[百]{ひゃく} · [三百]{さんびゃく} · [八百屋]{やおや} greengrocer\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "千",
+      "back": "thousand",
+      "reading": "セン / ち",
+      "extra": "[千]{せん} · [三千]{さんぜん} · [千円]{せんえん}\n\n3 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "万",
+      "back": "ten thousand",
+      "reading": "マン・バン",
+      "extra": "[一万]{いちまん} · [万年筆]{まんねんひつ} fountain pen\n\n3 strokes. Japanese groups by four digits."
+    },
+    {
+      "kind": "kanji",
+      "front": "円",
+      "back": "yen · circle",
+      "reading": "エン / まる",
+      "extra": "[円]{えん} yen · [百円]{ひゃくえん} · [千円]{せんえん}\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "時",
+      "back": "hour · time",
+      "reading": "ジ / とき",
+      "extra": "[時間]{じかん} time · [一時]{いちじ} one o'clock · [時々]{ときどき} sometimes\n\n10 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "分",
+      "back": "minute · part · understand",
+      "reading": "ブン・フン・プン / わ-かる",
+      "extra": "[分かる]{わかる} to understand · [五分]{ごふん} five minutes · [自分]{じぶん} oneself · [半分]{はんぶん} half\n\n4 strokes. Four readings, all common."
+    },
+    {
+      "kind": "kanji",
+      "front": "半",
+      "back": "half",
+      "reading": "ハン",
+      "extra": "[半分]{はんぶん} half · [三時半]{さんじはん} half past three\n\n5 strokes."
+    }
+  ],
+  "Kanji 4 · 月 火 水 木 金 土 曜": [
+    {
+      "kind": "kanji",
+      "front": "月",
+      "back": "moon · month",
+      "reading": "ゲツ・ガツ / つき",
+      "extra": "[月曜日]{げつようび} Monday · [一月]{いちがつ} January · [今月]{こんげつ} this month · [月]{つき} moon\n\n4 strokes. がつ names a month, げつ is a month long."
+    },
+    {
+      "kind": "kanji",
+      "front": "火",
+      "back": "fire",
+      "reading": "カ / ひ",
+      "extra": "[火曜日]{かようび} Tuesday · [火]{ひ} fire · [花火]{はなび} fireworks\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "水",
+      "back": "water",
+      "reading": "スイ / みず",
+      "extra": "[水曜日]{すいようび} Wednesday · [水]{みず} water\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "木",
+      "back": "tree · wood",
+      "reading": "モク・ボク / き",
+      "extra": "[木曜日]{もくようび} Thursday · [木]{き} tree\n\n4 strokes. One stroke from 本."
+    },
+    {
+      "kind": "kanji",
+      "front": "金",
+      "back": "gold · money",
+      "reading": "キン / かね",
+      "extra": "[金曜日]{きんようび} Friday · [お金]{おかね} money · [金]{きん} gold\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "土",
+      "back": "earth · soil",
+      "reading": "ド / つち",
+      "extra": "[土曜日]{どようび} Saturday · [土]{つち} earth\n\n3 strokes. The lower stroke is the longer one."
+    },
+    {
+      "kind": "kanji",
+      "front": "曜",
+      "back": "day of the week",
+      "reading": "ヨウ",
+      "extra": "[曜日]{ようび} · [何曜日]{なんようび} which day\n\n18 strokes, and essentially one word."
+    }
+  ],
+  "Kanji 5 · 上 下 前 後 左 右 外 行": [
+    {
+      "kind": "kanji",
+      "front": "上",
+      "back": "above · up",
+      "reading": "ジョウ / うえ・あ-がる",
+      "extra": "[上]{うえ} on top · [上手]{じょうず} good at · [上がる]{あがる} to rise\n\n3 strokes. [上手]{じょうず} is irregular."
+    },
+    {
+      "kind": "kanji",
+      "front": "下",
+      "back": "below · down",
+      "reading": "カ・ゲ / した・くだ-さい",
+      "extra": "[下]{した} under · [下手]{へた} bad at · [地下]{ちか} underground · ください\n\n3 strokes. [下手]{へた} is irregular."
+    },
+    {
+      "kind": "kanji",
+      "front": "前",
+      "back": "front · before",
+      "reading": "ゼン / まえ",
+      "extra": "[前]{まえ} in front · [午前]{ごぜん} morning · [名前]{なまえ} name\n\n9 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "後",
+      "back": "behind · after",
+      "reading": "ゴ・コウ / あと・うし-ろ",
+      "extra": "[後ろ]{うしろ} behind · [午後]{ごご} afternoon · [後で]{あとで} later\n\n9 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "左",
+      "back": "left",
+      "reading": "サ / ひだり",
+      "extra": "[左]{ひだり} left · [左手]{ひだりて} left hand\n\n5 strokes. Starts with the horizontal — unlike 右."
+    },
+    {
+      "kind": "kanji",
+      "front": "右",
+      "back": "right",
+      "reading": "ウ・ユウ / みぎ",
+      "extra": "[右]{みぎ} right · [右手]{みぎて} right hand\n\n5 strokes. Starts with the diagonal."
+    },
+    {
+      "kind": "kanji",
+      "front": "外",
+      "back": "outside",
+      "reading": "ガイ / そと",
+      "extra": "[外]{そと} outside · [外国]{がいこく} abroad · [外国人]{がいこくじん} a foreigner\n\n5 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "行",
+      "back": "to go · to carry out",
+      "reading": "コウ / い-く・おこな-う",
+      "extra": "[行く]{いく} to go · [銀行]{ぎんこう} bank · [旅行]{りょこう} travel\n\n6 strokes."
+    }
+  ],
+  "だれ なに どこ どれ いつ — the question words": [
+    {
+      "kind": "word",
+      "front": "何",
+      "back": "what",
+      "reading": "なに / なん"
+    },
+    {
+      "kind": "word",
+      "front": "誰",
+      "back": "who",
+      "reading": "だれ"
+    },
+    {
+      "kind": "word",
+      "front": "どこ",
+      "back": "where"
+    },
+    {
+      "kind": "word",
+      "front": "いつ",
+      "back": "when"
+    },
+    {
+      "kind": "word",
+      "front": "どれ",
+      "back": "which one"
+    },
+    {
+      "kind": "word",
+      "front": "どうして",
+      "back": "why"
+    },
+    {
+      "kind": "word",
+      "front": "どう",
+      "back": "how"
+    },
+    {
+      "kind": "word",
+      "front": "いくら",
+      "back": "how much"
+    },
+    {
+      "kind": "word",
+      "front": "いくつ",
+      "back": "how many"
+    }
+  ],
+  "Days, months and dates": [
+    {
+      "kind": "word",
+      "front": "月曜日",
+      "back": "Monday",
+      "reading": "げつようび"
+    },
+    {
+      "kind": "word",
+      "front": "火曜日",
+      "back": "Tuesday",
+      "reading": "かようび"
+    },
+    {
+      "kind": "word",
+      "front": "水曜日",
+      "back": "Wednesday",
+      "reading": "すいようび"
+    },
+    {
+      "kind": "word",
+      "front": "木曜日",
+      "back": "Thursday",
+      "reading": "もくようび"
+    },
+    {
+      "kind": "word",
+      "front": "金曜日",
+      "back": "Friday",
+      "reading": "きんようび"
+    },
+    {
+      "kind": "word",
+      "front": "土曜日",
+      "back": "Saturday",
+      "reading": "どようび"
+    },
+    {
+      "kind": "word",
+      "front": "日曜日",
+      "back": "Sunday",
+      "reading": "にちようび"
+    }
+  ],
+  "Greetings and set phrases": [
+    {
+      "kind": "sentence",
+      "front": "おはようございます",
+      "back": "Good morning"
+    },
+    {
+      "kind": "sentence",
+      "front": "こんにちは",
+      "back": "Hello (daytime)"
+    },
+    {
+      "kind": "sentence",
+      "front": "こんばんは",
+      "back": "Good evening"
+    },
+    {
+      "kind": "sentence",
+      "front": "おやすみなさい",
+      "back": "Good night"
+    },
+    {
+      "kind": "sentence",
+      "front": "ありがとうございます",
+      "back": "Thank you"
+    },
+    {
+      "kind": "sentence",
+      "front": "どういたしまして",
+      "back": "You're welcome"
+    },
+    {
+      "kind": "sentence",
+      "front": "すみません",
+      "back": "Excuse me / sorry / thank you"
+    },
+    {
+      "kind": "sentence",
+      "front": "ごめんなさい",
+      "back": "Sorry"
+    },
+    {
+      "kind": "sentence",
+      "front": "はじめまして",
+      "back": "How do you do"
+    },
+    {
+      "kind": "sentence",
+      "front": "よろしくお願いします",
+      "back": "Please treat me well",
+      "reading": "よろしくおねがいします"
+    },
+    {
+      "kind": "sentence",
+      "front": "いただきます",
+      "back": "Said before eating"
+    },
+    {
+      "kind": "sentence",
+      "front": "ごちそうさまでした",
+      "back": "Said after eating"
+    },
+    {
+      "kind": "sentence",
+      "front": "いってきます",
+      "back": "I'm off"
+    },
+    {
+      "kind": "sentence",
+      "front": "ただいま",
+      "back": "I'm home"
+    },
+    {
+      "kind": "sentence",
+      "front": "おかえりなさい",
+      "back": "Welcome back"
+    },
+    {
+      "kind": "sentence",
+      "front": "お疲れさまでした",
+      "back": "Thanks for your work",
+      "reading": "おつかれさまでした"
+    }
+  ],
+  "Family: the two sets of words": [
+    {
+      "kind": "word",
+      "front": "母",
+      "back": "my mother",
+      "reading": "はは"
+    },
+    {
+      "kind": "word",
+      "front": "お母さん",
+      "back": "your mother",
+      "reading": "おかあさん"
+    },
+    {
+      "kind": "word",
+      "front": "父",
+      "back": "my father",
+      "reading": "ちち"
+    },
+    {
+      "kind": "word",
+      "front": "お父さん",
+      "back": "your father",
+      "reading": "おとうさん"
+    },
+    {
+      "kind": "word",
+      "front": "姉",
+      "back": "my older sister",
+      "reading": "あね"
+    },
+    {
+      "kind": "word",
+      "front": "お姉さん",
+      "back": "your older sister",
+      "reading": "おねえさん"
+    },
+    {
+      "kind": "word",
+      "front": "兄",
+      "back": "my older brother",
+      "reading": "あに"
+    },
+    {
+      "kind": "word",
+      "front": "お兄さん",
+      "back": "your older brother",
+      "reading": "おにいさん"
+    },
+    {
+      "kind": "word",
+      "front": "妹",
+      "back": "younger sister",
+      "reading": "いもうと"
+    },
+    {
+      "kind": "word",
+      "front": "弟",
+      "back": "younger brother",
+      "reading": "おとうと"
+    },
+    {
+      "kind": "word",
+      "front": "家族",
+      "back": "family",
+      "reading": "かぞく"
+    },
+    {
+      "kind": "word",
+      "front": "兄弟",
+      "back": "siblings",
+      "reading": "きょうだい"
+    }
   ]
 }

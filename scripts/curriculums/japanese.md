@@ -163,7 +163,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | # | Stage | Roughly |
 | --- | --- | --- |
 | 1 | The script and the sounds | **35 — written** |
-| 2 | First grammar, first words | 55 |
+| 2 | First grammar, first words | **55 — written** |
 | 3 | The core sentence | 60 |
 | 4 | Everyday Japanese | 70 |
 | 5 | Intermediate grammar | 90 |
@@ -173,7 +173,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | 9 | Native material | 50 |
 | 10 | Classical Japanese | 40 |
 | 11 | Ad astra | open |
-| — | Kanji track, interleaved | ~250 |
+| — | Kanji track, its own modules | ~250 (**40 written**) |
 
 **Roughly 850–900 lessons.** That is the honest size of zero to mastery when
 every lesson teaches its point.
