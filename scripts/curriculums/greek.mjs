@@ -1,223 +1,233 @@
-// Builds the Modern Greek curriculum from its own document.
+// Builds the Modern Greek curriculum.
 //
-// Source: Media/Courses/Languages/Greek/Greek-Language-Curriculum-2026-2029.md,
-// which carries a complete unit-by-unit page map for all three Basic Course
-// volumes — printed pages, PDF pages, and the topic of every unit. All of that
-// is transcribed here; none of it is invented.
+// Source: scripts/curriculums/greek.md, which is the plan and the argument.
+// The material is in greek-detail.json and the cards are in greek-cards.json,
+// for the reasons japanese.mjs gives: prose full of tables does not belong
+// inside a JS template literal, and cards are data rather than prose.
 //
-// TANDEM, ON HIS WORD, AND AGAINST THE DOCUMENT'S LETTER. It says "work
-// through the resources below in order" and never mentions concurrency —
-// unlike the Japanese path, which says explicitly that kana runs alongside.
-// Read strictly, that means 60 Pimsleur lessons, about thirty hours, before
-// Unit 1 introduces the alphabet. So Pimsleur sets the cadence and the Basic
-// Course runs alongside from session 1, which puts the writing system at the
-// start where it belongs.
+// A REWRITE, NOT A REVISION. The first Greek curriculum (2026-10-09) was 98
+// lessons transcribed off the FSI Basic Course and Pimsleur with no material
+// in the lessons at all, on migration 0007's rule that a transcribed
+// curriculum keeps its substance in its resource. That rule is overturned:
+// every lesson here teaches its point in full and then directs practice.
 //
-// The rate is set by what a unit actually is: a Pimsleur lesson is half an
-// hour of audio, a GBC unit is eight to twenty-five printed pages with drills.
-// So roughly three GBC units per five sessions rather than one each.
+// WHAT IT IS FOR, IN HIS WORDS: "liturgy and also the greek people at church".
+// The second half is Modern Greek. The first half is mostly NOT — the Divine
+// Liturgy is Koine and Byzantine Greek — and by his ruling that is a separate
+// curriculum later: classical Greek moving into theological and liturgical
+// Greek. So the learned register is deliberately skipped here, and greek.md
+// says so where a reader would otherwise think it an omission.
 //
-// NO DETAIL, DECIDED 2026-10-09 and not an omission. 0007_lesson_detail.sql
-// draws the line between a transcribed curriculum, whose substance is in the
-// resource, and a designed one, which has nowhere else to keep it. This is
-// transcribed: a session pointing at Pimsleur and the Basic Course does not
-// need the grammar restated beside it. Godot, Drawing, Aseprite and Piano
-// carry detail because they are designed; this, Japanese and Odin do not.
+// FSI IS DEMOTED, PIMSLEUR IS KEPT, both at his word. FSI is free, owned, and
+// from the 1960s — drachmas, the monarchy, katharevousa as a living register —
+// so it stays as drills and audio and stops being the spine. Language Transfer
+// plus the Centre for the Greek Language's free material is the spine instead.
 //
-// Prints SQL. Nothing is executed here.
+// SCRIPT FROM LESSON ONE, and handwriting taught. SPELLING IS DRILLED — "drills
+// bruh" — which is why orthography is a track rather than a remark.
+//
+// STANDARD AND CYPRIOT, his answer, so Cyprus gets a stage rather than a
+// footnote. VOCABULARY IS OPEN-ENDED: no target number, no core list.
+//
+// Prints SQL. Nothing is executed here — `npm run curriculum greek`.
 
-const SOURCE =
-  'Media/Courses/Languages/Greek/Greek-Language-Curriculum-2026-2029.md';
+import detail from './greek-detail.json' with { type: 'json' };
+import cards from './greek-cards.json' with { type: 'json' };
 
-/** Pimsleur level and lesson for a session. Two levels of thirty. */
-function pimsleur(session) {
-  return `Pimsleur ${session <= 30 ? 1 : 2}-${((session - 1) % 30) + 1}`;
-}
-
-// Volume 1, Units 1-25. Printed pages and focus, from the document's table.
-const VOL1 = [
-  [1, '1-12', 'writing system, vowels, consonants'],
-  [2, '13-20', 'copula, palatalisation, definite article'],
-  [3, '21-29', 'gender, agreement, articles'],
-  [4, '30-40', 'pronouns, verb classes, present, to be'],
-  [5, '41-65', 'accusative, stress, plurals, Class II · Review 1-5'],
-  [6, '66-80', 'future, perfective stems, subjunctive, time'],
-  [7, '81-96', 'genitive, noun and adjective declension'],
-  [8, '97-112', 'possessive, object and demonstrative pronouns'],
-  [9, '113-120', 'third-declension neuters'],
-  [10, '121-139', 'past tense, simple past · Review 6-10'],
-  [11, '140-150', 'continuous past, irregular pasts'],
-  [12, '151-160', 'vocative and imperatives'],
-  [13, '161-168', 'Class II present, future, subjunctive'],
-  [14, '169-180', 'declension, numerals, early formal cases'],
-  [15, '181-201', 'Class II perfective and past, irregulars · Review 11-15'],
-  [16, '202-211', 'adverbs, comparison, superlative, conditional'],
-  [17, '212-219', 'Class II imperative, declinable numerals'],
-  [18, '220-229', 'present perfect, prefixes, past augment'],
-  [19, '230-240', 'past perfect, Class III verbs'],
-  [20, '241-258', 'perfective stems, Class III past · Review 16-20'],
-  [21, '259-266', 'third-declension neuters, Class III imperative'],
-  [22, '267-273', 'adjectives, prohibitive imperative, existence'],
-  [23, '274-281', 'past participle, mixed conjugation'],
-  [24, '282-290', 'prefixes, present active participle'],
-  [25, '291-305', 'ordinals, telling time · Review 21-25'],
-];
-
-// Volume 2, Units 26-50. Topic and printed pages.
-const VOL2 = [
-  [26, '329-337', 'buying things'],
-  [27, '338-346', 'hotel reservations by phone'],
-  [28, '347-359', 'in the hotel'],
-  [29, '360-367', 'weather report'],
-  [30, '368-382', 'a party · Review 26-30'],
-  [31, '383-390', 'in a cafe'],
-  [32, '391-396', 'driving'],
-  [33, '397-406', 'driving, continued'],
-  [34, '407-414', 'in the harbour'],
-  [35, '415-429', 'at the airport · Review 31-35'],
-  [36, '430-436', 'at the consulate'],
-  [37, '437-439', 'applying for a visa'],
-  [38, '440-441', 'visa, continued'],
-  [39, '442-443', "in the Vice Consul's office"],
-  [40, '444-452', 'Greek islands · Review 36-40'],
-  [41, '453-457', 'in the courtroom'],
-  [42, '458-461', 'courtroom, continued'],
-  [43, '462-469', 'courtroom, continued'],
-  [44, '470-473', 'a political discussion'],
-  [45, '474-484', 'political discussion · Review 41-45'],
-  [46, '485-486', 'fine arts'],
-  [47, '487-488', 'fine arts, continued'],
-  [48, '489-490', 'fine arts, continued'],
-  [49, '491-495', 'fine arts, continued'],
-  [50, '496-505', 'the Greek theatre'],
-];
-
-// Volume 3, Units 51-75a. The register matters here: the document warns that
-// this volume predates the modern standard and that katharevousa and
-// monarchy-era material should be recognised rather than adopted, so every
-// lesson carries its register from the document's own column.
-const VOL3 = [
-  ['51', '529-544', 'Olympic Games', 'mixed'],
-  ['52', '545-551', 'the former Royal House', 'historical'],
-  ['53', '552-559', 'demotic songs', 'cultural'],
-  ['54', '560-567', 'tobacco in Greece', 'mixed'],
-  ['55', '568-586', 'modern and ancient Greeks', 'mixed'],
-  ['56', '587-594', 'music in Greece', 'mixed'],
-  ['57', '595-604', 'the Greek flag', 'mixed'],
-  ['58', '605-611', 'handicraft of Greek women', 'historical'],
-  ['59', '612-620', 'proclamation for 28 October 1940', 'historical'],
-  ['60', '621-627', 'Greek history', 'historical'],
-  ['61', '628-634', 'Naval Battle of Navarino', 'historical'],
-  ['62', '635-639', 'modern Greek literature', 'cultural'],
-  ['63', '640-642', 'literature, continued', 'cultural'],
-  ['64', '643-646', 'Greek diglossia', 'language history'],
-  ['65', '647-651', 'diglossia, continued', 'language history'],
-  ['66', '652-655', "Vlakhos's letter to Hitler", 'historical'],
-  ['67', '656-659', 'letter, continued', 'historical'],
-  ['68', '660-662', 'letter, continued', 'historical'],
-  ['69', '663-666', 'letter, continued', 'historical'],
-  ['70', '667-671', 'letter, continued', 'historical'],
-  ['71', '672-675', 'a newspaper article', 'mixed'],
-  ['72', '676-679', 'article, continued', 'mixed'],
-  ['73', '680-683', 'article, continued', 'mixed'],
-  ['74', '684-689', 'soccer in Greece', 'mixed'],
-  ['75', '690-696', 'television', 'mixed'],
-  ['75a', '697-710', 'Treaty of Lausanne', 'historical'],
-];
-
-const unit1 = ([n, pp, focus]) => `GBC1 U${n} · pp. ${pp} · ${focus}`;
-const unit2 = ([n, pp, focus]) => `GBC2 U${n} · pp. ${pp} · ${focus}`;
-const unit3 = ([n, pp, focus, reg]) => `GBC3 U${n} · pp. ${pp} · ${focus} (${reg})`;
-
-/** Place items evenly across a span of sessions, in order. */
-function place(into, items, from, to) {
-  const span = to - from + 1;
-  items.forEach((item, i) => {
-    const at = from + Math.floor((i * span) / items.length);
-    if (!into.has(at)) into.set(at, []);
-    into.get(at).push(item);
-  });
-}
-
-const parts = new Map();
-
-// Volume 1 alongside Pimsleur from session 1 — the whole point of going
-// tandem, since Unit 1 IS the alphabet.
-place(parts, VOL1.map(unit1), 1, 40);
-
-// Volume 2 begins once Volume 1 is through, and reaches Unit 38 inside the
-// sixty. The rest follows after, because a unit a session is faster than a
-// unit of this size is actually read.
-place(parts, VOL2.slice(0, 13).map(unit2), 41, 60);
-
-const STAGES = [
-  { name: 'Stage 1 · Sound and script', from: 1, to: 30 },
-  { name: 'Stage 2 · Grammar and situations', from: 31, to: 60 },
-];
-
-const modules = STAGES.map((stage) => ({
-  name: stage.name,
-  lessons: Array.from({ length: stage.to - stage.from + 1 }, (_, i) => {
-    const session = stage.from + i;
-    return [`${session} · ${pimsleur(session)}`, ...(parts.get(session) ?? [])].join(' · ');
-  }),
-}));
-
-// What does not fit inside the sixty: the back half of Volume 2, and the whole
-// of Volume 3 — which the document treats as a reading volume rather than a
-// spoken one, and warns is dated.
-modules.push({
-  name: 'Beyond the sixty · Volume 2, the rest',
-  lessons: VOL2.slice(13).map(unit2),
-});
-modules.push({
-  name: 'Volume 3 · Reading, formal and historical',
-  lessons: VOL3.map(unit3),
-});
+const SOURCE = 'scripts/curriculums/greek.md';
+const NAME = 'Greek';
 
 /** SQL single-quoted string. An apostrophe in a title ends the literal early. */
-const q = (value) => `'${String(value).replace(/'/g, "''")}'`;
+const q = (value) =>
+  value === null || value === undefined ? 'null' : `'${String(value).replace(/'/g, "''")}'`;
+
+const NOW = new Date().toISOString();
+const CURRICULUM = `(select id from curriculums where name = ${q(NAME)})`;
+/** The lesson just inserted. The other scripts use the same trick. */
+const LESSON = '(select max(id) from lessons)';
+
+/** Every key asked for, so a stray one in a data file can be found. */
+const askedDetail = new Set();
+const askedCards = new Set();
+
+function detailFor(name) {
+  askedDetail.add(name);
+  const text = detail[name];
+  if (text === undefined) {
+    // Loud rather than silent: a lesson renamed here and not in the data file
+    // would otherwise quietly lose its material.
+    missing.push(name);
+    return null;
+  }
+  return text;
+}
+
+/**
+ * A card's natural key, which is what the database matches on: curriculum,
+ * kind and front. Two lessons claiming the same one is a silent bug — the
+ * insert is `where not exists`, so the second claim does not fail, it just
+ * quietly re-points the card at the later lesson. Caught here instead.
+ */
+const claimed = new Map();
+const twiceClaimed = [];
+
+function cardsFor(name) {
+  askedCards.add(name);
+  const list = cards[name] ?? [];
+  for (const card of list) {
+    const key = `${card.kind}\u0000${card.front}`;
+    if (claimed.has(key)) twiceClaimed.push([card.front, claimed.get(key), name]);
+    else claimed.set(key, name);
+  }
+  return list;
+}
+
+const missing = [];
+
+/* The stages. A lesson is [name, sources?] — the material is looked up by
+ * name, and so are the cards. */
+const stages = [
+  {
+    name: 'Stage 1 · The alphabet, the sounds and the hand',
+    lessons: [
+    ['How this curriculum works'],
+    ['What this curriculum is for, and what it is not'],
+    ['The alphabet: twenty-four letters', [{ title: 'Portal for the Greek Language', url: 'https://www.greek-language.gr/greekLang/modern_greek/tools/', note: 'Triantafyllidis dictionary with full inflection tables, and the school grammars. Free.' }, { title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['Α α, Β β, Γ γ, Δ δ', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['Ε ε, Ζ ζ, Η η, Θ θ', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['Ι ι, Κ κ, Λ λ, Μ μ', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['Ν ν, Ξ ξ, Ο ο, Π π', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['Ρ ρ, Σ σ ς, Τ τ, Υ υ', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['Φ φ, Χ χ, Ψ ψ, Ω ω', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['The two sigmas, and the shapes that catch you out'],
+    ['The five vowel sounds, and the many ways to write them', [{ title: 'Portal for the Greek Language', url: 'https://www.greek-language.gr/greekLang/modern_greek/tools/', note: 'Triantafyllidis dictionary with full inflection tables, and the school grammars. Free.' }]],
+    ['The vowel digraphs: αι ει οι ου υι', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['αυ and ευ — where the υ turns into a consonant', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['The consonant digraphs: μπ ντ γκ γγ', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['τσ and τζ', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['γ before ε and ι, and the γι sound', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }, { title: 'Language Transfer — Complete Greek', url: 'https://www.languagetransfer.org/greek', note: '120 free audio lessons. The grammar by reasoning rather than drilling.' }]],
+    ['The stress accent: what it marks, and why it is compulsory', [{ title: 'Portal for the Greek Language', url: 'https://www.greek-language.gr/greekLang/modern_greek/tools/', note: 'Triantafyllidis dictionary with full inflection tables, and the school grammars. Free.' }]],
+    ['Where the stress falls: the last three syllables', [{ title: 'Portal for the Greek Language', url: 'https://www.greek-language.gr/greekLang/modern_greek/tools/', note: 'Triantafyllidis dictionary with full inflection tables, and the school grammars. Free.' }, { title: 'Interactive school books (ebooks.edu.gr)', url: 'http://ebooks.edu.gr/ebooks/', note: 'Every Greek state school textbook, free — including the official grammar and the readers.' }]],
+    ['Reading your first sentences aloud', [{ title: 'Pimsleur Modern Greek 1–2', note: 'Owned. 60 lessons, half an hour each. Answer out loud.' }, { title: 'Language Transfer — Complete Greek', url: 'https://www.languagetransfer.org/greek', note: '120 free audio lessons. The grammar by reasoning rather than drilling.' }]],
+    ['Handwriting: the lowercase letters', [{ title: 'Interactive school books (ebooks.edu.gr)', url: 'http://ebooks.edu.gr/ebooks/', note: 'Every Greek state school textbook, free — including the official grammar and the readers.' }]],
+    ['Handwriting: the capitals, and when Greek uses them', [{ title: 'Interactive school books (ebooks.edu.gr)', url: 'http://ebooks.edu.gr/ebooks/', note: 'Every Greek state school textbook, free — including the official grammar and the readers.' }]],
+    ['Typing Greek'],
+    ['Double consonants, and what they do not do', [{ title: 'Portal for the Greek Language', url: 'https://www.greek-language.gr/greekLang/modern_greek/tools/', note: 'Triantafyllidis dictionary with full inflection tables, and the school grammars. Free.' }]],
+    ['The sounds Greek has, and the ones it has not', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['Punctuation, and the question mark that is not a semicolon', [{ title: 'Interactive school books (ebooks.edu.gr)', url: 'http://ebooks.edu.gr/ebooks/', note: 'Every Greek state school textbook, free — including the official grammar and the readers.' }]],
+    ['Numbers 0 to 20', [{ title: 'Forvo — Greek', url: 'https://forvo.com/languages/el/', note: 'Native recordings of individual words, free.' }]],
+    ['Greek letters as numbers'],
+    ['Listening from day one', [{ title: 'Pimsleur Modern Greek 1–2', note: 'Owned. 60 lessons, half an hour each. Answer out loud.' }, { title: 'Language Transfer — Complete Greek', url: 'https://www.languagetransfer.org/greek', note: '120 free audio lessons. The grammar by reasoning rather than drilling.' }, { title: 'Easy Greek', url: 'https://www.easy-languages.org/easy-greek', note: 'Street interviews with Greek and English subtitles. Start with the Super Easy tier.' }, { title: 'Kypros.org — Learn Greek', url: 'http://www.kypros.org/', note: '105 free audio lessons, Cyprus-based.' }, { title: 'stixoi.info', url: 'https://www.stixoi.info/', note: 'The lyrics of essentially every Greek song.' }]],
+    ['Reading from day one: signs, labels and menus', [{ title: 'Interactive school books (ebooks.edu.gr)', url: 'http://ebooks.edu.gr/ebooks/', note: 'Every Greek state school textbook, free — including the official grammar and the readers.' }, { title: 'Portal for the Greek Language', url: 'https://www.greek-language.gr/greekLang/modern_greek/tools/', note: 'Triantafyllidis dictionary with full inflection tables, and the school grammars. Free.' }]],
+    ['Review: the script and the sounds'],
+    ],
+  },
+];
+
 
 const out = [
   '-- Generated by scripts/curriculums/greek.mjs. Read before running.',
-  '-- Apply it with `npm run curriculum greek`, which carries ticks and route',
-  '-- changes across the rebuild below. Running this file through wrangler by',
-  '-- hand discards every one of them.',
-  // Rebuildable without losing its place. The row is created only if it is
-  // not already there, and its modules are cleared instead — deleting the
-  // curriculum and reinserting it would take a new position at the end, and
-  // curriculum order IS the route through all the routes.
+  '-- Apply it with `npm run curriculum greek`, which carries ticks, detail',
+  '-- typed at the dashboard and every card\'s review history across the rebuild',
+  '-- below. Running this file through wrangler by hand discards them.',
+  // Rebuildable without losing its place: the row is created only if it is not
+  // already there, and its modules are cleared instead. Deleting the curriculum
+  // and reinserting it would take a new position at the end, and curriculum
+  // order IS the route through all the routes.
   `insert into curriculums (name, source, status, position, created_at)\n` +
-    `  select 'Greek', ${q(SOURCE)}, 'active',\n` +
-    `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())}\n` +
-    `  where not exists (select 1 from curriculums where name = 'Greek');`,
-  `update curriculums set source = ${q(SOURCE)} where name = 'Greek';`,
-  // Lessons first, then modules. ON DELETE CASCADE covers this wherever foreign
-  // keys are enforced — D1 enforces them — and silently does nothing where they
-  // are not, orphaning every lesson instead of removing it so that a rebuild
-  // quietly adds a second full set nobody can see, because every read joins
-  // through modules. Written out rather than relied upon.
+    `  select ${q(NAME)}, ${q(SOURCE)}, 'active',\n` +
+    `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(NOW)}\n` +
+    `  where not exists (select 1 from curriculums where name = ${q(NAME)});`,
+  `update curriculums set source = ${q(SOURCE)} where name = ${q(NAME)};`,
+
+  // Lesson-scoped sources are the script's own and go before the lessons do.
+  // ON DELETE CASCADE would cover it wherever foreign keys are enforced — D1
+  // enforces them, node:sqlite does not — so it is written out rather than
+  // relied upon. The curriculum's own list, where lesson_id is null, is NOT
+  // touched: nothing could regenerate it. See migration 0009.
+  `delete from sources where lesson_id is not null and curriculum_id = ${CURRICULUM};`,
+
+  // Lessons, then modules. Same reasoning.
   `delete from lessons where module_id in\n` +
-    `  (select id from modules where curriculum_id =\n` +
-    `     (select id from curriculums where name = 'Greek'));`,
-  `delete from modules where curriculum_id =\n` +
-    `  (select id from curriculums where name = 'Greek');`,
+    `  (select id from modules where curriculum_id = ${CURRICULUM});`,
+  `delete from modules where curriculum_id = ${CURRICULUM};`,
+  '',
+  '-- CARDS ARE NEVER DELETED HERE. A card carries months of review history and',
+  '-- no script can regenerate that, so the rebuild above sets lesson_id to null',
+  '-- (migration 0010) and each card is matched again below by its natural key:',
+  '-- curriculum, kind and front. Insert what is new, update what exists, and',
+  '-- leave every scheduling column alone.',
 ];
 
-modules.forEach((module, m) => {
+stages.forEach((stage, m) => {
   out.push(
+    '',
+    `-- ${stage.name}`,
     `insert into modules (curriculum_id, name, position)\n` +
-      `  values ((select id from curriculums where name = 'Greek'), ${q(module.name)}, ${m + 1});`,
+      `  values (${CURRICULUM}, ${q(stage.name)}, ${m + 1});`,
   );
-  module.lessons.forEach((lesson, l) => {
+
+  stage.lessons.forEach(([name, sources = []], l) => {
     out.push(
-      `insert into lessons (module_id, name, position, on_route)\n` +
-        `  values ((select max(id) from modules), ${q(lesson)}, ${l + 1}, 1);`,
+      `insert into lessons (module_id, name, position, on_route, detail)\n` +
+        `  values ((select max(id) from modules), ${q(name)}, ${l + 1}, 1, ${q(detailFor(name))});`,
     );
+
+    sources.forEach((source, s) => {
+      out.push(
+        `insert into sources (curriculum_id, lesson_id, title, url, note, position)\n` +
+          `  values (${CURRICULUM}, ${LESSON}, ${q(source.title)}, ${q(source.url ?? null)},` +
+          ` ${q(source.note ?? null)}, ${s + 1});`,
+      );
+    });
+
+    for (const card of cardsFor(name)) {
+      const identity =
+        `curriculum_id = ${CURRICULUM} and kind = ${q(card.kind)} and front = ${q(card.front)}`;
+      out.push(
+        `insert into cards (curriculum_id, lesson_id, kind, front, back, reading, extra,\n` +
+          `                   due, stability, difficulty, scheduled_days, learning_steps,\n` +
+          `                   reps, lapses, state, last_review, unlocked_on, created_at)\n` +
+          `  select ${CURRICULUM}, ${LESSON}, ${q(card.kind)}, ${q(card.front)}, ${q(card.back)},\n` +
+          `         ${q(card.reading ?? null)}, ${q(card.extra ?? null)}, ${q(NOW)},\n` +
+          `         0, 0, 0, 0, 0, 0, 0, null, null, ${q(NOW)}\n` +
+          `  where not exists (select 1 from cards where ${identity});`,
+        // Content and the lesson link are the script's; scheduling and
+        // unlocked_on are the dashboard's and are not named here.
+        `update cards set lesson_id = ${LESSON}, back = ${q(card.back)},\n` +
+          `       reading = ${q(card.reading ?? null)}, extra = ${q(card.extra ?? null)}\n` +
+          ` where ${identity};`,
+      );
+    }
   });
 });
 
+const strayDetail = Object.keys(detail).filter((key) => !askedDetail.has(key));
+const strayCards = Object.keys(cards).filter((key) => !askedCards.has(key));
+
+if (twiceClaimed.length) {
+  console.error(`\n${twiceClaimed.length} card(s) are claimed by two lessons:`);
+  for (const [front, first, second] of twiceClaimed) {
+    console.error(`  · ${front}  —  ${first}  and  ${second}`);
+  }
+  console.error('\nA card belongs to one lesson. Nothing printed.');
+  process.exit(1);
+}
+
+if (missing.length) {
+  console.error(`\nNo material for ${missing.length} lesson(s):`);
+  for (const name of missing) console.error(`  · ${name}`);
+  console.error('\nEvery lesson teaches its point in full. Nothing printed.');
+  process.exit(1);
+}
+for (const key of strayDetail) console.error(`! piano-detail.json has no lesson: ${key}`);
+for (const key of strayCards) console.error(`! piano-cards.json has no lesson: ${key}`);
+
 console.log(out.join('\n'));
-console.error(
-  `modules: ${modules.length}  lessons: ${modules.reduce((n, m) => n + m.lessons.length, 0)}`,
+
+const lessons = stages.reduce((n, s) => n + s.lessons.length, 0);
+const cardCount = stages.reduce(
+  (n, s) => n + s.lessons.reduce((k, [name]) => k + (cards[name]?.length ?? 0), 0),
+  0,
 );
+console.error(`modules: ${stages.length}  lessons: ${lessons}  cards: ${cardCount}`);

@@ -1,0 +1,614 @@
+{
+  "The alphabet: twenty-four letters": [
+    {
+      "kind": "word",
+      "front": "Α α",
+      "back": "álfa — says *a* as in father"
+    },
+    {
+      "kind": "word",
+      "front": "Β β",
+      "back": "víta — says **v**, never *b*"
+    },
+    {
+      "kind": "word",
+      "front": "Γ γ",
+      "back": "gáma — a soft voiced *gh*; a *y* sound before ε and ι"
+    },
+    {
+      "kind": "word",
+      "front": "Δ δ",
+      "back": "délta — says *th* as in **this**"
+    },
+    {
+      "kind": "word",
+      "front": "Ε ε",
+      "back": "épsilon — says *e* as in bet"
+    },
+    {
+      "kind": "word",
+      "front": "Ζ ζ",
+      "back": "zíta — says *z*"
+    },
+    {
+      "kind": "word",
+      "front": "Η η",
+      "back": "íta — says *ee*"
+    },
+    {
+      "kind": "word",
+      "front": "Θ θ",
+      "back": "thíta — says *th* as in **think**"
+    },
+    {
+      "kind": "word",
+      "front": "Ι ι",
+      "back": "ghióta — says *ee*. Never dotted."
+    },
+    {
+      "kind": "word",
+      "front": "Κ κ",
+      "back": "kápa — says *k*, with no puff of air"
+    },
+    {
+      "kind": "word",
+      "front": "Λ λ",
+      "back": "lámda — says a light *l*, never the dark English one"
+    },
+    {
+      "kind": "word",
+      "front": "Μ μ",
+      "back": "mi — says *m*"
+    },
+    {
+      "kind": "word",
+      "front": "Ν ν",
+      "back": "ni — says *n*. Looks like a Latin v."
+    },
+    {
+      "kind": "word",
+      "front": "Ξ ξ",
+      "back": "ksi — says *ks*"
+    },
+    {
+      "kind": "word",
+      "front": "Ο ο",
+      "back": "ómikron — says *o* as in lot"
+    },
+    {
+      "kind": "word",
+      "front": "Π π",
+      "back": "pi — says *p*, with no puff of air"
+    },
+    {
+      "kind": "word",
+      "front": "Ρ ρ",
+      "back": "ro — one tapped *r*, as in Spanish *pero*"
+    },
+    {
+      "kind": "word",
+      "front": "Σ σ ς",
+      "back": "sígma — says *s*; ς only at the end of a word"
+    },
+    {
+      "kind": "word",
+      "front": "Τ τ",
+      "back": "taf — says *t*, with no puff of air"
+    },
+    {
+      "kind": "word",
+      "front": "Υ υ",
+      "back": "ípsilon — says *ee*"
+    },
+    {
+      "kind": "word",
+      "front": "Φ φ",
+      "back": "fi — says *f*. English writes it *ph*."
+    },
+    {
+      "kind": "word",
+      "front": "Χ χ",
+      "back": "khi — the *ch* of Scottish *loch*; lighter before ε and ι"
+    },
+    {
+      "kind": "word",
+      "front": "Ψ ψ",
+      "back": "psi — says *ps*, including at the start of a word"
+    },
+    {
+      "kind": "word",
+      "front": "Ω ω",
+      "back": "ōméga — says *o* as in lot, exactly like ο"
+    }
+  ],
+  "The five vowel sounds, and the many ways to write them": [
+    {
+      "kind": "grammar",
+      "front": "The five Greek vowel sounds",
+      "back": "a, e, i, o, u — no length, no reduction, no glides"
+    },
+    {
+      "kind": "grammar",
+      "front": "Ways to write the *i* sound",
+      "back": "ι, η, υ, ει, οι, υι",
+      "extra": "Which one a word takes is a fact about that word."
+    },
+    {
+      "kind": "grammar",
+      "front": "Ways to write the *e* sound",
+      "back": "ε, αι"
+    },
+    {
+      "kind": "grammar",
+      "front": "Ways to write the *o* sound",
+      "back": "ο, ω"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to write the *u* sound",
+      "back": "ου — the only way. There is no single letter for it."
+    }
+  ],
+  "The vowel digraphs: αι ει οι ου υι": [
+    {
+      "kind": "grammar",
+      "front": "αι",
+      "back": "says *e* — **και** is *ke*, **παιδί** is *pedí*"
+    },
+    {
+      "kind": "grammar",
+      "front": "ει",
+      "back": "says *i* — **είμαι**, **γράφει**"
+    },
+    {
+      "kind": "grammar",
+      "front": "οι",
+      "back": "says *i* — **οικογένεια**, and the masculine plural ending"
+    },
+    {
+      "kind": "grammar",
+      "front": "ου",
+      "back": "says *u* — **μου**, **πού**"
+    },
+    {
+      "kind": "grammar",
+      "front": "How a digraph is broken into two syllables",
+      "back": "A diaeresis on the second letter (**Μάιος**, **παϊδάκια**) or the accent on the first",
+      "extra": "Unmarked, the pair is one sound."
+    },
+    {
+      "kind": "grammar",
+      "front": "Where the accent goes on a digraph",
+      "back": "On the second letter — **παίζω**, **είμαι**, **πού**"
+    }
+  ],
+  "αυ and ευ — where the υ turns into a consonant": [
+    {
+      "kind": "grammar",
+      "front": "αυ",
+      "back": "*af* before a voiceless consonant (**αυτός**), *av* before a vowel or voiced consonant (**αύριο**)"
+    },
+    {
+      "kind": "grammar",
+      "front": "ευ",
+      "back": "*ef* before a voiceless consonant (**ευχαριστώ**), *ev* otherwise (**Εύα**)"
+    },
+    {
+      "kind": "grammar",
+      "front": "The voiceless consonants",
+      "back": "κ π τ φ θ χ σ ξ ψ",
+      "extra": "Before any of these, the υ of αυ/ευ is *f*."
+    }
+  ],
+  "The consonant digraphs: μπ ντ γκ γγ": [
+    {
+      "kind": "grammar",
+      "front": "μπ",
+      "back": "*b* at the start of a word, *mb* inside it — **μπύρα**, **αμπέλι**"
+    },
+    {
+      "kind": "grammar",
+      "front": "ντ",
+      "back": "*d* at the start, *nd* inside — **ντομάτα**, **πέντε**"
+    },
+    {
+      "kind": "grammar",
+      "front": "γκ",
+      "back": "*g* at the start, *ng* inside — **γκολ**, **αγκαλιά**"
+    },
+    {
+      "kind": "grammar",
+      "front": "γγ",
+      "back": "*ng*, never at the start of a word — **άγγελος**"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Greek has no letter for b, d or g",
+      "back": "β δ γ softened to *v*, *th* and *gh* in antiquity, and the stops are written μπ, ντ, γκ instead"
+    }
+  ],
+  "τσ and τζ": [
+    {
+      "kind": "grammar",
+      "front": "τσ",
+      "back": "*ts*, one sound — **τσάι**, **κορίτσι**"
+    },
+    {
+      "kind": "grammar",
+      "front": "τζ",
+      "back": "*dz*, one sound — **τζάκι**, **τζατζίκι**"
+    }
+  ],
+  "γ before ε and ι, and the γι sound": [
+    {
+      "kind": "grammar",
+      "front": "γ before ε, ι, η, υ, αι, ει, οι",
+      "back": "A *y* sound, as in *yes* — **γεια σου** is *yá su*, **γυναίκα** is *yinéka*"
+    },
+    {
+      "kind": "grammar",
+      "front": "γι before a vowel",
+      "back": "One *y* glide — **γιατί** *yatí*, **γιαγιά** *yayá*"
+    }
+  ],
+  "The stress accent: what it marks, and why it is compulsory": [
+    {
+      "kind": "grammar",
+      "front": "What the Greek accent marks",
+      "back": "Which syllable is stressed — nothing else. One per word, compulsory from two syllables up."
+    },
+    {
+      "kind": "grammar",
+      "front": "πότε / ποτέ",
+      "back": "when? / never",
+      "extra": "The standard demonstration that the accent is load-bearing."
+    },
+    {
+      "kind": "grammar",
+      "front": "γέρος / γερός",
+      "back": "old man / strong, healthy"
+    },
+    {
+      "kind": "grammar",
+      "front": "μόνος / μονός",
+      "back": "alone / single, odd-numbered"
+    },
+    {
+      "kind": "grammar",
+      "front": "πού / που",
+      "back": "where? / that, who",
+      "extra": "One of the few accented monosyllables, kept to prevent confusion."
+    },
+    {
+      "kind": "grammar",
+      "front": "Accents on capitals",
+      "back": "All-capital text takes none; a single initial capital keeps its accent — **Άννα**, but **ΑΘΗΝΑ**"
+    }
+  ],
+  "Where the stress falls: the last three syllables": [
+    {
+      "kind": "grammar",
+      "front": "The rule of limitation",
+      "back": "The stress is always on one of the last three syllables — never the fourth from the end"
+    },
+    {
+      "kind": "grammar",
+      "front": "λήγουσα · παραλήγουσα · προπαραλήγουσα",
+      "back": "Last syllable · second from last · third from last"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why άνθρωπος becomes ανθρώπου",
+      "back": "The ending changed, so the stress moved forward to stay within the last three syllables"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why ο δάσκαλός μου has two accents",
+      "back": "The attached pronoun counts as a syllable, pushing the original stress out of the last three — so a second accent is added inside the limit"
+    }
+  ],
+  "Reading your first sentences aloud": [
+    {
+      "kind": "sentence",
+      "front": "Καλημέρα!",
+      "back": "Good morning"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλησπέρα!",
+      "back": "Good evening"
+    },
+    {
+      "kind": "sentence",
+      "front": "Γεια σου.",
+      "back": "Hi — to one person, familiar",
+      "extra": "Said *yá su*."
+    },
+    {
+      "kind": "sentence",
+      "front": "Γεια σας.",
+      "back": "Hello — polite, or to several people"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι κάνεις;",
+      "back": "How are you? — familiar",
+      "extra": "The ; is a question mark."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι κάνετε;",
+      "back": "How are you? — polite or plural"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλά, ευχαριστώ.",
+      "back": "Fine, thank you"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πώς σε λένε;",
+      "back": "What is your name?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Με λένε…",
+      "back": "My name is…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Χάρηκα.",
+      "back": "Pleased to meet you"
+    },
+    {
+      "kind": "grammar",
+      "front": "When to use the plural at church",
+      "back": "With anyone older, anyone just met, and the priest — γεια σας, τι κάνετε",
+      "extra": "Singular with friends."
+    }
+  ],
+  "Double consonants, and what they do not do": [
+    {
+      "kind": "grammar",
+      "front": "Double consonants in Standard Modern Greek",
+      "back": "Written double, pronounced single — **θάλασσα** is *thálasa*, **αλλά** is *alá*",
+      "extra": "Cypriot Greek does pronounce them double."
+    }
+  ],
+  "The sounds Greek has, and the ones it has not": [
+    {
+      "kind": "grammar",
+      "front": "Greek sounds English has not",
+      "back": "The soft *gh* of γ, the *loch* sound of χ, the single tapped ρ, and unaspirated κ π τ"
+    },
+    {
+      "kind": "grammar",
+      "front": "English sounds Greek has not",
+      "back": "*sh*, *ch*, *j*, the English *r*, the schwa, *w*, and long/short vowel pairs"
+    },
+    {
+      "kind": "grammar",
+      "front": "The biggest thing to unlearn",
+      "back": "Vowel reduction. Every Greek vowel is fully pronounced — **θάλασσα** has three identical *a* sounds."
+    }
+  ],
+  "Punctuation, and the question mark that is not a semicolon": [
+    {
+      "kind": "grammar",
+      "front": ";",
+      "back": "The Greek question mark — **Τι κάνεις;**"
+    },
+    {
+      "kind": "grammar",
+      "front": "·",
+      "back": "The Greek semicolon, written as a raised dot (άνω τελεία)"
+    },
+    {
+      "kind": "grammar",
+      "front": "« »",
+      "back": "Greek quotation marks (εισαγωγικά)"
+    },
+    {
+      "kind": "grammar",
+      "front": "What an apostrophe marks",
+      "back": "Elision — a dropped final vowel: **σ' αγαπώ** for σε αγαπώ, **απ' εδώ** for από εδώ"
+    },
+    {
+      "kind": "grammar",
+      "front": "Greek number punctuation",
+      "back": "Comma for the decimal point, full stop for thousands — **1.500,50**"
+    }
+  ],
+  "Numbers 0 to 20": [
+    {
+      "kind": "word",
+      "front": "μηδέν",
+      "back": "0"
+    },
+    {
+      "kind": "word",
+      "front": "ένα",
+      "back": "1",
+      "extra": "Also the word for *a*. Inflects: ένας / μία / ένα."
+    },
+    {
+      "kind": "word",
+      "front": "δύο",
+      "back": "2"
+    },
+    {
+      "kind": "word",
+      "front": "τρία",
+      "back": "3",
+      "extra": "Inflects: τρεις (m/f) / τρία (n)."
+    },
+    {
+      "kind": "word",
+      "front": "τέσσερα",
+      "back": "4",
+      "extra": "Inflects: τέσσερις (m/f) / τέσσερα (n)."
+    },
+    {
+      "kind": "word",
+      "front": "πέντε",
+      "back": "5"
+    },
+    {
+      "kind": "word",
+      "front": "έξι",
+      "back": "6"
+    },
+    {
+      "kind": "word",
+      "front": "εφτά",
+      "back": "7",
+      "extra": "Formal spelling επτά."
+    },
+    {
+      "kind": "word",
+      "front": "οχτώ",
+      "back": "8",
+      "extra": "Formal spelling οκτώ."
+    },
+    {
+      "kind": "word",
+      "front": "εννιά",
+      "back": "9",
+      "extra": "Formal spelling εννέα."
+    },
+    {
+      "kind": "word",
+      "front": "δέκα",
+      "back": "10"
+    },
+    {
+      "kind": "grammar",
+      "front": "How the teens are built",
+      "back": "δέκα + the digit, as one word — δεκατρία, δεκατέσσερα, δεκαπέντε"
+    },
+    {
+      "kind": "word",
+      "front": "έντεκα",
+      "back": "11"
+    },
+    {
+      "kind": "word",
+      "front": "δώδεκα",
+      "back": "12"
+    },
+    {
+      "kind": "word",
+      "front": "είκοσι",
+      "back": "20"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which Greek numbers inflect",
+      "back": "Only 1, 3 and 4 — ένας/μία/ένα, τρεις/τρία, τέσσερις/τέσσερα"
+    }
+  ],
+  "Greek letters as numbers": [
+    {
+      "kind": "grammar",
+      "front": "Α΄ Β΄ Γ΄ Δ΄ Ε΄",
+      "back": "1 2 3 4 5 — the κεραία after the letter says it is a number"
+    },
+    {
+      "kind": "grammar",
+      "front": "ΣΤ΄",
+      "back": "6 — the old letter stigma's place, written ΣΤ in modern Greek"
+    },
+    {
+      "kind": "grammar",
+      "front": "Ι΄ Κ΄ Λ΄",
+      "back": "10 20 30 — the tens run from Ι"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where Greek numerals are used",
+      "back": "Church books, icon and monument inscriptions, school years, numbered rulers and outlines — never prices or phone numbers"
+    }
+  ],
+  "Handwriting: the capitals, and when Greek uses them": [
+    {
+      "kind": "grammar",
+      "front": "ΙΣ ΧΣ",
+      "back": "Ἰησοῦς Χριστός — Jesus Christ, on icons"
+    },
+    {
+      "kind": "grammar",
+      "front": "ΜΡ ΘΥ",
+      "back": "Μήτηρ Θεοῦ — Mother of God"
+    },
+    {
+      "kind": "grammar",
+      "front": "Ο ΩΝ",
+      "back": "\"The One who is\" — in Christ's halo"
+    },
+    {
+      "kind": "grammar",
+      "front": "What Greek does not capitalise",
+      "back": "εγώ (I), days and months in running text, and adjectives of nationality — **Έλληνας** but **ελληνικά**"
+    }
+  ],
+  "Typing Greek": [
+    {
+      "kind": "grammar",
+      "front": "The five non-phonetic Greek keyboard keys",
+      "back": "u → θ · c → ψ · v → ω · j → ξ · w → ς"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to type a Greek accent",
+      "back": "The ; key, then the vowel — ; then a gives ά",
+      "extra": "Shift-; then the vowel gives a diaeresis."
+    }
+  ],
+  "Reading from day one: signs, labels and menus": [
+    {
+      "kind": "word",
+      "front": "ΦΑΡΜΑΚΕΙΟ",
+      "back": "pharmacy"
+    },
+    {
+      "kind": "word",
+      "front": "ΑΡΤΟΠΟΙΕΙΟ",
+      "back": "bakery — *bread-making place*"
+    },
+    {
+      "kind": "word",
+      "front": "ΤΡΑΠΕΖΑ",
+      "back": "bank"
+    },
+    {
+      "kind": "word",
+      "front": "ΕΞΟΔΟΣ",
+      "back": "exit"
+    },
+    {
+      "kind": "word",
+      "front": "ΕΙΣΟΔΟΣ",
+      "back": "entrance"
+    },
+    {
+      "kind": "word",
+      "front": "ΑΝΟΙΧΤΑ / ΚΛΕΙΣΤΑ",
+      "back": "open / closed"
+    },
+    {
+      "kind": "word",
+      "front": "ΤΑΜΕΙΟ",
+      "back": "cash desk"
+    },
+    {
+      "kind": "word",
+      "front": "ΠΡΟΣΟΧΗ",
+      "back": "caution"
+    },
+    {
+      "kind": "grammar",
+      "front": "The -είο ending",
+      "back": "\"Place where\" — αρτοποιείο, κρεοπωλείο, βιβλιοπωλείο, ξενοδοχείο, νοσοκομείο"
+    }
+  ]
+}
