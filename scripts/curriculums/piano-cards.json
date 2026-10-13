@@ -1860,5 +1860,218 @@
       "back": "A transcription reproduces the recording; an arrangement is a piano piece made from the song",
       "extra": "Prefer a good arrangement — what works for a band often does not work for two hands."
     }
+  ],
+  "What playing by ear is": [
+    {
+      "kind": "grammar",
+      "front": "What playing by ear is made of",
+      "back": "Hearing pitch relationships, hearing harmony, knowing the keyboard, and knowing the patterns",
+      "extra": "Only the first is ear training in the narrow sense."
+    }
+  ],
+  "Hearing intervals": [
+    {
+      "kind": "grammar",
+      "front": "Minor 3rd — anchor tune",
+      "back": "Greensleeves"
+    },
+    {
+      "kind": "grammar",
+      "front": "Major 3rd — anchor tune",
+      "back": "When the Saints"
+    },
+    {
+      "kind": "grammar",
+      "front": "Perfect 4th — anchor tune",
+      "back": "Here Comes the Bride"
+    },
+    {
+      "kind": "grammar",
+      "front": "Perfect 5th — anchor tune",
+      "back": "Twinkle Twinkle"
+    },
+    {
+      "kind": "grammar",
+      "front": "Major 6th — anchor tune",
+      "back": "My Bonnie Lies Over the Ocean"
+    },
+    {
+      "kind": "grammar",
+      "front": "Minor 7th — anchor tune",
+      "back": "Star Trek theme"
+    },
+    {
+      "kind": "grammar",
+      "front": "Octave — anchor tune",
+      "back": "Somewhere Over the Rainbow"
+    }
+  ],
+  "Hearing by function": [
+    {
+      "kind": "grammar",
+      "front": "Degree 3, by ear",
+      "back": "The bright one — the note that says major"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 4, by ear",
+      "back": "Leaning, slightly uncomfortable — wants to fall to 3"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 6, by ear",
+      "back": "Soft, wistful"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 7, by ear",
+      "back": "Tense, pulling hard up to the tonic"
+    },
+    {
+      "kind": "grammar",
+      "front": "The order to learn the degrees by ear",
+      "back": "1, 5, 3 — then 2 and 7 — then 4 and 6"
+    }
+  ],
+  "Finding the key of a recording": [
+    {
+      "kind": "grammar",
+      "front": "How to find a recording's key",
+      "back": "Hum the note the music ends on, find it at the piano, then test the major third against the minor third"
+    }
+  ],
+  "Working out the chords": [
+    {
+      "kind": "grammar",
+      "front": "Why knowing the root usually settles the chord",
+      "back": "A major key's chords have fixed qualities — 1, 4 and 5 major, 2, 3 and 6 minor",
+      "extra": "So the bass line plus the key gives you the harmony."
+    }
+  ],
+  "Learning a song from a recording": [
+    {
+      "kind": "grammar",
+      "front": "The order to work a song out in",
+      "back": "Structure first, chords second, melody third",
+      "extra": "The reverse is how people get stuck."
+    }
+  ],
+  "Faking a song you half-know": [
+    {
+      "kind": "grammar",
+      "front": "The two rules of faking a song",
+      "back": "Never stop, and commit",
+      "extra": "A wrong chord in time is barely noticed; a pause is obvious."
+    }
+  ],
+  "Perfect pitch, relative pitch, and what is trainable": [
+    {
+      "kind": "grammar",
+      "front": "Perfect pitch versus relative pitch",
+      "back": "Absolute pitch names a note with no reference and is largely acquired before age six. Relative pitch hears relationships, is what musicianship runs on, and is trainable at any age."
+    }
+  ],
+  "Listening to your own playing": [
+    {
+      "kind": "grammar",
+      "front": "How to hear your own playing accurately",
+      "back": "Eyes shut, one named fault per run, slower than you can, very quietly, and counting aloud"
+    }
+  ],
+  "Motif, and how an idea is developed": [
+    {
+      "kind": "grammar",
+      "front": "Sequence",
+      "back": "The motif repeated a step or a third higher or lower",
+      "extra": "Three statements, then break the pattern — two sounds accidental, four mechanical."
+    },
+    {
+      "kind": "grammar",
+      "front": "Inversion (of a motif)",
+      "back": "Upside down — where it rose, it falls"
+    },
+    {
+      "kind": "grammar",
+      "front": "Augmentation and diminution",
+      "back": "The same idea in longer notes, or in shorter ones"
+    },
+    {
+      "kind": "grammar",
+      "front": "Fragmentation",
+      "back": "Part of the motif, repeated — the standard way of building tension into a climax"
+    }
+  ],
+  "Phrase and form": [
+    {
+      "kind": "grammar",
+      "front": "Period",
+      "back": "Two phrases: the first ending unresolved, the second resolving. Eight bars, one complete thought."
+    },
+    {
+      "kind": "grammar",
+      "front": "Binary and ternary form",
+      "back": "AB, often both repeated — and ABA, where the return is usually altered"
+    },
+    {
+      "kind": "grammar",
+      "front": "Rounded binary",
+      "back": "AABA′ — folk tunes, standards, and a great many pop songs"
+    }
+  ],
+  "Modes and scales as colour": [
+    {
+      "kind": "grammar",
+      "front": "Dorian",
+      "back": "Minor with a raised 6th — D to D on white keys. Minor but hopeful; folk and game music."
+    },
+    {
+      "kind": "grammar",
+      "front": "Phrygian",
+      "back": "Minor with a flattened 2nd — E to E. Spanish, dark."
+    },
+    {
+      "kind": "grammar",
+      "front": "Lydian",
+      "back": "Major with a raised 4th — F to F. Floating, wondrous."
+    },
+    {
+      "kind": "grammar",
+      "front": "Mixolydian",
+      "back": "Major with a flattened 7th — G to G. Folk, rock, anything with ♭VII."
+    },
+    {
+      "kind": "grammar",
+      "front": "How to keep a mode sounding modal",
+      "back": "Use the characteristic note prominently and avoid the dominant cadence",
+      "extra": "V–i pulls the ear straight back to major-minor."
+    }
+  ],
+  "Rhythm, groove and metre": [
+    {
+      "kind": "grammar",
+      "front": "6/8",
+      "back": "Two big beats, each split in three — rolling, pastoral",
+      "extra": "The metre most beginners never write in."
+    },
+    {
+      "kind": "word",
+      "front": "Anacrusis, in writing",
+      "back": "Starting the melody before the bar line, which gives a phrase a push"
+    }
+  ],
+  "Variations": [
+    {
+      "kind": "grammar",
+      "front": "The variation types",
+      "back": "Rhythmic, decorated, textural, register, modal, harmonic, faster or slower, fragmented"
+    }
+  ],
+  "When a piece of yours is finished": [
+    {
+      "kind": "grammar",
+      "front": "When a composition is finished",
+      "back": "It has a form you can name, a prepared ending, a notated version, one revision after a week away, nothing kept only because you wrote it, and you can play it comfortably",
+      "extra": "Whether it is good is deliberately not on the list."
+    }
   ]
 }

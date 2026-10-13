@@ -128,8 +128,8 @@ where instinct will not.
 | 6 | Technique and the pedal | 25 | 28 |
 | 7 | Harmony in practice | 25 | 26 |
 | 8 | Intermediate repertoire | 25 | 26 |
-| 9 | Playing by ear | 20 | — |
-| 10 | Writing your own | 20 | — |
+| 9 | Playing by ear | 20 | 21 |
+| 10 | Writing your own | 20 | 20 |
 | 11 | Ad astra | open | — |
 | — | Theory track, its own modules | ~40 | — |
 
