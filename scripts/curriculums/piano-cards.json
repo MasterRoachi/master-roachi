@@ -2073,5 +2073,515 @@
       "back": "It has a form you can name, a prepared ending, a notated version, one revision after a week away, nothing kept only because you wrote it, and you can play it comfortably",
       "extra": "Whether it is good is deliberately not on the list."
     }
+  ],
+  "Keeping the instrument": [
+    {
+      "kind": "grammar",
+      "front": "Tuning, regulation and voicing",
+      "back": "Tuning sets the pitch · regulation adjusts the action so it plays evenly · voicing reshapes the hammer felts to change the tone",
+      "extra": "On a century-old upright, regulation often does more for the playing than tuning does."
+    }
+  ],
+  "When to stop, and how to come back": [
+    {
+      "kind": "grammar",
+      "front": "What time away from the piano costs",
+      "back": "A week: nothing · a month: a fortnight of recovery · six months: the repertoire lapses but the knowledge does not",
+      "extra": "Reading, harmony, the ear and the method are knowledge rather than conditioning."
+    },
+    {
+      "kind": "grammar",
+      "front": "How to come back after a long gap",
+      "back": "Easy old pieces, slowly, in short sessions with the tension checks running — then sight-reading, then one piece you want",
+      "extra": "Never start with the hardest thing you could play before."
+    }
+  ],
+  "The stave and the clefs": [
+    {
+      "kind": "grammar",
+      "front": "Alto clef",
+      "back": "A C clef with middle C on the middle line — the viola's clef"
+    },
+    {
+      "kind": "grammar",
+      "front": "Tenor clef",
+      "back": "A C clef with middle C on the fourth line up — upper registers of cello, bassoon and trombone"
+    },
+    {
+      "kind": "grammar",
+      "front": "Treble clef with a small 8 below",
+      "back": "Sound an octave lower than written — tenor voice and guitar"
+    }
+  ],
+  "Note values and beaming": [
+    {
+      "kind": "grammar",
+      "front": "The beaming rule",
+      "back": "Beam within the beat, not across it",
+      "extra": "Which is why six quavers beam as three pairs in 4/4 and as two threes in 6/8."
+    },
+    {
+      "kind": "grammar",
+      "front": "Double dot",
+      "back": "Adds half the note's value, then half again — a double-dotted crotchet is one and three quarters"
+    }
+  ],
+  "Simple and compound metre": [
+    {
+      "kind": "grammar",
+      "front": "Simple and compound metre",
+      "back": "Simple: each beat divides into two. Compound: each beat divides into three."
+    },
+    {
+      "kind": "grammar",
+      "front": "What the top number means in compound metre",
+      "back": "The number of divisions, not beats — 6/8 is two dotted-crotchet beats",
+      "extra": "The commonest misreading in notation."
+    },
+    {
+      "kind": "grammar",
+      "front": "4/4 accent pattern",
+      "back": "Strong, weak, medium, weak"
+    },
+    {
+      "kind": "grammar",
+      "front": "The ¢ sign",
+      "back": "2/2 — alla breve, two minim beats",
+      "extra": "The C sign means 4/4. Neither abbreviates an English word."
+    }
+  ],
+  "Irregular metres and tuplets": [
+    {
+      "kind": "grammar",
+      "front": "How 7/8 is grouped",
+      "back": "2+2+3, 3+2+2 or 2+3+2 — the beaming says which"
+    },
+    {
+      "kind": "grammar",
+      "front": "Duplet",
+      "back": "Two notes in the time of three — a compound-metre tuplet"
+    },
+    {
+      "kind": "grammar",
+      "front": "Three against two, counted",
+      "back": "\"Nice cup of tea\" — the words land on the right notes"
+    }
+  ],
+  "Rests, and how silence is written": [
+    {
+      "kind": "grammar",
+      "front": "Whole rest or half rest",
+      "back": "The whole rest hangs below the fourth line; the half rest sits on the third"
+    },
+    {
+      "kind": "grammar",
+      "front": "A whole-bar rest",
+      "back": "Written as a semibreve rest whatever the time signature"
+    },
+    {
+      "kind": "word",
+      "front": "Caesura",
+      "back": "Two slanted lines — a break in the sound, taking time from outside the beat"
+    },
+    {
+      "kind": "grammar",
+      "front": "Tie or slur",
+      "back": "Same pitch: a tie, adding the durations. Different pitches: a slur, meaning legato."
+    }
+  ],
+  "Expression marks, and the terms": [
+    {
+      "kind": "word",
+      "front": "langsam",
+      "back": "German: slow"
+    },
+    {
+      "kind": "word",
+      "front": "lebhaft",
+      "back": "German: lively"
+    },
+    {
+      "kind": "word",
+      "front": "zart",
+      "back": "German: tender"
+    },
+    {
+      "kind": "word",
+      "front": "cédez",
+      "back": "French: yield, slow down"
+    },
+    {
+      "kind": "word",
+      "front": "en dehors",
+      "back": "French: bring out, to the fore"
+    },
+    {
+      "kind": "word",
+      "front": "non troppo",
+      "back": "Not too much"
+    },
+    {
+      "kind": "word",
+      "front": "morendo",
+      "back": "Dying away"
+    },
+    {
+      "kind": "word",
+      "front": "attacca",
+      "back": "Go straight on to the next movement, without a break"
+    }
+  ],
+  "Reading a printed edition": [
+    {
+      "kind": "grammar",
+      "front": "Square brackets in a score",
+      "back": "An editorial addition, not the composer's",
+      "extra": "Dashed slurs mean the same thing."
+    },
+    {
+      "kind": "word",
+      "front": "Ossia",
+      "back": "An alternative passage printed on a small stave, usually easier"
+    }
+  ],
+  "Intervals, properly": [
+    {
+      "kind": "grammar",
+      "front": "Which intervals can be perfect",
+      "back": "The unison, fourth, fifth and octave",
+      "extra": "Seconds, thirds, sixths and sevenths are major or minor instead."
+    },
+    {
+      "kind": "grammar",
+      "front": "How to name an interval",
+      "back": "Count letter names for the number, then compare with the major scale of the lower note for the quality"
+    },
+    {
+      "kind": "grammar",
+      "front": "Augmented fourth or diminished fifth",
+      "back": "Both are six semitones. The augmented fourth resolves outward; the diminished fifth inward."
+    }
+  ],
+  "Inversion and compound intervals": [
+    {
+      "kind": "grammar",
+      "front": "The interval inversion rule",
+      "back": "The numbers add to nine and the quality flips — perfect stays perfect"
+    },
+    {
+      "kind": "grammar",
+      "front": "Compound intervals",
+      "back": "Larger than an octave: subtract seven for the simple equivalent",
+      "extra": "A major tenth is a major third plus an octave."
+    }
+  ],
+  "All twelve major keys": [
+    {
+      "kind": "grammar",
+      "front": "How many key signatures there are",
+      "back": "Fifteen, for twelve keys — B/C♭, F♯/G♭ and C♯/D♭ are enharmonic pairs"
+    }
+  ],
+  "The three minors, written": [
+    {
+      "kind": "grammar",
+      "front": "What a minor key signature describes",
+      "back": "The natural minor only — the relative major's signature",
+      "extra": "So harmonic and melodic minors need accidentals written in the music."
+    }
+  ],
+  "Other scales": [
+    {
+      "kind": "grammar",
+      "front": "Octatonic (diminished) scale",
+      "back": "Alternating tone and semitone, eight notes — and only three exist"
+    },
+    {
+      "kind": "grammar",
+      "front": "The yo scale",
+      "back": "Japanese pentatonic, 1 2 4 5 6 — bright; folk song and much anime melody"
+    },
+    {
+      "kind": "grammar",
+      "front": "The in scale",
+      "back": "Japanese pentatonic, 1 ♭2 4 5 ♭6 — darker, with semitones. Also miyako-bushi."
+    },
+    {
+      "kind": "grammar",
+      "front": "Locrian",
+      "back": "Flattened 2nd and 5th — B to B on white keys. Unusable in practice."
+    }
+  ],
+  "Writing a scale, and why spelling matters": [
+    {
+      "kind": "grammar",
+      "front": "The one-letter rule",
+      "back": "A seven-note scale uses each letter name once, with whatever accidentals that needs",
+      "extra": "Which is why double sharps and double flats exist."
+    }
+  ],
+  "Seventh chords and figures": [
+    {
+      "kind": "grammar",
+      "front": "Seventh chord inversion figures",
+      "back": "Root 7 · first 6/5 · second 4/3 · third 4/2",
+      "extra": "All of them intervals above the bass."
+    },
+    {
+      "kind": "grammar",
+      "front": "How a seventh resolves",
+      "back": "Downwards by step",
+      "extra": "Which is why V⁴₂ goes to I⁶ rather than to root-position I."
+    }
+  ],
+  "Figured bass": [
+    {
+      "kind": "grammar",
+      "front": "Figured bass: no figure",
+      "back": "A root-position triad on that bass note"
+    },
+    {
+      "kind": "grammar",
+      "front": "Figured bass: an accidental alone",
+      "back": "Applies to the third above the bass"
+    },
+    {
+      "kind": "grammar",
+      "front": "Figured bass: 4–3 or 7–6",
+      "back": "A suspension: play the first interval, then resolve to the second"
+    }
+  ],
+  "Roman numeral analysis": [
+    {
+      "kind": "grammar",
+      "front": "Applied chord notation",
+      "back": "V/V — \"five of five\", the dominant of the dominant",
+      "extra": "The chord after it is usually the one named after the slash."
+    },
+    {
+      "kind": "grammar",
+      "front": "Tonicisation or modulation",
+      "back": "A secondary dominant and its target tonicises briefly; a new key confirmed by its own cadence is a modulation"
+    }
+  ],
+  "Non-chord tones": [
+    {
+      "kind": "word",
+      "front": "Suspension (non-chord tone)",
+      "back": "Held over from the previous chord, dissonant on the strong beat, resolving down by step"
+    },
+    {
+      "kind": "word",
+      "front": "Retardation",
+      "back": "Like a suspension, but resolving upwards by step"
+    },
+    {
+      "kind": "word",
+      "front": "Escape tone",
+      "back": "Approached by step, left by a leap in the opposite direction"
+    },
+    {
+      "kind": "word",
+      "front": "Anticipation",
+      "back": "The next chord's note, arriving early"
+    },
+    {
+      "kind": "word",
+      "front": "Passing and neighbour tones",
+      "back": "Both approached by step — the passing tone continues, the neighbour returns"
+    }
+  ],
+  "Cadences in detail": [
+    {
+      "kind": "grammar",
+      "front": "Perfect authentic or imperfect authentic",
+      "back": "PAC: V–I, both root position, tonic in the top voice. IAC: V–I with an inversion, or without the tonic on top."
+    },
+    {
+      "kind": "grammar",
+      "front": "Phrygian half cadence",
+      "back": "iv⁶ to V in a minor key, the bass falling by semitone"
+    },
+    {
+      "kind": "grammar",
+      "front": "Cadential I⁶₄",
+      "back": "I⁶₄–V–I — the second inversion tonic delaying the dominant. The standard Classical cadence formula."
+    }
+  ],
+  "The chromatic chords, catalogued": [
+    {
+      "kind": "grammar",
+      "front": "The three augmented sixths",
+      "back": "Italian A♭ C F♯ · French A♭ C D F♯ · German A♭ C E♭ F♯ (in C minor)",
+      "extra": "The German one is spelled like a dominant seventh, which is the enharmonic pivot."
+    },
+    {
+      "kind": "grammar",
+      "front": "Chromatic mediants",
+      "back": "Chords a third away with an altered quality — in C: E, A♭, E♭ major",
+      "extra": "No functional relationship. The cinematic lift."
+    }
+  ],
+  "Four-part writing: the frame": [
+    {
+      "kind": "grammar",
+      "front": "Four-part doubling",
+      "back": "Root position: double the root · first inversion: root or fifth · second inversion: the fifth · never the leading note"
+    },
+    {
+      "kind": "grammar",
+      "front": "Four-part spacing",
+      "back": "No more than an octave between adjacent upper voices; the tenor-bass gap may be wider"
+    }
+  ],
+  "The motions, and the forbidden parallels": [
+    {
+      "kind": "grammar",
+      "front": "The four motions",
+      "back": "Parallel, similar, contrary, oblique"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why parallel fifths and octaves are avoided",
+      "back": "The two voices fuse into one sound, which defeats a four-voice texture",
+      "extra": "A style rule, not a law — Debussy and rock music use them deliberately."
+    }
+  ],
+  "Species counterpoint": [
+    {
+      "kind": "grammar",
+      "front": "The five species",
+      "back": "1: note against note · 2: two against one · 3: four against one · 4: suspensions · 5: florid"
+    }
+  ],
+  "Imitation, canon and fugue": [
+    {
+      "kind": "grammar",
+      "front": "Canon",
+      "back": "Strict imitation maintained throughout — the second voice follows the first for the whole piece"
+    },
+    {
+      "kind": "word",
+      "front": "Stretto",
+      "back": "Fugal entries overlapping more closely than before"
+    },
+    {
+      "kind": "word",
+      "front": "Invertible counterpoint",
+      "back": "Two lines written so that either can be on top"
+    },
+    {
+      "kind": "grammar",
+      "front": "A fugue's parts",
+      "back": "Subject, answer a fifth higher, exposition, episodes, middle entries in other keys, often a stretto and a dominant pedal, then a final statement"
+    }
+  ],
+  "Phrase structure, named": [
+    {
+      "kind": "grammar",
+      "front": "Period or sentence",
+      "back": "A period is two phrases, the first ending weakly. A sentence is a two-bar idea stated and repeated, then a continuation and cadence."
+    },
+    {
+      "kind": "word",
+      "front": "Elision",
+      "back": "One phrase's last bar also being the next phrase's first — which is why bar counts sometimes refuse to add up"
+    }
+  ],
+  "The standard forms": [
+    {
+      "kind": "grammar",
+      "front": "Rondo form",
+      "back": "ABACA — a recurring refrain with contrasting episodes"
+    },
+    {
+      "kind": "grammar",
+      "front": "The Baroque sonata cycle",
+      "back": "Fast, slow, dance, fast",
+      "extra": "A suite is a set of dances in one key instead."
+    }
+  ],
+  "Score reading": [
+    {
+      "kind": "grammar",
+      "front": "Order of instruments in a score",
+      "back": "Woodwind, brass, percussion, soloists or voices, then strings — highest first within each family"
+    }
+  ],
+  "Transposing instruments": [
+    {
+      "kind": "grammar",
+      "front": "Clarinet or trumpet in B♭",
+      "back": "Sounds a major second below the written note"
+    },
+    {
+      "kind": "grammar",
+      "front": "Horn in F",
+      "back": "Sounds a perfect fifth below the written note"
+    },
+    {
+      "kind": "grammar",
+      "front": "Alto saxophone in E♭",
+      "back": "Sounds a major sixth below the written note"
+    }
+  ],
+  "Reducing a score to two hands": [
+    {
+      "kind": "grammar",
+      "front": "What to keep when reducing a score",
+      "back": "The bass line first, then the melody wherever it is, then compact harmony — and leave out the octave doublings"
+    }
+  ],
+  "The overtone series": [
+    {
+      "kind": "grammar",
+      "front": "The first six partials",
+      "back": "C, C, G, C, E, G — an octave, a fifth, an octave, a major third, a fifth",
+      "extra": "Partials 4, 5 and 6 are a major triad. The chord is in the physics."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why consonance follows ratios",
+      "back": "Octave 2:1, fifth 3:2, fourth 4:3, major third 5:4 — simpler ratios share more partials"
+    },
+    {
+      "kind": "grammar",
+      "front": "The seventh and eleventh partials",
+      "back": "They fall between the keys of our scale — noticeably flat of B♭ and between F and F♯"
+    }
+  ],
+  "Temperament and tuning": [
+    {
+      "kind": "grammar",
+      "front": "The Pythagorean comma",
+      "back": "Twelve pure fifths overshoot seven octaves by about a quarter of a semitone — which is why every tuning is a compromise"
+    },
+    {
+      "kind": "grammar",
+      "front": "Equal temperament",
+      "back": "Twelve exactly equal semitones: every key equally usable and equally slightly impure",
+      "extra": "Fifths very slightly narrow, major thirds noticeably wide of pure."
+    },
+    {
+      "kind": "grammar",
+      "front": "Meantone and well temperament",
+      "back": "Meantone narrows the fifths for good thirds and leaves a wolf interval. A well temperament spreads the error so every key works, with the common keys better."
+    },
+    {
+      "kind": "grammar",
+      "front": "What The Well-Tempered Clavier claims",
+      "back": "That a well-tempered instrument can play in all twenty-four keys",
+      "extra": "Well temperament rather than equal, as far as the scholarship goes."
+    },
+    {
+      "kind": "grammar",
+      "front": "Stretch tuning",
+      "back": "Tuners deliberately tune the extremes slightly wide, because piano strings' overtones are not perfectly harmonic"
+    },
+    {
+      "kind": "grammar",
+      "front": "A440 and Baroque pitch",
+      "back": "Modern standard pitch is A440; Baroque pitch was commonly around A415, about a semitone lower"
+    }
   ]
 }

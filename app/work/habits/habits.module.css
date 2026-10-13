@@ -215,8 +215,7 @@
 
 /* --- the icon picker ---------------------------------------------------- */
 
-.picker,
-.iconChoice {
+.picker {
   display: flex;
   flex-wrap: wrap;
   gap: 0.2rem;
@@ -240,13 +239,6 @@
   background: var(--bg);
   border: 1px solid var(--line-bright);
   border-radius: 8px;
-}
-
-/* In the add form it lays out across the full width, where there is room for
-   it, instead of being a column of nine rows. */
-.iconChoice {
-  max-width: 100%;
-  margin-bottom: 0.6rem;
 }
 
 .pick,
@@ -417,61 +409,166 @@
   font-weight: 600;
 }
 
-.add {
-  margin: 1.25rem 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid var(--line);
+/* The add card.
+ *
+ * Its own section above every year, because a habit is not a fact about 2026
+ * and the form has no business inside one. Shut by default: adding is rare
+ * next to ticking, so it is a round + that opens a card rather than a panel
+ * standing open under a grid read every morning.
+ *
+ * THE GRID SETS THE WIDTH. Thirty-six icons is exactly six by six, and the
+ * name/frequency row above is sized from the same --cell and --gap so the two
+ * line up edge to edge instead of being two guesses that nearly match. */
+
+.addSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0 0 1.75rem;
+}
+
+.addToggle,
+.addToggleOn {
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.addToggle svg,
+.addToggleOn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: transform 0.18s ease, stroke 0.15s ease;
+}
+
+.addToggle:hover {
+  border-color: var(--line-bright);
+}
+
+.addToggle:hover svg {
+  stroke: var(--ink);
+}
+
+/* Open: the same plus, turned forty-five degrees. The control that opened the
+   card is then visibly the one that shuts it. */
+.addToggleOn {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.addToggleOn svg {
+  stroke: var(--accent);
+  transform: rotate(45deg);
+}
+
+.addCard {
+  /* One icon square and the space between two. Everything in the card is
+     measured from these. */
+  --cell: 3.1rem;
+  --gap: 0.35rem;
+  --pad: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  /* border-box is global, so the padding is inside this number. */
+  width: calc(var(--cell) * 6 + var(--gap) * 5 + var(--pad) * 2);
+  max-width: 100%;
+  padding: var(--pad);
+  border: 1px solid var(--line-bright);
+  border-radius: 12px;
+  background: var(--bg-raised);
 }
 
 .addRow {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--gap);
 }
 
-.add input,
-.add select {
+/* The name bar takes what the dropdown does not. min-width: 0 is what lets it
+   shrink inside the flex row rather than forcing the card wider than the grid
+   — the usual flex floor is the input's own default size. */
+.addRow input:not([type='number']) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.addRow select {
+  flex: 0 0 auto;
+}
+
+.addCard input,
+.addCard select {
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--ink);
   font: inherit;
-  font-size: 0.875rem;
-  padding: 0.35rem 0.6rem;
-}
-
-.add input:not([type='number']) {
-  min-width: 13rem;
-  flex: 1 1 13rem;
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.5rem;
 }
 
 .target {
-  width: 4rem;
+  flex: 0 0 3.2rem;
+  width: 3.2rem;
+  text-align: center;
 }
 
-.add input:focus,
-.add select:focus {
+.addCard input:focus,
+.addCard select:focus {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.add button[type='submit'] {
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--gap);
+}
+
+/* The shared .pick is a fixed 28px for the in-row picker. In the card it fills
+   its column instead, and aspect-ratio keeps it square at whatever that is. */
+.iconGrid .pick,
+.iconGrid .pickOn {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.iconGrid svg {
+  width: 20px;
+  height: 20px;
+}
+
+.addGo {
   background: none;
   border: 1px solid var(--line-bright);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--ink);
   font: inherit;
   font-size: 0.875rem;
-  padding: 0.35rem 0.9rem;
+  padding: 0.45rem 0.9rem;
   cursor: pointer;
 }
 
-.add button[type='submit']:hover:not(:disabled) {
+.addGo:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.add button[type='submit']:disabled {
+.addGo:disabled {
   opacity: 0.4;
   cursor: default;
 }

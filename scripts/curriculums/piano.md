@@ -130,8 +130,23 @@ where instinct will not.
 | 8 | Intermediate repertoire | 25 | 26 |
 | 9 | Playing by ear | 20 | 21 |
 | 10 | Writing your own | 20 | 20 |
-| 11 | Ad astra | open | — |
-| — | Theory track, its own modules | ~40 | — |
+| 11 | Ad astra | open | 13 |
+| — | Theory track, its own modules | ~40 | 40 |
+
+**The theory track is five modules of eight**, drawn as a separate row of
+cards on the stages screen rather than as stages:
+
+| Module | What it covers |
+| --- | --- |
+| Theory 1 · Notation and rhythm | clefs, values and beaming, metre, tuplets, rests, the terms in three languages, ornament signs, editions |
+| Theory 2 · Scales, keys and intervals | interval naming and inversion, enharmonics, all fifteen signatures, the three minors written, the modes, the other scales, spelling |
+| Theory 3 · Harmony on paper | triads and figures, sevenths, figured bass, Roman numerals, non-chord tones, cadences in full, modulation, the chromatic chords catalogued |
+| Theory 4 · Counterpoint and voice-leading | four-part writing, the motions and the parallels, harmonising a bass and a melody, species counterpoint, canon and fugue, chorale style, self-checking, and why the rules exist |
+| Theory 5 · Form, score and sound | phrase structure, the forms, score reading, transposing instruments, reduction, the overtone series, temperament, and analysis as a habit |
+
+It goes deliberately past what the route needs — roughly a conservatoire
+first year's theory — and the last lesson of each module says what is beyond it
+and where to find that free.
 
 **The written column is lessons in the database**, not an estimate. Where it
 differs from the estimate the stage decided its own length: stage 1 needed

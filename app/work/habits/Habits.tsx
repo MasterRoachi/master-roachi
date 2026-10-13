@@ -82,6 +82,9 @@ export default function Habits() {
   const [target, setTarget] = useState(3);
   const [icon, setIcon] = useState<string>(HABIT_ICONS[0].name);
   const [picking, setPicking] = useState<number | null>(null);
+  // The add card, which is shut by default. Adding a habit is rare next to
+  // ticking one, so it costs a click rather than a permanent panel.
+  const [adding, setAdding] = useState(false);
 
   const fetchMonth = useCallback(async (wanted: string | null, force = false) => {
     if (wanted && !force && cache[wanted]) return;
@@ -170,6 +173,109 @@ export default function Habits() {
     <div className={styles.page}>
       {error && <p className={styles.warn}>{error}</p>}
 
+      {/* Adding, which is its own section above the years.
+          It used to live at the foot of the open year, INSIDE the loop — so it
+          belonged to a year, which is wrong twice: a habit is not a fact about
+          2026, and opening two years drew two of the form sharing one set of
+          state. One card above all of them instead, shut until it is wanted. */}
+      <section className={styles.addSection}>
+        <button
+          type="button"
+          className={adding ? styles.addToggleOn : styles.addToggle}
+          aria-expanded={adding}
+          aria-controls="add-habit"
+          aria-label={adding ? 'Close' : 'Add a habit'}
+          title={adding ? 'Close' : 'Add a habit'}
+          onClick={() => setAdding((open) => !open)}
+        >
+          {/* One plus, rotated to a cross when open, so the button that opened
+              the card is visibly the one that shuts it. */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+
+        {adding && (
+          <form
+            id="add-habit"
+            className={styles.addCard}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') setAdding(false);
+            }}
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!name.trim()) return;
+              void act({
+                action: 'add',
+                name,
+                cadence,
+                icon,
+                ...(cadence === 'weekly' ? { target } : {}),
+              }).then(() => {
+                setName('');
+                // Shut on success, so the new row is what is on screen rather
+                // than the form that made it.
+                setAdding(false);
+              });
+            }}
+          >
+            <div className={styles.addRow}>
+              <input
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Add a habit"
+                aria-label="New habit"
+                autoFocus
+              />
+              <select
+                value={cadence}
+                aria-label="How often"
+                onChange={(event) => setCadence(event.target.value as 'daily' | 'weekly')}
+              >
+                <option value="daily">every day</option>
+                <option value="weekly">times a week</option>
+              </select>
+              {cadence === 'weekly' && (
+                <input
+                  type="number"
+                  min={1}
+                  max={7}
+                  value={target}
+                  className={styles.target}
+                  aria-label="Times per week"
+                  onChange={(event) => setTarget(Number(event.target.value))}
+                />
+              )}
+            </div>
+
+            {/* Thirty-six icons, which is exactly six by six. The row above is
+                sized to this grid rather than the other way round — see the
+                --cell and --gap the card sets. */}
+            <div className={styles.iconGrid}>
+              {HABIT_ICONS.map((option) => (
+                <button
+                  key={option.name}
+                  type="button"
+                  title={option.label}
+                  aria-label={option.label}
+                  aria-pressed={icon === option.name}
+                  className={icon === option.name ? styles.pickOn : styles.pick}
+                  onClick={() => setIcon(option.name)}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d={option.d} />
+                  </svg>
+                </button>
+              ))}
+            </div>
+
+            <button type="submit" className={styles.addGo} disabled={!name.trim()}>
+              Add
+            </button>
+          </form>
+        )}
+      </section>
+
       {/* Newest first: the year being filled in is the one wanted, and older
           years are archive. */}
       {[...data.years].reverse().map((year) => {
@@ -249,7 +355,7 @@ export default function Habits() {
                   <div className={styles.waiting} aria-hidden="true" />
                 ) : data.habits.length === 0 ? (
                   <p className={styles.empty}>
-                    Nothing tracked yet. Add one below — <em>every day</em> for something
+                    Nothing tracked yet. Add one above — <em>every day</em> for something
                     expected daily, or <em>times a week</em> for something with a number
                     attached, like the gym three times a week.
                   </p>
@@ -406,72 +512,6 @@ export default function Habits() {
                     </table>
                   </div>
                 )}
-
-                <form
-                  className={styles.add}
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    if (!name.trim()) return;
-                    void act({
-                      action: 'add',
-                      name,
-                      cadence,
-                      icon,
-                      ...(cadence === 'weekly' ? { target } : {}),
-                    }).then(() => setName(''));
-                  }}
-                >
-                  <span className={styles.iconChoice}>
-                    {HABIT_ICONS.map((option) => (
-                      <button
-                        key={option.name}
-                        type="button"
-                        title={option.label}
-                        aria-label={option.label}
-                        aria-pressed={icon === option.name}
-                        className={icon === option.name ? styles.pickOn : styles.pick}
-                        onClick={() => setIcon(option.name)}
-                      >
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d={option.d} />
-                        </svg>
-                      </button>
-                    ))}
-                  </span>
-
-                  <span className={styles.addRow}>
-                    <input
-                      value={name}
-                      onChange={(event) => setName(event.target.value)}
-                      placeholder="Add a habit"
-                      aria-label="New habit"
-                    />
-                    <select
-                      value={cadence}
-                      aria-label="How often"
-                      onChange={(event) =>
-                        setCadence(event.target.value as 'daily' | 'weekly')
-                      }
-                    >
-                      <option value="daily">every day</option>
-                      <option value="weekly">times a week</option>
-                    </select>
-                    {cadence === 'weekly' && (
-                      <input
-                        type="number"
-                        min={1}
-                        max={7}
-                        value={target}
-                        className={styles.target}
-                        aria-label="Times per week"
-                        onChange={(event) => setTarget(Number(event.target.value))}
-                      />
-                    )}
-                    <button type="submit" disabled={!name.trim()}>
-                      Add
-                    </button>
-                  </span>
-                </form>
               </div>
             )}
           </section>
