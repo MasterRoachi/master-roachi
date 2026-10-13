@@ -2143,5 +2143,720 @@
       "front": "The indeclinable neuters",
       "back": "το ευρώ, το ταξί, το μετρό, το σινεμά, το πάρτι, το Πάσχα — one form for everything"
     }
+  ],
+  "Aspect: the one thing to understand about Greek verbs": [
+    {
+      "kind": "grammar",
+      "front": "What aspect is",
+      "back": "Whether the action is seen as ongoing (imperfective) or as one complete whole (perfective) — and Greek forces the choice in the future, the subjunctive, the imperative and the past"
+    },
+    {
+      "kind": "grammar",
+      "front": "θα γράφω or θα γράψω",
+      "back": "θα γράφω = I will be writing, will write regularly · θα γράψω = I will write, once, done"
+    }
+  ],
+  "The two stems": [
+    {
+      "kind": "grammar",
+      "front": "Why γράψω is not a word on its own",
+      "back": "The perfective stem is dependent — it only appears after θα, να, ας, αν, όταν, πριν, μην, για να"
+    },
+    {
+      "kind": "grammar",
+      "front": "The whole verb system in one grid",
+      "back": "Present γράφω · future θα γράφω / θα γράψω · subjunctive να γράφω / να γράψω · past έγραφα / έγραψα · imperative γράφε / γράψε"
+    }
+  ],
+  "Forming the perfective stem": [
+    {
+      "kind": "grammar",
+      "front": "The three sound rules for the perfective",
+      "back": "Labial (φ β π ευ) → ψ · velar (κ γ χ χν) → ξ · dental and -ζω → σ"
+    },
+    {
+      "kind": "grammar",
+      "front": "The perfective of the second conjugation",
+      "back": "-ήσω — αγαπάω/αγαπήσω, μιλάω/μιλήσω, τηλεφωνώ/τηλεφωνήσω"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which verbs have no perfective stem",
+      "back": "είμαι, έχω, ξέρω, πρέπει — their meaning is inherently ongoing"
+    }
+  ],
+  "Perfective stems to learn as pairs": [
+    {
+      "kind": "grammar",
+      "front": "βλέπω →",
+      "back": "να δω · είδα",
+      "extra": "see"
+    },
+    {
+      "kind": "grammar",
+      "front": "λέω →",
+      "back": "να πω · είπα",
+      "extra": "say"
+    },
+    {
+      "kind": "grammar",
+      "front": "πηγαίνω / πάω →",
+      "back": "να πάω · πήγα",
+      "extra": "go"
+    },
+    {
+      "kind": "grammar",
+      "front": "έρχομαι →",
+      "back": "να έρθω · ήρθα",
+      "extra": "come"
+    },
+    {
+      "kind": "grammar",
+      "front": "τρώω →",
+      "back": "να φάω · έφαγα",
+      "extra": "eat"
+    },
+    {
+      "kind": "grammar",
+      "front": "πίνω →",
+      "back": "να πιω · ήπια",
+      "extra": "drink"
+    },
+    {
+      "kind": "grammar",
+      "front": "δίνω →",
+      "back": "να δώσω · έδωσα",
+      "extra": "give"
+    },
+    {
+      "kind": "grammar",
+      "front": "παίρνω →",
+      "back": "να πάρω · πήρα",
+      "extra": "take"
+    },
+    {
+      "kind": "grammar",
+      "front": "βρίσκω →",
+      "back": "να βρω · βρήκα",
+      "extra": "find"
+    },
+    {
+      "kind": "grammar",
+      "front": "μπαίνω →",
+      "back": "να μπω · μπήκα",
+      "extra": "go in"
+    },
+    {
+      "kind": "grammar",
+      "front": "βγαίνω →",
+      "back": "να βγω · βγήκα",
+      "extra": "go out"
+    },
+    {
+      "kind": "grammar",
+      "front": "μένω →",
+      "back": "να μείνω · έμεινα",
+      "extra": "stay, live"
+    },
+    {
+      "kind": "grammar",
+      "front": "φεύγω →",
+      "back": "να φύγω · έφυγα",
+      "extra": "leave"
+    },
+    {
+      "kind": "grammar",
+      "front": "στέλνω →",
+      "back": "να στείλω · έστειλα",
+      "extra": "send"
+    },
+    {
+      "kind": "grammar",
+      "front": "φέρνω →",
+      "back": "να φέρω · έφερα",
+      "extra": "bring"
+    },
+    {
+      "kind": "grammar",
+      "front": "μαθαίνω →",
+      "back": "να μάθω · έμαθα",
+      "extra": "learn"
+    },
+    {
+      "kind": "grammar",
+      "front": "καταλαβαίνω →",
+      "back": "να καταλάβω · κατάλαβα",
+      "extra": "understand"
+    },
+    {
+      "kind": "grammar",
+      "front": "ξεχνάω →",
+      "back": "να ξεχάσω · ξέχασα",
+      "extra": "forget"
+    },
+    {
+      "kind": "grammar",
+      "front": "ανεβαίνω →",
+      "back": "να ανεβώ · ανέβηκα",
+      "extra": "go up"
+    },
+    {
+      "kind": "grammar",
+      "front": "κατεβαίνω →",
+      "back": "να κατεβώ · κατέβηκα",
+      "extra": "go down"
+    }
+  ],
+  "Why Greek has no infinitive": [
+    {
+      "kind": "grammar",
+      "front": "How Greek says *to go*",
+      "back": "It cannot — να plus a conjugated verb: θέλω να πάω, *I want that I go*"
+    },
+    {
+      "kind": "sentence",
+      "front": "Θέλω να έρθεις.",
+      "back": "I want you to come.",
+      "extra": "The second verb takes its own subject, which English cannot do so neatly."
+    }
+  ],
+  "να, and what it does": [
+    {
+      "kind": "sentence",
+      "front": "Να ζήσεις!",
+      "back": "Long life to you — at a birthday or a wedding"
+    },
+    {
+      "kind": "sentence",
+      "front": "Να 'σαι καλά!",
+      "back": "Bless you — the everyday thank-you-plus-blessing"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ο Θεός να σε έχει καλά.",
+      "back": "God keep you well"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλά να περάσεις!",
+      "back": "Have a good time"
+    },
+    {
+      "kind": "grammar",
+      "front": "The negative after να",
+      "back": "μην, not δεν — Να μην ξεχάσεις!"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where the weak pronoun goes with να",
+      "back": "Between να and the verb — να μου πεις, να το κάνεις, να μου το δώσεις"
+    }
+  ],
+  "The subjunctive with the imperfective": [
+    {
+      "kind": "grammar",
+      "front": "What να plus the imperfective means",
+      "back": "Ongoing, habitual or general — Μου αρέσει να διαβάζω, Πρέπει να τρώμε καλά"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Μπορείς να μιλάς πιο αργά; is imperfective",
+      "back": "Because you want the slow speech to continue — να μιλήσεις would ask for one slow sentence"
+    }
+  ],
+  "The subjunctive with the perfective": [
+    {
+      "kind": "grammar",
+      "front": "What να plus the perfective means",
+      "back": "One complete action — Θέλω να πάω, Πρέπει να φύγω, Να μου τηλεφωνήσεις"
+    },
+    {
+      "kind": "grammar",
+      "front": "να μάθω or να μαθαίνω",
+      "back": "να μάθω = to learn and get there · να μαθαίνω = to be learning, as part of life"
+    },
+    {
+      "kind": "grammar",
+      "front": "να δω, conjugated",
+      "back": "να δω, να δεις, να δει, να δούμε, να δείτε, να δουν"
+    },
+    {
+      "kind": "grammar",
+      "front": "να πω, conjugated",
+      "back": "να πω, να πεις, να πει, να πούμε, να πείτε, να πουν"
+    }
+  ],
+  "The aspect decision, in practice": [
+    {
+      "kind": "grammar",
+      "front": "The shortcut when you cannot decide",
+      "back": "Use the perfective — it is the commoner choice and the smaller error"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which verbs take the imperfective after them",
+      "back": "μου αρέσει να, ξέρω να, αρχίζω να, συνεχίζω να, μαθαίνω να"
+    }
+  ],
+  "θέλω να, μπορώ να, πρέπει να": [
+    {
+      "kind": "sentence",
+      "front": "Θα ήθελα…",
+      "back": "I would like… — the polite form, worth using from today"
+    },
+    {
+      "kind": "grammar",
+      "front": "μπορεί να",
+      "back": "maybe, it may — fixed in the third person: Μπορεί να βρέξει"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι πρέπει να κάνω;",
+      "back": "What should I do?"
+    },
+    {
+      "kind": "grammar",
+      "front": "Δεν θέλω να πάω or Θέλω να μην πάω",
+      "back": "*I do not want to go* against *I want not to go* — δεν negates the first verb, μην the second"
+    }
+  ],
+  "The future with θα": [
+    {
+      "kind": "grammar",
+      "front": "What θα is",
+      "back": "An invariable particle, placed after δεν and any pronouns — Δεν θα σου το πω",
+      "extra": "It is a worn-down θέλω να, like English *will*."
+    },
+    {
+      "kind": "grammar",
+      "front": "The future of είμαι and έχω",
+      "back": "θα είμαι, θα έχω — they have only one stem, so no choice to make"
+    }
+  ],
+  "The continuous future": [
+    {
+      "kind": "grammar",
+      "front": "θα γράψω or θα γράφω",
+      "back": "θα γράψω = I will write it · θα γράφω = I will be writing, will write regularly"
+    }
+  ],
+  "The imperative: telling someone to do something": [
+    {
+      "kind": "grammar",
+      "front": "The perfective imperative",
+      "back": "Perfective stem + -ε singular, -τε plural — γράψε / γράψτε, with the stress back: διάβασε"
+    },
+    {
+      "kind": "grammar",
+      "front": "έλα / ελάτε",
+      "back": "Come! — the irregular imperative of έρχομαι, and used constantly as *come on*"
+    },
+    {
+      "kind": "grammar",
+      "front": "πες / πείτε · δες / δείτε · φάε / φάτε · δώσε / δώστε",
+      "back": "say · see · eat · give — the irregular imperatives you need daily"
+    },
+    {
+      "kind": "grammar",
+      "front": "Πρόσεχε or Πρόσεξε",
+      "back": "Πρόσεχε = be careful generally · Πρόσεξε = watch out, now"
+    }
+  ],
+  "Negative commands, and ας": [
+    {
+      "kind": "grammar",
+      "front": "How to tell someone not to do something",
+      "back": "μην plus the subjunctive — the imperative has no negative in Greek"
+    },
+    {
+      "kind": "grammar",
+      "front": "Μην καπνίζεις or Μην καπνίσεις",
+      "back": "Μην καπνίζεις = do not smoke, ever · Μην καπνίσεις = do not smoke that one",
+      "extra": "Which is why signs say Μην καπνίζετε."
+    },
+    {
+      "kind": "grammar",
+      "front": "ας",
+      "back": "let's, let him — Ας πάμε, Ας δούμε, Ας μην πάμε",
+      "extra": "πάμε on its own is the commonest *let's go*."
+    },
+    {
+      "kind": "grammar",
+      "front": "Δεν πειράζει or Μην πειράζεις",
+      "back": "Δεν πειράζει = never mind (a statement) · Μην πειράζεις = do not tease (a command)"
+    }
+  ],
+  "The past: Greek's two past tenses": [
+    {
+      "kind": "grammar",
+      "front": "The two past tenses",
+      "back": "Aorist (perfective stem) = I did it · imperfect (imperfective stem) = I was doing it, I used to do it"
+    },
+    {
+      "kind": "grammar",
+      "front": "The past endings",
+      "back": "-α, -ες, -ε, -αμε, -ατε, -αν — the same for both tenses"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one-sentence summary of the two pasts",
+      "back": "The aorist tells the story, the imperfect paints the scene"
+    }
+  ],
+  "The aorist: how it is formed": [
+    {
+      "kind": "grammar",
+      "front": "έγραψα, conjugated",
+      "back": "έγραψα, έγραψες, έγραψε, γράψαμε, γράψατε, έγραψαν"
+    },
+    {
+      "kind": "grammar",
+      "front": "The aorist of the -άω verbs",
+      "back": "-ησα — μίλησα, ρώτησα, αγάπησα, τηλεφώνησα"
+    }
+  ],
+  "The augment, and where the stress goes": [
+    {
+      "kind": "grammar",
+      "front": "Why έγραψα has an ε- and γράψαμε does not",
+      "back": "The past is stressed on the third syllable from the end; the augment is added only when the word is too short",
+      "extra": "A stress rule, not a grammatical one."
+    },
+    {
+      "kind": "grammar",
+      "front": "The fastest reading cue for a past tense",
+      "back": "A verb beginning έ-, εί- or ή-"
+    }
+  ],
+  "The aorist of the irregular verbs": [
+    {
+      "kind": "grammar",
+      "front": "ήπια",
+      "back": "I drank — from πίνω"
+    },
+    {
+      "kind": "grammar",
+      "front": "βρήκα",
+      "back": "I found — from βρίσκω"
+    },
+    {
+      "kind": "grammar",
+      "front": "έμεινα / έφυγα",
+      "back": "I stayed / I left — from μένω and φεύγω"
+    },
+    {
+      "kind": "grammar",
+      "front": "ήθελα",
+      "back": "I wanted — formally an imperfect, and the everyday past of θέλω"
+    }
+  ],
+  "The imperfect": [
+    {
+      "kind": "grammar",
+      "front": "The imperfect of the second conjugation",
+      "back": "-ούσα — μιλούσα, αγαπούσα, μπορούσα, τηλεφωνούσα",
+      "extra": "Stress on the -ού- throughout."
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν μπορούσα να έρθω.",
+      "back": "I could not come. — a state"
+    },
+    {
+      "kind": "sentence",
+      "front": "Όταν ήμουν παιδί…",
+      "back": "When I was a child… — and the imperfect follows it"
+    }
+  ],
+  "Aorist or imperfect": [
+    {
+      "kind": "grammar",
+      "front": "Διάβαζα όταν χτύπησε το τηλέφωνο.",
+      "back": "I was reading when the phone rang — the imperfect is the frame, the aorist the interruption"
+    },
+    {
+      "kind": "grammar",
+      "front": "μπορούσα or μπόρεσα",
+      "back": "μπορούσα = I was able (a state) · μπόρεσα = I managed (an occasion)"
+    },
+    {
+      "kind": "grammar",
+      "front": "ήξερα or έμαθα",
+      "back": "ήξερα = I knew · έμαθα = I found out"
+    }
+  ],
+  "ήμουν and είχα": [
+    {
+      "kind": "grammar",
+      "front": "ήμουν, conjugated",
+      "back": "ήμουν, ήσουν, ήταν, ήμασταν, ήσασταν, ήταν"
+    },
+    {
+      "kind": "grammar",
+      "front": "είχα, conjugated",
+      "back": "είχα, είχες, είχε, είχαμε, είχατε, είχαν"
+    },
+    {
+      "kind": "grammar",
+      "front": "υπήρχε / υπήρχαν",
+      "back": "there was / there were — the past of υπάρχει"
+    }
+  ],
+  "The mediopassive: what it is": [
+    {
+      "kind": "grammar",
+      "front": "What the mediopassive covers",
+      "back": "Passive, reflexive, and the middle — plus a large group of verbs that exist only in it"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to spot a mediopassive verb",
+      "back": "Its *I* form ends in -μαι — έρχομαι, κάθομαι, θυμάμαι, φαίνομαι"
+    },
+    {
+      "kind": "word",
+      "front": "Ενοικιάζεται / Πωλείται",
+      "back": "For rent / For sale — mediopassive, and on signs everywhere"
+    }
+  ],
+  "The mediopassive present": [
+    {
+      "kind": "grammar",
+      "front": "έρχομαι, conjugated",
+      "back": "έρχομαι, έρχεσαι, έρχεται, ερχόμαστε, έρχεστε, έρχονται"
+    },
+    {
+      "kind": "grammar",
+      "front": "θυμάμαι, conjugated",
+      "back": "θυμάμαι, θυμάσαι, θυμάται, θυμόμαστε, θυμάστε, θυμούνται",
+      "extra": "κοιμάμαι and φοβάμαι follow it exactly."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι γίνεται;",
+      "back": "What's going on? / How are things? — the everyday greeting among friends"
+    },
+    {
+      "kind": "sentence",
+      "front": "Λυπάμαι πολύ.",
+      "back": "I am very sorry."
+    }
+  ],
+  "The past of the mediopassive verbs": [
+    {
+      "kind": "grammar",
+      "front": "The mediopassive aorist endings",
+      "back": "-θηκα, -θηκες, -θηκε, -θήκαμε, -θήκατε, -θηκαν"
+    },
+    {
+      "kind": "grammar",
+      "front": "θυμήθηκα / κοιμήθηκα / σκέφτηκα",
+      "back": "I remembered / I slept / I thought"
+    },
+    {
+      "kind": "grammar",
+      "front": "Έγινε!",
+      "back": "Done! Consider it done. — and Τι έγινε; is *what happened*"
+    },
+    {
+      "kind": "sentence",
+      "front": "Γεννήθηκα στη…",
+      "back": "I was born in… — a passive, as in English"
+    },
+    {
+      "kind": "grammar",
+      "front": "The mediopassive imperfect endings",
+      "back": "-όμουν, -όσουν, -όταν, -όμασταν, -όσασταν, -ονταν — ερχόμουν, καθόμουν"
+    }
+  ],
+  "έρχομαι, πάω, λέω, τρώω": [
+    {
+      "kind": "grammar",
+      "front": "πάω, conjugated",
+      "back": "πάω, πας, πάει, πάμε, πάτε, πάνε",
+      "extra": "πάμε does duty as *let's go*."
+    },
+    {
+      "kind": "grammar",
+      "front": "λέω, conjugated",
+      "back": "λέω, λες, λέει, λέμε, λέτε, λένε"
+    },
+    {
+      "kind": "grammar",
+      "front": "τρώω, conjugated",
+      "back": "τρώω, τρως, τρώει, τρώμε, τρώτε, τρώνε"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πώς το λένε;",
+      "back": "What is it called?"
+    }
+  ],
+  "Compound verbs and the prefixes": [
+    {
+      "kind": "grammar",
+      "front": "ξανα-",
+      "back": "again — and it is productive: ξαναλέω, ξαναπάω, ξαναγράφω"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why one verb gives you a family",
+      "back": "A compound keeps the simple verb's pattern — γράφω/γράψω gives υπογράφω, αντιγράφω, περιγράφω with all their forms"
+    },
+    {
+      "kind": "word",
+      "front": "προσεύχομαι",
+      "back": "I pray",
+      "extra": "προσ- towards + εύχομαι wish."
+    }
+  ],
+  "Verbs of motion": [
+    {
+      "kind": "grammar",
+      "front": "Πέρασε από το σπίτι.",
+      "back": "Drop round to the house — περνάω από is the standard invitation"
+    },
+    {
+      "kind": "word",
+      "front": "φτάνω",
+      "back": "I arrive — να φτάσω, έφτασα",
+      "extra": "Φτάνει! also means *that's enough*."
+    },
+    {
+      "kind": "word",
+      "front": "με τα πόδια",
+      "back": "on foot"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πόση ώρα κάνει;",
+      "back": "How long does it take?"
+    }
+  ],
+  "Time words for the past": [
+    {
+      "kind": "word",
+      "front": "χθες / προχθές / πέρυσι",
+      "back": "yesterday / the day before yesterday / last year"
+    },
+    {
+      "kind": "word",
+      "front": "μόλις",
+      "back": "just now — and *as soon as*: Μόλις φτάσω, θα σου τηλεφωνήσω"
+    },
+    {
+      "kind": "word",
+      "front": "ακόμα / πια",
+      "back": "still, yet / any more — Δεν ήρθε ακόμα · Δεν μένει πια εδώ"
+    },
+    {
+      "kind": "grammar",
+      "front": "πρώτα, μετά, στο τέλος",
+      "back": "first, then, in the end — the sequencing kit for any story"
+    }
+  ],
+  "How often: the frequency words": [
+    {
+      "kind": "word",
+      "front": "πάντα / συνήθως / συχνά",
+      "back": "always / usually / often"
+    },
+    {
+      "kind": "word",
+      "front": "σπάνια / ποτέ",
+      "back": "rarely / never",
+      "extra": "ποτέ needs δεν: Δεν πάω ποτέ."
+    },
+    {
+      "kind": "grammar",
+      "front": "μία φορά τη βδομάδα",
+      "back": "once a week — the accusative with no preposition, as in την Κυριακή"
+    }
+  ],
+  "Asking about the past": [
+    {
+      "kind": "sentence",
+      "front": "Τι έκανες;",
+      "back": "What did you do?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πώς πέρασες;",
+      "back": "How was it? — the standard question after any event",
+      "extra": "Answer: Πέρασα πολύ ωραία."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι έγινε;",
+      "back": "What happened?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αλήθεια; Και μετά;",
+      "back": "Really? And then? — the two follow-ups that keep a conversation alive"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν μπόρεσα να έρθω.",
+      "back": "I was not able to come. — the polite excuse"
+    }
+  ],
+  "Telling a story in the past": [
+    {
+      "kind": "grammar",
+      "front": "How Greek reports speech",
+      "back": "ότι, with no tense shift — Μου είπε ότι θα έρθει, literally *he told me that he will come*"
+    },
+    {
+      "kind": "word",
+      "front": "ενώ / αφού",
+      "back": "while / after — both with a clause"
+    }
+  ],
+  "At church: talking about the service afterwards": [
+    {
+      "kind": "sentence",
+      "front": "Τι εορτάζουμε σήμερα;",
+      "back": "What are we celebrating today?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι σημαίνει αυτή η λέξη;",
+      "back": "What does this word mean? — the most productive question in a parish hall"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κατάλαβα λίγο.",
+      "back": "I understood a little."
+    },
+    {
+      "kind": "sentence",
+      "front": "Άναψα ένα κερί.",
+      "back": "I lit a candle."
+    },
+    {
+      "kind": "word",
+      "front": "σιγά σιγά",
+      "back": "slowly, little by little — the standard Greek encouragement for anything long and hard"
+    }
+  ],
+  "How to store a verb": [
+    {
+      "kind": "grammar",
+      "front": "What a verb card must carry",
+      "back": "The present, the dependent (να …), the aorist, and the imperative if it has one — four forms, never one"
+    }
+  ],
+  "The aspect drill": [
+    {
+      "kind": "grammar",
+      "front": "Να μου τηλεφωνήσεις or Να μου τηλεφωνείς",
+      "back": "Call me (once) · Call me (every day)"
+    },
+    {
+      "kind": "grammar",
+      "front": "Έτρωγα όταν ήρθε or Έφαγα και έφυγα",
+      "back": "I was eating when he came · I ate and left"
+    }
   ]
 }

@@ -128,9 +128,9 @@ material is graded against them.
 | 1 | The alphabet, the sounds and the hand | — | 30 | 30 |
 | 2 | First Greek: being, having, and the noun | A1 | 35 | 36 |
 | 3 | The cases, in use | A1–A2 | 35 | 35 |
-| 4 | Verbs and aspect | A2 | 40 | — |
+| 4 | Verbs and aspect | A2 | 40 | 40 |
 | 5 | Everyday Greek | A2 | 40 | — |
-| 6 | The past, the future and the moods | A2–B1 | 35 | — |
+| 6 | The perfect, the passive and the conditional | A2–B1 | 35 | — |
 | 7 | Pronouns, clauses and connected speech | B1 | 35 | — |
 | 8 | Real Greek: listening and reading | B1–B2 | 30 | — |
 | 9 | Writing, argument and register | B2 | 30 | — |
@@ -138,6 +138,13 @@ material is graded against them.
 | 11 | Literature, and ad astra | C1+ | open | — |
 | — | Spelling track, its own modules | — | ~40 | 8 |
 | — | Forms track, its own modules | — | ~40 | 7 |
+
+**Stage 4 absorbed the past tenses** (rewritten 2026-10-14). The plan had them
+in stage 6, and aspect cannot be learned without them: the aorist against the
+imperfect is where the distinction is most visible, and teaching the future and
+the subjunctive without it would mean teaching the choice twice. Stage 6 now
+takes what is built on top — the perfect tenses, the pluperfect, the
+conditional, the passive across the tenses, and the participles.
 
 **Comparable to Japanese in length**, at his word — that came out at 382
 lessons, and this is planned at roughly the same.
