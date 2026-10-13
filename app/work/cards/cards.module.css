@@ -138,36 +138,50 @@
   font-size: 0.8125rem;
 }
 
-/* A SQUARE, above the panel, and its size does not change when the answer is
-   revealed.
+/* The card and the panel, side by side and equal.
  *
- * Square because a card is a card — it was briefly a band across the full
- * width, which is a header rather than a card. The three rows are fixed, so
- * revealing fills the middle one instead of making the whole thing taller: it
- * used to grow, which moved the buttons under the cursor at the exact moment a
- * hand was on its way to them. */
+ * It has been three things. Half the screen beside the panel; then a band
+ * across the full width, which is a header rather than a card; then a square
+ * above it, which was too small to read a revealed answer in. Back to halves,
+ * which is the only one of the three with room for both jobs. */
+.pair {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+@media (max-width: 56rem) {
+  .pair {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
+/* Fills its half, so revealing the answer cannot change its size, while what
+   is INSIDE it is centred vertically rather than pinned to the top. The
+   buttons stay in their own row at the foot and do not move when the middle
+   grows — a card whose buttons shift is a card that moves them under the
+   cursor at the moment a hand is on its way to them. */
 .card {
   min-height: 0;
-  height: clamp(8rem, 26vh, 14rem);
-  aspect-ratio: 1;
-  justify-self: center;
+  min-width: 0;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 0.5rem;
-  padding: 0.8rem;
+  grid-template-rows: 1fr auto;
+  gap: 0.8rem;
+  padding: 1.2rem;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--bg-raised);
 }
 
-/* The character, and then the answer under it. One region, scrolling, so that
-   a card with a long extra stays exactly as big as a card without one. */
 .face {
   min-height: 0;
   min-width: 0;
   overflow-y: auto;
   display: grid;
-  gap: 0.4rem;
+  gap: 0.5rem;
   align-content: center;
   justify-items: center;
   text-align: center;
@@ -186,7 +200,7 @@
    thing on it. Japanese at this size is legible with its ruby. */
 .front {
   margin: 0;
-  font-size: clamp(2rem, 8vh, 3.25rem);
+  font-size: clamp(2.5rem, 9vh, 5rem);
   line-height: 1.1;
   text-align: center;
 }
@@ -198,7 +212,7 @@
 }
 
 .reveal {
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.4rem;
   border: 1px solid var(--line-bright);
   border-radius: 999px;
   background: none;
@@ -210,14 +224,14 @@
 
 .reading {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 1.375rem;
   color: var(--gold);
 }
 
 .meaning {
   margin: 0;
-  font-size: 1rem;
-  line-height: 1.45;
+  font-size: 1.0625rem;
+  line-height: 1.5;
 }
 
 .buttons {
@@ -228,7 +242,7 @@
 }
 
 .buttons button {
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.4rem;
   border: 1px solid var(--line-bright);
   border-radius: 999px;
   background: none;

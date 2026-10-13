@@ -675,17 +675,17 @@ is what refusing has to mean for a pen that has already left the panel. The
 five pixels are converted at whatever the panel is currently scaled to, so they
 are five pixels on screen rather than five at one window size.
 
-**The card is a square above the panel, and its size does not change when the
-answer is revealed.** It began as half the screen beside the panel, which left
-the writing area no bigger than the thing prompting it; it was then briefly a
-band across the full width, which is a header rather than a card. A square,
-above, with the panel taking everything below it.
+**The card and the panel are equal halves, side by side.** That arrangement
+was arrived at by elimination: a band across the full width is a header rather
+than a card, and a square above the panel was too small to read a revealed
+answer in. Halves are the only shape tried that has room for both jobs.
 
-Its three rows are fixed, so revealing fills the middle one rather than making
-the card taller. It used to grow, and growing moved its own buttons under the
-cursor at the exact moment a hand was on its way to them. A card with a long
-extra scrolls that middle row; it does not become a bigger card than one
-without.
+**The card fills its half, so revealing cannot change its size**, and what is
+inside it is centred vertically rather than pinned to the top. The buttons have
+a row of their own at the foot and do not move when the middle grows — a card
+that moves its own buttons does so at the exact moment a hand is on its way to
+them. A long extra scrolls the middle; it does not make one card bigger than
+another.
 
 The page stays in the site's `.shell` content column like every other backend
 page. It was briefly full-bleed, to give the panel the whole screen, and that

@@ -238,10 +238,10 @@ export default function Cards() {
       {error && <p className={styles.error}>{error}</p>}
 
       {card ? (
-        /* The card is a band above the panel, and the panel takes the rest.
-         * They were equal halves side by side, which left the writing area no
-         * bigger than the thing prompting it. */
-        <>
+        /* Side by side and equal. The card needs room for a revealed answer
+         * and the panel needs room to write in, and halves are the only
+         * arrangement tried so far that gives both. */
+        <div className={styles.pair}>
           <Review
             card={card}
             shown={shown}
@@ -252,7 +252,7 @@ export default function Cards() {
           {/* Keyed, so a new card gets a new panel rather than one carrying
               the last card's tool, section and position. */}
           <Note key={card.id} scene={note} onChange={setNote} onSection={setNoteSection} />
-        </>
+        </div>
       ) : (
         <div className={styles.done}>
           <p>Nothing due.</p>
@@ -351,15 +351,15 @@ function Review({
 }) {
   const kind = CARD_KINDS[card.kind];
 
-  /* Three fixed rows in a square: the prompt, what is being asked, and the
-   * buttons. Revealing fills the middle row rather than making the card
-   * taller, because a card that grows moves its own buttons under the cursor
-   * at the moment a hand is on its way to them. */
+  /* Two rows: everything, centred vertically, and the buttons at the foot.
+   * The card fills its half so revealing cannot change its size, and the
+   * buttons have a row of their own so they do not move when the middle of it
+   * grows — that is the moment a hand is already on its way to them. */
   return (
     <div className={styles.card}>
-      <p className={styles.prompt}>{kind.prompt}</p>
-
       <div className={styles.face}>
+        <p className={styles.prompt}>{kind.prompt}</p>
+
         {/* Ruby-capable, which is the whole reason ruby exists: a kanji card
             showing its reading on the next line is two things to read, and the
             reading is the answer anyway. */}
