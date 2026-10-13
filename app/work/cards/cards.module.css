@@ -137,6 +137,24 @@
   font-size: 0.8125rem;
 }
 
+/* The card and the note, equal halves. Stacked only where there is genuinely
+   no width for two — the backend is desktop-first and this page is used with a
+   tablet pen, so the side-by-side case is the real one. */
+.pair {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+@media (max-width: 56rem) {
+  .pair {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
 .card {
   min-height: 0;
   display: grid;
@@ -144,8 +162,6 @@
   gap: 1rem;
   justify-items: center;
   align-content: start;
-  width: min(100%, 36rem);
-  margin: 0 auto;
   padding: 1.6rem;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -257,4 +273,97 @@
 .done p:first-child {
   margin: 0;
   font-size: 1.25rem;
+}
+
+/* --- the note ----------------------------------------------------------- */
+
+.note {
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+  padding: 0.6rem;
+}
+
+.noteTools {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.noteTools button {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.noteTools button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.toolOn {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+}
+
+.noteHint {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-2);
+}
+
+/* The scrolling window onto a note that grows downward forever. It is the one
+   thing in the backend that is MEANT to scroll: the page does not, and this
+   does, because the note is taller than the panel by design. */
+.notePane {
+  position: relative;
+  min-height: 0;
+  overflow-y: auto;
+  border-radius: 8px;
+  background: #16181d;
+}
+
+.noteSurface {
+  display: block;
+  width: 100%;
+  /* A finger pans, a pen draws — the pointer handler sorts them out. Without
+     pan-y there is no way to look back at an earlier attempt on a tablet
+     except the scrollbar. */
+  touch-action: pan-y;
+}
+
+.noteSurface[data-tool='pen'] {
+  cursor: crosshair;
+}
+
+.noteSurface[data-tool='text'] {
+  cursor: text;
+}
+
+/* Positioned over the text item being typed, in CSS pixels scaled from scene
+   units — see scale() in Note.tsx. */
+.noteEditor {
+  position: absolute;
+  min-width: 6rem;
+  padding: 0;
+  border: 0;
+  border-left: 2px solid var(--gold);
+  background: none;
+  color: #e8e6e1;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  overflow: hidden;
 }

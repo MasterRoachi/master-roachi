@@ -23,6 +23,7 @@ import {
   review,
   type Card,
 } from '../lib/cards';
+import { isEmptyNote, noteHeight, parseNote } from '../lib/card-note';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
@@ -1896,6 +1897,13 @@ export default {
           )?.n ?? 0,
         );
 
+      /** A card's note, which is drawn beside it. */
+      const noteFor = async (card: number) =>
+        (await db
+          .prepare(`select scene, height from card_notes where card_id = ?1`)
+          .bind(card)
+          .first<{ scene: string; height: number }>()) ?? null;
+
       /**
        * The next card in a deck: everything due first, oldest due first, and
        * only then something new, and only within the allowance.
@@ -1937,12 +1945,18 @@ export default {
         if (request.method === 'GET') {
           const asked = Number(url.searchParams.get('deck'));
           const deck = Number.isInteger(asked) && asked > 0 ? asked : null;
+          const card = deck ? ((await nextCard(deck)) ?? null) : null;
           return json(
             {
               configured: true,
               today,
               decks: await decksOf(),
-              card: deck ? ((await nextCard(deck)) ?? null) : null,
+              card,
+              // With the card rather than after it. The note panel is beside
+              // the card, so fetching it separately would draw it empty and
+              // then fill it in — and on a card being seen for the fifth time
+              // that flash is the previous four attempts appearing late.
+              note: card ? await noteFor(Number(card.id)) : null,
             },
             200,
           );
@@ -1982,7 +1996,45 @@ export default {
             const now = new Date();
             const next = review(card, rating, now);
 
+            /* THE NOTE SAVES WITH THE ANSWER, which is his rule: "the note
+             * should automatically save when i say good or again". So it rides
+             * on this request rather than having a save of its own — there is
+             * no Save button to forget, and the write that records the review
+             * is the write that records what was written.
+             *
+             * `height` is derived and not taken from the browser: every band
+             * that has ink, plus one empty one. That is also the whole append
+             * mechanism — the empty band at the bottom is where the next
+             * attempt goes, so the note continues below the previous one
+             * without anything deciding to add space. See lib/card-note.ts.
+             *
+             * A note that will not parse is DROPPED and reported, never
+             * written: it would otherwise overwrite attempts already saved
+             * with something that cannot be read back. */
+            const writes = [];
+            let noteSaved: boolean | null = null;
+
+            if (body.note !== undefined && body.note !== null) {
+              const scene = parseNote(body.note);
+              if (scene === null) {
+                noteSaved = false;
+              } else if (!isEmptyNote(scene)) {
+                noteSaved = true;
+                writes.push(
+                  db
+                    .prepare(
+                      `insert into card_notes (card_id, scene, height, updated_at)
+                       values (?1, ?2, ?3, ?4)
+                       on conflict(card_id) do update
+                         set scene = ?2, height = ?3, updated_at = ?4`,
+                    )
+                    .bind(id, JSON.stringify(scene), noteHeight(scene), now.toISOString()),
+                );
+              }
+            }
+
             await db.batch([
+              ...writes,
               db
                 .prepare(
                   `update cards set due = ?2, stability = ?3, difficulty = ?4,
@@ -2012,11 +2064,17 @@ export default {
                 .bind(id, rating, card.state, now.toISOString(), today),
             ]);
 
+            const following = (await nextCard(card.curriculum_id)) ?? null;
             return json(
               {
                 answered: true,
                 decks: await decksOf(),
-                card: (await nextCard(card.curriculum_id)) ?? null,
+                card: following,
+                note: following ? await noteFor(Number(following.id)) : null,
+                // Said out loud rather than assumed. A note that could not be
+                // read is the one case where the review was recorded and the
+                // writing was not, and the page has to be able to say so.
+                noteSaved,
               },
               200,
             );

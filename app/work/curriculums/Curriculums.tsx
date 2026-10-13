@@ -667,6 +667,25 @@ export default function Curriculums() {
               <span>{current.name}</span>
             </p>
 
+            {/* The Cards card: gold, and NOT one of the stages.
+                His design — "it should also not be in the list, but a separate
+                card that's the same size and shape exactly but horizontal,
+                just beneath the curriculum name, above the search". So the
+                same card turned on its side, which is why the dimensions below
+                are a stage's two measurements swapped rather than new ones.
+                Out of the list because it is not a stage: it leaves the page
+                rather than opening a layer inside it. */}
+            {current.cards ? (
+              <a
+                href={`/work/cards/?deck=${current.id}`}
+                className={styles.cardsCard}
+              >
+                <span className={styles.cardsMark}>★</span>
+                <span className={styles.cardsName}>Cards</span>
+                <span className={styles.cardsCount}>{current.cards}</span>
+              </a>
+            ) : null}
+
             <div className={styles.searchRow}>
               <input
                 type="search"
@@ -718,23 +737,6 @@ export default function Curriculums() {
                   </button>
                 );
               })}
-
-              {/* A gold card among the stages, where the curriculum has cards.
-                  His design: "if the curriculum calls for flashcards, it
-                  should have a card in the list of stages that's gold and
-                  links to the /work/cards page". It is a link and not a layer,
-                  because reviewing is a different activity from reading a
-                  lesson — it has its own page and its own keyboard. */}
-              {current.cards ? (
-                <a
-                  href={`/work/cards/?deck=${current.id}`}
-                  className={`${styles.stageCard} ${styles.cardsCard}`}
-                >
-                  <span className={styles.stageNumber}>★</span>
-                  <span className={styles.stageName}>Cards</span>
-                  <span className={styles.stagePercent}>{current.cards}</span>
-                </a>
-              ) : null}
 
               {adding === `module:${current.id}` ? (
                 <form

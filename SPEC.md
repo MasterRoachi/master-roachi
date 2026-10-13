@@ -530,9 +530,16 @@ rather than a preference:
 **A deck is a curriculum, which is why there is no decks table.** Eight
 curriculums are eight decks; they are already named, ordered and coloured, and
 a second list of the same things would have to be kept in step by hand. Where a
-curriculum has cards, its stage fan grows a **gold card** that links to the
-deck — his design, so that flashcards are reachable from the thing that teaches
-them without being a layer inside it.
+curriculum has cards, a **gold card** sits under its name on the stages screen
+and links to the deck.
+
+It is deliberately **not one of the stages**, and it is **horizontal**: the same
+card as a stage, the same area and corner radius, turned on its side — 11rem by
+8rem where a stage is 8 by 11, and the CSS is those two measurements swapped
+rather than numbers of its own. His design. Out of the list because it is not a
+stage: every other card there opens a layer, and this one leaves the page.
+Filled gold rather than outlined, in the same gold a finished curriculum
+wears.
 
 **Scheduling is FSRS, through `ts-fsrs`** — the algorithm Anki itself moved to,
 open source, zero dependencies, and a pure function of the card and the rating.
@@ -580,6 +587,47 @@ whole, and the build script re-points it by the card's natural key —
 `(curriculum, kind, front)`, which is also what stops the same question being
 asked twice in one deck. A card left pointing at nothing is reported by
 `apply.mjs`: its history is intact but nothing will ever unlock it again.
+
+**The note beside the card.** A kanji card says *write it from memory*, and his
+question was the obvious one: where. So the card has a note panel beside it,
+the same size — "the card and sketchpad are equal size" — taking pen and text
+with a tablet. One card has exactly one note, enforced by `card_notes.card_id`
+being the primary key, because "one card and one note always live together".
+
+It **saves when the card is answered**, on the same request that records the
+review. There is no Save button to forget, and the write that records the
+answer is the write that records what was written. A note that will not parse
+is dropped and reported rather than stored: it would otherwise overwrite
+attempts already saved with something that cannot be read back. The review
+still lands — refusing the answer because the drawing was malformed would lose
+both.
+
+**It grows downward and nothing is written over.** The note is a whole number
+of bands tall, where a band is the height of the panel, and the rule is: every
+band with ink in it, plus one empty one. That empty band is where the next
+attempt goes, and the panel opens scrolled to it — so the note becomes every
+attempt at that character in order, with the previous one still there to
+compare against, which is most of the reason for writing kanji by hand at all.
+There is no append step and no counter: `noteHeight()` derives it from the
+lowest point anything reaches, so it cannot drift from what is actually on the
+page. Write nothing and the note does not grow.
+
+The scene format is the sketchpad's own (`lib/sketch.ts`) — the same strokes
+and text items, so the surface and the renderer are the same idea in both
+places. Stored as JSON rather than as the SVG the sketchpad writes, because a
+card note is dashboard data and never opened as a file; `toSvg()` still turns
+one into a file if that is ever wanted. There is a size limit, because a note
+that grows forever by design eventually stops being a row D1 will take.
+
+**A finger scrolls and a pen draws**, decided on `pointerType`. Without that
+the only way to look back at an earlier attempt on a tablet would be the
+scrollbar, because a surface that draws on touch cannot pan. And there is **no
+eraser**: a note is the record of the attempts, and rubbing out a bad one
+throws away the comparison. Undo exists for the stroke that went wrong on the
+way out of the pen.
+
+The notes pane is **the one thing in the backend that is meant to scroll**. The
+page does not; this does, because the note is taller than the panel by design.
 
 Cards are typed — `kanji`, `word`, `grammar`, `sentence` — rather than a free
 front and back. A blank rectangle has to be filled in by hand every time,

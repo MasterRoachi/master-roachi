@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import LessonMarkdown, { Line } from '@/components/LessonMarkdown';
 import { CARD_KINDS, NEW_PER_DAY, type Card, type Deck } from '@/lib/cards';
 import { statusLook } from '@/lib/curriculum-card';
+import { emptyScene, type Scene } from '@/lib/sketch';
+import Note from './Note';
 import styles from './cards.module.css';
 
 // Two screens: the decks, and one card.
@@ -24,6 +26,8 @@ interface Payload {
   today: string;
   decks: Deck[];
   card: Card | null;
+  /** The card's note, as stored. Absent where nothing has been written yet. */
+  note: { scene: string; height: number } | null;
 }
 
 export default function Cards() {
@@ -32,6 +36,9 @@ export default function Cards() {
   const [shown, setShown] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /* The note being written, held here rather than in the panel: it is sent
+   * with the answer, so the thing that posts it has to own it. */
+  const [note, setNote] = useState<Scene>(emptyScene());
 
   const load = useCallback(async (which: number | null) => {
     try {
@@ -61,6 +68,23 @@ export default function Cards() {
 
   const card = data?.card ?? null;
 
+  /* The note arrives with its card, so it is adopted whenever the card
+   * changes. A scene that will not parse is replaced by an empty one and said
+   * out loud: the alternative is a blank panel that silently overwrites
+   * attempts already saved. */
+  useEffect(() => {
+    if (!data?.note) {
+      setNote(emptyScene());
+      return;
+    }
+    try {
+      setNote(JSON.parse(data.note.scene) as Scene);
+    } catch {
+      setNote(emptyScene());
+      setError('The note saved against this card could not be read.');
+    }
+  }, [data?.note, data?.card?.id]);
+
   /** Answer, and take whatever comes back as the next card. */
   const answer = useCallback(
     async (button: 'again' | 'good') => {
@@ -70,17 +94,39 @@ export default function Cards() {
         const response = await fetch('/work/api/cards', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ action: 'answer', id: card.id, button }),
+          body: JSON.stringify({
+            action: 'answer',
+            id: card.id,
+            button,
+            // Saved by answering, which is the whole arrangement — there is no
+            // Save button to forget. See the note handling in the endpoint.
+            note: JSON.stringify(note),
+          }),
         });
-        const result = (await response.json()) as Partial<Payload> & { error?: string };
+        const result = (await response.json()) as Partial<Payload> & {
+          error?: string;
+          noteSaved?: boolean | null;
+        };
         if (!response.ok) {
           setError(result.error ?? 'That did not work.');
           return;
         }
-        setError(null);
+        // The one case where the review landed and the writing did not.
+        setError(
+          result.noteSaved === false
+            ? 'Answered, but the note could not be saved — what you wrote is not in it.'
+            : null,
+        );
         setShown(false);
         setData((was) =>
-          was ? { ...was, decks: result.decks ?? was.decks, card: result.card ?? null } : was,
+          was
+            ? {
+                ...was,
+                decks: result.decks ?? was.decks,
+                card: result.card ?? null,
+                note: result.note ?? null,
+              }
+            : was,
         );
       } catch {
         setError('That did not work.');
@@ -99,6 +145,13 @@ export default function Cards() {
     const onKey = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       if (!card) return;
+
+      /* Not while typing in the note. Space means Good everywhere on this
+       * page except inside that textarea, where it has to mean a space — and
+       * the shortcut that answers the card would otherwise file it away
+       * mid-word. */
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('[data-note-input]')) return;
 
       if (!shown) {
         if (event.key === ' ' || event.key === 'Enter') {
@@ -167,7 +220,20 @@ export default function Cards() {
       {error && <p className={styles.error}>{error}</p>}
 
       {card ? (
-        <Review card={card} shown={shown} busy={busy} onShow={() => setShown(true)} onAnswer={answer} />
+        /* The card and the note, the same size side by side — his layout: "the
+         * card and sketchpad are equal size". Two equal columns, because the
+         * writing is half of what a kanji card asks for and a panel squeezed
+         * into a corner would say it was the lesser half. */
+        <div className={styles.pair}>
+          <Review
+            card={card}
+            shown={shown}
+            busy={busy}
+            onShow={() => setShown(true)}
+            onAnswer={answer}
+          />
+          <Note scene={note} onChange={setNote} cardId={card.id} />
+        </div>
       ) : (
         <div className={styles.done}>
           <p>Nothing due.</p>

@@ -80,6 +80,17 @@ execFileSync(
 );
 const flashcards = await import(pathToFileURL(flashBundle).href);
 
+// The note that lives with a card. noteHeight() is the entire append
+// mechanism — get it wrong and the next attempt is written over the last one
+// instead of under it, which is the one thing the note exists to avoid.
+const noteBundle = path.join(os.tmpdir(), 'master-roachi-card-note-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/card-note.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${noteBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const cardNote = await import(pathToFileURL(noteBundle).href);
+
 // The icon set, where a typo is silent: a malformed path renders as nothing
 // and a duplicated name makes one icon unreachable.
 const iconBundle = path.join(os.tmpdir(), 'master-roachi-icon-bundle.mjs');
@@ -1185,6 +1196,8 @@ function fakeD1() {
     },
   ];
   const cardReviews = [];
+  /** card_id → { scene, height }. The primary key IS the card. */
+  const cardNotes = new Map();
   const sqlLog = [];
 
   const statement = (sql) => {
@@ -1283,6 +1296,9 @@ function fakeD1() {
               .sort((a, b) => a.position - b.position)[0] ?? null
           );
         }
+        if (sql.includes('from card_notes')) {
+          return cardNotes.get(bound[0]) ?? null;
+        }
         if (sql.includes('from card_reviews r')) {
           const [day, deck] = bound;
           return {
@@ -1340,6 +1356,9 @@ function fakeD1() {
             // Applied for real, so the idempotency guard has something to see.
             if (sql.includes('set post_path')) row.post_path = bound[1];
           }
+        }
+        if (sql.startsWith('insert into card_notes')) {
+          cardNotes.set(bound[0], { scene: bound[1], height: bound[2] });
         }
         if (sql.startsWith('update cards set due')) {
           const row = flash.find((k) => k.id === bound[0]);
@@ -1441,6 +1460,7 @@ function fakeD1() {
     _sources: sources,
     _cards: flash,
     _reviews: cardReviews,
+    _notes: cardNotes,
     prepare: statement,
     // The real batch runs the statements; the fake has to as well, or a
     // reorder would silently do nothing in a test and pass.
@@ -4548,6 +4568,182 @@ globalThis.fetch = preGh;
   check('an unknown action is refused', res.status === 400, String(res.status));
 }
 
+// --- the note that lives with a card --------------------------------------
+{
+  const { NOTE_BAND, NOTE_MAX_BYTES, emptyNote, isEmptyNote, lowestPoint, noteHeight, parseNote } =
+    cardNote;
+
+  const stroke = (points) => ({ kind: 'stroke', id: 'a', colour: '#fff', width: 5, points });
+  const scene = (items) => ({ version: 1, background: '#16181d', items });
+
+  check('an empty note is one band tall', emptyNote().height === NOTE_BAND, String(emptyNote().height));
+  check('and reads as empty', isEmptyNote(emptyNote().scene), '');
+
+  check('nothing drawn reaches nowhere', lowestPoint(scene([])) === 0, '');
+  check(
+    'the lowest point is the lowest point of any stroke',
+    lowestPoint(scene([stroke([[0, 10], [0, 900]]), stroke([[0, 400]])])) === 900,
+    '',
+  );
+  check(
+    'a text block counts its own lines, not just its baseline',
+    lowestPoint(scene([{ kind: 'text', id: 't', x: 0, y: 100, size: 40, colour: '#fff', text: 'a\nb\nc' }])) > 100,
+    '',
+  );
+  check(
+    'an empty text box reaches nowhere, so it cannot grow the note',
+    lowestPoint(scene([{ kind: 'text', id: 't', x: 0, y: 900, size: 40, colour: '#fff', text: '   ' }])) === 0,
+    '',
+  );
+
+  /* THE APPEND RULE: every band with ink, plus one empty one. That empty band
+     is where the next attempt goes, which is what makes a note continue below
+     the previous attempt rather than over it. */
+  check('an untouched note is one band', noteHeight(scene([])) === NOTE_BAND, '');
+  check(
+    'ink in the first band makes the note two',
+    noteHeight(scene([stroke([[0, 500]])])) === NOTE_BAND * 2,
+    String(noteHeight(scene([stroke([[0, 500]])]))),
+  );
+  check(
+    'ink in the second band makes it three',
+    noteHeight(scene([stroke([[0, 500]]), stroke([[0, 1500]])])) === NOTE_BAND * 3,
+    '',
+  );
+  check(
+    'and there is ALWAYS exactly one empty band at the bottom',
+    [0, 400, 1200, 1201, 5000].every((y) => {
+      const height = noteHeight(scene([stroke([[0, y]])]));
+      return height - Math.ceil(y / NOTE_BAND) * NOTE_BAND === NOTE_BAND;
+    }),
+    '',
+  );
+  check(
+    'ink exactly on a band boundary does not claim the next band twice',
+    noteHeight(scene([stroke([[0, NOTE_BAND]])])) === NOTE_BAND * 2,
+    String(noteHeight(scene([stroke([[0, NOTE_BAND]])]))),
+  );
+
+  // parseNote is a boundary: this arrives from a browser.
+  check('a good scene parses', parseNote(JSON.stringify(scene([stroke([[0, 1]])])))?.items.length === 1, '');
+  check('a non-string is refused', parseNote({ version: 1 }) === null, '');
+  check('malformed JSON is refused', parseNote('{nope') === null, '');
+  check('the wrong version is refused', parseNote(JSON.stringify({ version: 2, items: [] })) === null, '');
+  check('items that are not an array are refused', parseNote(JSON.stringify({ version: 1, items: 'x' })) === null, '');
+  check(
+    'an item that is neither stroke nor text is dropped rather than kept',
+    parseNote(JSON.stringify(scene([stroke([[0, 1]]), { kind: 'blob', id: 'b' }])))?.items.length === 1,
+    '',
+  );
+  check(
+    'and something past the size limit is refused rather than truncated',
+    parseNote(JSON.stringify(scene([stroke(Array.from({ length: NOTE_MAX_BYTES }, () => [1, 1]))]))) === null,
+    '',
+  );
+}
+
+// --- the note, through the endpoint ---------------------------------------
+{
+  DB = fakeD1();
+  const dbEnv = { ...env, DB };
+
+  const post = (payload) =>
+    worker.fetch(
+      new Request('https://masterroachi.com/work/api/cards', {
+        method: 'POST',
+        headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+      dbEnv,
+    );
+
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  body = await res.json();
+  check('a card with nothing written has no note', body.note === null, JSON.stringify(body.note));
+
+  const written = JSON.stringify({
+    version: 1,
+    background: '#16181d',
+    items: [{ kind: 'stroke', id: 'a', colour: '#fff', width: 5, points: [[10, 20], [30, 500]] }],
+  });
+
+  res = await post({ action: 'answer', id: 1, button: 'again', note: written });
+  check('answering with a note saves it', res.status === 200, String(res.status));
+  body = await res.json();
+  check('and says that it saved', body.noteSaved === true, JSON.stringify(body.noteSaved));
+  check(
+    'the note is stored against the card, one per card',
+    DB._notes.size === 1 && DB._notes.has(1),
+    JSON.stringify([...DB._notes.keys()]),
+  );
+  check(
+    'and its height leaves an empty band below what was written',
+    DB._notes.get(1).height === 2400,
+    String(DB._notes.get(1).height),
+  );
+
+  /* Again schedules the card a minute out, so nothing is due in the instant
+     after answering — which is itself worth asserting, because a relearning
+     card served back immediately would be an infinite loop. */
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  body = await res.json();
+  check('a card answered Again is not served again in the same second', body.card === null, JSON.stringify(body.card));
+
+  // A minute later. The card comes back, and the note must come back with it.
+  DB._cards[0].due = '2026-10-13T00:00:00.000Z';
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  body = await res.json();
+  check('the card comes back with its note', body.card?.id === 1 && body.note !== null, JSON.stringify(body.card));
+  check(
+    'and the note is what was written, not a fresh one',
+    JSON.parse(body.note.scene).items.length === 1,
+    JSON.stringify(body.note),
+  );
+
+  // Writing further down grows it by one band and no more.
+  const more = JSON.stringify({
+    version: 1,
+    background: '#16181d',
+    items: [
+      { kind: 'stroke', id: 'a', colour: '#fff', width: 5, points: [[10, 20], [30, 500]] },
+      { kind: 'stroke', id: 'b', colour: '#fff', width: 5, points: [[10, 1400]] },
+    ],
+  });
+  res = await post({ action: 'answer', id: 1, button: 'again', note: more });
+  check('a second attempt grows the note by one band', DB._notes.get(1).height === 3600, String(DB._notes.get(1).height));
+  check('and keeps the first attempt', JSON.parse(DB._notes.get(1).scene).items.length === 2, '');
+
+  /* A note that cannot be read must not land. The review still does: refusing
+     the answer because the drawing was malformed would lose the review too. */
+  const before = DB._notes.get(1).scene;
+  res = await post({ action: 'answer', id: 1, button: 'good', note: '{not json' });
+  body = await res.json();
+  check('a malformed note does not fail the answer', res.status === 200, String(res.status));
+  check('it is reported as not saved', body.noteSaved === false, JSON.stringify(body.noteSaved));
+  check('and what was already saved is untouched', DB._notes.get(1).scene === before, '');
+
+  // An untouched panel should not write a row at all.
+  DB = fakeD1();
+  const env2 = { ...env, DB };
+  res = await worker.fetch(
+    new Request('https://masterroachi.com/work/api/cards', {
+      method: 'POST',
+      headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+      body: JSON.stringify({
+        action: 'answer',
+        id: 1,
+        button: 'good',
+        note: JSON.stringify({ version: 1, background: '#16181d', items: [] }),
+      }),
+    }),
+    env2,
+  );
+  body = await res.json();
+  check('an empty note writes no row', DB._notes.size === 0, String(DB._notes.size));
+  check('and says so by saying nothing', body.noteSaved === null, JSON.stringify(body.noteSaved));
+  check('while the review still landed', DB._reviews.length === 1, String(DB._reviews.length));
+}
+
 // --- the boards page --------------------------------------------------------
 {
   // Matched by NAME, deliberately: a board made today appears without anyone
@@ -4769,6 +4965,7 @@ fs.rmSync(fieldsBundle, { force: true });
 fs.rmSync(proseBundle, { force: true });
 fs.rmSync(cardBundle, { force: true });
 fs.rmSync(flashBundle, { force: true });
+fs.rmSync(noteBundle, { force: true });
 fs.rmSync(iconKeyBundle, { force: true });
 fs.rmSync(hubBundle, { force: true });
 process.exit(failed.length ? 1 : 0);
