@@ -1,31 +1,33 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { NOTE_BAND, NOTE_WIDTH, noteHeight } from '@/lib/card-note';
+import { NOTE_SECTION, NOTE_WIDTH, sectionsToShow } from '@/lib/card-note';
 import { newId, type Item, type Scene, type Stroke, type TextItem } from '@/lib/sketch';
 import styles from './cards.module.css';
 
 // The panel beside the card, where the writing happens.
 //
-// A kanji card says "read it, then write it from memory", and the obvious
-// question was where. Here, with a tablet pen or with text, in a note that
-// belongs to that one card for as long as both exist.
+// ONE SECTION IS VISIBLE AT A TIME. The panel does not scroll through a tall
+// page — it pages between sections by moving the viewBox, which is why the
+// surface is exactly the shape of one section and never taller.
 //
-// IT GROWS DOWNWARD AND NOTHING IS ERASED BY WRITING AGAIN. Every band that
-// has ink, plus one empty one at the bottom, which is where the next attempt
-// goes — so the note becomes every attempt at that character in order, with
-// the previous one still there to compare against. That comparison is most of
-// the reason for writing kanji by hand at all. The arithmetic is in
-// lib/card-note.ts; see noteHeight().
+// How many sections exist is decided ONCE, when the card arrives, and then
+// frozen while it is on screen. That is the correction to the first version:
+// deriving it continuously meant a new empty section appeared the moment a
+// stroke was made, because the stroke was what made the count go up. Now the
+// next section appears the next time the card comes round — which is also the
+// moment the last attempt becomes worth comparing against.
 //
 // The surface is a live SVG and not a canvas, for the sketchpad's reason: a
 // canvas turns every word into pixels the moment it is drawn, and these notes
 // have text in them.
 
+/** Past this many pixels of wheel or drag, the section changes. */
+const PAGE_THRESHOLD = 40;
+
 export default function Note({
   scene,
   onChange,
-  /** Changing this scrolls back to the empty band — a new card, a new attempt. */
   cardId,
 }: {
   scene: Scene;
@@ -36,27 +38,39 @@ export default function Note({
   const [live, setLive] = useState<Stroke | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
 
-  const pane = useRef<HTMLDivElement | null>(null);
+  /* Frozen per card. Not derived from `scene`, deliberately — see above. */
+  const [sections, setSections] = useState(1);
+  const [at_, setAt] = useState(0);
+
   const surface = useRef<SVGSVGElement | null>(null);
   const drawing = useRef<Stroke | null>(null);
+  const wheel = useRef(0);
+  const swipe = useRef<number | null>(null);
 
-  const height = noteHeight(scene);
-  const bands = Math.round(height / NOTE_BAND);
-
-  /* Open at the bottom, which is the empty band. The whole append design
-   * depends on this: land anywhere else and the next attempt is written over
-   * the last one instead of under it. */
+  /* A new card: count its sections, and open the empty one at the end, which
+   * is where the next attempt belongs. */
   useEffect(() => {
-    const box = pane.current;
-    if (box) box.scrollTop = box.scrollHeight;
-  }, [cardId, bands]);
+    const count = sectionsToShow(scene);
+    setSections(count);
+    setAt(count - 1);
+    setEditing(null);
+    // `scene` is deliberately not a dependency: this must run when the CARD
+    // changes and never when the drawing does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardId]);
 
-  /** Screen point to scene coordinates. The page scales; its coordinates do not. */
-  function at(event: { clientX: number; clientY: number }): [number, number] {
+  /** The top of the visible section, in scene units. */
+  const top = at_ * NOTE_SECTION;
+
+  const go = (delta: number) =>
+    setAt((was) => Math.min(sections - 1, Math.max(0, was + delta)));
+
+  /** Screen point to scene coordinates, offset into the visible section. */
+  function point(event: { clientX: number; clientY: number }): [number, number] {
     const box = surface.current!.getBoundingClientRect();
     return [
       ((event.clientX - box.left) / box.width) * NOTE_WIDTH,
-      ((event.clientY - box.top) / box.height) * height,
+      top + ((event.clientY - box.top) / box.height) * NOTE_SECTION,
     ];
   }
 
@@ -71,25 +85,33 @@ export default function Note({
 
   return (
     <div className={styles.note}>
+      {/* Its own corner, over the panel rather than in a band of its own:
+          a toolbar row would take height from the writing, which is the thing
+          that wanted to be bigger. */}
       <div className={styles.noteTools}>
         <button
           type="button"
-          className={tool === 'pen' ? styles.toolOn : undefined}
+          className={`${styles.tool} ${tool === 'pen' ? styles.toolOn : ''}`}
           onClick={() => setTool('pen')}
           title="Draw"
+          aria-label="Draw"
+          aria-pressed={tool === 'pen'}
         >
-          Pen
+          <PenIcon />
         </button>
         <button
           type="button"
-          className={tool === 'text' ? styles.toolOn : undefined}
+          className={`${styles.tool} ${tool === 'text' ? styles.toolOn : ''}`}
           onClick={() => setTool('text')}
           title="Type"
+          aria-label="Type"
+          aria-pressed={tool === 'text'}
         >
-          Text
+          <span className={styles.toolLetter}>T</span>
         </button>
         <button
           type="button"
+          className={styles.tool}
           // The last thing added, removed. There is no eraser on purpose: a
           // note is the record of the attempts, and rubbing out a bad one
           // throws away the comparison the note exists for. Undo is for the
@@ -97,186 +119,207 @@ export default function Note({
           onClick={() => change(scene.items.slice(0, -1))}
           disabled={scene.items.length === 0}
           title="Undo the last stroke"
+          aria-label="Undo the last stroke"
         >
-          Undo
+          <UndoIcon />
         </button>
-        <span className={styles.noteHint}>
-          {bands > 1 ? `attempt ${bands}` : 'write it here'}
-        </span>
       </div>
 
-      <div className={styles.notePane} ref={pane}>
-        <svg
-          ref={surface}
-          className={styles.noteSurface}
-          viewBox={`0 0 ${NOTE_WIDTH} ${height}`}
-          style={{ aspectRatio: `${NOTE_WIDTH} / ${height}` }}
-          data-tool={tool}
-          onPointerDown={(event) => {
-            // A finger scrolls, a pen and a mouse draw. Without this the only
-            // way to look back at an earlier attempt on a tablet would be the
-            // scrollbar, because a surface that draws on touch cannot pan.
-            if (event.pointerType === 'touch') return;
-
-            if (editing !== null) {
-              setEditing(null);
-              return;
-            }
-
-            const point = at(event);
-
-            if (tool === 'pen') {
-              event.currentTarget.setPointerCapture(event.pointerId);
-              drawing.current = {
-                kind: 'stroke',
-                id: newId(),
-                colour: '#e8e6e1',
-                // In scene units, so a stroke is the same weight whatever the
-                // panel is scaled to.
-                width: 5,
-                points: [point],
-              };
-              setLive({ ...drawing.current });
-              return;
-            }
-
-            event.preventDefault();
-            const item: TextItem = {
-              kind: 'text',
-              id: newId(),
-              x: point[0],
-              // On the baseline of the first line, so the click lands where
-              // the text starts rather than above it.
-              y: point[1] + 34 * 0.8,
-              size: 34,
-              colour: '#e8e6e1',
-              text: '',
-            };
-            change([...scene.items, item]);
-            setEditing(item.id);
-          }}
-          onPointerMove={(event) => {
-            if (!drawing.current) return;
-            drawing.current.points.push(at(event));
-            setLive({ ...drawing.current });
-          }}
-          onPointerUp={() => {
-            if (!drawing.current) return;
-            change([...scene.items, drawing.current]);
-            drawing.current = null;
-            setLive(null);
-          }}
-          onPointerCancel={() => {
-            drawing.current = null;
-            setLive(null);
-          }}
-        >
-          <rect width={NOTE_WIDTH} height={height} fill={scene.background} />
-
-          {/* A rule where each band ends, so the attempts read as separate
-              rather than as one long scribble. */}
-          {Array.from({ length: bands - 1 }, (_, band) => (
-            <line
-              key={band}
-              x1={0}
-              x2={NOTE_WIDTH}
-              y1={(band + 1) * NOTE_BAND}
-              y2={(band + 1) * NOTE_BAND}
-              stroke="oklch(34% 0 0)"
-              strokeWidth={2}
-              strokeDasharray="12 10"
+      {/* One dot per section, on the right and vertically centred. Hidden
+          while there is only one, because a single dot would be saying there
+          is somewhere else to be when there is not. */}
+      {sections > 1 && (
+        <div className={styles.dots} aria-hidden="true">
+          {Array.from({ length: sections }, (_, which) => (
+            <button
+              key={which}
+              type="button"
+              className={`${styles.dot} ${which === at_ ? styles.dotHere : ''}`}
+              onClick={() => setAt(which)}
+              tabIndex={-1}
+              title={which === sections - 1 ? 'This attempt' : `Attempt ${which + 1}`}
             />
           ))}
+        </div>
+      )}
 
-          {scene.items.map((item) =>
-            item.kind === 'stroke' ? (
-              <path
-                key={item.id}
-                d={pathD(item)}
-                fill="none"
-                stroke={item.colour}
-                strokeWidth={item.width}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            ) : (
-              <text
-                key={item.id}
-                x={item.x}
-                y={item.y}
-                fill={item.colour}
-                fontSize={item.size}
-                style={{ whiteSpace: 'pre' }}
-              >
-                {item.text.split('\n').map((line, at_) => (
-                  <tspan key={at_} x={item.x} dy={at_ === 0 ? 0 : item.size * 1.35}>
-                    {line || ' '}
-                  </tspan>
-                ))}
-              </text>
-            ),
-          )}
+      <svg
+        ref={surface}
+        className={styles.noteSurface}
+        // Paging IS the viewBox moving down a section at a time. Nothing
+        // scrolls, so nothing can be left half way between two sections.
+        viewBox={`0 ${top} ${NOTE_WIDTH} ${NOTE_SECTION}`}
+        data-tool={tool}
+        onWheel={(event) => {
+          // Accumulated rather than acted on per event: one flick of a wheel
+          // is a dozen events and would otherwise cross every section at once.
+          wheel.current += event.deltaY;
+          if (Math.abs(wheel.current) < PAGE_THRESHOLD) return;
+          go(wheel.current < 0 ? -1 : 1);
+          wheel.current = 0;
+        }}
+        onPointerDown={(event) => {
+          /* A finger pages, a pen and a mouse draw. Without the split there is
+           * no way to reach an earlier attempt on a tablet at all, since the
+           * panel has nothing to scroll. */
+          if (event.pointerType === 'touch') {
+            swipe.current = event.clientY;
+            return;
+          }
 
-          {live && (
+          if (editing !== null) {
+            setEditing(null);
+            return;
+          }
+
+          const where = point(event);
+
+          if (tool === 'pen') {
+            event.currentTarget.setPointerCapture(event.pointerId);
+            drawing.current = {
+              kind: 'stroke',
+              id: newId(),
+              colour: '#e8e6e1',
+              // In scene units, so a stroke is the same weight whatever the
+              // panel is scaled to.
+              width: 5,
+              points: [where],
+            };
+            setLive({ ...drawing.current });
+            return;
+          }
+
+          event.preventDefault();
+          const item: TextItem = {
+            kind: 'text',
+            id: newId(),
+            x: where[0],
+            // On the baseline of the first line, so the click lands where the
+            // text starts rather than above it.
+            y: where[1] + 34 * 0.8,
+            size: 34,
+            colour: '#e8e6e1',
+            text: '',
+          };
+          change([...scene.items, item]);
+          setEditing(item.id);
+        }}
+        onPointerMove={(event) => {
+          if (!drawing.current) return;
+          drawing.current.points.push(point(event));
+          setLive({ ...drawing.current });
+        }}
+        onPointerUp={(event) => {
+          if (swipe.current !== null) {
+            const moved = event.clientY - swipe.current;
+            swipe.current = null;
+            // Up for the previous attempt, down for the next — his direction,
+            // and the same sign as the wheel so the two cannot disagree.
+            if (Math.abs(moved) > PAGE_THRESHOLD) go(moved > 0 ? -1 : 1);
+            return;
+          }
+          if (!drawing.current) return;
+          change([...scene.items, drawing.current]);
+          drawing.current = null;
+          setLive(null);
+        }}
+        onPointerCancel={() => {
+          drawing.current = null;
+          swipe.current = null;
+          setLive(null);
+        }}
+      >
+        <rect x={0} y={top} width={NOTE_WIDTH} height={NOTE_SECTION} fill={scene.background} />
+
+        {scene.items.map((item) =>
+          item.kind === 'stroke' ? (
             <path
-              d={pathD(live)}
+              key={item.id}
+              d={pathD(item)}
               fill="none"
-              stroke={live.colour}
-              strokeWidth={live.width}
+              stroke={item.colour}
+              strokeWidth={item.width}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-          )}
-        </svg>
+          ) : (
+            <text
+              key={item.id}
+              x={item.x}
+              y={item.y}
+              fill={item.colour}
+              fontSize={item.size}
+              style={{ whiteSpace: 'pre' }}
+            >
+              {item.text.split('\n').map((line, index) => (
+                <tspan key={index} x={item.x} dy={index === 0 ? 0 : item.size * 1.35}>
+                  {line || ' '}
+                </tspan>
+              ))}
+            </text>
+          ),
+        )}
 
-        {/* The text editor, over the item being typed. data-note-input is what
-            the page's keyboard handler looks for: space means Good everywhere
-            except in here, where it has to mean a space. */}
-        {editing !== null &&
-          (() => {
-            const item = scene.items.find((one) => one.id === editing);
-            if (!item || item.kind !== 'text') return null;
-            const factor = scale();
-            return (
-              <textarea
-                data-note-input
-                autoFocus
-                className={styles.noteEditor}
-                value={item.text}
-                style={{
-                  left: item.x * factor,
-                  top: (item.y - item.size * 0.8) * factor,
-                  fontSize: item.size * factor,
-                  lineHeight: 1.35,
-                }}
-                onChange={(event) =>
-                  change(
-                    scene.items.map((one) =>
-                      one.id === editing ? { ...one, text: event.target.value } : one,
-                    ),
-                  )
+        {live && (
+          <path
+            d={pathD(live)}
+            fill="none"
+            stroke={live.colour}
+            strokeWidth={live.width}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        )}
+      </svg>
+
+      {/* The text editor, over the item being typed. data-note-input is what
+          the page's keyboard handler looks for: space means Good everywhere
+          except in here, where it has to mean a space. */}
+      {editing !== null &&
+        (() => {
+          const item = scene.items.find((one) => one.id === editing);
+          if (!item || item.kind !== 'text') return null;
+          const factor = scale();
+          return (
+            <textarea
+              data-note-input
+              autoFocus
+              className={styles.noteEditor}
+              value={item.text}
+              style={{
+                left: item.x * factor,
+                // Offset into the visible section, same as the pointer maths.
+                top: (item.y - top - item.size * 0.8) * factor,
+                fontSize: item.size * factor,
+                lineHeight: 1.35,
+              }}
+              onChange={(event) =>
+                change(
+                  scene.items.map((one) =>
+                    one.id === editing ? { ...one, text: event.target.value } : one,
+                  ),
+                )
+              }
+              onBlur={() => {
+                // An empty box is removed rather than saved. Otherwise a
+                // mis-click leaves an invisible item that counts towards the
+                // note's length and cannot be found to delete.
+                if (!item.text.trim()) {
+                  change(scene.items.filter((one) => one.id !== editing));
                 }
-                onBlur={() => {
-                  // An empty box is removed rather than saved. Otherwise a
-                  // mis-click leaves an invisible item that counts towards the
-                  // note's height and cannot be found to delete.
-                  if (!item.text.trim()) {
-                    change(scene.items.filter((one) => one.id !== editing));
-                  }
-                  setEditing(null);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Escape') event.currentTarget.blur();
-                }}
-              />
-            );
-          })()}
-      </div>
+                setEditing(null);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') event.currentTarget.blur();
+              }}
+            />
+          );
+        })()}
     </div>
   );
 }
 
-/** The same path the saved file uses, so the screen and the record agree. */
+/** The same path the saved record uses, so the screen and the record agree. */
 function pathD(stroke: Stroke): string {
   if (stroke.points.length === 0) return '';
   const [first, ...rest] = stroke.points;
@@ -286,4 +329,34 @@ function pathD(stroke: Stroke): string {
     return `M ${first[0]} ${first[1]} l 0.01 0`;
   }
   return `M ${first[0]} ${first[1]} ` + rest.map((p) => `L ${p[0]} ${p[1]}`).join(' ');
+}
+
+function PenIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <path
+        d="M4 20 L5.5 15.5 L16 5 L19 8 L8.5 18.5 Z M14 7 L17 10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function UndoIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+      <path
+        d="M8 7 L4 11 L8 15 M4 11 H14 a5 5 0 0 1 0 10 H10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }

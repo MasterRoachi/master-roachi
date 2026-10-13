@@ -23,7 +23,7 @@ import {
   review,
   type Card,
 } from '../lib/cards';
-import { isEmptyNote, noteHeight, parseNote } from '../lib/card-note';
+import { isEmptyNote, parseNote, writtenHeight } from '../lib/card-note';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
@@ -2002,11 +2002,11 @@ export default {
              * no Save button to forget, and the write that records the review
              * is the write that records what was written.
              *
-             * `height` is derived and not taken from the browser: every band
-             * that has ink, plus one empty one. That is also the whole append
-             * mechanism — the empty band at the bottom is where the next
-             * attempt goes, so the note continues below the previous one
-             * without anything deciding to add space. See lib/card-note.ts.
+             * `height` is derived and not taken from the browser: how far the
+             * note has actually been written, in whole sections. How many
+             * sections are SHOWN is a different question and is not stored,
+             * because it depends on when the card was opened — see
+             * sectionsToShow() in lib/card-note.ts.
              *
              * A note that will not parse is DROPPED and reported, never
              * written: it would otherwise overwrite attempts already saved
@@ -2028,7 +2028,7 @@ export default {
                        on conflict(card_id) do update
                          set scene = ?2, height = ?3, updated_at = ?4`,
                     )
-                    .bind(id, JSON.stringify(scene), noteHeight(scene), now.toISOString()),
+                    .bind(id, JSON.stringify(scene), writtenHeight(scene), now.toISOString()),
                 );
               }
             }

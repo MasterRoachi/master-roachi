@@ -602,15 +602,31 @@ attempts already saved with something that cannot be read back. The review
 still lands — refusing the answer because the drawing was malformed would lose
 both.
 
-**It grows downward and nothing is written over.** The note is a whole number
-of bands tall, where a band is the height of the panel, and the rule is: every
-band with ink in it, plus one empty one. That empty band is where the next
-attempt goes, and the panel opens scrolled to it — so the note becomes every
-attempt at that character in order, with the previous one still there to
-compare against, which is most of the reason for writing kanji by hand at all.
-There is no append step and no counter: `noteHeight()` derives it from the
-lowest point anything reaches, so it cannot drift from what is actually on the
-page. Write nothing and the note does not grow.
+**One section is visible at a time, and the next appears when the card comes
+round again.** A note is a whole number of sections, a section being exactly
+what the panel shows, and paging between them is the viewBox moving — nothing
+scrolls, so nothing can be left half way between two. The note becomes every
+attempt at that character in order, with the previous one there to compare
+against, which is most of the reason for writing kanji by hand at all.
+
+How many sections exist is decided **once, when the card arrives**, and frozen
+while it is on screen. The first version derived it continuously and was wrong
+in a way only using it shows: a fresh section appeared the instant a stroke was
+made, because the stroke was what made the count go up — "whenever i write
+anything it immediately spawns another note section below". Now the next
+section appears the next time the card is reached, which is also the moment the
+last attempt becomes worth comparing against.
+
+`sectionsWritten()` counts what is on the page and `sectionsToShow()` adds the
+one empty section to write on. Only the first is stored, in `height`: how many
+sections are *shown* is a question about when the card was opened, so it
+belongs to the page and is never written down.
+
+**One dot per section**, on the right and vertically centred, and hidden
+entirely while there is only one — a single dot would be saying there is
+somewhere else to be when there is not. Up for the previous attempt, down for
+the next, by wheel or by swipe, with the same sign for both so the two cannot
+disagree. A dot can also just be clicked.
 
 The scene format is the sketchpad's own (`lib/sketch.ts`) — the same strokes
 and text items, so the surface and the renderer are the same idea in both
@@ -619,15 +635,20 @@ card note is dashboard data and never opened as a file; `toSvg()` still turns
 one into a file if that is ever wanted. There is a size limit, because a note
 that grows forever by design eventually stops being a row D1 will take.
 
-**A finger scrolls and a pen draws**, decided on `pointerType`. Without that
-the only way to look back at an earlier attempt on a tablet would be the
-scrollbar, because a surface that draws on touch cannot pan. And there is **no
-eraser**: a note is the record of the attempts, and rubbing out a bad one
-throws away the comparison. Undo exists for the stroke that went wrong on the
-way out of the pen.
+**A finger pages and a pen draws**, decided on `pointerType`. Without the split
+there is no way to reach an earlier attempt on a tablet at all, since the panel
+has nothing to scroll. And there is **no eraser**: a note is the record of the
+attempts, and rubbing out a bad one throws away the comparison. Undo exists for
+the stroke that went wrong on the way out of the pen.
 
-The notes pane is **the one thing in the backend that is meant to scroll**. The
-page does not; this does, because the note is taller than the panel by design.
+**The panel has no border and no toolbar.** It is the writing surface and
+nothing else — "the panel does not need a border, it can just be the actual
+writing panel". The pen, T and undo buttons are three small round buttons in a
+column, floating in its top-right corner rather than in a band of their own: a
+row across the top would reach into the middle of the writing, and a band below
+would take height from the thing that wanted to be bigger. Both panels were
+made drastically larger at the same time, which meant taking the page's own
+padding down to almost nothing.
 
 Cards are typed — `kanji`, `word`, `grammar`, `sentence` — rather than a free
 front and back. A blank rectangle has to be filled in by hand every time,

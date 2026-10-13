@@ -15,13 +15,13 @@ import { emptyScene, type Scene } from './sketch';
 export const NOTE_WIDTH = 1600;
 
 /**
- * One band: the height of the visible panel, in scene units.
+ * One section: exactly what the panel shows, in scene units.
  *
- * A note is a whole number of bands tall. The band is what makes "the next
- * note just continues below the previous one" true without any append step —
- * see noteHeight().
+ * A note is a whole number of sections, and ONLY ONE IS EVER VISIBLE. The
+ * panel does not scroll through a tall page; it pages between sections, which
+ * is the difference between this and the sketchpad.
  */
-export const NOTE_BAND = 1200;
+export const NOTE_SECTION = 1200;
 
 /**
  * The biggest a note may get, in bytes of JSON.
@@ -41,7 +41,7 @@ export interface Note {
 }
 
 export function emptyNote(): Note {
-  return { scene: emptyScene(), height: NOTE_BAND };
+  return { scene: emptyScene(), height: NOTE_SECTION };
 }
 
 /** The lowest point any ink or text reaches. 0 for an empty scene. */
@@ -57,24 +57,43 @@ export function lowestPoint(scene: Scene): number {
       const bottom = item.y + item.size * 1.35 * (lines - 1);
       if (bottom > lowest) lowest = bottom;
     }
+
   }
   return lowest;
 }
 
+/** How many sections have something written in them. 0 for an empty note. */
+export function sectionsWritten(scene: Scene): number {
+  return Math.ceil(lowestPoint(scene) / NOTE_SECTION);
+}
+
 /**
- * How tall the note should be: every band that has been written in, plus one
- * empty one.
+ * How many sections to show, which is only ever asked ON LOADING A CARD.
  *
- * THIS IS THE WHOLE APPEND MECHANISM, and it is a derived number rather than a
- * stored one so that it cannot drift. There is always exactly one empty band
- * at the bottom, the page opens scrolled to it, and so the next attempt is
- * written below the last without anything having to decide to add space. Write
- * nothing and the note does not grow; fill the band and the next save makes
- * another.
+ * Every section with something in it, plus one empty one to write in. Asking
+ * once per card is the whole mechanism, and the first version got it wrong by
+ * asking continuously: a fresh section appeared the instant a stroke was made,
+ * because the stroke was what made the count go up. His words — "whenever i
+ * write anything it immediately spawns another note section below".
+ *
+ * So the count is frozen for as long as the card is on screen. Write as much
+ * as you like; the next section appears the next time you reach this card,
+ * which is also when the previous attempt becomes worth comparing against.
  */
-export function noteHeight(scene: Scene): number {
-  const used = Math.ceil(lowestPoint(scene) / NOTE_BAND);
-  return Math.max(1, used + 1) * NOTE_BAND;
+export function sectionsToShow(scene: Scene): number {
+  return Math.max(1, sectionsWritten(scene) + 1);
+}
+
+/**
+ * The height of what has been WRITTEN, for the `height` column.
+ *
+ * Not the height of what is shown — that is a count of sections and it lives
+ * in the page, because it depends on when the card was opened rather than on
+ * what is in the note. This is only a record of how far the note has actually
+ * filled.
+ */
+export function writtenHeight(scene: Scene): number {
+  return Math.max(1, sectionsWritten(scene)) * NOTE_SECTION;
 }
 
 /**

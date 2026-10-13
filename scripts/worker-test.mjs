@@ -4570,13 +4570,22 @@ globalThis.fetch = preGh;
 
 // --- the note that lives with a card --------------------------------------
 {
-  const { NOTE_BAND, NOTE_MAX_BYTES, emptyNote, isEmptyNote, lowestPoint, noteHeight, parseNote } =
-    cardNote;
+  const {
+    NOTE_SECTION,
+    NOTE_MAX_BYTES,
+    emptyNote,
+    isEmptyNote,
+    lowestPoint,
+    parseNote,
+    sectionsToShow,
+    sectionsWritten,
+    writtenHeight,
+  } = cardNote;
 
   const stroke = (points) => ({ kind: 'stroke', id: 'a', colour: '#fff', width: 5, points });
   const scene = (items) => ({ version: 1, background: '#16181d', items });
 
-  check('an empty note is one band tall', emptyNote().height === NOTE_BAND, String(emptyNote().height));
+  check('an empty note is one section tall', emptyNote().height === NOTE_SECTION, String(emptyNote().height));
   check('and reads as empty', isEmptyNote(emptyNote().scene), '');
 
   check('nothing drawn reaches nowhere', lowestPoint(scene([])) === 0, '');
@@ -4596,32 +4605,52 @@ globalThis.fetch = preGh;
     '',
   );
 
-  /* THE APPEND RULE: every band with ink, plus one empty one. That empty band
-     is where the next attempt goes, which is what makes a note continue below
-     the previous attempt rather than over it. */
-  check('an untouched note is one band', noteHeight(scene([])) === NOTE_BAND, '');
+  /* Sections written: what is actually on the page. The height column records
+     this and nothing else — how many sections are SHOWN is a question about
+     when the card was opened, so it is the page's and is never stored. */
+  check('an untouched note has nothing written in it', sectionsWritten(scene([])) === 0, '');
+  check('ink in the first section counts one', sectionsWritten(scene([stroke([[0, 500]])])) === 1, '');
   check(
-    'ink in the first band makes the note two',
-    noteHeight(scene([stroke([[0, 500]])])) === NOTE_BAND * 2,
-    String(noteHeight(scene([stroke([[0, 500]])]))),
+    'ink in the second counts two, including the first',
+    sectionsWritten(scene([stroke([[0, 1500]])])) === 2,
+    String(sectionsWritten(scene([stroke([[0, 1500]])]))),
   );
   check(
-    'ink in the second band makes it three',
-    noteHeight(scene([stroke([[0, 500]]), stroke([[0, 1500]])])) === NOTE_BAND * 3,
+    'ink exactly on a boundary does not claim the next section',
+    sectionsWritten(scene([stroke([[0, NOTE_SECTION]])])) === 1,
+    String(sectionsWritten(scene([stroke([[0, NOTE_SECTION]])]))),
+  );
+
+  /* Sections to show: every one written in, plus one empty to write on. Asked
+     ONCE when a card arrives and then frozen by the panel — deriving it
+     continuously is what made a new section appear the instant a stroke was
+     made. The freeze is in Note.tsx; what is testable here is the count. */
+  check('an empty note shows one section', sectionsToShow(scene([])) === 1, '');
+  check(
+    'a note written in once shows two: the attempt and a fresh one',
+    sectionsToShow(scene([stroke([[0, 500]])])) === 2,
+    String(sectionsToShow(scene([stroke([[0, 500]])]))),
+  );
+  check(
+    'and there is always exactly one empty section to write on',
+    [0, 400, 1200, 1201, 5000].every(
+      (y) => sectionsToShow(scene([stroke([[0, y]])])) === sectionsWritten(scene([stroke([[0, y]])])) + 1,
+    ),
     '',
   );
+
+  /* The stored height is what was WRITTEN — no empty section in it, or a note
+     would claim to be longer than its contents every time it was saved. */
+  check('an untouched note still records one section of height', writtenHeight(scene([])) === NOTE_SECTION, '');
   check(
-    'and there is ALWAYS exactly one empty band at the bottom',
-    [0, 400, 1200, 1201, 5000].every((y) => {
-      const height = noteHeight(scene([stroke([[0, y]])]));
-      return height - Math.ceil(y / NOTE_BAND) * NOTE_BAND === NOTE_BAND;
-    }),
-    '',
+    'and a note written in once records one, not two',
+    writtenHeight(scene([stroke([[0, 500]])])) === NOTE_SECTION,
+    String(writtenHeight(scene([stroke([[0, 500]])]))),
   );
   check(
-    'ink exactly on a band boundary does not claim the next band twice',
-    noteHeight(scene([stroke([[0, NOTE_BAND]])])) === NOTE_BAND * 2,
-    String(noteHeight(scene([stroke([[0, NOTE_BAND]])]))),
+    'written in twice records two',
+    writtenHeight(scene([stroke([[0, 1500]])])) === NOTE_SECTION * 2,
+    '',
   );
 
   // parseNote is a boundary: this arrives from a browser.
@@ -4677,8 +4706,8 @@ globalThis.fetch = preGh;
     JSON.stringify([...DB._notes.keys()]),
   );
   check(
-    'and its height leaves an empty band below what was written',
-    DB._notes.get(1).height === 2400,
+    'and its height is what was written, with no empty section added',
+    DB._notes.get(1).height === 1200,
     String(DB._notes.get(1).height),
   );
 
@@ -4710,7 +4739,7 @@ globalThis.fetch = preGh;
     ],
   });
   res = await post({ action: 'answer', id: 1, button: 'again', note: more });
-  check('a second attempt grows the note by one band', DB._notes.get(1).height === 3600, String(DB._notes.get(1).height));
+  check('a second attempt grows the note by one section', DB._notes.get(1).height === 2400, String(DB._notes.get(1).height));
   check('and keeps the first attempt', JSON.parse(DB._notes.get(1).scene).items.length === 2, '');
 
   /* A note that cannot be read must not land. The review still does: refusing
