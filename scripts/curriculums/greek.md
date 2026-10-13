@@ -127,7 +127,7 @@ material is graded against them.
 | --- | --- | --- | --- | --- |
 | 1 | The alphabet, the sounds and the hand | — | 30 | 30 |
 | 2 | First Greek: being, having, and the noun | A1 | 35 | 36 |
-| 3 | The cases, in use | A1–A2 | 35 | — |
+| 3 | The cases, in use | A1–A2 | 35 | 35 |
 | 4 | Verbs and aspect | A2 | 40 | — |
 | 5 | Everyday Greek | A2 | 40 | — |
 | 6 | The past, the future and the moods | A2–B1 | 35 | — |
@@ -137,7 +137,7 @@ material is graded against them.
 | 10 | Cypriot Greek | — | 20 | — |
 | 11 | Literature, and ad astra | C1+ | open | — |
 | — | Spelling track, its own modules | — | ~40 | 8 |
-| — | Forms track, its own modules | — | ~40 | — |
+| — | Forms track, its own modules | — | ~40 | 7 |
 
 **Comparable to Japanese in length**, at his word — that came out at 382
 lessons, and this is planned at roughly the same.

@@ -941,11 +941,6 @@
       "back": "The neuter plural of the adjective — καλός → καλά, γρήγορος → γρήγορα"
     },
     {
-      "kind": "grammar",
-      "front": "πολύς, πολλή, πολύ",
-      "back": "much, many — πολλά παιδιά, πολύ καλά, πολλή δουλειά"
-    },
-    {
       "kind": "word",
       "front": "μεγάλος",
       "back": "big, large — and *old* of a person"
@@ -969,6 +964,11 @@
       "kind": "word",
       "front": "δύσκολος",
       "back": "difficult"
+    },
+    {
+      "kind": "grammar",
+      "front": "πολύ as an adverb",
+      "back": "very — and it does not change: πολύ καλά, πολύ ακριβό"
     }
   ],
   "The personal pronouns, and when Greek uses them": [
@@ -1476,6 +1476,672 @@
       "kind": "grammar",
       "front": "What is never split across syllables",
       "back": "A digraph — neither αι ει οι ου αυ ευ nor μπ ντ γκ τσ τζ"
+    }
+  ],
+  "The genitive: what it is for": [
+    {
+      "kind": "grammar",
+      "front": "What the genitive does",
+      "back": "Of, and possession · the indirect object with pronouns · dates · age · a few fixed phrases",
+      "extra": "Not after prepositions — those take the accusative."
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek says *the teacher's book*",
+      "back": "το βιβλίο του δασκάλου — the thing owned first, the owner after, in the genitive"
+    }
+  ],
+  "The genitive of the article": [
+    {
+      "kind": "grammar",
+      "front": "The article, genitive",
+      "back": "του / της / του — plural των for all three genders"
+    },
+    {
+      "kind": "grammar",
+      "front": "The whole article table",
+      "back": "ο η το · τον την το · του της του — οι οι τα · τους τις τα · των των των"
+    }
+  ],
+  "The genitive: masculine nouns": [
+    {
+      "kind": "grammar",
+      "front": "ο δάσκαλος — genitive",
+      "back": "του δασκάλου · των δασκάλων",
+      "extra": "The stress moves forward, by the rule of limitation."
+    },
+    {
+      "kind": "grammar",
+      "front": "ο πατέρας / ο μαθητής — genitive",
+      "back": "του πατέρα, των πατέρων · του μαθητή, των μαθητών",
+      "extra": "The -ας and -ης genitive singular is the bare stem."
+    }
+  ],
+  "The genitive: feminine nouns": [
+    {
+      "kind": "grammar",
+      "front": "η γυναίκα — genitive",
+      "back": "της γυναίκας · των γυναικών"
+    },
+    {
+      "kind": "grammar",
+      "front": "η πόλη — genitive",
+      "back": "της πόλης · των πόλεων",
+      "extra": "The -ση/-ξη/-ψη nouns take -εων in the genitive plural."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Greek street names are genitives",
+      "back": "οδός Ερμού, πλατεία Συντάγματος — *the street of Hermes*, *the square of the Constitution*"
+    }
+  ],
+  "The genitive: neuter nouns": [
+    {
+      "kind": "grammar",
+      "front": "το παιδί — genitive",
+      "back": "του παιδιού · των παιδιών",
+      "extra": "The stress goes to the ending."
+    },
+    {
+      "kind": "grammar",
+      "front": "το μάθημα — genitive",
+      "back": "του μαθήματος · των μαθημάτων",
+      "extra": "-ματ- is the real stem, which English preserves in *mathematics*."
+    }
+  ],
+  "The genitive plural": [
+    {
+      "kind": "grammar",
+      "front": "The genitive plural ending",
+      "back": "-ων for every noun, with -εων for the -ση/-ξη/-ψη feminines"
+    },
+    {
+      "kind": "sentence",
+      "front": "η Κυριακή των Βαΐων",
+      "back": "Palm Sunday — *the Sunday of the palms*"
+    }
+  ],
+  "Possession: the two ways": [
+    {
+      "kind": "grammar",
+      "front": "Pronoun or genitive",
+      "back": "A weak pronoun for *my, your, his* — a genitive noun for anything named"
+    },
+    {
+      "kind": "grammar",
+      "front": "δικός μου",
+      "back": "mine, my own — it agrees with the thing owned: δικό μου, δική μου, δικά μου"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ποιανού είναι αυτό;",
+      "back": "Whose is this?"
+    }
+  ],
+  "Names in the genitive": [
+    {
+      "kind": "grammar",
+      "front": "ο Γιώργος — genitive and vocative",
+      "back": "του Γιώργου · Γιώργο!"
+    },
+    {
+      "kind": "grammar",
+      "front": "ο Γιάννης — genitive and vocative",
+      "back": "του Γιάννη · Γιάννη!"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a Greek woman's surname differs from her father's",
+      "back": "It is the genitive — Παπαδόπουλος / Παπαδοπούλου"
+    },
+    {
+      "kind": "grammar",
+      "front": "του Αγίου Γεωργίου",
+      "back": "of St George — how the calendar and name days are written"
+    }
+  ],
+  "Dates": [
+    {
+      "kind": "grammar",
+      "front": "How a Greek date is built",
+      "back": "The number, then the month in the genitive — 14 Οκτωβρίου"
+    },
+    {
+      "kind": "grammar",
+      "front": "On a date",
+      "back": "στις — στις 14 Οκτωβρίου · but την πρώτη Μαΐου for the 1st"
+    },
+    {
+      "kind": "word",
+      "front": "Μαΐου",
+      "back": "of May",
+      "extra": "Accent and diaeresis both, from the Spelling track."
+    }
+  ],
+  "Age, and how long things last": [
+    {
+      "kind": "sentence",
+      "front": "Πόσων χρονών είσαι;",
+      "back": "How old are you?"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek gives an age",
+      "back": "The genitive plural — είμαι τριάντα χρονών. Formally, ετών."
+    },
+    {
+      "kind": "grammar",
+      "front": "How long you have been doing something",
+      "back": "The present tense — Μαθαίνω ελληνικά έναν χρόνο",
+      "extra": "Where English uses a perfect."
+    },
+    {
+      "kind": "word",
+      "front": "του χρόνου",
+      "back": "next year — a fixed genitive"
+    }
+  ],
+  "The indirect object": [
+    {
+      "kind": "grammar",
+      "front": "Who gets the indirect object",
+      "back": "A pronoun takes the weak genitive (μου λέει); a noun takes σε plus the accusative (λέω στον Γιώργο)",
+      "extra": "Never a genitive noun — that would make it possession."
+    },
+    {
+      "kind": "grammar",
+      "front": "ρωτάω and βοηθάω",
+      "back": "They take the accusative, not the genitive — σε ρωτάω, σε βοηθάω"
+    }
+  ],
+  "The vocative": [
+    {
+      "kind": "grammar",
+      "front": "The vocative endings",
+      "back": "-ος nouns → -ε (or -ο in short names) · -ας and -ης drop the -ς · feminines and neuters unchanged"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one rule of the vocative",
+      "back": "No article, ever — Γιώργο, τι κάνεις; never ο Γιώργο"
+    },
+    {
+      "kind": "word",
+      "front": "παιδιά!",
+      "back": "everyone — used to address a group of any age"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Πάτερ is not πατέρα",
+      "back": "The modern vocative of πατέρας is πατέρα; Πάτερ is the older form, fixed for addressing a priest",
+      "extra": "Like Δόξα τω Θεώ — an older grammar surviving as a formula."
+    }
+  ],
+  "κύριε, κυρία and how Greeks address each other": [
+    {
+      "kind": "grammar",
+      "front": "κυρία Μαρία",
+      "back": "Title plus first name — polite and warm at once, and the register English has no equivalent for"
+    },
+    {
+      "kind": "word",
+      "front": "Σεβασμιώτατε",
+      "back": "Your Eminence — a bishop or metropolitan"
+    },
+    {
+      "kind": "word",
+      "front": "ο κουμπάρος",
+      "back": "your child's godfather, or your wedding sponsor — a close relationship, and a familiar greeting between men"
+    },
+    {
+      "kind": "word",
+      "front": "θεία / θείε",
+      "back": "aunt / uncle — used of any older person you are close to, and a compliment"
+    }
+  ],
+  "The full adjective table": [
+    {
+      "kind": "grammar",
+      "front": "καλός, the full set",
+      "back": "καλός καλή καλό · καλό καλή καλό · καλού καλής καλού · καλοί καλές καλά · καλούς καλές καλά · καλών"
+    },
+    {
+      "kind": "grammar",
+      "front": "How an adjective agrees",
+      "back": "In gender, number and case, all three at once — του καλού δασκάλου, τις μεγάλες πόλεις"
+    },
+    {
+      "kind": "grammar",
+      "front": "ο δάσκαλος ο καλός",
+      "back": "The emphatic position — *the teacher, the good one*, with both articles"
+    }
+  ],
+  "More adjective patterns": [
+    {
+      "kind": "grammar",
+      "front": "πολύς, πολλή, πολύ",
+      "back": "much, many — πολλοί, πολλές, πολλά in the plural",
+      "extra": "One λ in the masculine and neuter singular, two everywhere else."
+    },
+    {
+      "kind": "grammar",
+      "front": "όλος and the article",
+      "back": "The article comes after it — όλος ο κόσμος, όλη η μέρα, όλα τα παιδιά"
+    },
+    {
+      "kind": "grammar",
+      "front": "βαθύς, βαθιά, βαθύ",
+      "back": "The -ύς/-ιά/-ύ pattern — βαθύς, πλατύς, μακρύς, βαρύς"
+    },
+    {
+      "kind": "word",
+      "front": "διεθνής",
+      "back": "international — the learned -ής/-ής/-ές pattern, as on airport signs"
+    }
+  ],
+  "Comparatives": [
+    {
+      "kind": "grammar",
+      "front": "The everyday comparative",
+      "back": "πιο plus the adjective — πιο μεγάλος. πιο never changes."
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek says *than*",
+      "back": "από with the accusative — πιο μεγάλος από μένα",
+      "extra": "παρά before a clause."
+    },
+    {
+      "kind": "grammar",
+      "front": "as … as",
+      "back": "τόσο … όσο — Είναι τόσο μεγάλος όσο εγώ"
+    }
+  ],
+  "Superlatives": [
+    {
+      "kind": "grammar",
+      "front": "The superlative",
+      "back": "The article plus the comparative — ο πιο μεγάλος, ο μεγαλύτερος"
+    },
+    {
+      "kind": "grammar",
+      "front": "the biggest city in Greece",
+      "back": "η πιο μεγάλη πόλη της Ελλάδας — English *in* becomes a genitive"
+    },
+    {
+      "kind": "grammar",
+      "front": "What is inside Σεβασμιώτατε and Παναγιώτατε",
+      "back": "The -ότατος absolute superlative — *most reverend*, *all-holy*"
+    }
+  ],
+  "The irregular comparatives": [
+    {
+      "kind": "grammar",
+      "front": "καλός → ?",
+      "back": "καλύτερος — better. Adverb καλύτερα."
+    },
+    {
+      "kind": "grammar",
+      "front": "κακός → ?",
+      "back": "χειρότερος — worse. Adverb χειρότερα."
+    },
+    {
+      "kind": "grammar",
+      "front": "πολύς → ?",
+      "back": "περισσότερος — more",
+      "extra": "οι περισσότεροι = most people."
+    },
+    {
+      "kind": "grammar",
+      "front": "μεγάλος / μικρός → ?",
+      "back": "μεγαλύτερος / μικρότερος — and of people they mean older and younger"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλύτερα να πάμε.",
+      "back": "We had better go."
+    }
+  ],
+  "The pronouns in full": [
+    {
+      "kind": "grammar",
+      "front": "Which pronouns follow a preposition",
+      "back": "The strong ones — για μένα, με σένα, από αυτόν"
+    },
+    {
+      "kind": "grammar",
+      "front": "ο εαυτός μου",
+      "back": "myself — a noun meaning *the self*, with a possessive attached"
+    },
+    {
+      "kind": "grammar",
+      "front": "μόνος μου",
+      "back": "by myself — and it agrees: μόνη μου"
+    },
+    {
+      "kind": "grammar",
+      "front": "ο ένας τον άλλον",
+      "back": "each other"
+    }
+  ],
+  "που — the relative pronoun": [
+    {
+      "kind": "grammar",
+      "front": "που as a relative",
+      "back": "who, which, that — invariable, and never omitted the way English drops *that*"
+    },
+    {
+      "kind": "grammar",
+      "front": "ότι or ό,τι",
+      "back": "ότι = that (Ξέρω ότι…) · ό,τι = whatever (Κάνε ό,τι θέλεις)"
+    },
+    {
+      "kind": "grammar",
+      "front": "αυτό που",
+      "back": "what, in the sense of *the thing that* — Αυτό που θέλω είναι…"
+    }
+  ],
+  "ο οποίος, and when it is needed": [
+    {
+      "kind": "grammar",
+      "front": "When που will not do",
+      "back": "After a preposition (στο οποίο μένω) and where που would be ambiguous",
+      "extra": "Formal and written; speech restructures instead."
+    },
+    {
+      "kind": "grammar",
+      "front": "όποιος against ο οποίος",
+      "back": "όποιος = whoever · ο οποίος = who, which",
+      "extra": "The accent and the article distinguish them."
+    }
+  ],
+  "όλος, κάποιος, κανένας, τίποτα": [
+    {
+      "kind": "grammar",
+      "front": "κανένας and τίποτα",
+      "back": "With δεν they mean *nobody* and *nothing*; in a question they mean *anybody* and *anything*"
+    },
+    {
+      "kind": "word",
+      "front": "κάθε",
+      "back": "every — invariable: κάθε μέρα, κάθε Κυριακή"
+    },
+    {
+      "kind": "word",
+      "front": "ο ίδιος",
+      "back": "the same — and *himself*: ο ίδιος ο παπάς"
+    },
+    {
+      "kind": "word",
+      "front": "μερικοί",
+      "back": "some, a few — plural only"
+    }
+  ],
+  "Numbers in the other cases, and the ordinals": [
+    {
+      "kind": "grammar",
+      "front": "The genitive of 1, 3 and 4",
+      "back": "ενός / μιας · τριών · τεσσάρων"
+    },
+    {
+      "kind": "grammar",
+      "front": "The ordinals 1 to 5",
+      "back": "πρώτος · δεύτερος · τρίτος · τέταρτος · πέμπτος",
+      "extra": "Which is where the names of the weekdays come from."
+    },
+    {
+      "kind": "word",
+      "front": "μία φορά / δύο φορές",
+      "back": "once / twice",
+      "extra": "καμιά φορά = sometimes."
+    }
+  ],
+  "The neuter nouns in -ος, and other survivors": [
+    {
+      "kind": "grammar",
+      "front": "το δάσος, declined",
+      "back": "του δάσους · τα δάση · των δασών"
+    },
+    {
+      "kind": "grammar",
+      "front": "το φως, declined",
+      "back": "του φωτός · τα φώτα · των φώτων",
+      "extra": "φωτός is the *photo-* of English."
+    },
+    {
+      "kind": "grammar",
+      "front": "How to tell a neuter -ος noun from a masculine one",
+      "back": "Only by the article — ο δρόμος against το δάσος"
+    },
+    {
+      "kind": "word",
+      "front": "το γάλα",
+      "back": "milk — του γάλακτος",
+      "extra": "The stem behind *galaxy* and *lactose*."
+    }
+  ],
+  "Word order, now that the cases do the work": [
+    {
+      "kind": "grammar",
+      "front": "What a verb-first sentence does",
+      "back": "Makes the verb or the subject the news — Ήρθε ο Γιώργος"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Greek doubles the pronoun",
+      "back": "A noun moved to the front is repeated as a weak pronoun — Τον καφέ τον θέλω σκέτο"
+    },
+    {
+      "kind": "grammar",
+      "front": "What cannot move in a Greek sentence",
+      "back": "The weak pronouns before the verb, δεν before them, the article with its noun, a preposition before its noun"
+    }
+  ],
+  "Quantities, containers and measures": [
+    {
+      "kind": "grammar",
+      "front": "ένα κιλό ψωμί",
+      "back": "a kilo of bread — no preposition, and the thing stays in the accusative"
+    },
+    {
+      "kind": "word",
+      "front": "ένα ποτήρι / ένα μπουκάλι / μια μερίδα",
+      "back": "a glass / a bottle / a portion"
+    },
+    {
+      "kind": "sentence",
+      "front": "Φτάνει, ευχαριστώ!",
+      "back": "That's enough, thank you!",
+      "extra": "Expect to be ignored once."
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλή όρεξη!",
+      "back": "Enjoy your meal"
+    },
+    {
+      "kind": "sentence",
+      "front": "Στην υγειά μας!",
+      "back": "To our health — the toast"
+    }
+  ],
+  "Weather, and the impersonal verbs": [
+    {
+      "kind": "sentence",
+      "front": "Τι καιρό κάνει;",
+      "back": "What is the weather like?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κάνει ζέστη / Κάνει κρύο.",
+      "back": "It is hot / It is cold"
+    },
+    {
+      "kind": "word",
+      "front": "Βρέχει / Χιονίζει / Φυσάει",
+      "back": "It is raining / snowing / windy",
+      "extra": "No subject at all."
+    },
+    {
+      "kind": "grammar",
+      "front": "πρέπει",
+      "back": "must — it never changes form; the person is carried by the verb after να",
+      "extra": "Πρέπει να πάω, πρέπει να πας."
+    },
+    {
+      "kind": "word",
+      "front": "Απαγορεύεται",
+      "back": "It is forbidden — on signs everywhere"
+    }
+  ],
+  "Describing a person": [
+    {
+      "kind": "word",
+      "front": "ψηλός / κοντός",
+      "back": "tall / short"
+    },
+    {
+      "kind": "word",
+      "front": "μελαχρινός / ξανθός",
+      "back": "dark-haired / blond"
+    },
+    {
+      "kind": "word",
+      "front": "έξυπνος / αστείος / σοβαρός",
+      "back": "clever / funny / serious"
+    },
+    {
+      "kind": "word",
+      "front": "ευγενικός",
+      "back": "polite, kind"
+    },
+    {
+      "kind": "grammar",
+      "front": "The colours that do not inflect",
+      "back": "μπλε, καφέ, ροζ, γκρι, μωβ — loanwords, unchanged in every gender and case"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μοιάζει με τον πατέρα του.",
+      "back": "He looks like his father."
+    }
+  ],
+  "Describing a place": [
+    {
+      "kind": "word",
+      "front": "το χωριό / η γειτονιά",
+      "back": "village / neighbourhood"
+    },
+    {
+      "kind": "word",
+      "front": "η πλατεία / το λιμάνι",
+      "back": "square / harbour"
+    },
+    {
+      "kind": "word",
+      "front": "το καφενείο",
+      "back": "the old-style café — as against η καφετέρια"
+    },
+    {
+      "kind": "grammar",
+      "front": "Nationality and language",
+      "back": "The nationality is capitalised, the language is not — Είμαι Άγγλος, μιλάω αγγλικά"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μένω εδώ δέκα χρόνια.",
+      "back": "I have lived here ten years."
+    }
+  ],
+  "The case system, in one place": [
+    {
+      "kind": "grammar",
+      "front": "What each of the four cases does",
+      "back": "Nominative the subject · accusative the object, prepositions and time phrases · genitive *of* and possession · vocative addressing someone"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which gender changes in which case",
+      "back": "Neuters only in the genitive · feminines only in the genitive singular · masculines in every case"
+    }
+  ],
+  "Talking about your family and your parish": [
+    {
+      "kind": "sentence",
+      "front": "Δεν καταλαβαίνω τη Λειτουργία, αλλά μαθαίνω.",
+      "back": "I do not understand the Liturgy, but I am learning.",
+      "extra": "The sentence that will get you the most help."
+    },
+    {
+      "kind": "sentence",
+      "front": "Γιατί μαθαίνεις ελληνικά;",
+      "back": "Why are you learning Greek?",
+      "extra": "Have an answer ready — it is asked every time."
+    },
+    {
+      "kind": "sentence",
+      "front": "Συγγνώμη, δεν κατάλαβα.",
+      "back": "Sorry, I did not understand."
+    }
+  ],
+  "How to use a declension table": [
+    {
+      "kind": "grammar",
+      "front": "-ων on a noun",
+      "back": "Genitive plural, any gender"
+    },
+    {
+      "kind": "grammar",
+      "front": "-εων on a noun",
+      "back": "Genitive plural of a -ση / -ξη / -ψη feminine — so the nominative ends in -η"
+    },
+    {
+      "kind": "grammar",
+      "front": "-ματος on a noun",
+      "back": "Genitive singular of a -μα neuter"
+    },
+    {
+      "kind": "grammar",
+      "front": "-ιού on a noun",
+      "back": "Genitive singular of an -ι neuter"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to work back from an unknown form",
+      "back": "Read the case off the article, strip the ending, ask which pattern has it, rebuild the nominative, then check in the dictionary"
+    }
+  ],
+  "The article and the pronouns, in full": [
+    {
+      "kind": "grammar",
+      "front": "The genitive of the strong pronouns",
+      "back": "εμένα · εσένα · αυτού/αυτής/αυτού · εμάς · εσάς · αυτών"
+    }
+  ],
+  "Masculine nouns: every pattern": [
+    {
+      "kind": "grammar",
+      "front": "ο ιερέας, declined",
+      "back": "τον ιερέα · του ιερέα · οι ιερείς · των ιερέων"
+    },
+    {
+      "kind": "grammar",
+      "front": "ο Θεός — vocative",
+      "back": "Θεέ — as in Θεέ μου"
+    }
+  ],
+  "Feminine nouns: every pattern": [
+    {
+      "kind": "grammar",
+      "front": "της Ελλάδος or της Ελλάδας",
+      "back": "The same word in two registers — the learned -εως/-ος genitive survives in formal names like Τράπεζα της Ελλάδος"
+    }
+  ],
+  "Neuter nouns: every pattern": [
+    {
+      "kind": "grammar",
+      "front": "The indeclinable neuters",
+      "back": "το ευρώ, το ταξί, το μετρό, το σινεμά, το πάρτι, το Πάσχα — one form for everything"
     }
   ]
 }
