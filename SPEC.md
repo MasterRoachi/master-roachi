@@ -866,8 +866,8 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       2026-10-13 — `scripts/curriculums/japanese.md`. Eleven stages, ~850–900
       lessons, Imabi as the grammar spine with Irodori for the functional and
       spoken half, RTK dropped, all 2,136 jōyō in a frequency-ordered track,
-      pitch accent from the first stage. **Stages 1 to 4 and two kanji modules
-      are written and live**: 215 lessons, 219 lesson sources, 355 cards, 79 of
+      pitch accent from the first stage. **Stages 1 to 5 and two kanji modules
+      are written and live**: 275 lessons, 309 lesson sources, 355 cards, 79 of
       the jōyō. The rest is planned and not in the database, because a lesson
       with a name and no material is the index this curriculum exists to stop
       being.
