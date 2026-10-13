@@ -127,6 +127,30 @@ const stages = [
     ['What stage 2 was for'],
     ],
   },
+  {
+    name: 'Stage 3 · Hands together',
+    lessons: [
+    ['Why hands together is hard', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. Mental play and practice method.' }]],
+    ['Parallel motion', [{ title: 'Hoffman Academy', url: 'https://www.hoffmanacademy.com/' }]],
+    ['Contrary motion'],
+    ['One hand still, one moving'],
+    ['Melody over block chords'],
+    ['Melody over broken chords'],
+    ['Two different rhythms', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. Mental play and practice method.' }]],
+    ['Balance: making the melody speak'],
+    ['Voicing within one hand'],
+    ['Phrasing, and where a line breathes'],
+    ['Dynamics across both hands'],
+    ['Hands separately: when, and when to stop', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. Mental play and practice method.' }]],
+    ['Slow practice, and what it is actually for', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. Mental play and practice method.' }]],
+    ['Interleaving, properly'],
+    ['Practising a join', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. Mental play and practice method.' }]],
+    ['Reading two staves at once', [{ title: 'IMSLP', url: 'https://imslp.org', note: 'Anna Magdalena Notebook, Burgmüller, Satie — all free.' }]],
+    ['How pieces get memorised', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. Mental play and practice method.' }]],
+    ['A piece, hands together', [{ title: 'IMSLP', url: 'https://imslp.org', note: 'Anna Magdalena Notebook, Burgmüller, Satie — all free.' }, { title: 'MuseScore', url: 'https://musescore.com' }, { title: 'Paul Barton', url: 'https://www.youtube.com/@PaulBartonPiano', note: 'Tutorials for most of the standard repertoire.' }]],
+    ['What stage 3 was for'],
+    ],
+  },
 ];
 
 const out = [

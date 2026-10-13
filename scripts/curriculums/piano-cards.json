@@ -531,5 +531,129 @@
       "back": "C – G – Am – F",
       "extra": "The four-chord pop progression."
     }
+  ],
+  "Melody over broken chords": [
+    {
+      "kind": "word",
+      "front": "Block chord",
+      "back": "All the notes of the chord struck together"
+    },
+    {
+      "kind": "word",
+      "front": "Broken chord",
+      "back": "The notes of the chord played one after another, in a repeating pattern"
+    },
+    {
+      "kind": "word",
+      "front": "Alberti bass",
+      "back": "A broken-chord accompaniment in the pattern 1–5–3–5",
+      "extra": "Everywhere in Mozart and Clementi. The left hand of a thousand sonatinas."
+    },
+    {
+      "kind": "word",
+      "front": "Ostinato",
+      "back": "A short pattern repeated unchanged underneath everything else"
+    },
+    {
+      "kind": "word",
+      "front": "Countermelody",
+      "back": "A second tune played against the main one, rather than accompaniment"
+    }
+  ],
+  "Two different rhythms": [
+    {
+      "kind": "grammar",
+      "front": "Triplet",
+      "back": "Three notes in the time of two of the same value",
+      "extra": "Written with a small 3 over the group."
+    },
+    {
+      "kind": "grammar",
+      "front": "Tuplet",
+      "back": "Any group squeezed into the time of a different number — the 3, 5 or 6 over the beam says which"
+    },
+    {
+      "kind": "word",
+      "front": "Syncopation",
+      "back": "Accents landing off the beat"
+    },
+    {
+      "kind": "word",
+      "front": "Polyrhythm",
+      "back": "Two rhythms at once that do not divide the beat the same way"
+    },
+    {
+      "kind": "word",
+      "front": "Cross-rhythm",
+      "back": "A polyrhythm where the two divisions conflict throughout — three against two being the usual one",
+      "extra": "Stage 6 territory. Know the word now, play it later."
+    },
+    {
+      "kind": "word",
+      "front": "Hemiola",
+      "back": "Three beats heard as two, or two as three, without the time signature changing"
+    }
+  ],
+  "Reading two staves at once": [
+    {
+      "kind": "grammar",
+      "front": "Treble clef — the lines",
+      "back": "E G B D F, bottom to top",
+      "extra": "Every Good Boy Deserves Fruit."
+    },
+    {
+      "kind": "grammar",
+      "front": "Treble clef — the spaces",
+      "back": "F A C E, bottom to top"
+    },
+    {
+      "kind": "grammar",
+      "front": "Bass clef — the lines",
+      "back": "G B D F A, bottom to top",
+      "extra": "Good Boys Deserve Fruit Always. The clef's two dots straddle the F line."
+    },
+    {
+      "kind": "grammar",
+      "front": "Bass clef — the spaces",
+      "back": "A C E G, bottom to top"
+    },
+    {
+      "kind": "grammar",
+      "front": "Middle C on the grand staff",
+      "back": "One ledger line below the treble staff, or one ledger line above the bass staff — the same key either way"
+    },
+    {
+      "kind": "word",
+      "front": "Ledger line",
+      "back": "A short line added above or below a staff to carry notes beyond it"
+    },
+    {
+      "kind": "word",
+      "front": "Grand staff",
+      "back": "The two staves braced together, treble over bass, that piano music is written on"
+    }
+  ],
+  "Phrasing, and where a line breathes": [
+    {
+      "kind": "word",
+      "front": "Phrase",
+      "back": "A musical sentence — the span a line would sing in one breath",
+      "extra": "Usually four bars, often two or eight."
+    },
+    {
+      "kind": "word",
+      "front": "Antecedent and consequent",
+      "back": "The two halves of a period: the first phrase asks, the second answers"
+    },
+    {
+      "kind": "word",
+      "front": "Anacrusis",
+      "back": "A note or notes before the first full bar — the upbeat"
+    },
+    {
+      "kind": "word",
+      "front": "Breath mark",
+      "back": "A comma above the staff: lift, as a singer would breathe"
+    }
   ]
 }
