@@ -1405,5 +1405,340 @@
       "front": "Why Czerny and not Hanon",
       "back": "Czerny's studies are music — keys, phrases, dynamics — so what they teach transfers. Hanon's patterns do not occur in music."
     }
+  ],
+  "The seven chords of a key": [
+    {
+      "kind": "grammar",
+      "front": "The chord qualities of a major key",
+      "back": "major, minor, minor, major, major, minor, diminished",
+      "extra": "I ii iii IV V vi vii° — the same in every major key."
+    },
+    {
+      "kind": "grammar",
+      "front": "The seven chords of G major",
+      "back": "G, Am, Bm, C, D, Em, F♯dim"
+    },
+    {
+      "kind": "grammar",
+      "front": "The seven chords of F major",
+      "back": "F, Gm, Am, B♭, C, Dm, Edim"
+    },
+    {
+      "kind": "grammar",
+      "front": "The seven chords of A harmonic minor",
+      "back": "Am, Bdim, C, Dm, E, F, G♯dim",
+      "extra": "With the natural seventh instead you also get Em and G."
+    }
+  ],
+  "Function: tonic, dominant, subdominant": [
+    {
+      "kind": "grammar",
+      "front": "Tonic function",
+      "back": "Rest and arrival — I, vi, iii"
+    },
+    {
+      "kind": "grammar",
+      "front": "Subdominant function",
+      "back": "Departure — IV, ii"
+    },
+    {
+      "kind": "grammar",
+      "front": "Dominant function",
+      "back": "Tension demanding resolution — V, V7, vii°",
+      "extra": "They contain the leading note."
+    },
+    {
+      "kind": "grammar",
+      "front": "The standard harmonic sentence",
+      "back": "T → S → D → T",
+      "extra": "Home, away, tension, home."
+    }
+  ],
+  "Cadences": [
+    {
+      "kind": "grammar",
+      "front": "Perfect cadence",
+      "back": "V → I — the full stop"
+    },
+    {
+      "kind": "grammar",
+      "front": "Imperfect cadence",
+      "back": "→ V — the comma. Also called a half cadence."
+    },
+    {
+      "kind": "grammar",
+      "front": "Plagal cadence",
+      "back": "IV → I — the amen. Settled, softer than perfect."
+    },
+    {
+      "kind": "grammar",
+      "front": "Interrupted cadence",
+      "back": "V → vi — set up to land, and then does not"
+    },
+    {
+      "kind": "word",
+      "front": "Tierce de Picardie",
+      "back": "Ending a minor-key piece on a major tonic chord",
+      "extra": "Standard Baroque practice."
+    }
+  ],
+  "Voice-leading that matters at the piano": [
+    {
+      "kind": "grammar",
+      "front": "The three voice-leading habits",
+      "back": "Move the least, keep the common tones, and choose the top notes so they make a line"
+    },
+    {
+      "kind": "grammar",
+      "front": "How a dominant seventh resolves, note by note",
+      "back": "Leading note up a semitone, seventh down a semitone",
+      "extra": "In G7 → C: B to C, F to E."
+    }
+  ],
+  "Seventh chords: the five kinds": [
+    {
+      "kind": "grammar",
+      "front": "Major seventh chord",
+      "back": "1 3 5 7 — C E G B. On I and IV."
+    },
+    {
+      "kind": "grammar",
+      "front": "Dominant seventh chord",
+      "back": "1 3 5 ♭7 — C E G B♭. On V only."
+    },
+    {
+      "kind": "grammar",
+      "front": "Minor seventh chord",
+      "back": "1 ♭3 5 ♭7 — C E♭ G B♭. On ii, iii and vi."
+    },
+    {
+      "kind": "grammar",
+      "front": "Half-diminished chord",
+      "back": "1 ♭3 ♭5 ♭7 — C E♭ G♭ B♭. Written m7♭5. On vii° in major."
+    },
+    {
+      "kind": "grammar",
+      "front": "The seven sevenths of C major",
+      "back": "Cmaj7, Dm7, Em7, Fmaj7, G7, Am7, Bm7♭5",
+      "extra": "Only one dominant seventh, on V — which is why V7 names the key."
+    },
+    {
+      "kind": "grammar",
+      "front": "Which note to drop from a seventh chord",
+      "back": "The fifth. The third and seventh define the quality."
+    }
+  ],
+  "The dominant seventh, and resolution": [
+    {
+      "kind": "grammar",
+      "front": "The tritone in G7",
+      "back": "B and F — resolving outward to C and E",
+      "extra": "The most unstable interval in the system, and the engine of tonal harmony."
+    }
+  ],
+  "Inversions, and the figures on the page": [
+    {
+      "kind": "grammar",
+      "front": "Slash chord",
+      "back": "C/E means a C chord with E in the bass"
+    },
+    {
+      "kind": "grammar",
+      "front": "Figured inversions",
+      "back": "Numeral alone = root position · 6 = first inversion · 6/4 = second inversion"
+    },
+    {
+      "kind": "grammar",
+      "front": "I6/4 before V",
+      "back": "The standard classical approach to a perfect cadence",
+      "extra": "In C: G C E, then G B D, then C E G."
+    }
+  ],
+  "The circle progression, and ii–V–I": [
+    {
+      "kind": "grammar",
+      "front": "ii–V–I in C",
+      "back": "Dm, G, C",
+      "extra": "With sevenths: Dm7, G7, Cmaj7."
+    },
+    {
+      "kind": "grammar",
+      "front": "ii–V–I in G",
+      "back": "Am, D, G"
+    },
+    {
+      "kind": "grammar",
+      "front": "ii–V–I in F",
+      "back": "Gm, C, F"
+    },
+    {
+      "kind": "grammar",
+      "front": "ii–V–I in E♭",
+      "back": "Fm, B♭, E♭"
+    },
+    {
+      "kind": "grammar",
+      "front": "The circle progression",
+      "back": "iii–vi–ii–V–I — each root a fifth below the last",
+      "extra": "In C: Em, Am, Dm, G, C."
+    }
+  ],
+  "Suspensions and added notes": [
+    {
+      "kind": "grammar",
+      "front": "Suspended fourth",
+      "back": "The fourth in place of the third — Csus4 is C F G",
+      "extra": "Classically it resolves down to the third."
+    },
+    {
+      "kind": "grammar",
+      "front": "Suspended second",
+      "back": "The second in place of the third — Csus2 is C D G"
+    },
+    {
+      "kind": "grammar",
+      "front": "add9",
+      "back": "The ninth added to a triad, with no seventh — Cadd9 is C E G D",
+      "extra": "Not the same as Cmaj9, which has the seventh too."
+    },
+    {
+      "kind": "grammar",
+      "front": "Added sixth",
+      "back": "C6 is C E G A — warm, gentle",
+      "extra": "C6/9 — C E G A D — is the warmest ending chord available."
+    }
+  ],
+  "Secondary dominants": [
+    {
+      "kind": "word",
+      "front": "Secondary dominant",
+      "back": "The dominant seventh of a chord that is not the tonic, borrowed from outside the key",
+      "extra": "Written V/V, V/vi and so on."
+    },
+    {
+      "kind": "grammar",
+      "front": "V/V in C",
+      "back": "D7 — pointing at G"
+    },
+    {
+      "kind": "grammar",
+      "front": "V/vi in C",
+      "back": "E7 — pointing at Am"
+    },
+    {
+      "kind": "grammar",
+      "front": "V/IV in C",
+      "back": "C7 — the tonic with a flattened seventh, leaning onto F"
+    }
+  ],
+  "Borrowed chords and modal mixture": [
+    {
+      "kind": "grammar",
+      "front": "Minor iv in C major",
+      "back": "Fm — the most affecting borrowed chord there is"
+    },
+    {
+      "kind": "grammar",
+      "front": "♭VII in C major",
+      "back": "B♭ — arrives without pulling, since it has no leading note"
+    },
+    {
+      "kind": "grammar",
+      "front": "♭VI in C major",
+      "back": "A♭ — big and cinematic, usually going to ♭VII and then home"
+    },
+    {
+      "kind": "grammar",
+      "front": "What an accidental usually means",
+      "back": "Sharpened — a secondary dominant. Flattened — a borrowed chord."
+    }
+  ],
+  "Modulation: how a piece changes key": [
+    {
+      "kind": "grammar",
+      "front": "Where pieces modulate to",
+      "back": "The dominant first, then the relative minor or major, then the subdominant"
+    },
+    {
+      "kind": "grammar",
+      "front": "The four ways to modulate",
+      "back": "By the new dominant seventh, by a pivot chord, directly, or sequentially"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to hear a modulation",
+      "back": "Listen for a new leading note — an accidental that arrives and keeps recurring"
+    }
+  ],
+  "Chromatic colour: two chords to recognise": [
+    {
+      "kind": "grammar",
+      "front": "Neapolitan sixth",
+      "back": "♭II in first inversion — in C, D♭ major with F in the bass",
+      "extra": "Subdominant function: it leans to V."
+    },
+    {
+      "kind": "grammar",
+      "front": "Augmented sixth chord",
+      "back": "Built on the flattened sixth with a sharpened fourth — in C, A♭ and F♯ resolving outward to G",
+      "extra": "Italian, French and German versions differ by one note."
+    },
+    {
+      "kind": "grammar",
+      "front": "What any chromatic chord is doing",
+      "back": "Intensifying a dominant, borrowing colour from the parallel key, or pivoting to a new key"
+    }
+  ],
+  "Minor-key harmony in practice": [
+    {
+      "kind": "grammar",
+      "front": "Why a minor key has more chords than a major one",
+      "back": "Three minor scales, so the fifth chord can be major (harmonic) or minor (natural) — and the choice is made bar by bar",
+      "extra": "V major for a cadence; v or VII for a modal, folk or film colour."
+    },
+    {
+      "kind": "grammar",
+      "front": "Andalusian cadence",
+      "back": "i–VII–VI–V — in A minor: Am, G, F, E"
+    }
+  ],
+  "Pedal points and bass lines that walk": [
+    {
+      "kind": "word",
+      "front": "Pedal point",
+      "back": "A bass note held while the harmony moves above it"
+    },
+    {
+      "kind": "word",
+      "front": "Walking bass",
+      "back": "A bass that steps between chord roots, filling the gaps with scale notes",
+      "extra": "Chord notes on the changes; anything in the key in between."
+    }
+  ],
+  "The progressions your own music uses": [
+    {
+      "kind": "grammar",
+      "front": "Royal road progression",
+      "back": "IV–V–iii–vi — in C: F, G, Em, Am",
+      "extra": "王道進行. The anime chorus sound."
+    },
+    {
+      "kind": "grammar",
+      "front": "Komuro progression",
+      "back": "vi–IV–V–I — in C: Am, F, G, C"
+    },
+    {
+      "kind": "grammar",
+      "front": "Canon progression",
+      "back": "I–V–vi–iii–IV–I–IV–V — in C: C, G, Am, Em, F, C, F, G",
+      "extra": "Pachelbel's, with a descending bass."
+    }
+  ],
+  "Harmonising a melody": [
+    {
+      "kind": "grammar",
+      "front": "How to harmonise a tune",
+      "back": "Find the key, set the harmonic rhythm, list each bar's melody notes, choose chords containing them, decide by function, check the bass line, then play it"
+    }
   ]
 }
