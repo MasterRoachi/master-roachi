@@ -69,7 +69,7 @@ const NEXT_STATUS: Record<string, 'active' | 'paused' | 'done'> = {
 
 const STATUS_MARK: Record<string, string> = { active: '▶', paused: '॥', done: '✓' };
 
-type Layer = 'stages' | 'grid' | 'detail';
+type Layer = 'stages' | 'sources' | 'grid' | 'detail';
 
 /* How long the finishing flourish takes, in milliseconds.
  *
@@ -667,24 +667,37 @@ export default function Curriculums() {
               <span>{current.name}</span>
             </p>
 
-            {/* The Cards card: gold, and NOT one of the stages.
+            {/* The gold cards, which are NOT stages.
                 His design — "it should also not be in the list, but a separate
                 card that's the same size and shape exactly but horizontal,
-                just beneath the curriculum name, above the search". So the
-                same card turned on its side, which is why the dimensions below
+                just beneath the curriculum name, above the search". So a stage
+                card turned on its side, which is why the dimensions in the CSS
                 are a stage's two measurements swapped rather than new ones.
-                Out of the list because it is not a stage: it leaves the page
-                rather than opening a layer inside it. */}
-            {current.cards ? (
-              <a
-                href={`/work/cards/?deck=${current.id}`}
-                className={styles.cardsCard}
-              >
-                <span className={styles.cardsMark}>★</span>
-                <span className={styles.cardsName}>Cards</span>
-                <span className={styles.cardsCount}>{current.cards}</span>
-              </a>
-            ) : null}
+                Out of the list because neither opens a stage: one leaves the
+                page and the other opens a list. */}
+            {(current.cards || (current.sources && current.sources.length > 0)) && (
+              <div className={styles.goldRow}>
+                {current.cards ? (
+                  <a href={`/work/cards/?deck=${current.id}`} className={styles.cardsCard}>
+                    <span className={styles.cardsMark}>★</span>
+                    <span className={styles.cardsName}>Cards</span>
+                    <span className={styles.cardsCount}>{current.cards}</span>
+                  </a>
+                ) : null}
+
+                {current.sources && current.sources.length > 0 ? (
+                  <button
+                    type="button"
+                    className={styles.cardsCard}
+                    onClick={() => setLayer('sources')}
+                  >
+                    <span className={styles.cardsMark}>§</span>
+                    <span className={styles.cardsName}>Sources</span>
+                    <span className={styles.cardsCount}>{current.sources.length}</span>
+                  </button>
+                ) : null}
+              </div>
+            )}
 
             <div className={styles.searchRow}>
               <input
@@ -774,6 +787,30 @@ export default function Curriculums() {
                 </button>
               )}
             </div>
+          </div>
+        </Overlay>
+      )}
+
+      {/* --- the sources, which belong to the whole curriculum ------------ */}
+      {layer === 'sources' && current && (
+        <Overlay
+          onClose={close}
+          label={`${current.name} sources`}
+          onBack={() => setLayer('stages')}
+        >
+          <div className={styles.sourcesPane}>
+            <p className={styles.overlayTitle}>
+              <span>Sources</span>
+            </p>
+            <p className={styles.sourcesWhat}>
+              What {current.name} is studied from. A lesson&rsquo;s own sources — the chapter, the
+              page, the one video — are on the lesson.
+            </p>
+            {current.sources && current.sources.length > 0 ? (
+              <SourceList sources={current.sources} />
+            ) : (
+              <p className={styles.nothingYet}>Nothing recorded yet.</p>
+            )}
           </div>
         </Overlay>
       )}
@@ -959,25 +996,18 @@ export default function Curriculums() {
                     )}
                   </section>
 
-                  {/* Sources at two grains, the lesson's own first.
-                      This card showed the curriculum's whole list under every
-                      lesson, which is a bibliography — true of all of them and
-                      pointing none of them anywhere. The lesson's own are the
-                      chapter and the page; the curriculum's stay underneath,
-                      because knowing the shelf is still worth something. */}
+                  {/* THE LESSON'S OWN SOURCES, AND ONLY THOSE.
+                      The curriculum's whole list used to sit underneath, and
+                      it was a bibliography — true of every lesson and pointing
+                      none of them anywhere. It has its own gold card on the
+                      stages screen now, which is where a list that belongs to
+                      the whole curriculum belongs. */}
                   <section className={styles.lessonSection}>
                     <h3>Sources</h3>
                     {lesson.sources && lesson.sources.length > 0 ? (
                       <SourceList sources={lesson.sources} />
                     ) : (
                       <p className={styles.nothingYet}>Nothing recorded for this lesson yet.</p>
-                    )}
-
-                    {current.sources && current.sources.length > 0 && (
-                      <>
-                        <h4 className={styles.sourceGrain}>The whole curriculum</h4>
-                        <SourceList sources={current.sources} />
-                      </>
                     )}
                   </section>
 

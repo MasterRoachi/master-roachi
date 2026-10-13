@@ -542,15 +542,20 @@ rather than a preference:
 curriculums are eight decks; they are already named, ordered and coloured, and
 a second list of the same things would have to be kept in step by hand. Where a
 curriculum has cards, a **gold card** sits under its name on the stages screen
-and links to the deck.
+and links to the deck. A second gold card beside it opens the curriculum's
+**sources**.
 
-It is deliberately **not one of the stages**, and it is **horizontal**: the same
-card as a stage, the same area and corner radius, turned on its side — 11rem by
-8rem where a stage is 8 by 11, and the CSS is those two measurements swapped
-rather than numbers of its own. His design. Out of the list because it is not a
-stage: every other card there opens a layer, and this one leaves the page.
-Filled gold rather than outlined, in the same gold a finished curriculum
-wears.
+They are deliberately **not stages**, and they are **horizontal**: the same card
+as a stage, the same area and corner radius, turned on its side — 11rem by 8rem
+where a stage is 8 by 11, and the CSS is those two measurements swapped rather
+than numbers of its own. His design. Out of the list because neither opens a
+stage: one leaves the page and the other opens a list. Filled gold rather than
+outlined, in the same gold a finished curriculum wears.
+
+**The curriculum's sources live behind that card and nowhere else.** They used
+to sit under every lesson, below the lesson's own, which made a bibliography of
+them — true of all 35 lessons and pointing none of them anywhere. A lesson now
+shows only its own sources: the chapter, the page, the one video.
 
 **Scheduling is FSRS, through `ts-fsrs`** — the algorithm Anki itself moved to,
 open source, zero dependencies, and a pure function of the card and the rating.

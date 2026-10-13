@@ -755,12 +755,17 @@
  * that leaves the screen, and the gold is the same gold a finished curriculum
  * wears — see statusLook('done') in lib/curriculum-card.ts.
  */
+/* The gold cards, side by side and centred, between the name and the search. */
+.goldRow {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+}
+
 .cardsCard {
   width: 11rem;
   min-height: 8rem;
-  /* Centred like the title above it and the search below it. The title sits
-     1.25rem clear of what follows, so this keeps the same rhythm. */
-  margin: 0 auto 1.25rem;
   display: grid;
   align-content: start;
   gap: 0.4rem;
@@ -1090,6 +1095,32 @@
   font-size: 0.8125rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+/* The sources list, in its own layer off the stages screen. A list that
+   belongs to the whole curriculum belongs where the curriculum is, rather than
+   repeated under every one of its lessons. */
+.sourcesPane {
+  width: min(100%, 38rem);
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-raised);
+}
+
+.sourcesPane::-webkit-scrollbar {
+  display: none;
+}
+
+.sourcesWhat {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--muted);
+  text-align: center;
 }
 
 .nothingYet {
