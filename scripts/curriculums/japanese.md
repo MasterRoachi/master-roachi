@@ -167,7 +167,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | 3 | The core sentence | **57 — written** |
 | 4 | Everyday Japanese | **58 — written** |
 | 5 | Intermediate grammar | **60 — written** |
-| 6 | Reading real Japanese | 55 |
+| 6 | Reading real Japanese | **32 — written** |
 | 7 | Advanced grammar | 95 |
 | 8 | Keigo and register | 40 |
 | 9 | Native material | 50 |
