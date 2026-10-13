@@ -234,6 +234,17 @@ thing that is easy to leave out and impossible to debug by looking: without it
 a flex child grows to fit its content and pushes the shell past the viewport,
 whatever the parent's height says.
 
+**It caught the curriculum overlays too, and in two forms at once.** The lesson
+pane is `height: 100%` in a grid row that was `auto` — and a percentage height
+against an indefinite row means nothing, so the row grew with its content and
+pushed the tick button off the bottom of the screen. The overlay's row is now
+`minmax(0, 1fr)`, which makes it definite; the lesson body gained the missing
+`min-height: 0`; and both only showed up once a lesson ran to a few thousand
+characters, which stage one of Japanese is the first material in the system to
+do. These panes also **scroll without showing a bar** — his rule, and the right
+one, since a bar that appears and disappears as lessons change length is the
+page moving under the cursor.
+
 ### Boards
 
 A pill per board, one open at a time. Every board rendered at once, stacked,

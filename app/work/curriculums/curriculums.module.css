@@ -605,6 +605,12 @@
   inset: 0;
   z-index: 60;
   display: grid;
+  /* One row of exactly the space available, and never less than nothing.
+     Without it the row is `auto`, which sizes to its content and can grow past
+     the viewport — and then `height: 100%` on the pane inside is a percentage
+     of an indefinite thing, which means nothing at all. That is what let a
+     long lesson push its own tick button off the bottom of the screen. */
+  grid-template-rows: minmax(0, 1fr);
   place-items: center;
   padding: 2rem;
   background: color-mix(in oklch, var(--bg) 78%, black);
@@ -669,6 +675,12 @@
   width: min(100%, 60rem);
   max-height: 100%;
   overflow-y: auto;
+  /* Same rule as the lesson body: it may scroll, it may not show a bar. */
+  scrollbar-width: none;
+}
+
+.stageCentre::-webkit-scrollbar {
+  display: none;
 }
 
 .stageFan {
@@ -993,7 +1005,19 @@
 }
 
 .lessonBody {
+  /* min-height: 0 is what lets this be SHORTER than its content, which is the
+     whole mechanism. Without it the 1fr track grows to fit, the pane grows
+     past the overlay, and the tick button at the foot goes off the bottom of
+     the screen with no way to reach it. It was missing, and it only showed up
+     once a lesson was long enough to matter — stage one of Japanese is the
+     first material in the system that runs to a few thousand characters. */
+  min-height: 0;
   overflow-y: auto;
+  /* Scrolls, but shows no bar. His rule for these pages: "some scroll is fine,
+     but it shouldn't spawn a scrollbar" — a bar appearing and disappearing as
+     lessons change length is the page moving under the cursor, which is the
+     thing the whole backend shell exists to prevent. */
+  scrollbar-width: none;
   display: grid;
   gap: 1.5rem;
   align-content: start;
@@ -1001,6 +1025,17 @@
      1900px screen. */
   width: min(100%, 46rem);
   margin: 0 auto;
+}
+
+.lessonBody::-webkit-scrollbar {
+  display: none;
+}
+
+/* A table or a code block inside the material must be allowed to be narrower
+   than its content, or it widens the readable column instead of scrolling
+   inside itself. Same trap as above, in the other axis. */
+.lessonSection {
+  min-width: 0;
 }
 
 .lessonSection h3 {
