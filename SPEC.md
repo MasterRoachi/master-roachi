@@ -846,12 +846,14 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
-- [ ] **Japanese, phases 2 and 3.** Researched and planned on 2026-10-13 —
-      `scripts/curriculums/japanese.md`, approved. Eleven stages, ~850–900
+- [ ] **Japanese, stages 2–11.** Researched, planned and approved on
+      2026-10-13 — `scripts/curriculums/japanese.md`. Eleven stages, ~850–900
       lessons, Imabi as the grammar spine with Irodori for the functional and
       spoken half, RTK dropped, all 2,136 jōyō in a frequency-ordered track,
-      pitch accent from the first stage. Nothing of it is written yet; the
-      flashcard app it directs practice into is built.
+      pitch accent from the first stage. **Stage 1 is written and live**: 35
+      lessons, 45 lesson sources, 163 kana cards. The rest is planned and not
+      in the database, because a lesson with a name and no material is the
+      index this curriculum exists to stop being.
 - [ ] **No way to add a card from the page.** The endpoint takes one and the
       tests cover it, but there is no form: cards come from lessons, and
       mining is a later stage of the Japanese route. Needed before that stage,

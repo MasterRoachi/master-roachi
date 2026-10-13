@@ -380,6 +380,18 @@ for (const plan of plans) {
     for (const row of carried(ticks)) {
       restore.push(`update lessons set done_on = ${q(row.done_on)} where ${target(row)};`);
     }
+    /* And the cards those lessons teach. A tick is what unlocks a card, and
+     * the rebuild re-pointed every card at a brand new lesson row with
+     * unlocked_on still null — so without this, re-applying a curriculum would
+     * silently lock cards that had been in the deck for months. */
+    restore.push(`-- …and the cards those lessons unlock, which the rebuild re-pointed.`);
+    restore.push(
+      `update cards set unlocked_on = (select l.done_on from lessons l where l.id = cards.lesson_id)\n` +
+        ` where unlocked_on is null and lesson_id in (\n` +
+        `   select l.id from lessons l join modules m on m.id = l.module_id\n` +
+        `    join curriculums c on c.id = m.curriculum_id\n` +
+        `   where c.name = ${q(curriculum)} and l.done_on is not null);`,
+    );
   }
   if (carried(offRoute).length) {
     restore.push(`-- ${carried(offRoute).length} lesson(s) taken off the route at the dashboard.`);
@@ -484,14 +496,16 @@ for (const plan of plans) {
       (Number(after.cards) > 0 ? ` · ${after.cards} cards` : ''),
   );
 
-  /* A card whose lesson is gone. Not fatal and not fixable from here: the card
-   * keeps its review history, which is the point of SET NULL, but nothing will
-   * unlock it and no lesson claims it. Worth saying out loud because the
-   * symptom otherwise is a deck quietly holding cards that never come up. */
+  /* A card that belongs to no lesson. Either it was added by hand, which is
+   * normal and permanent, or a rename left it behind, which is not. They look
+   * identical from here, so this reports rather than judges — the symptom it
+   * exists to catch is a deck quietly holding cards that no lesson will ever
+   * unlock. A card's review history is intact either way; that is what ON
+   * DELETE SET NULL is for. */
   if (Number(after.adrift) > 0) {
     console.error(
-      `\n  ${after.adrift} card(s) no longer point at a lesson. Their history is intact,` +
-        `\n  but nothing teaches them — check the names in ${name}-cards.json against the script.`,
+      `\n  ${after.adrift} card(s) belong to no lesson — added by hand, or left behind` +
+        `\n  by a rename. History intact. Check ${name}-cards.json if that is a surprise.`,
     );
   }
   if (!ok) {

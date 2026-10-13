@@ -1,0 +1,853 @@
+{
+  "Hiragana: あ い う え お": [
+    {
+      "kind": "word",
+      "front": "あ",
+      "back": "a"
+    },
+    {
+      "kind": "word",
+      "front": "い",
+      "back": "i"
+    },
+    {
+      "kind": "word",
+      "front": "う",
+      "back": "u"
+    },
+    {
+      "kind": "word",
+      "front": "え",
+      "back": "e"
+    },
+    {
+      "kind": "word",
+      "front": "お",
+      "back": "o"
+    }
+  ],
+  "Hiragana: か き く け こ": [
+    {
+      "kind": "word",
+      "front": "か",
+      "back": "ka"
+    },
+    {
+      "kind": "word",
+      "front": "き",
+      "back": "ki"
+    },
+    {
+      "kind": "word",
+      "front": "く",
+      "back": "ku"
+    },
+    {
+      "kind": "word",
+      "front": "け",
+      "back": "ke"
+    },
+    {
+      "kind": "word",
+      "front": "こ",
+      "back": "ko"
+    }
+  ],
+  "Hiragana: さ し す せ そ": [
+    {
+      "kind": "word",
+      "front": "さ",
+      "back": "sa"
+    },
+    {
+      "kind": "word",
+      "front": "し",
+      "back": "shi"
+    },
+    {
+      "kind": "word",
+      "front": "す",
+      "back": "su"
+    },
+    {
+      "kind": "word",
+      "front": "せ",
+      "back": "se"
+    },
+    {
+      "kind": "word",
+      "front": "そ",
+      "back": "so"
+    }
+  ],
+  "Hiragana: た ち つ て と": [
+    {
+      "kind": "word",
+      "front": "た",
+      "back": "ta"
+    },
+    {
+      "kind": "word",
+      "front": "ち",
+      "back": "chi"
+    },
+    {
+      "kind": "word",
+      "front": "つ",
+      "back": "tsu"
+    },
+    {
+      "kind": "word",
+      "front": "て",
+      "back": "te"
+    },
+    {
+      "kind": "word",
+      "front": "と",
+      "back": "to"
+    }
+  ],
+  "Hiragana: な に ぬ ね の": [
+    {
+      "kind": "word",
+      "front": "な",
+      "back": "na"
+    },
+    {
+      "kind": "word",
+      "front": "に",
+      "back": "ni"
+    },
+    {
+      "kind": "word",
+      "front": "ぬ",
+      "back": "nu"
+    },
+    {
+      "kind": "word",
+      "front": "ね",
+      "back": "ne"
+    },
+    {
+      "kind": "word",
+      "front": "の",
+      "back": "no"
+    }
+  ],
+  "Hiragana: は ひ ふ へ ほ": [
+    {
+      "kind": "word",
+      "front": "は",
+      "back": "ha"
+    },
+    {
+      "kind": "word",
+      "front": "ひ",
+      "back": "hi"
+    },
+    {
+      "kind": "word",
+      "front": "ふ",
+      "back": "fu"
+    },
+    {
+      "kind": "word",
+      "front": "へ",
+      "back": "he"
+    },
+    {
+      "kind": "word",
+      "front": "ほ",
+      "back": "ho"
+    }
+  ],
+  "Hiragana: ま み む め も": [
+    {
+      "kind": "word",
+      "front": "ま",
+      "back": "ma"
+    },
+    {
+      "kind": "word",
+      "front": "み",
+      "back": "mi"
+    },
+    {
+      "kind": "word",
+      "front": "む",
+      "back": "mu"
+    },
+    {
+      "kind": "word",
+      "front": "め",
+      "back": "me"
+    },
+    {
+      "kind": "word",
+      "front": "も",
+      "back": "mo"
+    }
+  ],
+  "Hiragana: や ゆ よ": [
+    {
+      "kind": "word",
+      "front": "や",
+      "back": "ya"
+    },
+    {
+      "kind": "word",
+      "front": "ゆ",
+      "back": "yu"
+    },
+    {
+      "kind": "word",
+      "front": "よ",
+      "back": "yo"
+    }
+  ],
+  "Hiragana: ら り る れ ろ": [
+    {
+      "kind": "word",
+      "front": "ら",
+      "back": "ra"
+    },
+    {
+      "kind": "word",
+      "front": "り",
+      "back": "ri"
+    },
+    {
+      "kind": "word",
+      "front": "る",
+      "back": "ru"
+    },
+    {
+      "kind": "word",
+      "front": "れ",
+      "back": "re"
+    },
+    {
+      "kind": "word",
+      "front": "ろ",
+      "back": "ro"
+    }
+  ],
+  "Hiragana: わ を ん": [
+    {
+      "kind": "word",
+      "front": "わ",
+      "back": "wa"
+    },
+    {
+      "kind": "word",
+      "front": "を",
+      "back": "o — the object particle"
+    },
+    {
+      "kind": "word",
+      "front": "ん",
+      "back": "n"
+    }
+  ],
+  "Dakuten and handakuten": [
+    {
+      "kind": "word",
+      "front": "が",
+      "back": "ga"
+    },
+    {
+      "kind": "word",
+      "front": "ぎ",
+      "back": "gi"
+    },
+    {
+      "kind": "word",
+      "front": "ぐ",
+      "back": "gu"
+    },
+    {
+      "kind": "word",
+      "front": "げ",
+      "back": "ge"
+    },
+    {
+      "kind": "word",
+      "front": "ご",
+      "back": "go"
+    },
+    {
+      "kind": "word",
+      "front": "ざ",
+      "back": "za"
+    },
+    {
+      "kind": "word",
+      "front": "じ",
+      "back": "ji"
+    },
+    {
+      "kind": "word",
+      "front": "ず",
+      "back": "zu"
+    },
+    {
+      "kind": "word",
+      "front": "ぜ",
+      "back": "ze"
+    },
+    {
+      "kind": "word",
+      "front": "ぞ",
+      "back": "zo"
+    },
+    {
+      "kind": "word",
+      "front": "だ",
+      "back": "da"
+    },
+    {
+      "kind": "word",
+      "front": "ぢ",
+      "back": "ji — rare"
+    },
+    {
+      "kind": "word",
+      "front": "づ",
+      "back": "zu — rare"
+    },
+    {
+      "kind": "word",
+      "front": "で",
+      "back": "de"
+    },
+    {
+      "kind": "word",
+      "front": "ど",
+      "back": "do"
+    },
+    {
+      "kind": "word",
+      "front": "ば",
+      "back": "ba"
+    },
+    {
+      "kind": "word",
+      "front": "び",
+      "back": "bi"
+    },
+    {
+      "kind": "word",
+      "front": "ぶ",
+      "back": "bu"
+    },
+    {
+      "kind": "word",
+      "front": "べ",
+      "back": "be"
+    },
+    {
+      "kind": "word",
+      "front": "ぼ",
+      "back": "bo"
+    },
+    {
+      "kind": "word",
+      "front": "ぱ",
+      "back": "pa"
+    },
+    {
+      "kind": "word",
+      "front": "ぴ",
+      "back": "pi"
+    },
+    {
+      "kind": "word",
+      "front": "ぷ",
+      "back": "pu"
+    },
+    {
+      "kind": "word",
+      "front": "ぺ",
+      "back": "pe"
+    },
+    {
+      "kind": "word",
+      "front": "ぽ",
+      "back": "po"
+    }
+  ],
+  "Yōon: the small や ゆ よ": [
+    {
+      "kind": "word",
+      "front": "きゃ",
+      "back": "kya"
+    },
+    {
+      "kind": "word",
+      "front": "きゅ",
+      "back": "kyu"
+    },
+    {
+      "kind": "word",
+      "front": "きょ",
+      "back": "kyo"
+    },
+    {
+      "kind": "word",
+      "front": "しゃ",
+      "back": "sha"
+    },
+    {
+      "kind": "word",
+      "front": "しゅ",
+      "back": "shu"
+    },
+    {
+      "kind": "word",
+      "front": "しょ",
+      "back": "sho"
+    },
+    {
+      "kind": "word",
+      "front": "ちゃ",
+      "back": "cha"
+    },
+    {
+      "kind": "word",
+      "front": "ちゅ",
+      "back": "chu"
+    },
+    {
+      "kind": "word",
+      "front": "ちょ",
+      "back": "cho"
+    },
+    {
+      "kind": "word",
+      "front": "にゃ",
+      "back": "nya"
+    },
+    {
+      "kind": "word",
+      "front": "にゅ",
+      "back": "nyu"
+    },
+    {
+      "kind": "word",
+      "front": "にょ",
+      "back": "nyo"
+    },
+    {
+      "kind": "word",
+      "front": "ひゃ",
+      "back": "hya"
+    },
+    {
+      "kind": "word",
+      "front": "ひゅ",
+      "back": "hyu"
+    },
+    {
+      "kind": "word",
+      "front": "ひょ",
+      "back": "hyo"
+    },
+    {
+      "kind": "word",
+      "front": "みゃ",
+      "back": "mya"
+    },
+    {
+      "kind": "word",
+      "front": "みゅ",
+      "back": "myu"
+    },
+    {
+      "kind": "word",
+      "front": "みょ",
+      "back": "myo"
+    },
+    {
+      "kind": "word",
+      "front": "りゃ",
+      "back": "rya"
+    },
+    {
+      "kind": "word",
+      "front": "りゅ",
+      "back": "ryu"
+    },
+    {
+      "kind": "word",
+      "front": "りょ",
+      "back": "ryo"
+    },
+    {
+      "kind": "word",
+      "front": "ぎゃ",
+      "back": "gya"
+    },
+    {
+      "kind": "word",
+      "front": "ぎゅ",
+      "back": "gyu"
+    },
+    {
+      "kind": "word",
+      "front": "ぎょ",
+      "back": "gyo"
+    },
+    {
+      "kind": "word",
+      "front": "じゃ",
+      "back": "ja"
+    },
+    {
+      "kind": "word",
+      "front": "じゅ",
+      "back": "ju"
+    },
+    {
+      "kind": "word",
+      "front": "じょ",
+      "back": "jo"
+    },
+    {
+      "kind": "word",
+      "front": "びゃ",
+      "back": "bya"
+    },
+    {
+      "kind": "word",
+      "front": "びゅ",
+      "back": "byu"
+    },
+    {
+      "kind": "word",
+      "front": "びょ",
+      "back": "byo"
+    },
+    {
+      "kind": "word",
+      "front": "ぴゃ",
+      "back": "pya"
+    },
+    {
+      "kind": "word",
+      "front": "ぴゅ",
+      "back": "pyu"
+    },
+    {
+      "kind": "word",
+      "front": "ぴょ",
+      "back": "pyo"
+    }
+  ],
+  "Katakana: ア イ ウ エ オ カ キ ク ケ コ": [
+    {
+      "kind": "word",
+      "front": "ア",
+      "back": "a"
+    },
+    {
+      "kind": "word",
+      "front": "イ",
+      "back": "i"
+    },
+    {
+      "kind": "word",
+      "front": "ウ",
+      "back": "u"
+    },
+    {
+      "kind": "word",
+      "front": "エ",
+      "back": "e"
+    },
+    {
+      "kind": "word",
+      "front": "オ",
+      "back": "o"
+    },
+    {
+      "kind": "word",
+      "front": "カ",
+      "back": "ka"
+    },
+    {
+      "kind": "word",
+      "front": "キ",
+      "back": "ki"
+    },
+    {
+      "kind": "word",
+      "front": "ク",
+      "back": "ku"
+    },
+    {
+      "kind": "word",
+      "front": "ケ",
+      "back": "ke"
+    },
+    {
+      "kind": "word",
+      "front": "コ",
+      "back": "ko"
+    }
+  ],
+  "Katakana: サ シ ス セ ソ タ チ ツ テ ト": [
+    {
+      "kind": "word",
+      "front": "サ",
+      "back": "sa"
+    },
+    {
+      "kind": "word",
+      "front": "シ",
+      "back": "shi"
+    },
+    {
+      "kind": "word",
+      "front": "ス",
+      "back": "su"
+    },
+    {
+      "kind": "word",
+      "front": "セ",
+      "back": "se"
+    },
+    {
+      "kind": "word",
+      "front": "ソ",
+      "back": "so"
+    },
+    {
+      "kind": "word",
+      "front": "タ",
+      "back": "ta"
+    },
+    {
+      "kind": "word",
+      "front": "チ",
+      "back": "chi"
+    },
+    {
+      "kind": "word",
+      "front": "ツ",
+      "back": "tsu"
+    },
+    {
+      "kind": "word",
+      "front": "テ",
+      "back": "te"
+    },
+    {
+      "kind": "word",
+      "front": "ト",
+      "back": "to"
+    }
+  ],
+  "Katakana: ナ ニ ヌ ネ ノ ハ ヒ フ ヘ ホ": [
+    {
+      "kind": "word",
+      "front": "ナ",
+      "back": "na"
+    },
+    {
+      "kind": "word",
+      "front": "ニ",
+      "back": "ni"
+    },
+    {
+      "kind": "word",
+      "front": "ヌ",
+      "back": "nu"
+    },
+    {
+      "kind": "word",
+      "front": "ネ",
+      "back": "ne"
+    },
+    {
+      "kind": "word",
+      "front": "ノ",
+      "back": "no"
+    },
+    {
+      "kind": "word",
+      "front": "ハ",
+      "back": "ha"
+    },
+    {
+      "kind": "word",
+      "front": "ヒ",
+      "back": "hi"
+    },
+    {
+      "kind": "word",
+      "front": "フ",
+      "back": "fu"
+    },
+    {
+      "kind": "word",
+      "front": "ヘ",
+      "back": "he"
+    },
+    {
+      "kind": "word",
+      "front": "ホ",
+      "back": "ho"
+    }
+  ],
+  "Katakana: マ ミ ム メ モ ヤ ユ ヨ": [
+    {
+      "kind": "word",
+      "front": "マ",
+      "back": "ma"
+    },
+    {
+      "kind": "word",
+      "front": "ミ",
+      "back": "mi"
+    },
+    {
+      "kind": "word",
+      "front": "ム",
+      "back": "mu"
+    },
+    {
+      "kind": "word",
+      "front": "メ",
+      "back": "me"
+    },
+    {
+      "kind": "word",
+      "front": "モ",
+      "back": "mo"
+    },
+    {
+      "kind": "word",
+      "front": "ヤ",
+      "back": "ya"
+    },
+    {
+      "kind": "word",
+      "front": "ユ",
+      "back": "yu"
+    },
+    {
+      "kind": "word",
+      "front": "ヨ",
+      "back": "yo"
+    }
+  ],
+  "Katakana: ラ リ ル レ ロ ワ ヲ ン": [
+    {
+      "kind": "word",
+      "front": "ラ",
+      "back": "ra"
+    },
+    {
+      "kind": "word",
+      "front": "リ",
+      "back": "ri"
+    },
+    {
+      "kind": "word",
+      "front": "ル",
+      "back": "ru"
+    },
+    {
+      "kind": "word",
+      "front": "レ",
+      "back": "re"
+    },
+    {
+      "kind": "word",
+      "front": "ロ",
+      "back": "ro"
+    },
+    {
+      "kind": "word",
+      "front": "ワ",
+      "back": "wa"
+    },
+    {
+      "kind": "word",
+      "front": "ヲ",
+      "back": "o — effectively never used"
+    },
+    {
+      "kind": "word",
+      "front": "ン",
+      "back": "n"
+    }
+  ],
+  "Katakana for sounds Japanese does not have": [
+    {
+      "kind": "word",
+      "front": "ファ",
+      "back": "fa"
+    },
+    {
+      "kind": "word",
+      "front": "フィ",
+      "back": "fi"
+    },
+    {
+      "kind": "word",
+      "front": "フェ",
+      "back": "fe"
+    },
+    {
+      "kind": "word",
+      "front": "フォ",
+      "back": "fo"
+    },
+    {
+      "kind": "word",
+      "front": "ウィ",
+      "back": "wi"
+    },
+    {
+      "kind": "word",
+      "front": "ウェ",
+      "back": "we"
+    },
+    {
+      "kind": "word",
+      "front": "ウォ",
+      "back": "wo"
+    },
+    {
+      "kind": "word",
+      "front": "ヴ",
+      "back": "vu"
+    },
+    {
+      "kind": "word",
+      "front": "ティ",
+      "back": "ti"
+    },
+    {
+      "kind": "word",
+      "front": "ディ",
+      "back": "di"
+    },
+    {
+      "kind": "word",
+      "front": "チェ",
+      "back": "che"
+    },
+    {
+      "kind": "word",
+      "front": "シェ",
+      "back": "she"
+    },
+    {
+      "kind": "word",
+      "front": "ジェ",
+      "back": "je"
+    }
+  ]
+}

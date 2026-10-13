@@ -162,7 +162,7 @@ reading payoff front-loads and the tail is honestly a tail.
 
 | # | Stage | Roughly |
 | --- | --- | --- |
-| 1 | The script and the sounds | 35 |
+| 1 | The script and the sounds | **35 — written** |
 | 2 | First grammar, first words | 55 |
 | 3 | The core sentence | 60 |
 | 4 | Everyday Japanese | 70 |
@@ -176,8 +176,22 @@ reading payoff front-loads and the tail is honestly a tail.
 | — | Kanji track, interleaved | ~250 |
 
 **Roughly 850–900 lessons.** That is the honest size of zero to mastery when
-every lesson teaches its point. It is not a number to hit: stage 11 has no end,
+every lesson teaches its point.
+
+**It is built a stage at a time**, and only what is written is in the database.
+A lesson with a name and no material would be exactly the index this curriculum
+exists to stop being, so the shape above is a plan rather than a set of empty
+rows waiting to be filled. It is not a number to hit: stage 11 has no end,
 and he can stop anywhere, since the route has no gates.
+
+### A note on card kinds
+
+Kana cards are `word` cards. A `kana` kind would be more honest — the prompt
+for a kana is "read it", not "read it, then write it from memory" — but the
+kinds live in a `CHECK` constraint, and widening one in SQLite means rebuilding
+the table. That table holds every card's review history, and rebuilding it to
+improve a label is not a trade worth making. `word` says "read it", which is
+the right prompt; the writing practice is directed by the lesson.
 
 ## The flashcard app
 
