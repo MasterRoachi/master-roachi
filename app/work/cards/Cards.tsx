@@ -238,11 +238,10 @@ export default function Cards() {
       {error && <p className={styles.error}>{error}</p>}
 
       {card ? (
-        /* The card and the note, the same size side by side — his layout: "the
-         * card and sketchpad are equal size". Two equal columns, because the
-         * writing is half of what a kanji card asks for and a panel squeezed
-         * into a corner would say it was the lesser half. */
-        <div className={styles.pair}>
+        /* The card is a band above the panel, and the panel takes the rest.
+         * They were equal halves side by side, which left the writing area no
+         * bigger than the thing prompting it. */
+        <>
           <Review
             card={card}
             shown={shown}
@@ -251,14 +250,9 @@ export default function Cards() {
             onAnswer={answer}
           />
           {/* Keyed, so a new card gets a new panel rather than one carrying
-              the last card's tool, section and scroll position. */}
-          <Note
-            key={card.id}
-            scene={note}
-            onChange={setNote}
-            onSection={setNoteSection}
-          />
-        </div>
+              the last card's tool, section and position. */}
+          <Note key={card.id} scene={note} onChange={setNote} onSection={setNoteSection} />
+        </>
       ) : (
         <div className={styles.done}>
           <p>Nothing due.</p>
@@ -357,32 +351,40 @@ function Review({
 }) {
   const kind = CARD_KINDS[card.kind];
 
+  /* Three columns, all of them present whether the answer is shown or not: the
+   * card's height and the buttons' position must not move when it is revealed,
+   * because that is the moment a hand is already on its way to them. */
   return (
     <div className={styles.card}>
-      <p className={styles.prompt}>{kind.prompt}</p>
+      <div className={styles.face}>
+        <p className={styles.prompt}>{kind.prompt}</p>
+        {/* Ruby-capable, which is the whole reason ruby exists: a kanji card
+            showing its reading on the next line is two things to read, and the
+            reading is the answer anyway. */}
+        <p className={`${styles.front} ${card.kind === 'sentence' ? styles.frontSentence : ''}`}>
+          <Line text={card.front} />
+        </p>
+      </div>
 
-      {/* The front is ruby-capable, which is the whole reason ruby exists: a
-          kanji card showing its reading on the next line is two things to
-          read, and the reading is the answer anyway. */}
-      <p className={`${styles.front} ${card.kind === 'sentence' ? styles.frontSentence : ''}`}>
-        <Line text={card.front} />
-      </p>
-
-      {!shown ? (
-        <button type="button" className={styles.reveal} onClick={onShow}>
-          Show <kbd>space</kbd>
-        </button>
-      ) : (
-        <>
-          <div className={styles.back}>
+      <div className={styles.answer}>
+        {shown && (
+          <>
             {card.reading && <p className={styles.reading}>{card.reading}</p>}
             <p className={styles.meaning}>
               <Line text={card.back} />
             </p>
             {card.extra && <LessonMarkdown source={card.extra} />}
-          </div>
+          </>
+        )}
+      </div>
 
-          <p className={styles.buttons}>
+      <p className={styles.buttons}>
+        {!shown ? (
+          <button type="button" className={styles.reveal} onClick={onShow}>
+            Show <kbd>space</kbd>
+          </button>
+        ) : (
+          <>
             <button type="button" disabled={busy} onClick={() => onAnswer('again')}>
               Again <kbd>1</kbd>
             </button>
@@ -394,9 +396,9 @@ function Review({
             >
               Good <kbd>space</kbd>
             </button>
-          </p>
-        </>
-      )}
+          </>
+        )}
+      </p>
     </div>
   );
 }

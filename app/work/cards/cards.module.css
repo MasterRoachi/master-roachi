@@ -4,19 +4,27 @@
  * sized to fit rather than allowed to grow. A review screen that scrolls is a
  * review screen where the buttons move. */
 
+/* The page takes the viewport instead of the site's content column — see the
+   note in page.tsx. 10px to the screen edges and nothing more. */
+.bleed {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px 10px;
+}
+
 .page {
   /* Tokens from app/globals.css; gold is the backend's accent, declared here
      the same way the curriculums page declares it. */
   --gold: oklch(80% 0.13 85);
-  height: 100%;
+  flex: 1;
   min-height: 0;
   display: grid;
-  /* The pair takes everything that is left, and what is left is nearly all of
-     it: one line of chrome above, and no padding worth the name. The card and
-     the note were both too small to write in. */
+  /* Chrome, then the card as a band of fixed height, then the panel taking
+     everything that is left — which is nearly all of it. */
   grid-template-rows: auto auto 1fr;
-  gap: 0.6rem;
-  padding: 0.6rem 0 0.8rem;
+  gap: 10px;
 }
 
 .quiet {
@@ -139,38 +147,46 @@
   font-size: 0.8125rem;
 }
 
-/* The card and the note, equal halves. Stacked only where there is genuinely
-   no width for two — the backend is desktop-first and this page is used with a
-   tablet pen, so the side-by-side case is the real one. */
-.pair {
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  align-items: stretch;
-}
-
-@media (max-width: 56rem) {
-  .pair {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-  }
-}
-
+/* THE CARD IS A BAND ABOVE THE PANEL, and its height does not change when the
+   answer is revealed.
+ *
+ * It was half the screen, square-ish, and it grew as the answer appeared —
+ * which moved the buttons under the cursor at the exact moment they were about
+ * to be pressed. So: a fixed height, and the answer fills a column that was
+ * already there and empty rather than being added underneath. Smaller too, to
+ * leave the panel the room it wanted. */
 .card {
   min-height: 0;
   min-width: 0;
+  height: clamp(6.5rem, 20vh, 9rem);
   display: grid;
-  /* The front takes the middle and the buttons stay at the foot, so the card
-     fills its half instead of sitting in the top of it. */
-  grid-template-rows: auto 1fr auto auto;
-  gap: 0.8rem;
-  justify-items: center;
-  align-content: stretch;
-  padding: 1.2rem;
+  grid-template-columns: minmax(7rem, auto) 1fr auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.9rem 1.2rem;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--bg-raised);
+}
+
+/* The prompt and the character, which is what the card is for. */
+.face {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+}
+
+/* The answer. A column that exists whether or not it has anything in it, so
+   revealing cannot change the card's shape. Scrolls if a card's extra runs
+   long — the card does not grow for it. */
+.answer {
+  min-width: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.3rem;
+  align-content: center;
 }
 
 .prompt {
@@ -186,9 +202,8 @@
    thing on it. Japanese at this size is legible with its ruby. */
 .front {
   margin: 0;
-  align-self: center;
-  font-size: clamp(3rem, 11vw, 7rem);
-  line-height: 1.2;
+  font-size: clamp(2rem, 7vh, 3.25rem);
+  line-height: 1.1;
   text-align: center;
 }
 
@@ -209,32 +224,22 @@
   cursor: pointer;
 }
 
-.back {
-  width: 100%;
-  min-width: 0;
-  display: grid;
-  gap: 0.6rem;
-  justify-items: center;
-  overflow-y: auto;
-  text-align: center;
-}
-
 .reading {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.125rem;
   color: var(--gold);
 }
 
 .meaning {
   margin: 0;
-  font-size: 1.125rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.45;
 }
 
 .buttons {
   margin: 0;
-  display: flex;
-  gap: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
 }
 
 .buttons button {

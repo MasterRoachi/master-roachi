@@ -665,6 +665,28 @@ has nothing to scroll. And there is **no eraser**: a note is the record of the
 attempts, and rubbing out a bad one throws away the comparison. Undo exists for
 the stroke that went wrong on the way out of the pen.
 
+**Nothing can be drawn past the edge of a section.** A dotted line sits five
+pixels in from the panel's border and every point is clamped inside it. Without
+the clamp a stroke carried on past the bottom of the panel into the section
+below, so one drawing of 中 occupied two sections and came back as three dots
+— a second attempt that was really the tail of the first. Dragging past the
+edge flattens the stroke onto the line rather than continuing beyond it, which
+is what refusing has to mean for a pen that has already left the panel. The
+five pixels are converted at whatever the panel is currently scaled to, so they
+are five pixels on screen rather than five at one window size.
+
+**The card is a band above the panel, and its height does not change when the
+answer is revealed.** It was half the screen, square-ish, and it grew as the
+answer appeared — which moved the buttons under the cursor at the exact moment
+a hand was on its way to them. Now it is three columns at a fixed height, all
+of them present whether the answer is shown or not: the answer fills a column
+that was already there and empty.
+
+The page **opts out of the site's `.shell`**, which every other backend page
+uses. That wrapper caps the width at 1180px and pads it by up to 64px a side,
+and this page's whole job is a writing panel as large as the screen will give
+— "only a 10px gap between it and screen edges".
+
 **The panel has no border and no toolbar.** It is the writing surface and
 nothing else — "the panel does not need a border, it can just be the actual
 writing panel". The pen, T and undo buttons are three small round buttons in a

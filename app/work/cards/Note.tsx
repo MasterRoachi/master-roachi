@@ -49,6 +49,10 @@ export default function Note({
    * thing a writing area cannot afford. NOTE_SECTION is only the value before
    * the first measurement lands. */
   const [section, setSection] = useState(NOTE_SECTION);
+  /* The margin, in scene units, that the dotted line marks and nothing may be
+   * drawn past. Five CSS pixels, converted at whatever the panel is scaled to,
+   * so it is five pixels on screen rather than five pixels at one window size. */
+  const [inset, setInset] = useState(14);
 
   /* Counted ONCE, from the note this panel was mounted with and the section
    * height it was first measured at. The panel is keyed by card, so a new card
@@ -72,6 +76,7 @@ export default function Note({
       if (box.width === 0) return;
       const height = Math.round((box.height / box.width) * NOTE_WIDTH);
       setSection(height);
+      setInset((5 / box.width) * NOTE_WIDTH);
       onSection(height);
 
       if (!counted.current) {
@@ -99,12 +104,25 @@ export default function Note({
   const go = (delta: number) =>
     setAt((was) => Math.min(sections - 1, Math.max(0, was + delta)));
 
-  /** Screen point to scene coordinates, offset into the visible section. */
+  /**
+   * Screen point to scene coordinates, offset into the visible section and
+   * CLAMPED INSIDE IT.
+   *
+   * The clamp is the point. Without it a stroke carried on past the bottom of
+   * the panel into the section below, so one drawing of 中 occupied two
+   * sections and showed up as three dots next time — a second attempt that was
+   * really the tail of the first. Dragging past the edge now flattens the
+   * stroke onto the dotted line instead of continuing beyond it, which is what
+   * "it shouldn't allow me to" has to mean for a pen that has already left the
+   * panel.
+   */
   function point(event: { clientX: number; clientY: number }): [number, number] {
     const box = surface.current!.getBoundingClientRect();
+    const x = ((event.clientX - box.left) / box.width) * NOTE_WIDTH;
+    const y = top + ((event.clientY - box.top) / box.height) * section;
     return [
-      ((event.clientX - box.left) / box.width) * NOTE_WIDTH,
-      top + ((event.clientY - box.top) / box.height) * section,
+      Math.min(Math.max(x, inset), NOTE_WIDTH - inset),
+      Math.min(Math.max(y, top + inset), top + section - inset),
     ];
   }
 
@@ -235,8 +253,9 @@ export default function Note({
             id: newId(),
             x: where[0],
             // On the baseline of the first line, so the click lands where the
-            // text starts rather than above it.
-            y: where[1] + 34 * 0.8,
+            // text starts rather than above it — and never so low that the
+            // first line is already past the dotted edge.
+            y: Math.min(where[1] + 34 * 0.8, top + section - inset),
             size: 34,
             colour: '#e8e6e1',
             text: '',
@@ -270,6 +289,21 @@ export default function Note({
         }}
       >
         <rect x={0} y={top} width={NOTE_WIDTH} height={section} fill={scene.background} />
+
+        {/* The edge of what this section will take. Five pixels in, dotted,
+            and nothing can be drawn past it — see the clamp in point(). */}
+        <rect
+          x={inset}
+          y={top + inset}
+          width={NOTE_WIDTH - inset * 2}
+          height={section - inset * 2}
+          fill="none"
+          stroke="oklch(38% 0 0)"
+          strokeWidth={inset / 3}
+          strokeDasharray={`${inset * 1.4} ${inset * 1.4}`}
+          rx={inset}
+          pointerEvents="none"
+        />
 
         {scene.items.map((item) =>
           item.kind === 'stroke' ? (
