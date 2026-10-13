@@ -351,22 +351,22 @@ function Review({
 }) {
   const kind = CARD_KINDS[card.kind];
 
-  /* Three columns, all of them present whether the answer is shown or not: the
-   * card's height and the buttons' position must not move when it is revealed,
-   * because that is the moment a hand is already on its way to them. */
+  /* Three fixed rows in a square: the prompt, what is being asked, and the
+   * buttons. Revealing fills the middle row rather than making the card
+   * taller, because a card that grows moves its own buttons under the cursor
+   * at the moment a hand is on its way to them. */
   return (
     <div className={styles.card}>
+      <p className={styles.prompt}>{kind.prompt}</p>
+
       <div className={styles.face}>
-        <p className={styles.prompt}>{kind.prompt}</p>
         {/* Ruby-capable, which is the whole reason ruby exists: a kanji card
             showing its reading on the next line is two things to read, and the
             reading is the answer anyway. */}
         <p className={`${styles.front} ${card.kind === 'sentence' ? styles.frontSentence : ''}`}>
           <Line text={card.front} />
         </p>
-      </div>
 
-      <div className={styles.answer}>
         {shown && (
           <>
             {card.reading && <p className={styles.reading}>{card.reading}</p>}

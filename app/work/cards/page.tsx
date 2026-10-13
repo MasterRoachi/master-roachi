@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { pageMeta } from '@/lib/seo';
 import Cards from './Cards';
-import styles from './cards.module.css';
 
 // Flashcards, because Anki was not going to be used.
 //
@@ -17,13 +16,8 @@ export const metadata: Metadata = pageMeta({
 });
 
 export default function WorkCardsPage() {
-  /* NOT the site's .shell wrapper, which every other backend page uses. That
-   * caps the width at 1180px and pads it by up to 64px a side, and this page's
-   * whole job is a writing panel as large as the screen will give — "only a
-   * 10px gap between it and screen edges". So it opts out and takes the
-   * viewport. */
   return (
-    <div className={styles.bleed}>
+    <div className="shell">
       <Cards />
     </div>
   );

@@ -675,17 +675,21 @@ is what refusing has to mean for a pen that has already left the panel. The
 five pixels are converted at whatever the panel is currently scaled to, so they
 are five pixels on screen rather than five at one window size.
 
-**The card is a band above the panel, and its height does not change when the
-answer is revealed.** It was half the screen, square-ish, and it grew as the
-answer appeared — which moved the buttons under the cursor at the exact moment
-a hand was on its way to them. Now it is three columns at a fixed height, all
-of them present whether the answer is shown or not: the answer fills a column
-that was already there and empty.
+**The card is a square above the panel, and its size does not change when the
+answer is revealed.** It began as half the screen beside the panel, which left
+the writing area no bigger than the thing prompting it; it was then briefly a
+band across the full width, which is a header rather than a card. A square,
+above, with the panel taking everything below it.
 
-The page **opts out of the site's `.shell`**, which every other backend page
-uses. That wrapper caps the width at 1180px and pads it by up to 64px a side,
-and this page's whole job is a writing panel as large as the screen will give
-— "only a 10px gap between it and screen edges".
+Its three rows are fixed, so revealing fills the middle one rather than making
+the card taller. It used to grow, and growing moved its own buttons under the
+cursor at the exact moment a hand was on its way to them. A card with a long
+extra scrolls that middle row; it does not become a bigger card than one
+without.
+
+The page stays in the site's `.shell` content column like every other backend
+page. It was briefly full-bleed, to give the panel the whole screen, and that
+was further than he wanted.
 
 **The panel has no border and no toolbar.** It is the writing surface and
 nothing else — "the panel does not need a border, it can just be the actual
