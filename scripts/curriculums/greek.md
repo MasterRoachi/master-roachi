@@ -126,7 +126,7 @@ material is graded against them.
 | # | Stage | Level | Roughly | Written |
 | --- | --- | --- | --- | --- |
 | 1 | The alphabet, the sounds and the hand | — | 30 | 30 |
-| 2 | First Greek: being, having, and the noun | A1 | 35 | — |
+| 2 | First Greek: being, having, and the noun | A1 | 35 | 36 |
 | 3 | The cases, in use | A1–A2 | 35 | — |
 | 4 | Verbs and aspect | A2 | 40 | — |
 | 5 | Everyday Greek | A2 | 40 | — |
@@ -136,7 +136,7 @@ material is graded against them.
 | 9 | Writing, argument and register | B2 | 30 | — |
 | 10 | Cypriot Greek | — | 20 | — |
 | 11 | Literature, and ad astra | C1+ | open | — |
-| — | Spelling track, its own modules | — | ~40 | — |
+| — | Spelling track, its own modules | — | ~40 | 8 |
 | — | Forms track, its own modules | — | ~40 | — |
 
 **Comparable to Japanese in length**, at his word — that came out at 382

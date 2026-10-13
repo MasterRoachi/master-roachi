@@ -610,5 +610,872 @@
       "front": "The -είο ending",
       "back": "\"Place where\" — αρτοποιείο, κρεοπωλείο, βιβλιοπωλείο, ξενοδοχείο, νοσοκομείο"
     }
+  ],
+  "είμαι — I am": [
+    {
+      "kind": "grammar",
+      "front": "είμαι, conjugated",
+      "back": "είμαι · είσαι · είναι · είμαστε · είστε · είναι",
+      "extra": "είναι is both *is* and *are*."
+    },
+    {
+      "kind": "sentence",
+      "front": "Είμαι από την Αγγλία.",
+      "back": "I am from England."
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν είμαι Έλληνας.",
+      "back": "I am not Greek."
+    }
+  ],
+  "The three genders": [
+    {
+      "kind": "grammar",
+      "front": "What the noun ending tells you",
+      "back": "-ος, -ας, -ης masculine · -α, -η feminine · -ο, -ι, -μα neuter",
+      "extra": "Nine times out of ten. η οδός and το δάσος are the kind of exception that matters."
+    },
+    {
+      "kind": "grammar",
+      "front": "-άκι",
+      "back": "The diminutive ending, and always neuter — το παιδάκι, το καφεδάκι"
+    }
+  ],
+  "The definite article": [
+    {
+      "kind": "grammar",
+      "front": "The article, nominative",
+      "back": "ο / η / το — plural οι / οι / τα"
+    },
+    {
+      "kind": "grammar",
+      "front": "The article, accusative",
+      "back": "τον / την / το — plural τους / τις / τα"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where Greek uses the article and English does not",
+      "back": "With names (ο Γιώργος), with possessives (ο φίλος μου), with abstract nouns (η αγάπη), with countries and languages"
+    }
+  ],
+  "ένας, μία, ένα — a and an": [
+    {
+      "kind": "grammar",
+      "front": "ένας / μία / ένα",
+      "back": "a, an — and the number one. Accusative masculine έναν.",
+      "extra": "No plural: *some books* is simply βιβλία."
+    }
+  ],
+  "Nominative and accusative": [
+    {
+      "kind": "grammar",
+      "front": "What the nominative is for",
+      "back": "The subject — and the form a dictionary lists"
+    },
+    {
+      "kind": "grammar",
+      "front": "What the accusative is for",
+      "back": "The object, and everything after a preposition, and *on Sunday*-type time phrases"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which gender never changes between the two cases",
+      "back": "Neuter — το παιδί is both subject and object"
+    }
+  ],
+  "Masculine nouns in -ος": [
+    {
+      "kind": "grammar",
+      "front": "ο δάσκαλος, declined",
+      "back": "τον δάσκαλο · οι δάσκαλοι · τους δασκάλους",
+      "extra": "The stress moves forward in δασκάλους, by the rule of limitation."
+    },
+    {
+      "kind": "grammar",
+      "front": "The vocative of -ος nouns",
+      "back": "-ε — δάσκαλε! Γιώργο! φίλε!"
+    }
+  ],
+  "Masculine nouns in -ας and -ης": [
+    {
+      "kind": "grammar",
+      "front": "ο πατέρας, declined",
+      "back": "τον πατέρα · οι πατέρες · τους πατέρες"
+    },
+    {
+      "kind": "grammar",
+      "front": "ο μαθητής, declined",
+      "back": "τον μαθητή · οι μαθητές · τους μαθητές"
+    },
+    {
+      "kind": "word",
+      "front": "ο ιερέας",
+      "back": "the priest — τον ιερέα, οι ιερείς"
+    },
+    {
+      "kind": "word",
+      "front": "ο καφές",
+      "back": "the coffee — τον καφέ, οι καφέδες"
+    }
+  ],
+  "Feminine nouns in -α and -η": [
+    {
+      "kind": "grammar",
+      "front": "η γυναίκα, declined",
+      "back": "την γυναίκα · οι γυναίκες · τις γυναίκες",
+      "extra": "Feminine singulars never change — only the article does."
+    },
+    {
+      "kind": "grammar",
+      "front": "η πόλη, declined",
+      "back": "την πόλη · οι πόλεις · τις πόλεις"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which -η feminines pluralise in -εις",
+      "back": "The -ση, -ξη and -ψη nouns — πόλη, τάξη, σκέψη, λύση, κυβέρνηση",
+      "extra": "Ancient third-declension nouns keeping their old plural."
+    }
+  ],
+  "Neuter nouns in -ο, -ι and -μα": [
+    {
+      "kind": "grammar",
+      "front": "The three neuter plurals",
+      "back": "-ο → -α · -ι → -ια · -μα → -ματα",
+      "extra": "το βιβλίο/τα βιβλία · το παιδί/τα παιδιά · το μάθημα/τα μαθήματα"
+    }
+  ],
+  "έχω — I have": [
+    {
+      "kind": "grammar",
+      "front": "έχω, conjugated",
+      "back": "έχω · έχεις · έχει · έχουμε · έχετε · έχουν"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν έχει σημασία.",
+      "back": "It does not matter."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχεις δίκιο.",
+      "back": "You are right."
+    }
+  ],
+  "Verbs in -ω: the present tense": [
+    {
+      "kind": "grammar",
+      "front": "The Class A endings",
+      "back": "-ω · -εις · -ει · -ουμε · -ετε · -ουν",
+      "extra": "Stress stays on the stem."
+    },
+    {
+      "kind": "word",
+      "front": "θέλω",
+      "back": "I want"
+    },
+    {
+      "kind": "word",
+      "front": "ξέρω",
+      "back": "I know"
+    },
+    {
+      "kind": "word",
+      "front": "βλέπω",
+      "back": "I see"
+    },
+    {
+      "kind": "word",
+      "front": "κάνω",
+      "back": "I do, I make"
+    },
+    {
+      "kind": "word",
+      "front": "μένω",
+      "back": "I live, I stay"
+    },
+    {
+      "kind": "word",
+      "front": "διαβάζω",
+      "back": "I read"
+    },
+    {
+      "kind": "word",
+      "front": "καταλαβαίνω",
+      "back": "I understand"
+    },
+    {
+      "kind": "word",
+      "front": "μαθαίνω",
+      "back": "I learn"
+    },
+    {
+      "kind": "word",
+      "front": "πίνω",
+      "back": "I drink"
+    },
+    {
+      "kind": "word",
+      "front": "παίρνω",
+      "back": "I take, I get"
+    }
+  ],
+  "Verbs in -άω and -ώ: the second class": [
+    {
+      "kind": "grammar",
+      "front": "The Class B1 endings",
+      "back": "-άω/-ώ · -άς · -άει/-ά · -άμε/-ούμε · -άτε · -άνε/-ούν",
+      "extra": "αγαπάω. The long forms are the spoken ones."
+    },
+    {
+      "kind": "grammar",
+      "front": "The Class B2 endings",
+      "back": "-ώ · -είς · -εί · -ούμε · -είτε · -ούν",
+      "extra": "μπορώ, οδηγώ, τηλεφωνώ."
+    },
+    {
+      "kind": "grammar",
+      "front": "How to tell a verb's class",
+      "back": "Where the stress falls in the *I* form — γράφω on the stem, αγαπώ and μπορώ on the ending"
+    },
+    {
+      "kind": "word",
+      "front": "μιλάω",
+      "back": "I speak"
+    },
+    {
+      "kind": "word",
+      "front": "μπορώ",
+      "back": "I can"
+    },
+    {
+      "kind": "word",
+      "front": "ρωτάω",
+      "back": "I ask"
+    },
+    {
+      "kind": "word",
+      "front": "πεινάω",
+      "back": "I am hungry"
+    }
+  ],
+  "δεν — how Greek says not": [
+    {
+      "kind": "grammar",
+      "front": "δεν or μην",
+      "back": "δεν for statements · μην for commands, prohibitions and after να"
+    },
+    {
+      "kind": "grammar",
+      "front": "The Greek double negative",
+      "back": "Correct and required — Δεν ξέρω τίποτα, Δεν ήρθε κανείς, Δεν πάω πουθενά"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν καταλαβαίνω.",
+      "back": "I do not understand."
+    }
+  ],
+  "Questions, and the question words": [
+    {
+      "kind": "grammar",
+      "front": "How a yes/no question is formed",
+      "back": "Nothing changes — the voice rises and the ; is written. No *do*, no inversion."
+    },
+    {
+      "kind": "word",
+      "front": "πού;",
+      "back": "where?"
+    },
+    {
+      "kind": "word",
+      "front": "πότε;",
+      "back": "when?"
+    },
+    {
+      "kind": "word",
+      "front": "πώς;",
+      "back": "how?"
+    },
+    {
+      "kind": "word",
+      "front": "γιατί;",
+      "back": "why? — and *because*"
+    },
+    {
+      "kind": "word",
+      "front": "ποιος, ποια, ποιο;",
+      "back": "who? which? — it inflects like an adjective"
+    },
+    {
+      "kind": "word",
+      "front": "πόσο;",
+      "back": "how much?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πώς το λένε στα ελληνικά;",
+      "back": "How do you say it in Greek?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μπορείς να μιλάς πιο αργά;",
+      "back": "Can you speak more slowly?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Από πού είσαι;",
+      "back": "Where are you from?"
+    }
+  ],
+  "Adjectives, and agreement": [
+    {
+      "kind": "grammar",
+      "front": "καλός, declined",
+      "back": "καλός / καλή / καλό · καλοί / καλές / καλά · acc. pl. masc. καλούς"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek makes an adverb",
+      "back": "The neuter plural of the adjective — καλός → καλά, γρήγορος → γρήγορα"
+    },
+    {
+      "kind": "grammar",
+      "front": "πολύς, πολλή, πολύ",
+      "back": "much, many — πολλά παιδιά, πολύ καλά, πολλή δουλειά"
+    },
+    {
+      "kind": "word",
+      "front": "μεγάλος",
+      "back": "big, large — and *old* of a person"
+    },
+    {
+      "kind": "word",
+      "front": "μικρός",
+      "back": "small — and *young*"
+    },
+    {
+      "kind": "word",
+      "front": "ωραίος",
+      "back": "lovely, nice"
+    },
+    {
+      "kind": "word",
+      "front": "ακριβός",
+      "back": "expensive"
+    },
+    {
+      "kind": "word",
+      "front": "δύσκολος",
+      "back": "difficult"
+    }
+  ],
+  "The personal pronouns, and when Greek uses them": [
+    {
+      "kind": "grammar",
+      "front": "The strong pronouns",
+      "back": "εγώ · εσύ · αυτός/αυτή/αυτό · εμείς · εσείς · αυτοί/αυτές/αυτά"
+    },
+    {
+      "kind": "grammar",
+      "front": "When Greek uses a subject pronoun",
+      "back": "Only for emphasis or contrast — the verb ending already says who",
+      "extra": "Using εγώ in every sentence is the clearest mark of a foreigner."
+    }
+  ],
+  "αυτός and εκείνος — this and that": [
+    {
+      "kind": "grammar",
+      "front": "αυτός with a noun",
+      "back": "The article stays — αυτός ο άντρας, αυτή η γυναίκα, αυτό το παιδί"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι είναι αυτό;",
+      "back": "What is this?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αυτό, παρακαλώ.",
+      "back": "This one, please."
+    }
+  ],
+  "υπάρχει — there is": [
+    {
+      "kind": "grammar",
+      "front": "υπάρχει / υπάρχουν",
+      "back": "there is / there are — it agrees with the thing, not with you",
+      "extra": "Colloquially έχει does the same job: Έχει ψωμί;"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν υπάρχει πρόβλημα.",
+      "back": "There is no problem."
+    }
+  ],
+  "μου, σου, του — saying whose": [
+    {
+      "kind": "grammar",
+      "front": "The possessives",
+      "back": "μου · σου · του · της · μας · σας · τους — after the noun, with the article kept"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why it is ο δάσκαλός μου",
+      "back": "The pronoun counts as a syllable, so a second accent appears inside the last three",
+      "extra": "το όνομά μου, το μάθημά μου."
+    },
+    {
+      "kind": "word",
+      "front": "ο νονός / η νονά",
+      "back": "godfather / godmother",
+      "extra": "A real family relationship in Greek practice."
+    },
+    {
+      "kind": "word",
+      "front": "ο παππούς / η γιαγιά",
+      "back": "grandfather / grandmother"
+    },
+    {
+      "kind": "word",
+      "front": "ο αδελφός / η αδελφή",
+      "back": "brother / sister"
+    }
+  ],
+  "με, σε, τον — the object pronouns": [
+    {
+      "kind": "grammar",
+      "front": "The weak object pronouns",
+      "back": "με · σε · τον/την/το · μας · σας · τους/τις/τα"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where the weak pronoun goes",
+      "back": "Before the verb in a statement, after it in a command — Το θέλω, but Δώσε το!"
+    },
+    {
+      "kind": "grammar",
+      "front": "Two pronouns together",
+      "back": "Indirect first, then direct — Μου το δίνει, Δώσε μου το"
+    }
+  ],
+  "μου αρέσει — liking things": [
+    {
+      "kind": "grammar",
+      "front": "μου αρέσει or μου αρέσουν",
+      "back": "The verb agrees with the thing liked — Μου αρέσει ο καφές, Μου αρέσουν τα παιδιά"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν μου αρέσει.",
+      "back": "I do not like it."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μου αρέσει να διαβάζω.",
+      "back": "I like reading."
+    },
+    {
+      "kind": "grammar",
+      "front": "μου λείπει",
+      "back": "I miss it / him — *it is lacking to me*"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν πειράζει.",
+      "back": "Never mind, it does not matter."
+    }
+  ],
+  "Prepositions: σε, από, για, με": [
+    {
+      "kind": "grammar",
+      "front": "What case follows a Greek preposition",
+      "back": "The accusative, every time"
+    },
+    {
+      "kind": "word",
+      "front": "σε",
+      "back": "in, at, to, on — one word for all four"
+    },
+    {
+      "kind": "word",
+      "front": "από",
+      "back": "from, of, than, by"
+    },
+    {
+      "kind": "word",
+      "front": "για",
+      "back": "for, about"
+    },
+    {
+      "kind": "word",
+      "front": "με",
+      "back": "with, by"
+    },
+    {
+      "kind": "word",
+      "front": "χωρίς",
+      "back": "without"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which pronouns follow prepositions",
+      "back": "The strong ones — για μένα, με σένα, από αυτόν. Never *για με*."
+    }
+  ],
+  "στον, στη, στο — σε plus the article": [
+    {
+      "kind": "grammar",
+      "front": "σε plus the article",
+      "back": "στον / στη(ν) / στο — plural στους / στις / στα",
+      "extra": "Compulsory. Never written as two words."
+    },
+    {
+      "kind": "sentence",
+      "front": "Πάω στην εκκλησία.",
+      "back": "I am going to church."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μένω στην Αγγλία.",
+      "back": "I live in England.",
+      "extra": "στην keeps its -ν before a vowel."
+    }
+  ],
+  "Where things are": [
+    {
+      "kind": "word",
+      "front": "πάνω σε / κάτω από",
+      "back": "on / under"
+    },
+    {
+      "kind": "word",
+      "front": "δίπλα σε / απέναντι από",
+      "back": "next to / opposite"
+    },
+    {
+      "kind": "word",
+      "front": "μπροστά από / πίσω από",
+      "back": "in front of / behind"
+    },
+    {
+      "kind": "word",
+      "front": "κοντά / μακριά",
+      "back": "near / far"
+    },
+    {
+      "kind": "word",
+      "front": "αριστερά / δεξιά / ευθεία",
+      "back": "left / right / straight on"
+    }
+  ],
+  "Politeness: εσύ and εσείς": [
+    {
+      "kind": "grammar",
+      "front": "When to use the plural *you*",
+      "back": "Anyone older, anyone just met, officials — and the priest, always, until told otherwise"
+    },
+    {
+      "kind": "word",
+      "front": "Πάτερ",
+      "back": "Father — the vocative, and how you address a priest"
+    },
+    {
+      "kind": "grammar",
+      "front": "Γεια σου or γεια σας",
+      "back": "σου to a friend · σας politely or to several people"
+    }
+  ],
+  "Numbers 20 to 100, and prices": [
+    {
+      "kind": "word",
+      "front": "τριάντα · σαράντα · πενήντα",
+      "back": "30 · 40 · 50"
+    },
+    {
+      "kind": "word",
+      "front": "εξήντα · εβδομήντα · ογδόντα · ενενήντα",
+      "back": "60 · 70 · 80 · 90"
+    },
+    {
+      "kind": "word",
+      "front": "εκατό · χίλια",
+      "back": "100 · 1000"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πόσο κάνει;",
+      "back": "How much is it?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τίποτα άλλο, ευχαριστώ.",
+      "back": "Nothing else, thanks."
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek builds compound numbers",
+      "back": "The two words in order, nothing between — είκοσι ένα, τριάντα πέντε, ενενήντα εννιά"
+    }
+  ],
+  "Telling the time": [
+    {
+      "kind": "sentence",
+      "front": "Τι ώρα είναι;",
+      "back": "What time is it?"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why the hours use μία, τρεις, τέσσερις",
+      "back": "Because ώρα is feminine, so the numbers that inflect take their feminine forms"
+    },
+    {
+      "kind": "grammar",
+      "front": "και or παρά",
+      "back": "και for past the hour, παρά for to it — τρεις και τέταρτο, τέσσερις παρά είκοσι"
+    },
+    {
+      "kind": "grammar",
+      "front": "At what time",
+      "back": "στις — στις τρεις, στις πέντε και μισή · but στη μία"
+    },
+    {
+      "kind": "word",
+      "front": "το πρωί / το μεσημέρι / το βράδυ",
+      "back": "the morning / midday / the evening"
+    }
+  ],
+  "Days, months and the church year": [
+    {
+      "kind": "grammar",
+      "front": "The days of the week",
+      "back": "Δευτέρα · Τρίτη · Τετάρτη · Πέμπτη · Παρασκευή · Σάββατο · Κυριακή",
+      "extra": "Second, third, fourth, fifth — then Preparation, Sabbath, and the Lord's day."
+    },
+    {
+      "kind": "grammar",
+      "front": "On a day",
+      "back": "The accusative with no preposition — τη Δευτέρα, την Κυριακή, το Σάββατο"
+    },
+    {
+      "kind": "sentence",
+      "front": "Χρόνια πολλά!",
+      "back": "Many years! — for name days, birthdays and feasts. The most useful greeting in Greek life."
+    },
+    {
+      "kind": "sentence",
+      "front": "Χριστός Ανέστη! — Αληθώς Ανέστη!",
+      "back": "Christ is risen — truly he is risen",
+      "extra": "An older form kept as a formula, used for forty days after Pascha."
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλή Σαρακοστή",
+      "back": "A good Lent — said as the fast begins"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλή Κυριακή!",
+      "back": "A good Sunday to you"
+    }
+  ],
+  "At church: the words you will hear first": [
+    {
+      "kind": "word",
+      "front": "η εκκλησία",
+      "back": "the church"
+    },
+    {
+      "kind": "word",
+      "front": "η Θεία Λειτουργία",
+      "back": "the Divine Liturgy"
+    },
+    {
+      "kind": "word",
+      "front": "ο Εσπερινός",
+      "back": "Vespers"
+    },
+    {
+      "kind": "word",
+      "front": "ο Όρθρος",
+      "back": "Matins, before the Liturgy"
+    },
+    {
+      "kind": "word",
+      "front": "ο παπάς",
+      "back": "the priest — everyday and affectionate; ο ιερέας is the formal word"
+    },
+    {
+      "kind": "word",
+      "front": "ο ψάλτης",
+      "back": "the chanter"
+    },
+    {
+      "kind": "word",
+      "front": "το κερί",
+      "back": "the candle"
+    },
+    {
+      "kind": "word",
+      "front": "η εικόνα",
+      "back": "the icon"
+    },
+    {
+      "kind": "word",
+      "front": "το αντίδωρο",
+      "back": "the blessed bread given out after the Liturgy"
+    },
+    {
+      "kind": "word",
+      "front": "το τέμπλο",
+      "back": "the icon screen"
+    },
+    {
+      "kind": "word",
+      "front": "η ενορία",
+      "back": "the parish"
+    },
+    {
+      "kind": "word",
+      "front": "το μνημόσυνο",
+      "back": "the memorial service"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δόξα τω Θεώ.",
+      "back": "Glory to God",
+      "extra": "A dative — a form the modern language no longer has, surviving as a formula."
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλή δύναμη!",
+      "back": "Strength to you — in Lent, or to someone with something hard on"
+    },
+    {
+      "kind": "sentence",
+      "front": "Περαστικά!",
+      "back": "Get well soon"
+    }
+  ],
+  "Ordering a coffee: your first real exchange": [
+    {
+      "kind": "word",
+      "front": "ελληνικός καφές",
+      "back": "Greek coffee — σκέτος (no sugar), μέτριος (a little), γλυκός (sweet)"
+    },
+    {
+      "kind": "word",
+      "front": "φραπέ",
+      "back": "instant coffee shaken cold with ice"
+    },
+    {
+      "kind": "sentence",
+      "front": "Έναν ελληνικό μέτριο, παρακαλώ.",
+      "back": "A Greek coffee with a little sugar, please."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τον λογαριασμό, παρακαλώ.",
+      "back": "The bill, please."
+    },
+    {
+      "kind": "sentence",
+      "front": "Πάμε για καφέ;",
+      "back": "Shall we go for a coffee?",
+      "extra": "An invitation to an hour, not to a drink."
+    }
+  ],
+  "Writing, from the first week": [
+    {
+      "kind": "sentence",
+      "front": "Δεν ξέρω πολλά ελληνικά, αλλά μαθαίνω.",
+      "back": "I do not know much Greek, but I am learning.",
+      "extra": "The most useful sentence you can have this year."
+    }
+  ],
+  "The i sounds: ι η υ ει οι": [
+    {
+      "kind": "grammar",
+      "front": "Which i-ending goes with which part of speech",
+      "back": "-ει a verb (3rd sg) · -εις a verb (2nd sg) · -η a feminine noun · -οι a masculine plural · -ι a neuter noun · -εις the plural of -ση/-ξη/-ψη nouns"
+    },
+    {
+      "kind": "grammar",
+      "front": "The English-cousin trick",
+      "back": "The English spelling often preserves the Greek one — ψυχή/psychology (υ), ιστορία/history (ι), ειρήνη/Irene (ει), οικονομία/economy (οι)"
+    }
+  ],
+  "The e sounds: ε and αι": [
+    {
+      "kind": "grammar",
+      "front": "Where αι appears rather than ε",
+      "back": "και, ναι, είναι · the mediopassive endings -μαι, -σαι, -ται, -νται · and a set of stems (παιδί, γυναίκα, αίμα, παίζω)"
+    },
+    {
+      "kind": "grammar",
+      "front": "-ομαι against -ουμε",
+      "back": "-ομαι is the mediopassive *I* (έρχομαι) · -ουμε is the active *we* (γράφουμε)"
+    }
+  ],
+  "The o sounds: ο and ω": [
+    {
+      "kind": "grammar",
+      "front": "The most useful spelling rule in Greek",
+      "back": "Verbs take -ω, nouns take -ο — γράφω but το βιβλίο"
+    },
+    {
+      "kind": "grammar",
+      "front": "The other grammatical ω",
+      "back": "The genitive plural -ων — των παιδιών, των ανθρώπων"
+    }
+  ],
+  "Final -ν: when to write it": [
+    {
+      "kind": "grammar",
+      "front": "When τον, την and έναν keep the -ν",
+      "back": "Before a vowel and before κ π τ, μπ ντ γκ, τσ τζ, ξ ψ — dropped before the other consonants",
+      "extra": "στην Αθήνα, στην πόλη — but στη Θεσσαλονίκη, στη μητέρα."
+    },
+    {
+      "kind": "grammar",
+      "front": "Which words keep the -ν always, in practice",
+      "back": "δεν, μην, and masculine τον — because dropping τον's ν would lose the gender"
+    }
+  ],
+  "The accent rules in full": [
+    {
+      "kind": "grammar",
+      "front": "The three accented monosyllables",
+      "back": "ή (or), πού (where?), πώς (how?) — against η, που, πως"
+    },
+    {
+      "kind": "grammar",
+      "front": "The disambiguating accent on a weak pronoun",
+      "back": "Ο πατέρας μού είπε — *told me*, where μου unaccented would read as *my*"
+    }
+  ],
+  "Diaeresis, apostrophe and syllables": [
+    {
+      "kind": "grammar",
+      "front": "When the diaeresis is omitted",
+      "back": "When the first of the two vowels carries the accent — Μάιος, νεράιδα, ρολόι, πλάι"
+    },
+    {
+      "kind": "grammar",
+      "front": "When both accent and diaeresis appear",
+      "back": "When the ι or υ is itself stressed and still needs separating — Μαΐου, πρωτεΐνη, ταΐζω"
+    },
+    {
+      "kind": "grammar",
+      "front": "παιδάκια or παϊδάκια",
+      "back": "παιδάκια = little children · παϊδάκια = lamb chops",
+      "extra": "Two dots, two different words."
+    },
+    {
+      "kind": "grammar",
+      "front": "What is never split across syllables",
+      "back": "A digraph — neither αι ει οι ου αυ ευ nor μπ ντ γκ τσ τζ"
+    }
   ]
 }
