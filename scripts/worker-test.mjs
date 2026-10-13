@@ -67,6 +67,19 @@ execFileSync(
 );
 const markdown = await import(pathToFileURL(markdownBundle).href);
 
+// The flashcard scheduler. FSRS is a third-party pure function, so what is
+// tested here is the wrapper around it: that the row goes in and comes back as
+// a row, that two buttons map to the library's four ratings, and that the
+// new-card allowance counts the right thing. All of it is silent when wrong —
+// a card scheduled into 1970 still renders.
+const flashBundle = path.join(os.tmpdir(), 'master-roachi-flashcards-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/cards.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${flashBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const flashcards = await import(pathToFileURL(flashBundle).href);
+
 // The icon set, where a typo is silent: a malformed path renders as nothing
 // and a duplicated name makes one icon unreachable.
 const iconBundle = path.join(os.tmpdir(), 'master-roachi-icon-bundle.mjs');
@@ -1155,6 +1168,23 @@ function fakeD1() {
   const sources = [
     { id: 1, curriculum_id: 1, lesson_id: null, title: 'The Odin Project', url: 'https://theodinproject.com', note: null, position: 1 },
   ];
+  /* Flashcards. One unlocked and new, one still waiting on its lesson — the
+     two states that decide whether a card is ever offered. */
+  const flash = [
+    {
+      id: 1, curriculum_id: 1, lesson_id: 1, kind: 'word', front: '日本', back: 'Japan',
+      reading: 'にほん', extra: null, due: '2026-10-13T00:00:00.000Z', stability: 0,
+      difficulty: 0, scheduled_days: 0, learning_steps: 0, reps: 0, lapses: 0, state: 0,
+      last_review: null, unlocked_on: '2026-10-13',
+    },
+    {
+      id: 2, curriculum_id: 1, lesson_id: 1, kind: 'kanji', front: '国', back: 'country',
+      reading: 'くに', extra: null, due: '2026-10-13T00:00:00.000Z', stability: 0,
+      difficulty: 0, scheduled_days: 0, learning_steps: 0, reps: 0, lapses: 0, state: 0,
+      last_review: null, unlocked_on: null,
+    },
+  ];
+  const cardReviews = [];
   const sqlLog = [];
 
   const statement = (sql) => {
@@ -1166,6 +1196,31 @@ function fakeD1() {
       },
       async all() {
         sqlLog.push(sql);
+        // Before `from curriculums`: the decks query reads from both, and the
+        // broader branch below would answer it with the curriculum rows.
+        if (sql.includes('join cards k')) {
+          const now = bound[0];
+          return {
+            results: curriculums
+              .map((c) => {
+                const mine = flash.filter((k) => k.curriculum_id === c.id);
+                return {
+                  id: c.id, name: c.name, status: c.status ?? 'active', position: c.position ?? 1,
+                  new_per_day: c.new_per_day ?? null,
+                  due: mine.filter((k) => k.unlocked_on !== null && k.state !== 0 && k.due <= now).length,
+                  fresh: mine.filter((k) => k.unlocked_on !== null && k.state === 0).length,
+                  locked: mine.filter((k) => k.unlocked_on === null).length,
+                  total: mine.length,
+                };
+              })
+              .filter((row) => row.total > 0),
+          };
+        }
+        if (sql.includes('count(*) as n from cards group by')) {
+          const counts = new Map();
+          for (const k of flash) counts.set(k.curriculum_id, (counts.get(k.curriculum_id) ?? 0) + 1);
+          return { results: [...counts].map(([curriculum_id, n]) => ({ curriculum_id, n })) };
+        }
         if (sql.includes('from books')) return { results: books };
         if (sql.includes('from curriculums')) return { results: curriculums };
         if (sql.includes('from modules')) return { results: modules };
@@ -1228,6 +1283,32 @@ function fakeD1() {
               .sort((a, b) => a.position - b.position)[0] ?? null
           );
         }
+        if (sql.includes('from card_reviews r')) {
+          const [day, deck] = bound;
+          return {
+            n: cardReviews.filter((r) => {
+              const card = flash.find((k) => k.id === r.card_id);
+              return r.day === day && r.state === 0 && card?.curriculum_id === deck;
+            }).length,
+          };
+        }
+        if (sql.includes('select new_per_day from curriculums')) {
+          const row = curriculums.find((c) => c.id === bound[0]);
+          return row ? { new_per_day: row.new_per_day ?? null } : null;
+        }
+        if (sql.includes('from cards')) {
+          if (sql.includes('where id = ?1')) return flash.find((k) => k.id === bound[0]) ?? null;
+          const [deck, now] = bound;
+          const mine = flash.filter((k) => k.curriculum_id === deck && k.unlocked_on !== null);
+          if (sql.includes('state != 0')) {
+            return (
+              mine
+                .filter((k) => k.state !== 0 && k.due <= now)
+                .sort((a, b) => (a.due < b.due ? -1 : 1))[0] ?? null
+            );
+          }
+          return mine.filter((k) => k.state === 0).sort((a, b) => a.id - b.id)[0] ?? null;
+        }
         // Is this lesson in THAT curriculum — the 0009 ownership check. Ahead
         // of the branch below, which answers only "the lesson exists" and
         // would let a lesson id from another curriculum through.
@@ -1259,6 +1340,45 @@ function fakeD1() {
             // Applied for real, so the idempotency guard has something to see.
             if (sql.includes('set post_path')) row.post_path = bound[1];
           }
+        }
+        if (sql.startsWith('update cards set due')) {
+          const row = flash.find((k) => k.id === bound[0]);
+          if (row) {
+            [, row.due, row.stability, row.difficulty, row.scheduled_days,
+              row.learning_steps, row.reps, row.lapses, row.state, row.last_review] = bound;
+          }
+        }
+        if (sql.startsWith('update cards set unlocked_on')) {
+          const hit = flash.filter((k) => k.lesson_id === bound[0] && k.unlocked_on === null);
+          for (const row of hit) row.unlocked_on = bound[1];
+          // meta.changes is what the endpoint reports as `unlocked`.
+          return { meta: { changes: hit.length } };
+        }
+        if (sql.startsWith('insert into card_reviews')) {
+          cardReviews.push({
+            card_id: bound[0], rating: bound[1], state: bound[2],
+            reviewed_at: bound[3], day: bound[4],
+          });
+        }
+        if (sql.startsWith('update curriculums set new_per_day')) {
+          const row = curriculums.find((c) => c.id === bound[0]);
+          if (row) row.new_per_day = bound[1];
+        }
+        if (sql.startsWith('insert into cards')) {
+          const [curriculum_id, kind, front, back, reading, extra, due, day] = bound;
+          if (flash.some((k) => k.curriculum_id === curriculum_id && k.kind === kind && k.front === front)) {
+            // The unique index on (curriculum_id, kind, front).
+            throw new Error('UNIQUE constraint failed: cards.front');
+          }
+          flash.push({
+            id: flash.length + 1, curriculum_id, lesson_id: null, kind, front, back, reading,
+            extra, due, stability: 0, difficulty: 0, scheduled_days: 0, learning_steps: 0,
+            reps: 0, lapses: 0, state: 0, last_review: null, unlocked_on: day,
+          });
+        }
+        if (sql.startsWith('delete from cards')) {
+          const at = flash.findIndex((k) => k.id === bound[0]);
+          if (at !== -1) flash.splice(at, 1);
         }
         if (sql.startsWith('insert into sources')) {
           sources.push({
@@ -1319,6 +1439,8 @@ function fakeD1() {
 
   return {
     _sources: sources,
+    _cards: flash,
+    _reviews: cardReviews,
     prepare: statement,
     // The real batch runs the statements; the fake has to as well, or a
     // reorder would silently do nothing in a test and pass.
@@ -4057,6 +4179,121 @@ globalThis.fetch = preGh;
   check('a dash in a cell is a cell, not a bullet', table !== null && table.rows[0][0] === '-', JSON.stringify(table));
 }
 
+// --- the flashcard scheduler ----------------------------------------------
+{
+  const { allowance, freshScheduling, isCardKind, ratingFor, review, NEW_PER_DAY, CARD_KINDS } =
+    flashcards;
+
+  check('two buttons, and they are the library\'s ratings', ratingFor('again') === 1 && ratingFor('good') === 3, `${ratingFor('again')}/${ratingFor('good')}`);
+  check('an unknown button is refused rather than defaulted', ratingFor('easy') === null && ratingFor(undefined) === null, '');
+
+  check(
+    'every card kind carries a prompt',
+    Object.values(CARD_KINDS).every((kind) => typeof kind.prompt === 'string' && kind.prompt.length > 0),
+    JSON.stringify(CARD_KINDS),
+  );
+  check('a kind is checked against the set', isCardKind('kanji') && !isCardKind('verb'), '');
+
+  const now = new Date('2026-10-13T09:00:00.000Z');
+  const fresh = freshScheduling(now);
+  check(
+    'a fresh card is new, unseen, and due now',
+    fresh.state === 0 && fresh.reps === 0 && fresh.last_review === null && fresh.due === now.toISOString(),
+    JSON.stringify(fresh),
+  );
+
+  // Good moves it forward and records that it was seen.
+  const good = review(fresh, 3, now);
+  check('Good leaves the new state', good.state !== 0, JSON.stringify(good));
+  check('and counts the repetition', good.reps === 1, String(good.reps));
+  check('and stamps the review', good.last_review === now.toISOString(), String(good.last_review));
+  check('and schedules it later than now', new Date(good.due) > now, `${good.due} vs ${now.toISOString()}`);
+
+  // Again on a card in review is a lapse, and the interval must not grow.
+  const later = new Date('2026-11-13T09:00:00.000Z');
+  const settled = review(review(review(fresh, 3, now), 3, later), 3, new Date('2026-12-13T09:00:00.000Z'));
+  const lapsed = review(settled, 1, new Date('2027-01-13T09:00:00.000Z'));
+  check('Again counts a lapse', lapsed.lapses === settled.lapses + 1, `${settled.lapses} → ${lapsed.lapses}`);
+  check(
+    'and does not schedule it further out than Good did',
+    new Date(lapsed.due).getTime() - new Date('2027-01-13T09:00:00.000Z').getTime() <
+      new Date(settled.due).getTime() - new Date('2026-12-13T09:00:00.000Z').getTime(),
+    `${lapsed.due} / ${settled.due}`,
+  );
+
+  // Repeated Good should stretch the interval, which is the whole point.
+  const first = review(fresh, 3, now);
+  const second = review(first, 3, new Date(first.due));
+  const gap = (card, from) => new Date(card.due).getTime() - new Date(from).getTime();
+  check(
+    'the interval grows with each Good',
+    gap(second, first.due) > gap(first, now.toISOString()),
+    `${gap(first, now.toISOString())} → ${gap(second, first.due)}`,
+  );
+
+  // Round-tripping through the database must not change the schedule: every
+  // field is stored as the library names it, so this is the test that the
+  // column list and the Card type have not drifted apart.
+  const stored = JSON.parse(JSON.stringify(second));
+  check(
+    'a card survives a round trip through JSON unchanged',
+    JSON.stringify(review(stored, 3, new Date(second.due))) ===
+      JSON.stringify(review(second, 3, new Date(second.due))),
+    '',
+  );
+
+  // The allowance.
+  check('the default allowance applies where a deck has no opinion', allowance({ new_per_day: null }, 0) === NEW_PER_DAY, String(NEW_PER_DAY));
+  check('a deck\'s own number wins', allowance({ new_per_day: 3 }, 0) === 3, '');
+  check('what was introduced today comes off it', allowance({ new_per_day: 10 }, 4) === 6, '');
+  check('it never goes negative', allowance({ new_per_day: 10 }, 25) === 0, '');
+  check('zero means no new cards at all', allowance({ new_per_day: 0 }, 0) === 0, '');
+}
+
+// --- ruby, and the rest of a line -----------------------------------------
+{
+  const { inlineTokens } = markdown;
+
+  let tokens = inlineTokens('plain text');
+  check('plain text is one token', tokens.length === 1 && tokens[0].kind === 'text', JSON.stringify(tokens));
+
+  tokens = inlineTokens('**bold** and *italic* and `code`');
+  check(
+    'bold, italic and code are still read',
+    tokens.filter((t) => t.kind === 'bold').length === 1 &&
+      tokens.filter((t) => t.kind === 'italic').length === 1 &&
+      tokens.filter((t) => t.kind === 'code').length === 1,
+    JSON.stringify(tokens),
+  );
+
+  tokens = inlineTokens('[日本]{にほん} is a country');
+  check(
+    'ruby carries its characters and its reading',
+    tokens[0].kind === 'ruby' && tokens[0].text === '日本' && tokens[0].reading === 'にほん',
+    JSON.stringify(tokens),
+  );
+  check('and the rest of the line survives it', tokens[1]?.text === ' is a country', JSON.stringify(tokens));
+
+  tokens = inlineTokens('[今日]{きょう}の[天気]{てんき}');
+  check(
+    'two rubies in a line are two rubies',
+    tokens.filter((t) => t.kind === 'ruby').length === 2,
+    JSON.stringify(tokens),
+  );
+
+  // A link is `](`, ruby is `]{`. The difference is the whole grammar, so a
+  // link must not be eaten as ruby.
+  tokens = inlineTokens('see [the guide](https://example.com) for more');
+  check(
+    'a markdown link is not read as ruby',
+    tokens.every((t) => t.kind !== 'ruby'),
+    JSON.stringify(tokens),
+  );
+
+  check('an empty reading is not ruby', inlineTokens('[日本]{}').every((t) => t.kind !== 'ruby'), '');
+  check('an unclosed ruby is left as text', inlineTokens('[日本]{にほん').every((t) => t.kind !== 'ruby'), '');
+}
+
 // --- lesson detail, written to D1 AND to the repo --------------------------
 //
 // For a designed curriculum, scripts/curriculums/<name>-detail.json is the
@@ -4186,6 +4423,129 @@ globalThis.fetch = preGh;
 
   globalThis.fetch = preGh;
   DB = fakeD1();
+}
+
+// --- cards, through the endpoint -------------------------------------------
+//
+// A deck is a curriculum, so the things worth testing are the ones a deck
+// cannot express: that a locked card is never served, that the day's allowance
+// is counted from the review log rather than from the pile, and that answering
+// writes both the schedule and the history.
+{
+  DB = fakeD1();
+  const dbEnv = { ...env, DB };
+
+  res = await worker.fetch(get('https://masterroachi.com/work/api/cards'), dbEnv);
+  check('cards without Access serves the 404 page', (await res.text()) === '404 page', String(res.status));
+
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards'), dbEnv);
+  body = await res.json();
+  check('a deck is listed for a curriculum that has cards', body.decks?.length === 1, JSON.stringify(body.decks));
+  check(
+    'and it counts what is new, what is due and what is locked',
+    body.decks[0].fresh === 1 && body.decks[0].due === 0 && body.decks[0].locked === 1,
+    JSON.stringify(body.decks[0]),
+  );
+  check('no deck asked for means no card served', body.card === null, JSON.stringify(body.card));
+
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  body = await res.json();
+  check('asking for a deck serves one card', body.card?.id === 1, JSON.stringify(body.card));
+  check('and never the locked one', body.card?.id !== 2, JSON.stringify(body.card));
+  check('the card carries its reading, for the ruby', body.card?.reading === 'にほん', String(body.card?.reading));
+
+  const post = (payload) =>
+    worker.fetch(
+      new Request('https://masterroachi.com/work/api/cards', {
+        method: 'POST',
+        headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+      dbEnv,
+    );
+
+  res = await post({ action: 'answer', id: 2, button: 'good' });
+  check('a locked card cannot be answered', res.status === 400, String(res.status));
+
+  res = await post({ action: 'answer', id: 1 });
+  check('answering needs a button', res.status === 400, String(res.status));
+
+  res = await post({ action: 'answer', id: 1, button: 'easy' });
+  check('and only one of the two buttons', res.status === 400, String(res.status));
+
+  res = await post({ action: 'answer', id: 1, button: 'good' });
+  body = await res.json();
+  check('a card can be answered', res.status === 200, String(res.status));
+  check(
+    'the schedule is written',
+    DB._cards[0].state !== 0 && DB._cards[0].reps === 1 && DB._cards[0].last_review !== null,
+    JSON.stringify(DB._cards[0]),
+  );
+  check(
+    'and the review is logged with the state it was in BEFORE',
+    DB._reviews.length === 1 && DB._reviews[0].rating === 3 && DB._reviews[0].state === 0,
+    JSON.stringify(DB._reviews),
+  );
+  check('the answer hands back the decks', Array.isArray(body.decks), JSON.stringify(body.decks));
+
+  /* The allowance. One new card has now been introduced today, so a deck
+     capped at one must offer nothing more — and it must be counted from the
+     log, since that card is no longer in the `new` state to be counted. */
+  res = await post({ action: 'new-per-day', curriculum_id: 1, value: 1 });
+  check('the one setting can be set', res.status === 200, String(res.status));
+  check('and it is stored on the curriculum', DB._curriculums[0].new_per_day === 1, JSON.stringify(DB._curriculums[0]));
+
+  res = await post({ action: 'add', curriculum_id: 1, kind: 'word', front: '本', back: 'book' });
+  check('a card can be added by hand', res.status === 200, String(res.status));
+  check(
+    'and it is unlocked at once, having no lesson to wait for',
+    DB._cards.at(-1).unlocked_on !== null && DB._cards.at(-1).lesson_id === null,
+    JSON.stringify(DB._cards.at(-1)),
+  );
+
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  body = await res.json();
+  check(
+    'the day\'s allowance is spent, so no new card is offered',
+    body.card === null,
+    JSON.stringify(body.card),
+  );
+
+  res = await post({ action: 'new-per-day', curriculum_id: 1, value: null });
+  check('and clearing it puts the deck back on the default', DB._curriculums[0].new_per_day === null, '');
+
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  body = await res.json();
+  check('which offers the next new card again', body.card?.front === '本', JSON.stringify(body.card));
+
+  res = await post({ action: 'add', curriculum_id: 1, kind: 'word', front: '本', back: 'book' });
+  check('the same question twice in one deck is refused', res.status === 409, String(res.status));
+
+  res = await post({ action: 'add', curriculum_id: 1, kind: 'verb', front: 'x', back: 'y' });
+  check('an unknown kind is refused', res.status === 400, String(res.status));
+
+  res = await post({ action: 'add', curriculum_id: 1, kind: 'word', front: '', back: 'y' });
+  check('a card needs a front and a back', res.status === 400, String(res.status));
+
+  /* Ticking a lesson unlocks what it taught. Card 2 has been locked all the
+     way through this block, which is what makes this test mean something. */
+  res = await worker.fetch(
+    new Request('https://masterroachi.com/work/api/curriculums', {
+      method: 'POST',
+      headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'toggle-lesson', id: 1 }),
+    }),
+    dbEnv,
+  );
+  body = await res.json();
+  check('ticking a lesson unlocks its cards', body.unlocked === 1, JSON.stringify(body));
+  check('and the card is now reviewable', DB._cards[1].unlocked_on !== null, JSON.stringify(DB._cards[1]));
+
+  res = await post({ action: 'remove', id: 1 });
+  check('a card can be removed', res.status === 200 && !DB._cards.some((k) => k.id === 1), '');
+
+  res = await post({ action: 'nonsense' });
+  check('an unknown action is refused', res.status === 400, String(res.status));
 }
 
 // --- the boards page --------------------------------------------------------
@@ -4408,6 +4768,7 @@ fs.rmSync(colourBundle, { force: true });
 fs.rmSync(fieldsBundle, { force: true });
 fs.rmSync(proseBundle, { force: true });
 fs.rmSync(cardBundle, { force: true });
+fs.rmSync(flashBundle, { force: true });
 fs.rmSync(iconKeyBundle, { force: true });
 fs.rmSync(hubBundle, { force: true });
 process.exit(failed.length ? 1 : 0);

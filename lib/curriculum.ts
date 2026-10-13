@@ -59,6 +59,14 @@ export interface Curriculum {
   status: 'active' | 'paused' | 'done';
   modules: Module[];
   sources?: Source[];
+  /**
+   * How many cards this curriculum has, or absent where it has none.
+   *
+   * A count and not a boolean because the stage fan prints it: the gold Cards
+   * card says how many, which is the only number on that screen that is not a
+   * percentage. See migrations/0010_cards.sql — a deck IS a curriculum.
+   */
+  cards?: number;
 }
 
 /* THE ROUTE IS GONE, deliberately and at his word: "get rid of the entire

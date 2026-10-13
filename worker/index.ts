@@ -15,6 +15,14 @@ import { collectionFor, newPath, pathAllowed, setDraft } from '../lib/collection
 import { isDay, isMonth, localDay, monthDays, type D1Database } from './db';
 import { outlineSize, parseOutline } from '../lib/outline';
 import { validIconName } from '../lib/habit-icons';
+import {
+  allowance,
+  freshScheduling,
+  isCardKind,
+  ratingFor,
+  review,
+  type Card,
+} from '../lib/cards';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
@@ -1298,7 +1306,7 @@ export default {
         if (request.method === 'GET') {
           // Four flat reads assembled here, rather than a join returning one
           // row per lesson with its curriculum's name repeated on every one.
-          const [curriculums, modules, lessons, sources] = await Promise.all([
+          const [curriculums, modules, lessons, cardCounts, sources] = await Promise.all([
             db
               .prepare(
                 `select id, name, source, status, position from curriculums
@@ -1325,6 +1333,11 @@ export default {
             }>(),
             db
               .prepare(
+                `select curriculum_id, count(*) as n from cards group by curriculum_id`,
+              )
+              .all<{ curriculum_id: number; n: number }>(),
+            db
+              .prepare(
                 `select id, curriculum_id, lesson_id, title, url, note, position from sources
                  order by position, id`,
               )
@@ -1337,6 +1350,11 @@ export default {
               note: string | null;
             }>(),
           ]);
+
+          const cards = new Map<number, number>();
+          for (const row of cardCounts.results) {
+            cards.set(Number(row.curriculum_id), Number(row.n));
+          }
 
           /* Sources at their two grains, split by whether they name a lesson.
            * Null is the curriculum's own list, shown under every lesson; set
@@ -1389,6 +1407,12 @@ export default {
                 ...c,
                 modules: modulesByCurriculum.get(Number(c.id)) ?? [],
                 sources: sourcesByCurriculum.get(Number(c.id)) ?? [],
+                // Omitted rather than zero where there are none: the stage fan
+                // tests this to decide whether to draw the gold Cards card,
+                // and `cards: 0` would have it drawing a card saying 0.
+                ...(cards.get(Number(c.id))
+                  ? { cards: cards.get(Number(c.id)) }
+                  : {}),
               })),
             },
             200,
@@ -1562,7 +1586,32 @@ export default {
 
             const next = lesson.done_on ? null : day;
             await db.prepare(`update lessons set done_on = ?2 where id = ?1`).bind(id, next).run();
-            return json({ done: next !== null, day: next }, 200);
+
+            /* Ticking a lesson UNLOCKS the cards it teaches — "auto", his
+             * choice, so that finishing a lesson and forgetting its cards is
+             * not possible. The cards already exist, built with the
+             * curriculum; `unlocked_on` is what makes them reviewable, which
+             * is how 2,136 kanji can sit in the database without 2,136 cards
+             * arriving on day one.
+             *
+             * Unticking does NOT lock them again. A card that has been
+             * answered has a review history, and hiding it because a tick was
+             * clicked twice would be a worse answer than leaving it in the
+             * pile. `unlocked_on is null` also means a re-tick cannot move a
+             * date that is already set. */
+            let unlocked = 0;
+            if (next !== null) {
+              const result = (await db
+                .prepare(
+                  `update cards set unlocked_on = ?2
+                    where lesson_id = ?1 and unlocked_on is null`,
+                )
+                .bind(id, next)
+                .run()) as { meta?: { changes?: number } };
+              unlocked = Number(result?.meta?.changes ?? 0);
+            }
+
+            return json({ done: next !== null, day: next, unlocked }, 200);
           }
 
           /* Sources: what a curriculum, or one of its lessons, is studied
@@ -1770,6 +1819,277 @@ export default {
             // with it is intended, not incidental.
             await db.prepare(`delete from ${table} where id = ?1`).bind(id).run();
             return json({ removed: true }, 200);
+          }
+
+          return json({ error: 'unknown action' }, 400);
+        }
+
+        return json({ error: 'method not allowed' }, 405);
+      } catch (error) {
+        return json({ error: String(error instanceof Error ? error.message : error) }, 502);
+      }
+    }
+
+    // --- cards -------------------------------------------------------------
+    //
+    // A deck is a curriculum, so there is no deck to choose, create or find —
+    // which was half of what was wrong with Anki. One card is served at a
+    // time and answering it returns the next, so a session is one round trip
+    // per card and a refresh cannot lose a place.
+    if (route === '/work/api/cards') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      const db = env.DB;
+      if (!db) return json({ configured: false, decks: [] }, 200);
+
+      const today = localDay();
+      const nowIso = new Date().toISOString();
+
+      const CARD_COLUMNS =
+        `id, curriculum_id, lesson_id, kind, front, back, reading, extra,
+         due, stability, difficulty, scheduled_days, learning_steps, reps,
+         lapses, state, last_review, unlocked_on`;
+
+      /** The decks, with the four numbers the list shows. */
+      const decksOf = async () =>
+        (
+          await db
+            .prepare(
+              `select c.id, c.name, c.status, c.position, c.new_per_day,
+                      sum(case when k.unlocked_on is not null and k.state != 0
+                                 and k.due <= ?1 then 1 else 0 end) as due,
+                      sum(case when k.unlocked_on is not null and k.state = 0
+                               then 1 else 0 end) as fresh,
+                      sum(case when k.unlocked_on is null then 1 else 0 end) as locked,
+                      count(k.id) as total
+                 from curriculums c
+                 join cards k on k.curriculum_id = c.id
+                group by c.id
+                having count(k.id) > 0
+                order by c.position, c.id`,
+            )
+            .bind(nowIso)
+            .all()
+        ).results;
+
+      /**
+       * How many new cards this deck may still introduce today.
+       *
+       * Counted from the REVIEW LOG, on reviews where the card was new at the
+       * time — not from the cards whose state is new now. A card introduced
+       * this morning is in learning by lunchtime, so counting the pile would
+       * let the allowance refill itself all day long.
+       */
+      const introducedToday = async (deck: number) =>
+        Number(
+          (
+            await db
+              .prepare(
+                `select count(*) as n from card_reviews r
+                   join cards k on k.id = r.card_id
+                  where r.day = ?1 and r.state = 0 and k.curriculum_id = ?2`,
+              )
+              .bind(today, deck)
+              .first<{ n: number }>()
+          )?.n ?? 0,
+        );
+
+      /**
+       * The next card in a deck: everything due first, oldest due first, and
+       * only then something new, and only within the allowance.
+       *
+       * Reviews before new cards and not interleaved, because a day's reviews
+       * are a debt already owed and new cards are a choice to take on more.
+       */
+      const nextCard = async (deck: number) => {
+        const due = await db
+          .prepare(
+            `select ${CARD_COLUMNS} from cards
+              where curriculum_id = ?1 and unlocked_on is not null
+                and state != 0 and due <= ?2
+              order by due, id limit 1`,
+          )
+          .bind(deck, nowIso)
+          .first();
+        if (due) return due;
+
+        const settings = await db
+          .prepare(`select new_per_day from curriculums where id = ?1`)
+          .bind(deck)
+          .first<{ new_per_day: number | null }>();
+        if (!settings) return null;
+
+        if (allowance(settings, await introducedToday(deck)) <= 0) return null;
+
+        return await db
+          .prepare(
+            `select ${CARD_COLUMNS} from cards
+              where curriculum_id = ?1 and unlocked_on is not null and state = 0
+              order by id limit 1`,
+          )
+          .bind(deck)
+          .first();
+      };
+
+      try {
+        if (request.method === 'GET') {
+          const asked = Number(url.searchParams.get('deck'));
+          const deck = Number.isInteger(asked) && asked > 0 ? asked : null;
+          return json(
+            {
+              configured: true,
+              today,
+              decks: await decksOf(),
+              card: deck ? ((await nextCard(deck)) ?? null) : null,
+            },
+            200,
+          );
+        }
+
+        if (request.method === 'POST') {
+          const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+          if (!body) return json({ error: 'malformed body' }, 400);
+          const action = String(body.action ?? '');
+
+          const text = (value: unknown, max = 2000): string =>
+            typeof value === 'string' ? value.trim().slice(0, max) : '';
+
+          /* Answering a card: schedule it, log it, hand back the next one.
+           *
+           * The log is written even though FSRS does not need it — the card's
+           * own state is enough to schedule the next review. It is kept so the
+           * scheduler can be re-optimised against his own answers later, which
+           * is the one thing that would make this better than Anki rather than
+           * only less annoying, and a history not kept cannot be recovered. */
+          if (action === 'answer') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which card' }, 400);
+
+            const rating = ratingFor(body.button);
+            if (rating === null) return json({ error: 'which button' }, 400);
+
+            const card = await db
+              .prepare(`select ${CARD_COLUMNS} from cards where id = ?1`)
+              .bind(id)
+              .first<Card>();
+            if (!card) return json({ error: 'no such card' }, 404);
+            if (card.unlocked_on === null) {
+              return json({ error: 'that card is still locked' }, 400);
+            }
+
+            const now = new Date();
+            const next = review(card, rating, now);
+
+            await db.batch([
+              db
+                .prepare(
+                  `update cards set due = ?2, stability = ?3, difficulty = ?4,
+                          scheduled_days = ?5, learning_steps = ?6, reps = ?7,
+                          lapses = ?8, state = ?9, last_review = ?10
+                    where id = ?1`,
+                )
+                .bind(
+                  id,
+                  next.due,
+                  next.stability,
+                  next.difficulty,
+                  next.scheduled_days,
+                  next.learning_steps,
+                  next.reps,
+                  next.lapses,
+                  next.state,
+                  next.last_review,
+                ),
+              db
+                .prepare(
+                  `insert into card_reviews (card_id, rating, state, reviewed_at, day)
+                   values (?1, ?2, ?3, ?4, ?5)`,
+                )
+                // `card.state`, the state BEFORE the answer: that is what an
+                // optimiser needs and the update above has already lost it.
+                .bind(id, rating, card.state, now.toISOString(), today),
+            ]);
+
+            return json(
+              {
+                answered: true,
+                decks: await decksOf(),
+                card: (await nextCard(card.curriculum_id)) ?? null,
+              },
+              200,
+            );
+          }
+
+          // The one setting there is. Null puts the deck back on the default
+          // rather than storing it, so changing the default later changes
+          // every deck that never had an opinion.
+          if (action === 'new-per-day') {
+            const id = Number(body.curriculum_id);
+            if (!Number.isInteger(id)) return json({ error: 'which deck' }, 400);
+            const raw = body.value;
+            const value =
+              raw === null || raw === '' || raw === undefined
+                ? null
+                : Math.min(Math.max(Math.round(Number(raw)) || 0, 0), 500);
+            if (value !== null && !Number.isFinite(value)) {
+              return json({ error: 'not a number' }, 400);
+            }
+            await db
+              .prepare(`update curriculums set new_per_day = ?2 where id = ?1`)
+              .bind(id, value)
+              .run();
+            return json({ updated: true, decks: await decksOf() }, 200);
+          }
+
+          /* A card by hand — a mined word, something a lesson missed. Unlocked
+           * immediately: there is no lesson to wait for. */
+          if (action === 'add') {
+            const id = Number(body.curriculum_id);
+            if (!Number.isInteger(id)) return json({ error: 'which deck' }, 400);
+            if (!isCardKind(body.kind)) return json({ error: 'which kind' }, 400);
+
+            const front = text(body.front, 200);
+            const back = text(body.back);
+            if (!front || !back) return json({ error: 'needs a front and a back' }, 400);
+
+            const fresh = freshScheduling(new Date());
+            try {
+              await db
+                .prepare(
+                  `insert into cards (curriculum_id, lesson_id, kind, front, back, reading,
+                                      extra, due, stability, difficulty, scheduled_days,
+                                      learning_steps, reps, lapses, state, last_review,
+                                      unlocked_on, created_at)
+                   values (?1, null, ?2, ?3, ?4, ?5, ?6, ?7, 0, 0, 0, 0, 0, 0, 0, null, ?8, ?8)`,
+                )
+                .bind(
+                  id,
+                  body.kind,
+                  front,
+                  back,
+                  text(body.reading, 200) || null,
+                  text(body.extra) || null,
+                  fresh.due,
+                  today,
+                )
+                .run();
+            } catch {
+              // The unique index on (curriculum_id, kind, front). Reported as
+              // a duplicate rather than as a server error, because asking the
+              // same question twice in one deck is a mistake with an obvious
+              // fix and not a failure.
+              return json({ error: 'that card is already in this deck' }, 409);
+            }
+            return json({ added: true, decks: await decksOf() }, 200);
+          }
+
+          if (action === 'remove') {
+            const id = Number(body.id);
+            if (!Number.isInteger(id)) return json({ error: 'which card' }, 400);
+            await db.prepare(`delete from cards where id = ?1`).bind(id).run();
+            return json({ removed: true, decks: await decksOf() }, 200);
           }
 
           return json({ error: 'unknown action' }, 400);

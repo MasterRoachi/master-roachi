@@ -731,6 +731,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The Cards card: gold, among the stages, where the curriculum has cards.
+   Gold because it is the one card in the fan that is not a stage — it leaves
+   the page rather than opening a layer. */
+.cardsCard {
+  border-color: var(--gold);
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.cardsCard .stageNumber,
+.cardsCard .stagePercent {
+  color: var(--gold);
+}
+
 .addStage {
   place-content: center;
   justify-items: center;
@@ -956,130 +970,6 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--gold);
-}
-
-.lessonSection p,
-.lessonSection ul,
-.lessonSection ol {
-  font-size: 0.9375rem;
-  line-height: 1.65;
-}
-
-.detailHeading {
-  margin: 1.1rem 0 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink);
-}
-
-.detailHeading:first-child {
-  margin-top: 0;
-}
-
-.detailList {
-  margin: 0 0 0.8rem;
-  padding-left: 1.1rem;
-  display: grid;
-  gap: 0.3rem;
-}
-
-.lessonSection code {
-  background: var(--bg);
-  border-radius: 4px;
-  padding: 0.05rem 0.25rem;
-  font-size: 0.875em;
-}
-
-/* A fenced code block.
- *
- * The scroll rule matters more than it looks. The shell is exactly 100dvh and
- * the page itself never scrolls, so a wide line of code has to be absorbed
- * HERE — `min-width: 0` on this block and `overflow-x: auto` on the pre — or
- * it widens its grid track, widens .lessonBody past its 46rem, and puts a
- * horizontal scrollbar on a page whose whole design is that it has none. It
- * is the same trap as the min-height: 0 one, in the other axis. */
-.codeBlock {
-  position: relative;
-  min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--bg);
-}
-
-.codeBlock pre {
-  margin: 0;
-  padding: 0.7rem 0.85rem;
-  overflow-x: auto;
-  font-size: 0.8125rem;
-  line-height: 1.55;
-}
-
-.codeBlock code {
-  background: none;
-  padding: 0;
-  font-size: inherit;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-
-/* Outside the pre so it is not copied with the code — see the renderer. */
-.codeLang {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 0.15rem 0.45rem;
-  border-left: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  border-radius: 0 8px 0 6px;
-  background: var(--bg-raised);
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  pointer-events: none;
-}
-
-/* A table, which scrolls sideways for the same reason the code does: a Greek
-   paradigm is five cases across two numbers and will not narrow. */
-.tableWrap {
-  min-width: 0;
-  overflow-x: auto;
-}
-
-.detailTable {
-  border-collapse: collapse;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.detailTable th,
-.detailTable td {
-  padding: 0.35rem 0.7rem;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-
-.detailTable th {
-  font-weight: 500;
-  white-space: nowrap;
-  color: var(--gold);
-  border-bottom-color: var(--line-bright);
-}
-
-.detailTable tr:last-child td {
-  border-bottom: none;
-}
-
-/* "The whole curriculum", under a lesson's own sources. Quieter than the
-   section heading above it, because it is a fallback and not the answer. */
-.sourceGrain {
-  margin: 1rem 0 0.4rem;
-  font-size: 0.625rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted-2);
 }
 
 /* Visual examples, which are the images in the detail pulled out of the

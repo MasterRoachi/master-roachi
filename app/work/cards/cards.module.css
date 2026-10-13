@@ -1,0 +1,260 @@
+/* Cards: the decks, and one card at a time.
+ *
+ * The backend shell is exactly 100dvh and never scrolls, so this page is
+ * sized to fit rather than allowed to grow. A review screen that scrolls is a
+ * review screen where the buttons move. */
+
+.page {
+  /* Tokens from app/globals.css; gold is the backend's accent, declared here
+     the same way the curriculums page declares it. */
+  --gold: oklch(80% 0.13 85);
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 0.9rem;
+  align-content: start;
+  padding: 1.2rem 0 1.6rem;
+}
+
+.quiet {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.error {
+  margin: 0;
+  color: oklch(70% 0.15 25);
+  font-size: 0.875rem;
+}
+
+/* --- the decks ---------------------------------------------------------- */
+
+.decks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.9rem;
+  align-content: start;
+}
+
+.deck {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--deck, var(--line));
+  border-radius: 10px;
+  background: var(--deck-face, var(--bg-raised));
+  color: var(--deck-ink, var(--ink));
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.deck:hover {
+  border-color: var(--deck, var(--line-bright));
+}
+
+.deckName {
+  font-weight: 500;
+}
+
+/* The one number that matters: how many cards are waiting. */
+.waiting {
+  min-width: 2rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--deck, var(--gold));
+  color: var(--bg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.clear {
+  color: var(--deck-ink, var(--muted));
+  opacity: 0.6;
+}
+
+.deckMeta {
+  margin: 0.35rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.deckMeta label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.deckMeta input {
+  width: 3.5rem;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+/* --- one card ----------------------------------------------------------- */
+
+.crumb {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.crumb button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gold);
+  font: inherit;
+  cursor: pointer;
+}
+
+.remaining {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.card {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 1rem;
+  justify-items: center;
+  align-content: start;
+  width: min(100%, 36rem);
+  margin: 0 auto;
+  padding: 1.6rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+}
+
+.prompt {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+/* The front, which is the whole point of the screen, so it is the biggest
+   thing on it. Japanese at this size is legible with its ruby. */
+.front {
+  margin: 0;
+  font-size: clamp(2.5rem, 9vw, 4.5rem);
+  line-height: 1.25;
+  text-align: center;
+}
+
+/* A sentence is not one word and cannot have one word's size. */
+.frontSentence {
+  font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+  line-height: 1.7;
+}
+
+.reveal {
+  padding: 0.5rem 1.2rem;
+  border: 1px solid var(--line-bright);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.back {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+  overflow-y: auto;
+  text-align: center;
+}
+
+.reading {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--gold);
+}
+
+.meaning {
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+.buttons {
+  margin: 0;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.buttons button {
+  padding: 0.6rem 1.6rem;
+  border: 1px solid var(--line-bright);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.buttons button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.good {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
+}
+
+.card kbd,
+.reveal kbd {
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 0.75em;
+  color: var(--muted);
+}
+
+.done {
+  display: grid;
+  gap: 0.3rem;
+  place-content: center;
+  text-align: center;
+}
+
+.done p:first-child {
+  margin: 0;
+  font-size: 1.25rem;
+}

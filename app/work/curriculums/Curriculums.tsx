@@ -13,7 +13,7 @@ import {
 } from '@/lib/curriculum';
 import CurriculumIcon from '@/components/CurriculumIcon';
 import { GOLD, scatterFor, statusLook } from '@/lib/curriculum-card';
-import { blocksOf, tableOf } from '@/lib/lesson-markdown';
+import LessonMarkdown from '@/components/LessonMarkdown';
 import styles from './curriculums.module.css';
 
 // A deck of cards, and a drill-down through it.
@@ -719,6 +719,23 @@ export default function Curriculums() {
                 );
               })}
 
+              {/* A gold card among the stages, where the curriculum has cards.
+                  His design: "if the curriculum calls for flashcards, it
+                  should have a card in the list of stages that's gold and
+                  links to the /work/cards page". It is a link and not a layer,
+                  because reviewing is a different activity from reading a
+                  lesson — it has its own page and its own keyboard. */}
+              {current.cards ? (
+                <a
+                  href={`/work/cards/?deck=${current.id}`}
+                  className={`${styles.stageCard} ${styles.cardsCard}`}
+                >
+                  <span className={styles.stageNumber}>★</span>
+                  <span className={styles.stageName}>Cards</span>
+                  <span className={styles.stagePercent}>{current.cards}</span>
+                </a>
+              ) : null}
+
               {adding === `module:${current.id}` ? (
                 <form
                   className={`${styles.stageCard} ${styles.addStage}`}
@@ -932,7 +949,7 @@ export default function Curriculums() {
                   <section className={styles.lessonSection}>
                     <h3>Details</h3>
                     {lesson.detail ? (
-                      <Markdown source={lesson.detail} />
+                      <LessonMarkdown source={lesson.detail} />
                     ) : (
                       <p className={styles.nothingYet}>
                         Nothing written yet.
@@ -1135,136 +1152,3 @@ function imagesIn(detail: string | null): { src: string; alt: string }[] {
   }));
 }
 
-/**
- * Lesson detail, rendered.
- *
- * It is authored as Markdown and the page used to print the string raw, which
- * made the substance of a lesson a wall of asterisks — the opposite of the
- * point, since `detail` exists because a name "tells me what is learned
- * conceptually, but what wrist level means, what posture to use is a mystery".
- *
- * Rendered here rather than with the site's MDX pipeline, which is a server
- * component compiled at build and cannot run in the browser. A subset is
- * enough for what these contain, and anything it does not understand comes out
- * as its own paragraph rather than as nothing.
- *
- * The subset is the ceiling on what a lesson can teach, which is why code
- * blocks and tables are in it: a curriculum written around a renderer that
- * cannot show a paradigm or a working example is written to the renderer
- * instead of to the subject. Reading the blocks out of the text is in
- * lib/lesson-markdown.ts, where it can be tested — the failure mode there is
- * not a crash but hundreds of lessons quietly showing the wrong thing.
- */
-function Markdown({ source }: { source: string }) {
-  return (
-    <>
-      {blocksOf(source).map((block, at) => {
-        if (block.kind === 'code') {
-          return (
-            <div key={at} className={styles.codeBlock}>
-              {/* Outside the <pre>, so that dragging across the code and
-                  copying it does not come away with the word "gdscript" on
-                  the front of the first line. */}
-              {block.lang && <span className={styles.codeLang}>{block.lang}</span>}
-              <pre>
-                <code>{block.text}</code>
-              </pre>
-            </div>
-          );
-        }
-
-        // Images are lifted out into Visual examples, so a block that is only
-        // an image renders as nothing here rather than as its own markup. Only
-        // prose: image syntax inside a fence is code and stays put.
-        const text = block.text.replace(/!\[[^\]]*\]\([^)\s]+\)/g, '').trim();
-        if (text === '') return null;
-
-        const heading = /^(#{1,4})\s+(.*)$/.exec(text);
-        if (heading) {
-          return (
-            <h3 key={at} className={styles.detailHeading}>
-              {inline(heading[2])}
-            </h3>
-          );
-        }
-
-        const table = tableOf(text);
-        if (table) {
-          return (
-            <div key={at} className={styles.tableWrap}>
-              <table className={styles.detailTable}>
-                <thead>
-                  <tr>
-                    {table.head.map((cell, column) => (
-                      <th key={column} style={{ textAlign: table.align[column] ?? 'left' }}>
-                        {inline(cell)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {table.rows.map((row, index) => (
-                    <tr key={index}>
-                      {row.map((cell, column) => (
-                        <td key={column} style={{ textAlign: table.align[column] ?? 'left' }}>
-                          {inline(cell)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        }
-
-        const lines = text.split('\n');
-        if (lines.every((line) => /^\s*[-*]\s+/.test(line))) {
-          return (
-            <ul key={at} className={styles.detailList}>
-              {lines.map((line, index) => (
-                <li key={index}>{inline(line.replace(/^\s*[-*]\s+/, ''))}</li>
-              ))}
-            </ul>
-          );
-        }
-        if (lines.every((line) => /^\s*\d+[.)]\s+/.test(line))) {
-          return (
-            <ol key={at} className={styles.detailList}>
-              {lines.map((line, index) => (
-                <li key={index}>{inline(line.replace(/^\s*\d+[.)]\s+/, ''))}</li>
-              ))}
-            </ol>
-          );
-        }
-
-        return <p key={at}>{inline(text)}</p>;
-      })}
-    </>
-  );
-}
-
-/**
- * Bold, italic and code within a line.
- *
- * Split rather than replaced into HTML: building a string and injecting it
- * would mean trusting this text, and although it is his own, a renderer that
- * cannot inject is simply a better renderer.
- */
-function inline(text: string): React.ReactNode[] {
-  const out: React.ReactNode[] = [];
-  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
-  let at = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = pattern.exec(text)) !== null) {
-    if (match.index > at) out.push(text.slice(at, match.index));
-    const token = match[0];
-    if (token.startsWith('**')) out.push(<strong key={match.index}>{token.slice(2, -2)}</strong>);
-    else if (token.startsWith('`')) out.push(<code key={match.index}>{token.slice(1, -1)}</code>);
-    else out.push(<em key={match.index}>{token.slice(1, -1)}</em>);
-    at = match.index + token.length;
-  }
-  if (at < text.length) out.push(text.slice(at));
-  return out;
-}

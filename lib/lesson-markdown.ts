@@ -113,3 +113,61 @@ export function tableOf(block: string): Table | null {
     rows: lines.slice(2).map(cells),
   };
 }
+
+export type Inline =
+  | { kind: 'text'; text: string }
+  | { kind: 'bold'; text: string }
+  | { kind: 'italic'; text: string }
+  | { kind: 'code'; text: string }
+  | { kind: 'ruby'; text: string; reading: string };
+
+/**
+ * Bold, italic, code and ruby within a line.
+ *
+ * Tokenised rather than turned into a string of HTML. Building markup and
+ * injecting it would mean trusting this text, and although it is his own, a
+ * renderer that cannot inject is simply a better renderer.
+ *
+ * RUBY IS `[漢字]{かんじ}`. Japanese needs readings printed above the
+ * characters rather than beside them — a kanji card showing 日本 with にほん on
+ * the next line is two things to read, where ruby is one. The syntax is
+ * explicit at both ends so that it cannot be confused with a link: the
+ * difference between `](` and `]{` is the whole grammar.
+ *
+ * Aozora Bunko's own notation is 漢字《かんじ》, which would have the merit of
+ * matching the texts he will eventually read. It is not used here because it
+ * has no opening delimiter — the reader has to guess how far back the reading
+ * applies, and Aozora resolves that with a second marker, ｜, which is a
+ * character nobody will type by hand.
+ */
+export function inlineTokens(text: string): Inline[] {
+  const out: Inline[] = [];
+  const pattern = /(\[[^\]]+\]\{[^}]+\}|\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  let at = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > at) out.push({ kind: 'text', text: text.slice(at, match.index) });
+    const token = match[0];
+
+    if (token.startsWith('[')) {
+      const split = token.indexOf(']{');
+      out.push({
+        kind: 'ruby',
+        text: token.slice(1, split),
+        reading: token.slice(split + 2, -1),
+      });
+    } else if (token.startsWith('**')) {
+      out.push({ kind: 'bold', text: token.slice(2, -2) });
+    } else if (token.startsWith('`')) {
+      out.push({ kind: 'code', text: token.slice(1, -1) });
+    } else {
+      out.push({ kind: 'italic', text: token.slice(1, -1) });
+    }
+
+    at = match.index + token.length;
+  }
+
+  if (at < text.length) out.push({ kind: 'text', text: text.slice(at) });
+  return out;
+}

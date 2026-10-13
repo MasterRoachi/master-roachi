@@ -201,6 +201,7 @@ backend.
 | `/work/habits` | A year opens into months, a month into its own days |
 | `/work/reading` | A bookcase of four shelves; a book's notes can become a post |
 | `/work/curriculums` | What is being studied, and how far through it you are |
+| `/work/cards` | Flashcards. A deck is a curriculum, and two buttons |
 | `/work/sketchpad` | Write and draw on one page, saved as one file |
 | `/work/writing` | Posts. Editing one commits it, and the commit publishes it |
 | `/work/projects` | The project pages behind `/projects` |
@@ -510,6 +511,82 @@ counting. A flag saying "not these" and no rows saying it reach the same
 number, and only one of them needs maintaining. None of the fourteen was
 ticked, so the rebuild lost no date.
 
+### Cards
+
+Flashcards, because Anki was not going to be used. Every modern approach to
+Japanese assumes a spaced-repetition system running daily and 2,136 kanji
+cannot be held any other way, so the backend grew one.
+
+**His four objections are the whole specification**, and each is a constraint
+rather than a preference:
+
+| He said | So |
+|---|---|
+| "it's in a separate window" | it is a page in the backend |
+| "finding the right decks is almost impossible" | **a deck is a curriculum**, and its lessons make its cards |
+| "i have no idea how it works" | there is nothing to understand: no deck options, no intervals, no ease factors on screen |
+| "learning it takes as long as learning godot" | **two buttons** |
+
+**A deck is a curriculum, which is why there is no decks table.** Eight
+curriculums are eight decks; they are already named, ordered and coloured, and
+a second list of the same things would have to be kept in step by hand. Where a
+curriculum has cards, its stage fan grows a **gold card** that links to the
+deck — his design, so that flashcards are reachable from the thing that teaches
+them without being a layer inside it.
+
+**Scheduling is FSRS, through `ts-fsrs`** — the algorithm Anki itself moved to,
+open source, zero dependencies, and a pure function of the card and the rating.
+The columns in `cards` are named exactly as the library names its `Card`
+fields, so there is no mapping to get wrong in either direction: the row goes
+in and the next row comes back. Writing "double the interval on a correct
+answer" would have been fifteen lines and would have had to be replaced by this
+the first time the intervals felt wrong.
+
+**Two buttons, mapped to the library's four ratings.** FSRS schedules better
+with Again/Hard/Good/Easy, and it gets Again/Good: deciding between Hard and
+Good is the micro-judgement that turns reviewing into admin. They are stored as
+the library's numbers anyway, so a third button later is a change to one map
+and not a migration over a year of history.
+
+**Every review is logged, although FSRS does not need it.** The card's own
+state is enough to schedule the next review. `card_reviews` exists because
+without it the scheduler can never be re-optimised against his own answers —
+the one thing that would make this better than Anki rather than merely less
+annoying — and a history not kept cannot be recovered later. The log stores the
+state the card was in *before* the answer, which is what an optimiser needs and
+what the update destroys.
+
+**A card is unlocked by ticking the lesson that teaches it.** Cards exist from
+the moment a curriculum is built and wait; `unlocked_on` is what makes one
+reviewable. That is how 2,136 kanji can sit in the database without 2,136 cards
+arriving on day one, and it is why seeding is automatic rather than a button —
+his choice. Unticking does not lock a card again: it may already have a review
+history, and hiding it because a tick was clicked twice is the worse answer.
+
+**One setting: how many new cards a day, per deck.** On `curriculums` rather
+than in a settings table, and per deck because Japanese is 2,136 kanji and
+Greek is a vocabulary list. Null means the default, so changing the default
+later changes every deck that never had an opinion. The allowance is counted
+from the **review log**, on reviews where the card was new at the time — not
+from the cards whose state is new now. A card introduced this morning is in
+learning by lunchtime, so counting the pile would let the allowance refill
+itself all day.
+
+**A rebuild must never touch a card.** `cards.lesson_id` is `ON DELETE SET
+NULL` and not `CASCADE`, because `npm run curriculum` deletes every lesson and
+re-inserts it: a cascade would take months of review history with it, and no
+script could put it back. The rebuild empties the link, the card survives
+whole, and the build script re-points it by the card's natural key —
+`(curriculum, kind, front)`, which is also what stops the same question being
+asked twice in one deck. A card left pointing at nothing is reported by
+`apply.mjs`: its history is intact but nothing will ever unlock it again.
+
+Cards are typed — `kanji`, `word`, `grammar`, `sentence` — rather than a free
+front and back. A blank rectangle has to be filled in by hand every time,
+whereas a kanji card already knows it wants readings, words and a stroke count,
+and it is the type that decides the card asks for the hand as well as the
+memory. Handwriting stayed a goal, so a kanji card says *write it from memory*.
+
 ### What a lesson can show
 
 The lesson card renders Markdown with a hand-written subset — the site's MDX
@@ -538,10 +615,24 @@ curriculums yet, for the obvious reason. There will be: kana against their
 romanisation, a Greek noun's cases across both numbers, the three spheres of
 government against what each may legislate on.
 
+**Ruby**, as `[漢字]{かんじ}`, added when the cards page arrived: Japanese wants
+readings printed above the characters rather than beside them, because a card
+showing 日本 with にほん on the next line is two things to read. The syntax is
+explicit at both ends so it cannot be confused with a link — the difference
+between `](` and `]{` is the whole grammar. Aozora Bunko's own 漢字《かんじ》
+was rejected for having no opening delimiter: the reader has to guess how far
+back the reading reaches, and Aozora settles that with a second marker nobody
+would type by hand.
+
 Reading the blocks out of the text lives in `lib/lesson-markdown.ts` rather
 than in the component, so it can be tested. Its failure mode is not a crash —
 it is hundreds of lessons quietly displaying something other than what was
 written, which is what had already happened.
+
+The renderer itself is `components/LessonMarkdown.tsx`, shared by the lesson
+card and the cards page. Shared rather than copied because two renderers for
+the same subset diverge, and the one that diverges is always the one the
+material was not written against.
 
 Both a code block and a table **scroll sideways inside their own box**. The
 shell is exactly 100dvh and the page never scrolls, so a line of code that will
@@ -636,8 +727,23 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
-- [ ] **Rewrite all eight curriculums**, one at a time, in route order:
-      Japanese, Piano, Greek, Odin, Godot, Aseprite, Drawing, SA politics.
+- [ ] **Japanese, phases 2 and 3.** Researched and planned on 2026-10-13 —
+      `scripts/curriculums/japanese.md`, approved. Eleven stages, ~850–900
+      lessons, Imabi as the grammar spine with Irodori for the functional and
+      spoken half, RTK dropped, all 2,136 jōyō in a frequency-ordered track,
+      pitch accent from the first stage. Nothing of it is written yet; the
+      flashcard app it directs practice into is built.
+- [ ] **No way to add a card from the page.** The endpoint takes one and the
+      tests cover it, but there is no form: cards come from lessons, and
+      mining is a later stage of the Japanese route. Needed before that stage,
+      not before the one after this.
+- [ ] **FSRS is unoptimised**, and will be until there is a review history
+      worth optimising against. `ts-fsrs` ships an optimiser that takes one;
+      `card_reviews` exists to be handed to it. Nothing to do yet except keep
+      the log.
+- [ ] **Rewrite the remaining seven curriculums**, one at a time, in route
+      order:
+      Piano, Greek, Odin, Godot, Aseprite, Drawing, SA politics.
       Three phases each — research the subject and the free resources that
       teach it, plan the whole curriculum and have it approved, then implement.
       Zero to mastery, comprehensive, length per subject, and the material

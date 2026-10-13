@@ -36,6 +36,11 @@ export const WORK_TOOLS: WorkTool[] = [
     what: 'What is being studied, and how far through it you are.',
   },
   {
+    href: '/work/cards/',
+    name: 'Cards',
+    what: 'What needs reviewing, and nothing else.',
+  },
+  {
     href: '/work/sketchpad/',
     name: 'Sketchpad',
     what: 'Write and draw on one page. Saved as one file.',

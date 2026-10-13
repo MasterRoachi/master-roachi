@@ -41,6 +41,14 @@
 //             rows for Japanese, Greek and Odin exist in no script and nothing
 //             could regenerate them, so a rebuild leaves them alone. See
 //             migration 0009.
+//   cards     never deleted, by anything. `cards.lesson_id` is ON DELETE SET
+//             NULL rather than CASCADE precisely so that a rebuild cannot take
+//             a card's review history with the lesson that taught it — see
+//             migration 0010. The rebuild empties the link and the build script
+//             re-points it by the card's natural key (curriculum, kind,
+//             front). A card left pointing at nothing is reported below: it
+//             means the lesson it belonged to was renamed or dropped, and
+//             nothing will ever unlock it again.
 //
 // LESSON NAMES MUST BE UNIQUE WITHIN A CURRICULUM, and this script refuses to
 // apply one where they are not. `<name>-detail.json` is keyed by lesson name
@@ -457,7 +465,11 @@ for (const plan of plans) {
             (select count(*) from sources s
               where s.curriculum_id = c.id and s.lesson_id is not null) as lesson_sources,
             (select count(*) from sources s
-              where s.curriculum_id = c.id and s.lesson_id is null) as list
+              where s.curriculum_id = c.id and s.lesson_id is null) as list,
+            (select count(*) from cards k where k.curriculum_id = c.id) as cards,
+            (select count(*) from cards k
+              where k.curriculum_id = c.id and k.lesson_id is null
+                and k.unlocked_on is not null) as adrift
        from curriculums c
        join modules m on m.curriculum_id = c.id
        join lessons l on l.module_id = m.id
@@ -468,8 +480,20 @@ for (const plan of plans) {
   console.error(
     `  ${ok ? 'applied' : 'APPLIED, BUT'}: ${after.modules} modules · ${after.lessons} lessons · ` +
       `${after.detailed ?? 0} with detail · ${after.ticked ?? 0} ticked · ` +
-      `${after.lesson_sources ?? 0} lesson sources · ${after.list ?? 0} on the curriculum's list`,
+      `${after.lesson_sources ?? 0} lesson sources · ${after.list ?? 0} on the curriculum's list` +
+      (Number(after.cards) > 0 ? ` · ${after.cards} cards` : ''),
   );
+
+  /* A card whose lesson is gone. Not fatal and not fixable from here: the card
+   * keeps its review history, which is the point of SET NULL, but nothing will
+   * unlock it and no lesson claims it. Worth saying out loud because the
+   * symptom otherwise is a deck quietly holding cards that never come up. */
+  if (Number(after.adrift) > 0) {
+    console.error(
+      `\n  ${after.adrift} card(s) no longer point at a lesson. Their history is intact,` +
+        `\n  but nothing teaches them — check the names in ${name}-cards.json against the script.`,
+    );
+  }
   if (!ok) {
     failed += 1;
     console.error(`  expected ${built.size} lessons and the database has ${after.lessons}.`);

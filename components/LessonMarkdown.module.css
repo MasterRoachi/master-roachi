@@ -1,0 +1,138 @@
+/* The teaching subset, styled once for every page that teaches in it. */
+
+.prose {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+  /* The grid children must be allowed to be narrower than their content, or a
+     wide table or a long line of code widens the whole column. The pages this
+     renders on do not scroll. */
+  min-width: 0;
+}
+
+.prose p {
+  margin: 0;
+}
+
+.heading {
+  margin: 0.3rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+
+.heading:first-child {
+  margin-top: 0;
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.prose code {
+  background: var(--bg);
+  border-radius: 4px;
+  padding: 0.05rem 0.25rem;
+  font-size: 0.875em;
+}
+
+/* Ruby. The reading is smaller and quieter than the characters it sits over —
+   it is there to be glanced at, and a reading as loud as the word is a reading
+   that gets read instead of the word. */
+.prose ruby {
+  ruby-position: over;
+}
+
+.prose rt {
+  font-size: 0.5em;
+  color: var(--muted);
+  /* Kana over kanji are cramped by default; this is what makes にほん legible
+     over 日本 at body size. */
+  letter-spacing: 0.02em;
+}
+
+/* A fenced code block.
+ *
+ * The scroll rule matters more than it looks. The backend shell is exactly
+ * 100dvh and the page itself never scrolls, so a wide line of code has to be
+ * absorbed HERE — `min-width: 0` on the block and `overflow-x: auto` on the
+ * pre — or it widens its grid track, widens the readable column, and puts a
+ * horizontal scrollbar on a page whose whole design is that it has none. It is
+ * the same trap as the min-height: 0 one, in the other axis. */
+.codeBlock {
+  position: relative;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.codeBlock pre {
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.codeBlock code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Outside the pre so it is not copied with the code — see the renderer. */
+.codeLang {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.15rem 0.45rem;
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0 8px 0 6px;
+  background: var(--bg-raised);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* A table, which scrolls sideways for the same reason the code does: a Greek
+   paradigm is five cases across two numbers and will not narrow. */
+.tableWrap {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.table th,
+.table td {
+  padding: 0.35rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.table th {
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--gold, var(--accent));
+  border-bottom-color: var(--line-bright);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
