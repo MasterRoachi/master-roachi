@@ -81,6 +81,7 @@ const stages = [
   {
     name: 'Stage 1 · The script and the sounds',
     lessons: [
+    ['How this curriculum works'],
     ['The three scripts, and what each one is for', [{ title: 'Tofugu — Learn Hiragana', url: 'https://www.tofugu.com/japanese/learn-hiragana/' }]],
     ['Hiragana: あ い う え お', [{ title: 'Tofugu — Learn Hiragana', url: 'https://www.tofugu.com/japanese/learn-hiragana/' }, { title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
     ['Hiragana: か き く け こ', [{ title: 'Tofugu — Learn Hiragana', url: 'https://www.tofugu.com/japanese/learn-hiragana/' }, { title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],

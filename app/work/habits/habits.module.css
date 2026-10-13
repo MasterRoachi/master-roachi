@@ -6,7 +6,10 @@
 
 .page {
   max-width: 60rem;
-  margin: 2rem auto 4rem;
+  /* The streak bar is fixed to the foot of the window, so the column has to
+     end above it or the last year card sits under the bar. */
+  margin: 2rem auto 0;
+  padding-bottom: 5.5rem;
 }
 
 /* --- the year pills ------------------------------------------------------ */
@@ -34,9 +37,12 @@
 }
 
 .yearPill {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  /* Centred, with the +/- taken out of the flow and pinned right — the year
+     is the thing being read, and space-between put it off to one side. */
+  justify-content: center;
   gap: 1rem;
   width: 100%;
   background: none;
@@ -54,6 +60,8 @@
 }
 
 .chev {
+  position: absolute;
+  right: 1.1rem;
   color: var(--muted);
   font-size: 1.1rem;
   line-height: 1;
@@ -69,8 +77,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
-  padding: 0.2rem 0 0.9rem;
-  border-bottom: 1px solid var(--line);
+  padding: 0.2rem 0 0.2rem;
 }
 
 .month,
@@ -106,91 +113,93 @@
   font-weight: 600;
 }
 
-.caption {
+/* --- the two cards ------------------------------------------------------ */
+
+/* Daily and weekly, side by side while there is room. They are not the same
+   question — a weekly habit sitting unticked among the dailies reads as a
+   thing missed rather than a thing not due — so they are two cards and not
+   one list with a heading in the middle. */
+.decks {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
   gap: 0.75rem;
-  margin: 0.9rem 0 0.6rem;
-  color: var(--muted);
-  font-size: 0.8125rem;
+  margin: 0.9rem 0 0.2rem;
 }
 
-.caption strong {
-  color: var(--ink);
-  font-size: 1rem;
+.deck {
+  flex: 1 1 14rem;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--bg) 35%, var(--bg-raised));
+  padding: 0.8rem;
 }
 
-/* --- the grid ----------------------------------------------------------- */
-
-/* Thirty-one columns do not fit a phone, and shrinking the squares to make
-   them fit makes them unhittable. Scrolls sideways instead, with the habit
-   names pinned so a row stays identifiable. */
-.scroll {
-  overflow-x: auto;
-  padding-bottom: 0.4rem;
+/* The boxes wrap rather than sitting on a fixed column count: the two cards
+   are different widths and a fixed grid would leave a hole in the narrower
+   one. */
+.boxes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
 }
 
-.grid {
-  border-collapse: collapse;
-  font-size: 0.8125rem;
-}
-
-.grid th {
-  font-weight: 500;
-  color: var(--muted);
-  font-size: 0.65rem;
-  padding: 0.15rem 0;
-  text-align: center;
-  vertical-align: bottom;
-}
-
-.grid td {
-  padding: 1px;
-  text-align: center;
-}
-
-/* The weekday initial above the date. A gap every seventh column then reads
-   as a pattern rather than as a run of numbers. */
-.wd {
-  display: block;
-  font-size: 0.6rem;
-  opacity: 0.55;
-}
-
-.grid abbr {
-  text-decoration: none;
-  cursor: help;
-  font-variant-numeric: tabular-nums;
-}
-
-.nameCell {
-  position: sticky;
-  left: 0;
-  background: var(--bg-raised);
-  text-align: left !important;
-  padding: 0 0.9rem 0 0 !important;
-  color: var(--ink) !important;
-  font-size: 0.875rem !important;
-  white-space: nowrap;
-  z-index: 2;
-}
-
-/* Icon and name on one line, so the row is identifiable by shape before it is
-   read. */
-.iconButton {
-  background: none;
-  border: 0;
-  padding: 0 0.4rem 0 0;
+/* 2.6rem: a comfortable tap target, and big enough that the icon inside is
+   the thing you read rather than a speck in a checkbox. */
+.box,
+.boxOn {
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  vertical-align: middle;
-  line-height: 0;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.box {
+  border: 1px solid var(--line-bright);
+  background: var(--bg);
+}
+
+.box:hover {
+  border-color: var(--accent);
+}
+
+.box .glyph {
+  stroke: var(--muted);
+}
+
+.box:hover .glyph {
+  stroke: var(--accent);
+}
+
+.boxOn {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+}
+
+.boxOn .glyph {
+  stroke: var(--bg);
+}
+
+/* Darkened rather than lightened, so hovering a done box reads as "undo this"
+   instead of as more emphasis. */
+.boxOn:hover {
+  background: color-mix(in oklab, var(--accent) 80%, black);
+}
+
+.box:focus-visible,
+.boxOn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .glyph {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   fill: none;
   stroke: var(--muted);
   stroke-width: 1.8;
@@ -198,43 +207,86 @@
   stroke-linejoin: round;
 }
 
-.iconButton:hover .glyph {
-  stroke: var(--accent);
+/* --- the streak bar ----------------------------------------------------- */
+
+/* Pinned to the foot of the window, not to the end of the document: the runs
+   are what the page is for, and scrolling to find out whether anything is
+   being kept defeats them. One row, never wrapping — it scrolls sideways on a
+   narrow screen rather than becoming two rows and eating the page.
+   `safe center` so that when it does overflow, the first card is still
+   reachable instead of being clipped off the left. */
+.streaks {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: safe center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  margin: 0;
+  /* It sits over the scrolling column, so it needs a ground of its own. */
+  padding: 0.7rem 1rem;
+  background: var(--bg);
 }
 
-.habitName {
-  vertical-align: middle;
+/* Gold, with black figures — his call, 14 Oct. These are the one thing on the
+   page that is always on screen, so they are the one thing that is always
+   lit. */
+.streak {
+  position: relative;
+  flex: 0 0 auto;
+  width: 3.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+  padding: 0.4rem 0.2rem 0.35rem;
+  border: 1px solid var(--accent);
+  border-radius: 9px;
+  background: var(--accent);
 }
 
-.cadence {
-  color: var(--muted);
-  font-size: 0.7rem;
-  margin-left: 0.45rem;
+.streakIcon {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+/* Black on the gold, and it stays black on hover: the card is already the
+   lit state, so brightening it would say nothing. */
+.streak .glyph,
+.streakIcon:hover .glyph {
+  stroke: var(--bg);
+}
+
+.streakRun {
+  font-size: 1rem;
   font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  color: var(--bg);
 }
 
 /* --- the icon picker ---------------------------------------------------- */
 
+/* Over the page rather than pushing the row apart — a picker that resized the
+   card would move every streak the moment it opened. */
 .picker {
+  position: absolute;
+  bottom: calc(100% + 0.3rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
   display: flex;
   flex-wrap: wrap;
   gap: 0.2rem;
-}
-
-/* Thirty-six of them, so the picker is capped and scrolls rather than
-   growing taller than the window. */
-.picker {
   width: 17rem;
   max-height: 13rem;
   overflow-y: auto;
-}
-
-/* Over the grid rather than pushing the row apart — a picker that resized the
-   table would move every square the moment it opened. */
-.picker {
-  position: absolute;
-  z-index: 3;
-  margin-top: 0.3rem;
   padding: 0.4rem;
   background: var(--bg);
   border: 1px solid var(--line-bright);
@@ -283,114 +335,6 @@
 
 .pickOn svg {
   stroke: var(--accent);
-}
-
-/* --- the squares -------------------------------------------------------- */
-
-/* Saturday and Sunday, a shade back. Enough to see the week, not enough to
-   suggest those days count for less. */
-.weekend {
-  background: color-mix(in oklab, var(--bg) 35%, var(--bg-raised));
-}
-
-.todayHead {
-  color: var(--accent) !important;
-}
-
-.todayCol {
-  background: var(--accent-dim);
-}
-
-/* 22px: big enough to hit on a phone, small enough that a month of them is
-   still a shape rather than a spreadsheet. */
-.on,
-.off,
-.future {
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  border: 1px solid var(--line-bright);
-  display: block;
-  padding: 0;
-}
-
-.off,
-.on {
-  cursor: pointer;
-}
-
-.off {
-  background: var(--bg);
-}
-
-.off:hover {
-  border-color: var(--accent);
-}
-
-.on {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-/* Darkened rather than lightened, so hovering a done square reads as "undo
-   this" instead of as more emphasis. */
-.on:hover {
-  background: color-mix(in oklab, var(--accent) 80%, black);
-}
-
-/* A day that has not happened. Barely there, and not clickable. */
-.future {
-  background: none;
-  border-style: dashed;
-  border-color: var(--line);
-  opacity: 0.4;
-  cursor: default;
-}
-
-.off:focus-visible,
-.on:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
-
-.runHead {
-  padding-left: 0.7rem !important;
-}
-
-.run,
-.runMet {
-  font-variant-numeric: tabular-nums;
-  padding-left: 0.7rem !important;
-  white-space: nowrap;
-  color: var(--accent);
-}
-
-/* A weekly habit that has hit its number this week — 3/3 and 1/3 are the same
-   shape otherwise. */
-.runMet {
-  background: var(--accent-dim);
-  border-radius: 3px;
-}
-
-.archive {
-  background: none;
-  border: 0;
-  color: transparent;
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 0.3rem;
-}
-
-/* Hidden until the row is hovered. Archiving is rare, and a column of × down
-   a page read every morning is clutter inviting an accident. */
-.grid tr:hover .archive,
-.archive:focus-visible {
-  color: var(--muted);
-}
-
-.archive:hover {
-  color: var(--accent) !important;
 }
 
 /* --- adding ------------------------------------------------------------- */
@@ -588,15 +532,10 @@
   margin-bottom: 1rem;
 }
 
-/* A month still in flight. The pills and the caption have already moved, so
-   this says only that the squares are not known yet — and it holds the space
-   the grid will take, so nothing below it jumps when they arrive. */
+/* A month still in flight. The pills have already moved, so this says only
+   that the boxes are not known yet — and it holds the space the cards will
+   take, so nothing below them jumps when they arrive. */
 .waiting {
-  min-height: 9rem;
+  min-height: 7rem;
 }
 
-.loading {
-  color: var(--muted);
-  font-size: 0.75rem;
-  opacity: 0.7;
-}

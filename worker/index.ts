@@ -13,6 +13,7 @@ import {
 } from './github';
 import { collectionFor, newPath, pathAllowed, setDraft } from '../lib/collections';
 import { isDay, isMonth, localDay, monthDays, type D1Database } from './db';
+import { dayStreak, weekStreak } from '../lib/habits';
 import { outlineSize, parseOutline } from '../lib/outline';
 import { validIconName } from '../lib/habit-icons';
 import {
@@ -958,6 +959,36 @@ export default {
             (byHabit[String(row.habit_id)] ??= []).push(row.day);
           }
 
+          // Streaks, computed here because they are the page's one measure
+          // and a month of ticks cannot tell you one: a run begun in
+          // September is still a run on 1 October. The whole history is
+          // small — one row per habit per day — and it is read in full
+          // rather than guessing at a window long enough to be safe.
+          const all = await db
+            .prepare('select habit_id, day from habit_ticks order by day')
+            .all<{ habit_id: number; day: string }>();
+
+          const everyDay: Record<string, string[]> = {};
+          for (const row of all.results) {
+            (everyDay[String(row.habit_id)] ??= []).push(row.day);
+          }
+
+          // A daily habit counts days, a weekly one counts WEEKS that met the
+          // target — his ruling, 14 Oct 2026. The two are not comparable, so
+          // the unit travels with the number and the page labels it.
+          const streaks: Record<string, number> = {};
+          for (const habit of habits.results as {
+            id: number;
+            cadence: string;
+            target: number | null;
+          }[]) {
+            const mine = everyDay[String(habit.id)] ?? [];
+            streaks[String(habit.id)] =
+              habit.cadence === 'weekly'
+                ? weekStreak(mine, habit.target ?? 1, today)
+                : dayStreak(mine, today);
+          }
+
           // Which years the page offers. From the earliest thing that exists —
           // a tick, or a habit that was created before its first tick — through
           // the current year, so the list grows on its own and never shows a
@@ -982,6 +1013,7 @@ export default {
               configured: true,
               habits: habits.results,
               ticks: byHabit,
+              streaks,
               month,
               days,
               today,

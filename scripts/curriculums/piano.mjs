@@ -84,6 +84,7 @@ const stages = [
   {
     name: 'Stage 1 · The instrument and the hands',
     lessons: [
+    ['How this curriculum works'],
     ['Sitting at it', [{ title: 'Hoffman Academy', url: 'https://www.hoffmanacademy.com/', note: '400+ free video lessons.' }]],
     ['How the arm makes the sound', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. The standard text on how to practise.' }]],
     ['Finding your way around the keys', [{ title: 'Hoffman Academy', url: 'https://www.hoffmanacademy.com/', note: '400+ free video lessons.' }]],

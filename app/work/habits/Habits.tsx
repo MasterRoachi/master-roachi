@@ -2,15 +2,24 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { HABIT_ICONS, iconFor } from '@/lib/habit-icons';
-import { INITIALS, streak, thisWeek, weekday } from '@/lib/habits';
 import styles from './habits.module.css';
 
-// Year, then month, then the grid.
+// Year, then month, then two cards — and a row of streaks under everything.
 //
 // A habit tracker is a thing you keep for years, so the page is shaped like
 // the archive it becomes: a short list of years, a year opening into twelve
-// months, a month showing its own days. The alternative — one endless rolling
-// window — reads fine in week two and is unusable in year two.
+// months. What a month holds changed on 14 Oct 2026: it was a table of
+// habits by days, and it is now TWO CARDS, daily and weekly, each one
+// nothing but its habits as icon checkboxes.
+//
+// ONLY TODAY IS EDITABLE — his rule. The thirty-one columns are gone with the
+// table, so there is no longer a square for another day to click. A box is
+// the habit, not the habit-on-a-date, and ticking one ticks it for today.
+//
+// The streak cards at the foot are the page's one measure, which is why the
+// number comes from the server: a run begun in September is still a run on
+// 1 October, and a month of ticks cannot tell you that. See dayStreak() and
+// weekStreak() in lib/habits.ts.
 //
 // The server decides what "today" is and which month is being shown. The page
 // never computes a date: a browser's clock can be wrong, and a wrong one would
@@ -28,6 +37,8 @@ interface Payload {
   configured: boolean;
   habits: Habit[];
   ticks: Record<string, string[]>;
+  /** Habit id -> run. Days for a daily habit, WEEKS for a weekly one. */
+  streaks: Record<string, number>;
   month: string;
   days: string[];
   today: string;
@@ -37,6 +48,12 @@ interface Payload {
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/** The two cards a month holds, in the order they are read. */
+const CARDS = [
+  { cadence: 'daily' as const, label: 'Daily' },
+  { cadence: 'weekly' as const, label: 'Weekly' },
 ];
 
 /** The icon, or a neutral mark for a habit that has not been given one. */
@@ -69,7 +86,6 @@ export default function Habits() {
   /** The newest payload, for the things that do not vary by month. */
   const [latest, setLatest] = useState<Payload | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   // Which month is being asked for. Null means "whatever the server calls
   // now", which is how the current month opens by default without the page
@@ -88,7 +104,6 @@ export default function Habits() {
 
   const fetchMonth = useCallback(async (wanted: string | null, force = false) => {
     if (wanted && !force && cache[wanted]) return;
-    setLoading(true);
     try {
       const response = await fetch(
         `/work/api/habits${wanted ? `?month=${wanted}` : ''}`,
@@ -106,8 +121,6 @@ export default function Habits() {
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not read them.');
-    } finally {
-      setLoading(false);
     }
   }, [cache]);
 
@@ -144,7 +157,7 @@ export default function Habits() {
   const data = latest;
   // What the grid draws. Undefined for a month still in flight, which is why
   // everything the CLICK affects reads from `month` rather than from here —
-  // the pills and the caption must move on the click, not on the response.
+  // the pills must move on the click, not on the response.
   const shown = month ? cache[month] : undefined;
 
   if (!data.configured) {
@@ -158,16 +171,7 @@ export default function Habits() {
   }
 
   const selected = month ?? data.month;
-  const shownYear = Number(selected.slice(0, 4));
-  const shownMonth = Number(selected.slice(5, 7));
   const thisMonth = data.today.slice(0, 7);
-
-  const doneToday =
-    selected === thisMonth && shown
-      ? shown.habits.filter((habit) =>
-          (shown.ticks[String(habit.id)] ?? []).includes(data.today),
-        ).length
-      : null;
 
   return (
     <div className={styles.page}>
@@ -336,22 +340,10 @@ export default function Habits() {
                   })}
                 </nav>
 
-                <p className={styles.caption}>
-                  <strong>
-                    {MONTHS[shownMonth - 1]} {shownYear}
-                  </strong>
-                  {loading && <span className={styles.loading}>reading…</span>}
-                  {doneToday !== null && (
-                    <span>
-                      {doneToday} of {data.habits.length} done today
-                    </span>
-                  )}
-                </p>
-
                 {!shown ? (
-                  // The frame is already correct; only the squares are not
-                  // known yet. Reserving the space stops the page jumping when
-                  // they arrive.
+                  // The frame is already correct; only the boxes are not
+                  // known yet. Reserving the space stops the page jumping
+                  // when they arrive.
                   <div className={styles.waiting} aria-hidden="true" />
                 ) : data.habits.length === 0 ? (
                   <p className={styles.empty}>
@@ -360,156 +352,56 @@ export default function Habits() {
                     attached, like the gym three times a week.
                   </p>
                 ) : (
-                  <div className={styles.scroll}>
-                    <table className={styles.grid}>
-                      <thead>
-                        <tr>
-                          <th scope="col" className={styles.nameCell} />
-                          {shown.days.map((day) => {
-                            const wd = weekday(day);
-                            return (
-                              <th
-                                scope="col"
-                                key={day}
-                                className={[
-                                  day === data.today ? styles.todayHead : '',
-                                  wd === 0 || wd === 6 ? styles.weekend : '',
-                                ]
-                                  .filter(Boolean)
-                                  .join(' ')}
-                              >
-                                <span className={styles.wd}>{INITIALS[wd]}</span>
-                                <abbr title={day}>{Number(day.slice(8))}</abbr>
-                              </th>
-                            );
-                          })}
-                          <th scope="col" className={styles.runHead}>
-                            Run
-                          </th>
-                          <th scope="col" />
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {shown.habits.map((habit) => {
-                          const days = shown.ticks[String(habit.id)] ?? [];
-                          const done = new Set(days);
-                          const weekly = habit.cadence === 'weekly';
-                          const week = thisWeek(days, data.today);
-                          const run = streak(days, shown.days, data.today);
-                          const met = weekly && habit.target !== null && week >= habit.target;
+                  // Two cards, daily and weekly. Split rather than labelled:
+                  // the two are not the same question, and a weekly habit
+                  // sitting unticked among the dailies reads as a thing
+                  // missed rather than a thing not due.
+                  <div className={styles.decks}>
+                    {CARDS.map(({ cadence, label }) => {
+                      const mine = shown.habits.filter(
+                        (habit) => habit.cadence === cadence,
+                      );
+                      if (mine.length === 0) return null;
 
-                          return (
-                            <tr key={habit.id}>
-                              <th scope="row" className={styles.nameCell}>
+                      return (
+                        <section key={cadence} className={styles.deck} aria-label={label}>
+                          <div className={styles.boxes}>
+                            {mine.map((habit) => {
+                              const ticked = (shown.ticks[String(habit.id)] ?? []).includes(
+                                data.today,
+                              );
+                              return (
                                 <button
+                                  key={habit.id}
                                   type="button"
-                                  className={styles.iconButton}
-                                  title="Change the icon"
+                                  className={ticked ? styles.boxOn : styles.box}
+                                  aria-pressed={ticked}
+                                  // The name is nowhere on the card, so it has
+                                  // to be in the label or the box is a mystery
+                                  // glyph to a screen reader and to anyone who
+                                  // has forgotten which icon they chose.
+                                  aria-label={`${habit.name}, today`}
+                                  title={
+                                    habit.cadence === 'weekly'
+                                      ? `${habit.name} — ${habit.target}×/wk`
+                                      : habit.name
+                                  }
                                   onClick={() =>
-                                    setPicking(picking === habit.id ? null : habit.id)
+                                    void act({
+                                      action: 'toggle',
+                                      id: habit.id,
+                                      day: data.today,
+                                    })
                                   }
                                 >
                                   <Glyph name={habit.icon} />
                                 </button>
-                                <span className={styles.habitName}>{habit.name}</span>
-                                {weekly && (
-                                  <span className={styles.cadence}>{habit.target}×/wk</span>
-                                )}
-
-                                {picking === habit.id && (
-                                  <span className={styles.picker}>
-                                    {HABIT_ICONS.map((option) => (
-                                      <button
-                                        key={option.name}
-                                        type="button"
-                                        title={option.label}
-                                        aria-label={option.label}
-                                        className={
-                                          habit.icon === option.name
-                                            ? styles.pickOn
-                                            : styles.pick
-                                        }
-                                        onClick={() => {
-                                          setPicking(null);
-                                          void act({
-                                            action: 'icon',
-                                            id: habit.id,
-                                            icon: option.name,
-                                          });
-                                        }}
-                                      >
-                                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                                          <path d={option.d} />
-                                        </svg>
-                                      </button>
-                                    ))}
-                                  </span>
-                                )}
-                              </th>
-
-                              {shown.days.map((day) => {
-                                const wd = weekday(day);
-                                const future = day > data.today;
-                                return (
-                                  <td
-                                    key={day}
-                                    className={[
-                                      wd === 0 || wd === 6 ? styles.weekend : '',
-                                      day === data.today ? styles.todayCol : '',
-                                    ]
-                                      .filter(Boolean)
-                                      .join(' ')}
-                                  >
-                                    <button
-                                      type="button"
-                                      // A day that has not happened is not
-                                      // tickable, and saying so with the
-                                      // control is better than refusing the
-                                      // click afterwards.
-                                      disabled={future}
-                                      className={
-                                        future
-                                          ? styles.future
-                                          : done.has(day)
-                                            ? styles.on
-                                            : styles.off
-                                      }
-                                      aria-label={`${habit.name}, ${day}`}
-                                      aria-pressed={done.has(day)}
-                                      onClick={() =>
-                                        void act({ action: 'toggle', id: habit.id, day })
-                                      }
-                                    />
-                                  </td>
-                                );
-                              })}
-
-                              {/* A streak is the wrong measure for a habit
-                                  done four times a week — it would read as
-                                  broken every week it succeeded. */}
-                              <td className={met ? styles.runMet : styles.run}>
-                                {weekly ? `${week}/${habit.target}` : run || '—'}
-                              </td>
-
-                              <td>
-                                <button
-                                  type="button"
-                                  className={styles.archive}
-                                  title="Archive — keeps the history"
-                                  onClick={() => {
-                                    if (confirm(`Archive "${habit.name}"? Its history is kept.`)) {
-                                      void act({ action: 'archive', id: habit.id });
-                                    }
-                                  }}
-                                >
-                                  ×
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                              );
+                            })}
+                          </div>
+                        </section>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -517,6 +409,70 @@ export default function Habits() {
           </section>
         );
       })}
+
+      {/* The streaks, under every year rather than inside one.
+          A run is not a fact about 2026 — it crosses New Year like any other
+          week — and putting it in the open year would have hidden the page's
+          one measure behind a disclosure.
+
+          These cards are also where a habit is MANAGED, which is what keeps
+          the two above them as bare as he asked: a box up there is a tick and
+          nothing else, so changing an icon and archiving had to live
+          somewhere. Clicking the icon here opens the picker; the × appears on
+          hover, as it did in the old grid. */}
+      {data.habits.length > 0 && (
+        <section className={styles.streaks} aria-label="Streaks">
+          {data.habits.map((habit) => {
+            const run = data.streaks?.[String(habit.id)] ?? 0;
+            const weekly = habit.cadence === 'weekly';
+            const unit = weekly
+              ? `${habit.name} — ${run === 1 ? 'week' : 'weeks'}`
+              : `${habit.name} — ${run === 1 ? 'day' : 'days'}`;
+            return (
+              <div key={habit.id} className={styles.streak}>
+                <button
+                  type="button"
+                  className={styles.streakIcon}
+                  title={`${habit.name} — change the icon`}
+                  aria-label={`${habit.name}, change the icon`}
+                  onClick={() => setPicking(picking === habit.id ? null : habit.id)}
+                >
+                  <Glyph name={habit.icon} />
+                </button>
+
+                {/* The unit is not printed — his call, 14 Oct. It survives in
+                    the title, because a run of days and a run of weeks still
+                    are not the same thing. */}
+                <span className={styles.streakRun} title={unit}>
+                  {run}
+                </span>
+
+                {picking === habit.id && (
+                  <div className={styles.picker}>
+                    {HABIT_ICONS.map((option) => (
+                      <button
+                        key={option.name}
+                        type="button"
+                        title={option.label}
+                        aria-label={option.label}
+                        className={habit.icon === option.name ? styles.pickOn : styles.pick}
+                        onClick={() => {
+                          setPicking(null);
+                          void act({ action: 'icon', id: habit.id, icon: option.name });
+                        }}
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d={option.d} />
+                        </svg>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </section>
+      )}
     </div>
   );
 }
