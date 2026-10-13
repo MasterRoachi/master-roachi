@@ -4577,6 +4577,7 @@ globalThis.fetch = preGh;
     isEmptyNote,
     lowestPoint,
     parseNote,
+    sectionHeight,
     sectionsToShow,
     sectionsWritten,
     writtenHeight,
@@ -4636,6 +4637,35 @@ globalThis.fetch = preGh;
     [0, 400, 1200, 1201, 5000].every(
       (y) => sectionsToShow(scene([stroke([[0, y]])])) === sectionsWritten(scene([stroke([[0, y]])])) + 1,
     ),
+    '',
+  );
+
+  /* The section height is measured by the panel, so it arrives from a browser
+     and is bounded here rather than trusted. A zero would divide by zero and
+     something enormous would make every note one section long. */
+  check('a missing section height falls back', sectionHeight(undefined) === NOTE_SECTION, '');
+  check('and so does a non-number', sectionHeight('tall') === NOTE_SECTION, '');
+  check('zero is refused', sectionHeight(0) === 200, String(sectionHeight(0)));
+  check('a negative is refused', sectionHeight(-900) === 200, String(sectionHeight(-900)));
+  check('something enormous is capped', sectionHeight(10 ** 9) === 20000, String(sectionHeight(10 ** 9)));
+  check('a plausible measurement is kept', sectionHeight(1130) === 1130, '');
+
+  /* Everything that counts sections takes the measured height, so the sections
+     the server records are the sections the page drew. */
+  check(
+    'sections are counted at the measured height, not the default',
+    sectionsWritten(scene([stroke([[0, 1100]])]), 1000) === 2 &&
+      sectionsWritten(scene([stroke([[0, 1100]])]), 1200) === 1,
+    '',
+  );
+  check(
+    'and so is the height that gets stored',
+    writtenHeight(scene([stroke([[0, 1100]])]), 1000) === 2000,
+    String(writtenHeight(scene([stroke([[0, 1100]])]), 1000)),
+  );
+  check(
+    'and so is what the panel shows',
+    sectionsToShow(scene([stroke([[0, 1100]])]), 1000) === 3,
     '',
   );
 
@@ -4741,6 +4771,35 @@ globalThis.fetch = preGh;
   res = await post({ action: 'answer', id: 1, button: 'again', note: more });
   check('a second attempt grows the note by one section', DB._notes.get(1).height === 2400, String(DB._notes.get(1).height));
   check('and keeps the first attempt', JSON.parse(DB._notes.get(1).scene).items.length === 2, '');
+
+  // The measured section height travels with the note, so the height recorded
+  // is in the sections that were actually drawn rather than nominal ones.
+  res = await post({
+    action: 'answer',
+    id: 1,
+    button: 'again',
+    note: written,
+    noteSection: 600,
+  });
+  check(
+    'the measured section height decides what is recorded',
+    // The stroke reaches y=500, which is one whole section when a section is
+    // 600 units — and the height recorded is in those units, not nominal ones.
+    DB._notes.get(1).height === 600,
+    String(DB._notes.get(1).height),
+  );
+  res = await post({
+    action: 'answer',
+    id: 1,
+    button: 'again',
+    note: written,
+    noteSection: 'nonsense',
+  });
+  check(
+    'and a measurement that is not a number falls back rather than breaking',
+    DB._notes.get(1).height === 1200,
+    String(DB._notes.get(1).height),
+  );
 
   /* A note that cannot be read must not land. The review still does: refusing
      the answer because the drawing was malformed would lose the review too. */

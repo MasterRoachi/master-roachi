@@ -23,7 +23,7 @@ import {
   review,
   type Card,
 } from '../lib/cards';
-import { isEmptyNote, parseNote, writtenHeight } from '../lib/card-note';
+import { isEmptyNote, parseNote, sectionHeight, writtenHeight } from '../lib/card-note';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
@@ -2028,7 +2028,14 @@ export default {
                        on conflict(card_id) do update
                          set scene = ?2, height = ?3, updated_at = ?4`,
                     )
-                    .bind(id, JSON.stringify(scene), writtenHeight(scene), now.toISOString()),
+                    .bind(
+                      id,
+                      JSON.stringify(scene),
+                      // Measured by the page, bounded here. The sections the
+                      // server records are then the sections that were drawn.
+                      writtenHeight(scene, sectionHeight(body.noteSection)),
+                      now.toISOString(),
+                    ),
                 );
               }
             }

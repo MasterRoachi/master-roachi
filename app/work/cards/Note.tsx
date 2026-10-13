@@ -28,39 +28,73 @@ const PAGE_THRESHOLD = 40;
 export default function Note({
   scene,
   onChange,
-  cardId,
+  onSection,
 }: {
   scene: Scene;
   onChange: (scene: Scene) => void;
-  cardId: number;
+  /** The measured section height, reported up so it can be saved with the note. */
+  onSection: (height: number) => void;
 }) {
   const [tool, setTool] = useState<'pen' | 'text'>('pen');
   const [live, setLive] = useState<Stroke | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
-
-  /* Frozen per card. Not derived from `scene`, deliberately — see above. */
-  const [sections, setSections] = useState(1);
-  const [at_, setAt] = useState(0);
 
   const surface = useRef<SVGSVGElement | null>(null);
   const drawing = useRef<Stroke | null>(null);
   const wheel = useRef(0);
   const swipe = useRef<number | null>(null);
 
-  /* A new card: count its sections, and open the empty one at the end, which
-   * is where the next attempt belongs. */
+  /* A section is exactly the shape of the panel, measured, so the surface
+   * fills it. A fixed shape left a bar of dead space above and below — the one
+   * thing a writing area cannot afford. NOTE_SECTION is only the value before
+   * the first measurement lands. */
+  const [section, setSection] = useState(NOTE_SECTION);
+
+  /* Counted ONCE, from the note this panel was mounted with and the section
+   * height it was first measured at. The panel is keyed by card, so a new card
+   * is a new panel and this happens again — which is what keeps the count
+   * frozen while a card is on screen without having to watch for the card
+   * changing underneath it.
+   *
+   * It waits for the measurement rather than counting at the fallback height
+   * and correcting afterwards: a count taken at one section height and drawn
+   * at another is a note whose dots do not match its contents. */
+  const [sections, setSections] = useState(1);
+  const [at_, setAt] = useState(0);
+  const counted = useRef(false);
+
   useEffect(() => {
-    const count = sectionsToShow(scene);
-    setSections(count);
-    setAt(count - 1);
-    setEditing(null);
-    // `scene` is deliberately not a dependency: this must run when the CARD
-    // changes and never when the drawing does.
+    const element = surface.current;
+    if (!element) return;
+
+    const measure = () => {
+      const box = element.getBoundingClientRect();
+      if (box.width === 0) return;
+      const height = Math.round((box.height / box.width) * NOTE_WIDTH);
+      setSection(height);
+      onSection(height);
+
+      if (!counted.current) {
+        counted.current = true;
+        const count = sectionsToShow(scene, height);
+        setSections(count);
+        // Open on the empty one at the end, which is where this attempt goes.
+        setAt(count - 1);
+      }
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+    // `scene` is read once, on the first measurement, and must not re-run this
+    // when the drawing changes — that is the bug this whole design exists to
+    // avoid. The panel is keyed by card, so the mount already scopes it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardId]);
+  }, [onSection]);
 
   /** The top of the visible section, in scene units. */
-  const top = at_ * NOTE_SECTION;
+  const top = at_ * section;
 
   const go = (delta: number) =>
     setAt((was) => Math.min(sections - 1, Math.max(0, was + delta)));
@@ -70,7 +104,7 @@ export default function Note({
     const box = surface.current!.getBoundingClientRect();
     return [
       ((event.clientX - box.left) / box.width) * NOTE_WIDTH,
-      top + ((event.clientY - box.top) / box.height) * NOTE_SECTION,
+      top + ((event.clientY - box.top) / box.height) * section,
     ];
   }
 
@@ -146,9 +180,15 @@ export default function Note({
       <svg
         ref={surface}
         className={styles.noteSurface}
+        // A surface full of paths and text is, to the browser, something to
+        // select and drag — which is where the grab cursor came from, and why
+        // the stroke after the first one started a drag instead of a line. The
+        // rest of the answer is in the CSS: no selection, no native drag, and
+        // the drawn items take no pointer events at all.
+        onDragStart={(event) => event.preventDefault()}
         // Paging IS the viewBox moving down a section at a time. Nothing
         // scrolls, so nothing can be left half way between two sections.
-        viewBox={`0 ${top} ${NOTE_WIDTH} ${NOTE_SECTION}`}
+        viewBox={`0 ${top} ${NOTE_WIDTH} ${section}`}
         data-tool={tool}
         onWheel={(event) => {
           // Accumulated rather than acted on per event: one flick of a wheel
@@ -229,7 +269,7 @@ export default function Note({
           setLive(null);
         }}
       >
-        <rect x={0} y={top} width={NOTE_WIDTH} height={NOTE_SECTION} fill={scene.background} />
+        <rect x={0} y={top} width={NOTE_WIDTH} height={section} fill={scene.background} />
 
         {scene.items.map((item) =>
           item.kind === 'stroke' ? (

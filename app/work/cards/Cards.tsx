@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import LessonMarkdown, { Line } from '@/components/LessonMarkdown';
 import { CARD_KINDS, NEW_PER_DAY, type Card, type Deck } from '@/lib/cards';
 import { statusLook } from '@/lib/curriculum-card';
+import { NOTE_SECTION } from '@/lib/card-note';
 import { emptyScene, type Scene } from '@/lib/sketch';
 import Note from './Note';
 import styles from './cards.module.css';
@@ -39,6 +40,36 @@ export default function Cards() {
   /* The note being written, held here rather than in the panel: it is sent
    * with the answer, so the thing that posts it has to own it. */
   const [note, setNote] = useState<Scene>(emptyScene());
+  /* How tall one section is, measured by the panel and reported back up, so
+   * the server records the sections that were actually drawn. */
+  const [noteSection, setNoteSection] = useState(NOTE_SECTION);
+
+  /* The note arrives with its card and is adopted in the SAME update, never in
+   * an effect afterwards.
+   *
+   * It was an effect, and that was a real bug: the render that handed the
+   * panel a new card still had the previous card's note in state, so the panel
+   * counted that note's sections, and the next answer posted it back against
+   * the wrong card. One card showing the one before it, sections appearing
+   * from nowhere, and writing landing in neither were all this.
+   *
+   * A scene that will not parse becomes an empty one and is said out loud: a
+   * blank panel that silently overwrites attempts already saved is worse than
+   * an error message. */
+  const adopt = useCallback((payload: Payload | null): Payload | null => {
+    if (!payload) return payload;
+    if (!payload.note) {
+      setNote(emptyScene());
+      return payload;
+    }
+    try {
+      setNote(JSON.parse(payload.note.scene) as Scene);
+    } catch {
+      setNote(emptyScene());
+      setError('The note saved against this card could not be read.');
+    }
+    return payload;
+  }, []);
 
   const load = useCallback(async (which: number | null) => {
     try {
@@ -46,11 +77,11 @@ export default function Cards() {
         `/work/api/cards${which ? `?deck=${which}` : ''}`,
         { cache: 'no-store' },
       );
-      setData((await response.json()) as Payload);
+      setData(adopt((await response.json()) as Payload));
     } catch {
       setError('Could not reach the cards.');
     }
-  }, []);
+  }, [adopt]);
 
   /* ?deck=N opens straight into a deck, which is how the gold Cards card on
    * the curriculums page arrives. Read from the location rather than with
@@ -68,22 +99,6 @@ export default function Cards() {
 
   const card = data?.card ?? null;
 
-  /* The note arrives with its card, so it is adopted whenever the card
-   * changes. A scene that will not parse is replaced by an empty one and said
-   * out loud: the alternative is a blank panel that silently overwrites
-   * attempts already saved. */
-  useEffect(() => {
-    if (!data?.note) {
-      setNote(emptyScene());
-      return;
-    }
-    try {
-      setNote(JSON.parse(data.note.scene) as Scene);
-    } catch {
-      setNote(emptyScene());
-      setError('The note saved against this card could not be read.');
-    }
-  }, [data?.note, data?.card?.id]);
 
   /** Answer, and take whatever comes back as the next card. */
   const answer = useCallback(
@@ -101,6 +116,7 @@ export default function Cards() {
             // Saved by answering, which is the whole arrangement — there is no
             // Save button to forget. See the note handling in the endpoint.
             note: JSON.stringify(note),
+            noteSection,
           }),
         });
         const result = (await response.json()) as Partial<Payload> & {
@@ -119,14 +135,16 @@ export default function Cards() {
         );
         setShown(false);
         setData((was) =>
-          was
-            ? {
-                ...was,
-                decks: result.decks ?? was.decks,
-                card: result.card ?? null,
-                note: result.note ?? null,
-              }
-            : was,
+          adopt(
+            was
+              ? {
+                  ...was,
+                  decks: result.decks ?? was.decks,
+                  card: result.card ?? null,
+                  note: result.note ?? null,
+                }
+              : was,
+          ),
         );
       } catch {
         setError('That did not work.');
@@ -134,7 +152,7 @@ export default function Cards() {
         setBusy(false);
       }
     },
-    [busy, card],
+    [adopt, busy, card, note, noteSection],
   );
 
   /* The keyboard, which is the point of a review session: space reveals, then
@@ -232,7 +250,14 @@ export default function Cards() {
             onShow={() => setShown(true)}
             onAnswer={answer}
           />
-          <Note scene={note} onChange={setNote} cardId={card.id} />
+          {/* Keyed, so a new card gets a new panel rather than one carrying
+              the last card's tool, section and scroll position. */}
+          <Note
+            key={card.id}
+            scene={note}
+            onChange={setNote}
+            onSection={setNoteSection}
+          />
         </div>
       ) : (
         <div className={styles.done}>

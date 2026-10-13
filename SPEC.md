@@ -622,6 +622,24 @@ one empty section to write on. Only the first is stored, in `height`: how many
 sections are *shown* is a question about when the card was opened, so it
 belongs to the page and is never written down.
 
+**The note is adopted in the same update as its card, never in an effect
+afterwards.** It was an effect, and that was the bug behind three separate
+symptoms: the render that handed the panel a new card still held the previous
+card's note, so the panel counted that note's sections and the next answer
+posted it back against the wrong card. One card showing the one before it,
+sections appearing from nowhere, and writing landing in neither were all the
+same fault. The panel is also keyed by card id, so a new card gets a new panel
+rather than one carrying the last card's tool and position.
+
+**A section is the measured shape of the panel**, not a fixed one. A fixed 4:3
+section sat centred in a taller cell and left a bar of dead space above and
+below it, which a writing area cannot afford. The measurement travels with the
+note when it is saved, so the sections the server records are the sections the
+page drew, and it is bounded on the way in because it arrives from a browser.
+The cost is that resizing the window moves where sections divide — a fair trade
+for a scratch pad on one rig against making the geometry permanent, which would
+mean every note carrying the shape of the window it was first opened in.
+
 **One dot per section**, on the right and vertically centred, and hidden
 entirely while there is only one — a single dot would be saying there is
 somewhere else to be when there is not. Up for the previous attempt, down for
@@ -634,6 +652,12 @@ places. Stored as JSON rather than as the SVG the sketchpad writes, because a
 card note is dashboard data and never opened as a file; `toSvg()` still turns
 one into a file if that is ever wanted. There is a size limit, because a note
 that grows forever by design eventually stops being a row D1 will take.
+
+A surface full of paths and text is, to a browser, a picture worth dragging —
+which is where a grab cursor came from, and why the stroke after the first one
+started a drag instead of a line. The answer is three rules together: no text
+selection, no native image drag, and the drawn items take no pointer events at
+all, so only the surface is ever the target.
 
 **A finger pages and a pen draws**, decided on `pointerType`. Without the split
 there is no way to reach an earlier attempt on a tablet at all, since the panel

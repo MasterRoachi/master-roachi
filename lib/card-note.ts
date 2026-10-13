@@ -20,6 +20,17 @@ export const NOTE_WIDTH = 1600;
  * A note is a whole number of sections, and ONLY ONE IS EVER VISIBLE. The
  * panel does not scroll through a tall page; it pages between sections, which
  * is the difference between this and the sketchpad.
+ *
+ * This is the FALLBACK. The real height is measured from the panel, so that a
+ * section is exactly the shape of the space it is drawn in and the surface
+ * fills it — a fixed shape left a bar of dead space above and below, which is
+ * the one thing a writing area cannot afford. The measurement travels with the
+ * note when it is saved, so the server records the same sections the page drew.
+ *
+ * The cost is that resizing the window moves where sections divide. For a
+ * scratch pad on one rig that is a fair trade against making the geometry
+ * permanent, which would mean every note carrying the shape of the window it
+ * was first opened in.
  */
 export const NOTE_SECTION = 1200;
 
@@ -62,9 +73,18 @@ export function lowestPoint(scene: Scene): number {
   return lowest;
 }
 
+/** A sane section height from anywhere, including the wire. */
+export function sectionHeight(value: unknown): number {
+  const asked = Number(value);
+  if (!Number.isFinite(asked)) return NOTE_SECTION;
+  // Bounded rather than trusted: the page measures this, and a zero would
+  // divide by zero while something enormous would make every note one section.
+  return Math.min(Math.max(Math.round(asked), 200), 20_000);
+}
+
 /** How many sections have something written in them. 0 for an empty note. */
-export function sectionsWritten(scene: Scene): number {
-  return Math.ceil(lowestPoint(scene) / NOTE_SECTION);
+export function sectionsWritten(scene: Scene, section: number = NOTE_SECTION): number {
+  return Math.ceil(lowestPoint(scene) / sectionHeight(section));
 }
 
 /**
@@ -80,8 +100,8 @@ export function sectionsWritten(scene: Scene): number {
  * as you like; the next section appears the next time you reach this card,
  * which is also when the previous attempt becomes worth comparing against.
  */
-export function sectionsToShow(scene: Scene): number {
-  return Math.max(1, sectionsWritten(scene) + 1);
+export function sectionsToShow(scene: Scene, section: number = NOTE_SECTION): number {
+  return Math.max(1, sectionsWritten(scene, section) + 1);
 }
 
 /**
@@ -92,8 +112,8 @@ export function sectionsToShow(scene: Scene): number {
  * what is in the note. This is only a record of how far the note has actually
  * filled.
  */
-export function writtenHeight(scene: Scene): number {
-  return Math.max(1, sectionsWritten(scene)) * NOTE_SECTION;
+export function writtenHeight(scene: Scene, section: number = NOTE_SECTION): number {
+  return Math.max(1, sectionsWritten(scene, section)) * sectionHeight(section);
 }
 
 /**
