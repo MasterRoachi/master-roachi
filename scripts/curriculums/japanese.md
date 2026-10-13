@@ -170,13 +170,19 @@ reading payoff front-loads and the tail is honestly a tail.
 | 6 | Reading real Japanese | **32 — written** |
 | 7 | Advanced grammar | **24 — written** |
 | 8 | Keigo and register | **14 — written** |
-| 9 | Native material | 50 |
-| 10 | Classical Japanese | 40 |
-| 11 | Ad astra | open |
+| 9 | Living in Japanese | **12 — written** |
+| 10 | Classical Japanese | **11 — written** |
+| 11 | Ad astra | **3 — written**, and open |
 | — | Kanji track, its own modules | ~250 (**119 written**) |
 
-**Roughly 850–900 lessons.** That is the honest size of zero to mastery when
-every lesson teaches its point.
+**All eleven stages are now written, at 376 lessons rather than the 850–900
+first estimated.** The estimate assumed a lesson per grammar point; in practice
+related points belong together — the four conditionals in one lesson rather
+than four — and a stage of forty dense lessons teaches more than sixty thin
+ones. The kanji track is the part that is genuinely unfinished: 119 of 2,136.
+
+What that number was honestly measuring was the size of the material, and that
+is intact: 262 tables, and every lesson teaching its point in full.
 
 **It is built a stage at a time**, and only what is written is in the database.
 A lesson with a name and no material would be exactly the index this curriculum

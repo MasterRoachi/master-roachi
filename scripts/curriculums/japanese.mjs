@@ -460,6 +460,48 @@ const stages = [
     ],
   },
   {
+    name: 'Stage 9 · Living in Japanese',
+    lessons: [
+    ['Making Japanese the default'],
+    ['Japanese for programming', [{ title: 'Qiita', url: 'https://qiita.com/', note: 'Japanese developer articles.' }]],
+    ['Games in Japanese'],
+    ['Novels: building the habit', [{ title: '読書メーター', url: 'https://bookmeter.com/', note: 'Book logging, in Japanese.' }]],
+    ['Literature: the canon', [{ title: 'Aozora Bunko', url: 'https://www.aozora.gr.jp/', note: 'Every classical text, free. Historical kana in many editions.' }]],
+    ['Poetry: 俳句 and 短歌'],
+    ['The intermediate plateau'],
+    ['Measuring progress when it is invisible', [{ title: 'jpdb.io', url: 'https://jpdb.io/' }]],
+    ['Vocabulary past 10,000, and kanji past the jōyō', [{ title: '漢検 — Kanji Kentei', url: 'https://www.kanken.or.jp/kanken/', note: 'Past papers published free.' }, { title: 'jpdb.io', url: 'https://jpdb.io/' }]],
+    ['Specialised vocabulary: your own field'],
+    ['Teaching, translating and explaining'],
+    ['Review: living in Japanese'],
+    ],
+  },
+  {
+    name: 'Stage 10 · Classical Japanese',
+    lessons: [
+    ['Classical Japanese: why bother', [{ title: 'Imabi — Classical Japanese', url: 'https://imabi.org/', note: '36 lessons on 古文.' }, { title: 'NHK高校講座 古典', url: 'https://www.nhk.or.jp/kokokoza/', note: 'The school course, with video. Free.' }]],
+    ['歴史的仮名遣い — historical kana', [{ title: 'Imabi — Classical Japanese', url: 'https://imabi.org/', note: '36 lessons on 古文.' }]],
+    ['Classical verbs: the conjugation classes', [{ title: 'Imabi — Classical Japanese', url: 'https://imabi.org/', note: '36 lessons on 古文.' }]],
+    ['Classical auxiliaries: き, けり, つ, ぬ, たり, り', [{ title: 'Imabi — Classical Japanese', url: 'https://imabi.org/', note: '36 lessons on 古文.' }]],
+    ['Classical auxiliaries: む, べし, らむ, まし', [{ title: 'Imabi — Classical Japanese', url: 'https://imabi.org/', note: '36 lessons on 古文.' }]],
+    ['係り結び — the bound ending', [{ title: 'Imabi — Classical Japanese', url: 'https://imabi.org/', note: '36 lessons on 古文.' }]],
+    ['Reading 枕草子 and 徒然草', [{ title: 'Aozora Bunko', url: 'https://www.aozora.gr.jp/', note: 'Every classical text, free. Historical kana in many editions.' }, { title: 'NHK高校講座 古典', url: 'https://www.nhk.or.jp/kokokoza/', note: 'The school course, with video. Free.' }]],
+    ['平家物語 and the war tales', [{ title: 'Aozora Bunko', url: 'https://www.aozora.gr.jp/', note: 'Every classical text, free. Historical kana in many editions.' }]],
+    ['和歌 and 百人一首', [{ title: '百人一首', url: 'https://www.ogurasanso.co.jp/site/hyakunin/', note: 'All hundred poems with notes.' }]],
+    ['漢文 and 訓読', [{ title: 'NHK高校講座 古典', url: 'https://www.nhk.or.jp/kokokoza/', note: 'The school course, with video. Free.' }]],
+    ['Review: classical Japanese'],
+    ],
+  },
+  /* No end, by instruction: "we never stop if possible, ad astra". */
+  {
+    name: 'Stage 11 · Ad astra',
+    lessons: [
+    ['What finished would mean'],
+    ['A hundred books', [{ title: '読書メーター', url: 'https://bookmeter.com/', note: 'Book logging, in Japanese.' }]],
+    ['Keeping it, over years'],
+    ],
+  },
+  {
     name: 'Kanji 1 · The commonest characters',
     lessons: [
     ['Kanji 1 · 日 一 人 大 年 国 中 本', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],

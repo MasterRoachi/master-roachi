@@ -862,15 +862,12 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
-- [ ] **Japanese, stages 2–11.** Researched, planned and approved on
-      2026-10-13 — `scripts/curriculums/japanese.md`. Eleven stages, ~850–900
-      lessons, Imabi as the grammar spine with Irodori for the functional and
-      spoken half, RTK dropped, all 2,136 jōyō in a frequency-ordered track,
-      pitch accent from the first stage. **Stages 1 to 8 and three kanji modules
-      are written and live**: 350 lessons, 373 lesson sources, 426 cards, 119
-      of the jōyō. The rest is planned and not in the database, because a lesson
-      with a name and no material is the index this curriculum exists to stop
-      being.
+- [ ] **Japanese: the kanji track.** All eleven stages are written and live —
+      376 lessons, 392 lesson sources, 426 cards — but the kanji track is 119
+      of 2,136. Three modules of eight-character sets exist; roughly 250 more
+      lessons would finish it, frequency-ordered, each set taught through the
+      words its readings appear in. That is the only part of
+      `scripts/curriculums/japanese.md` still outstanding.
 - [ ] **FSRS is unoptimised**, and will be until there is a review history
       worth optimising against. `ts-fsrs` ships an optimiser that takes one;
       `card_reviews` exists to be handed to it. Nothing to do yet except keep
