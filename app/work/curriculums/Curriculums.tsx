@@ -8,10 +8,12 @@ import {
   type Curriculum,
   type Lesson,
   type Module,
+  type Source,
   type Step,
 } from '@/lib/curriculum';
 import CurriculumIcon from '@/components/CurriculumIcon';
 import { GOLD, scatterFor, statusLook } from '@/lib/curriculum-card';
+import { blocksOf, tableOf } from '@/lib/lesson-markdown';
 import styles from './curriculums.module.css';
 
 // A deck of cards, and a drill-down through it.
@@ -176,6 +178,7 @@ export default function Curriculums() {
         error?: string;
         repoOwned?: boolean;
         committed?: string | null;
+        truncated?: boolean;
       };
       if (!response.ok) {
         setError(result.error ?? `that did not work (${response.status})`);
@@ -904,7 +907,11 @@ export default function Curriculums() {
                         void act({ action: 'set-detail', id: lesson.id, detail: detailDraft }).then(
                           (result) => {
                             setEditingDetail(false);
-                            if (result?.repoOwned && !result.committed) {
+                            if (result?.truncated) {
+                              setError(
+                                'Saved, but it was cut at 32,000 characters — the end of what you wrote is not in it.',
+                              );
+                            } else if (result?.repoOwned && !result.committed) {
                               setError(
                                 'Saved here, but the repo copy did not commit — the next rebuild will overwrite it.',
                               );
@@ -928,31 +935,30 @@ export default function Curriculums() {
                       <Markdown source={lesson.detail} />
                     ) : (
                       <p className={styles.nothingYet}>
-                        Nothing written. For a transcribed curriculum that is correct — the
-                        substance is in the resource, and the sources below are where it lives.
+                        Nothing written yet.
                       </p>
                     )}
                   </section>
 
+                  {/* Sources at two grains, the lesson's own first.
+                      This card showed the curriculum's whole list under every
+                      lesson, which is a bibliography — true of all of them and
+                      pointing none of them anywhere. The lesson's own are the
+                      chapter and the page; the curriculum's stay underneath,
+                      because knowing the shelf is still worth something. */}
                   <section className={styles.lessonSection}>
                     <h3>Sources</h3>
-                    {current.sources && current.sources.length > 0 ? (
-                      <ul className={styles.sourceList}>
-                        {current.sources.map((source) => (
-                          <li key={source.id}>
-                            {source.url ? (
-                              <a href={source.url} target="_blank" rel="noreferrer">
-                                {source.title}
-                              </a>
-                            ) : (
-                              source.title
-                            )}
-                            {source.note && <span className={styles.sourceNote}>{source.note}</span>}
-                          </li>
-                        ))}
-                      </ul>
+                    {lesson.sources && lesson.sources.length > 0 ? (
+                      <SourceList sources={lesson.sources} />
                     ) : (
-                      <p className={styles.nothingYet}>Nothing recorded for this curriculum yet.</p>
+                      <p className={styles.nothingYet}>Nothing recorded for this lesson yet.</p>
+                    )}
+
+                    {current.sources && current.sources.length > 0 && (
+                      <>
+                        <h4 className={styles.sourceGrain}>The whole curriculum</h4>
+                        <SourceList sources={current.sources} />
+                      </>
                     )}
                   </section>
 
@@ -1087,6 +1093,32 @@ function Chevron({ direction }: { direction: 'left' | 'right' }) {
 }
 
 /**
+ * A list of sources, at either grain — one lesson's or a whole curriculum's.
+ *
+ * The same shape for both, because they are the same rows: migration 0009
+ * added a nullable `lesson_id` rather than a second table, for exactly this
+ * reason.
+ */
+function SourceList({ sources }: { sources: Source[] }) {
+  return (
+    <ul className={styles.sourceList}>
+      {sources.map((source) => (
+        <li key={source.id}>
+          {source.url ? (
+            <a href={source.url} target="_blank" rel="noreferrer">
+              {source.title}
+            </a>
+          ) : (
+            source.title
+          )}
+          {source.note && <span className={styles.sourceNote}>{source.note}</span>}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
  * The images in a lesson's detail, which is where a visual example can come
  * from — nothing else on a lesson carries a picture.
  *
@@ -1112,26 +1144,42 @@ function imagesIn(detail: string | null): { src: string; alt: string }[] {
  * conceptually, but what wrist level means, what posture to use is a mystery".
  *
  * Rendered here rather than with the site's MDX pipeline, which is a server
- * component compiled at build and cannot run in the browser. A small subset is
+ * component compiled at build and cannot run in the browser. A subset is
  * enough for what these contain, and anything it does not understand comes out
  * as its own paragraph rather than as nothing.
+ *
+ * The subset is the ceiling on what a lesson can teach, which is why code
+ * blocks and tables are in it: a curriculum written around a renderer that
+ * cannot show a paradigm or a working example is written to the renderer
+ * instead of to the subject. Reading the blocks out of the text is in
+ * lib/lesson-markdown.ts, where it can be tested — the failure mode there is
+ * not a crash but hundreds of lessons quietly showing the wrong thing.
  */
 function Markdown({ source }: { source: string }) {
-  const blocks = source
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean);
-
   return (
     <>
-      {blocks.map((block, at) => {
-        // Images are lifted out into Visual examples, so a block that is only
-        // an image renders as nothing here rather than as its own markup.
-        const withoutImages = block.replace(/!\[[^\]]*\]\([^)\s]+\)/g, '').trim();
-        if (withoutImages === '') return null;
-        block = withoutImages;
+      {blocksOf(source).map((block, at) => {
+        if (block.kind === 'code') {
+          return (
+            <div key={at} className={styles.codeBlock}>
+              {/* Outside the <pre>, so that dragging across the code and
+                  copying it does not come away with the word "gdscript" on
+                  the front of the first line. */}
+              {block.lang && <span className={styles.codeLang}>{block.lang}</span>}
+              <pre>
+                <code>{block.text}</code>
+              </pre>
+            </div>
+          );
+        }
 
-        const heading = /^(#{1,4})\s+(.*)$/.exec(block);
+        // Images are lifted out into Visual examples, so a block that is only
+        // an image renders as nothing here rather than as its own markup. Only
+        // prose: image syntax inside a fence is code and stays put.
+        const text = block.text.replace(/!\[[^\]]*\]\([^)\s]+\)/g, '').trim();
+        if (text === '') return null;
+
+        const heading = /^(#{1,4})\s+(.*)$/.exec(text);
         if (heading) {
           return (
             <h3 key={at} className={styles.detailHeading}>
@@ -1140,7 +1188,37 @@ function Markdown({ source }: { source: string }) {
           );
         }
 
-        const lines = block.split('\n');
+        const table = tableOf(text);
+        if (table) {
+          return (
+            <div key={at} className={styles.tableWrap}>
+              <table className={styles.detailTable}>
+                <thead>
+                  <tr>
+                    {table.head.map((cell, column) => (
+                      <th key={column} style={{ textAlign: table.align[column] ?? 'left' }}>
+                        {inline(cell)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.rows.map((row, index) => (
+                    <tr key={index}>
+                      {row.map((cell, column) => (
+                        <td key={column} style={{ textAlign: table.align[column] ?? 'left' }}>
+                          {inline(cell)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
+        const lines = text.split('\n');
         if (lines.every((line) => /^\s*[-*]\s+/.test(line))) {
           return (
             <ul key={at} className={styles.detailList}>
@@ -1160,7 +1238,7 @@ function Markdown({ source }: { source: string }) {
           );
         }
 
-        return <p key={at}>{inline(block)}</p>;
+        return <p key={at}>{inline(text)}</p>;
       })}
     </>
   );

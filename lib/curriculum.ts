@@ -10,10 +10,22 @@ export interface Lesson {
   name: string;
   done_on: string | null;
   /**
-   * What the lesson actually teaches, in Markdown. Null where the substance
-   * lives in the resource instead — see migrations/0007_lesson_detail.sql.
+   * What the lesson actually teaches, in Markdown.
+   *
+   * Null now means not written yet, and it used to mean something else: 0007
+   * drew a line between a transcribed curriculum, whose substance sits in the
+   * resource, and a designed one, which has nowhere else to keep it. That line
+   * is gone — every lesson is to teach on its own, at his word: "i dont want
+   * to open the sources, the material itself should be accessible here".
+   * Japanese, Greek and Odin are the lessons still waiting on it.
    */
   detail: string | null;
+  /**
+   * This lesson's own sources — the chapter, the page, the one video — as
+   * against the curriculum's list, which belongs to every lesson equally. See
+   * migration 0009.
+   */
+  sources?: Source[];
 }
 
 export interface Module {
@@ -23,12 +35,15 @@ export interface Module {
 }
 
 /**
- * Where a curriculum is studied from.
+ * Where something is studied from.
  *
- * A list, because a real one is studied from several things at once — Greek
- * runs Pimsleur and the Basic Course in tandem. `curriculums.source` is a
- * different fact and still there: it records which document DESIGNED the
- * curriculum, which the build scripts read. See migration 0008.
+ * A list, because a real curriculum is studied from several things at once —
+ * Greek runs Pimsleur and the Basic Course in tandem. At two grains since
+ * 0009: a curriculum's whole list, and a single lesson's own. The shape is the
+ * same either way, so this is one interface.
+ *
+ * `curriculums.source` is a different fact and still there: it records which
+ * document DESIGNED the curriculum, which the build scripts read. See 0008.
  */
 export interface Source {
   id: number;

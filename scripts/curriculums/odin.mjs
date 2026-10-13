@@ -15,7 +15,7 @@
 //
 // Courses are not numbered. The other curriculums open a module with a stage
 // number because their order is the argument; here the course name says where
-// you are, and a 1-to-34 sequence across seven courses would say nothing a
+// you are, and a 1-to-34 sequence across the six would say nothing a
 // reader wants.
 //
 // NO DETAIL, DELIBERATELY. 0007_lesson_detail.sql states the rule: detail is
@@ -292,51 +292,23 @@ const courses = [
       { name: 'Final project', lessons: ['Project: Odin-Book', 'Conclusion'] },
     ],
   },
-  {
-    course: 'Getting Hired',
-    sections: [
-      {
-        name: 'Preparing for Your Job Search',
-        lessons: [
-          'How This Course Will Work',
-          'Professional Networking',
-          'Strategy',
-          'It Starts with YOU',
-          'What Companies Want',
-          'What You Can Do to Prepare',
-          'Project: Building Your Personal Website',
-        ],
-      },
-      {
-        name: 'Applying to and Interviewing for Jobs',
-        lessons: [
-          'Collecting Job Leads',
-          'Qualifying Job Leads',
-          'Project: Building Your Resume',
-          'Applying for Web Development Jobs',
-          'Preparing to Interview and Interviewing',
-          'Handling a Job Offer',
-          'Conclusion',
-        ],
-      },
-    ],
-  },
 ];
 
-/* THE ROUTE IS GONE, and Getting Hired is the course it existed for.
+/* GETTING HIRED IS GONE, 2026-10-13, at his word: "delete it".
  *
- * `on_route` was added by 0006 for exactly this path — "what is being asked is
- * '18 of the 41 I am actually doing'" — and the honest answer here was one
- * whole course switched off: fourteen lessons about networking, job leads, a
- * CV and interviewing, which SPEC.md already settles for the site ("a personal
- * brand site, not a portfolio for job applications ... That framing is dead").
+ * Six courses, not the path's seven. The seventh was fourteen lessons on
+ * networking, job leads, a CV and interviewing, and SPEC.md already settles
+ * the question they serve ("a personal brand site, not a portfolio for job
+ * applications ... That framing is dead").
  *
- * He has since removed the whole dynamic: "get rid of the entire on the route
- * dynamic it's not necessary, even for odin". So those fourteen lessons now
- * COUNT, and Odin reads 112 of 151 rather than 112 of 137. The course stays in
- * the curriculum because it really is on the path; the only way to stop it
- * counting now is to delete it, which is his call and not a thing a build
- * script should decide.
+ * It took this long because `on_route` expressed it instead — 0006 was added
+ * for exactly this course, "what is being asked is '18 of the 41 I am actually
+ * doing'". When he removed the whole dynamic ("get rid of the entire on the
+ * route dynamic it's not necessary, even for odin") those fourteen started
+ * counting, and Odin read 112 of 151 rather than 112 of 137. A flag said "not
+ * these" and deleting says the same thing with nothing to maintain.
+ *
+ * None of the fourteen was ticked, so the rebuild loses no date.
  */
 
 /** SQL single-quoted string. An apostrophe in a title ends the literal early. */
@@ -393,7 +365,7 @@ for (const { course, sections } of courses) {
 
 /* WHAT IS ALREADY DONE IS STILL NOT TICKED HERE, and that is deliberate.
  *
- * Five of the seven courses are finished and so is the first NodeJS project —
+ * Five of the six courses are finished and so is the first NodeJS project —
  * twenty-four projects sit in ~/Work/Master Roachi/odin-projects, and the
  * handoff notes in that repository walk through the JavaScript CS section,
  * testing, Advanced HTML and CSS, React, databases and NodeJS in order.

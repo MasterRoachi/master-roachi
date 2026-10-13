@@ -55,6 +55,18 @@ execFileSync(
 );
 const dbLib = await import(pathToFileURL(dbBundle).href);
 
+// Reading a lesson's blocks, which is the ceiling on what a lesson can teach
+// now that the material itself lives in `detail`. Silent when wrong: a fence
+// misread does not throw, it shows a program as one run-together line, which
+// is exactly what the ninety-two Godot lessons were doing.
+const markdownBundle = path.join(os.tmpdir(), 'master-roachi-markdown-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/lesson-markdown.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${markdownBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const markdown = await import(pathToFileURL(markdownBundle).href);
+
 // The icon set, where a typo is silent: a malformed path renders as nothing
 // and a duplicated name makes one icon unreachable.
 const iconBundle = path.join(os.tmpdir(), 'master-roachi-icon-bundle.mjs');
@@ -1141,7 +1153,7 @@ function fakeD1() {
   const modules = [{ id: 1, curriculum_id: 1, name: 'Foundations', position: 1 }];
   const lessons = [{ id: 1, module_id: 1, name: 'Intro', position: 1, done_on: null, on_route: 1 }];
   const sources = [
-    { id: 1, curriculum_id: 1, title: 'The Odin Project', url: 'https://theodinproject.com', note: null, position: 1 },
+    { id: 1, curriculum_id: 1, lesson_id: null, title: 'The Odin Project', url: 'https://theodinproject.com', note: null, position: 1 },
   ];
   const sqlLog = [];
 
@@ -1216,6 +1228,14 @@ function fakeD1() {
               .sort((a, b) => a.position - b.position)[0] ?? null
           );
         }
+        // Is this lesson in THAT curriculum — the 0009 ownership check. Ahead
+        // of the branch below, which answers only "the lesson exists" and
+        // would let a lesson id from another curriculum through.
+        if (sql.includes('from lessons l') && sql.includes('m.curriculum_id')) {
+          const lesson = lessons.find((l) => l.id === bound[0]);
+          const module = modules.find((m) => m.id === lesson?.module_id);
+          return module && module.curriculum_id === bound[1] ? { ok: 1 } : null;
+        }
         if (sql.includes('from lessons')) {
           return lessons.find((l) => l.id === bound[0]) ?? null;
         }
@@ -1247,6 +1267,8 @@ function fakeD1() {
             title: bound[1],
             url: bound[2],
             note: bound[3],
+            // `?5`, the optional lesson. See migration 0009.
+            lesson_id: bound[4] ?? null,
             position: sources.length + 1,
           });
         }
@@ -3879,6 +3901,160 @@ globalThis.fetch = preGh;
 
   res = await post({ action: 'remove-source' });
   check('removing needs an id', res.status === 400, String(res.status));
+
+  /* The lesson grain, from 0009. A curriculum's list is a bibliography — true
+   * of every lesson and pointing none of them anywhere — so a source can name
+   * one lesson, and that lesson shows it instead. */
+  res = await post({
+    action: 'add-source',
+    curriculum_id: 1,
+    lesson_id: 1,
+    title: 'Thompson, ch. 4',
+    note: 'pp. 61-88',
+  });
+  check('a source can name a lesson', res.status === 200, String(res.status));
+  check(
+    'and is stored against it',
+    DB._sources.some((one) => one.title === 'Thompson, ch. 4' && one.lesson_id === 1),
+    JSON.stringify(DB._sources),
+  );
+
+  res = await post({
+    action: 'add-source',
+    curriculum_id: 1,
+    lesson_id: 99,
+    title: 'A lesson that is not in this curriculum',
+  });
+  check('a lesson from elsewhere is refused', res.status === 400, String(res.status));
+  check(
+    'and nothing was written',
+    !DB._sources.some((one) => one.lesson_id === 99),
+    JSON.stringify(DB._sources),
+  );
+
+  res = await post({ action: 'add-source', curriculum_id: 1, lesson_id: 'one', title: 'Nope' });
+  check('a lesson id that is not a number is refused', res.status === 400, String(res.status));
+
+  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/curriculums'), dbEnv);
+  body = await res.json();
+  const lesson = body.curriculums?.[0]?.modules?.[0]?.lessons?.[0];
+  check(
+    'a lesson carries its own sources',
+    lesson?.sources?.length === 1 && lesson.sources[0].title === 'Thompson, ch. 4',
+    JSON.stringify(lesson?.sources),
+  );
+  check(
+    "and they are not in the curriculum's list",
+    body.curriculums[0].sources.length === 1 &&
+      body.curriculums[0].sources[0].title === 'The Odin Project',
+    JSON.stringify(body.curriculums[0].sources),
+  );
+  check(
+    'the lesson id is not repeated inside the source it is already attached to',
+    lesson.sources[0].lesson_id === undefined,
+    JSON.stringify(lesson.sources[0]),
+  );
+}
+
+// --- what a lesson's Markdown is read as -----------------------------------
+//
+// Every one of these is a thing that silently displayed wrongly before, or
+// would the first time a curriculum tried it.
+{
+  const { blocksOf, tableOf } = markdown;
+
+  let blocks = blocksOf('A paragraph.\n\nAnother one.');
+  check(
+    'blank lines still separate prose',
+    blocks.length === 2 && blocks.every((b) => b.kind === 'prose'),
+    JSON.stringify(blocks),
+  );
+
+  blocks = blocksOf('Before.\n\n```gdscript\nvar x := 1\n```\n\nAfter.');
+  check(
+    'a fence is its own block, between the prose',
+    blocks.length === 3 &&
+      blocks[0].kind === 'prose' &&
+      blocks[1].kind === 'code' &&
+      blocks[2].kind === 'prose',
+    JSON.stringify(blocks),
+  );
+  check('and the language comes with it', blocks[1].lang === 'gdscript', String(blocks[1].lang));
+  check('and the fences themselves are gone', blocks[1].text === 'var x := 1', JSON.stringify(blocks[1].text));
+
+  // The whole reason this is not a split on blank lines.
+  blocks = blocksOf('```js\nconst a = 1;\n\nconst b = 2;\n```');
+  check(
+    'a blank line inside a fence does not split it',
+    blocks.length === 1 && blocks[0].kind === 'code' && blocks[0].text === 'const a = 1;\n\nconst b = 2;',
+    JSON.stringify(blocks),
+  );
+
+  blocks = blocksOf('```\nplain\n```');
+  check(
+    'a fence with no language is still a fence',
+    blocks.length === 1 && blocks[0].kind === 'code' && blocks[0].lang === null,
+    JSON.stringify(blocks),
+  );
+
+  blocks = blocksOf('Text.\n\n```py\nnever closed');
+  check(
+    'an unclosed fence runs to the end rather than being lost',
+    blocks.length === 2 && blocks[1].kind === 'code' && blocks[1].text === 'never closed',
+    JSON.stringify(blocks),
+  );
+
+  blocks = blocksOf('```sh\n  indented --flag\n\tand a tab\n```');
+  check(
+    'indentation inside a fence is kept exactly',
+    blocks[0].text === '  indented --flag\n\tand a tab',
+    JSON.stringify(blocks[0].text),
+  );
+
+  // Two samples in one lesson, which is most of Godot's.
+  blocks = blocksOf('One:\n\n```js\na\n```\n\nTwo:\n\n```js\nb\n```');
+  check(
+    'two fences in one lesson stay two',
+    blocks.filter((b) => b.kind === 'code').length === 2,
+    JSON.stringify(blocks),
+  );
+
+  check('nothing at all is no blocks', blocksOf('').length === 0, '');
+
+  // Tables.
+  let table = tableOf('| Kana | Romaji |\n| --- | --- |\n| あ | a |\n| い | i |');
+  check(
+    'a pipe table is read as one',
+    table !== null && table.head.length === 2 && table.rows.length === 2,
+    JSON.stringify(table),
+  );
+  check('its header cells are trimmed', table.head[0] === 'Kana', JSON.stringify(table.head));
+  check('and its body comes through in order', table.rows[1][1] === 'i', JSON.stringify(table.rows));
+
+  table = tableOf('| left | mid | right |\n| :-- | :-: | --: |\n| a | b | c |');
+  check(
+    'the delimiter row carries the alignment',
+    table.align.join(',') === 'left,center,right',
+    JSON.stringify(table?.align),
+  );
+
+  check(
+    'a table needs a delimiter row, or it is prose',
+    tableOf('| not | a table |\n| still | not |') === null,
+    '',
+  );
+  check('one line is not a table', tableOf('| just the one |') === null, '');
+  check('and neither is prose that merely mentions a pipe', tableOf('a | b') === null, '');
+
+  // A bullet list is checked for after the table, and a table row can begin
+  // with a dash, so neither may be mistaken for the other.
+  check(
+    'a bullet list is not a table',
+    tableOf('- one\n- two') === null,
+    '',
+  );
+  table = tableOf('| - | x |\n| --- | --- |\n| - | y |');
+  check('a dash in a cell is a cell, not a bullet', table !== null && table.rows[0][0] === '-', JSON.stringify(table));
 }
 
 // --- lesson detail, written to D1 AND to the repo --------------------------

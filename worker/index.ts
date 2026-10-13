@@ -1325,30 +1325,50 @@ export default {
             }>(),
             db
               .prepare(
-                `select id, curriculum_id, title, url, note, position from sources
+                `select id, curriculum_id, lesson_id, title, url, note, position from sources
                  order by position, id`,
               )
               .all<{
               id: number;
               curriculum_id: number;
+              lesson_id: number | null;
               title: string;
               url: string | null;
               note: string | null;
             }>(),
           ]);
 
+          /* Sources at their two grains, split by whether they name a lesson.
+           * Null is the curriculum's own list, shown under every lesson; set
+           * belongs to that one lesson. See migration 0009. */
+          const sourcesByCurriculum = new Map<number, unknown[]>();
+          const sourcesByLesson = new Map<number, unknown[]>();
+          for (const source of sources.results) {
+            const { lesson_id, ...rest } = source;
+            // `== null`, which takes undefined with it. A strict check against
+            // null puts every row in the lesson bucket the moment the column
+            // is missing from a read, and the symptom is a Sources card that
+            // has quietly gone empty everywhere.
+            if (lesson_id == null) {
+              if (!sourcesByCurriculum.has(source.curriculum_id)) {
+                sourcesByCurriculum.set(source.curriculum_id, []);
+              }
+              sourcesByCurriculum.get(source.curriculum_id)!.push(rest);
+            } else {
+              if (!sourcesByLesson.has(lesson_id)) sourcesByLesson.set(lesson_id, []);
+              sourcesByLesson.get(lesson_id)!.push(rest);
+            }
+          }
+
           const lessonsByModule = new Map<number, unknown[]>();
           for (const lesson of lessons.results) {
             if (!lessonsByModule.has(lesson.module_id)) lessonsByModule.set(lesson.module_id, []);
-            lessonsByModule.get(lesson.module_id)!.push(lesson);
-          }
-
-          const sourcesByCurriculum = new Map<number, unknown[]>();
-          for (const source of sources.results) {
-            if (!sourcesByCurriculum.has(source.curriculum_id)) {
-              sourcesByCurriculum.set(source.curriculum_id, []);
-            }
-            sourcesByCurriculum.get(source.curriculum_id)!.push(source);
+            // Attached only where there are some. An empty array on every
+            // lesson is a few bytes each and this payload is every lesson of
+            // every curriculum — it is already the largest thing the backend
+            // sends, and the curriculums are about to grow by an order.
+            const own = sourcesByLesson.get(lesson.id);
+            lessonsByModule.get(lesson.module_id)!.push(own ? { ...lesson, sources: own } : lesson);
           }
 
           const modulesByCurriculum = new Map<number, unknown[]>();
@@ -1545,24 +1565,51 @@ export default {
             return json({ done: next !== null, day: next }, 200);
           }
 
-          /* Sources: what a curriculum is actually studied from.
+          /* Sources: what a curriculum, or one of its lessons, is studied
+           * from.
            *
            * A list rather than the one `curriculums.source` line, because a
            * real curriculum is studied from several things at once — Greek
            * runs Pimsleur and the Basic Course in tandem. See migration 0008,
-           * which also explains why that column is still there. */
+           * which also explains why that column is still there, and 0009 for
+           * the lesson grain. */
           if (action === 'add-source') {
             const id = Number(body.curriculum_id);
             const title = text(body.title);
             if (!Number.isInteger(id)) return json({ error: 'which curriculum' }, 400);
             if (!title) return json({ error: 'needs a title' }, 400);
+
+            /* Optional, and checked against the curriculum when it is given: a
+             * source row carries both ids, so a lesson id from somewhere else
+             * would file the row under one curriculum and display it under
+             * another's lesson, which no later read could tell was wrong. */
+            let lesson: number | null = null;
+            if (body.lesson_id !== undefined && body.lesson_id !== null) {
+              lesson = Number(body.lesson_id);
+              if (!Number.isInteger(lesson)) return json({ error: 'which lesson' }, 400);
+              const owns = await db
+                .prepare(
+                  `select 1 as ok from lessons l
+                     join modules m on m.id = l.module_id
+                    where l.id = ?1 and m.curriculum_id = ?2`,
+                )
+                .bind(lesson, id)
+                .first();
+              if (!owns) return json({ error: 'that lesson is not in that curriculum' }, 400);
+            }
+
             await db
               .prepare(
-                `insert into sources (curriculum_id, title, url, note, position)
-                 values (?1, ?2, ?3, ?4,
-                   (select coalesce(max(position), 0) + 1 from sources where curriculum_id = ?1))`,
+                // `lesson_id is ?5` rather than `=`, which is the whole trick:
+                // the same statement has to number a curriculum's list and one
+                // lesson's, and `= null` matches nothing, so a curriculum
+                // source would restart at 1 on every insert.
+                `insert into sources (curriculum_id, lesson_id, title, url, note, position)
+                 values (?1, ?5, ?2, ?3, ?4,
+                   (select coalesce(max(position), 0) + 1 from sources
+                     where curriculum_id = ?1 and lesson_id is ?5))`,
               )
-              .bind(id, title, text(body.url, 500) || null, text(body.note, 500) || null)
+              .bind(id, title, text(body.url, 500) || null, text(body.note, 500) || null, lesson)
               .run();
             return json({ added: true }, 200);
           }
@@ -1591,7 +1638,17 @@ export default {
           if (action === 'set-detail') {
             const id = Number(body.id);
             if (!Number.isInteger(id)) return json({ error: 'which lesson' }, 400);
-            const detail = typeof body.detail === 'string' ? body.detail.slice(0, 8000) : null;
+            /* 32k, up from 8k, and the cut is now reported rather than
+             * silent. `detail` stopped being a note and became the material
+             * itself — "the material itself should be accessible here" — so a
+             * lesson can run to a few thousand words, and a paste that lost
+             * its last third to a slice() while the editor said Saved is the
+             * kind of loss nothing afterwards can see. A cap stays: this is an
+             * unauthenticated-by-shape text field writing to a row, and
+             * 'however much you send' is not a size. */
+            const sent = typeof body.detail === 'string' ? body.detail : null;
+            const detail = sent === null ? null : sent.slice(0, 32_000);
+            const truncated = sent !== null && sent.length > detail!.length;
             const value = detail && detail.trim() ? detail : null;
 
             await db
@@ -1670,7 +1727,7 @@ export default {
               }
             }
 
-            return json({ updated: true, id, repoOwned, committed }, 200);
+            return json({ updated: true, id, repoOwned, committed, truncated }, 200);
           }
 
           if (action === 'rename') {

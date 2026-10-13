@@ -32,10 +32,23 @@
 //             is a decision made at the dashboard, not here.
 //   detail    the repo wins where it has any, because `<name>-detail.json` is
 //             the source of truth and editing it has to be able to change a
-//             lesson. Where the rebuild leaves detail null — Greek, Japanese
-//             and Odin, the transcribed curriculums, by the rule in 0007 —
-//             anything typed at the dashboard is kept. Overwrites are counted
-//             and reported rather than done quietly.
+//             lesson. Where the rebuild leaves detail null, anything typed at
+//             the dashboard is kept. Overwrites are counted and reported
+//             rather than done quietly.
+//   sources   a build script owns the rows that name a lesson and deletes its
+//             own on a rebuild. It does NOT own the rows where `lesson_id` is
+//             null: those are the curriculum's own reading list, the sixteen
+//             rows for Japanese, Greek and Odin exist in no script and nothing
+//             could regenerate them, so a rebuild leaves them alone. See
+//             migration 0009.
+//
+// LESSON NAMES MUST BE UNIQUE WITHIN A CURRICULUM, and this script refuses to
+// apply one where they are not. `<name>-detail.json` is keyed by lesson name
+// alone — not module plus name — so two lessons called "Review" are one entry:
+// they would show identical material, and editing either at the dashboard
+// would rewrite both. That was harmless while the curriculums were small and
+// is not while they are being written out to teach a subject from nothing,
+// where "Review" and "Shadowing" and "Drills" want to appear in every module.
 //
 // Not atomic, and it cannot be: D1 rejects an explicit BEGIN inside execute.
 // The mitigation is that the SQL is rehearsed in full against a throwaway
@@ -44,7 +57,7 @@
 // left on disk either way, so a half-applied rebuild can be re-run.
 
 import { execFileSync } from 'node:child_process';
-import { readdirSync, readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync, mkdtempSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -182,7 +195,30 @@ function prepare(name) {
     built.set(k, row);
   }
 
-  return { name, curriculum: curriculums[0].name, sql, built, twice };
+  /* A name used twice anywhere in the curriculum, which the detail file cannot
+   * represent. Refused rather than warned about: the damage is silent in both
+   * directions — two lessons showing one lesson's material, and a dashboard
+   * edit to either rewriting both — and renaming one of them is a two-second
+   * fix in the script that is about to be run again anyway. */
+  const seenName = new Map();
+  for (const row of rows) {
+    seenName.set(row.lesson, (seenName.get(row.lesson) ?? 0) + 1);
+  }
+  const repeated = [...seenName].filter(([, n]) => n > 1);
+  if (repeated.length && existsSync(join(HERE, `${name}-detail.json`))) {
+    console.error(`\n${name}.mjs uses ${repeated.length} lesson name(s) more than once:`);
+    for (const [lesson, n] of repeated.slice(0, 12)) {
+      console.error(`  · ${JSON.stringify(lesson)} ×${n}`);
+    }
+    if (repeated.length > 12) console.error(`  … and ${repeated.length - 12} more`);
+    console.error(
+      `\n${name}-detail.json is keyed by lesson name, so those share one entry.` +
+        `\nMake the names distinct. Nothing applied.`,
+    );
+    process.exit(1);
+  }
+
+  return { name, curriculum: curriculums[0].name, sql, built, twice, repeated };
 }
 
 console.error(`Reading ${wanted.length === 1 ? wanted[0] : `${wanted.length} curriculums`}…\n`);
@@ -205,8 +241,19 @@ const scratch = mkdtempSync(join(tmpdir(), 'curriculum-'));
 let failed = 0;
 
 for (const plan of plans) {
-  const { name, curriculum, built, twice } = plan;
+  const { name, curriculum, built, twice, repeated } = plan;
   console.error(`\n── ${curriculum}  (${name}.mjs)`);
+
+  /* Reached only where there is no detail file — prepare() refuses outright
+   * where there is one. Still worth saying: the day this curriculum grows a
+   * detail file is the day it stops applying, and finding that out then is
+   * finding it out at the worst moment. */
+  if (repeated.length) {
+    console.error(
+      `  ! ${repeated.length} lesson name(s) used more than once. No detail file yet,` +
+        ` so nothing breaks today; one cannot be added until they are distinct.`,
+    );
+  }
 
   for (const row of twice) {
     console.error(`  ! two lessons named ${JSON.stringify(row.lesson)} in ${JSON.stringify(row.module)};`);
@@ -406,7 +453,11 @@ for (const plan of plans) {
     `select count(distinct m.id) as modules, count(l.id) as lessons,
             sum(case when l.done_on is not null then 1 else 0 end) as ticked,
             sum(case when l.on_route = 0 then 1 else 0 end) as off_route,
-            sum(case when l.detail is not null then 1 else 0 end) as detailed
+            sum(case when l.detail is not null then 1 else 0 end) as detailed,
+            (select count(*) from sources s
+              where s.curriculum_id = c.id and s.lesson_id is not null) as lesson_sources,
+            (select count(*) from sources s
+              where s.curriculum_id = c.id and s.lesson_id is null) as list
        from curriculums c
        join modules m on m.curriculum_id = c.id
        join lessons l on l.module_id = m.id
@@ -416,7 +467,8 @@ for (const plan of plans) {
   const ok = Number(after.lessons) === built.size;
   console.error(
     `  ${ok ? 'applied' : 'APPLIED, BUT'}: ${after.modules} modules · ${after.lessons} lessons · ` +
-      `${after.detailed ?? 0} with detail · ${after.ticked ?? 0} ticked · ${after.off_route ?? 0} off route`,
+      `${after.detailed ?? 0} with detail · ${after.ticked ?? 0} ticked · ` +
+      `${after.lesson_sources ?? 0} lesson sources · ${after.list ?? 0} on the curriculum's list`,
   );
   if (!ok) {
     failed += 1;

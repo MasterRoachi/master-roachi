@@ -426,11 +426,38 @@ at the back of each deck is for.
 
 ### Curriculums
 
-Eight, in `scripts/curriculums/`. 708 lessons, 694 on the route, 341 carrying
-detail. In order, because **the order of the curriculums is the route through
-all of them**: Japanese, Piano, Greek, Odin, Godot, Aseprite, Drawing, South
-African politics. That is the order he asked for, set on 2026-10-12; until then
-they sat in the order they happened to be built in.
+Eight, in `scripts/curriculums/`. 694 lessons, 341 carrying detail. In order,
+because **the order of the curriculums is the route through all of them**:
+Japanese, Piano, Greek, Odin, Godot, Aseprite, Drawing, South African politics.
+That is the order he asked for, set on 2026-10-12; until then they sat in the
+order they happened to be built in.
+
+**All eight are being rewritten, one at a time, from 2026-10-13.** Not expanded
+at the edges: re-researched and re-planned to teach their subject from nothing
+to mastery, in three phases per curriculum — research the subject and the free
+resources that teach it, plan the whole thing and have it approved, then
+implement. Length is per subject; none of them has to match another's.
+
+The rule that shaped the existing eight is therefore **gone**: 0007 drew a line
+between a transcribed curriculum, whose substance sits in the resource, and a
+designed one, which carries its own. His ruling replaces it — *"i dont want to
+open the sources, the material itself should be accessible here"* — so every
+lesson is to teach on its own, and a source becomes attribution and further
+reading rather than the place the substance lives. Japanese, Greek and Odin are
+the 353 lessons still waiting on it.
+
+Two consequences, built on 2026-10-13 before any of the rewriting:
+
+- **Lesson names must be unique within a curriculum, and `apply.mjs` now
+  refuses one where they are not.** `<name>-detail.json` is keyed by lesson
+  name alone, not module plus name, so two lessons called "Review" are one
+  entry: they would show identical material, and editing either at the
+  dashboard would rewrite both. Harmless while the curriculums were small;
+  not while they are being written to teach a subject from nothing, where
+  "Review" and "Drills" want to appear in every module. Odin already had two —
+  "Conclusion" ×4 and "How This Course Will Work" ×3 — which is how the guard
+  found its first catch on the day it was written.
+- **Sources have two grains.** See below.
 
 Each is a `.mjs` that **prints SQL and executes nothing**, with a `.md` beside
 it where the curriculum is designed rather than transcribed. Re-running one
@@ -474,6 +501,85 @@ Odin carries the system's only real progress: **112 of 137**, backfilled
 provably already finished rather than the day it happened. The alternative was
 leaving 112 lessons untickable. Those ticks survived a rebuild of the live
 database, which is how the preservation was verified.
+
+137 and not 151, because **Getting Hired is deleted** as of 2026-10-13, at his
+word: *"delete it"*. Six of the path's seven courses. The route existed for
+that one course — 0006 was added for it, *"what is being asked is '18 of the 41
+I am actually doing'"* — and when the route went, its fourteen lessons started
+counting. A flag saying "not these" and no rows saying it reach the same
+number, and only one of them needs maintaining. None of the fourteen was
+ticked, so the rebuild lost no date.
+
+### What a lesson can show
+
+The lesson card renders Markdown with a hand-written subset — the site's MDX
+pipeline is a server component compiled at build and cannot run in the browser.
+**That subset is the ceiling on what a lesson can teach**, which stopped being
+a detail the moment the material itself moved into `detail`: a curriculum
+written around a renderer that cannot show a working example or a paradigm is
+written to the renderer instead of to the subject.
+
+So it has fenced code blocks and pipe tables, as of 2026-10-13, alongside the
+headings, lists, bold, italic, inline code and images it already had.
+
+**Code blocks were not merely missing, they were being mangled.** The renderer
+split the whole string on blank lines before looking at anything, which cannot
+see a fence: a sample containing a blank line arrived as two or three unrelated
+blocks with its backticks in different ones, and every sample, blank line or
+not, came out as a single run-together inline code span — ``` is three
+backticks and the inline pattern matches a pair of them, so it read the fence
+as a delimiter and the whole program as its contents. **88 of Godot's 92
+lessons were shipping their code that way.** Fences are now found by walking
+lines, and only what is left over is split on blank lines.
+
+Tables are decided by the delimiter row, not by lines that merely begin with a
+pipe, and it carries the column alignment with it. There are none in the
+curriculums yet, for the obvious reason. There will be: kana against their
+romanisation, a Greek noun's cases across both numbers, the three spheres of
+government against what each may legislate on.
+
+Reading the blocks out of the text lives in `lib/lesson-markdown.ts` rather
+than in the component, so it can be tested. Its failure mode is not a crash —
+it is hundreds of lessons quietly displaying something other than what was
+written, which is what had already happened.
+
+Both a code block and a table **scroll sideways inside their own box**. The
+shell is exactly 100dvh and the page never scrolls, so a line of code that will
+not wrap has to be absorbed where it occurs or it widens its grid track,
+widens the readable column past its 46rem, and puts a horizontal scrollbar on a
+page whose whole design is that it has none. `min-width: 0` is what makes that
+work — the same trap as the `min-height: 0` one, in the other axis.
+
+### Two grains of source
+
+A source belongs to a curriculum or to one lesson, and migration 0009 is a
+nullable `lesson_id` rather than a second table, because they are the same
+rows: null means the curriculum's own list, set means that one lesson's.
+
+0008's grain was right for the question it answered — what is this studied FROM,
+where Japanese runs fourteen books at once. It is the wrong grain for the
+question a lesson asks. "Thompson, *A History of South Africa*" is true of all
+thirty-two lessons and points none of them anywhere; the lesson wants chapter 4,
+and the next one wants chapter 5. A curriculum-wide list shown under every
+lesson is a bibliography, and a bibliography is what you consult once you have
+already decided what to read. So the card shows the lesson's own first, with the
+curriculum's underneath.
+
+**A build script owns the rows that name a lesson** and deletes its own on a
+rebuild. It does not own the rows where `lesson_id` is null: the sixteen already
+there for Japanese, Greek and Odin exist in no script, nothing could regenerate
+them, and a rebuild leaves them alone.
+
+`add-source` takes an optional lesson and **checks it against the curriculum**,
+because a row carries both ids — a lesson id from somewhere else would file the
+source under one curriculum and display it under another's lesson, and no later
+read could tell that was wrong.
+
+The dashboard's detail editor now holds **32,000 characters rather than 8,000,
+and says so when it cuts**. `detail` stopped being a note and became the
+material, so a lesson runs to a few thousand words, and a paste that lost its
+last third to a `slice()` while the editor said *Saved* is a loss nothing
+afterwards can see.
 
 ## Tech Stack
 
@@ -530,10 +636,15 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
-- [ ] **Expand the curricula.** Asked for twice (12 and 13 October), after the
-      backend rework. Which of the eight and how far is his call; it should go
-      through `scripts/curriculums/<name>.mjs` and `-detail.json` so a rebuild
-      keeps it.
+- [ ] **Rewrite all eight curriculums**, one at a time, in route order:
+      Japanese, Piano, Greek, Odin, Godot, Aseprite, Drawing, SA politics.
+      Three phases each — research the subject and the free resources that
+      teach it, plan the whole curriculum and have it approved, then implement.
+      Zero to mastery, comprehensive, length per subject, and the material
+      itself in the lesson rather than a pointer to a book. Through
+      `scripts/curriculums/<name>.mjs` and `-detail.json`, so a rebuild keeps
+      it. The prerequisites are done (code blocks, tables, lesson sources, the
+      duplicate-name guard); nothing of the rewriting itself is started.
 - [ ] **`PRINTFUL_TOKEN` is not set as a Worker secret**, so the store's Sync
       button reports "not switched on". The feature is built and unreachable
       until `npx wrangler secret put PRINTFUL_TOKEN` is run.
@@ -541,14 +652,12 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       ones; Piano, Godot, Aseprite, Drawing and SA politics were carrying the
       path of the document that DESIGNED them, which is not something he
       studies from, so those rows were deleted rather than replaced with
-      invented book titles.
+      invented book titles. Answered by the rewriting above, which researches
+      free resources per subject — and now at two grains, so a lesson can name
+      its own chapter.
 - [ ] **`npm run lint` is broken**, and was before any of this work: Next 16
       removed `next lint`, and the repo has no eslint config. Fixing it means
       choosing one.
-- [ ] **Odin reads 112 of 151 now the route is gone.** Its fourteen formerly
-      off-route lessons are the whole Getting Hired course, and they count.
-      Deleting that course is the only way to stop them, and that is a decision
-      rather than a bug.
 - [ ] **Which board holds the unfamiliar Trello cards.** Not North Star and not
       Sales, by his own check. The folded "can see N boards" line on
       `/work/boards` names every board the token reaches, including the ones no
