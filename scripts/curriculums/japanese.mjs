@@ -379,6 +379,16 @@ const stages = [
     ['Kanji 10 · 見 言 話 食 飲 買 出 入', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
     ],
   },
+  {
+    name: 'Kanji 3 · Describing, places and more verbs',
+    lessons: [
+    ['Kanji 11 · 高 安 新 古 多 少 長 短', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ['Kanji 12 · 東 西 南 北 山 川 田 町', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ['Kanji 13 · 天 気 雨 風 空 海 花 色', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ['Kanji 14 · 立 休 待 持 作 使 住 知', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ['Kanji 15 · 店 駅 道 車 電 社 事 方', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
+    ],
+  },
 ];
 
 const out = [

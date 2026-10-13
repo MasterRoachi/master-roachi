@@ -173,7 +173,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | 9 | Native material | 50 |
 | 10 | Classical Japanese | 40 |
 | 11 | Ad astra | open |
-| — | Kanji track, its own modules | ~250 (**79 written**) |
+| — | Kanji track, its own modules | ~250 (**119 written**) |
 
 **Roughly 850–900 lessons.** That is the honest size of zero to mastery when
 every lesson teaches its point.

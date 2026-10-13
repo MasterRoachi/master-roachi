@@ -2140,5 +2140,295 @@
       "back": "priority seat",
       "reading": "ゆうせんせき"
     }
+  ],
+  "Kanji 11 · 高 安 新 古 多 少 長 短": [
+    {
+      "kind": "kanji",
+      "front": "高",
+      "back": "tall · expensive",
+      "reading": "コウ / たか-い",
+      "extra": "[高い]{たかい} tall, expensive · [高校]{こうこう} high school · [最高]{さいこう} the best\n\n10 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "安",
+      "back": "cheap · at ease",
+      "reading": "アン / やす-い",
+      "extra": "[安い]{やすい} cheap · [安心]{あんしん} relief · [安全]{あんぜん} safety\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "新",
+      "back": "new",
+      "reading": "シン / あたら-しい",
+      "extra": "[新しい]{あたらしい} new · [新聞]{しんぶん} newspaper · [新幹線]{しんかんせん} bullet train\n\n13 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "古",
+      "back": "old",
+      "reading": "コ / ふる-い",
+      "extra": "[古い]{ふるい} old · [中古]{ちゅうこ} second-hand · [古本]{ふるほん} used book\n\n5 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "多",
+      "back": "many",
+      "reading": "タ / おお-い",
+      "extra": "[多い]{おおい} many · [多分]{たぶん} probably · [多数]{たすう} a majority\n\n6 strokes. [多い]{おおい} cannot go before a noun."
+    },
+    {
+      "kind": "kanji",
+      "front": "少",
+      "back": "few · a little",
+      "reading": "ショウ / すく-ない・すこ-し",
+      "extra": "[少ない]{すくない} few · [少し]{すこし} a little · [少年]{しょうねん} a boy\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "長",
+      "back": "long · head of",
+      "reading": "チョウ / なが-い",
+      "extra": "[長い]{ながい} long · [社長]{しゃちょう} company president · [長所]{ちょうしょ} a strength\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "短",
+      "back": "short",
+      "reading": "タン / みじか-い",
+      "extra": "[短い]{みじかい} short · [短期]{たんき} short term · [短所]{たんしょ} a weakness\n\n12 strokes."
+    }
+  ],
+  "Kanji 12 · 東 西 南 北 山 川 田 町": [
+    {
+      "kind": "kanji",
+      "front": "東",
+      "back": "east",
+      "reading": "トウ / ひがし",
+      "extra": "[東]{ひがし} east · [東京]{とうきょう} Tokyo · [東口]{ひがしぐち} east exit\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "西",
+      "back": "west",
+      "reading": "セイ・サイ / にし",
+      "extra": "[西]{にし} west · [西口]{にしぐち} west exit · [関西]{かんさい} Kansai\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "南",
+      "back": "south",
+      "reading": "ナン / みなみ",
+      "extra": "[南]{みなみ} south · [南口]{みなみぐち} south exit\n\n9 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "北",
+      "back": "north",
+      "reading": "ホク / きた",
+      "extra": "[北]{きた} north · [北口]{きたぐち} north exit · [東北]{とうほく} Tohoku\n\n5 strokes. The compass order is 東西南北."
+    },
+    {
+      "kind": "kanji",
+      "front": "山",
+      "back": "mountain",
+      "reading": "サン / やま",
+      "extra": "[山]{やま} mountain · [富士山]{ふじさん} Mt Fuji · [火山]{かざん} volcano\n\n3 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "川",
+      "back": "river",
+      "reading": "セン / かわ",
+      "extra": "[川]{かわ} river · [河川]{かせん} rivers\n\n3 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "田",
+      "back": "rice field",
+      "reading": "デン / た",
+      "extra": "[田んぼ]{たんぼ} paddy · [田中]{たなか} Tanaka · [水田]{すいでん} paddy field\n\n5 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "町",
+      "back": "town",
+      "reading": "チョウ / まち",
+      "extra": "[町]{まち} town · [下町]{したまち} the old quarter\n\n7 strokes."
+    }
+  ],
+  "Kanji 13 · 天 気 雨 風 空 海 花 色": [
+    {
+      "kind": "kanji",
+      "front": "天",
+      "back": "heaven · sky",
+      "reading": "テン",
+      "extra": "[天気]{てんき} weather · [天国]{てんごく} heaven\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "気",
+      "back": "spirit · air · mood",
+      "reading": "キ・ケ",
+      "extra": "[天気]{てんき} · [元気]{げんき} well · [気持ち]{きもち} feeling · [病気]{びょうき} illness · [人気]{にんき} popularity\n\n6 strokes. One of the most productive characters there is."
+    },
+    {
+      "kind": "kanji",
+      "front": "雨",
+      "back": "rain",
+      "reading": "ウ / あめ",
+      "extra": "[雨]{あめ} rain · [大雨]{おおあめ} heavy rain · [梅雨]{つゆ} rainy season\n\n8 strokes. [梅雨]{つゆ} is wholly irregular."
+    },
+    {
+      "kind": "kanji",
+      "front": "風",
+      "back": "wind",
+      "reading": "フウ / かぜ",
+      "extra": "[風]{かぜ} wind · [台風]{たいふう} typhoon · [風邪]{かぜ} a cold\n\n9 strokes. Wind and a cold are the same sound, different characters."
+    },
+    {
+      "kind": "kanji",
+      "front": "空",
+      "back": "sky · empty",
+      "reading": "クウ / そら・あ-く",
+      "extra": "[空]{そら} sky · [空気]{くうき} air · [空港]{くうこう} airport · [空いている]{あいている} free, vacant\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "海",
+      "back": "sea",
+      "reading": "カイ / うみ",
+      "extra": "[海]{うみ} sea · [海外]{かいがい} overseas\n\n9 strokes. The 氵 radical is water."
+    },
+    {
+      "kind": "kanji",
+      "front": "花",
+      "back": "flower",
+      "reading": "カ / はな",
+      "extra": "[花]{はな} flower · [花見]{はなみ} blossom viewing · [花火]{はなび} fireworks\n\n7 strokes. The 艹 radical is grass."
+    },
+    {
+      "kind": "kanji",
+      "front": "色",
+      "back": "colour",
+      "reading": "ショク / いろ",
+      "extra": "[色]{いろ} colour · [茶色]{ちゃいろ} brown · [顔色]{かおいろ} complexion\n\n6 strokes."
+    }
+  ],
+  "Kanji 14 · 立 休 待 持 作 使 住 知": [
+    {
+      "kind": "kanji",
+      "front": "立",
+      "back": "to stand",
+      "reading": "リツ / た-つ",
+      "extra": "[立つ]{たつ} to stand · [立派]{りっぱ} splendid · [国立]{こくりつ} national\n\n5 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "休",
+      "back": "to rest",
+      "reading": "キュウ / やす-む",
+      "extra": "[休む]{やすむ} to rest · [休み]{やすみ} a holiday · [休日]{きゅうじつ} a day off\n\n6 strokes. A person 亻 beside a tree 木."
+    },
+    {
+      "kind": "kanji",
+      "front": "待",
+      "back": "to wait",
+      "reading": "タイ / ま-つ",
+      "extra": "[待つ]{まつ} to wait · [期待]{きたい} expectation · [待合室]{まちあいしつ} waiting room\n\n9 strokes. 彳 is the going radical — not the hand of 持."
+    },
+    {
+      "kind": "kanji",
+      "front": "持",
+      "back": "to hold",
+      "reading": "ジ / も-つ",
+      "extra": "[持つ]{もつ} to hold · [気持ち]{きもち} feeling · [持参]{じさん} bringing along\n\n9 strokes. 扌 is the hand radical."
+    },
+    {
+      "kind": "kanji",
+      "front": "作",
+      "back": "to make",
+      "reading": "サク・サ / つく-る",
+      "extra": "[作る]{つくる} to make · [作品]{さくひん} a work · [作家]{さっか} an author\n\n7 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "使",
+      "back": "to use",
+      "reading": "シ / つか-う",
+      "extra": "[使う]{つかう} to use · [使用]{しよう} use · [大使館]{たいしかん} embassy\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "住",
+      "back": "to live",
+      "reading": "ジュウ / す-む",
+      "extra": "[住む]{すむ} to live · [住所]{じゅうしょ} address · [住民]{じゅうみん} resident\n\n7 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "知",
+      "back": "to know",
+      "reading": "チ / し-る",
+      "extra": "[知る]{しる} to know · [知識]{ちしき} knowledge · [知人]{ちじん} acquaintance\n\n8 strokes. 知っています but 知りません — irregular."
+    }
+  ],
+  "Kanji 15 · 店 駅 道 車 電 社 事 方": [
+    {
+      "kind": "kanji",
+      "front": "店",
+      "back": "shop",
+      "reading": "テン / みせ",
+      "extra": "[店]{みせ} shop · [書店]{しょてん} bookshop · [喫茶店]{きっさてん} coffee house · [開店]{かいてん} opening\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "駅",
+      "back": "station",
+      "reading": "エキ",
+      "extra": "[駅]{えき} station · [駅前]{えきまえ} in front of the station\n\n14 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "道",
+      "back": "road · the way",
+      "reading": "ドウ / みち",
+      "extra": "[道]{みち} road · [道路]{どうろ} roadway · [北海道]{ほっかいどう} Hokkaido · [柔道]{じゅうどう} judo\n\n12 strokes. Also 'the way' of a discipline."
+    },
+    {
+      "kind": "kanji",
+      "front": "車",
+      "back": "vehicle",
+      "reading": "シャ / くるま",
+      "extra": "[車]{くるま} car · [電車]{でんしゃ} train · [自転車]{じてんしゃ} bicycle\n\n7 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "電",
+      "back": "electricity",
+      "reading": "デン",
+      "extra": "[電気]{でんき} electricity · [電車]{でんしゃ} train · [電話]{でんわ} telephone\n\n13 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "社",
+      "back": "company · shrine",
+      "reading": "シャ / やしろ",
+      "extra": "[会社]{かいしゃ} company · [社会]{しゃかい} society · [神社]{じんじゃ} shrine · [社長]{しゃちょう} president\n\n7 strokes. 会社 and 社会 reverse to mean different things."
+    },
+    {
+      "kind": "kanji",
+      "front": "事",
+      "back": "thing · matter",
+      "reading": "ジ / こと",
+      "extra": "[事]{こと} thing · [仕事]{しごと} work · [事故]{じこ} accident · [大事]{だいじ} important\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "方",
+      "back": "direction · side · person",
+      "reading": "ホウ / かた",
+      "extra": "[方]{ほう} side · [方法]{ほうほう} method · [夕方]{ゆうがた} evening · [あの方]{あのかた} that person (polite) · [読み方]{よみかた} how to read\n\n4 strokes."
+    }
   ]
 }
