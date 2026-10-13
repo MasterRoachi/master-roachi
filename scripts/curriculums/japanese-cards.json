@@ -1632,5 +1632,513 @@
       "reading": "もらう",
       "extra": "The giver takes **に** or から.\n\n田中さん**に**本をもらいました。"
     }
+  ],
+  "Kanji 6 · 今 先 来 毎 週 午 間 何": [
+    {
+      "kind": "kanji",
+      "front": "今",
+      "back": "now",
+      "reading": "コン / いま",
+      "extra": "[今]{いま} now · [今日]{きょう} today · [今週]{こんしゅう} this week · [今年]{ことし} this year\n\n4 strokes. Three of those four readings are irregular."
+    },
+    {
+      "kind": "kanji",
+      "front": "先",
+      "back": "ahead · previous",
+      "reading": "セン / さき",
+      "extra": "[先生]{せんせい} teacher · [先週]{せんしゅう} last week · [先に]{さきに} ahead\n\n6 strokes. 先 is the past, 来 is the future."
+    },
+    {
+      "kind": "kanji",
+      "front": "来",
+      "back": "to come · next",
+      "reading": "ライ / く-る",
+      "extra": "[来る]{くる} to come · [来週]{らいしゅう} next week · [来年]{らいねん} next year\n\n7 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "毎",
+      "back": "every",
+      "reading": "マイ",
+      "extra": "[毎日]{まいにち} every day · [毎週]{まいしゅう} every week · [毎朝]{まいあさ} every morning\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "週",
+      "back": "week",
+      "reading": "シュウ",
+      "extra": "[今週]{こんしゅう} · [週末]{しゅうまつ} weekend · [一週間]{いっしゅうかん} one week\n\n11 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "午",
+      "back": "noon",
+      "reading": "ゴ",
+      "extra": "[午前]{ごぜん} morning · [午後]{ごご} afternoon · [正午]{しょうご} midday\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "間",
+      "back": "interval · between",
+      "reading": "カン / あいだ",
+      "extra": "[時間]{じかん} time · [間]{あいだ} between · [人間]{にんげん} human\n\n12 strokes. かん for a span, あいだ for a gap."
+    },
+    {
+      "kind": "kanji",
+      "front": "何",
+      "back": "what",
+      "reading": "カ / なに・なん",
+      "extra": "[何]{なに} · [何時]{なんじ} what time · [何人]{なんにん} how many people\n\n7 strokes. なん before です and counters."
+    }
+  ],
+  "Kanji 7 · 口 目 耳 手 足 力 心 体": [
+    {
+      "kind": "kanji",
+      "front": "口",
+      "back": "mouth · opening",
+      "reading": "コウ / くち",
+      "extra": "[口]{くち} mouth · [入口]{いりぐち} entrance · [出口]{でぐち} exit · [人口]{じんこう} population\n\n3 strokes. Wider than the katakana ロ."
+    },
+    {
+      "kind": "kanji",
+      "front": "目",
+      "back": "eye",
+      "reading": "モク / め",
+      "extra": "[目]{め} eye · [一つ目]{ひとつめ} the first one · [目的]{もくてき} purpose\n\n5 strokes. Makes ordinals."
+    },
+    {
+      "kind": "kanji",
+      "front": "耳",
+      "back": "ear",
+      "reading": "ジ / みみ",
+      "extra": "[耳]{みみ} ear\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "手",
+      "back": "hand",
+      "reading": "シュ / て",
+      "extra": "[手]{て} hand · [上手]{じょうず} good at · [手紙]{てがみ} letter · [切手]{きって} stamp\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "足",
+      "back": "foot · leg · to suffice",
+      "reading": "ソク / あし・た-りる",
+      "extra": "[足]{あし} leg · [足りる]{たりる} to be enough · [一足]{いっそく} one pair\n\n7 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "力",
+      "back": "power",
+      "reading": "リョク / ちから",
+      "extra": "[力]{ちから} strength · [体力]{たいりょく} stamina · [努力]{どりょく} effort\n\n2 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "心",
+      "back": "heart · mind",
+      "reading": "シン / こころ",
+      "extra": "[心]{こころ} heart · [安心]{あんしん} relief · [心配]{しんぱい} worry\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "体",
+      "back": "body",
+      "reading": "タイ / からだ",
+      "extra": "[体]{からだ} body · [体力]{たいりょく} stamina · [体育]{たいいく} PE\n\n7 strokes."
+    }
+  ],
+  "Kanji 8 · 子 女 男 父 母 友 名 私": [
+    {
+      "kind": "kanji",
+      "front": "子",
+      "back": "child",
+      "reading": "シ / こ",
+      "extra": "[子供]{こども} child · [女の子]{おんなのこ} girl · [椅子]{いす} chair\n\n3 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "女",
+      "back": "woman",
+      "reading": "ジョ / おんな",
+      "extra": "[女]{おんな} woman · [女性]{じょせい} female · [彼女]{かのじょ} she\n\n3 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "男",
+      "back": "man",
+      "reading": "ダン / おとこ",
+      "extra": "[男]{おとこ} man · [男性]{だんせい} male\n\n7 strokes. 田 over 力 — field and strength."
+    },
+    {
+      "kind": "kanji",
+      "front": "父",
+      "back": "father",
+      "reading": "フ / ちち",
+      "extra": "[父]{ちち} my father · [お父さん]{おとうさん} your father\n\n4 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "母",
+      "back": "mother",
+      "reading": "ボ / はは",
+      "extra": "[母]{はは} my mother · [お母さん]{おかあさん} your mother\n\n5 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "友",
+      "back": "friend",
+      "reading": "ユウ / とも",
+      "extra": "[友達]{ともだち} friend · [友人]{ゆうじん} friend (formal)\n\n4 strokes. [友達]{ともだち} is irregular — だち, not たち."
+    },
+    {
+      "kind": "kanji",
+      "front": "名",
+      "back": "name",
+      "reading": "メイ / な",
+      "extra": "[名前]{なまえ} name · [有名]{ゆうめい} famous · [何名]{なんめい} how many people\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "私",
+      "back": "I · private",
+      "reading": "シ / わたし",
+      "extra": "[私]{わたし} I · [私立]{しりつ} private (institution)\n\n7 strokes."
+    }
+  ],
+  "Kanji 9 · 学 校 生 字 読 書 聞 語": [
+    {
+      "kind": "kanji",
+      "front": "学",
+      "back": "learning",
+      "reading": "ガク / まな-ぶ",
+      "extra": "[学校]{がっこう} school · [大学]{だいがく} university · [学生]{がくせい} student\n\n8 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "校",
+      "back": "school",
+      "reading": "コウ",
+      "extra": "[学校]{がっこう} · [高校]{こうこう} high school\n\n10 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "生",
+      "back": "life · raw · student",
+      "reading": "セイ・ショウ / い-きる・う-まれる・なま",
+      "extra": "[学生]{がくせい} · [先生]{せんせい} · [生まれる]{うまれる} to be born · [生ビール]{なまビール} draught beer\n\n5 strokes. A dozen readings; learn it through its words."
+    },
+    {
+      "kind": "kanji",
+      "front": "字",
+      "back": "character",
+      "reading": "ジ",
+      "extra": "[漢字]{かんじ} kanji · [文字]{もじ} character · [ローマ字]{ローマじ} romaji\n\n6 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "読",
+      "back": "to read",
+      "reading": "ドク / よ-む",
+      "extra": "[読む]{よむ} to read · [読書]{どくしょ} reading\n\n14 strokes. Contains 言, the speech radical."
+    },
+    {
+      "kind": "kanji",
+      "front": "書",
+      "back": "to write",
+      "reading": "ショ / か-く",
+      "extra": "[書く]{かく} to write · [辞書]{じしょ} dictionary · [図書館]{としょかん} library\n\n10 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "聞",
+      "back": "to hear · to ask",
+      "reading": "ブン / き-く",
+      "extra": "[聞く]{きく} to listen, to ask · [新聞]{しんぶん} newspaper\n\n14 strokes. An ear 耳 inside a gate 門."
+    },
+    {
+      "kind": "kanji",
+      "front": "語",
+      "back": "language · to tell",
+      "reading": "ゴ / かた-る",
+      "extra": "[日本語]{にほんご} · [英語]{えいご} English · [単語]{たんご} vocabulary\n\n14 strokes. Attach to a country for its language."
+    }
+  ],
+  "Kanji 10 · 見 言 話 食 飲 買 出 入": [
+    {
+      "kind": "kanji",
+      "front": "見",
+      "back": "to see",
+      "reading": "ケン / み-る",
+      "extra": "[見る]{みる} to see · [意見]{いけん} opinion · [見せる]{みせる} to show\n\n7 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "言",
+      "back": "to say · word",
+      "reading": "ゲン / い-う・こと",
+      "extra": "[言う]{いう} to say · [言葉]{ことば} word, language\n\n7 strokes. The speech radical."
+    },
+    {
+      "kind": "kanji",
+      "front": "話",
+      "back": "to speak · a talk",
+      "reading": "ワ / はな-す・はなし",
+      "extra": "[話す]{はなす} to speak · [話]{はなし} a story · [電話]{でんわ} telephone · [会話]{かいわ} conversation\n\n13 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "食",
+      "back": "to eat · food",
+      "reading": "ショク / た-べる",
+      "extra": "[食べる]{たべる} to eat · [食事]{しょくじ} a meal · [和食]{わしょく} Japanese food\n\n9 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "飲",
+      "back": "to drink",
+      "reading": "イン / の-む",
+      "extra": "[飲む]{のむ} to drink · [飲み物]{のみもの} a drink\n\n12 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "買",
+      "back": "to buy",
+      "reading": "バイ / か-う",
+      "extra": "[買う]{かう} to buy · [買い物]{かいもの} shopping\n\n12 strokes."
+    },
+    {
+      "kind": "kanji",
+      "front": "出",
+      "back": "to exit · to put out",
+      "reading": "シュツ / で-る・だ-す",
+      "extra": "[出る]{でる} to come out · [出す]{だす} to take out · [出口]{でぐち} exit · [出発]{しゅっぱつ} departure\n\n5 strokes. Both halves of a transitive pair in one character."
+    },
+    {
+      "kind": "kanji",
+      "front": "入",
+      "back": "to enter · to put in",
+      "reading": "ニュウ / はい-る・い-れる",
+      "extra": "[入る]{はいる} to enter · [入れる]{いれる} to put in · [入口]{いりぐち} entrance\n\n2 strokes. Not 人 — the right stroke crosses over."
+    }
+  ],
+  "Set phrases you will hear constantly": [
+    {
+      "kind": "word",
+      "front": "お疲れさまです",
+      "back": "Hello · goodbye · well done",
+      "reading": "おつかれさまです",
+      "extra": "The all-purpose workplace phrase. ご苦労さまです is the same thing downward — never to a superior."
+    },
+    {
+      "kind": "word",
+      "front": "お世話になっております",
+      "back": "Thank you for your continued support",
+      "reading": "おせわになっております",
+      "extra": "Opens essentially every business email and phone call."
+    },
+    {
+      "kind": "word",
+      "front": "失礼します",
+      "back": "Excuse me — entering, leaving, interrupting",
+      "reading": "しつれいします",
+      "extra": "失礼しました on the way out."
+    },
+    {
+      "kind": "word",
+      "front": "恐れ入ります",
+      "back": "Sorry to trouble you · thank you",
+      "reading": "おそれいります",
+      "extra": "Formal."
+    },
+    {
+      "kind": "word",
+      "front": "大丈夫です",
+      "back": "I'm fine · no thanks · that's OK",
+      "reading": "だいじょうぶです",
+      "extra": "The universal polite no."
+    },
+    {
+      "kind": "word",
+      "front": "とりあえず",
+      "back": "For now, to start with",
+      "extra": "とりあえずビールで — the first order at every izakaya."
+    },
+    {
+      "kind": "word",
+      "front": "やっぱり",
+      "back": "As I thought · actually, on reflection",
+      "extra": "やっぱりやめます — I'll pass after all."
+    },
+    {
+      "kind": "word",
+      "front": "なるほど",
+      "back": "I see · that makes sense",
+      "extra": "For peers and downward. そうなんですね is safer upward."
+    },
+    {
+      "kind": "word",
+      "front": "お待たせしました",
+      "back": "Sorry to have kept you waiting",
+      "reading": "おまたせしました"
+    },
+    {
+      "kind": "word",
+      "front": "そろそろ",
+      "back": "It's about that time",
+      "extra": "そろそろ失礼します — how you begin to leave."
+    }
+  ],
+  "Reading signs: the kanji you must know": [
+    {
+      "kind": "word",
+      "front": "入口",
+      "back": "entrance",
+      "reading": "いりぐち"
+    },
+    {
+      "kind": "word",
+      "front": "出口",
+      "back": "exit",
+      "reading": "でぐち"
+    },
+    {
+      "kind": "word",
+      "front": "非常口",
+      "back": "emergency exit",
+      "reading": "ひじょうぐち"
+    },
+    {
+      "kind": "word",
+      "front": "改札",
+      "back": "ticket gate",
+      "reading": "かいさつ"
+    },
+    {
+      "kind": "word",
+      "front": "立入禁止",
+      "back": "no entry",
+      "reading": "たちいりきんし"
+    },
+    {
+      "kind": "word",
+      "front": "禁煙",
+      "back": "no smoking",
+      "reading": "きんえん"
+    },
+    {
+      "kind": "word",
+      "front": "注意",
+      "back": "caution",
+      "reading": "ちゅうい"
+    },
+    {
+      "kind": "word",
+      "front": "危険",
+      "back": "danger",
+      "reading": "きけん"
+    },
+    {
+      "kind": "word",
+      "front": "営業中",
+      "back": "open for business",
+      "reading": "えいぎょうちゅう"
+    },
+    {
+      "kind": "word",
+      "front": "準備中",
+      "back": "not yet open",
+      "reading": "じゅんびちゅう"
+    },
+    {
+      "kind": "word",
+      "front": "故障中",
+      "back": "out of order",
+      "reading": "こしょうちゅう"
+    },
+    {
+      "kind": "word",
+      "front": "使用中",
+      "back": "in use · occupied",
+      "reading": "しようちゅう"
+    },
+    {
+      "kind": "word",
+      "front": "押す",
+      "back": "push",
+      "reading": "おす"
+    },
+    {
+      "kind": "word",
+      "front": "引く",
+      "back": "pull",
+      "reading": "ひく"
+    },
+    {
+      "kind": "word",
+      "front": "お手洗い",
+      "back": "toilet",
+      "reading": "おてあらい"
+    }
+  ],
+  "Trains: reading the signs": [
+    {
+      "kind": "word",
+      "front": "各駅停車",
+      "back": "stops at every station",
+      "reading": "かくえきていしゃ",
+      "extra": "Also [普通]{ふつう}."
+    },
+    {
+      "kind": "word",
+      "front": "急行",
+      "back": "express — skips stations",
+      "reading": "きゅうこう"
+    },
+    {
+      "kind": "word",
+      "front": "快速",
+      "back": "rapid",
+      "reading": "かいそく"
+    },
+    {
+      "kind": "word",
+      "front": "特急",
+      "back": "limited express — often an extra charge",
+      "reading": "とっきゅう"
+    },
+    {
+      "kind": "word",
+      "front": "〜方面",
+      "back": "bound for ~",
+      "reading": "〜ほうめん",
+      "extra": "新宿方面 — towards Shinjuku."
+    },
+    {
+      "kind": "word",
+      "front": "〜行き",
+      "back": "bound for ~",
+      "reading": "〜ゆき",
+      "extra": "On the front of the train."
+    },
+    {
+      "kind": "word",
+      "front": "番線",
+      "back": "platform number",
+      "reading": "ばんせん"
+    },
+    {
+      "kind": "word",
+      "front": "乗り換え",
+      "back": "transfer",
+      "reading": "のりかえ"
+    },
+    {
+      "kind": "word",
+      "front": "優先席",
+      "back": "priority seat",
+      "reading": "ゆうせんせき"
+    }
   ]
 }

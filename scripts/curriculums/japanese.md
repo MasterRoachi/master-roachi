@@ -165,7 +165,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | 1 | The script and the sounds | **35 — written** |
 | 2 | First grammar, first words | **55 — written** |
 | 3 | The core sentence | **57 — written** |
-| 4 | Everyday Japanese | 70 |
+| 4 | Everyday Japanese | **58 — written** |
 | 5 | Intermediate grammar | 90 |
 | 6 | Reading real Japanese | 55 |
 | 7 | Advanced grammar | 95 |
@@ -173,7 +173,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | 9 | Native material | 50 |
 | 10 | Classical Japanese | 40 |
 | 11 | Ad astra | open |
-| — | Kanji track, its own modules | ~250 (**40 written**) |
+| — | Kanji track, its own modules | ~250 (**79 written**) |
 
 **Roughly 850–900 lessons.** That is the honest size of zero to mastery when
 every lesson teaches its point.
