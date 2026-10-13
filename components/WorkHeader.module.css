@@ -3,9 +3,13 @@
 .header {
   margin-bottom: 1.5rem;
   padding: 0.9rem 1rem;
+  /* The menus hang out of the header and must not be clipped by the shell's
+     own overflow rules, so the header is the stacking context they sit in. */
+  position: relative;
+  z-index: 2;
 }
 
-.header ul {
+.bar {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -15,18 +19,71 @@
   gap: 0.25rem 1.1rem;
 }
 
-.header a {
+.header a,
+.header button {
   color: var(--muted);
   font-size: 0.875rem;
   text-decoration: none;
 }
 
-.header a:hover {
+/* A category is a button rather than a link — it goes nowhere on its own — and
+   is dressed to match the links beside it. */
+.header button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.header a:hover,
+.header button:hover,
+.header button[aria-expanded='true'] {
   color: var(--ink);
 }
 
-/* Which page you are on, which is the only thing the header has to say
-   beyond where you can go. */
+/* Which page you are on — or, on a category, which category it is in. The
+   only thing the header has to say beyond where you can go. */
 .here {
   color: var(--ink) !important;
+}
+
+/* --- a category's three ------------------------------------------------- */
+
+.section {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  /* Hung from the category's centre, so a menu under the middle category does
+     not run off either edge. */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  min-width: 9rem;
+  display: grid;
+  gap: 0.1rem;
+
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 14px 34px oklch(0% 0 0 / 0.5);
+}
+
+.menu a {
+  display: block;
+  padding: 0.3rem 0.55rem;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.menu a:hover {
+  background: var(--accent-dim);
+  color: var(--accent);
 }

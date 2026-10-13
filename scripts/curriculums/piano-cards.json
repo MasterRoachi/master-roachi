@@ -1,0 +1,535 @@
+{
+  "Loud and soft, from the arm": [
+    {
+      "kind": "word",
+      "front": "pp",
+      "back": "pianissimo — very quiet"
+    },
+    {
+      "kind": "word",
+      "front": "p",
+      "back": "piano — quiet"
+    },
+    {
+      "kind": "word",
+      "front": "mp",
+      "back": "mezzo-piano — moderately quiet"
+    },
+    {
+      "kind": "word",
+      "front": "mf",
+      "back": "mezzo-forte — moderately loud"
+    },
+    {
+      "kind": "word",
+      "front": "f",
+      "back": "forte — loud"
+    },
+    {
+      "kind": "word",
+      "front": "ff",
+      "back": "fortissimo — very loud"
+    },
+    {
+      "kind": "word",
+      "front": "cresc.",
+      "back": "crescendo — gradually louder",
+      "extra": "Also written as a widening hairpin."
+    },
+    {
+      "kind": "word",
+      "front": "dim.",
+      "back": "diminuendo — gradually quieter",
+      "extra": "Also *decresc.* Narrowing hairpin."
+    }
+  ],
+  "Note values, rests, and the beat": [
+    {
+      "kind": "grammar",
+      "front": "Semibreve / whole note",
+      "back": "4 beats in 4/4"
+    },
+    {
+      "kind": "grammar",
+      "front": "Minim / half note",
+      "back": "2 beats in 4/4"
+    },
+    {
+      "kind": "grammar",
+      "front": "Crotchet / quarter note",
+      "back": "1 beat in 4/4"
+    },
+    {
+      "kind": "grammar",
+      "front": "Quaver / eighth note",
+      "back": "½ a beat in 4/4"
+    },
+    {
+      "kind": "grammar",
+      "front": "Semiquaver / sixteenth note",
+      "back": "¼ of a beat in 4/4"
+    },
+    {
+      "kind": "grammar",
+      "front": "Dotted minim",
+      "back": "3 beats — the note plus half again"
+    },
+    {
+      "kind": "grammar",
+      "front": "Dotted crotchet",
+      "back": "1½ beats"
+    }
+  ],
+  "Tempo marks and the Italian": [
+    {
+      "kind": "word",
+      "front": "Largo",
+      "back": "broad, very slow — around 40–60"
+    },
+    {
+      "kind": "word",
+      "front": "Adagio",
+      "back": "slow, at ease — around 66–76"
+    },
+    {
+      "kind": "word",
+      "front": "Andante",
+      "back": "walking pace — around 76–108"
+    },
+    {
+      "kind": "word",
+      "front": "Moderato",
+      "back": "moderate — around 108–120"
+    },
+    {
+      "kind": "word",
+      "front": "Allegro",
+      "back": "fast and cheerful — around 120–156"
+    },
+    {
+      "kind": "word",
+      "front": "Vivace",
+      "back": "lively — around 156–176"
+    },
+    {
+      "kind": "word",
+      "front": "Presto",
+      "back": "very fast — around 168–200"
+    },
+    {
+      "kind": "word",
+      "front": "ritardando (rit.)",
+      "back": "gradually slower"
+    },
+    {
+      "kind": "word",
+      "front": "accelerando (accel.)",
+      "back": "gradually faster"
+    },
+    {
+      "kind": "word",
+      "front": "a tempo",
+      "back": "back to the original speed"
+    },
+    {
+      "kind": "word",
+      "front": "rubato",
+      "back": "flexible time — stolen, and given back"
+    },
+    {
+      "kind": "word",
+      "front": "dolce",
+      "back": "sweetly"
+    },
+    {
+      "kind": "word",
+      "front": "cantabile",
+      "back": "singing"
+    },
+    {
+      "kind": "word",
+      "front": "espressivo",
+      "back": "expressively"
+    },
+    {
+      "kind": "word",
+      "front": "leggiero",
+      "back": "lightly"
+    },
+    {
+      "kind": "word",
+      "front": "maestoso",
+      "back": "majestically"
+    },
+    {
+      "kind": "word",
+      "front": "grazioso",
+      "back": "gracefully"
+    },
+    {
+      "kind": "word",
+      "front": "sempre",
+      "back": "always"
+    },
+    {
+      "kind": "word",
+      "front": "più",
+      "back": "more"
+    },
+    {
+      "kind": "word",
+      "front": "meno",
+      "back": "less"
+    },
+    {
+      "kind": "word",
+      "front": "molto",
+      "back": "very"
+    },
+    {
+      "kind": "word",
+      "front": "poco a poco",
+      "back": "little by little"
+    },
+    {
+      "kind": "word",
+      "front": "subito",
+      "back": "suddenly"
+    }
+  ],
+  "Articulation: legato, staccato, slurs": [
+    {
+      "kind": "grammar",
+      "front": "Legato",
+      "back": "smooth and connected — hold each note until the next sounds",
+      "extra": "Marked with a slur over notes of different pitches."
+    },
+    {
+      "kind": "grammar",
+      "front": "Staccato",
+      "back": "short and detached — about half the written length",
+      "extra": "A dot above or below the note. Short, not loud."
+    },
+    {
+      "kind": "grammar",
+      "front": "Tenuto",
+      "back": "hold the full length, slightly weighted",
+      "extra": "A short line above or below."
+    },
+    {
+      "kind": "grammar",
+      "front": "Accent (>)",
+      "back": "louder at the start of the note"
+    },
+    {
+      "kind": "grammar",
+      "front": "Marcato (^)",
+      "back": "accented and short"
+    },
+    {
+      "kind": "grammar",
+      "front": "Slur",
+      "back": "play smoothly — a phrase",
+      "extra": "Over notes of DIFFERENT pitches. A tie joins the SAME pitch."
+    },
+    {
+      "kind": "grammar",
+      "front": "Tie",
+      "back": "hold the two notes as one",
+      "extra": "Between two notes of the same pitch."
+    },
+    {
+      "kind": "grammar",
+      "front": "Fermata",
+      "back": "hold longer than written — roughly half as long again"
+    }
+  ],
+  "The road map of a score": [
+    {
+      "kind": "word",
+      "front": "D.C.",
+      "back": "da capo — go back to the beginning"
+    },
+    {
+      "kind": "word",
+      "front": "D.S.",
+      "back": "dal segno — go back to the sign 𝄋"
+    },
+    {
+      "kind": "word",
+      "front": "Fine",
+      "back": "the end — where the piece stops after a D.C."
+    },
+    {
+      "kind": "word",
+      "front": "D.C. al Fine",
+      "back": "back to the start, play until *Fine*"
+    },
+    {
+      "kind": "word",
+      "front": "Coda",
+      "back": "the ending section — jump to it at *To Coda*"
+    },
+    {
+      "kind": "word",
+      "front": "8va",
+      "back": "play an octave higher than written"
+    },
+    {
+      "kind": "word",
+      "front": "8vb",
+      "back": "play an octave lower than written"
+    },
+    {
+      "kind": "word",
+      "front": "simile",
+      "back": "carry on in the same manner"
+    }
+  ],
+  "Intervals under the hand": [
+    {
+      "kind": "grammar",
+      "front": "Minor 2nd",
+      "back": "1 semitone",
+      "extra": "*Jaws*"
+    },
+    {
+      "kind": "grammar",
+      "front": "Major 2nd",
+      "back": "2 semitones",
+      "extra": "Happy Birthday"
+    },
+    {
+      "kind": "grammar",
+      "front": "Minor 3rd",
+      "back": "3 semitones",
+      "extra": "Smoke on the Water"
+    },
+    {
+      "kind": "grammar",
+      "front": "Major 3rd",
+      "back": "4 semitones",
+      "extra": "When the Saints"
+    },
+    {
+      "kind": "grammar",
+      "front": "Perfect 4th",
+      "back": "5 semitones",
+      "extra": "Here Comes the Bride"
+    },
+    {
+      "kind": "grammar",
+      "front": "Tritone",
+      "back": "6 semitones",
+      "extra": "*The Simpsons*. Neither major nor perfect."
+    },
+    {
+      "kind": "grammar",
+      "front": "Perfect 5th",
+      "back": "7 semitones",
+      "extra": "Twinkle Twinkle"
+    },
+    {
+      "kind": "grammar",
+      "front": "Minor 6th",
+      "back": "8 semitones"
+    },
+    {
+      "kind": "grammar",
+      "front": "Major 6th",
+      "back": "9 semitones",
+      "extra": "NBC chimes"
+    },
+    {
+      "kind": "grammar",
+      "front": "Minor 7th",
+      "back": "10 semitones",
+      "extra": "*Star Trek*"
+    },
+    {
+      "kind": "grammar",
+      "front": "Major 7th",
+      "back": "11 semitones"
+    },
+    {
+      "kind": "grammar",
+      "front": "Octave",
+      "back": "12 semitones",
+      "extra": "*Over the Rainbow*"
+    }
+  ],
+  "The major triad": [
+    {
+      "kind": "grammar",
+      "front": "C",
+      "back": "C E G",
+      "extra": "Major: 4 semitones then 3."
+    },
+    {
+      "kind": "grammar",
+      "front": "F",
+      "back": "F A C"
+    },
+    {
+      "kind": "grammar",
+      "front": "G",
+      "back": "G B D"
+    },
+    {
+      "kind": "grammar",
+      "front": "D",
+      "back": "D F♯ A"
+    },
+    {
+      "kind": "grammar",
+      "front": "A",
+      "back": "A C♯ E"
+    },
+    {
+      "kind": "grammar",
+      "front": "E",
+      "back": "E G♯ B"
+    },
+    {
+      "kind": "grammar",
+      "front": "B♭",
+      "back": "B♭ D F"
+    },
+    {
+      "kind": "grammar",
+      "front": "Major triad — the shape",
+      "back": "root, +4 semitones, +3 semitones",
+      "extra": "A snowman on the staff: three consecutive lines or three consecutive spaces."
+    }
+  ],
+  "The minor triad, and the difference": [
+    {
+      "kind": "grammar",
+      "front": "Cm",
+      "back": "C E♭ G",
+      "extra": "Minor: 3 semitones then 4."
+    },
+    {
+      "kind": "grammar",
+      "front": "Dm",
+      "back": "D F A",
+      "extra": "White keys only."
+    },
+    {
+      "kind": "grammar",
+      "front": "Em",
+      "back": "E G B",
+      "extra": "White keys only."
+    },
+    {
+      "kind": "grammar",
+      "front": "Am",
+      "back": "A C E",
+      "extra": "White keys only."
+    },
+    {
+      "kind": "grammar",
+      "front": "Fm",
+      "back": "F A♭ C"
+    },
+    {
+      "kind": "grammar",
+      "front": "Gm",
+      "back": "G B♭ D"
+    },
+    {
+      "kind": "grammar",
+      "front": "Minor triad — the shape",
+      "back": "root, +3 semitones, +4 semitones"
+    },
+    {
+      "kind": "grammar",
+      "front": "Diminished triad",
+      "back": "root, +3, +3 — e.g. C E♭ G♭",
+      "extra": "Tense, unstable."
+    },
+    {
+      "kind": "grammar",
+      "front": "Augmented triad",
+      "back": "root, +4, +4 — e.g. C E G♯",
+      "extra": "Strange, unsettled."
+    }
+  ],
+  "Chord symbols, and reading a lead sheet": [
+    {
+      "kind": "grammar",
+      "front": "C7",
+      "back": "C E G B♭",
+      "extra": "Major triad plus a MINOR seventh. Pulls to F."
+    },
+    {
+      "kind": "grammar",
+      "front": "Cmaj7",
+      "back": "C E G B",
+      "extra": "Major triad plus a MAJOR seventh."
+    },
+    {
+      "kind": "grammar",
+      "front": "Cm7",
+      "back": "C E♭ G B♭"
+    },
+    {
+      "kind": "grammar",
+      "front": "Csus4",
+      "back": "C F G",
+      "extra": "The third replaced by the fourth."
+    },
+    {
+      "kind": "grammar",
+      "front": "Csus2",
+      "back": "C D G"
+    },
+    {
+      "kind": "grammar",
+      "front": "C/E",
+      "back": "C major with E in the bass — E G C",
+      "extra": "A slash chord: first inversion."
+    },
+    {
+      "kind": "grammar",
+      "front": "C/G",
+      "back": "C major with G in the bass — G C E",
+      "extra": "Second inversion."
+    },
+    {
+      "kind": "grammar",
+      "front": "C°",
+      "back": "C E♭ G♭ — diminished"
+    }
+  ],
+  "I, IV and V — the three chords": [
+    {
+      "kind": "grammar",
+      "front": "I, IV, V in C",
+      "back": "C, F, G",
+      "extra": "V7 is G7 — G B D F — and pulls hard back to C."
+    },
+    {
+      "kind": "grammar",
+      "front": "I, IV, V in G",
+      "back": "G, C, D"
+    },
+    {
+      "kind": "grammar",
+      "front": "I, IV, V in F",
+      "back": "F, B♭, C"
+    },
+    {
+      "kind": "grammar",
+      "front": "The seven chords of C major",
+      "back": "C · Dm · Em · F · G · Am · Bdim",
+      "extra": "I ii iii IV V vi vii°. Lower case means minor."
+    },
+    {
+      "kind": "grammar",
+      "front": "I–V–vi–IV in C",
+      "back": "C – G – Am – F",
+      "extra": "The four-chord pop progression."
+    }
+  ]
+}

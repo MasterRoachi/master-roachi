@@ -4,8 +4,8 @@ import { site } from '@/lib/site';
 import { getStore, garmentLabel, priceSummary, productPath } from '@/lib/store';
 import StoreCopyEditor, { type EditorProduct } from './StoreCopyEditor';
 
-// Product copy — the one part of a product page that is not a number out of
-// Printful.
+// Products — the one part of a product page that is not a number out of
+// Printful, which is the copy.
 //
 // The product LIST is read at build time, because products come from Printful
 // and only change when the store is synced. That used to mean "a new product
@@ -19,7 +19,7 @@ import StoreCopyEditor, { type EditorProduct } from './StoreCopyEditor';
 
 export const metadata: Metadata = pageMeta({
   path: '/work/store/',
-  title: 'Product copy',
+  title: 'Products',
   description: 'What each design is, in your own words.',
   noIndex: true,
 });

@@ -1,252 +1,237 @@
-// Builds the Piano curriculum from scripts/curriculums/piano.md.
+// Builds the Piano curriculum.
 //
-// Unlike Japanese, this is a designed path rather than a transcription —
-// there was no piano material on the machine to transcribe. The prose
-// reasoning lives in piano.md beside this file; the milestones are here.
+// Source: scripts/curriculums/piano.md, which is the plan and the argument.
+// The material is in piano-detail.json and the cards are in piano-cards.json,
+// for the reasons japanese.mjs gives: prose full of tables does not belong
+// inside a JS template literal, and cards are data rather than prose.
 //
-// LESSONS ARE MILESTONES, NOT SESSIONS. That is the real difference from the
-// Japanese curriculum and it follows from the subject: a language resource is
-// consumed, so a session is "these pages", while a piano skill is acquired, so
-// a lesson is "can I do this yet". "C major, two octaves, hands together,
-// evenly at 60" is either true or it is not, and dating the day it became true
-// is worth more than dating the day a page was turned.
+// A DESIGNED PATH, NOT A TRANSCRIPTION. There is no piano material on the
+// machine — no books, nothing under Courses, ~/Media/Music empty — so every
+// stage is an argument rather than a page map. Argue with it; the reasoning is
+// in the .md.
 //
-// Sight-reading recurs from stage 2 onward rather than sitting in a stage of
-// its own. It decays faster than anything else without constant use, and the
-// route is walked in order — a sight-reading module at the end would never
-// come up as the next thing until everything else was finished, which is
-// exactly backwards for the skill that needs the most repetition.
+// LESSONS ARE MILESTONES, NOT SESSIONS, which is the real difference from the
+// Japanese curriculum and follows from the subject. A language resource is
+// consumed, so a session is "these pages"; a piano skill is acquired, so a
+// lesson is "can I do this yet". "C major, two octaves, hands together, evenly
+// at 60" is either true or it is not.
 //
-// The FUN entries are there for the same structural reason and a different
-// human one. Eight stages of Bach and Hanon with nothing anyone would choose
-// to play is how a classical path gets abandoned around stage 4, so each stage
-// from 2 onward carries something off the game and anime shelf that is
-// genuinely playable at that level. Folded in rather than kept in a module of
-// its own, so they are offered regularly and are never harder than the hands
-// currently are.
+// NOTHING HERE TELLS HIM TO RECORD HIMSELF. Asked directly, he said no, and
+// the first version of this curriculum leaned on it. With no recording and an
+// acoustic piano — so no MIDI, and none of the software that listens — the ear
+// and the metronome are the entire feedback loop. Lessons therefore name ONE
+// specific fault to listen for at a time, which is harder to write and is the
+// only honest substitute.
 //
-// Difficulty here is a claim about an ARRANGEMENT, not about a piece.
-// "Merry-Go-Round of Life" exists at grade 2 and at concert level; the stage
-// it sits in assumes the simpler one, and the harder one reappears at stage 7
-// on purpose.
-//
-// Prints SQL. Nothing is executed here.
+// Prints SQL. Nothing is executed here — `npm run curriculum piano`.
+
+import detail from './piano-detail.json' with { type: 'json' };
+import cards from './piano-cards.json' with { type: 'json' };
 
 const SOURCE = 'scripts/curriculums/piano.md';
+const NAME = 'Piano';
 
-// The substance of each milestone, keyed by its name.
-//
-// In JSON rather than inline because the prose is Markdown and holds
-// backticks, quotes and ${ — all of which need escaping inside a JS template
-// literal, and one missed escape turns the whole curriculum into a syntax
-// error. JSON needs none, and the prose stays editable on its own.
-import detail from './piano-detail.json' with { type: 'json' };
+/** SQL single-quoted string. An apostrophe in a title ends the literal early. */
+const q = (value) =>
+  value === null || value === undefined ? 'null' : `'${String(value).replace(/'/g, "''")}'`;
 
-/** Every key the lessons below actually asked for, so strays can be found. */
-const asked = new Set();
+const NOW = new Date().toISOString();
+const CURRICULUM = `(select id from curriculums where name = ${q(NAME)})`;
+/** The lesson just inserted. The other scripts use the same trick. */
+const LESSON = '(select max(id) from lessons)';
 
-/** The detail for a lesson, or null where none is written. */
+/** Every key asked for, so a stray one in a data file can be found. */
+const askedDetail = new Set();
+const askedCards = new Set();
+
 function detailFor(name) {
-  asked.add(name);
+  askedDetail.add(name);
   const text = detail[name];
   if (text === undefined) {
-    // Loud rather than silent: a lesson renamed here and not in
-    // the JSON would otherwise quietly lose its substance.
-    console.error(`  no detail for: ${name}`);
+    // Loud rather than silent: a lesson renamed here and not in the data file
+    // would otherwise quietly lose its material.
+    missing.push(name);
     return null;
   }
   return text;
 }
 
-/* And the other way round, which nothing used to check.
- *
- * A rename leaves the old key behind, and because the build only ever looks
- * keys UP, a stray sits there indefinitely saying nothing. Piano carried an
- * empty "— placeholder" entry from drafting for exactly this reason, found by
- * counting keys against lessons rather than by anything in the build. */
-function strays() {
-  return Object.keys(detail).filter((key) => !asked.has(key));
+/**
+ * A card's natural key, which is what the database matches on: curriculum,
+ * kind and front. Two lessons claiming the same one is a silent bug — the
+ * insert is `where not exists`, so the second claim does not fail, it just
+ * quietly re-points the card at the later lesson. Caught here instead.
+ */
+const claimed = new Map();
+const twiceClaimed = [];
+
+function cardsFor(name) {
+  askedCards.add(name);
+  const list = cards[name] ?? [];
+  for (const card of list) {
+    const key = `${card.kind}\u0000${card.front}`;
+    if (claimed.has(key)) twiceClaimed.push([card.front, claimed.get(key), name]);
+    else claimed.set(key, name);
+  }
+  return list;
 }
 
+const missing = [];
+
+/* The stages. A lesson is [name, sources?] — the material is looked up by
+ * name, and so are the cards. */
 const stages = [
   {
-    name: '1 · At the keyboard',
+    name: 'Stage 1 · The instrument and the hands',
     lessons: [
-      'Bench height and posture — wrists level, shoulders down, feet flat',
-      'Finger numbers 1-5, both hands, named without looking',
-      'Find any C on the keyboard; name every white key',
-      'The black-key pattern of 2 and 3; sharps and flats',
-      'Five-finger pattern C-G, right hand, evenly',
-      'Five-finger pattern C-G, left hand, evenly',
-      'Legato — two notes joined with no gap and no overlap',
-      'Staccato — short, from the wrist, not the arm',
+    ['Sitting at it', [{ title: 'Hoffman Academy', url: 'https://www.hoffmanacademy.com/', note: '400+ free video lessons.' }]],
+    ['How the arm makes the sound', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. The standard text on how to practise.' }]],
+    ['Finding your way around the keys', [{ title: 'Hoffman Academy', url: 'https://www.hoffmanacademy.com/', note: '400+ free video lessons.' }]],
+    ['The fingers have numbers'],
+    ['The five-finger position', [{ title: 'Hoffman Academy', url: 'https://www.hoffmanacademy.com/', note: '400+ free video lessons.' }, { title: 'Andrew Furmanczyk — free piano course', url: 'https://www.youtube.com/user/Lypur' }]],
+    ['Your piano: an old acoustic'],
+    ['Loud and soft, from the arm'],
+    ['A first tune, by hand position'],
+    ['Counting, and the metronome', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. The standard text on how to practise.' }]],
+    ['Rest, and when to stop', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. The standard text on how to practise.' }]],
+    ['The first bars of something you want to play', [{ title: 'MuseScore', url: 'https://musescore.com', note: 'Community arrangements at several difficulties each.' }]],
+    ['What stage 1 was for'],
     ],
   },
   {
-    name: '2 · Reading',
+    name: 'Stage 2 · Reading, and the first chords',
     lessons: [
-      'Treble staff: C-G on lines and spaces, named at sight',
-      'Bass staff: C-G below middle C, named at sight',
-      'The grand staff — middle C in both clefs, and why it appears twice',
-      'Note values: whole, half, quarter',
-      '4/4 and bar lines; counting aloud while playing',
-      '3/4 and the feel of three against four',
-      'Rests, counted as carefully as notes',
-      'Eighth notes and subdividing the beat',
-      'Play a written four-bar melody, right hand, counting aloud',
-      'Play a written four-bar melody, left hand, counting aloud',
-      'Sight-read: four new bars a day, one hand, no stopping',
-      'FUN · Minecraft — Wet Hands (C418), right-hand melody',
-      'FUN · Zelda — Zelda\u2019s Lullaby, melody only',
-    ],
-  },
-  {
-    name: '3 · Hands together',
-    lessons: [
-      'Both hands in parallel motion, five-finger pattern',
-      'Both hands in contrary motion',
-      'Left-hand single notes under a right-hand melody',
-      'A first piece, hands together, read from notation',
-      'Dynamics: p, mf, f — produced by touch, not by the pedal',
-      'Phrasing: shape a four-bar phrase rather than play eight equal notes',
-      'Play to a metronome at 60 without drifting',
-      'Sight-read: four new bars a day, hands together',
-      'FUN · Minecraft — Wet Hands, hands together',
-      'FUN · My Neighbour Totoro — Path of the Wind, easy arrangement',
-      'FUN · Zelda — Song of Storms, easy arrangement',
-    ],
-  },
-  {
-    name: '4 · Scales and keys',
-    lessons: [
-      'C major, one octave, right hand, thumb passing under cleanly',
-      'C major, one octave, left hand',
-      'C major, two octaves, hands together, evenly at 60',
-      'G major and F major, one octave each hand',
-      'The circle of fifths; key signatures to four sharps and four flats',
-      'A natural minor, then harmonic, then melodic — and the difference',
-      'Tonic triads and their inversions in C, G and F',
-      'Broken chords and arpeggios: C, G, F',
-      'All twelve major scales, two octaves, hands together',
-      'All twelve harmonic minor scales, two octaves, hands together',
-      'Sight-read: a piece in a key with three or more accidentals',
-      'FUN · Naruto — Sadness and Sorrow',
-      'FUN · Undertale — Home',
-    ],
-  },
-  {
-    name: '5 · Early repertoire',
-    lessons: [
-      'Bach — Minuet in G, BWV Anh. 114 (Anna Magdalena Notebook)',
-      'Bach — Minuet in G minor, BWV Anh. 115',
-      'Schumann — Melody, Op. 68 no. 1 (Album for the Young)',
-      'Schumann — Soldier’s March, Op. 68 no. 2',
-      'Burgmüller — Arabesque, Op. 100 no. 2',
-      'Clementi — Sonatina Op. 36 no. 1, first movement',
-      'Beethoven — Für Elise, main section',
-      'Satie — Gymnopédie no. 1',
-      'Sight-read: a complete short piece, first time, at half tempo',
-      'FUN · Howl\u2019s Moving Castle — Merry-Go-Round of Life, easy arrangement',
-      'FUN · Spirited Away — Always With Me (Itsumo Nando Demo)',
-      'FUN · Fullmetal Alchemist — Brothers',
-    ],
-  },
-  {
-    name: '6 · Technique',
-    lessons: [
-      'Hanon 1-5, hands together, 60bpm, evenly',
-      'Hanon 1-10 at 80bpm',
-      'Czerny Op. 599, studies 1-10',
-      'Sustain pedal — syncopated pedalling, changed on the beat after',
-      'Scales at 100bpm, four octaves, hands together',
-      'Chromatic scale, two octaves, both hands',
-      'Octave reaches and the stretch between 1 and 5',
-      'Trills, mordents and the ornaments Bach assumes you know',
-      'Sight-read: a piece with pedal markings, observed',
-      'FUN · Death Note — L\u2019s Theme',
-      'FUN · Final Fantasy X — To Zanarkand',
-      'FUN · Undertale — Megalovania',
-    ],
-  },
-  {
-    name: '7 · Intermediate repertoire',
-    lessons: [
-      'Bach — Prelude in C, WTC Book I',
-      'Bach — Invention no. 1 in C, BWV 772',
-      'Chopin — Prelude Op. 28 no. 4 in E minor',
-      'Chopin — Nocturne Op. 9 no. 2',
-      'Beethoven — Sonata Op. 49 no. 2, first movement',
-      'Debussy — Clair de Lune',
-      'Bach — a fugue from WTC Book I, voices audible separately',
-      'Sight-read: a movement you have never heard, hands together',
-      'FUN · Howl\u2019s Moving Castle — Merry-Go-Round of Life, full arrangement',
-      'FUN · Your Name — Nandemonaiya (RADWIMPS)',
-      'FUN · Attack on Titan — Vogel im Käfig',
-      'FUN · Demon Slayer — Gurenge',
-    ],
-  },
-  {
-    name: '8 · Keeping it',
-    lessons: [
-      'Sight-read one new piece a week, below current level, without stopping',
-      'Identify every interval within an octave by ear',
-      'Tell major from minor from diminished by ear, in any inversion',
-      'Transpose a simple piece into three other keys',
-      'Play a song from a lead sheet, left hand improvised',
-      'Memorise one piece completely, hands separately as well as together',
-      'Record yourself monthly and listen back to the whole thing',
-      'FUN · Learn one song you actually want to play, every month, forever',
+    ['The staff, and why middle C is the hinge', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }, { title: 'Andrew Furmanczyk — free piano course', url: 'https://www.youtube.com/user/Lypur' }]],
+    ['Ledger lines, and reading outside the staff', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['Note values, rests, and the beat', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['Time signatures and bar lines', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['Dotted notes and ties', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['Reading rhythm before pitch'],
+    ['Your first written line', [{ title: 'Hoffman Academy', url: 'https://www.hoffmanacademy.com/', note: '400+ free video lessons.' }, { title: 'IMSLP', url: 'https://imslp.org', note: 'Every public-domain score and method book.' }]],
+    ['Sight-reading: the daily ten minutes', [{ title: 'Piano Inspires — free sight-reading examples', url: 'https://pianoinspires.com/sight-reading-is-a-super-power/' }, { title: 'IMSLP', url: 'https://imslp.org', note: 'Every public-domain score and method book.' }]],
+    ['Sharps, flats and naturals on the page', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['The road map of a score'],
+    ['Articulation: legato, staccato, slurs'],
+    ['Tempo marks and the Italian'],
+    ['Intervals under the hand', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }, { title: 'Teoria', url: 'https://www.teoria.com/', note: 'Free ear training.' }]],
+    ['The major triad', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['The minor triad, and the difference', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['Chord symbols, and reading a lead sheet', [{ title: 'Ultimate Guitar', url: 'https://www.ultimate-guitar.com/', note: 'Chord charts for nearly every popular song. They work at a piano.' }]],
+    ['I, IV and V — the three chords', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['Playing a song from chords', [{ title: 'Ultimate Guitar', url: 'https://www.ultimate-guitar.com/', note: 'Chord charts for nearly every popular song. They work at a piano.' }]],
+    ['Broken chords and the first accompaniment patterns'],
+    ['Inversions, and why chords move smoothly', [{ title: 'musictheory.net', url: 'https://www.musictheory.net/', note: 'Free lessons and drills. No signup.' }]],
+    ['How to learn a new piece', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. The standard text on how to practise.' }]],
+    ['Structuring a session', [{ title: 'Fundamentals of Piano Practice', url: 'https://fundamentals-of-piano-practice.readthedocs.io/', note: 'Free. The standard text on how to practise.' }]],
+    ['A piece from the page', [{ title: 'MuseScore', url: 'https://musescore.com', note: 'Community arrangements at several difficulties each.' }, { title: 'Paul Barton', url: 'https://www.youtube.com/@PaulBartonPiano', note: '2,000+ classical tutorials.' }]],
+    ['What stage 2 was for'],
     ],
   },
 ];
 
-/** SQL single-quoted string. An apostrophe in a title ends the literal early. */
-const q = (value) => `'${String(value).replace(/'/g, "''")}'`;
-
 const out = [
   '-- Generated by scripts/curriculums/piano.mjs. Read before running.',
-  '-- Apply it with `npm run curriculum piano`, which carries ticks and route',
-  '-- changes across the rebuild below. Running this file through wrangler by',
-  '-- hand discards every one of them.',
-  // Rebuildable without losing its place. The row is created only if it is
-  // not already there, and its modules are cleared instead — deleting the
-  // curriculum and reinserting it would take a new position at the end, and
-  // curriculum order IS the route through all the routes.
+  '-- Apply it with `npm run curriculum piano`, which carries ticks, detail',
+  '-- typed at the dashboard and every card\'s review history across the rebuild',
+  '-- below. Running this file through wrangler by hand discards them.',
+  // Rebuildable without losing its place: the row is created only if it is not
+  // already there, and its modules are cleared instead. Deleting the curriculum
+  // and reinserting it would take a new position at the end, and curriculum
+  // order IS the route through all the routes.
   `insert into curriculums (name, source, status, position, created_at)\n` +
-    `  select 'Piano', ${q(SOURCE)}, 'active',\n` +
-    `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())}\n` +
-    `  where not exists (select 1 from curriculums where name = 'Piano');`,
-  `update curriculums set source = ${q(SOURCE)} where name = 'Piano';`,
-  // Lessons first, then modules. ON DELETE CASCADE covers this wherever foreign
-  // keys are enforced — D1 enforces them — and silently does nothing where they
-  // are not, orphaning every lesson instead of removing it so that a rebuild
-  // quietly adds a second full set nobody can see, because every read joins
-  // through modules. Written out rather than relied upon.
+    `  select ${q(NAME)}, ${q(SOURCE)}, 'active',\n` +
+    `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(NOW)}\n` +
+    `  where not exists (select 1 from curriculums where name = ${q(NAME)});`,
+  `update curriculums set source = ${q(SOURCE)} where name = ${q(NAME)};`,
+
+  // Lesson-scoped sources are the script's own and go before the lessons do.
+  // ON DELETE CASCADE would cover it wherever foreign keys are enforced — D1
+  // enforces them, node:sqlite does not — so it is written out rather than
+  // relied upon. The curriculum's own list, where lesson_id is null, is NOT
+  // touched: nothing could regenerate it. See migration 0009.
+  `delete from sources where lesson_id is not null and curriculum_id = ${CURRICULUM};`,
+
+  // Lessons, then modules. Same reasoning.
   `delete from lessons where module_id in\n` +
-    `  (select id from modules where curriculum_id =\n` +
-    `     (select id from curriculums where name = 'Piano'));`,
-  `delete from modules where curriculum_id =\n` +
-    `  (select id from curriculums where name = 'Piano');`,
+    `  (select id from modules where curriculum_id = ${CURRICULUM});`,
+  `delete from modules where curriculum_id = ${CURRICULUM};`,
+  '',
+  '-- CARDS ARE NEVER DELETED HERE. A card carries months of review history and',
+  '-- no script can regenerate that, so the rebuild above sets lesson_id to null',
+  '-- (migration 0010) and each card is matched again below by its natural key:',
+  '-- curriculum, kind and front. Insert what is new, update what exists, and',
+  '-- leave every scheduling column alone.',
 ];
 
 stages.forEach((stage, m) => {
   out.push(
+    '',
+    `-- ${stage.name}`,
     `insert into modules (curriculum_id, name, position)\n` +
-      `  values ((select id from curriculums where name = 'Piano'), ${q(stage.name)}, ${m + 1});`,
+      `  values (${CURRICULUM}, ${q(stage.name)}, ${m + 1});`,
   );
-  stage.lessons.forEach((lesson, l) => {
-    const text = detailFor(lesson);
+
+  stage.lessons.forEach(([name, sources = []], l) => {
     out.push(
       `insert into lessons (module_id, name, position, on_route, detail)\n` +
-        `  values ((select max(id) from modules), ${q(lesson)}, ${l + 1}, 1, ` +
-        `${text === null ? 'null' : q(text)});`,
+        `  values ((select max(id) from modules), ${q(name)}, ${l + 1}, 1, ${q(detailFor(name))});`,
     );
+
+    sources.forEach((source, s) => {
+      out.push(
+        `insert into sources (curriculum_id, lesson_id, title, url, note, position)\n` +
+          `  values (${CURRICULUM}, ${LESSON}, ${q(source.title)}, ${q(source.url ?? null)},` +
+          ` ${q(source.note ?? null)}, ${s + 1});`,
+      );
+    });
+
+    for (const card of cardsFor(name)) {
+      const identity =
+        `curriculum_id = ${CURRICULUM} and kind = ${q(card.kind)} and front = ${q(card.front)}`;
+      out.push(
+        `insert into cards (curriculum_id, lesson_id, kind, front, back, reading, extra,\n` +
+          `                   due, stability, difficulty, scheduled_days, learning_steps,\n` +
+          `                   reps, lapses, state, last_review, unlocked_on, created_at)\n` +
+          `  select ${CURRICULUM}, ${LESSON}, ${q(card.kind)}, ${q(card.front)}, ${q(card.back)},\n` +
+          `         ${q(card.reading ?? null)}, ${q(card.extra ?? null)}, ${q(NOW)},\n` +
+          `         0, 0, 0, 0, 0, 0, 0, null, null, ${q(NOW)}\n` +
+          `  where not exists (select 1 from cards where ${identity});`,
+        // Content and the lesson link are the script's; scheduling and
+        // unlocked_on are the dashboard's and are not named here.
+        `update cards set lesson_id = ${LESSON}, back = ${q(card.back)},\n` +
+          `       reading = ${q(card.reading ?? null)}, extra = ${q(card.extra ?? null)}\n` +
+          ` where ${identity};`,
+      );
+    }
   });
 });
 
-console.log(out.join('\n'));
-console.error(
-  `modules: ${stages.length}  milestones: ${stages.reduce((n, s) => n + s.lessons.length, 0)}`,
-);
+const strayDetail = Object.keys(detail).filter((key) => !askedDetail.has(key));
+const strayCards = Object.keys(cards).filter((key) => !askedCards.has(key));
 
-for (const key of strays()) console.error(`  detail for no milestone: ${key}`);
+if (twiceClaimed.length) {
+  console.error(`\n${twiceClaimed.length} card(s) are claimed by two lessons:`);
+  for (const [front, first, second] of twiceClaimed) {
+    console.error(`  · ${front}  —  ${first}  and  ${second}`);
+  }
+  console.error('\nA card belongs to one lesson. Nothing printed.');
+  process.exit(1);
+}
+
+if (missing.length) {
+  console.error(`\nNo material for ${missing.length} lesson(s):`);
+  for (const name of missing) console.error(`  · ${name}`);
+  console.error('\nEvery lesson teaches its point in full. Nothing printed.');
+  process.exit(1);
+}
+for (const key of strayDetail) console.error(`! piano-detail.json has no lesson: ${key}`);
+for (const key of strayCards) console.error(`! piano-cards.json has no lesson: ${key}`);
+
+console.log(out.join('\n'));
+
+const lessons = stages.reduce((n, s) => n + s.lessons.length, 0);
+const cardCount = stages.reduce(
+  (n, s) => n + s.lessons.reduce((k, [name]) => k + (cards[name]?.length ?? 0), 0),
+  0,
+);
+console.error(`modules: ${stages.length}  lessons: ${lessons}  cards: ${cardCount}`);
