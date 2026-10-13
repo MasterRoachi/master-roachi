@@ -655,5 +655,451 @@
       "front": "Breath mark",
       "back": "A comma above the staff: lift, as a singer would breathe"
     }
+  ],
+  "The major scale, and the pattern underneath it": [
+    {
+      "kind": "grammar",
+      "front": "The major scale pattern",
+      "back": "T T S · T T T S",
+      "extra": "Semitones between degrees 3–4 and 7–8, always."
+    },
+    {
+      "kind": "word",
+      "front": "Semitone",
+      "back": "The next key along, black or white, with nothing between"
+    },
+    {
+      "kind": "word",
+      "front": "Tone",
+      "back": "Two semitones"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why C major has no black keys",
+      "back": "The white keys' own semitones, E–F and B–C, already fall where the pattern needs them"
+    }
+  ],
+  "Key signatures on the page": [
+    {
+      "kind": "grammar",
+      "front": "Order of sharps",
+      "back": "F C G D A E B"
+    },
+    {
+      "kind": "grammar",
+      "front": "Order of flats",
+      "back": "B E A D G C F",
+      "extra": "The sharps backwards."
+    },
+    {
+      "kind": "grammar",
+      "front": "Naming a key from its sharps",
+      "back": "Last sharp, up a semitone",
+      "extra": "Three sharps ending G♯ → A major."
+    },
+    {
+      "kind": "grammar",
+      "front": "Naming a key from its flats",
+      "back": "The second-to-last flat is the key",
+      "extra": "One flat has nothing to point at: it is F major."
+    },
+    {
+      "kind": "grammar",
+      "front": "G major — key signature",
+      "back": "1 sharp — F♯"
+    },
+    {
+      "kind": "grammar",
+      "front": "D major — key signature",
+      "back": "2 sharps — F♯ C♯"
+    },
+    {
+      "kind": "grammar",
+      "front": "A major — key signature",
+      "back": "3 sharps — F♯ C♯ G♯"
+    },
+    {
+      "kind": "grammar",
+      "front": "E major — key signature",
+      "back": "4 sharps — F♯ C♯ G♯ D♯"
+    },
+    {
+      "kind": "grammar",
+      "front": "B major — key signature",
+      "back": "5 sharps — F♯ C♯ G♯ D♯ A♯"
+    },
+    {
+      "kind": "grammar",
+      "front": "F♯ major — key signature",
+      "back": "6 sharps — F♯ C♯ G♯ D♯ A♯ E♯"
+    },
+    {
+      "kind": "grammar",
+      "front": "F major — key signature",
+      "back": "1 flat — B♭"
+    },
+    {
+      "kind": "grammar",
+      "front": "B♭ major — key signature",
+      "back": "2 flats — B♭ E♭"
+    },
+    {
+      "kind": "grammar",
+      "front": "E♭ major — key signature",
+      "back": "3 flats — B♭ E♭ A♭"
+    },
+    {
+      "kind": "grammar",
+      "front": "A♭ major — key signature",
+      "back": "4 flats — B♭ E♭ A♭ D♭"
+    },
+    {
+      "kind": "grammar",
+      "front": "D♭ major — key signature",
+      "back": "5 flats — B♭ E♭ A♭ D♭ G♭"
+    },
+    {
+      "kind": "grammar",
+      "front": "How long an accidental lasts",
+      "back": "To the end of its bar, in that octave — the key signature lasts the whole piece, in every octave"
+    }
+  ],
+  "The circle of fifths": [
+    {
+      "kind": "grammar",
+      "front": "Circle of fifths, clockwise",
+      "back": "C G D A E B F♯",
+      "extra": "One more sharp at each step."
+    },
+    {
+      "kind": "grammar",
+      "front": "Circle of fifths, anticlockwise",
+      "back": "C F B♭ E♭ A♭ D♭ G♭",
+      "extra": "One more flat at each step."
+    },
+    {
+      "kind": "grammar",
+      "front": "Finding I, IV and V on the circle",
+      "back": "The key itself, its anticlockwise neighbour (IV) and its clockwise one (V)"
+    }
+  ],
+  "Fingering, and the two groups that explain nearly all of it": [
+    {
+      "kind": "grammar",
+      "front": "The one rule behind every scale fingering",
+      "back": "The thumb takes white keys; the groups of three and four arrange themselves around that"
+    },
+    {
+      "kind": "grammar",
+      "front": "C, G, D, A and E major — RH fingering",
+      "back": "1 2 3 1 2 3 4 5",
+      "extra": "All five, identically — the sharps never fall under the thumb."
+    },
+    {
+      "kind": "grammar",
+      "front": "C, G, D, A and E major — LH fingering",
+      "back": "5 4 3 2 1 3 2 1"
+    },
+    {
+      "kind": "grammar",
+      "front": "F major — RH fingering",
+      "back": "1 2 3 4 1 2 3 4",
+      "extra": "Four and four, because the thumb may not take B♭."
+    },
+    {
+      "kind": "grammar",
+      "front": "F major — LH fingering",
+      "back": "5 4 3 2 1 3 2 1",
+      "extra": "Unchanged from C major."
+    },
+    {
+      "kind": "grammar",
+      "front": "B♭ major — RH fingering",
+      "back": "4 1 2 3 1 2 3 4"
+    },
+    {
+      "kind": "grammar",
+      "front": "E♭ major — RH fingering",
+      "back": "3 1 2 3 4 1 2 3"
+    },
+    {
+      "kind": "grammar",
+      "front": "A♭ major — RH fingering",
+      "back": "3 4 1 2 3 1 2 3"
+    },
+    {
+      "kind": "grammar",
+      "front": "D♭ major — RH fingering",
+      "back": "2 3 1 2 3 4 1 2"
+    },
+    {
+      "kind": "grammar",
+      "front": "B major — RH fingering",
+      "back": "1 2 3 1 2 3 4 5"
+    },
+    {
+      "kind": "grammar",
+      "front": "F♯ major — RH fingering",
+      "back": "2 3 4 1 2 3 4 2"
+    },
+    {
+      "kind": "grammar",
+      "front": "B♭, E♭, A♭ and D♭ major — LH fingering",
+      "back": "3 2 1 4 3 2 1 3",
+      "extra": "The flat keys share a left hand."
+    }
+  ],
+  "Scale degrees, and their names": [
+    {
+      "kind": "grammar",
+      "front": "Degree 1",
+      "back": "Tonic — home"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 2",
+      "back": "Supertonic"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 3",
+      "back": "Mediant — the degree that decides major or minor"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 4",
+      "back": "Subdominant — a fifth below the tonic"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 5",
+      "back": "Dominant — a fifth above the tonic"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 6",
+      "back": "Submediant — the relative minor's home"
+    },
+    {
+      "kind": "grammar",
+      "front": "Degree 7",
+      "back": "Leading note — pulls up a semitone to the tonic"
+    },
+    {
+      "kind": "grammar",
+      "front": "Roman numerals in a major key",
+      "back": "I ii iii IV V vi vii° — capital for major, lower case for minor"
+    }
+  ],
+  "I, IV and V in any key": [
+    {
+      "kind": "grammar",
+      "front": "I, IV, V in D",
+      "back": "D, G, A"
+    },
+    {
+      "kind": "grammar",
+      "front": "I, IV, V in A",
+      "back": "A, D, E"
+    },
+    {
+      "kind": "grammar",
+      "front": "I, IV, V in E",
+      "back": "E, A, B"
+    },
+    {
+      "kind": "grammar",
+      "front": "I, IV, V in B♭",
+      "back": "B♭, E♭, F"
+    },
+    {
+      "kind": "grammar",
+      "front": "I, IV, V in E♭",
+      "back": "E♭, A♭, B♭"
+    },
+    {
+      "kind": "grammar",
+      "front": "I–V–vi–IV in G",
+      "back": "G, D, Em, C"
+    },
+    {
+      "kind": "grammar",
+      "front": "I–V–vi–IV in D",
+      "back": "D, A, Bm, G"
+    }
+  ],
+  "The minor scale: natural minor": [
+    {
+      "kind": "grammar",
+      "front": "The natural minor pattern",
+      "back": "T S T T S T T"
+    },
+    {
+      "kind": "grammar",
+      "front": "A natural minor",
+      "back": "A B C D E F G A — all white keys"
+    },
+    {
+      "kind": "grammar",
+      "front": "What makes a scale sound minor",
+      "back": "The third degree, a semitone lower than the major's. The sixth is lower too."
+    }
+  ],
+  "Harmonic minor": [
+    {
+      "kind": "grammar",
+      "front": "Harmonic minor — what changes",
+      "back": "The seventh degree is raised a semitone, ascending and descending",
+      "extra": "It creates a leading note, and makes V major."
+    },
+    {
+      "kind": "word",
+      "front": "Augmented second",
+      "back": "A three-semitone step — the gap between degrees 6 and 7 of the harmonic minor"
+    },
+    {
+      "kind": "grammar",
+      "front": "A harmonic minor",
+      "back": "A B C D E F G♯ A"
+    },
+    {
+      "kind": "grammar",
+      "front": "E harmonic minor",
+      "back": "E F♯ G A B C D♯ E"
+    },
+    {
+      "kind": "grammar",
+      "front": "D harmonic minor",
+      "back": "D E F G A B♭ C♯ D"
+    }
+  ],
+  "Melodic minor, and which to practise": [
+    {
+      "kind": "grammar",
+      "front": "Melodic minor — what changes",
+      "back": "Sixth and seventh raised going up; both back to natural coming down"
+    },
+    {
+      "kind": "grammar",
+      "front": "A melodic minor",
+      "back": "Up: A B C D E F♯ G♯ A · Down: A G F E D C B A"
+    }
+  ],
+  "Relative and parallel minor": [
+    {
+      "kind": "grammar",
+      "front": "Relative minor",
+      "back": "Shares the key signature. The sixth degree of the major — three semitones down."
+    },
+    {
+      "kind": "grammar",
+      "front": "Parallel minor",
+      "back": "Shares the tonic. Same home note, third, sixth and seventh lowered."
+    },
+    {
+      "kind": "grammar",
+      "front": "Relative minor of C",
+      "back": "A minor"
+    },
+    {
+      "kind": "grammar",
+      "front": "Relative minor of G",
+      "back": "E minor"
+    },
+    {
+      "kind": "grammar",
+      "front": "Relative minor of D",
+      "back": "B minor"
+    },
+    {
+      "kind": "grammar",
+      "front": "Relative minor of F",
+      "back": "D minor"
+    },
+    {
+      "kind": "grammar",
+      "front": "Relative minor of B♭",
+      "back": "G minor"
+    },
+    {
+      "kind": "grammar",
+      "front": "Relative minor of E♭",
+      "back": "C minor"
+    }
+  ],
+  "Three minor keys: A, E and D": [
+    {
+      "kind": "grammar",
+      "front": "i, iv, V in A minor",
+      "back": "Am, Dm, E major",
+      "extra": "V is major because the seventh is raised."
+    },
+    {
+      "kind": "grammar",
+      "front": "i, iv, V in E minor",
+      "back": "Em, Am, B major"
+    },
+    {
+      "kind": "grammar",
+      "front": "i, iv, V in D minor",
+      "back": "Dm, Gm, A major"
+    }
+  ],
+  "Arpeggios, two octaves, and the thumb": [
+    {
+      "kind": "grammar",
+      "front": "C major arpeggio — RH, two octaves",
+      "back": "1 2 3 1 2 3 5"
+    },
+    {
+      "kind": "grammar",
+      "front": "C major arpeggio — LH, two octaves",
+      "back": "5 3 2 1 3 2 1"
+    },
+    {
+      "kind": "word",
+      "front": "Arpeggio",
+      "back": "The notes of a chord played in order, continuing up through the octaves",
+      "extra": "A broken chord stays inside one octave and repeats; an arpeggio climbs."
+    }
+  ],
+  "The chromatic scale": [
+    {
+      "kind": "grammar",
+      "front": "Chromatic scale — the fingering rule",
+      "back": "3 on every black key, 1 on every white, and 2 on the white key with no black key before it in the direction of travel"
+    },
+    {
+      "kind": "grammar",
+      "front": "Chromatic scale — RH going up from C",
+      "back": "1 3 1 3 1 2 3 1 3 1 3 1 2",
+      "extra": "The 2 takes F and C."
+    },
+    {
+      "kind": "grammar",
+      "front": "Chromatic scale — LH going up from C",
+      "back": "1 3 1 3 2 1 3 1 3 1 3 2 1",
+      "extra": "The 2 takes E and B."
+    }
+  ],
+  "The pentatonic scale": [
+    {
+      "kind": "grammar",
+      "front": "Major pentatonic",
+      "back": "Degrees 1 2 3 5 6 — the major scale without its fourth and seventh",
+      "extra": "In C: C D E G A."
+    },
+    {
+      "kind": "grammar",
+      "front": "Minor pentatonic",
+      "back": "Degrees 1 ♭3 4 5 ♭7",
+      "extra": "In A: A C D E G — the same five notes as C major pentatonic."
+    },
+    {
+      "kind": "grammar",
+      "front": "The black keys, as a scale",
+      "back": "G♭ major pentatonic — or E♭ minor pentatonic",
+      "extra": "Which is why any order of black keys sounds like music."
+    }
   ]
 }
