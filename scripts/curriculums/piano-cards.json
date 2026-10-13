@@ -1101,5 +1101,102 @@
       "back": "G♭ major pentatonic — or E♭ minor pentatonic",
       "extra": "Which is why any order of black keys sounds like music."
     }
+  ],
+  "Where the free scores are, and which edition to take": [
+    {
+      "kind": "word",
+      "front": "Urtext",
+      "back": "An edition printing what the composer wrote, with editorial additions marked or absent"
+    }
+  ],
+  "Baroque: the first classical piece, and what the style wants": [
+    {
+      "kind": "word",
+      "front": "Terraced dynamics",
+      "back": "Loud and soft changed by section rather than swelled through a phrase",
+      "extra": "A harpsichord cannot crescendo. The style is shaped around that."
+    },
+    {
+      "kind": "word",
+      "front": "Finger legato",
+      "back": "Connecting notes with the fingers alone, holding each until the next sounds — no pedal"
+    },
+    {
+      "kind": "word",
+      "front": "Counterpoint",
+      "back": "Two or more independent lines, each a tune, with the harmony arising from how they fit"
+    }
+  ],
+  "Playing a cover from a lead sheet": [
+    {
+      "kind": "grammar",
+      "front": "The four progressions that cover most pop",
+      "back": "I–V–vi–IV · vi–IV–I–V · I–vi–IV–V · i–VI–III–VII"
+    },
+    {
+      "kind": "grammar",
+      "front": "i–VI–III–VII in A minor",
+      "back": "Am, F, C, G"
+    },
+    {
+      "kind": "grammar",
+      "front": "i–VI–III–VII in E minor",
+      "back": "Em, C, G, D"
+    },
+    {
+      "kind": "grammar",
+      "front": "vi–IV–I–V in G",
+      "back": "Em, C, G, D"
+    },
+    {
+      "kind": "word",
+      "front": "Lead sheet",
+      "back": "Melody, or just words, with chord symbols above — everything else is the player's"
+    }
+  ],
+  "Practising a hard bar: the tools": [
+    {
+      "kind": "word",
+      "front": "Backward chaining",
+      "back": "Learn the last bar, then the one before plus it, then three — always ending somewhere secure"
+    },
+    {
+      "kind": "word",
+      "front": "Blocking",
+      "back": "Play each beat's notes together as a chord to see the hand positions, then restore the rhythm"
+    },
+    {
+      "kind": "word",
+      "front": "Mental play",
+      "back": "Playing the piece in your head, with the fingering, away from the keyboard",
+      "extra": "Where the image goes blank is where the memory is not there."
+    }
+  ],
+  "Memorising a piece on purpose": [
+    {
+      "kind": "grammar",
+      "front": "The four memories",
+      "back": "Muscle, aural, visual, analytical",
+      "extra": "Muscle memory alone breaks at the first interruption."
+    },
+    {
+      "kind": "word",
+      "front": "Entry points",
+      "back": "Places in a piece you can start from cold — what turns a memory lapse into a pause rather than a stop"
+    }
+  ],
+  "Polishing: what makes a piece finished": [
+    {
+      "kind": "grammar",
+      "front": "When a piece counts as finished",
+      "back": "Start to end three times in four, no dreaded bar, fingering settled, phrasing and dynamics in, melody on top, rhythm honest, and recoverable"
+    }
+  ],
+  "Sight-reading: raising the level": [
+    {
+      "kind": "grammar",
+      "front": "The sight-reading level rule",
+      "back": "Roughly two grades below what you can learn — and if it never surprises you, it is too easy"
+    }
   ]
 }

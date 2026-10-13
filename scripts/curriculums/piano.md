@@ -118,20 +118,25 @@ where instinct will not.
 
 ## The stages
 
-| # | Stage | Roughly |
-| --- | --- | --- |
-| 1 | The instrument and the hands | 20 |
-| 2 | Reading, and the first chords | 30 |
-| 3 | Hands together | 25 |
-| 4 | Keys and scales | 25 |
-| 5 | First repertoire, first covers | 25 |
-| 6 | Technique and the pedal | 25 |
-| 7 | Harmony in practice | 25 |
-| 8 | Intermediate repertoire | 25 |
-| 9 | Playing by ear | 20 |
-| 10 | Writing your own | 20 |
-| 11 | Ad astra | open |
-| — | Theory track, its own modules | ~40 |
+| # | Stage | Roughly | Written |
+| --- | --- | --- | --- |
+| 1 | The instrument and the hands | 20 | 12 |
+| 2 | Reading, and the first chords | 30 | 24 |
+| 3 | Hands together | 25 | 19 |
+| 4 | Keys and scales | 25 | 29 |
+| 5 | First repertoire, first covers | 25 | 25 |
+| 6 | Technique and the pedal | 25 | — |
+| 7 | Harmony in practice | 25 | — |
+| 8 | Intermediate repertoire | 25 | — |
+| 9 | Playing by ear | 20 | — |
+| 10 | Writing your own | 20 | — |
+| 11 | Ad astra | open | — |
+| — | Theory track, its own modules | ~40 | — |
+
+**The written column is lessons in the database**, not an estimate. Where it
+differs from the estimate the stage decided its own length: stage 1 needed
+fewer than twenty because the body strand is short and specific, stage 4 needed
+twenty-nine because the keys do not compress.
 
 **Written a stage at a time**, and only what is written is in the database — a
 lesson with a name and no material is an index entry, which is what this is
