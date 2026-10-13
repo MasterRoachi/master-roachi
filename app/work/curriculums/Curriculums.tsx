@@ -5,6 +5,7 @@ import {
   nextPerCurriculum,
   nextStep,
   progressOf,
+  splitModules,
   type Curriculum,
   type Lesson,
   type Module,
@@ -734,8 +735,32 @@ export default function Curriculums() {
               )}
             </div>
 
+            {/* A track runs BESIDE the route rather than on it — Japanese's
+                kanji modules, worked through in parallel. White and
+                horizontal, below the search, so they read as a second row of
+                things rather than as stages that happen to come last. See
+                splitModules() for the convention that identifies them. */}
+            {splitModules(current.modules).tracks.length > 0 && (
+              <div className={styles.trackRow}>
+                {splitModules(current.modules).tracks.map((module) => {
+                  const progress = progressOf(module);
+                  return (
+                    <button
+                      key={module.id}
+                      type="button"
+                      className={styles.trackCard}
+                      onClick={() => flashTo('grid', () => setOpenStage(module.id))}
+                    >
+                      <span className={styles.trackName}>{module.name}</span>
+                      <span className={styles.trackPercent}>{progress.percent}%</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <div className={styles.stageFan}>
-              {current.modules.map((module, at) => {
+              {splitModules(current.modules).stages.map((module, at) => {
                 const progress = progressOf(module);
                 return (
                   <button
@@ -751,41 +776,6 @@ export default function Curriculums() {
                 );
               })}
 
-              {adding === `module:${current.id}` ? (
-                <form
-                  className={`${styles.stageCard} ${styles.addStage}`}
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    if (!draft.trim()) return;
-                    void act({ action: 'add-module', curriculum_id: current.id, name: draft }).then(
-                      () => {
-                        setDraft('');
-                        setAdding(null);
-                      },
-                    );
-                  }}
-                >
-                  <input
-                    value={draft}
-                    autoFocus
-                    placeholder="Stage"
-                    aria-label="New stage name"
-                    onChange={(event) => setDraft(event.target.value)}
-                    onKeyDown={(event) => event.key === 'Escape' && setAdding(null)}
-                  />
-                </form>
-              ) : (
-                <button
-                  type="button"
-                  className={`${styles.stageCard} ${styles.addStage}`}
-                  onClick={() => {
-                    setAdding(`module:${current.id}`);
-                    setDraft('');
-                  }}
-                >
-                  +
-                </button>
-              )}
             </div>
           </div>
         </Overlay>

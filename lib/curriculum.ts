@@ -215,3 +215,27 @@ export function recentlyDone(curriculum: Curriculum, today: string, days = 14): 
     .flatMap((module) => module.lessons)
     .filter((lesson) => lesson.done_on !== null && lesson.done_on >= from).length;
 }
+
+/**
+ * Stages, and tracks that run alongside them.
+ *
+ * A curriculum can have two kinds of module. Most are **stages**: steps on one
+ * route, taken in order. Some are a **track** running beside the route —
+ * Japanese's kanji modules, which are their own sequence and are worked
+ * through in parallel rather than at a particular point.
+ *
+ * THE CONVENTION IS THE NAME, and it is a convention rather than a column
+ * because it is a presentational distinction and does not belong in the
+ * schema. A curriculum that names any module "Stage ..." is declaring that it
+ * uses stages; in such a curriculum, a module that is not a stage is a track.
+ * A curriculum that never says "Stage" — Drawing, Godot, Odin — has no tracks
+ * and every module is drawn in the fan, exactly as before.
+ */
+export function splitModules(modules: Module[]): { stages: Module[]; tracks: Module[] } {
+  const staged = modules.some((module) => module.name.startsWith('Stage '));
+  if (!staged) return { stages: modules, tracks: [] };
+  return {
+    stages: modules.filter((module) => module.name.startsWith('Stage ')),
+    tracks: modules.filter((module) => !module.name.startsWith('Stage ')),
+  };
+}

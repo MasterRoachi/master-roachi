@@ -3874,6 +3874,37 @@ globalThis.fetch = preGh;
   );
 }
 
+// --- stages and the tracks beside them --------------------------------------
+{
+  const { splitModules } = curriculum;
+  const m = (name) => ({ id: 1, name, lessons: [] });
+
+  let split = splitModules([m('Stage 1 · Kana'), m('Stage 2 · Grammar'), m('Kanji 1 · The first set')]);
+  check(
+    'a staged curriculum puts its non-stage modules in a track',
+    split.stages.length === 2 && split.tracks.length === 1,
+    JSON.stringify(split),
+  );
+  check('and the track is the one that is not a stage', split.tracks[0].name.startsWith('Kanji'), '');
+
+  split = splitModules([m('1 · Seeing'), m('2 · Gesture'), m('3 · Form')]);
+  check(
+    'a curriculum that never says Stage has no tracks at all',
+    split.stages.length === 3 && split.tracks.length === 0,
+    JSON.stringify(split),
+  );
+
+  check('and nothing is lost either way', splitModules([]).stages.length === 0, '');
+
+  // The order within each group is the order given, which is the route.
+  split = splitModules([m('Kanji 1 · a'), m('Stage 1 · b'), m('Kanji 2 · c'), m('Stage 2 · d')]);
+  check(
+    'order is preserved inside each group',
+    split.stages[0].name === 'Stage 1 · b' && split.tracks[1].name === 'Kanji 2 · c',
+    JSON.stringify(split),
+  );
+}
+
 // --- an icon per curriculum ------------------------------------------------
 //
 // Matched on keywords rather than stored, so a new curriculum looks like

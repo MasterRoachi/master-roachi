@@ -552,6 +552,23 @@ than numbers of its own. His design. Out of the list because neither opens a
 stage: one leaves the page and the other opens a list. Filled gold rather than
 outlined, in the same gold a finished curriculum wears.
 
+**A track runs beside the route rather than on it.** Japanese's kanji modules
+are worked through in parallel rather than at a point in the sequence, so they
+are drawn as their own row of **white** horizontal cards below the search,
+leaving the stage fan to the stages. Three kinds of card on that screen now,
+and the colour says which: gold leaves the page, white runs alongside, dark is
+a step on the route.
+
+The convention is the name, not a column, because it is a presentational
+distinction: a curriculum that names any module "Stage …" is declaring that it
+uses stages, and in such a curriculum anything that is not one is a track. A
+curriculum that never says "Stage" — Drawing, Godot, Odin — has no tracks and
+draws every module in the fan, exactly as before. See `splitModules()`.
+
+**There is no longer a way to add a stage from the page.** Every curriculum is
+built by its script now, and a button that inserts a module the script does not
+know about creates a row that the next rebuild reports as an orphan.
+
 **The curriculum's sources live behind that card and nowhere else.** They used
 to sit under every lesson, below the lesson's own, which made a bibliography of
 them — true of all 35 lessons and pointing none of them anywhere. A lesson now

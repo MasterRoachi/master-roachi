@@ -755,6 +755,51 @@
  * that leaves the screen, and the gold is the same gold a finished curriculum
  * wears — see statusLook('done') in lib/curriculum-card.ts.
  */
+/* A TRACK runs beside the route rather than on it — Japanese's kanji modules.
+ * White, horizontal, in their own row below the search: the same card as a
+ * stage, turned on its side, exactly as the gold ones are. Three kinds of card
+ * on this screen now, and the colour is what says which: gold leaves the
+ * screen, white runs alongside, dark is a step on the route. */
+.trackRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+}
+
+.trackCard {
+  width: 11rem;
+  min-height: 8rem;
+  display: grid;
+  align-content: space-between;
+  gap: 0.4rem;
+  padding: 0.75rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid oklch(78% 0 0);
+  background: linear-gradient(160deg, oklch(94% 0 0), oklch(84% 0 0));
+  color: oklch(24% 0 0);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.trackCard:hover {
+  border-color: oklch(99% 0 0);
+}
+
+.trackName {
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.trackPercent {
+  font-size: 0.75rem;
+  color: oklch(38% 0 0);
+  font-variant-numeric: tabular-nums;
+}
+
 /* The gold cards, side by side and centred, between the name and the search. */
 .goldRow {
   display: flex;
@@ -800,25 +845,6 @@
   font-size: 0.75rem;
   color: oklch(32% 0.05 85);
   font-variant-numeric: tabular-nums;
-}
-
-.addStage {
-  place-content: center;
-  justify-items: center;
-  border-style: dashed;
-  font-size: 2rem;
-  color: var(--muted);
-}
-
-.addStage input {
-  width: 100%;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--ink);
-  padding: 0.3rem 0.4rem;
-  font: inherit;
-  font-size: 0.8125rem;
 }
 
 .searchRow {
