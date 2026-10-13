@@ -1740,5 +1740,125 @@
       "front": "How to harmonise a tune",
       "back": "Find the key, set the harmonic rhythm, list each bar's melody notes, choose chords containing them, decide by function, check the bass line, then play it"
     }
+  ],
+  "Sonata form, and reading a whole movement": [
+    {
+      "kind": "grammar",
+      "front": "Sonata form",
+      "back": "Exposition — two themes, the second in a new key · Development — unstable, modulating · Recapitulation — both themes at home, often with a coda"
+    },
+    {
+      "kind": "grammar",
+      "front": "What the recapitulation changes",
+      "back": "The second theme comes home instead of going to the dominant",
+      "extra": "Which is why learning the exposition gets you most of the recapitulation free."
+    }
+  ],
+  "Playing three voices": [
+    {
+      "kind": "word",
+      "front": "Finger substitution",
+      "back": "Silently changing fingers on a held key, freeing the first finger for something else",
+      "extra": "Written into the score as 5–4."
+    },
+    {
+      "kind": "word",
+      "front": "Redistribution",
+      "back": "Taking a note with the other hand from the one it is written for"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to practise three voices",
+      "back": "Each voice alone as a melody, then in pairs, then all three slowly — listening for whether each line is still audible"
+    }
+  ],
+  "Bach: the Little Preludes and the Inventions": [
+    {
+      "kind": "grammar",
+      "front": "Bach's Little Preludes",
+      "back": "BWV 924–943 — short, pedagogical, where intermediate Bach starts"
+    },
+    {
+      "kind": "grammar",
+      "front": "The Two-Part Inventions",
+      "back": "BWV 772–786 — fifteen pieces, two voices, one subject passed between the hands"
+    },
+    {
+      "kind": "grammar",
+      "front": "The Three-Part Sinfonias",
+      "back": "BWV 787–801 — three voices in two hands. A real jump."
+    }
+  ],
+  "Rubato, cantabile, and a left hand that keeps time": [
+    {
+      "kind": "grammar",
+      "front": "The rule that makes rubato work",
+      "back": "The left hand keeps time while the melody stretches and catches up",
+      "extra": "Both hands bending together is just slowing down."
+    },
+    {
+      "kind": "grammar",
+      "front": "Where to take time",
+      "back": "At the top of a phrase, into a cadence, at a change of section, on a long ornament",
+      "extra": "Never at anything merely difficult."
+    }
+  ],
+  "Debussy, Satie, and the impressionist sound": [
+    {
+      "kind": "grammar",
+      "front": "Whole-tone scale",
+      "back": "Six notes, every step a tone — no leading note, so no home",
+      "extra": "Only two of them exist."
+    },
+    {
+      "kind": "grammar",
+      "front": "What impressionist harmony does differently",
+      "back": "The same chords, used for colour rather than function — sevenths and ninths that do not resolve"
+    }
+  ],
+  "Getting a piece up to tempo": [
+    {
+      "kind": "grammar",
+      "front": "The three faults that cap tempo",
+      "back": "Tension, a fingering that cannot work fast, and insecurity",
+      "extra": "Never insufficient repetition. Change something rather than doing more."
+    },
+    {
+      "kind": "grammar",
+      "front": "What sets a piece's tempo",
+      "back": "Its single hardest passage. Bring that up and the piece follows."
+    }
+  ],
+  "Repeats, da capos and structural choices": [
+    {
+      "kind": "grammar",
+      "front": "D.S. al Coda",
+      "back": "Back to the sign, then jump to the coda at the ⊕"
+    },
+    {
+      "kind": "grammar",
+      "front": "Senza repetizione",
+      "back": "Without the repeats — what a da capo in a minuet and trio usually means"
+    },
+    {
+      "kind": "grammar",
+      "front": "What to do with a repeated section",
+      "back": "Make it different: quieter or louder, more rubato, an inner voice brought out — or, in Baroque music, ornamented"
+    }
+  ],
+  "Keeping a long piece once it is learned": [
+    {
+      "kind": "grammar",
+      "front": "What decays first in a long piece",
+      "back": "The hardest passage, the section joins, the dynamic plan, and the differences between near-identical passages"
+    }
+  ],
+  "The shelf, unsimplified": [
+    {
+      "kind": "grammar",
+      "front": "Transcription or arrangement",
+      "back": "A transcription reproduces the recording; an arrangement is a piano piece made from the song",
+      "extra": "Prefer a good arrangement — what works for a band often does not work for two hands."
+    }
   ]
 }
