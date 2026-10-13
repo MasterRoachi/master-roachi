@@ -1383,5 +1383,254 @@
       "back": "siblings",
       "reading": "きょうだい"
     }
+  ],
+  "Transitive and intransitive pairs": [
+    {
+      "kind": "word",
+      "front": "開く",
+      "back": "it opens (intransitive)",
+      "reading": "あく",
+      "extra": "Pair: [開ける]{あける} to open it. ドア**が**開く / ドア**を**開ける"
+    },
+    {
+      "kind": "word",
+      "front": "開ける",
+      "back": "to open it (transitive)",
+      "reading": "あける",
+      "extra": "Pair: [開く]{あく} it opens."
+    },
+    {
+      "kind": "word",
+      "front": "閉まる",
+      "back": "it closes",
+      "reading": "しまる",
+      "extra": "Pair: [閉める]{しめる} to close it."
+    },
+    {
+      "kind": "word",
+      "front": "閉める",
+      "back": "to close it",
+      "reading": "しめる",
+      "extra": "Pair: [閉まる]{しまる} it closes."
+    },
+    {
+      "kind": "word",
+      "front": "始まる",
+      "back": "it begins",
+      "reading": "はじまる",
+      "extra": "Pair: [始める]{はじめる} to begin it."
+    },
+    {
+      "kind": "word",
+      "front": "始める",
+      "back": "to begin it",
+      "reading": "はじめる",
+      "extra": "Pair: [始まる]{はじまる} it begins."
+    },
+    {
+      "kind": "word",
+      "front": "入る",
+      "back": "it enters · to go in",
+      "reading": "はいる",
+      "extra": "Pair: [入れる]{いれる} to put in. Group 1 despite the る."
+    },
+    {
+      "kind": "word",
+      "front": "入れる",
+      "back": "to put it in",
+      "reading": "いれる",
+      "extra": "Pair: [入る]{はいる} to go in."
+    },
+    {
+      "kind": "word",
+      "front": "出る",
+      "back": "it comes out · to leave",
+      "reading": "でる",
+      "extra": "Pair: [出す]{だす} to take out."
+    },
+    {
+      "kind": "word",
+      "front": "出す",
+      "back": "to take it out · to send",
+      "reading": "だす",
+      "extra": "Pair: [出る]{でる} to come out."
+    },
+    {
+      "kind": "word",
+      "front": "落ちる",
+      "back": "it falls",
+      "reading": "おちる",
+      "extra": "Pair: [落とす]{おとす} to drop it."
+    },
+    {
+      "kind": "word",
+      "front": "落とす",
+      "back": "to drop it",
+      "reading": "おとす",
+      "extra": "Pair: [落ちる]{おちる} it falls."
+    },
+    {
+      "kind": "word",
+      "front": "止まる",
+      "back": "it stops",
+      "reading": "とまる",
+      "extra": "Pair: [止める]{とめる} to stop it."
+    },
+    {
+      "kind": "word",
+      "front": "止める",
+      "back": "to stop it",
+      "reading": "とめる",
+      "extra": "Pair: [止まる]{とまる} it stops."
+    },
+    {
+      "kind": "word",
+      "front": "つく",
+      "back": "it turns on",
+      "reading": "つく",
+      "extra": "Pair: [つける]{つける} to turn it on. 電気**が**つく"
+    },
+    {
+      "kind": "word",
+      "front": "つける",
+      "back": "to turn it on",
+      "reading": "つける",
+      "extra": "Pair: つく it turns on."
+    },
+    {
+      "kind": "word",
+      "front": "消える",
+      "back": "it goes out · disappears",
+      "reading": "きえる",
+      "extra": "Pair: [消す]{けす} to turn it off."
+    },
+    {
+      "kind": "word",
+      "front": "消す",
+      "back": "to turn it off · erase",
+      "reading": "けす",
+      "extra": "Pair: [消える]{きえる} it goes out."
+    },
+    {
+      "kind": "word",
+      "front": "変わる",
+      "back": "it changes",
+      "reading": "かわる",
+      "extra": "Pair: [変える]{かえる} to change it."
+    },
+    {
+      "kind": "word",
+      "front": "変える",
+      "back": "to change it",
+      "reading": "かえる",
+      "extra": "Pair: [変わる]{かわる} it changes."
+    }
+  ],
+  "Keigo: a first look": [
+    {
+      "kind": "word",
+      "front": "いらっしゃる",
+      "back": "to go · to come · to be (honorific)",
+      "reading": "いらっしゃる",
+      "extra": "Honorific for [行く]{いく}, [来る]{くる}, いる. Said of the other person."
+    },
+    {
+      "kind": "word",
+      "front": "参る",
+      "back": "to go · to come (humble)",
+      "reading": "まいる",
+      "extra": "Humble for [行く]{いく}, [来る]{くる}. Said of yourself."
+    },
+    {
+      "kind": "word",
+      "front": "おっしゃる",
+      "back": "to say (honorific)",
+      "reading": "おっしゃる",
+      "extra": "Honorific for [言う]{いう}."
+    },
+    {
+      "kind": "word",
+      "front": "申す",
+      "back": "to say (humble)",
+      "reading": "もうす",
+      "extra": "Humble for [言う]{いう}. [申します]{もうします} in a self-introduction."
+    },
+    {
+      "kind": "word",
+      "front": "召し上がる",
+      "back": "to eat · to drink (honorific)",
+      "reading": "めしあがる",
+      "extra": "Honorific for [食べる]{たべる}, [飲む]{のむ}."
+    },
+    {
+      "kind": "word",
+      "front": "いただく",
+      "back": "to receive · to eat (humble)",
+      "reading": "いただく",
+      "extra": "Humble for [もらう]{もらう}, [食べる]{たべる}. いただきます before a meal."
+    },
+    {
+      "kind": "word",
+      "front": "なさる",
+      "back": "to do (honorific)",
+      "reading": "なさる",
+      "extra": "Honorific for する."
+    },
+    {
+      "kind": "word",
+      "front": "いたす",
+      "back": "to do (humble)",
+      "reading": "いたす",
+      "extra": "Humble for する."
+    }
+  ],
+  "The four conditionals compared": [
+    {
+      "kind": "grammar",
+      "front": "～と",
+      "back": "whenever A, automatically B",
+      "extra": "Plain non-past only. The second clause **cannot** be a command, request or invitation.\n\n春になる**と**、桜が咲きます。"
+    },
+    {
+      "kind": "grammar",
+      "front": "～たら",
+      "back": "if / when — the flexible one",
+      "extra": "From the た form. Second clause can be anything. The safe default.\n\n雨が降っ**たら**、行きません。"
+    },
+    {
+      "kind": "grammar",
+      "front": "～ば",
+      "back": "if and only if",
+      "extra": "え-sound + ば. General truths and set phrases.\n\nどうすれ**ば**いいですか。"
+    },
+    {
+      "kind": "grammar",
+      "front": "～なら",
+      "back": "given that A is the case",
+      "extra": "Responds to what was said. The second clause may happen **before** the first.\n\n日本に行く**なら**、ガイドブックを買ってください。"
+    }
+  ],
+  "あげる, くれる, もらう": [
+    {
+      "kind": "word",
+      "front": "あげる",
+      "back": "I give to someone else",
+      "reading": "あげる",
+      "extra": "Outward. Never points at the speaker.\n\n私は田中さん**に**本をあげました。"
+    },
+    {
+      "kind": "word",
+      "front": "くれる",
+      "back": "someone gives to me",
+      "reading": "くれる",
+      "extra": "Inward. The giver takes **が**.\n\n田中さん**が**本をくれました。"
+    },
+    {
+      "kind": "word",
+      "front": "もらう",
+      "back": "I receive from someone",
+      "reading": "もらう",
+      "extra": "The giver takes **に** or から.\n\n田中さん**に**本をもらいました。"
+    }
   ]
 }

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import LessonMarkdown, { Line } from '@/components/LessonMarkdown';
-import { CARD_KINDS, NEW_PER_DAY, type Card, type Deck } from '@/lib/cards';
+import { CARD_KINDS, NEW_PER_DAY, type Card, type CardKind, type Deck } from '@/lib/cards';
 import { statusLook } from '@/lib/curriculum-card';
 import { NOTE_SECTION } from '@/lib/card-note';
 import { emptyScene, type Scene } from '@/lib/sketch';
@@ -216,6 +216,14 @@ export default function Cards() {
             void load(null);
           }}
         />
+
+        {data.decks.length > 0 && (
+          <AddCard
+            decks={data.decks}
+            onAdded={() => void load(null)}
+            onError={setError}
+          />
+        )}
       </div>
     );
   }
@@ -332,6 +340,158 @@ function Decks({
         );
       })}
     </ul>
+  );
+}
+
+/**
+ * A card by hand — the mining form.
+ *
+ * Every other card in the system is made by the lesson that teaches it. This
+ * is for the ones you meet in the wild: a word from a reader, from a podcast,
+ * from a conversation. A hand-added card has no lesson, so it is unlocked the
+ * moment it is made.
+ *
+ * Folded away by default. It is the rarer of the two things done on this
+ * screen, and a form sitting open above the decks would make adding cards look
+ * like the point of the page rather than reviewing them.
+ */
+function AddCard({
+  decks,
+  onAdded,
+  onError,
+}: {
+  decks: Deck[];
+  onAdded: () => void;
+  onError: (message: string | null) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [deck, setDeck] = useState(decks[0]?.id ?? 0);
+  const [kind, setKind] = useState<CardKind>('word');
+  const [front, setFront] = useState('');
+  const [back, setBack] = useState('');
+  const [reading, setReading] = useState('');
+  const [extra, setExtra] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  if (!open) {
+    return (
+      <p className={styles.addRow}>
+        <button type="button" className={styles.addToggle} onClick={() => setOpen(true)}>
+          + Add a card
+        </button>
+      </p>
+    );
+  }
+
+  return (
+    <form
+      className={styles.add}
+      onSubmit={async (event) => {
+        event.preventDefault();
+        if (!front.trim() || !back.trim() || busy) return;
+        setBusy(true);
+        try {
+          const response = await fetch('/work/api/cards', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              action: 'add',
+              curriculum_id: deck,
+              kind,
+              front,
+              back,
+              reading,
+              extra,
+            }),
+          });
+          const result = (await response.json()) as { error?: string };
+          if (!response.ok) {
+            onError(result.error ?? 'That did not work.');
+            return;
+          }
+          onError(null);
+          // Front and back cleared, deck and kind kept: mining is done in
+          // runs, and re-choosing the same deck for every word is the kind of
+          // friction that stops it being done at all.
+          setFront('');
+          setBack('');
+          setReading('');
+          setExtra('');
+          onAdded();
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <p className={styles.addHead}>
+        <span>Add a card</span>
+        <button type="button" onClick={() => setOpen(false)} aria-label="Close">
+          ×
+        </button>
+      </p>
+
+      <label>
+        Deck
+        <select value={deck} onChange={(event) => setDeck(Number(event.target.value))}>
+          {decks.map((one) => (
+            <option key={one.id} value={one.id}>
+              {one.name}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label>
+        Kind
+        <select value={kind} onChange={(event) => setKind(event.target.value as CardKind)}>
+          {Object.entries(CARD_KINDS).map(([key, value]) => (
+            <option key={key} value={key}>
+              {value.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label>
+        Front
+        <input
+          value={front}
+          onChange={(event) => setFront(event.target.value)}
+          placeholder="日本"
+          autoFocus
+        />
+      </label>
+
+      <label>
+        Back
+        <input value={back} onChange={(event) => setBack(event.target.value)} placeholder="Japan" />
+      </label>
+
+      <label>
+        Reading
+        <input
+          value={reading}
+          onChange={(event) => setReading(event.target.value)}
+          placeholder="にほん"
+        />
+      </label>
+
+      <label className={styles.addWide}>
+        Extra
+        <textarea
+          value={extra}
+          onChange={(event) => setExtra(event.target.value)}
+          placeholder="The sentence you met it in. Markdown, and [漢字]{かんじ} for ruby."
+          rows={2}
+        />
+      </label>
+
+      <p className={styles.addActions}>
+        <button type="submit" disabled={busy || !front.trim() || !back.trim()}>
+          Add
+        </button>
+      </p>
+    </form>
   );
 }
 

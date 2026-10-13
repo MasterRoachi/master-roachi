@@ -866,15 +866,11 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       2026-10-13 — `scripts/curriculums/japanese.md`. Eleven stages, ~850–900
       lessons, Imabi as the grammar spine with Irodori for the functional and
       spoken half, RTK dropped, all 2,136 jōyō in a frequency-ordered track,
-      pitch accent from the first stage. **Stages 1 and 2 and the first kanji
-      module are written and live**: 95 lessons, 96 lesson sources, 246 cards,
-      40 of the jōyō. The rest is planned and not in the database, because a
-      lesson with a name and no material is the index this curriculum exists to
-      stop being.
-- [ ] **No way to add a card from the page.** The endpoint takes one and the
-      tests cover it, but there is no form: cards come from lessons, and
-      mining is a later stage of the Japanese route. Needed before that stage,
-      not before the one after this.
+      pitch accent from the first stage. **Stages 1 to 3 and the first kanji
+      module are written and live**: 152 lessons, 197 lesson sources, 281
+      cards, 40 of the jōyō. The rest is planned and not in the database,
+      because a lesson with a name and no material is the index this curriculum
+      exists to stop being.
 - [ ] **FSRS is unoptimised**, and will be until there is a review history
       worth optimising against. `ts-fsrs` ships an optimiser that takes one;
       `card_reviews` exists to be handed to it. Nothing to do yet except keep

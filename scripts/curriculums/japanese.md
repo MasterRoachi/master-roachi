@@ -164,7 +164,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | --- | --- | --- |
 | 1 | The script and the sounds | **35 — written** |
 | 2 | First grammar, first words | **55 — written** |
-| 3 | The core sentence | 60 |
+| 3 | The core sentence | **57 — written** |
 | 4 | Everyday Japanese | 70 |
 | 5 | Intermediate grammar | 90 |
 | 6 | Reading real Japanese | 55 |
