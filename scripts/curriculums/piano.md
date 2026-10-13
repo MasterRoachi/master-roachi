@@ -125,7 +125,7 @@ where instinct will not.
 | 3 | Hands together | 25 | 19 |
 | 4 | Keys and scales | 25 | 29 |
 | 5 | First repertoire, first covers | 25 | 25 |
-| 6 | Technique and the pedal | 25 | — |
+| 6 | Technique and the pedal | 25 | 28 |
 | 7 | Harmony in practice | 25 | — |
 | 8 | Intermediate repertoire | 25 | — |
 | 9 | Playing by ear | 20 | — |

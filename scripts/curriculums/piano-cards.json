@@ -1198,5 +1198,212 @@
       "front": "The sight-reading level rule",
       "back": "Roughly two grades below what you can learn — and if it never surprises you, it is too easy"
     }
+  ],
+  "The pedals on your piano — and what the middle one is": [
+    {
+      "kind": "word",
+      "front": "Sustain pedal",
+      "back": "The right pedal. Lifts every damper, so notes ring on and the whole instrument resonates."
+    },
+    {
+      "kind": "word",
+      "front": "Una corda",
+      "back": "The soft pedal on a grand — the action shifts so hammers strike two strings instead of three",
+      "extra": "Released by *tre corde*."
+    },
+    {
+      "kind": "word",
+      "front": "Half-blow",
+      "back": "The soft pedal on an upright — hammers move closer to the strings, so they strike with less speed",
+      "extra": "Quieter and duller, with no colour change."
+    },
+    {
+      "kind": "word",
+      "front": "Sostenuto",
+      "back": "A grand's middle pedal: holds only the notes already sounding",
+      "extra": "An upright's middle pedal is usually a practice mute or a bass sustain instead."
+    }
+  ],
+  "Syncopated pedalling": [
+    {
+      "kind": "grammar",
+      "front": "Syncopated pedalling",
+      "back": "Play, then change — lift and re-press the pedal just after the new note sounds",
+      "extra": "Also called legato pedalling. The foot is always a fraction behind the hand."
+    },
+    {
+      "kind": "grammar",
+      "front": "The test for a clean pedal change",
+      "back": "Play the chord, lift the hand entirely — the sound should continue unbroken, with no gap and no overlap"
+    }
+  ],
+  "Reading pedal marks, and why they are suggestions": [
+    {
+      "kind": "grammar",
+      "front": "Ped. ——— ✱",
+      "back": "Pedal down, held, released at the asterisk",
+      "extra": "The modern equivalent is a bracket with a notch at each change."
+    },
+    {
+      "kind": "grammar",
+      "front": "Who wrote the pedalling",
+      "back": "Usually an editor, unmarked. Follow it first, then judge it by ear on your own piano."
+    }
+  ],
+  "Pedalling by ear: listening for mud": [
+    {
+      "kind": "grammar",
+      "front": "Where the pedal changes",
+      "back": "With the harmony — and at a new bass note, before a rest, and at phrase ends. Not with every melody note."
+    }
+  ],
+  "What not to pedal": [
+    {
+      "kind": "grammar",
+      "front": "What takes no pedal",
+      "back": "Baroque music, scales and runs, repeated notes, staccato, and anything not yet learned"
+    }
+  ],
+  "Half pedal, and partial lifts": [
+    {
+      "kind": "word",
+      "front": "Half pedal",
+      "back": "A partial lift: the dampers touch the strings lightly, thinning the sound without cutting it"
+    },
+    {
+      "kind": "word",
+      "front": "Flutter pedal",
+      "back": "Several rapid small lifts, clearing a loud dense sound progressively"
+    }
+  ],
+  "How speed actually develops": [
+    {
+      "kind": "grammar",
+      "front": "Where speed comes from",
+      "back": "Economy of motion, relaxation between notes, chunking, the arm leading, and knowing it well enough not to think",
+      "extra": "Not from strength, and not from slow practice alone."
+    },
+    {
+      "kind": "grammar",
+      "front": "The fragment method",
+      "back": "Two to four notes at the target tempo, hands separately, then add a note",
+      "extra": "Short enough that tension cannot build."
+    }
+  ],
+  "Tension, and the signals to stop": [
+    {
+      "kind": "grammar",
+      "front": "The signals that mean stop today",
+      "back": "Pain while playing, tingling or numbness, a pumped tight forearm, weakness, or pain still there the next morning"
+    },
+    {
+      "kind": "grammar",
+      "front": "The six tension checks",
+      "back": "Shoulders down, jaw loose, breathing, wrist level, other hand loose, unused fingers still"
+    }
+  ],
+  "Dominant seventh and diminished arpeggios": [
+    {
+      "kind": "grammar",
+      "front": "Diminished seventh chord",
+      "back": "Four notes stacked in minor thirds — C E♭ F♯ A",
+      "extra": "The same shape on every root, and only three different ones exist in all of music."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a dominant seventh arpeggio fits the hand",
+      "back": "Four different notes to the octave, so one finger each — 1 2 3 4 up in the right hand"
+    }
+  ],
+  "Touch: legato, staccato, and where each comes from": [
+    {
+      "kind": "word",
+      "front": "Finger staccato",
+      "back": "Short, from the fingertip, hand quiet — for fast light passages"
+    },
+    {
+      "kind": "word",
+      "front": "Wrist staccato",
+      "back": "From the wrist, hand bouncing, forearm still — for repeated chords and crisp playing"
+    },
+    {
+      "kind": "word",
+      "front": "Forearm staccato",
+      "back": "From the elbow, whole hand dropping and rebounding — for loud, heavy, slow staccato"
+    },
+    {
+      "kind": "word",
+      "front": "Portato",
+      "back": "Dots under a slur: slightly separated, but not short"
+    }
+  ],
+  "Repeated notes, and changing fingers": [
+    {
+      "kind": "grammar",
+      "front": "Fast repeated notes — the fingering",
+      "back": "Change fingers: 3 2 1, or 4 3 2 1 cycling",
+      "extra": "One finger cannot reset fast enough, and repeated chords use the wrist instead."
+    }
+  ],
+  "Trills and ornaments": [
+    {
+      "kind": "grammar",
+      "front": "Trill (tr)",
+      "back": "Rapid alternation with the note above",
+      "extra": "Baroque: start on the upper note. Classical onwards: generally the main note."
+    },
+    {
+      "kind": "grammar",
+      "front": "Mordent",
+      "back": "Main note, the note below, main note — fast, on the beat"
+    },
+    {
+      "kind": "grammar",
+      "front": "Upper mordent",
+      "back": "Main note, the note above, main note",
+      "extra": "The zigzag without the vertical line. Also called a Schneller."
+    },
+    {
+      "kind": "grammar",
+      "front": "Turn",
+      "back": "Above, main, below, main — four notes, fast, on the beat"
+    },
+    {
+      "kind": "grammar",
+      "front": "Acciaccatura",
+      "back": "A grace note with a slashed stem: as short as possible, crushed into the main note"
+    },
+    {
+      "kind": "grammar",
+      "front": "Appoggiatura",
+      "back": "A grace note without a slash: takes real time from the main note, usually half its value"
+    },
+    {
+      "kind": "grammar",
+      "front": "Spread chord (wavy line)",
+      "back": "Rolled bottom to top, fast, with the top note arriving on the beat"
+    }
+  ],
+  "Czerny, and how to use him": [
+    {
+      "kind": "grammar",
+      "front": "Czerny Op. 599",
+      "back": "Practical Method for Beginners — 100 studies, starts very easy. Where to begin."
+    },
+    {
+      "kind": "grammar",
+      "front": "Czerny Op. 849",
+      "back": "30 Studies in Mechanism — properly intermediate"
+    },
+    {
+      "kind": "grammar",
+      "front": "Czerny Op. 299",
+      "back": "School of Velocity — the famous one. Stage 8 or later."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Czerny and not Hanon",
+      "back": "Czerny's studies are music — keys, phrases, dynamics — so what they teach transfers. Hanon's patterns do not occur in music."
+    }
   ]
 }
