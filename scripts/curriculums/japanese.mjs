@@ -53,9 +53,24 @@ function detailFor(name) {
   return text;
 }
 
+/**
+ * A card's natural key, which is what the database matches on: curriculum,
+ * kind and front. Two lessons claiming the same one is a silent bug — the
+ * insert is `where not exists`, so the second claim does not fail, it just
+ * quietly re-points the card at the later lesson. Caught here instead.
+ */
+const claimed = new Map();
+const twiceClaimed = [];
+
 function cardsFor(name) {
   askedCards.add(name);
-  return cards[name] ?? [];
+  const list = cards[name] ?? [];
+  for (const card of list) {
+    const key = `${card.kind}\u0000${card.front}`;
+    if (claimed.has(key)) twiceClaimed.push([card.front, claimed.get(key), name]);
+    else claimed.set(key, name);
+  }
+  return list;
 }
 
 const missing = [];
@@ -426,6 +441,25 @@ const stages = [
     ],
   },
   {
+    name: 'Stage 8 · Keigo',
+    lessons: [
+    ['The three systems of keigo', [{ title: 'Imabi', url: 'https://imabi.org/', note: 'Seven lessons on keigo.' }, { title: '敬語の指針 (Agency for Cultural Affairs)', url: 'https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/keigo_tosin.pdf', note: 'The official guidance. Free, and the source for the five-category split.' }]],
+    ['尊敬語: the special verbs', [{ title: 'Imabi', url: 'https://imabi.org/', note: 'Seven lessons on keigo.' }]],
+    ['尊敬語: the regular patterns', [{ title: 'Imabi', url: 'https://imabi.org/', note: 'Seven lessons on keigo.' }]],
+    ['謙譲語: the special verbs', [{ title: 'Imabi', url: 'https://imabi.org/', note: 'Seven lessons on keigo.' }]],
+    ['謙譲語: the regular patterns', [{ title: 'Imabi', url: 'https://imabi.org/', note: 'Seven lessons on keigo.' }, { title: '敬語の指針 (Agency for Cultural Affairs)', url: 'https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/keigo_tosin.pdf', note: 'The official guidance. Free, and the source for the five-category split.' }]],
+    ['ございます, でございます and 美化語', [{ title: '敬語の指針 (Agency for Cultural Affairs)', url: 'https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/keigo_tosin.pdf', note: 'The official guidance. Free, and the source for the five-category split.' }]],
+    ['内 and 外: who counts as your group'],
+    ['二重敬語 and over-politeness', [{ title: '敬語の指針 (Agency for Cultural Affairs)', url: 'https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/keigo_tosin.pdf', note: 'The official guidance. Free, and the source for the five-category split.' }]],
+    ['Keigo on the telephone'],
+    ['Keigo in email'],
+    ['Asking, refusing and apologising in keigo'],
+    ['Keigo mistakes, and when not to use it', [{ title: '敬語の指針 (Agency for Cultural Affairs)', url: 'https://www.bunka.go.jp/seisaku/bunkashingikai/kokugo/hokoku/pdf/keigo_tosin.pdf', note: 'The official guidance. Free, and the source for the five-category split.' }]],
+    ['A full business exchange'],
+    ['Review: keigo'],
+    ],
+  },
+  {
     name: 'Kanji 1 · The commonest characters',
     lessons: [
     ['Kanji 1 · 日 一 人 大 年 国 中 本', [{ title: 'Jisho — stroke order animations', url: 'https://jisho.org', note: 'Search a character; the stroke order plays on its page.' }]],
@@ -536,6 +570,15 @@ stages.forEach((stage, m) => {
 
 const strayDetail = Object.keys(detail).filter((key) => !askedDetail.has(key));
 const strayCards = Object.keys(cards).filter((key) => !askedCards.has(key));
+
+if (twiceClaimed.length) {
+  console.error(`\n${twiceClaimed.length} card(s) are claimed by two lessons:`);
+  for (const [front, first, second] of twiceClaimed) {
+    console.error(`  · ${front}  —  ${first}  and  ${second}`);
+  }
+  console.error('\nA card belongs to one lesson. Nothing printed.');
+  process.exit(1);
+}
 
 if (missing.length) {
   console.error(`\nNo material for ${missing.length} lesson(s):`);

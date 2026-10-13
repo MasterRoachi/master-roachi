@@ -169,7 +169,7 @@ reading payoff front-loads and the tail is honestly a tail.
 | 5 | Intermediate grammar | **60 — written** |
 | 6 | Reading real Japanese | **32 — written** |
 | 7 | Advanced grammar | **24 — written** |
-| 8 | Keigo and register | 40 |
+| 8 | Keigo and register | **14 — written** |
 | 9 | Native material | 50 |
 | 10 | Classical Japanese | 40 |
 | 11 | Ad astra | open |

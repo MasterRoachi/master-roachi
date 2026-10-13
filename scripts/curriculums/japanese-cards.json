@@ -1526,64 +1526,6 @@
       "extra": "Pair: [変わる]{かわる} it changes."
     }
   ],
-  "Keigo: a first look": [
-    {
-      "kind": "word",
-      "front": "いらっしゃる",
-      "back": "to go · to come · to be (honorific)",
-      "reading": "いらっしゃる",
-      "extra": "Honorific for [行く]{いく}, [来る]{くる}, いる. Said of the other person."
-    },
-    {
-      "kind": "word",
-      "front": "参る",
-      "back": "to go · to come (humble)",
-      "reading": "まいる",
-      "extra": "Humble for [行く]{いく}, [来る]{くる}. Said of yourself."
-    },
-    {
-      "kind": "word",
-      "front": "おっしゃる",
-      "back": "to say (honorific)",
-      "reading": "おっしゃる",
-      "extra": "Honorific for [言う]{いう}."
-    },
-    {
-      "kind": "word",
-      "front": "申す",
-      "back": "to say (humble)",
-      "reading": "もうす",
-      "extra": "Humble for [言う]{いう}. [申します]{もうします} in a self-introduction."
-    },
-    {
-      "kind": "word",
-      "front": "召し上がる",
-      "back": "to eat · to drink (honorific)",
-      "reading": "めしあがる",
-      "extra": "Honorific for [食べる]{たべる}, [飲む]{のむ}."
-    },
-    {
-      "kind": "word",
-      "front": "いただく",
-      "back": "to receive · to eat (humble)",
-      "reading": "いただく",
-      "extra": "Humble for [もらう]{もらう}, [食べる]{たべる}. いただきます before a meal."
-    },
-    {
-      "kind": "word",
-      "front": "なさる",
-      "back": "to do (honorific)",
-      "reading": "なさる",
-      "extra": "Honorific for する."
-    },
-    {
-      "kind": "word",
-      "front": "いたす",
-      "back": "to do (humble)",
-      "reading": "いたす",
-      "extra": "Humble for する."
-    }
-  ],
   "The four conditionals compared": [
     {
       "kind": "grammar",
@@ -2429,6 +2371,270 @@
       "back": "direction · side · person",
       "reading": "ホウ / かた",
       "extra": "[方]{ほう} side · [方法]{ほうほう} method · [夕方]{ゆうがた} evening · [あの方]{あのかた} that person (polite) · [読み方]{よみかた} how to read\n\n4 strokes."
+    }
+  ],
+  "尊敬語: the special verbs": [
+    {
+      "kind": "word",
+      "front": "いらっしゃる",
+      "back": "to go · to come · to be (honorific)",
+      "reading": "いらっしゃる",
+      "extra": "Honorific for [行く]{いく}, [来る]{くる}, いる.\n\nます form drops the り: いらっしゃ**います**."
+    },
+    {
+      "kind": "word",
+      "front": "おっしゃる",
+      "back": "to say (honorific)",
+      "reading": "おっしゃる",
+      "extra": "Honorific for [言う]{いう}. おっしゃ**います**."
+    },
+    {
+      "kind": "word",
+      "front": "なさる",
+      "back": "to do (honorific)",
+      "reading": "なさる",
+      "extra": "Honorific for する. なさ**います**."
+    },
+    {
+      "kind": "word",
+      "front": "召し上がる",
+      "back": "to eat · to drink (honorific)",
+      "reading": "めしあがる",
+      "extra": "Honorific for [食べる]{たべる}, [飲む]{のむ}."
+    },
+    {
+      "kind": "word",
+      "front": "ご覧になる",
+      "back": "to look (honorific)",
+      "reading": "ごらんになる",
+      "extra": "Honorific for [見る]{みる}. ご覧ください — please look."
+    },
+    {
+      "kind": "word",
+      "front": "ご存じだ",
+      "back": "to know (honorific)",
+      "reading": "ごぞんじだ",
+      "extra": "Honorific for [知っている]{しっている}. ご存じですか — do you know?"
+    },
+    {
+      "kind": "word",
+      "front": "くださる",
+      "back": "to give me (honorific)",
+      "reading": "くださる",
+      "extra": "Honorific for [くれる]{くれる}. ください comes from this."
+    }
+  ],
+  "謙譲語: the special verbs": [
+    {
+      "kind": "word",
+      "front": "参る",
+      "back": "to go · to come (humble)",
+      "reading": "まいる",
+      "extra": "Humble for [行く]{いく}, [来る]{くる}."
+    },
+    {
+      "kind": "word",
+      "front": "おる",
+      "back": "to be (humble)",
+      "reading": "おる",
+      "extra": "Humble for いる. 田中は**おりません** — to an outsider, about your own colleague."
+    },
+    {
+      "kind": "word",
+      "front": "申す",
+      "back": "to say (humble)",
+      "reading": "もうす",
+      "extra": "Humble for [言う]{いう}. [申します]{もうします} in a self-introduction."
+    },
+    {
+      "kind": "word",
+      "front": "いたす",
+      "back": "to do (humble)",
+      "reading": "いたす",
+      "extra": "Humble for する. [いたします]{いたします}."
+    },
+    {
+      "kind": "word",
+      "front": "いただく",
+      "back": "to receive · to eat (humble)",
+      "reading": "いただく",
+      "extra": "Humble for [もらう]{もらう}, [食べる]{たべる}."
+    },
+    {
+      "kind": "word",
+      "front": "拝見する",
+      "back": "to look at (humble)",
+      "reading": "はいけんする",
+      "extra": "Humble for [見る]{みる} — of something belonging to them."
+    },
+    {
+      "kind": "word",
+      "front": "伺う",
+      "back": "to ask · to hear · to visit (humble)",
+      "reading": "うかがう",
+      "extra": "Three jobs. [明日伺います]{あしたうかがいます} — I'll visit tomorrow."
+    },
+    {
+      "kind": "word",
+      "front": "存じる",
+      "back": "to know · to think (humble)",
+      "reading": "ぞんじる",
+      "extra": "Humble for [知る]{しる}. 存じております / 存じません."
+    },
+    {
+      "kind": "word",
+      "front": "差し上げる",
+      "back": "to give (humble)",
+      "reading": "さしあげる",
+      "extra": "Humble for [あげる]{あげる}."
+    },
+    {
+      "kind": "word",
+      "front": "お目にかかる",
+      "back": "to meet (humble)",
+      "reading": "おめにかかる",
+      "extra": "Humble for [会う]{あう}. Literally 'to have one's eyes meet'."
+    },
+    {
+      "kind": "word",
+      "front": "ございます",
+      "back": "to be (polite)",
+      "reading": "ございます",
+      "extra": "Polite ある. でございます is the polite です."
+    },
+    {
+      "kind": "word",
+      "front": "承る",
+      "back": "to receive · to take (an order, a message)",
+      "reading": "うけたまわる",
+      "extra": "Humble for [受ける]{うける}. ご伝言を承ります."
+    }
+  ],
+  "四字熟語 — four-character compounds": [
+    {
+      "kind": "word",
+      "front": "一生懸命",
+      "back": "with all one's might",
+      "reading": "いっしょうけんめい",
+      "extra": "Entirely ordinary. [一生懸命働く]{いっしょうけんめいはたらく}."
+    },
+    {
+      "kind": "word",
+      "front": "一期一会",
+      "back": "a once-in-a-lifetime meeting",
+      "reading": "いちごいちえ",
+      "extra": "From the tea ceremony."
+    },
+    {
+      "kind": "word",
+      "front": "一石二鳥",
+      "back": "two birds with one stone",
+      "reading": "いっせきにちょう"
+    },
+    {
+      "kind": "word",
+      "front": "十人十色",
+      "back": "everyone is different",
+      "reading": "じゅうにんといろ",
+      "extra": "Ten people, ten colours."
+    },
+    {
+      "kind": "word",
+      "front": "試行錯誤",
+      "back": "trial and error",
+      "reading": "しこうさくご"
+    },
+    {
+      "kind": "word",
+      "front": "臨機応変",
+      "back": "adapting to circumstances",
+      "reading": "りんきおうへん"
+    },
+    {
+      "kind": "word",
+      "front": "自業自得",
+      "back": "you brought it on yourself",
+      "reading": "じごうじとく"
+    },
+    {
+      "kind": "word",
+      "front": "以心伝心",
+      "back": "tacit understanding",
+      "reading": "いしんでんしん"
+    },
+    {
+      "kind": "word",
+      "front": "本末転倒",
+      "back": "putting the cart before the horse",
+      "reading": "ほんまつてんとう"
+    },
+    {
+      "kind": "word",
+      "front": "単刀直入",
+      "back": "straight to the point",
+      "reading": "たんとうちょくにゅう"
+    }
+  ],
+  "ことわざ and 慣用句": [
+    {
+      "kind": "word",
+      "front": "顔が広い",
+      "back": "well connected",
+      "reading": "かおがひろい"
+    },
+    {
+      "kind": "word",
+      "front": "手を貸す",
+      "back": "to lend a hand",
+      "reading": "てをかす"
+    },
+    {
+      "kind": "word",
+      "front": "耳が痛い",
+      "back": "a criticism that stings",
+      "reading": "みみがいたい"
+    },
+    {
+      "kind": "word",
+      "front": "口が軽い",
+      "back": "indiscreet",
+      "reading": "くちがかるい"
+    },
+    {
+      "kind": "word",
+      "front": "気が合う",
+      "back": "to get on well",
+      "reading": "きがあう"
+    },
+    {
+      "kind": "word",
+      "front": "腹が立つ",
+      "back": "to be angry",
+      "reading": "はらがたつ"
+    },
+    {
+      "kind": "word",
+      "front": "頭が上がらない",
+      "back": "to be indebted to",
+      "reading": "あたまがあがらない"
+    },
+    {
+      "kind": "word",
+      "front": "足を引っ張る",
+      "back": "to hold someone back",
+      "reading": "あしをひっぱる"
+    },
+    {
+      "kind": "word",
+      "front": "気を使う",
+      "back": "to be considerate · to take care",
+      "reading": "きをつかう"
+    },
+    {
+      "kind": "word",
+      "front": "気が付く",
+      "back": "to notice",
+      "reading": "きがつく"
     }
   ]
 }
