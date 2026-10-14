@@ -1126,6 +1126,90 @@ export default {
       }
     }
 
+    // --- the Calibre index -------------------------------------------------
+    //
+    // Under /work/api/ with the rest of the backend, so the one Access policy
+    // covers it. That is the whole point of it being here: the index used to
+    // be public/work/library.json, which Access gated when served and the
+    // public GitHub repository published anyway. See migration 0014.
+    if (route === '/work/api/library') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (request.method !== 'GET') return json({ error: 'GET only' }, 405);
+
+      const db = env.DB;
+      if (!db) return json({ configured: false, books: [] }, 200);
+
+      try {
+        // The whole index in one response, the way the page has always had
+        // it: the add card filters as he types, and 3,600 rows is a search
+        // that should not go to Western Europe on every keystroke. Ordered
+        // here rather than in the client for the same reason.
+        const books = await db
+          .prepare(
+            `select calibre_id as id, title, authors, series, series_index as seriesIndex,
+                    genre, language, has_cover as cover, indexed_at
+             from library_books
+             order by authors, series_index, title`,
+          )
+          .all();
+
+        const rows = books.results ?? [];
+        return json(
+          {
+            configured: true,
+            // One value for the whole rebuild — library.mjs writes the same
+            // timestamp to every row — so the first row's is the index's.
+            generated: (rows[0] as { indexed_at?: string } | undefined)?.indexed_at ?? null,
+            books: rows.map(({ indexed_at: _indexed, ...book }) => book),
+          },
+          200,
+        );
+      } catch (error) {
+        return json({ error: String(error instanceof Error ? error.message : error) }, 500);
+      }
+    }
+
+    // --- a book's cover ----------------------------------------------------
+    //
+    // Only the shelved books have one; everything else falls through to the
+    // page's own placeholder. Same Access gate, for a stronger reason than
+    // the index: a cover says what he is reading now.
+    if (route === '/work/api/book-cover') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (request.method !== 'GET') return json({ error: 'GET only' }, 405);
+
+      const db = env.DB;
+      if (!db) return new Response(null, { status: 404 });
+
+      const id = Number(url.searchParams.get('id'));
+      if (!Number.isInteger(id) || id <= 0) return new Response(null, { status: 400 });
+
+      try {
+        const row = await db
+          .prepare('select webp, made_at from library_covers where calibre_id = ?')
+          .bind(id)
+          .first<{ webp: ArrayBuffer; made_at: string }>();
+        if (!row) return new Response(null, { status: 404 });
+
+        return new Response(row.webp, {
+          headers: {
+            'content-type': 'image/webp',
+            // Private: it is behind Access, and a shared cache must not hold
+            // it. Immutable for a day because the bytes only change when
+            // `npm run book-covers --force` is run by hand.
+            'cache-control': 'private, max-age=86400',
+            etag: `"${id}-${row.made_at}"`,
+          },
+        });
+      } catch {
+        return new Response(null, { status: 404 });
+      }
+    }
+
     // --- reading -----------------------------------------------------------
     if (route === '/work/api/reading') {
       const throughAccess = request.headers.has('cf-access-jwt-assertion');

@@ -1,32 +1,46 @@
-// The Calibre library, indexed for the reading page's book browser.
+// The Calibre library, indexed into D1 for the reading page's book browser.
 //
 // ~/Media/Books is a Calibre library: a metadata.db holding 3,600+ books with
 // their authors, series, tags and languages, and one folder per book with a
 // cover.jpg in it. That is a LIBRARY and not a reading list — see the reading
-// page for the difference — so none of it is imported. It is indexed, so that
-// adding a book can be a search rather than retyping what is already known.
+// page for the difference — so none of it is imported into `books`. It is
+// indexed, so that adding a book can be a search rather than retyping what is
+// already known.
 //
-// Run by hand (`npm run library`), NOT from prebuild. The library lives on
-// the rig and the deploy build runs in CI, where this path does not exist —
-// so the index is committed, and a run without the library leaves the
-// committed copy alone rather than writing an empty one.
+// WHERE IT GOES, AND WHY IT MOVED. This wrote public/work/library.json until
+// 2026-10-14. Access matches the /work prefix, so the file was gated when
+// SERVED — but the GitHub repository is public, so committing it published a
+// listing of everything he owns regardless, and it was therefore never
+// committed. The browser has been inert in production ever since: it fetched
+// a file that was not there. It is a D1 table now (migration 0014), served
+// from /work/api/library behind the same one Access policy, and nothing about
+// the library lands in the repository.
 //
-// The output goes under public/work/ on purpose: Cloudflare Access matches
-// the /work prefix, so the index is gated with the rest of the backend. In
-// public/ it would be a listing of everything he owns, served to anyone.
+// Run by hand (`npm run library`), NOT from prebuild: the library is on the
+// rig and the deploy build runs in CI, where this path does not exist. A run
+// without the library leaves the table alone rather than emptying it.
+//
+// Rebuilt wholesale, inside one transaction — delete, then insert. The index
+// is a projection of metadata.db and has nothing of its own to preserve, so
+// reconciling row by row would be work with no reader. `library_covers` is a
+// separate table precisely so that this cannot drop image bytes.
 
 import { createRequire } from 'node:module';
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { homedir } from 'node:os';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir, tmpdir } from 'node:os';
 
 const require = createRequire(import.meta.url);
+const ROOT = process.cwd();
 const LIBRARY = process.env.CALIBRE_LIBRARY ?? join(homedir(), 'Media', 'Books');
 const DB = join(LIBRARY, 'metadata.db');
-const OUT = 'public/work/library.json';
+const DATABASE = 'master-roachi';
+const where = process.argv.includes('--local') ? '--local' : '--remote';
 
+const { existsSync } = require('node:fs');
 if (!existsSync(DB)) {
-  console.log(`library: no metadata.db at ${DB} — leaving ${OUT} as committed.`);
+  console.log(`library: no metadata.db at ${DB} — the D1 index is left as it is.`);
   process.exit(0);
 }
 
@@ -59,27 +73,62 @@ const rows = db
   )
   .all();
 
-// The book's folder is NOT shipped. Covers are resolved at build time from
-// metadata.db by id (see book-covers.mjs), so a path in the client index
-// would be bytes nobody reads — and this file is fetched whole.
-const books = rows.map((r) => ({
-  id: r.id,
-  title: r.title,
-  authors: r.authors ?? null,
-  series: r.series ?? null,
+const NOW = new Date().toISOString();
+/** SQL single-quoted string. An apostrophe in a title ends the literal early. */
+const q = (value) =>
+  value === null || value === undefined ? 'null' : `'${String(value).replace(/'/g, "''")}'`;
+
+const values = rows.map((r) => {
   // Calibre stores 1.0 for a book that is not in a series. Only meaningful
   // alongside a series, so it travels with one or not at all.
-  seriesIndex: r.series ? r.seriesIndex : null,
-  genre: r.tags ?? null,
-  language: r.language ?? null,
-  cover: r.hasCover ? 1 : 0,
-}));
+  const seriesIndex = r.series ? r.seriesIndex : null;
+  return (
+    `(${r.id}, ${q(r.title)}, ${q(r.authors ?? null)}, ${q(r.series ?? null)}, ` +
+    `${seriesIndex === null ? 'null' : seriesIndex}, ${q(r.tags ?? null)}, ` +
+    `${q(r.language ?? null)}, ${r.hasCover ? 1 : 0}, ${q(NOW)})`
+  );
+});
 
-mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, JSON.stringify({ generated: new Date().toISOString(), books }));
-const kb = Math.round(Buffer.byteLength(JSON.stringify({ books })) / 1024);
+// Chunked: one INSERT per 500 rows. D1 takes a large statement happily enough,
+// but a single 3,600-row VALUES list is one unreadable line in the file this
+// writes, and a failure in it says nothing about which row was wrong.
+const CHUNK = 500;
+const statements = [
+  '-- Generated by scripts/library.mjs from ~/Media/Books/metadata.db.',
+  '-- The whole index, rebuilt. library_covers is deliberately untouched.',
+  'delete from library_books;',
+];
+for (let i = 0; i < values.length; i += CHUNK) {
+  statements.push(
+    'insert into library_books\n' +
+      '  (calibre_id, title, authors, series, series_index, genre, language, has_cover, indexed_at)\n' +
+      '  values\n  ' +
+      values.slice(i, i + CHUNK).join(',\n  ') +
+      ';',
+  );
+}
+
+const dir = mkdtempSync(join(tmpdir(), 'library-'));
+const file = join(dir, 'library.sql');
+writeFileSync(file, statements.join('\n\n') + '\n');
+
+try {
+  execFileSync('npx', ['wrangler', 'd1', 'execute', DATABASE, where, '--file', file], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    maxBuffer: 256 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+} catch (error) {
+  // A SQL error arrives on STDOUT with an empty stderr and exit 1.
+  console.error('\nwrangler could not write the index. The SQL is at:\n  ' + file + '\n');
+  console.error(String(error.stdout || '').trim() || String(error.stderr || error.message).trim());
+  process.exit(1);
+}
+rmSync(dir, { recursive: true, force: true });
+
 console.log(
-  `library: ${books.length} books -> ${OUT} (${kb} kB), ` +
-    `${books.filter((b) => b.series).length} in series, ` +
-    `${books.filter((b) => b.cover).length} with covers`,
+  `library: ${rows.length} books -> D1 library_books (${where.replace('--', '')}), ` +
+    `${rows.filter((b) => b.series).length} in series, ` +
+    `${rows.filter((b) => b.hasCover).length} with covers in Calibre`,
 );

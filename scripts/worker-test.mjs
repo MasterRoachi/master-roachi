@@ -1195,6 +1195,23 @@ function fakeD1() {
       last_review: null, unlocked_on: null,
     },
   ];
+  /* The Calibre index, and the covers for shelved books. Two rows is enough:
+     the route's job is to gate, order and shed indexed_at, not to search. */
+  const libraryBooks = [
+    {
+      calibre_id: 491, title: 'The Gulag Archipelago 1', authors: 'Aleksandr Solzhenitsyn',
+      series: 'The Gulag Archipelago', series_index: 1, genre: 'History.Russia & USSR',
+      language: 'eng', has_cover: 1, indexed_at: '2026-10-14T20:02:52.199Z',
+    },
+    {
+      calibre_id: 12, title: 'On the Incarnation', authors: 'Athanasius',
+      series: null, series_index: null, genre: 'Religion.Christianity.Patristics',
+      language: 'eng', has_cover: 0, indexed_at: '2026-10-14T20:02:52.199Z',
+    },
+  ];
+  const libraryCovers = [
+    { calibre_id: 491, webp: new Uint8Array([82, 73, 70, 70]).buffer, made_at: '2026-10-14T20:10:00.000Z' },
+  ];
   const cardReviews = [];
   /** card_id → { scene, height }. The primary key IS the card. */
   const cardNotes = new Map();
@@ -1234,6 +1251,18 @@ function fakeD1() {
           for (const k of flash) counts.set(k.curriculum_id, (counts.get(k.curriculum_id) ?? 0) + 1);
           return { results: [...counts].map(([curriculum_id, n]) => ({ curriculum_id, n })) };
         }
+        if (sql.includes('from library_books')) {
+          // The route aliases on the way out — calibre_id as id, series_index
+          // as seriesIndex, has_cover as cover — so the stub has to, or the
+          // test passes against a shape the page never sees.
+          return {
+            results: libraryBooks.map((b) => ({
+              id: b.calibre_id, title: b.title, authors: b.authors, series: b.series,
+              seriesIndex: b.series_index, genre: b.genre, language: b.language,
+              cover: b.has_cover, indexed_at: b.indexed_at,
+            })),
+          };
+        }
         if (sql.includes('from books')) return { results: books };
         if (sql.includes('from curriculums')) return { results: curriculums };
         if (sql.includes('from modules')) return { results: modules };
@@ -1255,6 +1284,9 @@ function fakeD1() {
       },
       async first() {
         sqlLog.push(sql);
+        if (sql.includes('from library_covers')) {
+          return libraryCovers.find((c) => c.calibre_id === bound[0]) ?? null;
+        }
         if (sql.includes('from books')) {
           return books.find((b) => b.id === bound[0]) ?? null;
         }
@@ -1682,6 +1714,88 @@ check(
   DB._habits.at(-1)?.icon === 'cross',
   JSON.stringify(DB._habits.at(-1)),
 );
+
+// --- the Calibre index -----------------------------------------------------
+//
+// It moved out of public/work/library.json and into D1 on 2026-10-14, because
+// Access gated the file when served and the public repository published it
+// anyway. What is worth testing is that the gate is really on, and that
+// indexed_at — one value repeated across 3,623 rows — is lifted out rather
+// than sent 3,623 times.
+
+DB = fakeD1();
+
+res = await worker.fetch(get('https://masterroachi.com/work/api/library'), dbEnv());
+check(
+  'the library without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/library'), env);
+body = await res.json();
+check(
+  'the library with no database answers configured:false',
+  res.status === 200 && body.configured === false && Array.isArray(body.books),
+  JSON.stringify(body),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/library'), dbEnv());
+body = await res.json();
+check('the library answers with its books', body.books.length === 2, JSON.stringify(body).slice(0, 120));
+check(
+  'generated is lifted off the rows',
+  body.generated === '2026-10-14T20:02:52.199Z',
+  String(body.generated),
+);
+check(
+  'and indexed_at is not repeated on every book',
+  body.books.every((b) => !('indexed_at' in b)),
+  JSON.stringify(body.books[0]),
+);
+check(
+  'a book carries what the add card fills in',
+  body.books[0].id === 491 && body.books[0].seriesIndex === 1 && body.books[0].cover === 1,
+  JSON.stringify(body.books[0]),
+);
+
+res = await worker.fetch(
+  postJson('https://masterroachi.com/work/api/library', { anything: true }),
+  dbEnv(),
+);
+check('the library refuses anything but GET', res.status === 405, String(res.status));
+
+// --- a book's cover --------------------------------------------------------
+
+res = await worker.fetch(get('https://masterroachi.com/work/api/book-cover?id=491'), dbEnv());
+check(
+  'a cover without Access serves the 404 page',
+  (await res.text()) === '404 page',
+  String(res.status),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/book-cover?id=491'), dbEnv());
+check(
+  'a shelved cover comes back as webp',
+  res.status === 200 && res.headers.get('content-type') === 'image/webp',
+  `${res.status} ${res.headers.get('content-type')}`,
+);
+check(
+  'and is marked private, because it says what he is reading',
+  (res.headers.get('cache-control') ?? '').startsWith('private'),
+  String(res.headers.get('cache-control')),
+);
+
+res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/book-cover?id=12'), dbEnv());
+check('a book with no cover is a 404, not an error', res.status === 404, String(res.status));
+
+for (const bad of ['', '0', '-3', 'abc', '1.5']) {
+  res = await worker.fetch(
+    viaAccess(`https://masterroachi.com/work/api/book-cover?id=${bad}`),
+    dbEnv(),
+  );
+  check(`a cover id of "${bad}" is refused`, res.status === 400, String(res.status));
+}
 
 // --- reading ---------------------------------------------------------------
 //

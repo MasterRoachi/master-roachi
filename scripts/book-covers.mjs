@@ -7,11 +7,16 @@
 //
 // Run by hand (`npm run book-covers`) like `npm run library`, and for the
 // same reason: the library is on the rig and the deploy build runs in CI.
-// Both the index and these webps are committed.
 //
-// GENERATED FILENAMES ARE RESERVED. public/work/books/<calibre id>.webp is
-// rewritten by this script — same rule as covers.mjs and store-art.mjs, so
-// nothing else may write there.
+// WHERE THEY GO, AND WHY THEY MOVED. These were public/work/books/<id>.webp
+// until 2026-10-14, committed so that CI could deploy them. The repository is
+// public, so that published the cover of every book he was reading — the same
+// fault the index had, and worse, because a cover says what he is reading now
+// rather than what he owns. They are rows in library_covers (migration 0014)
+// now, served from /work/api/book-cover behind Access.
+//
+// Keyed on the Calibre id, not on books.id: the art belongs to the library
+// row, so a shelf entry can be deleted and re-added without re-encoding.
 
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
@@ -23,7 +28,6 @@ const require = createRequire(import.meta.url);
 const ROOT = process.cwd();
 const LIBRARY = process.env.CALIBRE_LIBRARY ?? path.join(homedir(), 'Media', 'Books');
 const DB = path.join(LIBRARY, 'metadata.db');
-const OUT = 'public/work/books';
 const DATABASE = 'master-roachi';
 const where = process.argv.includes('--local') ? '--local' : '--remote';
 
@@ -40,7 +44,7 @@ try {
 }
 
 if (!fs.existsSync(DB)) {
-  console.log(`book-covers: no metadata.db at ${DB} — covers left as committed.`);
+  console.log(`book-covers: no metadata.db at ${DB} — the covers in D1 are left as they are.`);
   process.exit(0);
 }
 
@@ -78,7 +82,8 @@ const { DatabaseSync } = require('node:sqlite');
 const calibre = new DatabaseSync(`file:${DB}?mode=ro`, { readOnly: true });
 const find = calibre.prepare('select path, has_cover from books where id = ?');
 
-fs.mkdirSync(OUT, { recursive: true });
+/** Which covers D1 already holds, so an unchanged jpg is not re-encoded. */
+const have = new Set(d1('select calibre_id from library_covers').map((r) => r.calibre_id));
 
 let written = 0;
 const missing = [];
@@ -93,19 +98,30 @@ for (const { calibre_id: id } of shelved) {
     missing.push(id);
     continue;
   }
-  const target = path.join(OUT, `${id}.webp`);
-  // Skip a cover that is already current: this runs on every deploy and
-  // re-encoding an unchanged jpg churns the repo for nothing.
-  const src = fs.statSync(source);
-  if (fs.existsSync(target) && fs.statSync(target).mtimeMs >= src.mtimeMs) continue;
+  // Already held, and the source has not been re-encoded since. There is no
+  // mtime to compare against in D1, so --force is how a changed cover is
+  // replaced; without it this is cheap to run repeatedly.
+  if (have.has(id) && !process.argv.includes('--force')) continue;
 
-  await sharp(source).resize({ width: WIDTH, withoutEnlargement: true })
+  const webp = await sharp(source)
+    .resize({ width: WIDTH, withoutEnlargement: true })
     .webp({ quality: 80 })
-    .toFile(target);
+    .toBuffer();
+
+  // x'..' is SQLite's blob literal, and the only way to put bytes through
+  // `wrangler d1 execute`. Twice the size as hex, for a 320px webp — tens of
+  // kilobytes, for the handful of books actually on a shelf.
+  d1(
+    `insert into library_covers (calibre_id, webp, bytes, made_at)
+       values (${id}, x'${webp.toString('hex')}', ${webp.byteLength}, '${new Date().toISOString()}')
+     on conflict(calibre_id) do update set
+       webp = excluded.webp, bytes = excluded.bytes, made_at = excluded.made_at`,
+  );
   written += 1;
 }
 
 console.log(
-  `book-covers: ${shelved.length} shelved from the library, ${written} written to ${OUT}` +
+  `book-covers: ${shelved.length} shelved from the library, ${written} written to D1 ` +
+    `library_covers (${where.replace('--', '')})` +
     (missing.length ? `, ${missing.length} with no cover (${missing.join(', ')})` : ''),
 );
