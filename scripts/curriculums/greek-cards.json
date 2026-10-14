@@ -5473,5 +5473,5128 @@
       "front": "The measure of this stage",
       "back": "Not accuracy, but whether a Greek stops speaking to you carefully and starts speaking to you normally"
     }
+  ],
+  "What stage 8 is: input at volume": [
+    {
+      "kind": "grammar",
+      "front": "The ratio from stage 8 on",
+      "back": "Twenty minutes of study to an hour of Greek — input, not instruction"
+    },
+    {
+      "kind": "grammar",
+      "front": "B1 to C1, in hours",
+      "back": "Somewhere between 500 and 1,000 hours of contact"
+    },
+    {
+      "kind": "word",
+      "front": "η κατανόηση",
+      "back": "comprehension, understanding"
+    },
+    {
+      "kind": "word",
+      "front": "η παραγωγή",
+      "back": "production — the other half of the Ellinomatheia paper"
+    }
+  ],
+  "How comprehension builds": [
+    {
+      "kind": "grammar",
+      "front": "Why easy material beats hard material",
+      "back": "Acquisition happens in the part you understand; below about 80 per cent it is decoding, and almost nothing sticks"
+    },
+    {
+      "kind": "grammar",
+      "front": "What output does, and does not do",
+      "back": "It consolidates what you have taken in and shows you your gaps. It does not acquire new language."
+    },
+    {
+      "kind": "grammar",
+      "front": "The marker that material is at the right level",
+      "back": "You can keep going without stopping"
+    }
+  ],
+  "Choosing material at the right level": [
+    {
+      "kind": "grammar",
+      "front": "The hundred-word test",
+      "back": "3–5 unknown words per hundred is the learning zone; 0–2 is easy volume; more than 10, postpone it"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a Greek translation is easier than a Greek original",
+      "back": "The sentence shapes are closer to English and the vocabulary is less idiomatic"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one subject that is easiest for you to read in Greek",
+      "back": "The Church — you can predict the content, and prediction is what carries comprehension"
+    }
+  ],
+  "Intensive and extensive": [
+    {
+      "kind": "grammar",
+      "front": "Extensive against intensive, and the ratio",
+      "back": "Nine parts extensive (a lot, easily, no dictionary) to one part intensive (a little, every word, taken apart)"
+    },
+    {
+      "kind": "grammar",
+      "front": "The step of the intensive method that teaches most",
+      "back": "Rewriting the paragraph in simpler Greek — paraphrase forces you to own it rather than translate it"
+    },
+    {
+      "kind": "grammar",
+      "front": "What goes wrong with only intensive work",
+      "back": "You never get fast and you never finish anything"
+    }
+  ],
+  "The news, daily": [
+    {
+      "kind": "word",
+      "front": "η ανακοίνωση",
+      "back": "the announcement"
+    },
+    {
+      "kind": "word",
+      "front": "η απόφαση",
+      "back": "the decision"
+    },
+    {
+      "kind": "word",
+      "front": "η αύξηση",
+      "back": "the increase, the rise"
+    },
+    {
+      "kind": "word",
+      "front": "η μείωση",
+      "back": "the reduction, the fall"
+    },
+    {
+      "kind": "word",
+      "front": "η κυβέρνηση",
+      "back": "the government"
+    },
+    {
+      "kind": "word",
+      "front": "το υπουργείο",
+      "back": "the ministry"
+    },
+    {
+      "kind": "word",
+      "front": "τα μέτρα",
+      "back": "the measures"
+    },
+    {
+      "kind": "word",
+      "front": "η έρευνα",
+      "back": "the investigation; the research"
+    },
+    {
+      "kind": "word",
+      "front": "η είδηση",
+      "back": "the news item — plural οι ειδήσεις or τα νέα for the news"
+    },
+    {
+      "kind": "sentence",
+      "front": "σύμφωνα με ανακοίνωση του υπουργείου",
+      "back": "according to a ministry announcement"
+    },
+    {
+      "kind": "sentence",
+      "front": "λόγω της κακοκαιρίας",
+      "back": "because of the bad weather",
+      "extra": "λόγω takes the genitive"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αύξηση τιμών στα καύσιμα",
+      "back": "Rise in fuel prices — a headline: no article, no verb, all genitive"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κλειστά τα σχολεία την Παρασκευή",
+      "back": "Schools closed on Friday — headline grammar: the participle does adjectival work"
+    },
+    {
+      "kind": "grammar",
+      "front": "Headline grammar, in four rules",
+      "back": "Articles dropped, verbs dropped, everything genitive, and the passive participle used adjectivally — so a headline is a noun phrase"
+    },
+    {
+      "kind": "sentence",
+      "front": "Είδατε τι έγινε με…;",
+      "back": "Did you see what happened with…? — the opener that turns reading the news into a conversation"
+    }
+  ],
+  "Podcasts and radio": [
+    {
+      "kind": "grammar",
+      "front": "Why podcasts beat television at this level",
+      "back": "No pictures to carry you, long form so the vocabulary repeats, clean audio, and portable — so the hours accumulate"
+    },
+    {
+      "kind": "grammar",
+      "front": "The podcast format that is the sweet spot",
+      "back": "The interview: a predictable question, a long answer, and the subject stays put for ten minutes"
+    },
+    {
+      "kind": "grammar",
+      "front": "When to use a transcript",
+      "back": "On the second pass only. Listening with the transcript throughout is reading with sound."
+    },
+    {
+      "kind": "word",
+      "front": "η εκπομπή",
+      "back": "the programme, the broadcast"
+    },
+    {
+      "kind": "word",
+      "front": "η συνέντευξη",
+      "back": "the interview"
+    },
+    {
+      "kind": "word",
+      "front": "ο παρουσιαστής",
+      "back": "the presenter, the host"
+    },
+    {
+      "kind": "word",
+      "front": "ο καλεσμένος",
+      "back": "the guest"
+    }
+  ],
+  "Television, film and subtitles": [
+    {
+      "kind": "grammar",
+      "front": "The four subtitle combinations, ranked",
+      "back": "Greek audio + Greek subtitles (productive); Greek audio alone (the goal); English audio + Greek subtitles (useful reading); Greek audio + English subtitles (almost worthless)"
+    },
+    {
+      "kind": "grammar",
+      "front": "Five lines an episode",
+      "back": "Watch extensively, then take one two-minute scene and learn five lines — a hundred lines of real spoken Greek a season"
+    },
+    {
+      "kind": "word",
+      "front": "οι υπότιτλοι",
+      "back": "the subtitles"
+    },
+    {
+      "kind": "word",
+      "front": "η σειρά",
+      "back": "the series"
+    },
+    {
+      "kind": "word",
+      "front": "το επεισόδιο",
+      "back": "the episode"
+    },
+    {
+      "kind": "word",
+      "front": "η ταινία",
+      "back": "the film"
+    },
+    {
+      "kind": "sentence",
+      "front": "Είδες το…;",
+      "back": "Have you seen…? — a reliable conversational opener"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a film is harder than a series for a learner",
+      "back": "Film dialogue is the hardest register in the language: fast, overlapping, slangy, and written to sound unscripted"
+    }
+  ],
+  "Greek on the internet": [
+    {
+      "kind": "grammar",
+      "front": "The cheapest immersion trick there is",
+      "back": "Put the phone’s interface in Greek — twenty encounters a day with the same fifty words, meaning already known from context"
+    },
+    {
+      "kind": "grammar",
+      "front": "YouTube’s two features for a learner",
+      "back": "Automatic Greek captions, good enough to use as a transcript, and 0.75 playback speed without a pitch change"
+    },
+    {
+      "kind": "grammar",
+      "front": "The most useful Greek social-media account for you",
+      "back": "Your parish’s own page: short posts about events you attend, in the Greek of the people you talk to"
+    },
+    {
+      "kind": "word",
+      "front": "η ανάρτηση",
+      "back": "the post (on social media)"
+    },
+    {
+      "kind": "word",
+      "front": "το σχόλιο",
+      "back": "the comment"
+    },
+    {
+      "kind": "word",
+      "front": "ο συνδρομητής",
+      "back": "the subscriber"
+    },
+    {
+      "kind": "word",
+      "front": "ο κωδικός",
+      "back": "the password; the code"
+    }
+  ],
+  "Reading your first novel": [
+    {
+      "kind": "grammar",
+      "front": "The thirty-page rule",
+      "back": "The first thirty pages of a novel are the worst. Do not judge the book, or yourself, before page thirty."
+    },
+    {
+      "kind": "grammar",
+      "front": "The five criteria for a first novel",
+      "back": "Short; something you already know; modern and colloquial; dialogue-heavy; with an audiobook if possible"
+    },
+    {
+      "kind": "grammar",
+      "front": "A realistic first book in Greek for you",
+      "back": "A Gospel in modern Greek — every story known, concrete vocabulary, short sentences, free online"
+    },
+    {
+      "kind": "word",
+      "front": "το κεφάλαιο",
+      "back": "the chapter"
+    },
+    {
+      "kind": "word",
+      "front": "η σελίδα",
+      "back": "the page"
+    },
+    {
+      "kind": "word",
+      "front": "ο συγγραφέας",
+      "back": "the author"
+    },
+    {
+      "kind": "word",
+      "front": "το διήγημα",
+      "back": "the short story"
+    },
+    {
+      "kind": "word",
+      "front": "το μυθιστόρημα",
+      "back": "the novel"
+    }
+  ],
+  "Modern Greek literature: where to start": [
+    {
+      "kind": "word",
+      "front": "Νίκος Καζαντζάκης",
+      "back": "Kazantzakis — Ζορμπάς, Ο Χριστός ξανασταυρώνεται. The most famous abroad; Cretan vocabulary and long sentences."
+    },
+    {
+      "kind": "word",
+      "front": "Κ. Π. Καβάφης",
+      "back": "Cavafy — Ιθάκη, Περιμένοντας τους βαρβάρους. The most accessible great poet in the language."
+    },
+    {
+      "kind": "word",
+      "front": "Οδυσσέας Ελύτης",
+      "back": "Elytis — Nobel 1979. Το Άξιον Εστί, set to music by Theodorakis, so half the country knows it sung."
+    },
+    {
+      "kind": "word",
+      "front": "Γιώργος Σεφέρης",
+      "back": "Seferis — Nobel 1963"
+    },
+    {
+      "kind": "word",
+      "front": "Αλέξανδρος Παπαδιαμάντης",
+      "back": "Papadiamantis — the great short-story writer of Greek Orthodoxy. Katharevousa-flavoured, so hard."
+    },
+    {
+      "kind": "word",
+      "front": "Φώτης Κόντογλου",
+      "back": "Kontoglou — the icon painter’s prose: essays and stories, Byzantine in sympathy, somewhat archaising"
+    },
+    {
+      "kind": "word",
+      "front": "Άλκη Ζέη",
+      "back": "Alki Zei — Το καπλάνι της βιτρίνας. Written for children, about the dictatorship; the best first literary book in Greek."
+    },
+    {
+      "kind": "word",
+      "front": "Πέτρος Μάρκαρης",
+      "back": "Markaris — the Haritos crime novels. Current Athenian Greek, plot-driven: the easiest literary Greek there is."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why the Elders’ books read easily",
+      "back": "They are transcribed speech: simple vocabulary, short paragraphs, and material you want to read anyway"
+    }
+  ],
+  "The Church's modern Greek": [
+    {
+      "kind": "word",
+      "front": "ο πειρασμός",
+      "back": "temptation"
+    },
+    {
+      "kind": "word",
+      "front": "η άσκηση",
+      "back": "ascetic struggle — and, in ordinary use, an exercise"
+    },
+    {
+      "kind": "word",
+      "front": "η υπακοή",
+      "back": "obedience"
+    },
+    {
+      "kind": "word",
+      "front": "η προσκύνηση",
+      "back": "veneration — the bow and the kiss before an icon"
+    },
+    {
+      "kind": "word",
+      "front": "η ευλογία",
+      "back": "a blessing"
+    },
+    {
+      "kind": "word",
+      "front": "ο κανόνας",
+      "back": "the rule; the canon"
+    },
+    {
+      "kind": "word",
+      "front": "ο μάρτυρας",
+      "back": "the martyr"
+    },
+    {
+      "kind": "word",
+      "front": "ο όσιος",
+      "back": "the monastic saint — the title for a saint who was not martyred"
+    },
+    {
+      "kind": "word",
+      "front": "η εγκύκλιος",
+      "back": "the encyclical"
+    },
+    {
+      "kind": "word",
+      "front": "το κήρυγμα",
+      "back": "the sermon"
+    },
+    {
+      "kind": "word",
+      "front": "η κατήχηση",
+      "back": "catechism"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why church modern Greek leans formal",
+      "back": "It keeps more learned forms than the street — participles, the occasional katharevousa fossil. Recognise them; do not produce them."
+    }
+  ],
+  "The lives of the saints, in modern Greek": [
+    {
+      "kind": "sentence",
+      "front": "γεννήθηκε από γονείς ευσεβείς",
+      "back": "was born of pious parents"
+    },
+    {
+      "kind": "sentence",
+      "front": "από μικρή ηλικία αφιερώθηκε στον Θεό",
+      "back": "from an early age he dedicated himself to God"
+    },
+    {
+      "kind": "sentence",
+      "front": "υπέμεινε πολλά βάσανα",
+      "back": "he endured many sufferings"
+    },
+    {
+      "kind": "sentence",
+      "front": "εκοιμήθη εν Κυρίω",
+      "back": "fell asleep in the Lord — the Church’s fixed phrase for a saint’s death"
+    },
+    {
+      "kind": "sentence",
+      "front": "η μνήμη του τιμάται στις…",
+      "back": "his memory is honoured on the…"
+    },
+    {
+      "kind": "sentence",
+      "front": "έκανε πολλά θαύματα",
+      "back": "he worked many miracles"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ταις αυτού πρεσβείαις",
+      "back": "By his intercessions — the closing formula, and Koine rather than modern"
+    },
+    {
+      "kind": "word",
+      "front": "τα λείψανα",
+      "back": "the relics"
+    },
+    {
+      "kind": "word",
+      "front": "ο βίος",
+      "back": "the life (of a saint) — the genre’s own word"
+    },
+    {
+      "kind": "word",
+      "front": "το θαύμα",
+      "back": "the miracle"
+    },
+    {
+      "kind": "grammar",
+      "front": "εκοιμήθη against κοιμήθηκε",
+      "back": "εκοιμήθη is an ancient aorist passive, kept because it is the Church’s own word; κοιμήθηκε is the modern form, used of a person falling asleep"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a saint’s life is ideal narrative practice",
+      "back": "The structure is formulaic and repeats across hundreds of texts — read one and you can read all of them"
+    }
+  ],
+  "Non-fiction: history, politics, essays": [
+    {
+      "kind": "word",
+      "front": "επομένως",
+      "back": "therefore, consequently"
+    },
+    {
+      "kind": "word",
+      "front": "συνεπώς",
+      "back": "consequently"
+    },
+    {
+      "kind": "word",
+      "front": "ωστόσο",
+      "back": "however, nevertheless"
+    },
+    {
+      "kind": "word",
+      "front": "εντούτοις",
+      "back": "nevertheless — learned register"
+    },
+    {
+      "kind": "sentence",
+      "front": "αφ’ ενός… αφ’ ετέρου…",
+      "back": "on the one hand… on the other hand… — learned, and standard in essays"
+    },
+    {
+      "kind": "sentence",
+      "front": "θεωρείται ότι…",
+      "back": "it is considered that… — the passive used to avoid naming an agent"
+    },
+    {
+      "kind": "sentence",
+      "front": "πρέπει να σημειωθεί ότι…",
+      "back": "it must be noted that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "λαμβάνοντας υπόψη…",
+      "back": "taking into account… — a participle carrying a whole clause"
+    },
+    {
+      "kind": "sentence",
+      "front": "η επίδραση της πολιτικής της κυβέρνησης",
+      "back": "the effect of the government’s policy — a genitive chain three deep"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why an essay is hard, and it is not the vocabulary",
+      "back": "The syntax: long sentences, stacked subordinate clauses, nominalisation and connectives"
+    },
+    {
+      "kind": "grammar",
+      "front": "The free resource for Greek history in Greek",
+      "back": "The school history textbooks on ebooks.edu.gr — graded by year, written to be understood, and the national narrative as Greeks learn it"
+    }
+  ],
+  "Children's and young-adult Greek": [
+    {
+      "kind": "grammar",
+      "front": "Why children’s books are the best material at this level",
+      "back": "They are the only material that is both authentic and easy — full natural Greek by an author trying to be understood"
+    },
+    {
+      "kind": "grammar",
+      "front": "The translated-YA shortcut",
+      "back": "A book you have read in English, read in Greek: the plot you remember hands you the vocabulary"
+    },
+    {
+      "kind": "grammar",
+      "front": "What the school Ανθολόγιο gives you",
+      "back": "Easy Greek and the shared references — the poems and stories every Greek adult half-remembers"
+    },
+    {
+      "kind": "grammar",
+      "front": "The caution about a children’s-book diet",
+      "back": "It teaches animals, fairies and toys and misses adult life — so pair it with the news, which is all adult vocabulary and no plot"
+    },
+    {
+      "kind": "word",
+      "front": "το παραμύθι",
+      "back": "the fairy tale, the folk tale"
+    },
+    {
+      "kind": "word",
+      "front": "ο λύκος",
+      "back": "the wolf"
+    }
+  ],
+  "Song as text": [
+    {
+      "kind": "word",
+      "front": "το ρεμπέτικο",
+      "back": "rebetiko — the urban folk music of the refugees"
+    },
+    {
+      "kind": "word",
+      "front": "το έντεχνο",
+      "back": "art song — Theodorakis and Hadjidakis setting the poets"
+    },
+    {
+      "kind": "word",
+      "front": "το λαϊκό",
+      "back": "popular song — Kazantzidis, Bithikotsis"
+    },
+    {
+      "kind": "word",
+      "front": "τα δημοτικά",
+      "back": "the regional folk songs"
+    },
+    {
+      "kind": "word",
+      "front": "οι στίχοι",
+      "back": "the lyrics; the verses"
+    },
+    {
+      "kind": "word",
+      "front": "το ρεφρέν",
+      "back": "the chorus of a song"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ύμνος εις την Ελευθερίαν",
+      "back": "Hymn to Liberty — Solomos; its first verses are the national anthem"
+    },
+    {
+      "kind": "sentence",
+      "front": "Το Άξιον Εστί",
+      "back": "Elytis set by Theodorakis — close to a second anthem"
+    },
+    {
+      "kind": "grammar",
+      "front": "The six steps for learning a song",
+      "back": "Listen cold; read the lyrics; look up ten words; listen reading along; sing along; sing without the text"
+    },
+    {
+      "kind": "grammar",
+      "front": "What song gives that nothing else does",
+      "back": "Pronunciation matched to a model, the emotional vocabulary, and the social membership of being able to join in"
+    }
+  ],
+  "Audiobooks, and reading with your ears": [
+    {
+      "kind": "grammar",
+      "front": "The three audiobook modes, in order",
+      "back": "Listen while reading; listen after reading; listen cold. Progress in this stage is moving from the first to the third on the same book."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why text plus audio together is so efficient",
+      "back": "You see the spelling and hear the sound of the same word in the same second — the i-spelling problem solved from both ends"
+    },
+    {
+      "kind": "grammar",
+      "front": "Shadowing a paragraph, in four steps",
+      "back": "Sentence by sentence with the text; along with the recording, text visible; along without the text; then again"
+    },
+    {
+      "kind": "word",
+      "front": "το ηχητικό βιβλίο",
+      "back": "the audiobook"
+    },
+    {
+      "kind": "word",
+      "front": "η απαγγελία",
+      "back": "recitation, reading aloud (of poetry)"
+    }
+  ],
+  "Reading aloud at length": [
+    {
+      "kind": "grammar",
+      "front": "The four jobs reading aloud does at once",
+      "back": "Pronunciation under load, the stress accent rehearsed on every word, fluency in the mouth, and parsing — you cannot phrase a sentence you have not understood"
+    },
+    {
+      "kind": "grammar",
+      "front": "The pronunciation errors to watch for when reading aloud",
+      "back": "A wrong stress; hardening γ before ε and ι; the μπ/ντ/γκ clusters; and reducing unstressed vowels, which English speakers do and Greek never does"
+    },
+    {
+      "kind": "grammar",
+      "front": "What to do with a stumble",
+      "back": "Stop and redo that sentence three times. The stumbles are informative — almost always a cluster, a digraph, or a stress you have been getting wrong silently."
+    }
+  ],
+  "Vocabulary mining: what to card, what to let go": [
+    {
+      "kind": "grammar",
+      "front": "The three-tick rule",
+      "back": "Card a word on its third encounter in real material, not its first. A word met once is likely specific to that text."
+    },
+    {
+      "kind": "grammar",
+      "front": "The highest-value card there is",
+      "back": "A word you needed and did not have — the gap in your own speech, not a word from a list"
+    },
+    {
+      "kind": "grammar",
+      "front": "What never earns a card",
+      "back": "Anything you can work out from its parts; a proper name you will not mention; a technical term from a field you do not discuss; a word met once; and a word whose English equivalent you had to look up too"
+    },
+    {
+      "kind": "grammar",
+      "front": "New cards a week, at this level",
+      "back": "Ten to fifteen — about five hundred a year, with a review load of twenty minutes a day. More than that collapses."
+    },
+    {
+      "kind": "grammar",
+      "front": "When to delete a card",
+      "back": "When you have failed it six times. It is a badly made card or a word you are not ready for; it will come back in reading when it is time."
+    },
+    {
+      "kind": "word",
+      "front": "συμπαθητικός",
+      "back": "likeable, nice — NOT sympathetic. A false friend."
+    }
+  ],
+  "The reading journal": [
+    {
+      "kind": "grammar",
+      "front": "The six parts of a weekly journal entry",
+      "back": "What you read and heard; how it felt; five words with their sentences; one grammatical thing noticed; one thing you could not say; one sentence in Greek"
+    },
+    {
+      "kind": "grammar",
+      "front": "The two productive journal entries",
+      "back": "The thing you could not say, which becomes your next cards and your stage 9 topics, and the Greek sentence, which makes the journal itself practice"
+    },
+    {
+      "kind": "word",
+      "front": "μπερδεύομαι",
+      "back": "I get confused (from μπερδεύω, to muddle)"
+    },
+    {
+      "kind": "word",
+      "front": "η συμφορά",
+      "back": "disaster, calamity"
+    },
+    {
+      "kind": "word",
+      "front": "ανυπομονώ",
+      "back": "I can’t wait, I am impatient"
+    },
+    {
+      "kind": "sentence",
+      "front": "παρ’ όλα αυτά",
+      "back": "in spite of all that"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλύτερα να μην…",
+      "back": "I’d rather not… — the polite refusal, instead of a bare δεν θέλω"
+    },
+    {
+      "kind": "grammar",
+      "front": "αφού, with the aorist against the present",
+      "back": "With the aorist it means after; with the present it means since or because. Two English words, one Greek."
+    }
+  ],
+  "From input to speech": [
+    {
+      "kind": "grammar",
+      "front": "The highest-value output habit in the stage",
+      "back": "Retelling: thirty seconds, out loud, after everything you read or watch — immediately and badly, so you find out what you cannot say"
+    },
+    {
+      "kind": "grammar",
+      "front": "Sentence mining into speech",
+      "back": "Take five sentences from today’s material, say them until fluent, then change one element — subject, tense or object. A memorised line becomes a pattern you own."
+    },
+    {
+      "kind": "grammar",
+      "front": "The weekly output minimum for stage 8",
+      "back": "A daily retelling, five mined sentences a day, ten minutes of real conversation a week, and the journal’s one Greek sentence"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why speech built on a lot of input sounds better",
+      "back": "You reproduce what you have heard rather than assemble what you were taught — so the input is not delaying your speech, it is loading it"
+    }
+  ],
+  "Imitation as writing practice": [
+    {
+      "kind": "grammar",
+      "front": "The four imitation exercises, in order",
+      "back": "Copying; transformation (change one thing throughout); substitution (keep the structure, change the content); summary"
+    },
+    {
+      "kind": "grammar",
+      "front": "The exercise that actually teaches style",
+      "back": "Substitution — borrowing an author’s syntax while supplying your own meaning"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why copying by hand is not mindless",
+      "back": "It forces the spelling, the accents, the punctuation and the word order on you in a way reading does not — and it serves the handwriting"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why machine translation is useless for writing Greek",
+      "back": "It produces Greek that is grammatical and not Greek: the wrong register, the wrong idiom, the wrong preposition"
+    }
+  ],
+  "Plateaus, and what they are": [
+    {
+      "kind": "grammar",
+      "front": "Why a plateau is not a plateau",
+      "back": "The gains change form — from new knowledge to the same knowledge becoming automatic — and the frequency curve flattens, so the same effort yields less visible result"
+    },
+    {
+      "kind": "grammar",
+      "front": "The hours per level, honestly",
+      "back": "A1→A2 about 100; A2→B1 about 200 more; B1→B2 about 300 more; B2→C1 about 400 more; C1→C2 as long as you like"
+    },
+    {
+      "kind": "grammar",
+      "front": "The real danger of a plateau, and the defence",
+      "back": "Quitting. The defence is a floor so low you cannot fail to clear it — five minutes on a bad day keeps the chain alive."
+    },
+    {
+      "kind": "grammar",
+      "front": "The fix when nothing feels new",
+      "back": "Change the material, not the method"
+    }
+  ],
+  "Making a Greek environment": [
+    {
+      "kind": "grammar",
+      "front": "What an environment is for",
+      "back": "It produces Greek in the gaps without willpower — the cheapest hours in the curriculum"
+    },
+    {
+      "kind": "grammar",
+      "front": "The locale for a Greek desktop",
+      "back": "LANG=el_GR.UTF-8 — Hyprland and the GTK apps take it"
+    },
+    {
+      "kind": "grammar",
+      "front": "The monthly Greek day",
+      "back": "Everything you control, in Greek, from waking to sleeping. Tiring, and it shows you exactly where the gaps are."
+    },
+    {
+      "kind": "grammar",
+      "front": "What not to switch to Greek",
+      "back": "Anything you need urgently and cannot navigate — banking, work tools, anything medical"
+    },
+    {
+      "kind": "grammar",
+      "front": "The test of whether the environment is working",
+      "back": "Greek appears in your day without your having planned it"
+    }
+  ],
+  "Dictionaries and tools, used properly": [
+    {
+      "kind": "grammar",
+      "front": "The lookup rule at this level",
+      "back": "Look a word up only when the sentence has collapsed without it — and guess before you look"
+    },
+    {
+      "kind": "grammar",
+      "front": "The step of this stage that matters most for vocabulary",
+      "back": "Moving to a Greek-to-Greek dictionary: an English gloss is an approximation, a Greek definition is the word’s own shape, and reading it is more input"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which tool answers “what form is this?”",
+      "back": "Lexiscope — paste the inflected word, get the lemma and the full table"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which tool answers “how is this actually used?”",
+      "back": "Reverso Context or the corpus at greek-language.gr — the word in twenty real sentences"
+    },
+    {
+      "kind": "grammar",
+      "front": "What no dictionary can do",
+      "back": "Validate your own Greek. Search the exact phrase in quotes, ask a person, or post it where Greeks will correct it."
+    }
+  ],
+  "Keeping the spoken side alive": [
+    {
+      "kind": "grammar",
+      "front": "The specific risk of an input-heavy stage",
+      "back": "C1 comprehension with A2 speech — and the gap becomes uncomfortable enough to avoid speaking, which widens it"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μπορούμε να μιλάμε μόνο ελληνικά; Θέλω να μάθω.",
+      "back": "Can we speak only Greek? I want to learn. — the single most effective arrangement available"
+    },
+    {
+      "kind": "sentence",
+      "front": "Διόρθωσέ με, σε παρακαλώ.",
+      "back": "Correct me, please. — almost nobody says it, and it turns a polite conversation into a lesson"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μπορώ να βοηθήσω;",
+      "back": "Can I help? — the opener that gets you into the work and the conversation"
+    },
+    {
+      "kind": "grammar",
+      "front": "The weekly conversation minimum",
+      "back": "Ten minutes with a person. Not an hour, not a course. Weekly, for a year."
+    },
+    {
+      "kind": "grammar",
+      "front": "What Greeks make of a foreigner speaking Greek",
+      "back": "Disproportionate pleasure — it is a small language nobody learns, so the effort reads as respect. Use the advantage."
+    }
+  ],
+  "Measuring progress honestly": [
+    {
+      "kind": "grammar",
+      "front": "What not to measure",
+      "back": "Words known, cards reviewed, days on a streak, hours logged — all of them rise whether or not your Greek does"
+    },
+    {
+      "kind": "grammar",
+      "front": "The six quarterly measurements",
+      "back": "Pages per hour on known material; comprehension on one fixed recording; lookups per page; minutes without stopping; a written paragraph kept; a judgement on one spoken minute"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a fixed benchmark recording works",
+      "back": "The material is constant, so the change is you"
+    },
+    {
+      "kind": "grammar",
+      "front": "The only comparison that contains information",
+      "back": "Against your own March — not other learners, not natives, not the version of you who should be further along"
+    }
+  ],
+  "A diagnostic: the Ellinomatheia paper": [
+    {
+      "kind": "grammar",
+      "front": "What Ellinomatheia is used for here",
+      "back": "A thermometer. The levels are the skeleton because they are an honest external description and the material is free — and no exam is ever taken."
+    },
+    {
+      "kind": "grammar",
+      "front": "The five parts of an Ellinomatheia paper",
+      "back": "Reading comprehension; use of language; listening; written production; spoken production — and the first three mark themselves from the published keys"
+    },
+    {
+      "kind": "grammar",
+      "front": "What B2 means, in plain terms",
+      "back": "Arguing a position, following a discussion between natives, reading a newspaper, writing a structured text"
+    },
+    {
+      "kind": "grammar",
+      "front": "What C1 means, in plain terms",
+      "back": "Fluent and nearly effortless: implicit meaning, register control, literature"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one thing not to do with a past paper",
+      "back": "Study for it. Practising papers raises your score and not your Greek, which defeats its only purpose here."
+    },
+    {
+      "kind": "grammar",
+      "front": "Where the levels will be uneven, and it is normal",
+      "back": "Reading outruns writing by a level, and writing outruns speaking unless the ten minutes a week has been happening"
+    }
+  ],
+  "A week of stage 8, written out": [
+    {
+      "kind": "grammar",
+      "front": "The daily non-negotiables, when the week collapses",
+      "back": "The daily saint (four minutes), the deck (ten), one retelling (thirty seconds). Fifteen minutes, and the chain holds."
+    },
+    {
+      "kind": "grammar",
+      "front": "The weekly non-negotiables",
+      "back": "Ten minutes of conversation, one journal entry, one intensive session, and some pages of a book so that books get finished"
+    },
+    {
+      "kind": "grammar",
+      "front": "The best-value day in the week",
+      "back": "Sunday — the service, the notices, the sermon, and the fifteen minutes before and after with the people"
+    },
+    {
+      "kind": "grammar",
+      "front": "What to cut first when the hour is not there",
+      "back": "The intensive work. Never the extensive."
+    },
+    {
+      "kind": "grammar",
+      "front": "The tracks, in stage 8",
+      "back": "Spelling and Forms run alongside and should finish inside it — two sessions a week, twenty minutes each"
+    }
+  ],
+  "The long game": [
+    {
+      "kind": "grammar",
+      "front": "What changes at stage 8, in kind",
+      "back": "Stages 1–7 were a course, finite and ordered. Stage 8 is the beginning of the permanent arrangement — a language you use rather than study."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why the order was modern Greek first",
+      "back": "Not pedagogy: the Greek people at church can teach you what the Liturgy means, and to be taught by them you have to be able to talk to them. The modern language buys you the teachers."
+    },
+    {
+      "kind": "grammar",
+      "front": "What stage 8 contributes to the classical curriculum",
+      "back": "Several thousand words with ancient ancestors, the sound system, the case system, reading stamina, the Church’s modern vocabulary, and the people"
+    },
+    {
+      "kind": "grammar",
+      "front": "The measure of this stage, in the end",
+      "back": "Whether in five years there is Greek in your ordinary week without your having arranged it"
+    }
+  ],
+  "Review: stage 8": [
+    {
+      "kind": "grammar",
+      "front": "Stage 8, in one line",
+      "back": "Input at volume, with the method for each kind of material — and the practices that keep it running for years"
+    },
+    {
+      "kind": "grammar",
+      "front": "The five checkpoint questions for stage 8",
+      "back": "Have you finished a book in Greek? Is there unscheduled Greek in your week? Did the ten minutes of conversation happen most weeks? Are both tracks finished? Does the journal go back six months?"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one real task of stage 8",
+      "back": "Finish a book in Greek. If that has not happened, stay here."
+    },
+    {
+      "kind": "grammar",
+      "front": "What stage 9 needs from you",
+      "back": "Not more comprehension — a reading habit that is already running, because you will write by imitating what you have read"
+    }
+  ],
+  "What stage 9 is: producing Greek": [
+    {
+      "kind": "grammar",
+      "front": "Why writing comes after a stage of reading",
+      "back": "You write by imitating what you have read. Before that you produce English sentences in Greek words."
+    },
+    {
+      "kind": "grammar",
+      "front": "The one rule of stage 9",
+      "back": "Write what you can say — and never write a sentence whose shape you have not seen in Greek"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why writing is where you find out what you know",
+      "back": "Speech is forgiving — gesture, hesitation, a helpful listener. Writing shows the spelling, the accents, the agreement and the register, and nothing moves on until you commit."
+    }
+  ],
+  "Handwriting at speed": [
+    {
+      "kind": "grammar",
+      "front": "When to write the accent",
+      "back": "After the word, as one movement at the end — placing it mid-word breaks the stroke and costs more than it saves"
+    },
+    {
+      "kind": "grammar",
+      "front": "The handwriting confusions to drill out",
+      "back": "ν against υ, θ against a barred ο, ζ against ξ, γ against ψ, μ against υ — and ς inside a word, which is a visible error"
+    },
+    {
+      "kind": "grammar",
+      "front": "The best combined drill in the curriculum",
+      "back": "Dictation — it tests listening, the i-spellings, the accents and the final -ν at once"
+    }
+  ],
+  "Spelling under pressure": [
+    {
+      "kind": "grammar",
+      "front": "The single most useful fact about Greek spelling",
+      "back": "The endings are regular even when the roots are not — so most i decisions are grammar rather than memory"
+    },
+    {
+      "kind": "grammar",
+      "front": "The final -ν rule, in practice",
+      "back": "Kept on τον, την, δεν, μην, έναν before a vowel or a stop (κ π τ, μπ ντ γκ, τσ τζ, ξ ψ), dropped before other consonants — and when in doubt, keep it"
+    },
+    {
+      "kind": "grammar",
+      "front": "The six-step written spelling check",
+      "back": "Count the accents; ask of every i whether it is an ending; check final -ν; check the verb endings; check agreement; read it aloud"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which i endings are decided by grammar",
+      "back": "-ει third person singular, -η feminine singular, -οι masculine plural, -ι neuter singular"
+    }
+  ],
+  "Punctuation in full": [
+    {
+      "kind": "grammar",
+      "front": "The Greek question mark",
+      "back": "A semicolon: ;  — and on the Greek keyboard it is the q key. Writing ? is a visible foreignism."
+    },
+    {
+      "kind": "grammar",
+      "front": "The άνω τελεία",
+      "back": "The raised dot · — Greek’s semicolon. alt gr + w on the standard layout."
+    },
+    {
+      "kind": "grammar",
+      "front": "Greek quotation marks, and the full stop",
+      "back": "Guillemets « » — and the full stop goes OUTSIDE the closing mark"
+    },
+    {
+      "kind": "grammar",
+      "front": "The comma rule learners break",
+      "back": "No comma before ότι, να or an indirect question — and a comma is REQUIRED around a vocative"
+    },
+    {
+      "kind": "sentence",
+      "front": "Είπε: «Θα έρθω αύριο».",
+      "back": "He said: \"I’ll come tomorrow.\" — guillemets, and the full stop outside"
+    },
+    {
+      "kind": "sentence",
+      "front": "απ' τη δουλειά",
+      "back": "from work — από + τη, elided with an apostrophe"
+    },
+    {
+      "kind": "sentence",
+      "front": "κι εγώ",
+      "back": "me too — and this one has NO apostrophe, because κι is its own form"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek marks dialogue",
+      "back": "A dash at the start of the line: — Πού ήσουν;"
+    }
+  ],
+  "The sentence: from short to long": [
+    {
+      "kind": "grammar",
+      "front": "The five ways Greek extends a sentence",
+      "back": "Coordination, subordination, a relative clause, a participle, and nominalisation"
+    },
+    {
+      "kind": "grammar",
+      "front": "The most characteristic move of written Greek",
+      "back": "Front-loading — a participle, an adverbial or a subordinate clause before the main verb arrives"
+    },
+    {
+      "kind": "grammar",
+      "front": "The three ways a learner’s long sentence breaks",
+      "back": "The verb never arrives; the agreement drifts across the distance; the participle has the wrong subject"
+    },
+    {
+      "kind": "sentence",
+      "front": "Παρά τις δυσκολίες, και έχοντας υπόψη όσα είχαν συμβεί, η επιτροπή αποφάσισε να προχωρήσει.",
+      "back": "Despite the difficulties, and bearing in mind what had happened, the committee decided to proceed. — front-loaded written Greek"
+    },
+    {
+      "kind": "sentence",
+      "front": "Η απόφαση, η οποία ανακοινώθηκε χθες, άλλαξε τα πάντα.",
+      "back": "The decision, which was announced yesterday, changed everything. — ο οποίος, the formal relative"
+    }
+  ],
+  "The connective inventory": [
+    {
+      "kind": "word",
+      "front": "επιπλέον",
+      "back": "furthermore, in addition — written"
+    },
+    {
+      "kind": "word",
+      "front": "εξάλλου",
+      "back": "besides, after all"
+    },
+    {
+      "kind": "word",
+      "front": "αντίθετα",
+      "back": "on the contrary"
+    },
+    {
+      "kind": "word",
+      "front": "καθώς",
+      "back": "as, since — written"
+    },
+    {
+      "kind": "word",
+      "front": "εξαιτίας",
+      "back": "because of (+ genitive)"
+    },
+    {
+      "kind": "word",
+      "front": "άρα",
+      "back": "so, therefore"
+    },
+    {
+      "kind": "word",
+      "front": "συμπερασματικά",
+      "back": "in conclusion"
+    },
+    {
+      "kind": "word",
+      "front": "συγκεκριμένα",
+      "back": "specifically"
+    },
+    {
+      "kind": "word",
+      "front": "αρχικά",
+      "back": "initially"
+    },
+    {
+      "kind": "sentence",
+      "front": "δεδομένου ότι…",
+      "back": "given that… — formal"
+    },
+    {
+      "kind": "sentence",
+      "front": "ως εκ τούτου",
+      "back": "hence — formal and learned"
+    },
+    {
+      "kind": "sentence",
+      "front": "σε γενικές γραμμές",
+      "back": "broadly speaking"
+    },
+    {
+      "kind": "sentence",
+      "front": "μέχρι ενός σημείου",
+      "back": "up to a point"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where όμως sits",
+      "back": "Commonly second or third in its clause, unlike English however: Δεν ήρθε όμως."
+    },
+    {
+      "kind": "grammar",
+      "front": "The two connective cautions",
+      "back": "Do not over-signpost — one or two a paragraph; and match the register, because ως εκ τούτου in a message is absurd and λοιπόν in a formal letter is wrong"
+    }
+  ],
+  "Paragraphs, and how a Greek text is organised": [
+    {
+      "kind": "grammar",
+      "front": "The Greek paragraph, by convention",
+      "back": "Four to eight sentences carrying one idea developed — longer than modern English journalism trains you to expect"
+    },
+    {
+      "kind": "grammar",
+      "front": "The three parts of a Greek text",
+      "back": "Πρόλογος, κύριο μέρος, επίλογος — and the conclusion is expected to state a position, not merely summarise"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τα τελευταία χρόνια…",
+      "back": "In recent years… — the standard Greek essay opening"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αξίζει να σημειωθεί ότι…",
+      "back": "It is worth noting that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Όσον αφορά…",
+      "back": "As regards…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Εν κατακλείδι…",
+      "back": "In conclusion… — formal"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κλείνοντας, θα έλεγα ότι…",
+      "back": "In closing, I would say that…"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek expository prose moves between sentences",
+      "back": "A clause is nominalised and the noun phrase becomes the next sentence’s subject"
+    }
+  ],
+  "Register: the four levels": [
+    {
+      "kind": "grammar",
+      "front": "The four registers of written Greek",
+      "back": "Intimate and online; everyday neutral; formal; learned and ecclesiastical — and level 4 is read, not written, except the clergy’s forms of address"
+    },
+    {
+      "kind": "grammar",
+      "front": "The commonest learner error in written Greek",
+      "back": "Mixing levels in one text. Pick a level before the first word and hold it to the end."
+    },
+    {
+      "kind": "grammar",
+      "front": "The default register",
+      "back": "Neutral. Most of what you write is level 2, and over-formality reads as cold."
+    },
+    {
+      "kind": "word",
+      "front": "δηλώνω",
+      "back": "I state, I declare — the formal λέω"
+    },
+    {
+      "kind": "word",
+      "front": "πραγματοποιώ",
+      "back": "I carry out — the formal κάνω"
+    },
+    {
+      "kind": "word",
+      "front": "λαμβάνω",
+      "back": "I receive — the formal παίρνω"
+    },
+    {
+      "kind": "word",
+      "front": "παρέχω",
+      "back": "I provide — the formal δίνω"
+    },
+    {
+      "kind": "word",
+      "front": "αποστέλλω",
+      "back": "I send — the formal στέλνω"
+    },
+    {
+      "kind": "word",
+      "front": "επιθυμώ",
+      "back": "I wish — the formal θέλω"
+    },
+    {
+      "kind": "word",
+      "front": "διαπιστώνω",
+      "back": "I observe, I ascertain — the formal βλέπω"
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα σας παρακαλούσα να…",
+      "back": "I would ask you to… — the polite conditional, formal register"
+    }
+  ],
+  "The passive and the impersonal in writing": [
+    {
+      "kind": "grammar",
+      "front": "The main job of the written passive",
+      "back": "Hiding the agent. Official and journalistic Greek avoids naming who did a thing, and reading it means noticing the omission."
+    },
+    {
+      "kind": "sentence",
+      "front": "υποστηρίζεται ότι…",
+      "back": "it is maintained that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "αναμένεται να…",
+      "back": "it is expected to…"
+    },
+    {
+      "kind": "sentence",
+      "front": "προβλέπεται ότι…",
+      "back": "it is foreseen that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "απαγορεύεται να…",
+      "back": "it is forbidden to…"
+    },
+    {
+      "kind": "sentence",
+      "front": "συνιστάται να…",
+      "back": "it is recommended to…"
+    },
+    {
+      "kind": "sentence",
+      "front": "παρατηρείται ότι…",
+      "back": "it is observed that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αποφασίστηκε η αναστολή της λειτουργίας.",
+      "back": "The suspension of operation was decided. — nobody is responsible in this sentence, and that is the point"
+    },
+    {
+      "kind": "grammar",
+      "front": "When NOT to use the passive",
+      "back": "When a human is doing something to another human. Σας ευχαριστώ — not Ευχαριστίες εκφράζονται."
+    },
+    {
+      "kind": "grammar",
+      "front": "γράφτηκε against εγράφη",
+      "back": "The ordinary modern aorist passive against the learned form found in headlines, notices and church texts. Read both, write the first."
+    }
+  ],
+  "Nominalisation": [
+    {
+      "kind": "grammar",
+      "front": "What nominalisation is, and why Greek does it readily",
+      "back": "A clause becomes a noun phrase. Greek nouns decline, so the phrase slots into any role without rewriting the sentence — which English cannot do as neatly."
+    },
+    {
+      "kind": "grammar",
+      "front": "The suffix that makes most abstract written vocabulary",
+      "back": "-ση / -ξη / -ψη, off the perfective stem: απόφαση, ανακοίνωση, αύξηση, λήψη, κατανόηση"
+    },
+    {
+      "kind": "sentence",
+      "front": "η ανακοίνωση της απόφασης της κυβέρνησης",
+      "back": "the announcement of the government’s decision — a genitive chain three deep, which is normal; four is bad writing even in Greek"
+    },
+    {
+      "kind": "sentence",
+      "front": "κατά τη διάρκεια της λειτουργίας",
+      "back": "during the service"
+    },
+    {
+      "kind": "sentence",
+      "front": "με σκοπό την…",
+      "back": "with the aim of…"
+    },
+    {
+      "kind": "word",
+      "front": "η εξέλιξη",
+      "back": "the development, the course of events"
+    },
+    {
+      "kind": "word",
+      "front": "η συμμετοχή",
+      "back": "participation"
+    },
+    {
+      "kind": "word",
+      "front": "η πρόσκληση",
+      "back": "the invitation"
+    },
+    {
+      "kind": "grammar",
+      "front": "The nominalisation rule for your own writing",
+      "back": "One per sentence, and keep a real verb — three nominalisations and a weak verb is the nonsense of an official document"
+    }
+  ],
+  "The participles in writing": [
+    {
+      "kind": "grammar",
+      "front": "What the active participle does in a text",
+      "back": "Replaces a whole subordinate clause in one word — Φτάνοντας, είδα… for Όταν έφτασα, είδα…"
+    },
+    {
+      "kind": "grammar",
+      "front": "The participle’s negative",
+      "back": "μη, not δεν: μη γνωρίζοντας, μη έχοντας"
+    },
+    {
+      "kind": "grammar",
+      "front": "The iron rule of the participle",
+      "back": "Its subject must be the main clause’s subject. Φτάνοντας στο σπίτι, η πόρτα ήταν ανοιχτή is wrong — the door did not arrive."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχοντας ολοκληρώσει τις σπουδές του, επέστρεψε.",
+      "back": "Having completed his studies, he returned. — the compound participle, formal and useful"
+    },
+    {
+      "kind": "grammar",
+      "front": "κλειστός against κλεισμένος",
+      "back": "The short form is a state; the -μένος form implies someone did it. Same for ανοιχτός/ανοιγμένος, γεμάτος/γεμισμένος."
+    },
+    {
+      "kind": "word",
+      "front": "ο ενδιαφερόμενος",
+      "back": "the interested party — a learned participle fully naturalised as a noun"
+    },
+    {
+      "kind": "word",
+      "front": "ο υπογράφων",
+      "back": "the undersigned — learned, and live in official writing"
+    },
+    {
+      "kind": "word",
+      "front": "τα δεδομένα",
+      "back": "the data — an ancient passive participle, now an ordinary noun"
+    },
+    {
+      "kind": "grammar",
+      "front": "How many participles a paragraph can take",
+      "back": "One well-placed one makes it read as written Greek. Three in a row make it unreadable."
+    }
+  ],
+  "The learned forms you cannot avoid": [
+    {
+      "kind": "grammar",
+      "front": "Why katharevousa survives in official and church Greek",
+      "back": "It was the official written language until 1976, so everything administrative, legal and ecclesiastical was written in it for a century and a half — and the forms survive where that writing is still copied"
+    },
+    {
+      "kind": "grammar",
+      "front": "The seven learned forms you SHOULD write",
+      "back": "ο οποίος; ο εν λόγω; the fixed datives (εν τω μεταξύ, εντάξει, δόξα τω Θεώ); εξ αρχής and εκ νέου; υπέρ and κατά + genitive; the formal verb set; and the clergy’s forms of address"
+    },
+    {
+      "kind": "sentence",
+      "front": "εν πάση περιπτώσει",
+      "back": "in any case — a surviving dative"
+    },
+    {
+      "kind": "sentence",
+      "front": "εν τω μεταξύ",
+      "back": "meanwhile — a surviving dative"
+    },
+    {
+      "kind": "word",
+      "front": "ο εν λόγω",
+      "back": "the aforementioned, the said — live in official writing"
+    },
+    {
+      "kind": "sentence",
+      "front": "εξ αρχής",
+      "back": "from the start"
+    },
+    {
+      "kind": "sentence",
+      "front": "εκ νέου",
+      "back": "anew, afresh"
+    },
+    {
+      "kind": "sentence",
+      "front": "άνευ όρων",
+      "back": "unconditionally — άνευ is the ancient preposition for without"
+    },
+    {
+      "kind": "sentence",
+      "front": "διά ζώσης",
+      "back": "in person, face to face — literally \"through the living voice\""
+    },
+    {
+      "kind": "word",
+      "front": "πλην",
+      "back": "except (+ genitive) — learned and live"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why not to write the rest of the learned register",
+      "back": "Producing a register you do not fully control makes you sound confused rather than learned — and it belongs to the later classical curriculum"
+    }
+  ],
+  "Messages, and the internet's Greek": [
+    {
+      "kind": "grammar",
+      "front": "Greeklish",
+      "back": "Greek written in Latin letters, from the days of phones without a Greek keyboard. Read it; do not write it."
+    },
+    {
+      "kind": "grammar",
+      "front": "The one punctuation mark messaging keeps",
+      "back": "The question mark ; — because without it a question is not a question"
+    },
+    {
+      "kind": "word",
+      "front": "δλδ",
+      "back": "δηλαδή — i.e., I mean"
+    },
+    {
+      "kind": "word",
+      "front": "τλκ",
+      "back": "τελικά — in the end, so"
+    },
+    {
+      "kind": "word",
+      "front": "τσκ",
+      "back": "τίποτα — nothing much"
+    },
+    {
+      "kind": "word",
+      "front": "κλπ",
+      "back": "και λοιπά — etc."
+    },
+    {
+      "kind": "sentence",
+      "front": "Πες μου όταν μπορείς.",
+      "back": "Let me know when you can."
+    },
+    {
+      "kind": "sentence",
+      "front": "Φιλάκια",
+      "back": "Little kisses — a light, warm sign-off"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why you should keep the accents in messages even though Greeks drop them",
+      "back": "Your spelling study depends on them. Writing accent-free is a habit you cannot afford while you are still learning where they go."
+    }
+  ],
+  "An email": [
+    {
+      "kind": "sentence",
+      "front": "Καλημέρα σας,",
+      "back": "Good morning — the safe neutral email opening, right for nine emails in ten"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αξιότιμε Κύριε / Αξιότιμη Κυρία,",
+      "back": "Dear Sir / Madam — the formal, institutional opening"
+    },
+    {
+      "kind": "sentence",
+      "front": "Με εκτίμηση,",
+      "back": "Yours sincerely — the formal default close"
+    },
+    {
+      "kind": "sentence",
+      "front": "Παραμένω στη διάθεσή σας.",
+      "back": "I remain at your disposal. — formal, and expected in business Greek"
+    },
+    {
+      "kind": "sentence",
+      "front": "Σας ευχαριστώ εκ των προτέρων.",
+      "back": "Thank you in advance."
+    },
+    {
+      "kind": "sentence",
+      "front": "Σας γράφω σχετικά με…",
+      "back": "I am writing concerning…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Σας επισυνάπτω…",
+      "back": "I attach…"
+    },
+    {
+      "kind": "grammar",
+      "front": "The vocative trap in an email greeting",
+      "back": "Masculine -ος becomes -ε and -ης becomes -η: Αγαπητέ κύριε Παπαδόπουλε, Γιάννη, Νίκο. Feminines do not change."
+    },
+    {
+      "kind": "grammar",
+      "front": "What goes in a Greek subject line",
+      "back": "A noun phrase, not a sentence: Αίτηση για βεβαίωση. Ερώτηση σχετικά με το ωράριο."
+    }
+  ],
+  "A formal letter": [
+    {
+      "kind": "grammar",
+      "front": "How a Greek letter is dated",
+      "back": "Place first, then the day, then the month in the GENITIVE: Υόρκη, 14 Οκτωβρίου 2026"
+    },
+    {
+      "kind": "sentence",
+      "front": "Με την παρούσα σας ενημερώνω ότι…",
+      "back": "By the present letter I inform you that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Παρακαλώ για τις δικές σας ενέργειες.",
+      "back": "Please take the necessary action. — a standard and very useful formula"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μετά τιμής,",
+      "back": "Respectfully — the most formal close"
+    },
+    {
+      "kind": "sentence",
+      "front": "Είμαι στη διάθεσή σας για κάθε διευκρίνιση.",
+      "back": "I am available for any clarification."
+    },
+    {
+      "kind": "word",
+      "front": "η επιστολή",
+      "back": "the letter (formal) — το γράμμα is a letter to a friend"
+    },
+    {
+      "kind": "word",
+      "front": "η βεβαίωση",
+      "back": "the certificate, the written confirmation"
+    },
+    {
+      "kind": "word",
+      "front": "το δικαιολογητικό",
+      "back": "a supporting document"
+    },
+    {
+      "kind": "word",
+      "front": "αρμόδιος",
+      "back": "competent, responsible — the right office for the matter"
+    },
+    {
+      "kind": "word",
+      "front": "εντός",
+      "back": "within (a period of time) — learned, and standard in a letter"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why not to write an angry letter in Greek",
+      "back": "The formal register is the whole weapon. Adding heat weakens it, and a foreigner writing angry Greek is simply hard to read."
+    }
+  ],
+  "Forms, applications and officialdom": [
+    {
+      "kind": "word",
+      "front": "η ιθαγένεια",
+      "back": "citizenship — and υπηκοότητα for nationality"
+    },
+    {
+      "kind": "word",
+      "front": "η υπηκοότητα",
+      "back": "nationality"
+    },
+    {
+      "kind": "word",
+      "front": "η οικογενειακή κατάσταση",
+      "back": "marital status"
+    },
+    {
+      "kind": "word",
+      "front": "η υπεύθυνη δήλωση",
+      "back": "a sworn declaration — a fixture of Greek life, on a standard form"
+    },
+    {
+      "kind": "word",
+      "front": "ο αριθμός πρωτοκόλλου",
+      "back": "the reference number of a document"
+    },
+    {
+      "kind": "sentence",
+      "front": "Συμπληρώνεται από την υπηρεσία",
+      "back": "To be completed by the office"
+    },
+    {
+      "kind": "sentence",
+      "front": "Διαγράψτε ό,τι δεν ισχύει",
+      "back": "Delete what does not apply"
+    },
+    {
+      "kind": "sentence",
+      "front": "Απαιτούμενα δικαιολογητικά",
+      "back": "Required supporting documents"
+    },
+    {
+      "kind": "sentence",
+      "front": "άνευ αντικειμένου",
+      "back": "not applicable"
+    },
+    {
+      "kind": "sentence",
+      "front": "Παρακαλώ να μου χορηγήσετε βεβαίωση…",
+      "back": "Please issue me a certificate… — the whole of a Greek application, in one sentence"
+    },
+    {
+      "kind": "word",
+      "front": "το Ληξιαρχείο",
+      "back": "the registry office — births, marriages and deaths"
+    },
+    {
+      "kind": "word",
+      "front": "η Μητρόπολη",
+      "back": "the diocesan office — where a baptismal or marriage certificate comes from"
+    }
+  ],
+  "A notice, a programme, an announcement": [
+    {
+      "kind": "grammar",
+      "front": "The grammar of a Greek notice",
+      "back": "Nominal and nearly verbless: capitals in the heading (so no accents), genitives in the title, dates without the year, and one real verb if any"
+    },
+    {
+      "kind": "word",
+      "front": "η αγρυπνία",
+      "back": "the vigil — an all-night service"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ενημερώνουμε ότι…",
+      "back": "We inform you that… — the standard announcement opening"
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα πραγματοποιηθεί…",
+      "back": "will take place"
+    },
+    {
+      "kind": "sentence",
+      "front": "αναβάλλεται / ματαιώνεται",
+      "back": "is postponed / is cancelled"
+    },
+    {
+      "kind": "sentence",
+      "front": "Η παρουσία σας θα μας τιμήσει.",
+      "back": "Your presence will honour us. — the standard close of a Greek invitation"
+    },
+    {
+      "kind": "word",
+      "front": "ο πολιούχος",
+      "back": "the patron saint of a town or parish"
+    },
+    {
+      "kind": "word",
+      "front": "η πανήγυρις",
+      "back": "the patronal feast — colloquially το πανηγύρι"
+    },
+    {
+      "kind": "word",
+      "front": "η αρτοκλασία",
+      "back": "the blessing of the loaves"
+    },
+    {
+      "kind": "word",
+      "front": "η δεξίωση",
+      "back": "the reception"
+    },
+    {
+      "kind": "word",
+      "front": "το Εκκλησιαστικό Συμβούλιο",
+      "back": "the parish council"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a parish notice is formal in Greek",
+      "back": "Public writing in Greek is level 3 more consistently than in English. A chatty Greek notice reads as odd."
+    }
+  ],
+  "The CV and the covering letter": [
+    {
+      "kind": "word",
+      "front": "το βιογραφικό σημείωμα",
+      "back": "the CV — usually shortened to το βιογραφικό"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek states a language level on a CV",
+      "back": "By certificate band: άριστη (C2), πολύ καλή (C1), καλή (B2), βασική γνώση. And χωρίς πιστοποίηση — uncertified — is an ordinary thing to write."
+    },
+    {
+      "kind": "grammar",
+      "front": "What a Greek CV includes that a British one does not",
+      "back": "Date of birth, marital status, and military service for men — included without comment"
+    },
+    {
+      "kind": "sentence",
+      "front": "Διαθέτω εμπειρία στον τομέα…",
+      "back": "I have experience in the field of…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Με ιδιαίτερο ενδιαφέρον διάβασα την αγγελία σας.",
+      "back": "I read your advertisement with particular interest."
+    },
+    {
+      "kind": "sentence",
+      "front": "ανταποκρίνομαι στις απαιτήσεις της θέσης",
+      "back": "I meet the requirements of the post"
+    },
+    {
+      "kind": "word",
+      "front": "η προϋπηρεσία",
+      "back": "previous experience"
+    },
+    {
+      "kind": "word",
+      "front": "ο ελεύθερος επαγγελματίας",
+      "back": "a freelance, a self-employed professional"
+    },
+    {
+      "kind": "word",
+      "front": "η πλήρης απασχόληση",
+      "back": "full-time employment — μερική for part-time"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why to write your CV in Greek even if you never send it",
+      "back": "It is the best self-description exercise there is — naming what you do, know and have done, which is the content of every conversation about yourself"
+    }
+  ],
+  "Describing": [
+    {
+      "kind": "word",
+      "front": "βρίσκεται",
+      "back": "is situated — the standard verb for placing something"
+    },
+    {
+      "kind": "sentence",
+      "front": "στην άκρη του χωριού",
+      "back": "at the edge of the village"
+    },
+    {
+      "kind": "sentence",
+      "front": "απέναντι από",
+      "back": "opposite"
+    },
+    {
+      "kind": "sentence",
+      "front": "ανάμεσα σε",
+      "back": "between"
+    },
+    {
+      "kind": "sentence",
+      "front": "γύρω από",
+      "back": "around"
+    },
+    {
+      "kind": "sentence",
+      "front": "Είναι από τους ανθρώπους που…",
+      "back": "He is one of those people who… — a very Greek frame"
+    },
+    {
+      "kind": "sentence",
+      "front": "σαν να ζύγιζε κάθε λέξη",
+      "back": "as if he were weighing every word — σαν να + the subjunctive"
+    },
+    {
+      "kind": "word",
+      "front": "γεροδεμένος",
+      "back": "solidly built"
+    },
+    {
+      "kind": "word",
+      "front": "μελαχρινός",
+      "back": "dark-haired, dark-complexioned"
+    },
+    {
+      "kind": "word",
+      "front": "αυστηρός",
+      "back": "stern, strict"
+    },
+    {
+      "kind": "grammar",
+      "front": "The tense for description in the past",
+      "back": "The imperfect — states and habits. An aorist turns a description into a sequence of events."
+    }
+  ],
+  "Narrating": [
+    {
+      "kind": "grammar",
+      "front": "The division of labour in a Greek narrative",
+      "back": "Aorist for the events, one after another; imperfect for the background — weather, clothes, what was going on"
+    },
+    {
+      "kind": "grammar",
+      "front": "The historic present, and when Greeks use it",
+      "back": "A story told in the present for immediacy — extremely common in spoken narrative: Μπαίνω μέσα, και τι να δω;"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι να δω;",
+      "back": "And what do I see? — the fixed move for the surprise in a told story"
+    },
+    {
+      "kind": "sentence",
+      "front": "Σε κάποια στιγμή…",
+      "back": "At some point…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ξαφνικά…",
+      "back": "Suddenly…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Από τότε…",
+      "back": "Ever since then…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μου είπε ότι θα έρθει.",
+      "back": "He told me he would come. — NO tense shift in Greek reported speech"
+    },
+    {
+      "kind": "grammar",
+      "front": "How a told Greek story ends",
+      "back": "With a judgement rather than a stop: Από τότε δεν ξαναπήγα. Και κατάλαβα ότι… Έτσι είναι."
+    },
+    {
+      "kind": "grammar",
+      "front": "The five parts of a narrative",
+      "back": "Setting and ordinary state in the imperfect; the breaking event in the aorist; what followed, in order; the outcome and what it meant"
+    }
+  ],
+  "Explaining": [
+    {
+      "kind": "sentence",
+      "front": "γίνεται ως εξής",
+      "back": "is done as follows"
+    },
+    {
+      "kind": "sentence",
+      "front": "πρόκειται για…",
+      "back": "it is a matter of…, this is a…"
+    },
+    {
+      "kind": "sentence",
+      "front": "αποτελείται από…",
+      "back": "consists of…"
+    },
+    {
+      "kind": "sentence",
+      "front": "χωρίζεται σε…",
+      "back": "is divided into…"
+    },
+    {
+      "kind": "sentence",
+      "front": "διαφέρει από… ως προς…",
+      "back": "differs from… in respect of…"
+    },
+    {
+      "kind": "sentence",
+      "front": "σε αντίθεση με…",
+      "back": "in contrast to…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ας πάρουμε ένα παράδειγμα.",
+      "back": "Let's take an example."
+    },
+    {
+      "kind": "sentence",
+      "front": "Συνοψίζοντας…",
+      "back": "Summing up…"
+    },
+    {
+      "kind": "grammar",
+      "front": "The tense of an explanation",
+      "back": "The gnomic present — things generally true, even if the thing happens annually"
+    },
+    {
+      "kind": "grammar",
+      "front": "The known-to-new order",
+      "back": "Each sentence starts from what the previous one established and adds one new thing — the most useful compositional habit in any language"
+    },
+    {
+      "kind": "grammar",
+      "front": "The person to avoid in an explanation",
+      "back": "The second person. Παίρνεις το αλεύρι… is recipe register. Use the impersonal passive."
+    }
+  ],
+  "Arguing: building a position": [
+    {
+      "kind": "sentence",
+      "front": "υποστηρίζω ότι…",
+      "back": "I maintain that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κατά πρώτον…",
+      "back": "Firstly… — formal"
+    },
+    {
+      "kind": "sentence",
+      "front": "Χαρακτηριστικό παράδειγμα είναι…",
+      "back": "A characteristic example is…"
+    },
+    {
+      "kind": "sentence",
+      "front": "οδηγεί στο συμπέρασμα ότι…",
+      "back": "leads to the conclusion that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "έχει ως αποτέλεσμα…",
+      "back": "has as its result…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Επιπροσθέτως…",
+      "back": "Moreover… — formal"
+    },
+    {
+      "kind": "sentence",
+      "front": "υπό ορισμένες προϋποθέσεις",
+      "back": "under certain conditions"
+    },
+    {
+      "kind": "sentence",
+      "front": "ενδέχεται να…",
+      "back": "it may be that…"
+    },
+    {
+      "kind": "word",
+      "front": "το επιχείρημα",
+      "back": "the argument"
+    },
+    {
+      "kind": "word",
+      "front": "το μειονέκτημα",
+      "back": "the disadvantage — πλεονέκτημα for the advantage"
+    },
+    {
+      "kind": "grammar",
+      "front": "The four moves of a body paragraph",
+      "back": "The claim; the reason (επειδή); the evidence or example; the link back to the thesis (συνεπώς)"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a B2 argument hedges",
+      "back": "Flat assertion reads as unpersuasive and is marked down. κατά τη γνώμη μου, σε μεγάλο βαθμό, φαίνεται ότι."
+    }
+  ],
+  "Arguing: conceding and refuting": [
+    {
+      "kind": "sentence",
+      "front": "Είναι αλήθεια ότι…, όμως…",
+      "back": "It is true that…, however… — the most useful structure in argumentative writing"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αναμφίβολα…, παρ’ όλα αυτά…",
+      "back": "Undoubtedly…, nevertheless…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα μπορούσε να αντιτείνει κανείς ότι…",
+      "back": "One might object that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Το επιχείρημα αυτό παραβλέπει ότι…",
+      "back": "This argument overlooks that… — the workhorse refutation"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν προκύπτει ότι…",
+      "back": "It does not follow that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Η θέση αυτή δεν τεκμηριώνεται.",
+      "back": "This position is not substantiated."
+    },
+    {
+      "kind": "sentence",
+      "front": "Αυτό ισχύει μόνο εν μέρει.",
+      "back": "That is only partly true."
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα ήταν υπερβολή να πούμε ότι…",
+      "back": "It would be an exaggeration to say that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Με την ίδια λογική…",
+      "back": "By the same logic…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν είναι έτσι ακριβώς.",
+      "back": "It's not quite like that."
+    },
+    {
+      "kind": "grammar",
+      "front": "The shape of a good concession",
+      "back": "Concede fully, then turn. A half-hearted concession is worse than none, because the reader sees it."
+    },
+    {
+      "kind": "grammar",
+      "front": "The tone difference from British English",
+      "back": "Greek argument is more direct: Αυτό είναι λάθος is normal where British English would hedge. Over-hedging in Greek reads as evasive."
+    }
+  ],
+  "Summarising": [
+    {
+      "kind": "sentence",
+      "front": "αναφέρει ότι",
+      "back": "states that — neutral"
+    },
+    {
+      "kind": "sentence",
+      "front": "τονίζει ότι",
+      "back": "stresses that"
+    },
+    {
+      "kind": "sentence",
+      "front": "επισημαίνει ότι",
+      "back": "points out that"
+    },
+    {
+      "kind": "sentence",
+      "front": "διαπιστώνει ότι",
+      "back": "finds, observes that"
+    },
+    {
+      "kind": "sentence",
+      "front": "καταλήγει στο συμπέρασμα ότι",
+      "back": "concludes that"
+    },
+    {
+      "kind": "sentence",
+      "front": "παραδέχεται ότι",
+      "back": "concedes that"
+    },
+    {
+      "kind": "sentence",
+      "front": "διερωτάται αν",
+      "back": "asks whether"
+    },
+    {
+      "kind": "sentence",
+      "front": "αμφισβητεί",
+      "back": "questions, disputes"
+    },
+    {
+      "kind": "grammar",
+      "front": "The discipline that makes a summary a summary",
+      "back": "Write it from your marks with the original CLOSED. Writing with the text open produces paraphrase."
+    },
+    {
+      "kind": "grammar",
+      "front": "The three rules of a summary",
+      "back": "No new information; no opinion; no copied sentences"
+    },
+    {
+      "kind": "grammar",
+      "front": "What learners keep that should go, and drop that should stay",
+      "back": "Drop the examples; keep the main claim stated AS a claim, and the structure of the argument"
+    }
+  ],
+  "A review, and an opinion piece": [
+    {
+      "kind": "word",
+      "front": "η πλοκή",
+      "back": "the plot"
+    },
+    {
+      "kind": "word",
+      "front": "ο σκηνοθέτης",
+      "back": "the director"
+    },
+    {
+      "kind": "sentence",
+      "front": "διαδραματίζεται στη…",
+      "back": "is set in…"
+    },
+    {
+      "kind": "sentence",
+      "front": "πραγματεύεται το θέμα…",
+      "back": "deals with the subject of…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Το συνιστώ ανεπιφύλακτα.",
+      "back": "I recommend it unreservedly."
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν με έπεισε.",
+      "back": "It didn't convince me."
+    },
+    {
+      "kind": "sentence",
+      "front": "Με συγκίνησε.",
+      "back": "It moved me."
+    },
+    {
+      "kind": "sentence",
+      "front": "αξίζει τον κόπο",
+      "back": "it is worth the trouble"
+    },
+    {
+      "kind": "sentence",
+      "front": "Με αφορμή…",
+      "back": "Prompted by… — the standard opening of Greek opinion writing"
+    },
+    {
+      "kind": "sentence",
+      "front": "Το ερώτημα, τελικά, δεν είναι αν… αλλά αν…",
+      "back": "The question, in the end, is not whether… but whether… — the closing turn"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why posting Greek in public is worth the exposure",
+      "back": "A corrected sentence is worth ten uncorrected ones, and Greeks correcting a foreigner are almost always pleased rather than scornful"
+    }
+  ],
+  "Writing to the Church": [
+    {
+      "kind": "sentence",
+      "front": "Αιδεσιμότατε Πάτερ,",
+      "back": "Reverend Father — the formal letter opening to a parish priest"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ζητώ τις ευχές σας.",
+      "back": "I ask your prayers. — the standard closing request, expected rather than presumptuous"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ασπάζομαι τη δεξιά σας.",
+      "back": "I kiss your right hand. — the traditional close of a letter to a priest or bishop"
+    },
+    {
+      "kind": "sentence",
+      "front": "Σεβαστέ Πάτερ,",
+      "back": "Reverend Father — the simple formal opening of a letter to a priest"
+    },
+    {
+      "kind": "sentence",
+      "front": "Σεβασμιώτατε Πάτερ και Δέσποτα,",
+      "back": "Your Eminence — the opening of a letter to a metropolitan"
+    },
+    {
+      "kind": "word",
+      "front": "ο αρχιμανδρίτης",
+      "back": "the archimandrite — a senior unmarried priest; addressed Πανοσιολογιώτατε in writing"
+    },
+    {
+      "kind": "word",
+      "front": "Ιερολογιώτατε",
+      "back": "the written address to a deacon — spoken, Διάκονε"
+    },
+    {
+      "kind": "word",
+      "front": "Θεοφιλέστατε",
+      "back": "Your Grace — to an auxiliary bishop"
+    },
+    {
+      "kind": "word",
+      "front": "Μακαριώτατε",
+      "back": "Your Beatitude — to an archbishop"
+    },
+    {
+      "kind": "word",
+      "front": "Παναγιώτατε",
+      "back": "Your All-Holiness — to the Ecumenical Patriarch"
+    },
+    {
+      "kind": "word",
+      "front": "Πανοσιολογιώτατε",
+      "back": "to an archimandrite or an abbot"
+    },
+    {
+      "kind": "word",
+      "front": "Γερόντισσα",
+      "back": "Mother — the address to an abbess; Γέροντα to an elder"
+    },
+    {
+      "kind": "word",
+      "front": "η πρεσβυτέρα",
+      "back": "a married priest's wife — and the address to her"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δι’ ευχών σας",
+      "back": "Through your prayers"
+    },
+    {
+      "kind": "sentence",
+      "front": "Εύχομαι καλή δύναμη.",
+      "back": "I wish you strength. — for someone working or in a hard time"
+    },
+    {
+      "kind": "sentence",
+      "front": "Με αγάπη Χριστού,",
+      "back": "With the love of Christ — a warm close"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why the clergy’s forms are the one learned register to produce",
+      "back": "They are formulae rather than a register to control, and getting them wrong is not informality but error"
+    },
+    {
+      "kind": "grammar",
+      "front": "The -τατος pattern in the forms of address",
+      "back": "The ancient superlative: Σεβασμιώτατος, Παναγιώτατος, Μακαριώτατος, Αιδεσιμότατος — and all become vocatives in -ε or -η when you address someone"
+    }
+  ],
+  "Editing your own Greek": [
+    {
+      "kind": "grammar",
+      "front": "The rule that makes editing possible",
+      "back": "Leave it a day. You cannot see your own sentences an hour after writing them — and if there is no tomorrow, read it aloud."
+    },
+    {
+      "kind": "grammar",
+      "front": "The first item on the editing checklist",
+      "back": "Read it aloud. Half your errors are audible: a wrong ending, a missing article, a clause with no verb."
+    },
+    {
+      "kind": "grammar",
+      "front": "The twelve-item editing checklist",
+      "back": "Read aloud; one main verb present; agreement; case after prepositions; aspect in every past verb; participle subjects; the accents; the i spellings; final -ν; register held; connectives doing their job; cut a tenth"
+    },
+    {
+      "kind": "grammar",
+      "front": "The errors specific to an English speaker",
+      "back": "A missing article; a possessive adjective Greek does not have; an infinitive that does not exist; pronoun order; a subject pronoun in every sentence; English punctuation; and the calque"
+    },
+    {
+      "kind": "grammar",
+      "front": "The two-pass edit",
+      "back": "Pass one for sense, ignoring spelling entirely. Pass two for form, mechanically, without rereading for sense."
+    }
+  ],
+  "Getting corrected": [
+    {
+      "kind": "grammar",
+      "front": "Why self-editing is not enough",
+      "back": "It catches errors you know to look for. The errors that matter most are the ones you do not know are errors."
+    },
+    {
+      "kind": "sentence",
+      "front": "Πώς θα το έλεγες εσύ;",
+      "back": "How would YOU say it? — ask this rather than \"is this right?\", which only ever gets you \"yes, fine\""
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν λέμε έτσι.",
+      "back": "We don't say it like that. — the normal, blunt register of Greek help, and far more useful than politeness"
+    },
+    {
+      "kind": "grammar",
+      "front": "What to do with a correction",
+      "back": "Write both versions side by side; classify the error; card it if it is a pattern; and REUSE the corrected sentence within a week, or it is forgotten"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where to get corrected, free",
+      "back": "One person at church who agrees to correct you; a language exchange; LangCorrect or Journaly; the learner forums; and a corpus search of the exact phrase"
+    },
+    {
+      "kind": "grammar",
+      "front": "What it means if most corrections are register errors and calques",
+      "back": "You are writing English in Greek — and the fix is more reading, not more study"
+    }
+  ],
+  "Where you should be at the end of stage 9": [
+    {
+      "kind": "grammar",
+      "front": "The state of the four skills at the end of stage 9",
+      "back": "Reading B2 going to C1, listening B2, writing B2 — and speaking entirely dependent on whether the ten minutes a week happened"
+    },
+    {
+      "kind": "grammar",
+      "front": "What you should NOT expect to be able to do",
+      "back": "Write literary Greek; produce the learned register; write without errors; write fast. The goal was method and your own error list."
+    },
+    {
+      "kind": "grammar",
+      "front": "The six checkpoint questions for stage 9",
+      "back": "Is there a file of a dozen texts? Has a Greek corrected any of it? Can you write to a priest without looking up the forms? Did you write the argument with a concession? Can you name a text’s register at a glance? Are both tracks finished?"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which checkpoint failure actually matters",
+      "back": "No correction by a Greek. Everything else in the stage you can do alone; writing without correction fossilises."
+    }
+  ],
+  "Review: stage 9": [
+    {
+      "kind": "grammar",
+      "front": "Stage 9, in one line",
+      "back": "Producing Greek: the mechanics, the sentence, the register, the practical texts, the four modes, and the discipline of editing and being corrected"
+    },
+    {
+      "kind": "grammar",
+      "front": "The rule of the whole stage",
+      "back": "Write what you can say, and delete any sentence whose shape you have not seen in Greek — replacing it with two simpler ones you know are right"
+    },
+    {
+      "kind": "grammar",
+      "front": "What remains after stage 9",
+      "back": "Cyprus, and Literature and ad astra — neither gating the other, both on top of stage 8’s reading, which should by now be a habit"
+    },
+    {
+      "kind": "grammar",
+      "front": "When the classical curriculum can begin",
+      "back": "Whenever you want it. Nothing gates it, and everything from here is addition rather than progression."
+    }
+  ],
+  "What stage 10 is, and why Cyprus": [
+    {
+      "kind": "grammar",
+      "front": "Why Cypriot gets a stage in this curriculum",
+      "back": "His ruling — standard AND Cypriot — and the fact that the Greek community in Britain is substantially Cypriot, so the parish hall may be speaking it"
+    },
+    {
+      "kind": "grammar",
+      "front": "The rule of stage 10",
+      "back": "Understand the dialect; speak the standard. A foreigner speaking Cypriot reads as imitation, and every Cypriot speaks standard Greek anyway."
+    },
+    {
+      "kind": "grammar",
+      "front": "The Cypriot diglossia",
+      "back": "The dialect at home, with friends, in the village, in jokes and in anger; standard Greek in school, writing, news, church and public speech — sliding between them sentence by sentence"
+    }
+  ],
+  "The sounds of Cypriot": [
+    {
+      "kind": "grammar",
+      "front": "The five sound differences of Cypriot",
+      "back": "Long double consonants; aspirated ππ/ττ/κκ; κ→τζ before ε and ι; χ→sh before ε and ι; and final -ν kept"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Cypriot sounds older than standard Greek",
+      "back": "Because it is — the long consonants, the final -ν and the post-verbal pronoun are all Ancient Greek retentions the standard dropped"
+    },
+    {
+      "kind": "word",
+      "front": "τζαι",
+      "back": "και — the commonest word in the dialect, written τζαι, τζιαι, τσαι or τσιαι"
+    },
+    {
+      "kind": "word",
+      "front": "τζαιρός",
+      "back": "καιρός — weather, time"
+    },
+    {
+      "kind": "word",
+      "front": "σ̌έρι",
+      "back": "χέρι — the hand, with the sh sound standard Greek has not got"
+    },
+    {
+      "kind": "word",
+      "front": "όσ̌ι",
+      "back": "όχι"
+    },
+    {
+      "kind": "word",
+      "front": "σ̌ύλλος",
+      "back": "σκύλος — the dog"
+    },
+    {
+      "kind": "word",
+      "front": "ετσείνος",
+      "back": "εκείνος — that one"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ίντα τζαιρόν κάμνει;",
+      "back": "τι καιρό κάνει; — What's the weather doing?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Εν θωρώ τίποτε.",
+      "back": "δεν βλέπω τίποτα — I can't see anything."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Cypriot stops sound more familiar to an English ear",
+      "back": "The double voiceless stops are aspirated, as in English pot, top, cat — where standard Greek stops are unaspirated"
+    }
+  ],
+  "Writing Cypriot: there is no standard spelling": [
+    {
+      "kind": "grammar",
+      "front": "Why Cypriot has no standard orthography",
+      "back": "It has never been an official written language — standard Greek is what is taught, printed and used in church and government in Cyprus. The dialect is written anyway, by improvisation."
+    },
+    {
+      "kind": "grammar",
+      "front": "The three systems for writing Cypriot",
+      "back": "Ordinary improvised spelling; the linguists' carons (σ̌, ζ̌, τσ̌, τζ̌); and Cypriot Greeklish with sh and j"
+    },
+    {
+      "kind": "grammar",
+      "front": "What to do with an unknown Cypriot word",
+      "back": "Apply the five sound rules in reverse first. If it yields a standard word you are done; if not, it is real dialect vocabulary or a loanword."
+    },
+    {
+      "kind": "grammar",
+      "front": "What NOT to card from Cypriot",
+      "back": "The spellings. Card the word and the meaning, because the same word appears four ways."
+    },
+    {
+      "kind": "word",
+      "front": "Γιαγκουλλής",
+      "back": "the standard dialect dictionary — Λεξικό της Κυπριακής Διαλέκτου"
+    }
+  ],
+  "The grammar: pronouns and negation": [
+    {
+      "kind": "grammar",
+      "front": "The biggest grammatical difference in Cypriot",
+      "back": "The weak pronoun FOLLOWS the verb: λαλώ σου, θωρώ σε, είπεν μου, ξέρω το — the older Greek order, which the standard keeps only in the imperative"
+    },
+    {
+      "kind": "grammar",
+      "front": "The two jobs of εν",
+      "back": "είναι and δεν. A following verb means not; a following adjective, noun or adverb means is. Εν εν καλόν = it isn’t good."
+    },
+    {
+      "kind": "grammar",
+      "front": "The Cypriot future particle",
+      "back": "εννά (also έννα) for θα — from θέλω να, as θα is. Standard θα is used in Cyprus too."
+    },
+    {
+      "kind": "word",
+      "front": "μεν",
+      "back": "μην — don’t"
+    },
+    {
+      "kind": "word",
+      "front": "ίντα",
+      "back": "τι — what"
+    },
+    {
+      "kind": "word",
+      "front": "ίνταλως",
+      "back": "πώς — how"
+    },
+    {
+      "kind": "word",
+      "front": "πόθεν",
+      "back": "από πού — from where. Ancient Greek, unchanged, and ordinary speech in Cyprus."
+    },
+    {
+      "kind": "word",
+      "front": "λαλώ",
+      "back": "λέω — I say. One of the three Cypriot verbs you must know."
+    },
+    {
+      "kind": "word",
+      "front": "θωρώ",
+      "back": "βλέπω — I see"
+    },
+    {
+      "kind": "word",
+      "front": "κάμνω",
+      "back": "κάνω — I do, I make"
+    },
+    {
+      "kind": "word",
+      "front": "είπεν",
+      "back": "είπε — with the final -ν kept; and έδωκεν for έδωσε"
+    },
+    {
+      "kind": "sentence",
+      "front": "Εννά σου πω.",
+      "back": "θα σου πω — I’ll tell you."
+    },
+    {
+      "kind": "sentence",
+      "front": "Ίντα εν τούτον;",
+      "back": "τι είναι αυτό; — What’s this?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ίντα λαλείς, κόρη;",
+      "back": "τι λες, κορίτσι μου; — What are you saying, girl?"
+    }
+  ],
+  "The vocabulary that is genuinely different": [
+    {
+      "kind": "word",
+      "front": "ούλλος, ούλλοι",
+      "back": "όλος, όλοι — all"
+    },
+    {
+      "kind": "word",
+      "front": "μανιχός μου",
+      "back": "μόνος μου — by myself"
+    },
+    {
+      "kind": "word",
+      "front": "πελλός",
+      "back": "τρελός — mad, crazy"
+    },
+    {
+      "kind": "word",
+      "front": "μιτσής",
+      "back": "μικρός — small, young"
+    },
+    {
+      "kind": "word",
+      "front": "συντυχάννω",
+      "back": "μιλώ, συνομιλώ — I talk, I converse"
+    },
+    {
+      "kind": "word",
+      "front": "η τσαέρα",
+      "back": "η καρέκλα — the chair, from Romance"
+    },
+    {
+      "kind": "word",
+      "front": "το κοπέλι",
+      "back": "το αγόρι, το παιδί — the boy, the child; κοπελλούι for the little one"
+    },
+    {
+      "kind": "word",
+      "front": "κόρη",
+      "back": "girl — and used as an affectionate address to ANY woman, by men and women alike. No standard equivalent."
+    },
+    {
+      "kind": "word",
+      "front": "ο τζύρης",
+      "back": "ο πατέρας — father, in dialect; and τζυρά for madam"
+    },
+    {
+      "kind": "word",
+      "front": "η Λαμπρή",
+      "back": "Pascha, Easter — from λαμπρός, bright. The ordinary Cypriot word."
+    },
+    {
+      "kind": "word",
+      "front": "πιάννω",
+      "back": "πιάνω, παίρνω — I take, I catch"
+    },
+    {
+      "kind": "word",
+      "front": "έρκουμαι",
+      "back": "έρχομαι — I come"
+    },
+    {
+      "kind": "word",
+      "front": "φκάλλω",
+      "back": "βγάζω — I take out"
+    },
+    {
+      "kind": "word",
+      "front": "η στράτα",
+      "back": "ο δρόμος — the road"
+    },
+    {
+      "kind": "grammar",
+      "front": "The Cypriot πολλά, and the confusion it causes",
+      "back": "In Cypriot it means VERY, where standard Greek uses πολύ. Εν πολλά καλόν = it’s very good."
+    },
+    {
+      "kind": "grammar",
+      "front": "How to learn the Cypriot vocabulary",
+      "back": "Not as a list. Listen, and when a word does not resolve by the sound rules, look it up and card it — thirty or forty cover most ordinary speech."
+    }
+  ],
+  "The four foreign layers": [
+    {
+      "kind": "grammar",
+      "front": "The four foreign layers in Cypriot, in order",
+      "back": "Old French (Lusignan, 1192–1489), Venetian Italian (1489–1571), Ottoman Turkish (1571–1878), English (1878 onwards) — over an Ancient Greek substrate"
+    },
+    {
+      "kind": "word",
+      "front": "η κουμανταρία",
+      "back": "Commandaria — the sweet wine named for the Knights Hospitaller’s Grand Commandery"
+    },
+    {
+      "kind": "word",
+      "front": "κουμαντάρω",
+      "back": "I manage, I command — from Italian comandare"
+    },
+    {
+      "kind": "word",
+      "front": "ο μουχτάρης",
+      "back": "the village headman — a Turkish-derived title still in use"
+    },
+    {
+      "kind": "word",
+      "front": "ο τεντζερές",
+      "back": "the cooking pot — Turkish"
+    },
+    {
+      "kind": "word",
+      "front": "φούλ",
+      "back": "full — English, and used as an intensifier meaning completely"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a Turkish loanword does not mark a word as Cypriot",
+      "back": "Standard Greek has hundreds too — καφές, γιαούρτι, κέφι, μεζές. Cypriot simply has more, and keeps some the mainland replaced."
+    },
+    {
+      "kind": "grammar",
+      "front": "The sensitivity about Turkish loanwords in Cypriot",
+      "back": "Given 1974, do not make a thing of it. Linguists discuss it freely; it is not small talk."
+    },
+    {
+      "kind": "grammar",
+      "front": "Which layer to guess from a word’s subject",
+      "back": "Food, probably Turkish; household, legal or building, Italian or French; cars, shops and offices, English"
+    }
+  ],
+  "Food and the table in Cyprus": [
+    {
+      "kind": "word",
+      "front": "το χαλλούμι",
+      "back": "halloumi — grilled, fried or raw; traditionally sheep’s and goat’s milk, with mint between the folds"
+    },
+    {
+      "kind": "word",
+      "front": "η αναρή",
+      "back": "anari — the fresh whey cheese, like ricotta"
+    },
+    {
+      "kind": "word",
+      "front": "τα κουπέπια",
+      "back": "stuffed vine leaves — mainland Greek calls them ντολμαδάκια"
+    },
+    {
+      "kind": "word",
+      "front": "το κολοκάσι",
+      "back": "taro root, braised with pork or chicken — a Cypriot staple with no mainland equivalent"
+    },
+    {
+      "kind": "word",
+      "front": "η σούβλα",
+      "back": "large pieces of meat on a long skewer over coals — NOT souvlaki, which is the small version"
+    },
+    {
+      "kind": "word",
+      "front": "η σεφταλιά",
+      "back": "the Cypriot sausage in caul fat"
+    },
+    {
+      "kind": "word",
+      "front": "τα αφέλια",
+      "back": "pork in red wine and coriander seed"
+    },
+    {
+      "kind": "word",
+      "front": "οι φλαούνες",
+      "back": "the Easter cheese pastries — made in Holy Week with cheese, eggs, mint and raisins, eaten the moment the fast breaks"
+    },
+    {
+      "kind": "word",
+      "front": "τα λουβιά",
+      "back": "black-eyed beans, boiled and dressed with lemon and oil"
+    },
+    {
+      "kind": "word",
+      "front": "η ζιβανία",
+      "back": "zivania — the Cypriot grape spirit"
+    },
+    {
+      "kind": "word",
+      "front": "ο τραχανάς",
+      "back": "trachanas — cracked wheat soured with yoghurt, dried, made into soup"
+    },
+    {
+      "kind": "sentence",
+      "front": "Εν πολλά νόστιμον!",
+      "back": "It's very tasty! — with the Cypriot πολλά"
+    },
+    {
+      "kind": "grammar",
+      "front": "What a Cypriot μεζέ actually is",
+      "back": "Twenty or thirty small dishes over two or three hours, ending with the grilled meat. Pacing yourself early is the only strategy."
+    }
+  ],
+  "Greetings and the Cypriot manner": [
+    {
+      "kind": "sentence",
+      "front": "Είντα κάμνεις;",
+      "back": "τι κάνεις; — the Cypriot \"how are you\", and the one to recognise first"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλώς τον!",
+      "back": "Welcome — said by the host about the arriving person, in the third person; the guest replies Καλώς σας βρήκα"
+    },
+    {
+      "kind": "word",
+      "front": "μάστρε",
+      "back": "to a craftsman, and to any man whose name you do not know"
+    },
+    {
+      "kind": "word",
+      "front": "αρφή μου",
+      "back": "my brother — αδελφός/αδελφή contracted"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πόθεν είσαι;",
+      "back": "Where are you from? — and for a Cypriot the honest answer is a VILLAGE, even for someone born in London"
+    },
+    {
+      "kind": "grammar",
+      "front": "The πείραγμα",
+      "back": "Cypriot sociability runs on teasing — your accent, your age, your appetite. Being teased is being included; tease back or laugh, never explain yourself."
+    },
+    {
+      "kind": "grammar",
+      "front": "What to say when a Cypriot calls their own Greek \"not proper Greek\"",
+      "back": "That it is proper Greek, and older than Athenian in several features. The apology comes from a century of being told otherwise."
+    }
+  ],
+  "The Church of Cyprus": [
+    {
+      "kind": "grammar",
+      "front": "When the Church of Cyprus became autocephalous",
+      "back": "431, at the Council of Ephesus — one of the oldest autocephalous Churches in Orthodoxy, older than the national Churches by a millennium and a half"
+    },
+    {
+      "kind": "grammar",
+      "front": "The three privileges of the Archbishop of Cyprus",
+      "back": "He signs in red ink, carries an imperial sceptre instead of a pastoral staff, and wears a purple mantle — granted by tradition by the Emperor Zeno"
+    },
+    {
+      "kind": "word",
+      "front": "Άγιος Βαρνάβας",
+      "back": "the Apostle Barnabas — a Cypriot from Salamis, the island’s apostle and the founder of its Church"
+    },
+    {
+      "kind": "word",
+      "front": "Άγιος Λάζαρος",
+      "back": "Lazarus, raised by Christ, by tradition bishop of Kition — and his church stands in Larnaca"
+    },
+    {
+      "kind": "word",
+      "front": "Άγιος Μάμας",
+      "back": "Saint Mamas, the shepherd saint with the lion — hugely popular in Cyprus"
+    },
+    {
+      "kind": "word",
+      "front": "Άγιος Νεόφυτος ο Έγκλειστος",
+      "back": "the twelfth-century hermit whose carved cave-monastery is near Paphos"
+    },
+    {
+      "kind": "word",
+      "front": "Παναγία του Κύκκου",
+      "back": "Kykkos — the greatest Cypriot monastery, with an icon of the Mother of God attributed by tradition to Saint Luke, kept veiled"
+    },
+    {
+      "kind": "word",
+      "front": "Σταυροβούνι",
+      "back": "Stavrovouni — founded by tradition by Saint Helen, with a relic of the Cross"
+    },
+    {
+      "kind": "word",
+      "front": "Απόστολος Ανδρέας",
+      "back": "the monastery on the tip of the Karpas peninsula — in the occupied north, and a pilgrimage interrupted for decades"
+    },
+    {
+      "kind": "word",
+      "front": "ο Εθνάρχης",
+      "back": "the Ethnarch — the Archbishop as civil head of the Orthodox population under Ottoman rule, which is why Makarios III became the first President"
+    },
+    {
+      "kind": "word",
+      "front": "η λαμπρατζιά",
+      "back": "the Holy Saturday bonfire in Cyprus"
+    },
+    {
+      "kind": "word",
+      "front": "ο Κατακλυσμός",
+      "back": "the Pentecost Monday festival by the sea — flowers and water, over an older layer"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why the Church matters more in Cyprus than in Greece",
+      "back": "It was the nation’s administration for three centuries under Ottoman rule, and the Archbishop was Ethnarch — so it is far more entangled with national identity"
+    }
+  ],
+  "Cypriot history, in brief": [
+    {
+      "kind": "grammar",
+      "front": "How long Cyprus has been Greek-speaking",
+      "back": "Over three thousand years, from Mycenaean settlement around 1200 BC — the longest continuous Greek presence anywhere outside Greece"
+    },
+    {
+      "kind": "grammar",
+      "front": "1191 in Cyprus",
+      "back": "Richard I takes the island on the Third Crusade and sells it; the Lusignan kingdom follows, then Venice in 1489 and the Ottomans in 1571"
+    },
+    {
+      "kind": "grammar",
+      "front": "1878 in Cyprus",
+      "back": "British administration begins, leased from the Ottomans; annexed 1914, a Crown Colony from 1925, independent 1960"
+    },
+    {
+      "kind": "grammar",
+      "front": "The EOKA struggle",
+      "back": "1955–59, against British rule, for enosis — union with Greece. It ended in independence rather than union."
+    },
+    {
+      "kind": "grammar",
+      "front": "1960 in Cyprus",
+      "back": "Independence: the Republic of Cyprus, Makarios III as President, and two British Sovereign Base Areas retained"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why there are Cypriots in Britain",
+      "back": "Migration from the 1930s, heavy through the 1950s and 60s, and a surge after 1974 — around 300,000 people of Cypriot descent, who built most of the Greek Orthodox parishes here"
+    },
+    {
+      "kind": "grammar",
+      "front": "Makarios III",
+      "back": "Archbishop, Ethnarch and first President — the dominant figure of twentieth-century Cyprus, and genuinely divisive. Do not have a view."
+    }
+  ],
+  "1974, and what not to say": [
+    {
+      "kind": "grammar",
+      "front": "What happened in 1974",
+      "back": "The Greek junta backed a coup against Makarios; Turkey invaded five days later and took about 37 per cent of the island. Roughly 160,000 Greek Cypriots and 50,000 Turkish Cypriots were displaced, and some 2,000 people went missing."
+    },
+    {
+      "kind": "word",
+      "front": "τα κατεχόμενα",
+      "back": "the occupied territories — the standard Greek Cypriot term for the north"
+    },
+    {
+      "kind": "word",
+      "front": "οι αγνοούμενοι",
+      "back": "the missing — still being identified as graves are excavated"
+    },
+    {
+      "kind": "word",
+      "front": "το Κυπριακό",
+      "back": "the Cyprus problem — the standard shorthand for the whole question"
+    },
+    {
+      "kind": "word",
+      "front": "η Πράσινη Γραμμή",
+      "back": "the Green Line"
+    },
+    {
+      "kind": "word",
+      "front": "ο εγκλωβισμένος",
+      "back": "the enclaved — those who stayed in the north"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν ξεχνώ",
+      "back": "\"I do not forget\" — taught to Cypriot schoolchildren since 1974, and closer to a vow than a slogan"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ο Θεός να βάλει το χέρι του.",
+      "back": "May God put His hand to it. — expresses sympathy, hope and helplessness together, in the Church’s register, and commits to nothing"
+    },
+    {
+      "kind": "grammar",
+      "front": "The six things not to say about 1974",
+      "back": "Nothing a Turkish official would say; no proposed solution; no apportioning of blame; never that it was long ago; do not ask whether they have been back; and do not generalise about Turks — Turkish Cypriots and mainland Turkey are kept distinct"
+    },
+    {
+      "kind": "grammar",
+      "front": "What a newcomer should do when 1974 comes up",
+      "back": "Listen. Ask one question and hear the whole answer. Being the person who listened well is worth more than any opinion."
+    }
+  ],
+  "The diaspora: Cypriot Greek in Britain": [
+    {
+      "kind": "grammar",
+      "front": "The five features of British Cypriot Greek",
+      "back": "Code-switching mid-sentence; English loans with Greek endings (παρκάρω, σοπάρω); a frozen 1960s village vocabulary; English intonation in the young; and often no literacy in Greek"
+    },
+    {
+      "kind": "word",
+      "front": "παρκάρω",
+      "back": "I park — an English loan naturalised with a Greek ending, like σοπάρω and ντραϊβάρω"
+    },
+    {
+      "kind": "grammar",
+      "front": "The inversion you should expect in a British parish",
+      "back": "You can read better than many fluent speakers, and they can speak better than you will for years. Both facts are ordinary."
+    },
+    {
+      "kind": "grammar",
+      "front": "The best local Greek practice available to you",
+      "back": "The parish Greek school — most parishes run one, they teach standard Greek, and they are chronically short of help"
+    },
+    {
+      "kind": "sentence",
+      "front": "Είναι κανονικά ελληνικά, και πιο παλιά από τα αθηναϊκά.",
+      "back": "It is proper Greek, and older than Athenian. — true, and a genuine kindness to say"
+    }
+  ],
+  "Cypriot music": [
+    {
+      "kind": "word",
+      "front": "τα τσιαττιστά",
+      "back": "the improvised rhyming couplet duels — two singers trading fifteen-syllable verses, each capping the last. UNESCO intangible heritage, and nothing comparable exists in mainland Greek music."
+    },
+    {
+      "kind": "word",
+      "front": "η φωνή",
+      "back": "the traditional Cypriot melodic patterns on which singers improvise words — η φωνή της Μεσαρκάς, της Πάφου"
+    },
+    {
+      "kind": "word",
+      "front": "το πιθκιαύλι",
+      "back": "the Cypriot shepherd’s flute"
+    },
+    {
+      "kind": "word",
+      "front": "το λαούτο",
+      "back": "the lute, which plays with the violin in Cypriot folk music"
+    },
+    {
+      "kind": "word",
+      "front": "Αλκίνοος Ιωαννίδης",
+      "back": "the best-known Cypriot singer-songwriter — clear diction, mostly standard Greek, widely loved in Greece too"
+    },
+    {
+      "kind": "word",
+      "front": "Μιχάλης Τερλικκάς",
+      "back": "the leading figure in preserving and performing the Cypriot traditional repertoire"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a traditional Cypriot song is harder than Cypriot speech",
+      "back": "Folk lyrics use the oldest, densest village vocabulary, archaic even in Cyprus — treat the obscure words as scenery"
+    }
+  ],
+  "Dialect poetry: Michaelides and Lipertis": [
+    {
+      "kind": "word",
+      "front": "Βασίλης Μιχαηλίδης",
+      "back": "the national poet of Cyprus (1849–1917), who made the dialect a literary language"
+    },
+    {
+      "kind": "sentence",
+      "front": "Η 9η Ιουλίου 1821 εν Λευκωσία Κύπρου",
+      "back": "Michaelides’ great poem, on the execution of Archbishop Kyprianos and the bishops in 1821 — the central text of Cypriot literature, in dialect and in the fifteen-syllable folk metre"
+    },
+    {
+      "kind": "word",
+      "front": "Δημήτρης Λιπέρτης",
+      "back": "the other pillar of Cypriot dialect poetry (1866–1937) — Κυπριακά Τραγούδια, lyric, domestic, much of it set to music"
+    },
+    {
+      "kind": "word",
+      "front": "Κώστας Μόντης",
+      "back": "a major modern Cypriot poet — his Στιγμές are two or three lines each, and the best way in for a learner"
+    },
+    {
+      "kind": "word",
+      "front": "Κυριάκος Χαραλαμπίδης",
+      "back": "the leading contemporary Cypriot poet, in standard Greek, much of it about 1974"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to read dialect verse as a learner",
+      "back": "Aloud, for the metre and the rhyme, before any glossary — then one pass with a gloss, then aloud again"
+    }
+  ],
+  "Cypriot humour, and the sitcoms": [
+    {
+      "kind": "grammar",
+      "front": "Why a Cypriot sitcom is the best material in this stage",
+      "back": "Dialect at natural speed, with the situation visible, and subtitled in standard Greek for Greek broadcast — a dialect-to-standard parallel text with audio"
+    },
+    {
+      "kind": "word",
+      "front": "Αίγια Φούξια",
+      "back": "the long-running Cypriot village sitcom — dialect so broad that mainland Greeks need the subtitles, which means you get them too"
+    },
+    {
+      "kind": "word",
+      "front": "Οι Τάκκοι",
+      "back": "the Cypriot sketch series — satirical and fast"
+    },
+    {
+      "kind": "grammar",
+      "front": "The seven subjects of Cypriot humour",
+      "back": "Village against town; the dialect itself; bureaucracy; family obligation; hospitality as warfare; the returning diaspora cousin; and mainland Greeks"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one joke not to join in on",
+      "back": "Jokes about the dialect. Cypriots make them constantly; they are for its speakers to make."
+    }
+  ],
+  "Where to find Cypriot": [
+    {
+      "kind": "word",
+      "front": "ΡΙΚ",
+      "back": "the Cyprus Broadcasting Corporation — news in standard Greek, drama and comedy in dialect, and a large free archive"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one priority if you do only one thing in this stage",
+      "back": "Watch a Cypriot sitcom with the Greek subtitles on, regularly — the only resource that gives dialect, standard, audio and context at once"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why this stage has no course",
+      "back": "Cypriot has no graded readers, no comprehensible-input channel and no course that teaches it as a target. The sound rules and the vocabulary lessons substitute for one."
+    },
+    {
+      "kind": "grammar",
+      "front": "The resource that is on no list",
+      "back": "The Cypriots at your church. Nothing online will teach you the particular Greek of the particular village your parish came from."
+    }
+  ],
+  "The island itself: places and names": [
+    {
+      "kind": "word",
+      "front": "η Λευκωσία",
+      "back": "Nicosia — the capital, and the last divided capital in Europe"
+    },
+    {
+      "kind": "word",
+      "front": "η Λεμεσός",
+      "back": "Limassol — the biggest port and the commercial centre"
+    },
+    {
+      "kind": "word",
+      "front": "η Λάρνακα",
+      "back": "Larnaca — the main airport, and Saint Lazarus’s city"
+    },
+    {
+      "kind": "word",
+      "front": "η Αμμόχωστος",
+      "back": "Famagusta — in the occupied area; Βαρώσι is the sealed quarter"
+    },
+    {
+      "kind": "word",
+      "front": "η Κερύνεια",
+      "back": "Kyrenia — occupied; the north coast and the castle"
+    },
+    {
+      "kind": "word",
+      "front": "η Μόρφου",
+      "back": "Morphou — occupied, and its feast of Saint Mamas is a byword"
+    },
+    {
+      "kind": "word",
+      "front": "ο Τρόοδος",
+      "back": "the Troodos range — the painted churches, the villages, and snow"
+    },
+    {
+      "kind": "word",
+      "front": "ο Πενταδάκτυλος",
+      "back": "the Kyrenia range — \"the five fingers\", occupied"
+    },
+    {
+      "kind": "word",
+      "front": "η Καρπασία",
+      "back": "the long north-eastern peninsula, with Apostolos Andreas at its tip"
+    },
+    {
+      "kind": "word",
+      "front": "η Μεσαορία",
+      "back": "the central plain — the island’s granary, now largely occupied"
+    },
+    {
+      "kind": "word",
+      "front": "το χωρκό",
+      "back": "το χωριό — the village, in dialect; the unit of Cypriot identity"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which three city names to be careful with",
+      "back": "Famagusta, Kyrenia and Morphou — they are in the occupied north and they are the names on the Δεν ξεχνώ posters. Use the Greek names."
+    },
+    {
+      "kind": "grammar",
+      "front": "The geographical fact that explains Cyprus",
+      "back": "It is closer to Syria and Lebanon than to Greece — which has shaped its food, its loanwords, its history and its politics"
+    }
+  ],
+  "Speaking with Cypriots": [
+    {
+      "kind": "grammar",
+      "front": "The three reasons not to speak the dialect",
+      "back": "It reads as imitation of a dialect its speakers have been mocked for; you will get it wrong in ways that are funny rather than endearing; and every Cypriot speaks standard Greek anyway"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πώς θα το έλεγε ένας Ελλαδίτης;",
+      "back": "How would someone from Greece say it? — the right way to ask for the standard equivalent, because it treats both as equal"
+    },
+    {
+      "kind": "grammar",
+      "front": "The phrase to avoid when asking about dialect",
+      "back": "\"στα κανονικά\" — \"in proper Greek\". The word proper is the loaded one."
+    },
+    {
+      "kind": "grammar",
+      "front": "What dialect may enter your own speech, and what may not",
+      "back": "Adopt what is said to you repeatedly — κουμπάρε, Να ’στε καλά, the food words, η Λαμπρή. Import nothing you have only read."
+    },
+    {
+      "kind": "grammar",
+      "front": "The four things never to do with a Cypriot’s Greek",
+      "back": "Do not correct it; do not call it village Greek; do not perform the dialect as a joke; and do not treat it as a lesser Greek"
+    },
+    {
+      "kind": "grammar",
+      "front": "The best question available in a Cypriot parish",
+      "back": "Which village their family came from. It never fails."
+    }
+  ],
+  "Where you should be at the end of stage 10": [
+    {
+      "kind": "grammar",
+      "front": "The six checkpoint questions for stage 10",
+      "back": "Can you convert ten Cypriot words by the sound rules? Do you recognise εν, εννά and the post-verbal pronoun instantly? Have you watched a sitcom and written an exchange both ways? Do you know the four words of 1974? Have you asked about someone’s village? Do you know three words your parish uses that no book has?"
+    },
+    {
+      "kind": "grammar",
+      "front": "What stage 10 changes, measurably",
+      "back": "The percentage of parish-hall conversation you follow — measured with a clip at the start and at the end"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Cypriot prepares you for the classical curriculum",
+      "back": "The long consonants, the final -ν, the post-verbal pronoun and πόθεν are all Ancient Greek, kept in Cyprus and lost in Athens — so hearing them is hearing older Greek"
+    }
+  ],
+  "Review: stage 10": [
+    {
+      "kind": "grammar",
+      "front": "Stage 10, in one line",
+      "back": "The five sound rules, the four grammatical differences, the core vocabulary, the four loanword layers, the Church and history of the island, and the people in the hall"
+    },
+    {
+      "kind": "grammar",
+      "front": "What this stage was actually about",
+      "back": "Not a dialect in the abstract. Following the conversation, because the Greeks at the parish are more likely to be Cypriot than Greek."
+    }
+  ],
+  "What stage 11 is: no more course": [
+    {
+      "kind": "grammar",
+      "front": "Why literature is the end of the route, not the middle",
+      "back": "It is the hardest Greek — the full historical depth of the language, used deliberately; it requires everything else first; and it is the point. The rest was infrastructure."
+    },
+    {
+      "kind": "grammar",
+      "front": "What stage 11 lessons are",
+      "back": "Maps, not instruction: what a body of work is, why it matters, how hard it is, where to find it free, and which piece to start with"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why stage 11 is the threshold of the classical curriculum",
+      "back": "Papadiamantis, Kontoglou, the theologians and the hymnographers all write in or towards the learned register — the point at which modern Greek has taken you as far as it can"
+    }
+  ],
+  "How to read a Greek poem": [
+    {
+      "kind": "word",
+      "front": "ο δεκαπεντασύλλαβος",
+      "back": "the fifteen-syllable line — iambic, with a break after the eighth syllable. The Greek line: the folk songs, the Erotokritos, Solomos, and much verse that looks free."
+    },
+    {
+      "kind": "grammar",
+      "front": "The central technique of Greek poetry since the nineteenth century",
+      "back": "The register shift — a learned word in a demotic line, or an ancient form, where the shift itself carries the irony, distance or grandeur"
+    },
+    {
+      "kind": "grammar",
+      "front": "The six steps for reading a Greek poem",
+      "back": "Aloud whole; aloud for the metre; for sense; marking the register shifts; aloud again; and four lines by heart"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why to learn four lines of a poem by heart",
+      "back": "A poem memorised is in your Greek permanently, and Greeks quote poetry in ordinary conversation — having four lines is a form of membership"
+    }
+  ],
+  "Cavafy": [
+    {
+      "kind": "grammar",
+      "front": "Why Cavafy is the way into Greek poetry for a learner",
+      "back": "Short poems, plain vocabulary, prosaic syntax and concrete situations — and 154 canonical poems in all"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Cavafy barely survives translation",
+      "back": "His Greek mixes demotic with katharevousa and with the Greek of Alexandria and the Phanar, and the mixture IS the poem"
+    },
+    {
+      "kind": "sentence",
+      "front": "Να εύχεσαι να ’ναι μακρύς ο δρόμος.",
+      "back": "Pray that the road is long. — Ithaca"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν θα βρεις άλλη γη, δεν θα βρεις άλλη θάλασσα. Η πόλις θα σε ακολουθεί.",
+      "back": "You will find no new lands, no other seas. The city will follow you. — Η Πόλις"
+    },
+    {
+      "kind": "word",
+      "front": "Ιθάκη",
+      "back": "Cavafy’s most quoted poem — the journey rather than the arrival; said at graduations, retirements and funerals"
+    },
+    {
+      "kind": "word",
+      "front": "Περιμένοντας τους Βαρβάρους",
+      "back": "Waiting for the Barbarians — a city that needs its enemy"
+    },
+    {
+      "kind": "word",
+      "front": "Απολείπειν ο Θεός Αντώνιον",
+      "back": "The God Abandons Antony — on losing with dignity"
+    },
+    {
+      "kind": "grammar",
+      "front": "What λιμένας shows about Cavafy",
+      "back": "A learned accusative plural where demotic would have λιμάνια — the archaism lifts the harbours into myth. Cavafy in one word."
+    }
+  ],
+  "Seferis": [
+    {
+      "kind": "grammar",
+      "front": "Seferis, in the facts",
+      "back": "Γιώργος Σεφέρης, 1900–1971; born in Smyrna and driven out as a boy; career diplomat; the first Greek Nobel, 1963; denounced the junta publicly in 1969"
+    },
+    {
+      "kind": "sentence",
+      "front": "Όπου και να ταξιδέψω η Ελλάδα με πληγώνει.",
+      "back": "Wherever I travel, Greece wounds me."
+    },
+    {
+      "kind": "sentence",
+      "front": "Ξύπνησα με το μαρμάρινο τούτο κεφάλι στα χέρια",
+      "back": "I woke with this marble head in my hands — Μυθιστόρημα III, and the most quoted image in modern Greek poetry about the classical inheritance"
+    },
+    {
+      "kind": "word",
+      "front": "Μυθιστόρημα",
+      "back": "Seferis’ central work, 1935: twenty-four poems, free verse, the Argonauts as the century’s refugees"
+    },
+    {
+      "kind": "word",
+      "front": "Ημερολόγιο Καταστρώματος Γ´",
+      "back": "Seferis’ Cyprus book, from his 1953 visit — originally titled «Κύπρον, ου μ’ εθέσπισεν…», and the right reading after stage 10"
+    },
+    {
+      "kind": "word",
+      "front": "Δοκιμές",
+      "back": "Seferis’ essays — lucid prose, and his piece on Cavafy teaches more than any introduction"
+    }
+  ],
+  "Elytis": [
+    {
+      "kind": "grammar",
+      "front": "Elytis, in the facts",
+      "back": "Οδυσσέας Ελύτης, 1911–1996; born in Heraklion to a Lesvos family; fought in the Albanian campaign; Nobel 1979. The name is assembled from Ελλάδα, ελπίδα, ελευθερία, Ελένη."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τη γλώσσα μου έδωσαν ελληνική· το σπίτι φτωχικό στις αμμουδιές του Ομήρου.",
+      "back": "They gave me the Greek language; a poor house on Homer’s shores. — the most quoted statement in modern Greek about the Greek language"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ένα το χελιδόνι και η άνοιξη ακριβή, για να γυρίσει ο ήλιος θέλει δουλειά πολλή.",
+      "back": "One swallow, and spring is dear; for the sun to turn takes much work."
+    },
+    {
+      "kind": "word",
+      "front": "Το Άξιον Εστί",
+      "back": "Elytis’ central work, 1959 — in three parts (Γένεσις, Πάθη, Δοξαστικόν), built on the shape of an Orthodox office, and set by Theodorakis in 1964"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where the title Άξιον Εστί comes from",
+      "back": "The hymn to the Mother of God in the Divine Liturgy — \"it is meet and right\". Elytis built the sequence as a service: a Genesis, a Passion and a Doxology."
+    },
+    {
+      "kind": "word",
+      "front": "Το Μονόγραμμα",
+      "back": "Elytis’ single long love poem, 1971"
+    }
+  ],
+  "Ritsos, and the poems that became songs": [
+    {
+      "kind": "grammar",
+      "front": "Ritsos, in the facts",
+      "back": "Γιάννης Ρίτσος, 1909–1990; tuberculosis, the resistance, and exile on Makronisos, Ai Stratis and Leros; more than a hundred volumes; never given the Nobel, which Greeks still mention"
+    },
+    {
+      "kind": "word",
+      "front": "Επιτάφιος",
+      "back": "Ritsos, 1936 — a mother’s lament over her son, shot in the Thessaloniki tobacco strike. In the folk fifteen-syllable, publicly burned by the Metaxas dictatorship, and set by Theodorakis in 1958."
+    },
+    {
+      "kind": "sentence",
+      "front": "Γιε μου, σπλάχνο των σπλάχνων μου, καρδούλα της καρδιάς μου",
+      "back": "My son, flesh of my flesh, little heart of my heart — the opening of Επιτάφιος, in the register of the Greek funeral lament"
+    },
+    {
+      "kind": "grammar",
+      "front": "What Ritsos did in Επιτάφιος that every Greek hears",
+      "back": "He wrote a mother’s lament in the form of the Church’s own Εγκώμια, the Lamentations of Holy Friday — an atheist and a communist using the Church’s language because there is nothing else to use"
+    },
+    {
+      "kind": "word",
+      "front": "Δεκαοχτώ Λιανοτράγουδα της Πικρής Πατρίδας",
+      "back": "Ritsos, 1973 — eighteen short songs of the bitter homeland, written under the junta and set by Theodorakis"
+    },
+    {
+      "kind": "word",
+      "front": "Ο Μεγάλος Ερωτικός",
+      "back": "Hadjidakis, 1972 — Sappho, the Song of Songs, Erotokritos, Solomos, Cavafy, Elytis and Seferis on one record. A complete anthology of Greek love poetry with audio."
+    },
+    {
+      "kind": "sentence",
+      "front": "Στο περιγιάλι το κρυφό",
+      "back": "On the hidden shore — Theodorakis setting Seferis’ Άρνηση; everybody sings it, and most people do not know it is Seferis"
+    }
+  ],
+  "Solomos, Palamas and the nineteenth century": [
+    {
+      "kind": "sentence",
+      "front": "Μήγαρις έχω άλλο στο νου μου πάρεξ ελευθερία και γλώσσα;",
+      "back": "Have I anything else in my mind but freedom and language? — Solomos, and the foundation of modern Greek literature"
+    },
+    {
+      "kind": "sentence",
+      "front": "Σε γνωρίζω από την κόψη του σπαθιού την τρομερή",
+      "back": "I know you by the terrible edge of your sword — the first line of the national anthem of Greece AND of Cyprus, from Solomos’ Ύμνος εις την Ελευθερίαν"
+    },
+    {
+      "kind": "grammar",
+      "front": "Solomos’ decision, and why it founds everything after him",
+      "back": "He turned deliberately to the demotic at a moment when educated opinion held that serious literature required the learned language"
+    },
+    {
+      "kind": "grammar",
+      "front": "The thing to know about Solomos’ work",
+      "back": "Almost all of it is a fragment. He revised obsessively and finished little; what survives was assembled by editors."
+    },
+    {
+      "kind": "word",
+      "front": "Ο Κρητικός",
+      "back": "Solomos’ greatest poem — a shipwrecked Cretan, his dying beloved, and a vision. A fragment."
+    },
+    {
+      "kind": "word",
+      "front": "Κωστής Παλαμάς",
+      "back": "the dominant Greek literary figure of the generation after Solomos (1859–1943) — Ο Δωδεκάλογος του Γύφτου, Η Φλογέρα του Βασιλιά, and Ο Τάφος"
+    },
+    {
+      "kind": "grammar",
+      "front": "Palamas’ funeral, February 1943",
+      "back": "It became a national demonstration under German occupation: thousands followed the coffin, Sikelianos read over the grave, and the crowd sang the national anthem in front of the occupying troops"
+    },
+    {
+      "kind": "word",
+      "front": "Ανδρέας Κάλβος",
+      "back": "the other Zakynthian (1792–1869) — twenty odes in an archaising Pindaric Greek. Admired more than read."
+    }
+  ],
+  "The folk song, and Crete": [
+    {
+      "kind": "word",
+      "front": "το δημοτικό τραγούδι",
+      "back": "the demotic song — centuries of anonymous oral poetry in the fifteen-syllable line, and the acknowledged foundation of modern Greek literary language"
+    },
+    {
+      "kind": "word",
+      "front": "τα ακριτικά",
+      "back": "the Akritic songs — the Byzantine frontier guards, and Digenis wrestling with Death. The oldest layer."
+    },
+    {
+      "kind": "word",
+      "front": "οι παραλογές",
+      "back": "the ballads — narrative, supernatural, often terrible"
+    },
+    {
+      "kind": "word",
+      "front": "τα μοιρολόγια",
+      "back": "the laments — and in Mani a formal art with named composers"
+    },
+    {
+      "kind": "word",
+      "front": "Του νεκρού αδελφού",
+      "back": "The Dead Brother — Constantine rises from the grave to fetch his sister home. Pan-Balkan, and the Greek version the richest."
+    },
+    {
+      "kind": "word",
+      "front": "Της Άρτας το γιοφύρι",
+      "back": "The Bridge of Arta — the master builder’s wife walled in to make the bridge stand. The most famous Greek folk ballad."
+    },
+    {
+      "kind": "sentence",
+      "front": "Ολημερίς το χτίζανε, το βράδυ εγκρεμιζόταν.",
+      "back": "All day they built it, and at evening it fell down. — Της Άρτας το γιοφύρι"
+    },
+    {
+      "kind": "word",
+      "front": "Ερωτόκριτος",
+      "back": "Kornaros, c. 1600 — 10,000 lines of rhymed fifteen-syllable Cretan verse, still sung in Crete to the lyra"
+    },
+    {
+      "kind": "sentence",
+      "front": "Του Κύκλου τα γυρίσματα, που ανεβοκατεβαίνου",
+      "back": "The turnings of the Wheel, that rise and fall — the opening of the Erotokritos"
+    },
+    {
+      "kind": "word",
+      "front": "Η Θυσία του Αβραάμ",
+      "back": "The Sacrifice of Abraham — the Cretan religious drama"
+    },
+    {
+      "kind": "grammar",
+      "front": "What Cretan and Cypriot have in common",
+      "back": "The two great surviving Greek dialects with literatures of their own: ancient features kept, a fifteen-syllable tradition, and improvised verse contests — Cretan μαντινάδες and Cypriot τσιαττιστά"
+    }
+  ],
+  "Papadiamantis": [
+    {
+      "kind": "grammar",
+      "front": "Papadiamantis, in the facts",
+      "back": "Αλέξανδρος Παπαδιαμάντης, 1851–1911; son of a priest from Skiathos; lived in poverty in Athens; WAS A CHANTER, singing Byzantine chant at Saint Elisseos for decades. Two hundred stories, and held to be the greatest Greek prose writer."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Papadiamantis is the hardest prose in the curriculum",
+      "back": "Narration in katharevousa, dialogue in the Skiathos dialect, liturgical and scriptural quotation in Koine woven in unmarked, and long periodic sentences"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Papadiamantis matters most for this curriculum’s purpose",
+      "back": "No writer in the language is closer to the Church: the parish, the feasts, the fasts, the chanting, the priest, the poor widow and the sea, written from inside the liturgical year"
+    },
+    {
+      "kind": "word",
+      "front": "Η Φόνισσα",
+      "back": "The Murderess, 1903 — an old woman on Skiathos who drowns infant girls out of a terrible compassion. His masterpiece, about a hundred pages."
+    },
+    {
+      "kind": "word",
+      "front": "Στο Χριστό στο Κάστρο",
+      "back": "the Christmas story — a village walking through snow to the fortress church to keep the feast. The Orthodox Christmas in a short story, and where to start."
+    },
+    {
+      "kind": "word",
+      "front": "Όνειρο στο κύμα",
+      "back": "A Dream on the Wave — the shepherd boy, Moschoula and the sea. The most anthologised Greek short story."
+    },
+    {
+      "kind": "sentence",
+      "front": "Ήμουν πτωχόν παιδίον, βοσκόπουλο εις τα όρη…",
+      "back": "I was a poor child, a shepherd boy in the mountains — three katharevousa forms in eight words: πτωχόν, παιδίον, εις"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why both the Church and Greek literature claim Papadiamantis",
+      "back": "He is the bridge: the writer modern Greek Orthodox writers measure themselves against, and at the same time the consensus choice as the language’s finest prose stylist"
+    }
+  ],
+  "Kazantzakis": [
+    {
+      "kind": "grammar",
+      "front": "Why Kazantzakis is harder in Greek than in translation",
+      "back": "An enormous vocabulary of Cretan dialect, village words and his own coinages, long rolling sentences borrowed from the folk song, and militant demotic pushed to its limits"
+    },
+    {
+      "kind": "word",
+      "front": "Αναφορά στον Γκρέκο",
+      "back": "Report to Greco — the autobiography addressed to El Greco. The most beautiful and the most readable; where a learner should start."
+    },
+    {
+      "kind": "word",
+      "front": "Ο Χριστός Ξανασταυρώνεται",
+      "back": "Christ Recrucified, 1948 — a village passion play and the refugees who arrive during it. By many judgements his best novel."
+    },
+    {
+      "kind": "word",
+      "front": "Ασκητική",
+      "back": "The Saviours of God, 1927 — the metaphysical credo, and the key to all the rest"
+    },
+    {
+      "kind": "grammar",
+      "front": "Was Kazantzakis excommunicated?",
+      "back": "No. The Holy Synod of the Church of Greece considered action in 1955 over The Last Temptation and did not excommunicate him; the widely repeated claim is false. The Roman Catholic Church put the book on the Index."
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν ελπίζω τίποτα. Δε φοβούμαι τίποτα. Είμαι λέφτερος.",
+      "back": "I hope for nothing. I fear nothing. I am free. — his epitaph, cut into the Martinengo bastion in Heraklion"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to read Kazantzakis as an Orthodox reader",
+      "back": "Not as an Orthodox writer, and as one unavoidably formed by Orthodoxy — his lifelong subject is an ascetic’s subject, handled by a man who would not submit to the ascesis"
+    }
+  ],
+  "The Generation of the Thirties, and Asia Minor": [
+    {
+      "kind": "grammar",
+      "front": "What the Generation of the Thirties set out to do",
+      "back": "Make a modern Greek literature both European and Greek — Seferis and Elytis in poetry, Myrivilis, Venezis, Theotokas, Karagatsis and Prevelakis in prose. Their programme was Ελληνικότητα."
+    },
+    {
+      "kind": "grammar",
+      "front": "The Asia Minor Catastrophe, in figures",
+      "back": "In 1922 the Greek advance into Anatolia collapsed and Smyrna burned; by the 1923 Treaty of Lausanne roughly 1.2 million Orthodox Christians were expelled to Greece and about 400,000 Muslims to Turkey. Greece’s population rose by a quarter."
+    },
+    {
+      "kind": "word",
+      "front": "ο ξεριζωμός",
+      "back": "the uprooting — the Greek word for the whole 1922 event, and used of Cyprus in 1974 too"
+    },
+    {
+      "kind": "word",
+      "front": "οι χαμένες πατρίδες",
+      "back": "the lost homelands — Asia Minor, Pontus, Eastern Thrace"
+    },
+    {
+      "kind": "word",
+      "front": "η ανταλλαγή των πληθυσμών",
+      "back": "the exchange of populations, 1923"
+    },
+    {
+      "kind": "word",
+      "front": "Ματωμένα Χώματα",
+      "back": "Dido Sotiriou, 1962 — the Asia Minor novel most Greeks have read, narrated plainly by a villager. The readable way in."
+    },
+    {
+      "kind": "word",
+      "front": "Ιστορία ενός Αιχμαλώτου",
+      "back": "Stratis Doukas, 1929 — forty pages in the voice of the man who lived it, and as clean a piece of Greek prose as exists"
+    },
+    {
+      "kind": "word",
+      "front": "Η Ζωή εν Τάφω",
+      "back": "Myrivilis, 1924 — Life in the Tomb, the Macedonian front in letters. The great Greek war book, and hard."
+    },
+    {
+      "kind": "word",
+      "front": "Το Νούμερο 31328",
+      "back": "Venezis, 1931 — the author’s own experience in the Turkish labour battalions"
+    },
+    {
+      "kind": "grammar",
+      "front": "The three displacements that made the Greek diaspora in Britain",
+      "back": "1922 from Asia Minor, the post-war emigration from Greece and Cyprus, and 1974 from northern Cyprus"
+    }
+  ],
+  "The civil war, and the post-war novel": [
+    {
+      "kind": "word",
+      "front": "ο Εμφύλιος",
+      "back": "the Civil War, 1946–49 — and the word alone is enough"
+    },
+    {
+      "kind": "word",
+      "front": "η Κατοχή",
+      "back": "the Occupation, 1941–44 — German, Italian and Bulgarian, with mass starvation in Athens in the winter of 1941–42"
+    },
+    {
+      "kind": "word",
+      "front": "το Πολυτεχνείο",
+      "back": "the Polytechnic — 17 November 1973, the student rising against the junta, and a national holiday"
+    },
+    {
+      "kind": "word",
+      "front": "η Μεταπολίτευση",
+      "back": "the restoration of democracy from 1974"
+    },
+    {
+      "kind": "word",
+      "front": "τα ξερονήσια",
+      "back": "the barren prison islands — Makronisos, Ai Stratis, Gyaros"
+    },
+    {
+      "kind": "word",
+      "front": "Το Τρίτο Στεφάνι",
+      "back": "Tachtsis, 1962 — two women talking across forty years of Greek history, in the most natural spoken Greek in any Greek novel. The best book in this stage for a learner."
+    },
+    {
+      "kind": "word",
+      "front": "Το Κιβώτιο",
+      "back": "Alexandrou, 1974 — the great novel of the Greek left’s self-destruction: a man writing his defence about a box that turns out to be empty"
+    },
+    {
+      "kind": "word",
+      "front": "Γιώργος Ιωάννου",
+      "back": "short autobiographical prose about Thessaloniki, the occupation and the refugee quarters — plain modern Greek, beautiful, and attentive to the feasts"
+    },
+    {
+      "kind": "grammar",
+      "front": "The social rule about the civil war, as about 1974",
+      "back": "Do not take a side. The division is live in politics and in families, and a foreigner’s opinion about EAM or the colonels is not wanted."
+    },
+    {
+      "kind": "grammar",
+      "front": "The Church’s own position in this history",
+      "back": "Contested: Archbishop Damaskinos and the rescue of Athenian Jews on one side of the ledger, accommodations with the colonels on another. Know that it is contested; do not adjudicate it."
+    }
+  ],
+  "Contemporary Greek writing": [
+    {
+      "kind": "word",
+      "front": "Κάτι θα γίνει, θα δεις",
+      "back": "Christos Oikonomou — sixteen stories from the Piraeus of the crisis, in stripped-down Greek. For many readers the best Greek prose of the last twenty years."
+    },
+    {
+      "kind": "word",
+      "front": "Κική Δημουλά",
+      "back": "the most loved Greek poet of recent decades (1931–2020) — ordinary vocabulary used strangely, grief, and grammatical terms turned into images. Accessible to a learner."
+    },
+    {
+      "kind": "word",
+      "front": "Χάρτης",
+      "back": "a free online Greek literary monthly — poetry, prose and essays, current. The best single free source for contemporary writing."
+    },
+    {
+      "kind": "word",
+      "front": "Ο Αναγνώστης",
+      "back": "the free online Greek literary review — reviews of everything as it appears"
+    },
+    {
+      "kind": "word",
+      "front": "Ζυράννα Ζατέλη",
+      "back": "Και με το φως του λύκου επανέρχονται — strange, dense, northern. Hard and remarkable."
+    },
+    {
+      "kind": "word",
+      "front": "Έρση Σωτηροπούλου",
+      "back": "Τι μένει από τη νύχτα — Cavafy in Paris, as a novel"
+    },
+    {
+      "kind": "grammar",
+      "front": "The six subjects of contemporary Greek writing",
+      "back": "The crisis; migration and the boats; memory — the civil war, the junta, Asia Minor; Athens as a subject; the island and the village; and family, which is permanent"
+    }
+  ],
+  "Kontoglou and the Orthodox writers": [
+    {
+      "kind": "word",
+      "front": "Ρωμιοσύνη",
+      "back": "Romiosyne — the Orthodox Christian Greek people of Byzantium and the Ottoman centuries, defined by the Church rather than by antiquity. As against Ελληνισμός."
+    },
+    {
+      "kind": "grammar",
+      "front": "What Kontoglou did to Greek religious art",
+      "back": "He rejected the western-influenced academic painting that had dominated Greek churches since the eighteenth century and returned to the Byzantine tradition — the whole modern revival of Greek iconography descends from him"
+    },
+    {
+      "kind": "word",
+      "front": "Η Πονεμένη Ρωμιοσύνη",
+      "back": "Kontoglou's statement of what Romiosyne means — that the Orthodox Greek people, not the Parthenon, is what Greece actually is"
+    },
+    {
+      "kind": "word",
+      "front": "Νίκος Γαβριήλ Πεντζίκης",
+      "back": "Thessaloniki’s writer (1908–1993) — Μητέρα Θεσσαλονίκη, Ο Πεθαμένος και η Ανάσταση. The most Orthodox imagination in modern Greek prose, and difficult."
+    },
+    {
+      "kind": "word",
+      "front": "Γέροντας Παΐσιος ο Αγιορείτης",
+      "back": "the six volumes of Λόγοι — transcribed speech, simple vocabulary, short paragraphs. The easiest Orthodox reading in Greek."
+    },
+    {
+      "kind": "word",
+      "front": "Γέροντας Πορφύριος ο Καυσοκαλυβίτης",
+      "back": "Βίος και Λόγοι — on love, on prayer, on children"
+    },
+    {
+      "kind": "word",
+      "front": "Γέροντας Σωφρόνιος",
+      "back": "Saint Sophrony (1896–1993) — a Russian who founded the Monastery of Saint John the Baptist at Tolleshunt Knights, Essex, in 1959; canonised 2019. The main Orthodox monastic centre in Britain."
+    },
+    {
+      "kind": "word",
+      "front": "Αρχιμ. Αιμιλιανός Σιμωνοπετρίτης",
+      "back": "the catechetical talks from Simonopetra (1934–2019) — more demanding, and very fine"
+    },
+    {
+      "kind": "grammar",
+      "front": "The order to read the Orthodox writers in",
+      "back": "Paisios, then Kontoglou’s essays, then Pentzikis — the last after the classical curriculum"
+    }
+  ],
+  "Modern Greek theology": [
+    {
+      "kind": "grammar",
+      "front": "What happened in twentieth-century Greek theology",
+      "back": "A generation from the 1930s on set out to replace a theology written on German Protestant and scholastic models with one grounded in the Fathers and the liturgical and ascetic tradition"
+    },
+    {
+      "kind": "word",
+      "front": "η θέωσις",
+      "back": "deification, theosis — and note the ancient -ις ending, used unchanged because the term is the Fathers’ own"
+    },
+    {
+      "kind": "word",
+      "front": "η υπόστασις",
+      "back": "hypostasis, person — against η ουσία, essence"
+    },
+    {
+      "kind": "word",
+      "front": "το πρόσωπο",
+      "back": "the person — Yannaras’ central term"
+    },
+    {
+      "kind": "word",
+      "front": "οι άκτιστες ενέργειες",
+      "back": "the uncreated energies — the Palamite distinction"
+    },
+    {
+      "kind": "word",
+      "front": "το προπατορικό αμάρτημα",
+      "back": "ancestral sin — NOT \"original sin\", and the difference is Romanides’ whole argument"
+    },
+    {
+      "kind": "word",
+      "front": "η νήψη",
+      "back": "sobriety, watchfulness — and ο νηπτικός of the hesychast writers"
+    },
+    {
+      "kind": "word",
+      "front": "το κατ’ εικόνα και καθ’ ομοίωσιν",
+      "back": "according to the image and the likeness — Genesis 1:26, and the frame of Orthodox anthropology"
+    },
+    {
+      "kind": "word",
+      "front": "ο ησυχασμός",
+      "back": "hesychasm — and Saint Gregory Palamas, ο Παλαμάς, its defender"
+    },
+    {
+      "kind": "word",
+      "front": "Ιωάννης Ρωμανίδης",
+      "back": "Το Προπατορικόν Αμάρτημα, and the Ρωμηοσύνη books — influential and genuinely contested"
+    },
+    {
+      "kind": "word",
+      "front": "Ιωάννης Ζηζιούλας",
+      "back": "Metropolitan of Pergamon (1931–2023) — the Church constituted in the Eucharist around the bishop; the most internationally cited Greek theology of the century"
+    },
+    {
+      "kind": "word",
+      "front": "Χρήστος Γιανναράς",
+      "back": "Η Ελευθερία του Ήθους, Το Πρόσωπο και ο Έρως (1935–2024) — philosopher as much as theologian, and a newspaper columnist, so his Greek is readable"
+    },
+    {
+      "kind": "word",
+      "front": "Ζώον Θεούμενον",
+      "back": "Panagiotis Nellas — \"the deified animal\": the human person called to theosis, read out of the Fathers. Short, dense, and where to start."
+    },
+    {
+      "kind": "grammar",
+      "front": "The limit of modern Greek in theology",
+      "back": "You can read the theology; you cannot yet read the Fathers it quotes — and the discipline consists of reading the Fathers. Every one of these books is a door into the classical curriculum."
+    }
+  ],
+  "The essayists, and the lost centre": [
+    {
+      "kind": "word",
+      "front": "Το Χαμένο Κέντρο",
+      "back": "Zisimos Lorentzatos, 1961 — nominally on Seferis, in fact the argument that modern Greek literature lost its religious centre and replaced it with literature itself"
+    },
+    {
+      "kind": "grammar",
+      "front": "Lorentzatos’ candidate for the writer who kept the centre",
+      "back": "Papadiamantis — the chanter from Skiathos, writing in the Church’s register about the Church’s year, dismissed by the literary establishment of his day"
+    },
+    {
+      "kind": "word",
+      "front": "η συνέχεια",
+      "back": "continuity — the great Greek argument: whether modern Greece is continuous with Byzantium, with antiquity, or with neither"
+    },
+    {
+      "kind": "word",
+      "front": "ο εκδυτικισμός",
+      "back": "westernisation — and whether it was a gain"
+    },
+    {
+      "kind": "word",
+      "front": "Δ. Ν. Μαρωνίτης",
+      "back": "the critic whose modern Greek Iliad and Odyssey are the standard — and reading Homer in modern Greek translation is a legitimate step"
+    },
+    {
+      "kind": "word",
+      "front": "Στέλιος Ράμφος",
+      "back": "essays on Orthodoxy, modernity and the Greek self — contested and interesting"
+    },
+    {
+      "kind": "grammar",
+      "front": "The objections to Lorentzatos worth knowing",
+      "back": "That Elytis built the Άξιον Εστί on the Liturgy, that Ritsos wrote in the form of the Lamentations, and that Pentzikis and Kontoglou are precisely counter-examples"
+    }
+  ],
+  "How Greeks talk about their literature": [
+    {
+      "kind": "sentence",
+      "front": "Στα ελληνικά το διάβασες;",
+      "back": "Did you read it in Greek? — the question you will be asked, and answering yes is one of the better moments available to a learner"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι διαβάζεις τώρα;",
+      "back": "What are you reading now?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Είναι δυσκολοδιάβαστο.",
+      "back": "It's hard going."
+    },
+    {
+      "kind": "sentence",
+      "front": "Το έχω αρχίσει και το παράτησα.",
+      "back": "I started it and gave up."
+    },
+    {
+      "kind": "sentence",
+      "front": "Είναι από τα αγαπημένα μου.",
+      "back": "It's one of my favourites."
+    },
+    {
+      "kind": "word",
+      "front": "το γλωσσικό ζήτημα",
+      "back": "the language question — demotic against katharevousa, settled in 1976 and still argued about"
+    },
+    {
+      "kind": "word",
+      "front": "το μονοτονικό",
+      "back": "the single-accent system, which replaced the polytonic in 1982 — still resented by some, and the Church keeps the polytonic in liturgical texts"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why literature sits differently in Greek conversation",
+      "back": "Poetry is quoted, poets are public figures, the national anthem is a poem, the school anthology is shared memory, and the argument about the language is political rather than academic"
+    },
+    {
+      "kind": "grammar",
+      "front": "The caution about praising a Greek book",
+      "back": "Literary opinion is often political opinion — Ritsos and the left, Kazantzakis and the Church, Romanides and national identity. Ask rather than assert."
+    }
+  ],
+  "Ad astra": [
+    {
+      "kind": "grammar",
+      "front": "The permanent arrangement, after the curriculum",
+      "back": "A book always on the go; something in your ears in the dead time; the daily saint; ten minutes of the deck; Greek at church by default; a page a week written; and a poem a month"
+    },
+    {
+      "kind": "grammar",
+      "front": "The four things that decay without deliberate maintenance",
+      "back": "Speaking (the ten minutes a week); writing (a page a week); the accents and spelling (copy a paragraph by hand); and comprehension, which plateaus at the level of what you read"
+    },
+    {
+      "kind": "grammar",
+      "front": "What the next curriculum is",
+      "back": "Classical Greek into Koine, Byzantine and liturgical Greek — the hymnography, the Fathers, the Septuagint and the service books. Nothing gates it."
+    },
+    {
+      "kind": "grammar",
+      "front": "The measure of the whole route",
+      "back": "Not a level. Whether in five years there is Greek in your ordinary week without your having arranged it."
+    }
+  ],
+  "Review: stage 11, and the end of the route": [
+    {
+      "kind": "grammar",
+      "front": "Stage 11, in one line",
+      "back": "Maps rather than instruction: the poets, the folk tradition, the prose, the Church’s own writers, the arguments — and what to do for the rest of your life"
+    },
+    {
+      "kind": "grammar",
+      "front": "What the whole curriculum has and has not given",
+      "back": "Speaking, listening, reading, writing, the dialect and the conversation — and NOT the Liturgy, which it said in its first paragraph and which is the next curriculum"
+    },
+    {
+      "kind": "grammar",
+      "front": "The last instruction of the route",
+      "back": "Keep a book going, keep the four-minute floor, speak to someone weekly, and learn a poem a month. Ad astra."
+    }
+  ],
+  "Why the endings carry the leverage": [
+    {
+      "kind": "grammar",
+      "front": "Why the endings are where the leverage is",
+      "back": "Roots are arbitrary and inherited; ENDINGS are decided by the grammar — and endings are where most of the letters are, so getting them right removes most of your errors"
+    },
+    {
+      "kind": "grammar",
+      "front": "καλή, καλοί, καλεί — how to tell them apart",
+      "back": "καλή is a feminine singular adjective; καλοί a masculine plural; καλεί the verb καλώ in the third person. καλί is not a word."
+    },
+    {
+      "kind": "grammar",
+      "front": "The commonest orthographic error in Greek",
+      "back": "Writing να γράφη for να γράφει. The third person singular of a verb is -ει in every mood; -η is a katharevousa form abolished in 1976."
+    }
+  ],
+  "The masculine endings": [
+    {
+      "kind": "grammar",
+      "front": "The masculine nominative endings",
+      "back": "-ος (omicron), -ης (eta), -ας, -έας, -ους, -ωνας — and -ος with omicron and -ης with eta cover most masculine nouns"
+    },
+    {
+      "kind": "grammar",
+      "front": "The genitive of an -ης noun",
+      "back": "Drops the ς and keeps the eta: ο μαθητής → του μαθητή"
+    },
+    {
+      "kind": "grammar",
+      "front": "The plural of every masculine -ος noun",
+      "back": "-οι: οι άνθρωποι, οι δρόμοι, οι καλοί — never -ι and never -η"
+    },
+    {
+      "kind": "grammar",
+      "front": "The masculine accusative plural",
+      "back": "-ους with ς: τους ανθρώπους — the one plural form not shared with the nominative"
+    },
+    {
+      "kind": "grammar",
+      "front": "The masculine vocative endings",
+      "back": "-ος → -ε (Νίκο, Παπαδόπουλε); -ης → -η (Γιάννη); -ας → -α (πατέρα)"
+    }
+  ],
+  "The feminine endings": [
+    {
+      "kind": "grammar",
+      "front": "The single highest-value feminine plural rule",
+      "back": "An abstract noun in -ση/-ξη/-ψη makes its plural in -σεις: η απόφαση → οι αποφάσεις, η πόλη → οι πόλεις, η δύναμη → οι δυνάμεις"
+    },
+    {
+      "kind": "grammar",
+      "front": "The feminine genitive singular",
+      "back": "Adds a ς: της νίκης, της ώρας, της απόφασης"
+    },
+    {
+      "kind": "grammar",
+      "front": "The feminine nouns in -ος",
+      "back": "η οδός, η μέθοδος, η είσοδος, η περίοδος, η διάμετρος — feminine articles with masculine-shaped endings, and all learned vocabulary"
+    },
+    {
+      "kind": "grammar",
+      "front": "The feminine accusative singular",
+      "back": "Identical to the nominative — την νίκη, την ώρα, την πόλη — which removes one decision entirely"
+    },
+    {
+      "kind": "grammar",
+      "front": "The genitive plural of the πόλη type",
+      "back": "των πόλεων — keeping the learned -εων"
+    }
+  ],
+  "The neuter endings": [
+    {
+      "kind": "grammar",
+      "front": "The neuter’s gift",
+      "back": "The nominative and accusative are identical in both numbers, which removes half the decisions"
+    },
+    {
+      "kind": "grammar",
+      "front": "The genitive of an -ι neuter",
+      "back": "-ιού, with the stress on the ending: το παιδί → του παιδιού, το σπίτι → του σπιτιού"
+    },
+    {
+      "kind": "grammar",
+      "front": "The genitive of a -μα neuter",
+      "back": "-ατος: το γράμμα → του γράμματος, το μάθημα → του μαθήματος"
+    },
+    {
+      "kind": "grammar",
+      "front": "The plural of a neuter -ος noun",
+      "back": "-η with eta: το λάθος → τα λάθη, το κράτος → τα κράτη, το έθνος → τα έθνη. The neuter’s one real trap."
+    },
+    {
+      "kind": "grammar",
+      "front": "The four neuter spelling rules",
+      "back": "Singular -ι is always iota; singular -ο always omicron; plural -α/-ια/-ατα always alpha; plural -η belongs to the -ος nouns"
+    }
+  ],
+  "The genitive, in all three genders": [
+    {
+      "kind": "grammar",
+      "front": "The four genitive errors the table prevents",
+      "back": "του μαθητής (drop the ς); της νίκη (add a ς); του παιδίου (it is -ιού); του γράμματου (it is -ατος)"
+    },
+    {
+      "kind": "grammar",
+      "front": "The genitive plural, in one word",
+      "back": "-ων. Always omega, in all three genders, with no exception worth the name."
+    },
+    {
+      "kind": "grammar",
+      "front": "του against των",
+      "back": "του with omicron is the genitive singular; των with omega the genitive plural — two of the commonest words in the language"
+    },
+    {
+      "kind": "grammar",
+      "front": "The drill that fixes the genitive",
+      "back": "Take any noun phrase and put it after λόγω, μετά or σύμφωνα με, saying the ending’s reason aloud"
+    }
+  ],
+  "The plurals, in all three genders": [
+    {
+      "kind": "grammar",
+      "front": "The four plural endings that sound alike",
+      "back": "Masculine -ος → -οι; feminine -ση → -εις; neuter -ος → -η; feminine -ος → -οί. All four say *i*."
+    },
+    {
+      "kind": "grammar",
+      "front": "The three questions that decide a plural",
+      "back": "What gender? What is the singular ending? Then read the plural off the table."
+    },
+    {
+      "kind": "grammar",
+      "front": "The plural articles",
+      "back": "οι (masc. and fem. nominative, omicron-iota), τα (neuter), των (genitive), τους / τις / τα (accusative)"
+    },
+    {
+      "kind": "grammar",
+      "front": "Six irregular plurals worth knowing",
+      "back": "η γυναίκα → οι γυναίκες (gen. pl. των γυναικών); το κρέας → τα κρέατα; το φως → τα φώτα; το γάλα → τα γάλατα; το γεγονός → τα γεγονότα; ο καφές → οι καφέδες"
+    }
+  ],
+  "The adjective endings": [
+    {
+      "kind": "grammar",
+      "front": "The five adjective patterns",
+      "back": "-ος/-η/-ο (καλός); -ος/-α/-ο (ωραίος); -ύς/-ιά/-ύ (βαθύς); -ής/-ιά/-ί (σταχτής); -ης/-ης/-ες (διεθνής)"
+    },
+    {
+      "kind": "grammar",
+      "front": "When the feminine of an -ος adjective is -α",
+      "back": "When the stem ends in a vowel: ωραία, νέα, παλιά, κρύα. Everything else takes -η, including the -ρος adjectives: μικρή, καθαρή."
+    },
+    {
+      "kind": "grammar",
+      "front": "The -ύς/-ιά/-ύ group",
+      "back": "βαθύς, βαρύς, μακρύς, φαρδύς, πλατύς, ελαφρύς, παχύς, δασύς — small, closed, and the -ύ is upsilon"
+    },
+    {
+      "kind": "grammar",
+      "front": "The -ης/-ης/-ες learned adjectives",
+      "back": "διεθνής, ευγενής, συνεχής, ακριβής, ασφαλής, πλήρης — genitive -ούς, plural -είς, neuter plural -ή"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one rule that catches most adjective errors",
+      "back": "An adjective never has a spelling of its own — it has the noun’s. Find the noun, name its gender, number and case."
+    }
+  ],
+  "Spelling drill: the noun in a sentence": [
+    {
+      "kind": "grammar",
+      "front": "How the drill works",
+      "back": "Fill the blanked ending and say the REASON aloud. The reason transfers; the answer does not."
+    },
+    {
+      "kind": "grammar",
+      "front": "What your remaining errors should be after Spelling 2 and 3",
+      "back": "Roots, accents and double consonants — all memory, all cards. Ending errors should be near zero."
+    }
+  ],
+  "The verb endings, and the -ει problem": [
+    {
+      "kind": "grammar",
+      "front": "The six present active endings",
+      "back": "-ω (omega), -εις, -ει, -ουμε, -ετε, -ουν — and never -ο, -ης, -η or -ι"
+    },
+    {
+      "kind": "grammar",
+      "front": "-ω against -ο",
+      "back": "A verb’s first person is -ω with omega (γράφω); a neuter singular is -ο with omicron (το βιβλίο, καλό)"
+    },
+    {
+      "kind": "grammar",
+      "front": "-ετε against -εται, and the test",
+      "back": "Identical in sound. Can you put εσείς in front? Then -ετε, active. Can you put αυτό? Then -εται, passive."
+    },
+    {
+      "kind": "grammar",
+      "front": "Noun or verb — the one question for every *i*",
+      "back": "η νίκη is a noun, so -η; νικεί is a verb, so -ει. η ζωή / ζει. η τιμή / τιμά."
+    }
+  ],
+  "The present and the -άω verbs": [
+    {
+      "kind": "grammar",
+      "front": "The conjugation-2a endings",
+      "back": "-ώ, -άς, -ά, -άμε, -άτε, -ούν — with the alternatives -άω, -άει, -άνε. No -ει anywhere: the third singular is αγαπά or αγαπάει."
+    },
+    {
+      "kind": "grammar",
+      "front": "The conjugation-2b endings",
+      "back": "-ώ, -είς, -εί, -ούμε, -είτε, -ούν — as in μπορώ, θεωρώ, τηλεφωνώ"
+    },
+    {
+      "kind": "grammar",
+      "front": "The two questions that identify a conjugation",
+      "back": "Where is the stress in the first person — stem or ending? And is the second person -άς or -είς?"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why είναι is spelt -αι",
+      "back": "It is the commonest word in the language and it looks like a passive ending without being one"
+    },
+    {
+      "kind": "grammar",
+      "front": "The conjugation-2 imperfect",
+      "back": "Both types converge in -ούσα: αγαπούσα, μπορούσα — and -ούσα is long enough that no augment is ever needed"
+    }
+  ],
+  "The past endings, and the augment": [
+    {
+      "kind": "grammar",
+      "front": "The six past endings, shared by the aorist and the imperfect",
+      "back": "-α, -ες, -ε, -αμε, -ατε, -αν. Every one has alpha or epsilon and none has an *i* — so the past is the easiest part of the verb to spell."
+    },
+    {
+      "kind": "grammar",
+      "front": "The augment rule",
+      "back": "The past tense’s stress falls on the third syllable from the end. If the word has only two, an ε- is prefixed to make a third: έγραψα but γράψαμε."
+    },
+    {
+      "kind": "grammar",
+      "front": "The five verbs whose augment is η-",
+      "back": "ήθελα (θέλω), ήξερα (ξέρω), ήμουν (είμαι), ήπια (πίνω), ήρθα (έρχομαι)"
+    },
+    {
+      "kind": "grammar",
+      "front": "The learned augment, to read not write",
+      "back": "Katharevousa puts the ε- inside a compound: ανεχώρησε for αναχώρησε, ενεγράφη for γράφτηκε, εγένετο for έγινε"
+    }
+  ],
+  "The perfective stems, spelt": [
+    {
+      "kind": "grammar",
+      "front": "The three perfective markers, and what decides them",
+      "back": "Labials (π β φ, and -εύω) give ψ; velars (κ γ χ) give ξ; everything else gives σ"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why ζ goes both ways",
+      "back": "It is a fact about each verb: διαβάζω → διαβάσω but αλλάζω → άλλαξα. Roughly, -ίζω takes σ and -άζω often takes ξ, with exceptions both ways."
+    },
+    {
+      "kind": "grammar",
+      "front": "The conjugation-2 perfective markers",
+      "back": "-ήσω with eta for the -άω verbs (αγαπήσω, μιλήσω); -έσω with epsilon for some 2b verbs (μπορέσω, καλέσω); -άσω for a small group (γελάσω, περάσω, ξεχάσω, χαλάσω)"
+    },
+    {
+      "kind": "grammar",
+      "front": "The three irregular aorists with ει in the stem",
+      "back": "έμεινα (μένω), έστειλα (στέλνω) — and έπλυνα (πλένω) with upsilon"
+    }
+  ],
+  "The passive endings": [
+    {
+      "kind": "grammar",
+      "front": "The six present passive endings",
+      "back": "-μαι, -σαι, -ται, -μαστε, -στε, -νται — and the three vowel-final ones are all -αι, never -ε"
+    },
+    {
+      "kind": "grammar",
+      "front": "The aorist passive endings",
+      "back": "-θηκα, -τηκα, -χτηκα, -στηκα, with the person endings -ηκα, -ηκες, -ηκε, -ήκαμε, -ήκατε, -ηκαν. All eta, never iota."
+    },
+    {
+      "kind": "grammar",
+      "front": "θεωρείτε against θεωρείται",
+      "back": "*You consider* (active, second plural) against *it is considered* (passive, third singular). Both common in written Greek."
+    },
+    {
+      "kind": "grammar",
+      "front": "The passive subjunctive ending",
+      "back": "-θεί with epsilon-iota: να ανακοινωθεί, θα εγκριθεί. NOT -θή, which is katharevousa."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a deponent is never -ετε",
+      "back": "It has no active, so έρχεται, σκέφτεται, φοβάται are the only forms — there is no έρχετε"
+    }
+  ],
+  "The subjunctive, which has no spelling of its own": [
+    {
+      "kind": "grammar",
+      "front": "Why the subjunctive has no spelling of its own",
+      "back": "Modern Greek has no distinct subjunctive forms — να plus the ordinary indicative endings, in one aspect or the other"
+    },
+    {
+      "kind": "grammar",
+      "front": "The katharevousa subjunctive, which is now wrong",
+      "back": "ίνα γράφη → να γράφει; να γράφωμεν → να γράφουμε; να γραφή → να γραφεί"
+    },
+    {
+      "kind": "grammar",
+      "front": "δεν against μην",
+      "back": "δεν negates the indicative; μην negates everything with να, and the imperative. There is no negative imperative form."
+    },
+    {
+      "kind": "grammar",
+      "front": "The perfective imperative plural",
+      "back": "-τε on the perfective stem: γράψτε, διαβάστε, πάρτε, πείτε, δώστε, ελάτε"
+    }
+  ],
+  "Spelling drill: the verb in a sentence": [
+    {
+      "kind": "grammar",
+      "front": "The six verb error types to log",
+      "back": "-η for -ει; -ετε for -εται; the wrong perfective marker; a missing or wrong augment; -θή for -θεί; the wrong conjugation"
+    },
+    {
+      "kind": "grammar",
+      "front": "The weekly Spelling habit",
+      "back": "Twenty minutes twice a week on a drill set, plus one four-sentence dictation. Forty minutes."
+    }
+  ],
+  "Double consonants": [
+    {
+      "kind": "grammar",
+      "front": "Why Greek doubles consonants at all",
+      "back": "Standard Greek pronounces them as single sounds — the doubling is pure orthography inherited from Ancient Greek. Cypriot still pronounces them long, which is a genuine aid to memory."
+    },
+    {
+      "kind": "grammar",
+      "front": "The one real rule about double consonants",
+      "back": "A double letter is often a prefix meeting a stem: εκ + κλησία → εκκλησία; συν + γραφέας → συγγραφέας; εν + νοια → έννοια"
+    },
+    {
+      "kind": "grammar",
+      "front": "εκκλησία, and why the κκ cannot be forgotten",
+      "back": "It is εκ + κλησία — *called out* — so the double kappa is a prefix boundary"
+    },
+    {
+      "kind": "grammar",
+      "front": "πολύ against πολλοί",
+      "back": "πολύ (*very, much*) has one lambda; πολλοί, πολλά, πολλές (*many*) have two"
+    },
+    {
+      "kind": "grammar",
+      "front": "μέλι against μέλλον",
+      "back": "μέλι (honey) one lambda; μέλλον (the future) two"
+    }
+  ],
+  "The prefixes, and how they assimilate": [
+    {
+      "kind": "grammar",
+      "front": "How συν- assimilates",
+      "back": "συμ- before π β φ ψ μ; συγ- before κ γ χ ξ; συλ- before λ; συρ- before ρ; συν- otherwise"
+    },
+    {
+      "kind": "grammar",
+      "front": "How εν- assimilates",
+      "back": "εμ- before π β φ μ; εγ- before κ γ χ; ελ- before λ; εν- otherwise"
+    },
+    {
+      "kind": "grammar",
+      "front": "εκ- against εξ-",
+      "back": "εξ- before a vowel (εξέλιξη, εξομολόγηση, εξ αρχής); εκ- before a consonant (έκθεση, εκλογή, εκκλησία)"
+    },
+    {
+      "kind": "grammar",
+      "front": "α- against αν-",
+      "back": "αν- before a vowel (ανίκανος, ανώμαλος); α- before a consonant (άδικος, άγνωστος)"
+    },
+    {
+      "kind": "grammar",
+      "front": "The practical payoff of knowing the prefixes",
+      "back": "Split the prefix off an unknown long word and nine times in ten it becomes transparent — αναγνωρίζω = ανα + γνωρίζω; υπογραφή = υπο + γραφή"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why ευ- is spelt ευ even when it sounds like *ef*",
+      "back": "It is the digraph, voiced before a voiced sound (ευλογία) and voiceless before a voiceless one (ευχαριστώ) — spelt ευ either way"
+    }
+  ],
+  "The root spellings, by pattern": [
+    {
+      "kind": "grammar",
+      "front": "The one real rule about αι inside a root",
+      "back": "Verbs in -αίνω all take αι: μαθαίνω, πεθαίνω, ανεβαίνω, κατεβαίνω, πηγαίνω, ζεσταίνω, παθαίνω, φαίνομαι"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why the υ words are worth learning as a group",
+      "back": "υ is the least-guessed of the *i* spellings, and the group is large: τύχη, ύλη, φύση, λύση, μύθος, ρυθμός, σύστημα, ξύλο, νύχτα, δύναμη, ψυχή"
+    },
+    {
+      "kind": "grammar",
+      "front": "The free mnemonic that comes with every lookup",
+      "back": "The etymology line in the Triantafyllidis dictionary. τύχη < τυγχάνω explains the upsilon."
+    },
+    {
+      "kind": "grammar",
+      "front": "The four-step method for a root spelling",
+      "back": "Apply the endings rules; split off the prefix; guess the root and check it in Triantafyllidis; card it if you were wrong"
+    }
+  ],
+  "Homophones, and spelling as meaning": [
+    {
+      "kind": "grammar",
+      "front": "τοίχος against τείχος",
+      "back": "ο τοίχος is the wall of a room or house; το τείχος is a fortification — the walls of Constantinople are τα Τείχη"
+    },
+    {
+      "kind": "grammar",
+      "front": "κλίνω against κλείνω",
+      "back": "κλίνω is to incline, and to decline a noun; κλείνω is to close"
+    },
+    {
+      "kind": "grammar",
+      "front": "φιλί against φυλή",
+      "back": "φιλί is a kiss; φυλή a tribe or race"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek spells a loanword",
+      "back": "As simply as the sound allows, since 1976: single consonants, ε rather than αι, ι rather than ει or υ — τρένο, σεζόν, μπάσκετ, σάντουιτς"
+    },
+    {
+      "kind": "grammar",
+      "front": "ό,τι against ότι",
+      "back": "ότι means *that*; ό,τι with the comma means *whatever*. The comma is required."
+    }
+  ],
+  "Spelling drill: dictation": [
+    {
+      "kind": "grammar",
+      "front": "Why dictation is the best single spelling exercise",
+      "back": "It tests the endings, the roots, the accents, final -ν and the double consonants all at once — and the listening with them"
+    },
+    {
+      "kind": "grammar",
+      "front": "The dictation method",
+      "back": "Two to four sentences of audio you can follow; play it twice writing by hand; a third time to check; then classify every error"
+    },
+    {
+      "kind": "grammar",
+      "front": "The best free dictation material",
+      "back": "The Ellinomatheia listening papers — graded A1 to C2, with audio and transcripts"
+    },
+    {
+      "kind": "grammar",
+      "front": "The honest spelling target",
+      "back": "Not perfection, which no Greek has: no ending errors, accents placed, and a known list of root words on cards"
+    }
+  ],
+  "Abbreviations, in full": [
+    {
+      "kind": "word",
+      "front": "Ι.Ν.",
+      "back": "Ιερός Ναός — Holy Church of…, and it begins every Greek church notice"
+    },
+    {
+      "kind": "word",
+      "front": "π.",
+      "back": "πατήρ — Fr, before a priest’s name"
+    },
+    {
+      "kind": "word",
+      "front": "Ι.Μ.",
+      "back": "Ιερά Μονή (Holy Monastery) or Ιερά Μητρόπολις (Holy Metropolis)"
+    },
+    {
+      "kind": "word",
+      "front": "π.Χ. / μ.Χ.",
+      "back": "προ / μετά Χριστού — BC / AD, with a capital Χ for Christ"
+    },
+    {
+      "kind": "word",
+      "front": "κ.λπ.",
+      "back": "και λοιπά — etc."
+    },
+    {
+      "kind": "word",
+      "front": "π.χ.",
+      "back": "παραδείγματος χάριν — e.g."
+    },
+    {
+      "kind": "word",
+      "front": "βλ.",
+      "back": "βλέπε — see, cf."
+    },
+    {
+      "kind": "word",
+      "front": "Υ.Γ.",
+      "back": "υστερόγραφο — P.S."
+    },
+    {
+      "kind": "word",
+      "front": "Π.Δ. / Κ.Δ.",
+      "back": "Παλαιά / Καινή Διαθήκη — Old / New Testament"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek cites scripture",
+      "back": "Ματθ. 5, 3–12 or Ματθ. 5:3–12 — the comma is the more traditional Greek form"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why acronyms carry no accents",
+      "back": "They are written in capitals, and a word in capitals takes no accents"
+    }
+  ],
+  "The numerals, in full": [
+    {
+      "kind": "grammar",
+      "front": "The only four numerals that decline",
+      "back": "ένας, τρεις, τέσσερις, and the hundreds and thousands. Everything from 5 to 199 is invariable."
+    },
+    {
+      "kind": "grammar",
+      "front": "The two irregular numeral genitives",
+      "back": "τριών and τεσσάρων — τριών ημερών, τεσσάρων ετών"
+    },
+    {
+      "kind": "grammar",
+      "front": "How the alphabetic numerals work",
+      "back": "Units, tens and hundreds each have a letter and are added: ιβ΄ = 12, κε΄ = 25, ρν΄ = 150. A keraia (΄) marks a numeral."
+    },
+    {
+      "kind": "grammar",
+      "front": "The three letters that survive only as numerals",
+      "back": "ϛ stigma (6, also στ΄), ϙ koppa (90), ϡ sampi (900) — not letters of the alphabet"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where you will meet alphabetic numerals",
+      "back": "The odes of a canon (ωδή α΄, γ΄), the tones (ήχος πλ. δ΄), the Councils (η Ζ΄ Οικουμενική), school years, kings and patriarchs"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek writes a date",
+      "back": "The month in the genitive: 14 Οκτωβρίου 2026 — and 1η for the first"
+    }
+  ],
+  "Capitalisation, hyphens and syllables": [
+    {
+      "kind": "grammar",
+      "front": "The capitalisation difference learners get wrong most",
+      "back": "Language names and nationality adjectives are LOWER CASE in Greek: μαθαίνω ελληνικά, ένα ελληνικό βιβλίο — but ο Έλληνας is capitalised"
+    },
+    {
+      "kind": "grammar",
+      "front": "What a Greek book title capitalises",
+      "back": "Only the first word: Το τρίτο στεφάνι"
+    },
+    {
+      "kind": "grammar",
+      "front": "The religious capitals",
+      "back": "Capitalised: ο Θεός, ο Κύριος, η Παναγία, η Εκκλησία (institution), η Θεία Λειτουργία, the feasts, ο Άγιος Νικόλαος. Lower case: η εκκλησία (building), ο ιερέας, η νηστεία."
+    },
+    {
+      "kind": "grammar",
+      "front": "The two-consonant syllable rule",
+      "back": "Two consonants between vowels go with the following vowel if a Greek word can begin with that pair (βι-βλί-ο); otherwise they split (άν-θρω-πος)"
+    },
+    {
+      "kind": "grammar",
+      "front": "When a diaeresis is needed",
+      "back": "Only when there is no accent to separate the vowels: Μάιος and καΐκι need one, ρολόι does not"
+    }
+  ],
+  "Typing and writing Greek, as reference": [
+    {
+      "kind": "grammar",
+      "front": "The five non-phonetic keys on the Greek layout",
+      "back": "c = ψ, j = ξ, u = θ, v = ω, w = ς — and q = ; the question mark"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to type an accent",
+      "back": "Press ; (the semicolon key) then the vowel. shift + ; then the vowel gives the diaeresis."
+    },
+    {
+      "kind": "grammar",
+      "front": "The Hyprland setting for a Greek layout",
+      "back": "kb_layout = us,gr with kb_options = grp:alt_shift_toggle — alt + shift switches"
+    },
+    {
+      "kind": "grammar",
+      "front": "The letters that descend below the line",
+      "back": "γ, η, μ, ρ, φ, χ, ψ, ζ, β, ξ — and the next letter starts from the baseline, not from the tail"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where the polytonic layout matters",
+      "back": "Liturgical texts, and the classical curriculum. Not this one."
+    }
+  ],
+  "The spelling checklist, and self-testing": [
+    {
+      "kind": "grammar",
+      "front": "The twelve-item spelling checklist",
+      "back": "Read aloud; count the accents; every *i* — is it an ending?; every *o* — verb or noun?; every *e* — active or passive?; final -ν; the agreement chain; the genitive endings; the perfective marker; the double consonants; the punctuation; read aloud again"
+    },
+    {
+      "kind": "grammar",
+      "front": "The target distribution of errors after a year of the track",
+      "back": "Endings near zero; accents occasional; roots the bulk, all on cards; double consonants a known list; final -ν near zero"
+    },
+    {
+      "kind": "grammar",
+      "front": "What the Spelling track cannot do",
+      "back": "Make the roots derivable, because they are not. ποτέ, τύχη, θάλασσα, εκκλησία are facts — meet them, get them wrong, card them."
+    }
+  ],
+  "How the Greek verb is organised": [
+    {
+      "kind": "grammar",
+      "front": "The axis the Greek verb is organised on",
+      "back": "Aspect FIRST, tense second. Two stems — imperfective and perfective — and the tense and mood are built on whichever you chose."
+    },
+    {
+      "kind": "grammar",
+      "front": "The one empty cell in the Greek verb",
+      "back": "There is no perfective present — you cannot describe something as a completed whole while it is happening"
+    },
+    {
+      "kind": "grammar",
+      "front": "The five things Greek does not have",
+      "back": "No infinitive; no perfective present; no separate subjunctive forms; no progressive auxiliary; no sequence of tenses in reported speech"
+    },
+    {
+      "kind": "grammar",
+      "front": "The two questions to ask of any Greek verb form",
+      "back": "Which stem? Which tense and mood? That is how the system is indexed."
+    },
+    {
+      "kind": "grammar",
+      "front": "How the compound tenses work",
+      "back": "έχω or είχα plus an INVARIABLE perfective form that never changes for person: έχω γράψει, έχεις γράψει, έχει γράψει"
+    }
+  ],
+  "The two conjugations, in full": [
+    {
+      "kind": "grammar",
+      "front": "είμαι’s oddity",
+      "back": "It has passive-shaped endings and no active, and είναι is the third person for BOTH singular and plural — unique in the language"
+    },
+    {
+      "kind": "grammar",
+      "front": "The verbs that take both conjugation-2 sets",
+      "back": "ζητώ, κρατώ, βοηθώ, τραβώ — and both are correct"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to drill a conjugation table",
+      "back": "Cover the forms, say all six aloud, uncover and check, redo the misses three times. Thirty seconds a verb."
+    }
+  ],
+  "The imperfect, in full": [
+    {
+      "kind": "grammar",
+      "front": "The six uses of the imperfect",
+      "back": "Background; habit; an ongoing action interrupted; description in the past; an attempt; and politeness (ήθελα να σας ρωτήσω)"
+    },
+    {
+      "kind": "grammar",
+      "front": "Έγραφα against Έγραψα",
+      "back": "Έγραφα ένα γράμμα — I was writing one, perhaps unfinished. Έγραψα ένα γράμμα — I wrote it, done."
+    },
+    {
+      "kind": "grammar",
+      "front": "The two irregular imperfects to know cold",
+      "back": "ήμουν, ήσουν, ήταν… (είμαι) and είχα, είχες, είχε… (έχω) — and είχα is also the pluperfect’s auxiliary"
+    }
+  ],
+  "The imperfective future, subjunctive and imperative": [
+    {
+      "kind": "grammar",
+      "front": "The whole imperfective future",
+      "back": "θα plus the present, unchanged. θα is invariable and unaccented."
+    },
+    {
+      "kind": "grammar",
+      "front": "The verbs with no perfective future",
+      "back": "είμαι, έχω, ξέρω, θέλω, αγαπώ — states rather than events, so their future is naturally imperfective"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek makes the conditional",
+      "back": "θα plus the imperfect: θα έγραφα, *I would write* — the politeness tense"
+    },
+    {
+      "kind": "grammar",
+      "front": "The whole imperfective system, in one line",
+      "back": "One stem, six constructions, and only two sets of endings — the present’s and the past’s"
+    }
+  ],
+  "είμαι, έχω, and the state verbs": [
+    {
+      "kind": "grammar",
+      "front": "Why είμαι has no aorist",
+      "back": "It is a state, and states have no perfective aspect. Where English says *I was*, Greek says ήμουν — the imperfect — and there is nothing else to choose."
+    },
+    {
+      "kind": "grammar",
+      "front": "μπορώ against μπόρεσα",
+      "back": "μπορώ is *I am able*; μπόρεσα is *I managed*. The aspect difference is a capacity against an occasion."
+    },
+    {
+      "kind": "grammar",
+      "front": "έπρεπε, and the English modal it covers",
+      "back": "Both *I had to go* and *I should have gone* — context decides. And πρέπει να πήγε is *he must have gone*, for inference."
+    },
+    {
+      "kind": "grammar",
+      "front": "The verbs whose two aspects are two different English verbs",
+      "back": "μαθαίνω/μάθω (learn / find out); βλέπω/δω (watch / catch sight of); θυμάμαι/θυμηθώ (hold in mind / recall); καταλαβαίνω/καταλάβω (understand / realise)"
+    }
+  ],
+  "How to use a conjugation table": [
+    {
+      "kind": "grammar",
+      "front": "The four questions for recognising a verb form",
+      "back": "Active or passive? Which tense? Which person? What is the verb? — and Lexiscope when that fails"
+    },
+    {
+      "kind": "grammar",
+      "front": "The nine-transformation drill",
+      "back": "One sentence into past, imperfect, future, plural, negative, subjunctive, perfect, passive and pluperfect passive — every cell of the table, in two minutes"
+    },
+    {
+      "kind": "grammar",
+      "front": "The eight verb forms to drill, in priority order",
+      "back": "Present; aorist and imperfect; θα and να with both stems; είμαι/έχω/πάω/λέω/τρώω; aorist passive; perfect; imperatives; participles"
+    }
+  ],
+  "The perfective stem, formed": [
+    {
+      "kind": "grammar",
+      "front": "How a perfective is cited in a dictionary",
+      "back": "As the first person perfective subjunctive without να — γράψω"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why the three markers are what they are",
+      "back": "The same assimilation as English *scribe / script*: a consonant meeting a sibilant. Labials give ψ, velars ξ, everything else σ."
+    },
+    {
+      "kind": "grammar",
+      "front": "The -νω verbs’ perfectives",
+      "back": "Many form it by dropping the -ν- or changing the stem vowel rather than adding a marker: μένω/μείνω, στέλνω/στείλω, πλένω/πλύνω, φέρνω/φέρω, παίρνω/πάρω"
+    },
+    {
+      "kind": "grammar",
+      "front": "The carding rule for verbs",
+      "back": "Every verb is carded as a PAIR — γράφω / γράψω on one card. A verb without its perfective is half a verb."
+    }
+  ],
+  "The irregular perfectives": [
+    {
+      "kind": "grammar",
+      "front": "The six monosyllabic perfectives",
+      "back": "δω, πω, βρω, μπω, βγω, πιω — the strangest forms in the language and the most used"
+    },
+    {
+      "kind": "grammar",
+      "front": "The -αίνω pattern",
+      "back": "Drop the -αιν- and the perfective is short: μαθαίνω/μάθω, παθαίνω/πάθω, καταλαβαίνω/καταλάβω, μπαίνω/μπω, βγαίνω/βγω"
+    },
+    {
+      "kind": "grammar",
+      "front": "The labour-saving fact about compounds",
+      "back": "A compound inherits its simple verb’s perfective — so thirty simple verbs give you several hundred compounds"
+    },
+    {
+      "kind": "grammar",
+      "front": "The learned -έλθω compounds",
+      "back": "προσέλθω, επανέλθω, διέλθω, εξέλθω, εισέλθω — all from έρχομαι, all formal, all in official and church Greek"
+    }
+  ],
+  "The aorist, in full": [
+    {
+      "kind": "grammar",
+      "front": "Why the aorist and imperfect share their endings",
+      "back": "They do: -α, -ες, -ε, -αμε, -ατε, -αν. The difference between έγραφα and έγραψα is the STEM alone."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why the augment is not a separate thing to remember",
+      "back": "It is a consequence of the stress rule: the stress falls on the third syllable from the end, so short stems get an ε- to supply one"
+    },
+    {
+      "kind": "grammar",
+      "front": "The irregular aorists whose stress does not move",
+      "back": "είδα, είπα, πήγα, πήρα, βρήκα, ήρθα, μπήκα, βγήκα — the commonest verbs, and invariant in stress"
+    },
+    {
+      "kind": "grammar",
+      "front": "The two aorist errors learners make",
+      "back": "Using the aorist for description (Ήταν ψηλός, not an aorist); and the imperfect for a completed event (Πήγα, not πήγαινα)"
+    }
+  ],
+  "The perfective future, subjunctive and imperative": [
+    {
+      "kind": "grammar",
+      "front": "The particles that decide the aspect for you — perfective",
+      "back": "πριν, μόλις, αφού (after), ώσπου, όταν (once, in the future)"
+    },
+    {
+      "kind": "grammar",
+      "front": "The particles that decide the aspect for you — imperfective",
+      "back": "ενώ, όσο, καθώς, όταν (whenever), πάντα, συνήθως, κάθε, συχνά"
+    },
+    {
+      "kind": "grammar",
+      "front": "μην γράφεις against μην γράψεις",
+      "back": "The first is *stop writing*; the second *don’t write this*. There is no negative imperative form — μην plus the ordinary verb."
+    },
+    {
+      "kind": "grammar",
+      "front": "The polite imperative",
+      "back": "The plural, used to one person: Περιμένετε, παρακαλώ. Καθίστε."
+    }
+  ],
+  "The aspect pairs: the hundred verbs": [
+    {
+      "kind": "grammar",
+      "front": "How to use the hundred-verb list",
+      "back": "Not by reading. Card them ten at a time as pairs, and check with the cover-and-say drill."
+    },
+    {
+      "kind": "grammar",
+      "front": "The church verbs’ aspect pairs",
+      "back": "προσεύχομαι/προσευχηθώ, νηστεύω/νηστέψω, εξομολογούμαι/εξομολογηθώ, κοινωνώ/κοινωνήσω, ευλογώ/ευλογήσω, ψάλλω/ψάλω, προσκυνώ/προσκυνήσω, μετανοώ/μετανοήσω"
+    }
+  ],
+  "Drilling the pairs": [
+    {
+      "kind": "grammar",
+      "front": "Why the pair drill is the highest-value two minutes in the track",
+      "back": "The aspect choice is made BEFORE the tense, in the instant of speaking — so fluency in Greek is largely fluency in the two stems"
+    },
+    {
+      "kind": "grammar",
+      "front": "The four-form drill",
+      "back": "For each verb say the present, the aorist, the perfective future and the perfective subjunctive. Ten verbs, forty forms, three minutes."
+    },
+    {
+      "kind": "grammar",
+      "front": "The weekly Forms habit",
+      "back": "Two minutes of the pair drill and two of a transformation drill daily, plus two twenty-minute table sessions a week"
+    },
+    {
+      "kind": "grammar",
+      "front": "The marker that the Forms track is finished",
+      "back": "You produce any form without pausing, you recognise the irregulars on sight, and the aspect choice is automatic"
+    }
+  ],
+  "The passive present and imperfect": [
+    {
+      "kind": "grammar",
+      "front": "The three senses of the Greek passive",
+      "back": "True passive (το γράμμα γράφτηκε); reflexive (πλένομαι, ντύνομαι, σηκώνομαι); and reciprocal (αγαπιόμαστε, μιλιόμαστε)"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which passive sense is commonest in speech",
+      "back": "The reflexive — which is why so many verbs of daily routine are passive in form: σηκώνομαι, πλένομαι, ντύνομαι, ετοιμάζομαι, κουράζομαι, κοιμάμαι"
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek names the agent of a passive",
+      "back": "από plus the accusative — γράφτηκε από τον Παπαδιαμάντη. And υπό plus the genitive in the learned register, which you read and do not write."
+    },
+    {
+      "kind": "grammar",
+      "front": "The genuine ambiguity in the passive",
+      "back": "The first person plural is identical in the present and the imperfect: γραφόμαστε"
+    }
+  ],
+  "The aorist passive": [
+    {
+      "kind": "grammar",
+      "front": "The four aorist passive markers",
+      "back": "-ήθηκα/-ώθηκα for conjugation 2 and the -ώνω verbs; -φτηκα for labial stems; -χτηκα for velar; -θηκα/-στηκα for the rest"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why -φθηκε and -χθηκε exist beside -φτηκε and -χτηκε",
+      "back": "Register. The plainer forms are modern and safer; the -φθ-/-χθ- forms are commoner in official and church writing."
+    },
+    {
+      "kind": "grammar",
+      "front": "κοιμήθηκε against εκοιμήθη",
+      "back": "The modern aorist passive against the ancient one, kept because it is the Church’s word for a saint’s death"
+    },
+    {
+      "kind": "grammar",
+      "front": "The passive perfective subjunctive endings",
+      "back": "-ώ, -είς, -εί, -ούμε, -είτε, -ούν on the -θ- stem: να ανακοινωθεί, θα εγκριθεί"
+    }
+  ],
+  "The perfect tenses": [
+    {
+      "kind": "grammar",
+      "front": "Why the compound tenses are the easiest forms in the verb",
+      "back": "Only έχω conjugates. The second word — γράψει — never changes for person, number or gender."
+    },
+    {
+      "kind": "grammar",
+      "front": "How much Greek uses the perfect",
+      "back": "Far less than English. Έφαγα ήδη, not έχω φάει; Είδες την ταινία;, not έχεις δει."
+    },
+    {
+      "kind": "grammar",
+      "front": "The four jobs the Greek perfect does keep",
+      "back": "Lifetime experience; something never done (δεν έχω πάει ποτέ); emphasising completion against expectation; and precision about sequence in writing"
+    },
+    {
+      "kind": "grammar",
+      "front": "The English present perfect that is PRESENT in Greek",
+      "back": "With *for* or *since*: Μένω εδώ δέκα χρόνια. Μαθαίνω ελληνικά εδώ και δύο χρόνια. If it is still happening, use the present."
+    },
+    {
+      "kind": "grammar",
+      "front": "έχω γραμμένο το γράμμα",
+      "back": "έχω plus a DECLINED -μένος participle, agreeing with the object: *I have the letter written, ready*. Common in speech and in no textbook."
+    }
+  ],
+  "The participles": [
+    {
+      "kind": "grammar",
+      "front": "Why there is no perfective active participle",
+      "back": "There is not — γράψοντας does not exist. Greek uses έχοντας plus the invariable perfective: έχοντας διαβάσει."
+    },
+    {
+      "kind": "grammar",
+      "front": "The active participle’s spelling",
+      "back": "-οντας with omicron for conjugation 1; -ώντας with omega for conjugation 2, because the stress is on it"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why γραμμένος has a double μ",
+      "back": "The labial stem assimilates: γράφω → γραμμένος, κρύβω → κρυμμένος, κόβω → κομμένος"
+    },
+    {
+      "kind": "grammar",
+      "front": "The three ways to form a passive participle",
+      "back": "Labial stem → -μμένος (γραμμένος, κομμένος); velar → -γμένος (ανοιγμένος, βρεγμένος); dental or σ → -σμένος (διαβασμένος, κλεισμένος); conjugation 2 → -ημένος / -ωμένος"
+    },
+    {
+      "kind": "grammar",
+      "front": "The learned participles you CAN use",
+      "back": "The naturalised -όμενος nouns: ο εργαζόμενος, ο ενδιαφερόμενος, ο προϊστάμενος, τα λεγόμενα, τα δεδομένα, το περιεχόμενο"
+    }
+  ],
+  "The full verb, on one page": [
+    {
+      "kind": "grammar",
+      "front": "How many forms the Greek verb has",
+      "back": "About seventy, from four stems, with two sets of endings for the active and two for the passive — smaller than the Romance systems"
+    },
+    {
+      "kind": "grammar",
+      "front": "Which verb forms are ninety per cent of use",
+      "back": "Present active, aorist active, imperfect active, θα and να with both active stems, γράφεται and γράφτηκε"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one-page exercise worth doing once",
+      "back": "Copy the full table of one regular verb out by hand — twenty minutes, and it drills the handwriting and the spelling at once"
+    },
+    {
+      "kind": "grammar",
+      "front": "How much of the table an irregular verb actually changes",
+      "back": "βλέπω / δω differs from γράφω / γράψω in four cells out of seventy"
+    }
+  ],
+  "Deponents, and the verbs with no active": [
+    {
+      "kind": "grammar",
+      "front": "What a deponent is, and the test",
+      "back": "A verb that exists only in passive endings with an active meaning. If the active does not exist — there is no έρχω — the verb is deponent."
+    },
+    {
+      "kind": "grammar",
+      "front": "The -άμαι group",
+      "back": "φοβάμαι, θυμάμαι, κοιμάμαι, λυπάμαι — four verbs, one pattern, all very common: -άμαι, -άσαι, -άται, -όμαστε, -άστε, -ούνται"
+    },
+    {
+      "kind": "grammar",
+      "front": "The four church deponents",
+      "back": "προσεύχομαι, εξομολογούμαι, εύχομαι, δέχομαι — and μετανοώ, which is active in form and belongs with them in sense"
+    },
+    {
+      "kind": "grammar",
+      "front": "The active-against-reflexive pairs",
+      "back": "σηκώνω/σηκώνομαι, ντύνω/ντύνομαι, πλένω/πλένομαι, ετοιμάζω/ετοιμάζομαι, κουράζω/κουράζομαι, χάνω/χάνομαι, βρίσκω/βρίσκομαι, φέρνω/φέρομαι"
+    }
+  ],
+  "The numerals and the pronouns, as reference": [
+    {
+      "kind": "grammar",
+      "front": "The order of the weak pronouns",
+      "back": "Indirect before direct, and both before the verb: μου το έδωσε. After the verb in the imperative: δώσε μου το. Cypriot puts them after the verb everywhere."
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek says *myself*",
+      "back": "With a noun: ο εαυτός μου, which declines — Αγαπώ τον εαυτό μου. Greek has no reflexive pronoun."
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek says *one another*",
+      "back": "ο ένας τον άλλο"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why Greek has no possessive adjective",
+      "back": "The genitive clitic does the work, placed AFTER the noun: το σπίτι μου, ο πατέρας της, τα παιδιά τους"
+    }
+  ],
+  "The irregular nouns and adjectives": [
+    {
+      "kind": "grammar",
+      "front": "The five nouns with an -ατος or -ότος genitive",
+      "back": "το φως/του φωτός, το γάλα/του γάλακτος, το κρέας/του κρέατος, το γεγονός/του γεγονότος, το καθεστώς/του καθεστώτος"
+    },
+    {
+      "kind": "grammar",
+      "front": "The Greek nouns with no singular",
+      "back": "τα Χριστούγεννα, τα Θεοφάνεια, τα γενέθλια, τα μεσάνυχτα, τα λεφτά, οι διακοπές — hence Καλά Χριστούγεννα, with a plural adjective"
+    },
+    {
+      "kind": "grammar",
+      "front": "The -εως genitive, and where you will meet it",
+      "back": "The learned form of the -ση nouns: ημερομηνία γεννήσεως, η Κυριακή της Αναστάσεως, ώρα ενάρξεως. The commonest learned form on any form, sign or church notice. Read it; write the -ης."
+    },
+    {
+      "kind": "grammar",
+      "front": "ο Γέροντας and του γέροντος",
+      "back": "The modern and the learned forms of the same word — which is why the Elders’ books say Γέροντας Παΐσιος and a liturgical text has του γέροντος"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one genuinely irregular Greek adjective",
+      "back": "πολύς, πολλή, πολύ — single λ in the masculine and neuter nominative singular, double λ everywhere else"
+    },
+    {
+      "kind": "grammar",
+      "front": "The six irregular comparatives",
+      "back": "καλός→καλύτερος, κακός→χειρότερος, πολύς→περισσότερος, λίγος→λιγότερος, μεγάλος→μεγαλύτερος, μικρός→μικρότερος"
+    }
+  ],
+  "The irregular verbs, in one list": [
+    {
+      "kind": "grammar",
+      "front": "The -ερνω / -ελνω pattern",
+      "back": "Nine verbs on one pattern: σέρνω/σύρω, γέρνω/γείρω, δέρνω/δείρω, σπέρνω/σπείρω, φέρνω/φέρω, παίρνω/πάρω, στέλνω/στείλω, πλένω/πλύνω, μένω/μείνω"
+    },
+    {
+      "kind": "grammar",
+      "front": "The eleven learned aorists to recognise on sight",
+      "back": "εγένετο, ήλθε, είπεν/έφη, έδωκε, εγράφη, εκοιμήθη, ανέστη, ετελέσθη, εβαπτίσθη, απεβίωσε, επορεύθη"
+    },
+    {
+      "kind": "grammar",
+      "front": "πρόκειται να",
+      "back": "*It is going to, it is a matter of* — third person singular only, and very common in formal Greek: Πρόκειται να γίνει αύριο."
+    },
+    {
+      "kind": "grammar",
+      "front": "The whole irregularity of the Greek verb, counted",
+      "back": "Thirty core irregulars, nine on the -ερνω pattern, a dozen impersonals, and eleven learned forms to recognise — against English’s two hundred strong verbs"
+    }
+  ],
+  "When a form defeats you": [
+    {
+      "kind": "grammar",
+      "front": "The five steps for an unknown Greek form",
+      "back": "Find the ending; ask what kind of ending it is; strip it and look at the stem; strip the prefix; and put it through Lexiscope"
+    },
+    {
+      "kind": "grammar",
+      "front": "What the Forms track cannot cover",
+      "back": "The learned forms, which are everywhere in church, legal and official texts. For those: identify the root, accept the approximate sense, move on — and that is where the next curriculum begins."
+    },
+    {
+      "kind": "grammar",
+      "front": "The one habit that makes the Forms track stick",
+      "back": "Two minutes of the pair drill and one transformation drill a day. The tables are reference; the drills are the learning."
+    }
   ]
 }

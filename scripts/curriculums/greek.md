@@ -132,12 +132,57 @@ material is graded against them.
 | 5 | Everyday Greek | A2 | 40 | 40 |
 | 6 | The perfect, the passive and the conditional | A2–B1 | 35 | 35 |
 | 7 | Connected speech and the natural register | B1 | 35 | 40 |
-| 8 | Real Greek: listening and reading | B1–B2 | 30 | — |
-| 9 | Writing, argument and register | B2 | 30 | — |
-| 10 | Cypriot Greek | — | 20 | — |
-| 11 | Literature, and ad astra | C1+ | open | — |
-| — | Spelling track, its own modules | — | ~40 | 8 |
-| — | Forms track, its own modules | — | ~40 | 7 |
+| 8 | Real Greek: listening and reading | B1–B2 | 30 | 30 |
+| 9 | Writing, argument and register | B2 | 30 | 30 |
+| 10 | Cypriot Greek | — | 20 | 20 |
+| 11 | Literature, and ad astra | C1+ | open | 19 |
+| — | Spelling track, Spelling 1–5 | — | ~40 | 33 |
+| — | Forms track, Forms 1–5 | — | ~40 | 29 |
+
+**The route is complete** (2026-10-14): **21 modules, 417 lessons, 1,944 cards,
+471 lesson sources.** Eleven stages and both tracks, finished in one pass.
+
+**Stage 11 came out at nineteen lessons rather than "open"** — it is the one
+stage whose length the plan deliberately left unfixed, and nineteen is what the
+material wanted: a method lesson, six on the poets, one on the folk tradition
+and Crete, five on the prose, three on the Church's own writers and the
+essayists, one on the conversation about literature, and two closing. It is a
+stage of maps rather than instruction, and it ends pointing at the classical
+curriculum rather than at anything further here.
+
+**Stage 10 took twenty, as planned.** The honest shape of it is **understand the
+dialect, speak the standard** — because a foreigner speaking Cypriot reads as
+imitation, and because the point of the stage was never a dialect in the
+abstract. It was following the conversation in a parish hall that is more likely
+to be Cypriot than Greek. The lesson on 1974 is the one place in this curriculum
+that required explicit care about what not to say.
+
+**Both tracks finished short of the planned ~40 each** — 33 and 29 — because the
+planned length was a guess and the material did not need padding. Spelling
+2 and 3 carry the argument that most Greek spelling is grammar: the endings are
+regular even when the roots are not, so **the drills are ending drills and the
+cards are root cards**. Spelling 4 and 5 take the irreducible part — the double
+consonants, the prefixes, the homophones — and the mechanics. Forms 2 to 5 are
+the verb in full, built on the one fact that organises it: **aspect first, tense
+second.**
+
+**Stage 9 keeps one learned-register exception** (2026-10-14). His ruling is that
+the learned register is skipped and remembered for the later classical
+curriculum, and stage 9 holds to it with a single exception: **the forms of
+address for clergy and monastics**. A letter to a bishop that opens with
+anything else is not informal, it is wrong, and the forms are formulae rather
+than a register to control. The stage also names the seven other learned items
+that are live in ordinary modern writing — **ο οποίος**, **ο εν λόγω**, the
+fixed datives, **εκ/εξ**, **υπέρ/κατά**, the formal verb set — and says to read
+the rest and leave it alone.
+
+**Stage 8 is a method stage** (2026-10-14), and deliberately so. It adds no
+grammar. Thirty lessons on how to choose material, how to work at and above
+your level, what to card and what to let go, how to read a first novel, and how
+to keep a habit running for years — because from here the language is acquired
+rather than taught. The Church's own modern Greek is named as the best reading
+material available to him, for the reason that comprehension follows prediction
+and he can predict that content.
 
 **Stage 7 was re-scoped** (2026-10-14). The plan had it as "pronouns, clauses and
 connected speech", and the pronouns and clauses were finished in stage 3. What
@@ -209,6 +254,12 @@ Free, all of them, except the two he already owns.
 | **Morphology** | **Neurolingo Lexiscope** — inflects any Greek word. Free, capped daily. |
 | **Literature** | **snhell.gr** — the Centre for Neo-Hellenic Studies archive, with recordings of authors reading their own work |
 | **Lyrics** | **stixoi.info** — the lyrics of essentially every Greek song |
+| **The daily text** | **saint.gr** — today's saint, every day, in short modern Greek. Four minutes. |
+| **Church news** | **romfea.gr** — moderate modern Greek about the events the parish talks about |
+| **The news** | **ERT** (ert.gr) — plain standard Greek, plus radio and the ERTFLIX archive |
+| **A first book** | the **Hellenic Bible Society's** modern-Greek New Testament, free online |
+| **Customs and idiom** | **Omilo's** free articles and podcasts |
+| **Correction** | **LangCorrect** and **Journaly** — you write a paragraph, natives correct it, you correct their English. Free, and the scarcest resource in self-teaching. |
 
 **What is deliberately not here:** paid apps, paid textbooks, and the
 *Klik στα ελληνικά* series, which is excellent and is not free beyond samples.
@@ -222,3 +273,11 @@ Free, all of them, except the two he already owns.
 - [Kypros.org Greek lessons](http://www.kypros.org/)
 - [snhell.gr](http://www.snhell.gr/en/)
 - [Neurolingo Lexiscope](http://www.neurolingo.gr/en/online_tools/lexiscope.htm)
+- [Ellinomatheia — sample papers](https://www.ellinomatheia.gr/)
+- [saint.gr — the daily saint](https://www.saint.gr/)
+- [Romfea — church news](https://www.romfea.gr/)
+- [ERT](https://www.ert.gr/)
+- [Hellenic Bible Society](https://www.hbs.gr/)
+- [Omilo — free articles and podcasts](https://omilo.com/for-free/)
+- [LangCorrect](https://langcorrect.com/)
+- [Journaly](https://journaly.com/)
