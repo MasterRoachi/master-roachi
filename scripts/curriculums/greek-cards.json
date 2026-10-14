@@ -2858,5 +2858,1095 @@
       "front": "Έτρωγα όταν ήρθε or Έφαγα και έφυγα",
       "back": "I was eating when he came · I ate and left"
     }
+  ],
+  "The house and the rooms": [
+    {
+      "kind": "word",
+      "front": "το διαμέρισμα",
+      "back": "flat"
+    },
+    {
+      "kind": "word",
+      "front": "η πολυκατοικία",
+      "back": "block of flats"
+    },
+    {
+      "kind": "word",
+      "front": "το σαλόνι",
+      "back": "sitting room"
+    },
+    {
+      "kind": "word",
+      "front": "η κουζίνα",
+      "back": "kitchen — and *cooker*"
+    },
+    {
+      "kind": "word",
+      "front": "η κρεβατοκάμαρα",
+      "back": "bedroom"
+    },
+    {
+      "kind": "word",
+      "front": "το μπάνιο",
+      "back": "bathroom"
+    },
+    {
+      "kind": "word",
+      "front": "ο όροφος",
+      "back": "floor, storey",
+      "extra": "το ισόγειο is the ground floor."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μένω σε διαμέρισμα στον δεύτερο όροφο.",
+      "back": "I live in a flat on the second floor."
+    }
+  ],
+  "Things in the house": [
+    {
+      "kind": "word",
+      "front": "το ψυγείο",
+      "back": "fridge"
+    },
+    {
+      "kind": "word",
+      "front": "ο φούρνος",
+      "back": "oven — and *bakery*"
+    },
+    {
+      "kind": "word",
+      "front": "το πλυντήριο",
+      "back": "washing machine"
+    },
+    {
+      "kind": "word",
+      "front": "το μπρίκι",
+      "back": "the small pot for Greek coffee"
+    },
+    {
+      "kind": "word",
+      "front": "το εικονοστάσι",
+      "back": "the icon corner of a Greek home"
+    },
+    {
+      "kind": "word",
+      "front": "το κανδήλι",
+      "back": "the oil lamp before the icons"
+    },
+    {
+      "kind": "word",
+      "front": "ανάβω / σβήνω",
+      "back": "I light, switch on / I put out, switch off",
+      "extra": "ανάβω το κερί — I light the candle."
+    },
+    {
+      "kind": "sentence",
+      "front": "Χάλασε το ψυγείο.",
+      "back": "The fridge has broken."
+    }
+  ],
+  "The day: morning to night": [
+    {
+      "kind": "word",
+      "front": "ξυπνάω / σηκώνομαι",
+      "back": "I wake up / I get up"
+    },
+    {
+      "kind": "word",
+      "front": "ντύνομαι",
+      "back": "I get dressed"
+    },
+    {
+      "kind": "word",
+      "front": "ξεκουράζομαι",
+      "back": "I rest"
+    },
+    {
+      "kind": "word",
+      "front": "πάω για ύπνο",
+      "back": "I go to bed"
+    },
+    {
+      "kind": "word",
+      "front": "το μεσημέρι",
+      "back": "midday and the early afternoon — when Greece rests"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δουλεύω μέχρι τις πέντε.",
+      "back": "I work until five."
+    }
+  ],
+  "Food: the basics": [
+    {
+      "kind": "word",
+      "front": "το ψωμί / το τυρί / το αβγό",
+      "back": "bread / cheese / egg"
+    },
+    {
+      "kind": "word",
+      "front": "το λάδι / το αλάτι / το μέλι",
+      "back": "oil / salt / honey"
+    },
+    {
+      "kind": "word",
+      "front": "το κρέας / το ψάρι / το κοτόπουλο",
+      "back": "meat / fish / chicken"
+    },
+    {
+      "kind": "word",
+      "front": "νηστίσιμο",
+      "back": "fasting food — without meat, dairy and eggs",
+      "extra": "Είναι νηστίσιμο; is the question to know in Lent."
+    },
+    {
+      "kind": "word",
+      "front": "τα λαδερά",
+      "back": "dishes cooked in oil — the backbone of fasting food"
+    },
+    {
+      "kind": "word",
+      "front": "νηστεύω",
+      "back": "I fast"
+    }
+  ],
+  "At the bakery and the butcher": [
+    {
+      "kind": "word",
+      "front": "το κουλούρι",
+      "back": "the sesame bread ring"
+    },
+    {
+      "kind": "word",
+      "front": "η τυρόπιτα / η σπανακόπιτα",
+      "back": "cheese pie / spinach pie"
+    },
+    {
+      "kind": "word",
+      "front": "το τσουρέκι",
+      "back": "the sweet bread of Easter"
+    },
+    {
+      "kind": "word",
+      "front": "η βασιλόπιτα",
+      "back": "the New Year cake, with a coin in it"
+    },
+    {
+      "kind": "word",
+      "front": "ο κιμάς",
+      "back": "mince"
+    },
+    {
+      "kind": "word",
+      "front": "τα παϊδάκια",
+      "back": "lamb chops",
+      "extra": "With the diaeresis — παιδάκια is *little children*."
+    },
+    {
+      "kind": "sentence",
+      "front": "Να 'στε καλά.",
+      "back": "Be well — the shopkeeper's farewell."
+    }
+  ],
+  "At the supermarket": [
+    {
+      "kind": "word",
+      "front": "τα γαλακτοκομικά",
+      "back": "dairy — *milk-products*"
+    },
+    {
+      "kind": "word",
+      "front": "τα οπωρολαχανικά",
+      "back": "fruit and vegetables"
+    },
+    {
+      "kind": "word",
+      "front": "η προσφορά / η έκπτωση",
+      "back": "special offer / discount"
+    },
+    {
+      "kind": "word",
+      "front": "τα ψιλά",
+      "back": "small change",
+      "extra": "Δεν έχω ψιλά is a sentence you will need."
+    },
+    {
+      "kind": "word",
+      "front": "η ημερομηνία λήξης",
+      "back": "expiry date"
+    },
+    {
+      "kind": "word",
+      "front": "διατηρείται στο ψυγείο",
+      "back": "keep refrigerated",
+      "extra": "A mediopassive, as signs are."
+    }
+  ],
+  "Fruit and vegetables": [
+    {
+      "kind": "word",
+      "front": "η ντομάτα / το αγγούρι",
+      "back": "tomato / cucumber"
+    },
+    {
+      "kind": "word",
+      "front": "το κρεμμύδι / το σκόρδο",
+      "back": "onion / garlic"
+    },
+    {
+      "kind": "word",
+      "front": "η μελιτζάνα / το κολοκυθάκι",
+      "back": "aubergine / courgette"
+    },
+    {
+      "kind": "word",
+      "front": "τα χόρτα",
+      "back": "boiled wild greens — a staple, with no English word"
+    },
+    {
+      "kind": "word",
+      "front": "ο μαϊντανός / ο άνηθος / η ρίγανη",
+      "back": "parsley / dill / oregano"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αυτά είναι της εποχής;",
+      "back": "Are these in season?"
+    }
+  ],
+  "At the taverna: the menu": [
+    {
+      "kind": "word",
+      "front": "της ώρας",
+      "back": "grilled to order"
+    },
+    {
+      "kind": "word",
+      "front": "τα μαγειρευτά",
+      "back": "the day's cooked dishes, ready"
+    },
+    {
+      "kind": "word",
+      "front": "οι μεζέδες",
+      "back": "small plates to share"
+    },
+    {
+      "kind": "word",
+      "front": "η χωριάτικη",
+      "back": "the village salad"
+    },
+    {
+      "kind": "word",
+      "front": "το τζατζίκι",
+      "back": "yoghurt, cucumber and garlic"
+    },
+    {
+      "kind": "word",
+      "front": "τα γεμιστά",
+      "back": "stuffed tomatoes and peppers"
+    },
+    {
+      "kind": "word",
+      "front": "χύμα κρασί",
+      "back": "house wine from the barrel"
+    },
+    {
+      "kind": "word",
+      "front": "Κ/Ψ",
+      "back": "κατεψυγμένο — frozen, which a menu must declare"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι μαγειρευτά έχετε σήμερα;",
+      "back": "What cooked dishes do you have today?",
+      "extra": "The question that marks someone who knows how to order."
+    }
+  ],
+  "Ordering a meal, in full": [
+    {
+      "kind": "word",
+      "front": "Ορίστε",
+      "back": "here you are · go ahead · pardon? · yes? — the word of a thousand uses"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλή συνέχεια!",
+      "back": "Have a good rest of the day — said on leaving anywhere."
+    },
+    {
+      "kind": "word",
+      "front": "κερασμένο",
+      "back": "on the house",
+      "extra": "Σας το κεράσαμε — it's on us."
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν μπορώ άλλο!",
+      "back": "I cannot manage any more!"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μπορείτε να μας φέρετε λίγο ψωμί;",
+      "back": "Could you bring us some bread?"
+    }
+  ],
+  "Greek food: what the dishes actually are": [
+    {
+      "kind": "word",
+      "front": "ο μουσακάς / το παστίτσιο",
+      "back": "the two baked béchamel dishes"
+    },
+    {
+      "kind": "word",
+      "front": "το στιφάδο / το γιουβέτσι",
+      "back": "braised with onions / baked with orzo"
+    },
+    {
+      "kind": "word",
+      "front": "η μαγειρίτσα",
+      "back": "the soup eaten after the Resurrection service"
+    },
+    {
+      "kind": "word",
+      "front": "το κοκορέτσι",
+      "back": "the spit-roasted offal of Pascha"
+    },
+    {
+      "kind": "word",
+      "front": "τα μελομακάρονα / οι κουραμπιέδες",
+      "back": "the two Christmas biscuits"
+    },
+    {
+      "kind": "word",
+      "front": "η λαγάνα",
+      "back": "the flatbread of Clean Monday"
+    },
+    {
+      "kind": "word",
+      "front": "Καθαρά Δευτέρα",
+      "back": "Clean Monday — the start of Lent, eaten outdoors with kites"
+    }
+  ],
+  "The kafeneio, properly": [
+    {
+      "kind": "word",
+      "front": "φρέντο καπουτσίνο",
+      "back": "cold cappuccino, shaken — what Greece actually drinks"
+    },
+    {
+      "kind": "sentence",
+      "front": "Εγώ κερνάω.",
+      "back": "My treat."
+    },
+    {
+      "kind": "word",
+      "front": "το ουζερί / το τσιπουράδικο",
+      "back": "the places where spirits come with small plates"
+    },
+    {
+      "kind": "sentence",
+      "front": "Έλα να πιούμε έναν καφέ.",
+      "back": "Come and have a coffee."
+    }
+  ],
+  "Clothes": [
+    {
+      "kind": "word",
+      "front": "το πουκάμισο / το παντελόνι",
+      "back": "shirt / trousers"
+    },
+    {
+      "kind": "word",
+      "front": "τα παπούτσια / οι κάλτσες",
+      "back": "shoes / socks"
+    },
+    {
+      "kind": "word",
+      "front": "φοράω",
+      "back": "I wear"
+    },
+    {
+      "kind": "word",
+      "front": "μου πάει / μου κάνει",
+      "back": "it suits me / it fits me",
+      "extra": "The μου αρέσει pattern."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι πρέπει να φορέσω;",
+      "back": "What should I wear?"
+    }
+  ],
+  "Shopping for clothes": [
+    {
+      "kind": "word",
+      "front": "το δοκιμαστήριο",
+      "back": "fitting room"
+    },
+    {
+      "kind": "word",
+      "front": "το μέγεθος / το νούμερο",
+      "back": "size / shoe size"
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχετε πιο μεγάλο;",
+      "back": "Do you have a bigger one?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα το σκεφτώ.",
+      "back": "I will think about it — the polite exit."
+    },
+    {
+      "kind": "word",
+      "front": "οι εκπτώσεις",
+      "back": "the sales — fixed by law to two periods a year"
+    }
+  ],
+  "The body": [
+    {
+      "kind": "word",
+      "front": "το κεφάλι / το χέρι / το πόδι",
+      "back": "head / hand and arm / foot and leg",
+      "extra": "Greek does not split hand from arm, or foot from leg."
+    },
+    {
+      "kind": "word",
+      "front": "ο λαιμός / η πλάτη / η κοιλιά",
+      "back": "throat / back / stomach"
+    },
+    {
+      "kind": "word",
+      "front": "η γλώσσα",
+      "back": "tongue — and *language*"
+    },
+    {
+      "kind": "sentence",
+      "front": "Με πονάει το κεφάλι.",
+      "back": "My head hurts."
+    },
+    {
+      "kind": "sentence",
+      "front": "Από το στόμα σου και στον Θεό.",
+      "back": "From your mouth to God's ear."
+    }
+  ],
+  "At the doctor": [
+    {
+      "kind": "sentence",
+      "front": "Δεν αισθάνομαι καλά.",
+      "back": "I do not feel well."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχω πυρετό.",
+      "back": "I have a temperature."
+    },
+    {
+      "kind": "sentence",
+      "front": "Εδώ και τρεις μέρες.",
+      "back": "For three days now."
+    },
+    {
+      "kind": "word",
+      "front": "η συνταγή / η αντιβίωση",
+      "back": "prescription / antibiotics"
+    },
+    {
+      "kind": "sentence",
+      "front": "Πάρτε βαθιά ανάσα.",
+      "back": "Take a deep breath — and it is an imperative plural."
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα περάσει.",
+      "back": "It will pass."
+    }
+  ],
+  "At the pharmacy": [
+    {
+      "kind": "sentence",
+      "front": "Έχετε κάτι για τον πονοκέφαλο;",
+      "back": "Do you have something for a headache?",
+      "extra": "Έχετε κάτι για…; is the whole lesson."
+    },
+    {
+      "kind": "word",
+      "front": "το παυσίπονο",
+      "back": "painkiller"
+    },
+    {
+      "kind": "word",
+      "front": "χωρίς συνταγή",
+      "back": "without a prescription"
+    },
+    {
+      "kind": "word",
+      "front": "διανυκτερεύον φαρμακείο",
+      "back": "the duty pharmacy, open overnight"
+    }
+  ],
+  "Money and the bank": [
+    {
+      "kind": "word",
+      "front": "ο λογαριασμός",
+      "back": "account — and *the bill*"
+    },
+    {
+      "kind": "word",
+      "front": "τα μετρητά",
+      "back": "cash"
+    },
+    {
+      "kind": "word",
+      "front": "η ανάληψη",
+      "back": "withdrawal"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κρατήστε τα ρέστα.",
+      "back": "Keep the change."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μου δίνετε απόδειξη;",
+      "back": "Could you give me a receipt?"
+    },
+    {
+      "kind": "word",
+      "front": "Πληκτρολογήστε τον κωδικό σας",
+      "back": "enter your PIN — what the cash machine says"
+    }
+  ],
+  "The post office and deliveries": [
+    {
+      "kind": "word",
+      "front": "τα ΕΛΤΑ",
+      "back": "the Greek post office"
+    },
+    {
+      "kind": "word",
+      "front": "συστημένο",
+      "back": "registered"
+    },
+    {
+      "kind": "word",
+      "front": "ο παραλήπτης / ο αποστολέας",
+      "back": "recipient / sender"
+    },
+    {
+      "kind": "word",
+      "front": "το πατρώνυμο",
+      "back": "father's name — which Greek forms always ask for"
+    },
+    {
+      "kind": "word",
+      "front": "η υπογραφή",
+      "back": "signature — literally *under-writing*"
+    }
+  ],
+  "The telephone": [
+    {
+      "kind": "word",
+      "front": "Παρακαλώ; / Ορίστε;",
+      "back": "Hello? — the two phone answers"
+    },
+    {
+      "kind": "word",
+      "front": "παίρνω τηλέφωνο",
+      "back": "I call, I ring"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν σας ακούω καλά.",
+      "back": "I cannot hear you well."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τα λέμε!",
+      "back": "See you! / Talk soon."
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα σας ξαναπάρω.",
+      "back": "I will call you back."
+    }
+  ],
+  "Making an appointment": [
+    {
+      "kind": "word",
+      "front": "βολεύει",
+      "back": "it suits, it is convenient",
+      "extra": "Μου βολεύει · Δεν μου βολεύει."
+    },
+    {
+      "kind": "word",
+      "front": "κανονίζω",
+      "back": "I arrange",
+      "extra": "Κανονίστηκε — it's settled."
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα αργήσω λίγο.",
+      "back": "I will be a bit late."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τα κανονίζουμε.",
+      "back": "We'll sort it out — which means nothing has been fixed."
+    }
+  ],
+  "Travel: buses, trains and boats": [
+    {
+      "kind": "word",
+      "front": "το ΚΤΕΛ",
+      "back": "the intercity bus network"
+    },
+    {
+      "kind": "word",
+      "front": "αναχωρήσεις / αφίξεις",
+      "back": "departures / arrivals"
+    },
+    {
+      "kind": "word",
+      "front": "με επιστροφή / απλή μετάβαση",
+      "back": "return / one way"
+    },
+    {
+      "kind": "word",
+      "front": "η καθυστέρηση",
+      "back": "delay"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μου λέτε πού να κατεβώ;",
+      "back": "Could you tell me where to get off?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Απαγορεύτηκε ο απόπλους.",
+      "back": "The sailing has been cancelled — because of the wind."
+    }
+  ],
+  "At the airport": [
+    {
+      "kind": "word",
+      "front": "εσωτερικού / εξωτερικού",
+      "back": "domestic / international — genitives, on the signs"
+    },
+    {
+      "kind": "word",
+      "front": "η πύλη / η επιβίβαση",
+      "back": "gate / boarding"
+    },
+    {
+      "kind": "word",
+      "front": "παραλαβή αποσκευών",
+      "back": "baggage reclaim"
+    },
+    {
+      "kind": "sentence",
+      "front": "Οι επιβάτες παρακαλούνται να προσέλθουν…",
+      "back": "Passengers are requested to proceed… — a mediopassive and a να."
+    }
+  ],
+  "Booking a room": [
+    {
+      "kind": "word",
+      "front": "δίκλινο / μονόκλινο",
+      "back": "double room / single room",
+      "extra": "Built from the numbers: *two-bed*, *one-bed*."
+    },
+    {
+      "kind": "word",
+      "front": "η κράτηση",
+      "back": "the booking"
+    },
+    {
+      "kind": "word",
+      "front": "τα ενοικιαζόμενα δωμάτια",
+      "back": "rooms to rent — the common cheap option"
+    },
+    {
+      "kind": "word",
+      "front": "η φιλοξενία",
+      "back": "hospitality — *stranger-loving*, and taken seriously"
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχετε θέση για ένα βράδυ;",
+      "back": "Do you have room for a night? — at a monastery guesthouse."
+    }
+  ],
+  "Directions, in full": [
+    {
+      "kind": "sentence",
+      "front": "Πώς πάω στο…;",
+      "back": "How do I get to…?"
+    },
+    {
+      "kind": "word",
+      "front": "ευθεία / στρίψτε αριστερά",
+      "back": "straight on / turn left"
+    },
+    {
+      "kind": "word",
+      "front": "στα φανάρια / στη γωνία",
+      "back": "at the lights / on the corner"
+    },
+    {
+      "kind": "word",
+      "front": "το περίπτερο",
+      "back": "the kiosk — a standard landmark"
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα το δείτε.",
+      "back": "You'll see it — how Greeks end directions."
+    }
+  ],
+  "The city and its services": [
+    {
+      "kind": "word",
+      "front": "η λαϊκή",
+      "back": "the weekly street market"
+    },
+    {
+      "kind": "word",
+      "front": "το ΚΕΠ",
+      "back": "the citizens' service centre, where paperwork happens"
+    },
+    {
+      "kind": "word",
+      "front": "ο ΑΦΜ / το ΑΜΚΑ",
+      "back": "tax number / social security number"
+    },
+    {
+      "kind": "word",
+      "front": "τα χαρτιά",
+      "back": "the papers, the documents",
+      "extra": "Θέλει χαρτιά — the summary of any Greek process."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι ώρες είστε ανοιχτά;",
+      "back": "What are your opening hours?"
+    }
+  ],
+  "Work and jobs": [
+    {
+      "kind": "sentence",
+      "front": "Τι δουλειά κάνεις;",
+      "back": "What work do you do?"
+    },
+    {
+      "kind": "word",
+      "front": "ο υπάλληλος / ο συνάδελφος",
+      "back": "employee / colleague"
+    },
+    {
+      "kind": "word",
+      "front": "η απεργία",
+      "back": "strike — frequent, and it affects transport"
+    },
+    {
+      "kind": "word",
+      "front": "ο συνταξιούχος",
+      "back": "pensioner"
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχω πολλή δουλειά αυτή τη βδομάδα.",
+      "back": "I have a lot of work on this week."
+    }
+  ],
+  "School and studies": [
+    {
+      "kind": "word",
+      "front": "το δημοτικό / το γυμνάσιο / το λύκειο",
+      "back": "primary / lower secondary / upper secondary"
+    },
+    {
+      "kind": "word",
+      "front": "το φροντιστήριο",
+      "back": "the private cramming school — a Greek institution"
+    },
+    {
+      "kind": "word",
+      "front": "οι πανελλήνιες",
+      "back": "the national university entrance exams"
+    },
+    {
+      "kind": "word",
+      "front": "τα θρησκευτικά",
+      "back": "religious education — taught as Orthodoxy in state schools"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καταλαβαίνω πιο καλά απ' ό,τι μιλάω.",
+      "back": "I understand better than I speak."
+    }
+  ],
+  "The family, in full": [
+    {
+      "kind": "word",
+      "front": "ο πεθερός / η πεθερά",
+      "back": "father-in-law / mother-in-law"
+    },
+    {
+      "kind": "word",
+      "front": "ο γαμπρός / η νύφη",
+      "back": "son-in-law and bridegroom / daughter-in-law and bride"
+    },
+    {
+      "kind": "word",
+      "front": "τα συμπέθερα",
+      "back": "the two sets of in-laws, to each other — no English word"
+    },
+    {
+      "kind": "word",
+      "front": "το σόι",
+      "back": "the extended family, the clan"
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχεις οικογένεια;",
+      "back": "Are you married with children? — which is what it means."
+    },
+    {
+      "kind": "word",
+      "front": "η κουμπαριά",
+      "back": "the kinship between a family and their wedding sponsor or their child's godparent — treated as family, and in places an impediment to marriage"
+    }
+  ],
+  "Feelings and opinions": [
+    {
+      "kind": "word",
+      "front": "κουρασμένος / χαρούμενος / λυπημένος",
+      "back": "tired / happy / sad"
+    },
+    {
+      "kind": "word",
+      "front": "νιώθω",
+      "back": "I feel",
+      "extra": "νιώθω καλά, νιώθω κουρασμένος."
+    },
+    {
+      "kind": "sentence",
+      "front": "Νομίζω ότι…",
+      "back": "I think that…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι να κάνουμε;",
+      "back": "What can you do? — the Greek shrug."
+    },
+    {
+      "kind": "word",
+      "front": "ευτυχώς / δυστυχώς",
+      "back": "fortunately / unfortunately"
+    }
+  ],
+  "Agreeing and disagreeing": [
+    {
+      "kind": "sentence",
+      "front": "Εξαρτάται.",
+      "back": "It depends."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τέλος πάντων.",
+      "back": "Anyway — the universal subject-changer."
+    },
+    {
+      "kind": "sentence",
+      "front": "Είμαι ξένος, ακούω και μαθαίνω.",
+      "back": "I am a foreigner, I listen and learn."
+    },
+    {
+      "kind": "sentence",
+      "front": "Διαφωνώ.",
+      "back": "I disagree."
+    }
+  ],
+  "Small talk, Greek style": [
+    {
+      "kind": "sentence",
+      "front": "Τι νέα;",
+      "back": "What's new? — asked constantly, and answered Τίποτα ιδιαίτερο."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έφαγες;",
+      "back": "Have you eaten? — a real question, and a form of care."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έτσι είναι η ζωή.",
+      "back": "That's life."
+    },
+    {
+      "kind": "sentence",
+      "front": "Πάει ο καιρός.",
+      "back": "How time passes."
+    },
+    {
+      "kind": "sentence",
+      "front": "Χαιρετισμούς στην οικογένεια.",
+      "back": "Regards to the family — the standard parting courtesy."
+    },
+    {
+      "kind": "sentence",
+      "front": "Ευχαριστώ, προσπαθώ.",
+      "back": "Thank you, I'm trying — the right answer to a compliment on your Greek."
+    }
+  ],
+  "Invitations: accepting and refusing": [
+    {
+      "kind": "sentence",
+      "front": "Ευχαρίστως!",
+      "back": "With pleasure! — the one-word yes."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχουμε τραπέζι την Κυριακή.",
+      "back": "We're having people over on Sunday."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μη φέρεις τίποτα!",
+      "back": "Don't bring anything! — said, and not meant."
+    },
+    {
+      "kind": "sentence",
+      "front": "Την άλλη φορά σίγουρα.",
+      "back": "Next time for certain — how a refusal is softened."
+    }
+  ],
+  "At someone's house": [
+    {
+      "kind": "sentence",
+      "front": "Καλώς ήρθατε! — Καλώς σας βρήκα.",
+      "back": "Welcome! — and the guest's reply."
+    },
+    {
+      "kind": "sentence",
+      "front": "Χόρτασα.",
+      "back": "I am full — the word that works when φτάνει is ignored."
+    },
+    {
+      "kind": "sentence",
+      "front": "Και στα δικά σας!",
+      "back": "And may your own come too — the reply at a wedding or baptism."
+    },
+    {
+      "kind": "sentence",
+      "front": "Περάσαμε πολύ ωραία.",
+      "back": "We had a lovely time."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μείνε κι άλλο!",
+      "back": "Stay longer! — and expect to hear it three times before you get out"
+    }
+  ],
+  "The parish hall": [
+    {
+      "kind": "sentence",
+      "front": "Μπορείτε να με βοηθήσετε με τα ελληνικά μου;",
+      "back": "Could you help me with my Greek? — the most productive sentence in this lesson."
+    },
+    {
+      "kind": "sentence",
+      "front": "Θέλω να μάθω ελληνικά για να μιλάω με εσάς.",
+      "back": "I want to learn Greek in order to talk to you."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μιλάτε πολύ γρήγορα για μένα!",
+      "back": "You speak too fast for me! — always taken well."
+    },
+    {
+      "kind": "sentence",
+      "front": "Ακούω και μαθαίνω.",
+      "back": "I listen and I learn."
+    }
+  ],
+  "Name days, feasts and what to say": [
+    {
+      "kind": "word",
+      "front": "η γιορτή",
+      "back": "the name day — which matters more than a birthday"
+    },
+    {
+      "kind": "sentence",
+      "front": "Να τα εκατοστήσεις!",
+      "back": "May you reach a hundred — to the person celebrating."
+    },
+    {
+      "kind": "sentence",
+      "front": "Και του χρόνου!",
+      "back": "And next year too."
+    },
+    {
+      "kind": "word",
+      "front": "το πανηγύρι",
+      "back": "the parish's patronal festival"
+    },
+    {
+      "kind": "word",
+      "front": "15 Αυγούστου",
+      "back": "the Dormition — the name day of every Μαρία, Παναγιώτης and Δέσποινα"
+    },
+    {
+      "kind": "word",
+      "front": "23 Απριλίου / 26 Οκτωβρίου / 6 Δεκεμβρίου",
+      "back": "St George / St Demetrios / St Nicholas"
+    }
+  ],
+  "Reading: menus, notices and messages": [
+    {
+      "kind": "word",
+      "front": "π.μ. / μ.μ.",
+      "back": "a.m. / p.m."
+    },
+    {
+      "kind": "word",
+      "front": "π.χ. / κ.λπ. / δηλ.",
+      "back": "e.g. / etc. / that is"
+    },
+    {
+      "kind": "word",
+      "front": "Λόγω έργων",
+      "back": "because of works — on street notices"
+    },
+    {
+      "kind": "word",
+      "front": "Απαγορεύεται η είσοδος",
+      "back": "No entry"
+    }
+  ],
+  "Speaking: your first real conversations": [
+    {
+      "kind": "sentence",
+      "front": "Πώς να το πω…",
+      "back": "How shall I put it… — a filler that keeps you in Greek."
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν ξέρω τη λέξη, αλλά είναι σαν…",
+      "back": "I don't know the word, but it's like…"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μισό λεπτό…",
+      "back": "Just a moment…"
+    },
+    {
+      "kind": "grammar",
+      "front": "The one habit that ends people's Greek",
+      "back": "Switching to English when it gets hard — because then every conversation becomes English"
+    }
   ]
 }

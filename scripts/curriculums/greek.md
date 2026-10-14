@@ -129,7 +129,7 @@ material is graded against them.
 | 2 | First Greek: being, having, and the noun | A1 | 35 | 36 |
 | 3 | The cases, in use | A1–A2 | 35 | 35 |
 | 4 | Verbs and aspect | A2 | 40 | 40 |
-| 5 | Everyday Greek | A2 | 40 | — |
+| 5 | Everyday Greek | A2 | 40 | 40 |
 | 6 | The perfect, the passive and the conditional | A2–B1 | 35 | — |
 | 7 | Pronouns, clauses and connected speech | B1 | 35 | — |
 | 8 | Real Greek: listening and reading | B1–B2 | 30 | — |
