@@ -130,14 +130,21 @@ material is graded against them.
 | 3 | The cases, in use | A1–A2 | 35 | 35 |
 | 4 | Verbs and aspect | A2 | 40 | 40 |
 | 5 | Everyday Greek | A2 | 40 | 40 |
-| 6 | The perfect, the passive and the conditional | A2–B1 | 35 | — |
-| 7 | Pronouns, clauses and connected speech | B1 | 35 | — |
+| 6 | The perfect, the passive and the conditional | A2–B1 | 35 | 35 |
+| 7 | Connected speech and the natural register | B1 | 35 | 40 |
 | 8 | Real Greek: listening and reading | B1–B2 | 30 | — |
 | 9 | Writing, argument and register | B2 | 30 | — |
 | 10 | Cypriot Greek | — | 20 | — |
 | 11 | Literature, and ad astra | C1+ | open | — |
 | — | Spelling track, its own modules | — | ~40 | 8 |
 | — | Forms track, its own modules | — | ~40 | 7 |
+
+**Stage 7 was re-scoped** (2026-10-14). The plan had it as "pronouns, clauses and
+connected speech", and the pronouns and clauses were finished in stage 3. What
+was left is the half that matters and that no textbook covers: the particles,
+the idiom, the register, the gestures, the cultural references a conversation
+assumes, and the seven adoptions that make correct Greek sound Greek. It came
+out at forty lessons rather than thirty-five.
 
 **Stage 4 absorbed the past tenses** (rewritten 2026-10-14). The plan had them
 in stage 6, and aspect cannot be learned without them: the aorist against the

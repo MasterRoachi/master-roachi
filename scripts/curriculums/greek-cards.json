@@ -3948,5 +3948,1530 @@
       "front": "The one habit that ends people's Greek",
       "back": "Switching to English when it gets hard — because then every conversation becomes English"
     }
+  ],
+  "The perfect: έχω γράψει": [
+    {
+      "kind": "grammar",
+      "front": "How the perfect is formed",
+      "back": "έχω plus the perfective stem with -ει — and the second word never changes",
+      "extra": "έχω γράψει, έχεις γράψει, έχουμε γράψει."
+    },
+    {
+      "kind": "grammar",
+      "front": "What έχω γράψει's second word is",
+      "back": "A frozen descendant of the ancient infinitive — the one piece of that morphology left in the modern verb"
+    },
+    {
+      "kind": "grammar",
+      "front": "Where the pronoun goes in a perfect",
+      "back": "On έχω — Το έχω δει, never έχω το δει"
+    },
+    {
+      "kind": "grammar",
+      "front": "The mediopassive perfect",
+      "back": "έχω κουραστεί, έχω ετοιμαστεί, έχει γραφτεί — with -τεί or -θεί"
+    }
+  ],
+  "What the perfect is for": [
+    {
+      "kind": "grammar",
+      "front": "Why Greek uses the perfect less than English",
+      "back": "The aorist covers most of it — Έφαγες; not έχεις φάει",
+      "extra": "Have you eaten? · I have just arrived · He has gone out — all aorist in Greek."
+    },
+    {
+      "kind": "grammar",
+      "front": "How Greek says *I have lived here ten years*",
+      "back": "Μένω εδώ δέκα χρόνια — the present, because it is still going on"
+    }
+  ],
+  "The pluperfect and the future perfect": [
+    {
+      "kind": "grammar",
+      "front": "είχα γράψει",
+      "back": "I had written — είχα plus the same invariable form"
+    },
+    {
+      "kind": "sentence",
+      "front": "Όταν ήρθα, είχε φύγει.",
+      "back": "When I arrived, he had left."
+    },
+    {
+      "kind": "grammar",
+      "front": "θα έχει φύγει",
+      "back": "he must have left, he will have left by now",
+      "extra": "θα plus a perfect is the inferential *must have*."
+    }
+  ],
+  "The conditional: θα έγραφα": [
+    {
+      "kind": "grammar",
+      "front": "How the conditional is formed",
+      "back": "θα plus the imperfect — θα έγραφα, I would write"
+    },
+    {
+      "kind": "grammar",
+      "front": "θα's three jobs",
+      "back": "θα + perfective = will · θα + present = will be …-ing · θα + imperfect = would"
+    },
+    {
+      "kind": "sentence",
+      "front": "Θα μπορούσατε να μου πείτε…;",
+      "back": "Could you tell me…? — the full polite form"
+    },
+    {
+      "kind": "grammar",
+      "front": "πρέπει · θα έπρεπε · έπρεπε",
+      "back": "must · ought to · should have — a politeness scale, and the last one carries reproach"
+    },
+    {
+      "kind": "grammar",
+      "front": "θα είχα γράψει",
+      "back": "I would have written — the past conditional"
+    }
+  ],
+  "Real conditions: αν": [
+    {
+      "kind": "grammar",
+      "front": "The real condition",
+      "back": "αν plus the present or perfective, θα plus the perfective — Αν έχω χρόνο, θα έρθω"
+    },
+    {
+      "kind": "grammar",
+      "front": "αν or όταν",
+      "back": "αν = if (and maybe not) · όταν = when (and he will)"
+    },
+    {
+      "kind": "grammar",
+      "front": "What μέχρι να and πριν always take",
+      "back": "The perfective — a single completed point"
+    }
+  ],
+  "Unreal conditions": [
+    {
+      "kind": "grammar",
+      "front": "The unreal present condition",
+      "back": "Both halves imperfect — Αν είχα χρόνο, θα ερχόμουν"
+    },
+    {
+      "kind": "grammar",
+      "front": "The unreal past condition",
+      "back": "Both halves pluperfect — Αν είχα ξέρει, θα είχα έρθει",
+      "extra": "And in speech the imperfect does duty for both: Αν το ήξερα, θα ερχόμουν."
+    },
+    {
+      "kind": "grammar",
+      "front": "The mnemonic for unreal conditions",
+      "back": "Both halves are in the same tense"
+    }
+  ],
+  "The passive: how it is formed": [
+    {
+      "kind": "grammar",
+      "front": "The five passive aorist endings",
+      "back": "-φτηκα (labials) · -χτηκα (velars) · -στηκα (dentals, -ζω, -νω) · -ώθηκα (-ώνω) · -ήθηκα (-άω, -ώ)"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to get the passive future from the aorist",
+      "back": "Drop -ηκα, add -ώ — γράφτηκα → θα γραφτώ, να γραφτώ"
+    },
+    {
+      "kind": "grammar",
+      "front": "The passive dependent endings",
+      "back": "-ώ, -είς, -εί, -ούμε, -είτε, -ούν — the Class B2 endings"
+    }
+  ],
+  "Using the passive": [
+    {
+      "kind": "grammar",
+      "front": "Who by, in a passive",
+      "back": "από plus the accusative — γράφτηκε από τον πατέρα μου"
+    },
+    {
+      "kind": "grammar",
+      "front": "What speech uses instead of the passive",
+      "back": "The third person plural — Μου έκλεψαν το πορτοφόλι, Λένε ότι…, Πώς το λένε;"
+    },
+    {
+      "kind": "sentence",
+      "front": "Παρακαλείσθε να μην…",
+      "back": "You are requested not to… — the register of notices"
+    }
+  ],
+  "The participles: γράφοντας and γραμμένος": [
+    {
+      "kind": "grammar",
+      "front": "-οντας",
+      "back": "The active participle: invariable, *while doing* — γράφοντας, μιλώντας",
+      "extra": "Its subject must be the main verb's."
+    },
+    {
+      "kind": "grammar",
+      "front": "-μένος",
+      "back": "The passive participle: declines like an adjective, and describes a state — γραμμένος, κουρασμένος, παντρεμένος"
+    },
+    {
+      "kind": "grammar",
+      "front": "Η πόρτα είναι κλειστή or Η πόρτα κλείστηκε",
+      "back": "A state against an event — the participle describes, the passive aorist reports"
+    }
+  ],
+  "Reported speech": [
+    {
+      "kind": "grammar",
+      "front": "What Greek does not do in reported speech",
+      "back": "Shift the tense — Μου είπε ότι θα έρθει, *that he will come*"
+    },
+    {
+      "kind": "grammar",
+      "front": "ότι, να or αν",
+      "back": "ότι for a fact · να for a wish, command or purpose · αν for a question or condition"
+    },
+    {
+      "kind": "grammar",
+      "front": "The commonest reported-speech error",
+      "back": "Θέλω ότι έρθεις — wanting takes να, not ότι"
+    }
+  ],
+  "The modal system in full": [
+    {
+      "kind": "word",
+      "front": "αποκλείεται",
+      "back": "out of the question, no chance"
+    },
+    {
+      "kind": "grammar",
+      "front": "δεν χρειάζεται να",
+      "back": "there is no need to — as against δεν πρέπει να, must not"
+    },
+    {
+      "kind": "grammar",
+      "front": "The probability scale",
+      "back": "σίγουρα · οπωσδήποτε · μάλλον · πιθανώς · ίσως · μπορεί · αποκλείεται"
+    }
+  ],
+  "Wishes, regrets and μακάρι": [
+    {
+      "kind": "grammar",
+      "front": "μακάρι να, with three tenses",
+      "back": "perfective = I hope · imperfect = I wish it were · pluperfect = I wish it had been"
+    },
+    {
+      "kind": "sentence",
+      "front": "Αιωνία του η μνήμη.",
+      "back": "May his memory be eternal — the funeral formula, in the older grammar"
+    },
+    {
+      "kind": "sentence",
+      "front": "Καλό Παράδεισο.",
+      "back": "May he rest in paradise."
+    },
+    {
+      "kind": "sentence",
+      "front": "Ό,τι είναι γραφτό.",
+      "back": "Whatever is written — i.e. fated."
+    }
+  ],
+  "Deponent verbs in full": [
+    {
+      "kind": "grammar",
+      "front": "The deponent imperatives",
+      "back": "έλα · κάθισε · θυμήσου · μη φοβάσαι · ετοιμάσου · σήκω"
+    },
+    {
+      "kind": "grammar",
+      "front": "προσεύχομαι, conjugated as a deponent",
+      "back": "να προσευχηθώ · προσευχήθηκα · έχω προσευχηθεί"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μη φοβάσαι.",
+      "back": "Do not be afraid — and one of the commonest phrases in the Gospels."
+    }
+  ],
+  "The imperative in full": [
+    {
+      "kind": "grammar",
+      "front": "άσε",
+      "back": "leave it, let it be, never mind — Άσε με, Άσε το, Άσε!"
+    },
+    {
+      "kind": "grammar",
+      "front": "βρες · μπες · βγες · ανέβα · κατέβα",
+      "back": "find · go in · go out · go up · go down — the irregular imperatives"
+    },
+    {
+      "kind": "grammar",
+      "front": "The mediopassive imperative endings",
+      "back": "-σου in the singular, -θείτε or -στείτε in the plural — ετοιμάσου / ετοιμαστείτε"
+    }
+  ],
+  "Impersonal verbs and constructions": [
+    {
+      "kind": "grammar",
+      "front": "Which take the genitive and which the accusative",
+      "back": "μου αρέσει, μου φαίνεται, μου λείπει — but με πειράζει, με νοιάζει, με ενδιαφέρει, με βολεύει"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν με νοιάζει.",
+      "back": "I do not care."
+    },
+    {
+      "kind": "sentence",
+      "front": "Αξίζει να το δεις.",
+      "back": "It is worth seeing."
+    },
+    {
+      "kind": "sentence",
+      "front": "Πάει καιρός.",
+      "back": "It has been a long time."
+    }
+  ],
+  "Indirect questions and embedded clauses": [
+    {
+      "kind": "grammar",
+      "front": "παρόλο που / αν και",
+      "back": "although — both with an ordinary clause"
+    },
+    {
+      "kind": "grammar",
+      "front": "The formal connectives for *because* and *in order to*",
+      "back": "διότι, εφόσον, προκειμένου να — reading vocabulary"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν ξέρω αν θα έρθει.",
+      "back": "I do not know if he will come."
+    }
+  ],
+  "The verb, consolidated": [
+    {
+      "kind": "grammar",
+      "front": "What generates the whole Greek verb",
+      "back": "Three stems — imperfective, perfective, passive perfective — and four assemblers: θα, να, έχω, είχα"
+    },
+    {
+      "kind": "grammar",
+      "front": "What Greek has no form for",
+      "back": "An infinitive, a gerund-noun, a separate continuous aspect, a perfect progressive, or a sequence-of-tenses rule"
+    }
+  ],
+  "Written Greek: what it uses that speech does not": [
+    {
+      "kind": "word",
+      "front": "λόγω",
+      "back": "because of — with the genitive: λόγω καιρού, λόγω έργων, λόγω απεργίας"
+    },
+    {
+      "kind": "word",
+      "front": "επομένως / ωστόσο",
+      "back": "therefore / however"
+    },
+    {
+      "kind": "word",
+      "front": "σύμφωνα με",
+      "back": "according to"
+    },
+    {
+      "kind": "word",
+      "front": "όσον αφορά",
+      "back": "as regards"
+    },
+    {
+      "kind": "word",
+      "front": "εν ολίγοις",
+      "back": "in short — a frozen learned phrase"
+    },
+    {
+      "kind": "word",
+      "front": "δηλαδή",
+      "back": "that is, I mean — and the most useful filler in the language"
+    }
+  ],
+  "Nominalisation: verbs as nouns": [
+    {
+      "kind": "grammar",
+      "front": "The -ση / -ξη / -ψη pattern",
+      "back": "The action or its result, feminine, plural in -εις — απόφαση, σκέψη, αύξηση, μείωση, ανακοίνωση"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a Greek headline is a string of nouns",
+      "back": "Written Greek prefers nouns where speech prefers verbs — Αύξηση των τιμών λόγω της κρίσης"
+    },
+    {
+      "kind": "grammar",
+      "front": "The -σιμο pattern",
+      "back": "The act, neuter — το γράψιμο, το διάβασμα, το πλύσιμο, το μαγείρεμα"
+    }
+  ],
+  "The verbs that carry everything: κάνω, βάζω, παίρνω, πάω": [
+    {
+      "kind": "sentence",
+      "front": "κάνω υπομονή",
+      "back": "I am patient"
+    },
+    {
+      "kind": "sentence",
+      "front": "κάνω τον σταυρό μου",
+      "back": "I cross myself"
+    },
+    {
+      "kind": "sentence",
+      "front": "βάζω τα δυνατά μου",
+      "back": "I do my utmost"
+    },
+    {
+      "kind": "sentence",
+      "front": "με παίρνει ο ύπνος",
+      "back": "I fall asleep"
+    },
+    {
+      "kind": "sentence",
+      "front": "παίρνει καιρό",
+      "back": "it takes time"
+    },
+    {
+      "kind": "sentence",
+      "front": "πάει να πει",
+      "back": "it means, that is to say"
+    },
+    {
+      "kind": "sentence",
+      "front": "δεν πάει άλλο",
+      "back": "it cannot go on"
+    },
+    {
+      "kind": "sentence",
+      "front": "έχει πλάκα",
+      "back": "it is funny"
+    },
+    {
+      "kind": "sentence",
+      "front": "ό,τι πεις",
+      "back": "whatever you say"
+    }
+  ],
+  "Knowing, thinking and understanding": [
+    {
+      "kind": "grammar",
+      "front": "γνωρίζω or γνώρισα",
+      "back": "I know him (a state) · I met him (an event) — the same verb, two English words"
+    },
+    {
+      "kind": "grammar",
+      "front": "μαθαίνω or έμαθα",
+      "back": "I am learning · I found out, I heard"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κατάλαβα!",
+      "back": "I see! Got it! — the aorist, used as a one-word reply."
+    },
+    {
+      "kind": "grammar",
+      "front": "νομίζω or σκέφτομαι",
+      "back": "νομίζω is an opinion · σκέφτομαι is the activity of thinking"
+    },
+    {
+      "kind": "grammar",
+      "front": "πιστεύω σε",
+      "back": "believe in — Πιστεύω στον Θεό, and the Creed's Πιστεύω εις ένα Θεόν"
+    }
+  ],
+  "Politeness, in full": [
+    {
+      "kind": "grammar",
+      "front": "The four levels of a request",
+      "back": "Imperative · present as a question · μπορείς να · θα μπορούσατε να"
+    },
+    {
+      "kind": "word",
+      "front": "μήπως",
+      "back": "might you… — the standard softener for approaching a stranger"
+    },
+    {
+      "kind": "sentence",
+      "front": "Να 'σαι καλά.",
+      "back": "Be well — and a warmer reply to thanks than παρακαλώ."
+    },
+    {
+      "kind": "grammar",
+      "front": "The easiest politeness to get right",
+      "back": "Καλημέρα on entering a shop or a room, and Γεια σας on leaving"
+    }
+  ],
+  "What English speakers get wrong": [
+    {
+      "kind": "grammar",
+      "front": "The three errors to fix first",
+      "back": "The subject pronoun, the weak pronoun's position, and reduced vowels — they occur in nearly every sentence"
+    },
+    {
+      "kind": "grammar",
+      "front": "Είμαι κρύος",
+      "back": "Wrong for *I am cold* — it means *I am a cold person*. Use κρυώνω."
+    },
+    {
+      "kind": "grammar",
+      "front": "συγγνώμη or λυπάμαι",
+      "back": "συγγνώμη = excuse me, sorry for a fault · λυπάμαι = I am sorry, with sympathy"
+    }
+  ],
+  "The verbs of church life": [
+    {
+      "kind": "word",
+      "front": "κοινωνώ / μεταλαμβάνω",
+      "back": "I receive communion"
+    },
+    {
+      "kind": "word",
+      "front": "προσκυνώ",
+      "back": "I venerate — *towards-kiss*"
+    },
+    {
+      "kind": "word",
+      "front": "εξομολογούμαι",
+      "back": "I confess — *out-speak-together*"
+    },
+    {
+      "kind": "word",
+      "front": "λειτουργώ",
+      "back": "I celebrate the Liturgy — and, of a machine, *it works*",
+      "extra": "Το ασανσέρ δεν λειτουργεί."
+    },
+    {
+      "kind": "word",
+      "front": "γιορτάζω",
+      "back": "I celebrate a feast or a name day"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ευλογείτε. — Ο Κύριος.",
+      "back": "Bless — and the reply. The greeting to a priest or monk."
+    }
+  ],
+  "At church: death, memory and the words around them": [
+    {
+      "kind": "word",
+      "front": "εκοιμήθη",
+      "back": "he fell asleep — the church's word for died, in Koine"
+    },
+    {
+      "kind": "word",
+      "front": "τα κόλλυβα",
+      "back": "the boiled wheat blessed and handed out at a memorial"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ζωή σε λόγου σας.",
+      "back": "Life to you — the formula that answers condolences."
+    },
+    {
+      "kind": "sentence",
+      "front": "Θεός σχωρέσ' τον.",
+      "back": "God forgive him — said with the kollyva."
+    },
+    {
+      "kind": "word",
+      "front": "το τρισάγιο",
+      "back": "the short prayer service for the dead"
+    }
+  ],
+  "Reading: the news paragraph": [
+    {
+      "kind": "word",
+      "front": "η κυβέρνηση / το υπουργείο",
+      "back": "government / ministry"
+    },
+    {
+      "kind": "word",
+      "front": "η δήλωση / η ανακοίνωση",
+      "back": "statement / announcement"
+    },
+    {
+      "kind": "word",
+      "front": "η αύξηση / η μείωση",
+      "back": "increase / decrease"
+    },
+    {
+      "kind": "word",
+      "front": "αναμένεται",
+      "back": "it is expected"
+    },
+    {
+      "kind": "word",
+      "front": "η κακοκαιρία",
+      "back": "bad weather"
+    },
+    {
+      "kind": "word",
+      "front": "τα στοιχεία",
+      "back": "the data, the figures"
+    }
+  ],
+  "Listening: the news and the sermon": [
+    {
+      "kind": "word",
+      "front": "η μετάνοια",
+      "back": "repentance"
+    },
+    {
+      "kind": "word",
+      "front": "η ταπείνωση",
+      "back": "humility"
+    },
+    {
+      "kind": "word",
+      "front": "το έλεος",
+      "back": "mercy"
+    },
+    {
+      "kind": "word",
+      "front": "η χάρη",
+      "back": "grace"
+    },
+    {
+      "kind": "word",
+      "front": "η σωτηρία",
+      "back": "salvation"
+    },
+    {
+      "kind": "word",
+      "front": "η θυσία",
+      "back": "sacrifice"
+    }
+  ],
+  "Writing: letters and emails": [
+    {
+      "kind": "grammar",
+      "front": "The formal opening and closing",
+      "back": "Αξιότιμε κύριε / κυρία … Με εκτίμηση"
+    },
+    {
+      "kind": "grammar",
+      "front": "The informal sign-offs",
+      "back": "Φιλιά (close) · Με αγάπη · Φιλικά (friendly) · Με εκτίμηση (formal)"
+    },
+    {
+      "kind": "grammar",
+      "front": "Writing to a priest",
+      "back": "Σεβαστέ πάτερ … Με σεβασμό, or Ευλογείτε"
+    }
+  ],
+  "Speaking: narrating and explaining": [
+    {
+      "kind": "grammar",
+      "front": "The five-part narrative turn",
+      "back": "Set the scene (imperfect) · what had happened (pluperfect) · the events (aorists) · what was said (ότι) · how it was"
+    },
+    {
+      "kind": "word",
+      "front": "το θέμα είναι ότι…",
+      "back": "the thing is that…"
+    },
+    {
+      "kind": "grammar",
+      "front": "The three habits of a longer turn",
+      "back": "Signpost how many things you will say · do not stop to correct · finish with a comment rather than trailing off"
+    }
+  ],
+  "Listening at natural speed": [
+    {
+      "kind": "grammar",
+      "front": "The subtitle rule",
+      "back": "Greek subtitles, not English — English turns listening into reading"
+    },
+    {
+      "kind": "grammar",
+      "front": "The four-step method for a scene",
+      "back": "With subtitles, without, with again, then five lines said aloud until fluent"
+    }
+  ],
+  "The particles: λοιπόν, δηλαδή, βασικά": [
+    {
+      "kind": "word",
+      "front": "λοιπόν",
+      "back": "so, well then, right — the most frequent discourse word in spoken Greek"
+    },
+    {
+      "kind": "word",
+      "front": "βασικά",
+      "back": "basically, actually — softens and corrects"
+    },
+    {
+      "kind": "word",
+      "front": "τελικά",
+      "back": "in the end, as it turns out"
+    },
+    {
+      "kind": "word",
+      "front": "πάντως",
+      "back": "anyway, in any case"
+    },
+    {
+      "kind": "grammar",
+      "front": "καλά, two ways",
+      "back": "Said warmly: fine. Said flat: oh, come off it."
+    },
+    {
+      "kind": "word",
+      "front": "μάλιστα",
+      "back": "indeed, I see — formal, and the proper answer to a superior"
+    },
+    {
+      "kind": "word",
+      "front": "έγινε",
+      "back": "done, consider it done"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why δηλαδή is the learner's best friend",
+      "back": "It licenses a second attempt at a sentence you have made a mess of — …δηλαδή, θέλω να πω ότι…"
+    }
+  ],
+  "ρε, βρε, μωρέ": [
+    {
+      "kind": "grammar",
+      "front": "ρε",
+      "back": "A familiarity marker before an address — warm between friends, rude from a stranger or to an elder",
+      "extra": "Hear it constantly; use it almost never."
+    },
+    {
+      "kind": "grammar",
+      "front": "βρε / μωρέ",
+      "back": "Softer and older than ρε, often affectionate — βρε παιδί μου",
+      "extra": "μωρή, the feminine, is rude and should never be used."
+    },
+    {
+      "kind": "word",
+      "front": "παιδί μου",
+      "back": "my child — said to adults, affectionately or with exasperation",
+      "extra": "A senior's word; not yours yet."
+    },
+    {
+      "kind": "word",
+      "front": "κουμπάρε",
+      "back": "the kinship term, used as a friendly address between men"
+    }
+  ],
+  "Emphasis: order, repetition and the doubled pronoun": [
+    {
+      "kind": "grammar",
+      "front": "Τον καφέ τον θέλω σκέτο.",
+      "back": "A fronted noun is echoed by a weak pronoun — the clearest marker of natural spoken Greek"
+    },
+    {
+      "kind": "grammar",
+      "front": "Doubling an adjective",
+      "back": "Intensifies it — μικρός μικρός (tiny), ζεστό ζεστό (piping hot)"
+    },
+    {
+      "kind": "word",
+      "front": "πάρα πολύ",
+      "back": "very much indeed"
+    },
+    {
+      "kind": "word",
+      "front": "φοβερός / τρομερός",
+      "back": "terrible — and both used to mean *great*, as English *terrific* once did"
+    },
+    {
+      "kind": "word",
+      "front": "λίγο λίγο",
+      "back": "bit by bit"
+    }
+  ],
+  "Fillers, hesitation and buying time": [
+    {
+      "kind": "word",
+      "front": "ας πούμε",
+      "back": "let's say, sort of, for instance — the most flexible filler there is"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κάτσε.",
+      "back": "Hang on. — literally *sit*"
+    },
+    {
+      "kind": "grammar",
+      "front": "The rule about fillers",
+      "back": "Fill the gap in Greek, not in English — an English *erm* invites the other person to switch languages"
+    },
+    {
+      "kind": "sentence",
+      "front": "Ξέρω 'γω…",
+      "back": "I dunno… — ξέρω εγώ, contracted"
+    },
+    {
+      "kind": "word",
+      "front": "το πράγμα",
+      "back": "the thing — the universal stand-in, with αυτό and a gesture"
+    }
+  ],
+  "Interrupting, and holding the floor": [
+    {
+      "kind": "sentence",
+      "front": "Ναι, αλλά…",
+      "back": "Yes, but… — the standard, non-confrontational way into a conversation"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κάτσε να τελειώσω.",
+      "back": "Let me finish — perfectly polite in Greek"
+    },
+    {
+      "kind": "grammar",
+      "front": "πρώτον, δεύτερον, τρίτον",
+      "back": "firstly, secondly, thirdly — the clearest floor-holders there are"
+    },
+    {
+      "kind": "sentence",
+      "front": "Εσύ τι λες;",
+      "back": "What do you think? — and a graceful way to stop talking"
+    }
+  ],
+  "Backchannelling: showing you are listening": [
+    {
+      "kind": "grammar",
+      "front": "Why backchannelling matters",
+      "back": "A Greek listener produces one every few seconds; English silence reads as boredom or incomprehension",
+      "extra": "It is the cheapest fluency improvement available."
+    },
+    {
+      "kind": "sentence",
+      "front": "Και μετά;",
+      "back": "And then? — the strongest continuation prompt there is"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι λες!",
+      "back": "You don't say! — surprise, not a question"
+    },
+    {
+      "kind": "sentence",
+      "front": "Κουράγιο.",
+      "back": "Courage. — for bad news"
+    }
+  ],
+  "Diminutives and augmentatives": [
+    {
+      "kind": "grammar",
+      "front": "What -άκι actually means",
+      "back": "Affection and pleasantness, rarely size — and always neuter whatever the original gender"
+    },
+    {
+      "kind": "word",
+      "front": "καφεδάκι",
+      "back": "a coffee — and warmer than καφές when offering or ordering"
+    },
+    {
+      "kind": "grammar",
+      "front": "-άρα",
+      "back": "The augmentative, and admiring — αυτοκινητάρα is *a hell of a car*"
+    }
+  ],
+  "Idioms: the body": [
+    {
+      "kind": "sentence",
+      "front": "Μου έφαγε το κεφάλι.",
+      "back": "He drove me mad. — *ate my head*"
+    },
+    {
+      "kind": "sentence",
+      "front": "Βάζω το χέρι μου στη φωτιά.",
+      "back": "I would swear to it."
+    },
+    {
+      "kind": "sentence",
+      "front": "Με όλη μου την καρδιά.",
+      "back": "With all my heart."
+    },
+    {
+      "kind": "word",
+      "front": "το κακό μάτι",
+      "back": "the evil eye — and ξεματιάζω, to undo it"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μου βγήκε η γλώσσα.",
+      "back": "I was worn out. — *my tongue came out*"
+    }
+  ],
+  "Idioms: food, drink and the table": [
+    {
+      "kind": "sentence",
+      "front": "Ψωμί και αλάτι.",
+      "back": "Bread and salt — a shared life, a long friendship."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έφαγα πόρτα.",
+      "back": "I was turned away. — *I ate door*"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μην τα κάνεις θάλασσα.",
+      "back": "Do not make a mess of it."
+    },
+    {
+      "kind": "sentence",
+      "front": "Με γεια!",
+      "back": "— said to anyone with something new, or a haircut, or starting a meal."
+    },
+    {
+      "kind": "sentence",
+      "front": "Βγάζω το ψωμί μου.",
+      "back": "I earn my living."
+    }
+  ],
+  "Idioms: God, saints and the devil": [
+    {
+      "kind": "sentence",
+      "front": "Πρώτα ο Θεός.",
+      "back": "God first — said before any plan, by the devout and the indifferent alike."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχει ο Θεός.",
+      "back": "God will provide."
+    },
+    {
+      "kind": "sentence",
+      "front": "Ο Θεός να μη δώσει.",
+      "back": "God forbid."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχει τον άγιό του.",
+      "back": "He has his saint — he has protection, connections."
+    },
+    {
+      "kind": "sentence",
+      "front": "Κάθε άγιος και το θαύμα του.",
+      "back": "Every saint has his own miracle — everyone has their speciality."
+    },
+    {
+      "kind": "grammar",
+      "front": "The register of all this",
+      "back": "None of it is piety — Δόξα τω Θεώ from a shopkeeper is as automatic as English *thank goodness*"
+    }
+  ],
+  "Idioms: animals, weather and the rest": [
+    {
+      "kind": "sentence",
+      "front": "Κάνει τη πάπια.",
+      "back": "He plays the duck — pretends not to know."
+    },
+    {
+      "kind": "sentence",
+      "front": "Του αγίου Ποτέ.",
+      "back": "St Never's day — i.e. never."
+    },
+    {
+      "kind": "sentence",
+      "front": "Σπάει πλάκα.",
+      "back": "He's having a laugh."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μας δούλεψε.",
+      "back": "He had us on."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τα έχει τετρακόσια.",
+      "back": "He is all there, sharp."
+    },
+    {
+      "kind": "word",
+      "front": "μαύρα",
+      "back": "*black* — cash in hand, undeclared"
+    }
+  ],
+  "Proverbs": [
+    {
+      "kind": "sentence",
+      "front": "Κάλλιο αργά παρά ποτέ.",
+      "back": "Better late than never."
+    },
+    {
+      "kind": "sentence",
+      "front": "Φασούλι το φασούλι γεμίζει το σακούλι.",
+      "back": "Bean by bean the sack is filled."
+    },
+    {
+      "kind": "sentence",
+      "front": "Αγάλι αγάλι γίνεται η αγουρίδα μέλι.",
+      "back": "Slowly the unripe grape becomes honey — the one said to you about learning Greek."
+    },
+    {
+      "kind": "sentence",
+      "front": "Κάθε εμπόδιο για καλό.",
+      "back": "Every obstacle is for the good — the one said when something goes wrong."
+    },
+    {
+      "kind": "sentence",
+      "front": "Όποιος καεί στο χυλό φυσάει και το γιαούρτι.",
+      "back": "Burnt by porridge, he blows on the yoghurt."
+    },
+    {
+      "kind": "sentence",
+      "front": "Τα πολλά λόγια είναι φτώχεια.",
+      "back": "Many words are poverty."
+    },
+    {
+      "kind": "sentence",
+      "front": "Μέτρον άριστον.",
+      "back": "Moderation is best — quoted in its ancient form."
+    }
+  ],
+  "Gestures": [
+    {
+      "kind": "grammar",
+      "front": "Greek yes and no",
+      "back": "Yes is a single downward nod. No is an upward tilt of the head with raised eyebrows — which reads to an English speaker as *what?*"
+    },
+    {
+      "kind": "grammar",
+      "front": "The open palm",
+      "back": "η μούντζα — palm towards someone with fingers spread is a serious insult. Do not wave that way, and do not hold up five fingers for *five*."
+    },
+    {
+      "kind": "grammar",
+      "front": "Crossing oneself",
+      "back": "Right shoulder first, thumb and two fingers joined"
+    },
+    {
+      "kind": "grammar",
+      "front": "The triple ftou",
+      "back": "Spitting lightly three times to avert the evil eye, especially after praising a child"
+    }
+  ],
+  "The colloquial grammar": [
+    {
+      "kind": "grammar",
+      "front": "The -νε endings",
+      "back": "έχουνε, γράφουνε, ήτανε, ήμουνα — older forms surviving in speech, not sloppiness"
+    },
+    {
+      "kind": "grammar",
+      "front": "The elisions",
+      "back": "σ' αγαπώ · μ' αρέσει · πού 'ναι · θα 'μαι · κι εγώ"
+    },
+    {
+      "kind": "grammar",
+      "front": "The historic present",
+      "back": "Και πάω εγώ στο μαγαζί… — the standard way to tell a lively story"
+    },
+    {
+      "kind": "grammar",
+      "front": "σιγά μη",
+      "back": "as if — Σιγά μη βρεις ψωμί τέτοια ώρα",
+      "extra": "Pure spoken Greek, and sardonic."
+    }
+  ],
+  "Register: five ways to say one thing": [
+    {
+      "kind": "grammar",
+      "front": "The five registers",
+      "back": "Intimate/slang · casual spoken · neutral standard · formal · learned"
+    },
+    {
+      "kind": "grammar",
+      "front": "The rule of thumb for register",
+      "back": "Speak one notch less formally than you write"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to spot the learned register in two seconds",
+      "back": "εν, εις, εκ, διά, περί, υπέρ, άνευ, ως, τοις — and endings in -ωσις, -ότης, -ων, -ούσα"
+    }
+  ],
+  "Loanwords: Turkish, Italian, English": [
+    {
+      "kind": "word",
+      "front": "το κέφι",
+      "back": "good spirits, the pleasure of an occasion — Turkish, and untranslatable"
+    },
+    {
+      "kind": "word",
+      "front": "το ντέρτι",
+      "back": "a sweet melancholy, longing — Turkish, and central to how Greeks talk about music"
+    },
+    {
+      "kind": "word",
+      "front": "το γλέντι",
+      "back": "a celebration with music and food"
+    },
+    {
+      "kind": "word",
+      "front": "τζάμπα",
+      "back": "free, for nothing"
+    },
+    {
+      "kind": "grammar",
+      "front": "How to spot a recent loanword",
+      "back": "It does not inflect — το ταξί, το μετρό, το πάρτι, το ευρώ"
+    },
+    {
+      "kind": "grammar",
+      "front": "The Greek coinages that compete with English",
+      "back": "διαδίκτυο, υπολογιστής, κινητό, ιστοσελίδα"
+    }
+  ],
+  "Slang, the internet and youth language": [
+    {
+      "kind": "word",
+      "front": "τι φάση;",
+      "back": "what's going on? — the current all-purpose question"
+    },
+    {
+      "kind": "word",
+      "front": "τέλειο",
+      "back": "perfect, brilliant"
+    },
+    {
+      "kind": "word",
+      "front": "πλάκα",
+      "back": "a joke — για πλάκα, for fun"
+    },
+    {
+      "kind": "word",
+      "front": "χαλαρά",
+      "back": "easily, relaxed"
+    },
+    {
+      "kind": "word",
+      "front": "δεν παίζει",
+      "back": "no chance — *it doesn't play*"
+    },
+    {
+      "kind": "grammar",
+      "front": "κατεβάζω / ανεβάζω",
+      "back": "download / upload — the Greek words that won"
+    },
+    {
+      "kind": "grammar",
+      "front": "The messaging abbreviations",
+      "back": "Τπτ (τίποτα) · Τι κανς; · Καλημ · Ευχ · χαχαχα"
+    }
+  ],
+  "What you need to recognise and not say": [
+    {
+      "kind": "grammar",
+      "front": "μαλάκα",
+      "back": "Vulgar in origin, functionally *mate* between male friends, and a real insult from a stranger",
+      "extra": "Not available to you until a Greek friend uses it to you — and never at church."
+    },
+    {
+      "kind": "grammar",
+      "front": "The blasphemy taboo",
+      "back": "Ordinary Greek vulgarity is mild and ubiquitous; oaths against the sacred are serious and bounded",
+      "extra": "An English speaker, used to the reverse weighting, misjudges both."
+    },
+    {
+      "kind": "sentence",
+      "front": "Να πάρει η οργή.",
+      "back": "Damn it — the old-fashioned, entirely usable version."
+    },
+    {
+      "kind": "sentence",
+      "front": "Αυτό πάει πολύ.",
+      "back": "That is going too far."
+    }
+  ],
+  "Regional accents and what varies": [
+    {
+      "kind": "grammar",
+      "front": "Northern Greek",
+      "back": "Unstressed vowels dropped — τ' πδί for το παιδί — and the accusative used for pronouns: σε λέω"
+    },
+    {
+      "kind": "grammar",
+      "front": "Cretan",
+      "back": "κ before e/i becomes a *tch* — και → τσαι — and its own vocabulary: ίντα for *what*"
+    },
+    {
+      "kind": "grammar",
+      "front": "Pontic",
+      "back": "A separate dialect, barely intelligible to a standard speaker, still spoken by descendants of 1923"
+    },
+    {
+      "kind": "grammar",
+      "front": "Diaspora Greek",
+      "back": "English loanwords, simplified morphology in the second generation, and village forms preserved from the time of emigration"
+    }
+  ],
+  "The learned fossils in daily speech": [
+    {
+      "kind": "grammar",
+      "front": "εντάξει",
+      "back": "*εν τάξει* — in order. A dative, now one word meaning OK."
+    },
+    {
+      "kind": "word",
+      "front": "εν τω μεταξύ",
+      "back": "meanwhile — a dative"
+    },
+    {
+      "kind": "word",
+      "front": "εκ των προτέρων",
+      "back": "in advance"
+    },
+    {
+      "kind": "word",
+      "front": "τοις εκατό",
+      "back": "per cent — a dative"
+    },
+    {
+      "kind": "word",
+      "front": "διά βίου",
+      "back": "lifelong"
+    },
+    {
+      "kind": "grammar",
+      "front": "The γλωσσικό ζήτημα",
+      "back": "The language question: a century and a half of conflict over whether Greek should be written as spoken. Demotic won in 1976; these phrases are the remains."
+    }
+  ],
+  "Loanwords in the other direction": [
+    {
+      "kind": "grammar",
+      "front": "The guessing strategy",
+      "back": "An abstract or technical English word is usually a good bet in Greek — η ανάλυση, η κρίση, το σύστημα, η μέθοδος"
+    },
+    {
+      "kind": "grammar",
+      "front": "η εμπάθεια",
+      "back": "Not *empathy* — it means animosity",
+      "extra": "The most dangerous false friend in the language."
+    },
+    {
+      "kind": "grammar",
+      "front": "ο μάρτυρας",
+      "back": "martyr — and the word means *witness*"
+    },
+    {
+      "kind": "grammar",
+      "front": "η μετάνοια",
+      "back": "repentance — literally *a change of mind*"
+    },
+    {
+      "kind": "grammar",
+      "front": "η ιδιωτικός → ιδιωτικός",
+      "back": "private, not *idiotic*"
+    }
+  ],
+  "Telling a joke, and being teased": [
+    {
+      "kind": "sentence",
+      "front": "Κάνω πλάκα.",
+      "back": "I'm joking. — have it ready."
+    },
+    {
+      "kind": "sentence",
+      "front": "Με δουλεύεις;",
+      "back": "Are you pulling my leg?"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μιλάω ελληνικά σαν παιδί τριών χρονών.",
+      "back": "I speak Greek like a three-year-old — the safest joke available, and it works every time."
+    }
+  ],
+  "Complaining, sympathising and arguing": [
+    {
+      "kind": "sentence",
+      "front": "Δεν πάει άλλο.",
+      "back": "It cannot go on."
+    },
+    {
+      "kind": "sentence",
+      "front": "Έχω βαρεθεί.",
+      "back": "I am fed up."
+    },
+    {
+      "kind": "grammar",
+      "front": "ο υπεύθυνος",
+      "back": "the person in charge — the key word in any Greek complaint"
+    },
+    {
+      "kind": "grammar",
+      "front": "What Greek sympathy is not",
+      "back": "Advice. It is agreement and presence; offering a solution early reads as dismissal."
+    }
+  ],
+  "Toasts, speeches and set pieces": [
+    {
+      "kind": "sentence",
+      "front": "Πάντα άξιος!",
+      "back": "Always worthy — to the godparent at a baptism."
+    },
+    {
+      "kind": "sentence",
+      "front": "Να σας ζήσει!",
+      "back": "May the child live for you."
+    },
+    {
+      "kind": "sentence",
+      "front": "Να ζήσετε!",
+      "back": "Long life — to a married couple."
+    },
+    {
+      "kind": "grammar",
+      "front": "The four-sentence Greek toast",
+      "back": "Thank · say you are glad · wish health · bless. Then sit down."
+    }
+  ],
+  "Emphasis and intonation": [
+    {
+      "kind": "grammar",
+      "front": "What marks a Greek question",
+      "back": "The rising intonation alone — the words do not move",
+      "extra": "An unraised question is simply a statement."
+    },
+    {
+      "kind": "grammar",
+      "front": "Έλα, two ways",
+      "back": "Rising: come on / you're joking. Falling: come here — and *hello* on the phone."
+    },
+    {
+      "kind": "grammar",
+      "front": "What trains intonation",
+      "back": "Shadowing. It cannot be learned from a description."
+    }
+  ],
+  "Keeping up at speed": [
+    {
+      "kind": "grammar",
+      "front": "The best repair move",
+      "back": "Name the single word you missed — Μία λέξη δεν κατάλαβα: «…»",
+      "extra": "Quick, specific, and it shows you followed the rest."
+    },
+    {
+      "kind": "grammar",
+      "front": "What actually builds listening speed",
+      "back": "Volume at a level you mostly understand, shadowing, reading aloud, and repeated listening to the same material"
+    },
+    {
+      "kind": "grammar",
+      "front": "Why not to ask for slow speech all the time",
+      "back": "Slowed speech does not train the skill fast speech requires"
+    }
+  ],
+  "Greek music, and why it matters": [
+    {
+      "kind": "word",
+      "front": "η ξενιτιά",
+      "back": "the condition of being abroad, away from home, and the grief in it",
+      "extra": "The subject of hundreds of songs, because a third of the nation left."
+    },
+    {
+      "kind": "grammar",
+      "front": "το ρεμπέτικο",
+      "back": "The urban music of the 1920s to 50s — bouzouki, and the refugees from Asia Minor"
+    },
+    {
+      "kind": "grammar",
+      "front": "Καζαντζίδης",
+      "back": "The voice of the emigration years, and the emotional soundtrack of a diaspora parish"
+    },
+    {
+      "kind": "grammar",
+      "front": "το έντεχνο",
+      "back": "*Art song* — Theodorakis and Hadjidakis setting Seferis, Elytis, Ritsos and Gatsos"
+    }
+  ],
+  "The history everyone refers to": [
+    {
+      "kind": "grammar",
+      "front": "1821 / 25 Μαρτίου",
+      "back": "The Revolution — and the Annunciation. Church and nation on one day."
+    },
+    {
+      "kind": "grammar",
+      "front": "1922",
+      "back": "Η Μικρασιατική Καταστροφή — the Asia Minor Catastrophe and a million and a half refugees. The most consequential event in modern Greek history."
+    },
+    {
+      "kind": "grammar",
+      "front": "28 Οκτωβρίου",
+      "back": "Το ΟΧΙ — the refusal of Mussolini's ultimatum, 1940. The other national day."
+    },
+    {
+      "kind": "grammar",
+      "front": "1974",
+      "back": "The Turkish invasion of Cyprus, and the fall of the Junta"
+    },
+    {
+      "kind": "word",
+      "front": "η Πόλη",
+      "back": "*the City* — Constantinople. Never *Istanbul* in Greek."
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν ξέρω την ιστορία καλά. Μου λέτε;",
+      "back": "I do not know the history well. Will you tell me? — an hour of excellent listening practice from anyone over fifty."
+    }
+  ],
+  "Politics and football, carefully": [
+    {
+      "kind": "sentence",
+      "front": "Με ποιον είσαι;",
+      "back": "Who do you support? — and the acceptable answers are a team, or Δεν παρακολουθώ πολύ."
+    },
+    {
+      "kind": "grammar",
+      "front": "ΑΕΚ's double-headed eagle",
+      "back": "The club of the Asia Minor refugees — which ties straight back to 1922"
+    },
+    {
+      "kind": "sentence",
+      "front": "Δεν ξέρω αρκετά για την ελληνική πολιτική.",
+      "back": "I do not know enough about Greek politics."
+    }
+  ],
+  "Where people are from: the village and the island": [
+    {
+      "kind": "word",
+      "front": "ο ομογενής",
+      "back": "a Greek of the diaspora — *of the same descent*"
+    },
+    {
+      "kind": "word",
+      "front": "ο φιλέλληνας",
+      "back": "a lover of Greece — the word for a foreigner who takes it seriously"
+    },
+    {
+      "kind": "sentence",
+      "front": "Τι έχει το χωριό σας;",
+      "back": "What is your village known for? — the best question in the lesson."
+    },
+    {
+      "kind": "grammar",
+      "front": "August",
+      "back": "The country empties: people go to the village for the Dormition on the 15th. Θα πάτε στην Ελλάδα το καλοκαίρι; is the natural question."
+    }
+  ],
+  "Names: what they mean and how they work": [
+    {
+      "kind": "grammar",
+      "front": "The naming custom",
+      "back": "The first son is named for the paternal grandfather, the first daughter for the paternal grandmother — which is why cousins share names"
+    },
+    {
+      "kind": "grammar",
+      "front": "What a surname tells you",
+      "back": "-όπουλος Peloponnese · -άκης Crete · -ίδης and -όγλου Asia Minor and Pontos · Παπα- descended from a priest"
+    },
+    {
+      "kind": "grammar",
+      "front": "The short forms",
+      "back": "Κωνσταντίνος → Κώστας · Παναγιώτης → Πάνος or Τάκης · Ευάγγελος → Βαγγέλης · Αναστάσιος → Τάσος"
+    },
+    {
+      "kind": "grammar",
+      "front": "Παναγιώτης, Παναγιώτα, Δέσποινα, Μαρία",
+      "back": "All celebrate on 15 August, the Dormition"
+    }
+  ],
+  "Hospitality: the whole system": [
+    {
+      "kind": "grammar",
+      "front": "What φιλοξενία obliges of the guest",
+      "back": "Bring something · accept the first offer · compliment the food · refuse the third helping twice · offer to pay and be refused · leave in three rounds · reciprocate"
+    },
+    {
+      "kind": "sentence",
+      "front": "Την άλλη φορά εγώ.",
+      "back": "Next time me — how you take your turn without an argument."
+    },
+    {
+      "kind": "word",
+      "front": "δικός μας",
+      "back": "one of ours — the phrase you want said about you"
+    },
+    {
+      "kind": "word",
+      "front": "ο αρχοντάρης",
+      "back": "the guestmaster of a monastery"
+    }
+  ],
+  "Time, lateness and the Greek clock": [
+    {
+      "kind": "grammar",
+      "front": "η ώρα κοινής ησυχίας",
+      "back": "The afternoon quiet period, roughly 2 to 5 — when you do not telephone or ring a doorbell"
+    },
+    {
+      "kind": "grammar",
+      "front": "Έφτασα on the phone",
+      "back": "*I have arrived* — meaning *I am nearly there*, and the gap can be twenty minutes"
+    },
+    {
+      "kind": "grammar",
+      "front": "What θα τα πούμε and τα κανονίζουμε mean",
+      "back": "That no time has been fixed"
+    },
+    {
+      "kind": "grammar",
+      "front": "Arriving at church",
+      "back": "People arrive through the first half hour, light candles and move about. It is not rudeness."
+    }
+  ],
+  "Money, generosity and who pays": [
+    {
+      "kind": "grammar",
+      "front": "The rule about bills",
+      "back": "One person pays for everyone and the turn rotates. Splitting is for students."
+    },
+    {
+      "kind": "word",
+      "front": "κερνάω",
+      "back": "I treat, I stand a round — Εγώ κερνάω"
+    },
+    {
+      "kind": "grammar",
+      "front": "What to write at the παγκάρι",
+      "back": "Names of the living and the dead to be commemorated — υπέρ υγείας, υπέρ αναπαύσεως",
+      "extra": "Πώς γράφω ονόματα; is an ordinary question."
+    },
+    {
+      "kind": "grammar",
+      "front": "What not to do about money between friends",
+      "back": "Settle up exactly — the asymmetry is the relationship"
+    }
+  ],
+  "Reading: dialogue and the way people talk": [
+    {
+      "kind": "grammar",
+      "front": "How Greek fiction marks dialogue",
+      "back": "An em dash at the start of each speaker's line — « » is for quoted text in prose"
+    },
+    {
+      "kind": "grammar",
+      "front": "Αρκάς",
+      "back": "The great Greek cartoonist: a few colloquial lines per strip, every Greek knows them, and one a day is a lesson in this stage"
+    }
+  ],
+  "Speaking: sounding Greek": [
+    {
+      "kind": "grammar",
+      "front": "The seven adoptions",
+      "back": "Drop the subject pronoun · weak pronoun first · λοιπόν and δηλαδή · backchannel · full vowels and one tap on ρ · a diminutive when offering · the elisions"
+    },
+    {
+      "kind": "sentence",
+      "front": "Μιλάω μόνο ελληνικά, σιγά σιγά, αλλά μαθαίνω.",
+      "back": "I only speak Greek, slowly, but I am learning."
+    },
+    {
+      "kind": "grammar",
+      "front": "The measure of this stage",
+      "back": "Not accuracy, but whether a Greek stops speaking to you carefully and starts speaking to you normally"
+    }
   ]
 }
