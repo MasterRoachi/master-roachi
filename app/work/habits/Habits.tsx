@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { HABIT_ICONS, iconFor } from '@/lib/habit-icons';
+import { keptRatio, monthDaysOf, weekDays } from '@/lib/habits';
 import styles from './habits.module.css';
 
 // Year, then month, then two cards — and a row of streaks under everything.
@@ -39,6 +40,8 @@ interface Payload {
   ticks: Record<string, string[]>;
   /** Habit id -> run. Days for a daily habit, WEEKS for a weekly one. */
   streaks: Record<string, number>;
+  /** Habit id -> every day ever ticked. What the three grids read. */
+  history: Record<string, string[]>;
   month: string;
   days: string[];
   today: string;
@@ -50,11 +53,70 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
+/** The three things the grid can be. */
+type View = 'week' | 'month' | 'year';
+
+const VIEWS: { key: View; label: string }[] = [
+  { key: 'week', label: 'Week' },
+  { key: 'month', label: 'Month' },
+  { key: 'year', label: 'Year' },
+];
+
+const MONTH_INITIALS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+/** Monday first, matching weekDays(). */
+const DAY_INITIALS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
 /** The two cards a month holds, in the order they are read. */
 const CARDS = [
   { cadence: 'daily' as const, label: 'Daily' },
   { cadence: 'weekly' as const, label: 'Weekly' },
 ];
+
+/**
+ * The columns a view draws, left to right.
+ *
+ * `future` is kept apart from a zero value on purpose: a day that has not
+ * happened is not a day that was missed, and drawing the rest of the month
+ * as solid black would make every glance look like a collapse.
+ */
+function columnsFor(view: View, today: string): { key: string; label: string; future: boolean }[] {
+  if (view === 'week') {
+    return weekDays(today).map((day, i) => ({
+      key: day,
+      label: DAY_INITIALS[i],
+      future: day > today,
+    }));
+  }
+  if (view === 'month') {
+    return monthDaysOf(today.slice(0, 7)).map((day) => ({
+      key: day,
+      label: String(Number(day.slice(8))),
+      future: day > today,
+    }));
+  }
+  const year = today.slice(0, 4);
+  return MONTH_INITIALS.map((label, i) => {
+    const month = `${year}-${String(i + 1).padStart(2, '0')}`;
+    return { key: month, label, future: month > today.slice(0, 7) };
+  });
+}
+
+/**
+ * How gold a cell is, 0 to 1.
+ *
+ * Week and month are binary — a day was ticked or it was not. Only the year
+ * is shaded, because a month is not a thing that can be done. See keptRatio().
+ */
+function valueFor(
+  view: View,
+  habit: Habit,
+  column: string,
+  days: string[],
+  today: string,
+): number {
+  if (view === 'year') return keptRatio(days, habit.cadence, habit.target, column, today);
+  return days.includes(column) ? 1 : 0;
+}
 
 /** The icon, or a neutral mark for a habit that has not been given one. */
 function Glyph({ name }: { name: string | null }) {
@@ -101,6 +163,9 @@ export default function Habits() {
   // The add card, which is shut by default. Adding a habit is rare next to
   // ticking one, so it costs a click rather than a permanent panel.
   const [adding, setAdding] = useState(false);
+  // Which of the three grids is open, if any. One at a time: this is a
+  // glance, not three panels to arrange.
+  const [view, setView] = useState<View | null>(null);
 
   const fetchMonth = useCallback(async (wanted: string | null, force = false) => {
     if (wanted && !force && cache[wanted]) return;
@@ -364,7 +429,7 @@ export default function Habits() {
                       if (mine.length === 0) return null;
 
                       return (
-                        <section key={cadence} className={styles.deck} aria-label={label}>
+                        <section key={cadence} className={styles.deck}>
                           <div className={styles.boxes}>
                             {mine.map((habit) => {
                               const ticked = (shown.ticks[String(habit.id)] ?? []).includes(
@@ -399,6 +464,9 @@ export default function Habits() {
                               );
                             })}
                           </div>
+                          {/* Under the icons rather than over them: the row is
+                              the thing, and the word only says which row. */}
+                          <h3 className={styles.deckName}>{label}</h3>
                         </section>
                       );
                     })}
@@ -421,7 +489,87 @@ export default function Habits() {
           somewhere. Clicking the icon here opens the picker; the × appears on
           hover, as it did in the old grid. */}
       {data.habits.length > 0 && (
-        <section className={styles.streaks} aria-label="Streaks">
+        <div className={styles.dock}>
+          {/* The grid, over the page rather than in it — opening a month's
+              thirty-one columns inline would push the year cards off screen
+              to show something that is only ever glanced at. */}
+          {view && (
+            <div
+              className={styles.sheet}
+              role="group"
+              aria-label={`${view} grid`}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') setView(null);
+              }}
+            >
+              <div className={styles.sheetScroll}>
+                <table className={styles.sheetGrid}>
+                  <thead>
+                    <tr>
+                      <th />
+                      {columnsFor(view, data.today).map((column) => (
+                        <th key={column.key} scope="col" className={styles.sheetHead}>
+                          {column.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.habits.map((habit) => {
+                      const days = data.history?.[String(habit.id)] ?? [];
+                      return (
+                        <tr key={habit.id}>
+                          <th scope="row" className={styles.sheetName} title={habit.name}>
+                            <Glyph name={habit.icon} />
+                          </th>
+                          {columnsFor(view, data.today).map((column) => {
+                            const value = column.future
+                              ? 0
+                              : valueFor(view, habit, column.key, days, data.today);
+                            // A floor, so "a little" is still visibly
+                            // different from "none" — below about a fifth the
+                            // mix is indistinguishable from the background.
+                            const pct = value <= 0 ? 0 : Math.max(18, Math.round(value * 100));
+                            return (
+                              <td
+                                key={column.key}
+                                className={column.future ? styles.cellFuture : styles.cell}
+                                title={`${habit.name} — ${column.key}`}
+                                style={
+                                  pct > 0
+                                    ? {
+                                        background: `color-mix(in oklab, var(--accent) ${pct}%, var(--bg))`,
+                                      }
+                                    : undefined
+                                }
+                              />
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Three buttons, just above the streaks. */}
+          <div className={styles.views}>
+            {VIEWS.map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                className={view === key ? styles.viewOn : styles.view}
+                aria-pressed={view === key}
+                onClick={() => setView(view === key ? null : key)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <section className={styles.streaks} aria-label="Streaks">
           {data.habits.map((habit) => {
             const run = data.streaks?.[String(habit.id)] ?? 0;
             const weekly = habit.cadence === 'weekly';
@@ -470,8 +618,9 @@ export default function Habits() {
                 )}
               </div>
             );
-          })}
-        </section>
+            })}
+          </section>
+        </div>
       )}
     </div>
   );

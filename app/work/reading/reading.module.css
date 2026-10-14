@@ -1,44 +1,18 @@
 /* A bookcase. Tokens from app/globals.css.
  *
- * The shelves are the four states, and a book stands on one as a spine. What
- * makes it read as a bookcase rather than as a chart is that the spines differ
- * in width, height and colour — all derived, see lib/book-spine.ts — and that
- * each shelf has a board under it. Floating rectangles are not books. */
+ * It was spines on grey boards. Now that the Calibre library supplies cover
+ * art (scripts/book-covers.mjs) the books are the thing and the furniture
+ * around them was furniture, so a shelf is a plain grid of covers — 14 Oct
+ * 2026. A book with no cover still gets a derived colour and its title, which
+ * is lib/book-spine.ts earning its keep for the hand-typed case.
+ *
+ * The shelves are CARDS, shut, like the year cards on the habits page: all
+ * four open at once made the page as long as the collection. */
 
 .page {
-  max-width: 56rem;
+  /* The full width of .shell, like every other backend page. It was 56rem,
+     which was a column of text's width wrapped around a grid of covers. */
   margin: 2rem auto 4rem;
-}
-
-.tally {
-  color: var(--muted);
-  font-size: 0.9375rem;
-  margin: 0 0 1.5rem;
-}
-
-.tally strong {
-  color: var(--ink);
-  font-size: var(--step-sub);
-  font-variant-numeric: tabular-nums;
-  margin-right: 0.15rem;
-}
-
-/* --- shelves ------------------------------------------------------------ */
-
-.shelfBlock {
-  margin-bottom: 1.75rem;
-}
-
-.shelfBlock h2 {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  margin: 0 0 0.4rem;
-}
-
-.shelfBlock h2:empty {
-  display: none;
 }
 
 .count {
@@ -48,176 +22,34 @@
   font-variant-numeric: tabular-nums;
 }
 
-.shelf {
-  position: relative;
-}
-
-/* align-items: flex-end so books of different heights all stand ON the
-   shelf rather than being centred in the air above it. Scrolls sideways once
-   a shelf fills, which is what a real one does too. */
-.books {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  min-height: 3.5rem;
-  padding: 0 0.6rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-/* The board: a lip in front and a shadow under, so the books sit on something
-   and the shelf has a front edge. */
-.board {
-  height: 10px;
-  border-radius: 0 0 3px 3px;
-  background: linear-gradient(
-    to bottom,
-    color-mix(in oklab, var(--line-bright) 70%, var(--bg)),
-    var(--bg-raised)
-  );
-  box-shadow:
-    0 2px 0 color-mix(in oklab, black 45%, transparent),
-    0 10px 14px -8px color-mix(in oklab, black 70%, transparent);
-}
-
-/* --- a spine ------------------------------------------------------------ */
-
-.spine,
-.spineLight {
-  position: relative;
-  flex: 0 0 auto;
-  border: 1px solid;
-  border-radius: 2px 2px 1px 1px;
-  padding: 0.5rem 0;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  /* A spine is read bottom-to-top on most shelves. */
-  overflow: hidden;
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease;
-  box-shadow: inset -2px 0 4px -2px color-mix(in oklab, black 60%, transparent);
-}
-
-.spine {
-  color: oklch(92% 0.02 85);
-}
-
-/* A pale binding needs dark lettering, which is why the spine says whether it
-   is light. */
-.spineLight {
-  color: oklch(22% 0.03 85);
-}
-
-/* Lifts out of the shelf a little on hover — the gesture the click completes. */
-.spine:hover,
-.spineLight:hover {
-  transform: translateY(-7px);
-  box-shadow:
-    inset -2px 0 4px -2px color-mix(in oklab, black 60%, transparent),
-    0 8px 12px -4px color-mix(in oklab, black 70%, transparent);
-}
-
-.spine:focus-visible,
-.spineLight:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* The book that is currently open is off the shelf, so its slot is empty
-   rather than showing a duplicate of it. */
-.spineGone {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Binding bands near each end — most of what distinguishes a spine from a
-   coloured rectangle. */
-.band {
-  flex: 0 0 auto;
-  width: 72%;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.35;
-}
-
-.spineText {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  /* Vertical text, reading bottom to top, which is how most spines are set. */
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  padding: 0.3rem 0;
-}
-
-.spineTitle {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: 100%;
-}
-
-.spineAuthor {
-  font-size: 0.62rem;
-  opacity: 0.72;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: 40%;
-  flex: 0 0 auto;
-}
-
-/* --- year folds --------------------------------------------------------- */
-
-.yearPill {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  background: none;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.8125rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 0.3rem 0.9rem;
-  margin: 0 0 0.5rem;
-  cursor: pointer;
-}
-
-.yearPill:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.yearPill span:last-child {
-  margin-left: auto;
-  color: var(--muted);
-}
-
 /* --- the book, off the shelf and open ----------------------------------- */
 
 .overlay {
   position: fixed;
-  inset: 0;
+  /* PINNED TO THE VIEWPORT EXPLICITLY, not with inset: 0.
+     inset resolves against the containing block, and under /work this is
+     nested inside the app shell's panes — so it was coming out the height of
+     the scrolling column rather than the height of the window, and the whole
+     overlay stopped partway down the screen. dvh and vw depend on nothing
+     above this element. dvh, not vh, for the same reason the shell uses it:
+     on a phone the toolbar comes and goes and vh does not know. */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
   z-index: 50;
   background: color-mix(in oklab, black 72%, transparent);
   backdrop-filter: blur(3px);
-  display: grid;
-  place-items: center;
-  padding: 1.25rem;
+  /* FLEX, not grid. Two goes at grid both left the panel at its content
+     height: `place-items: center` sized the single row to content, and
+     stretching it still left `height: 100%` resolving against a track the
+     panel was itself defining. A flex row stretches its item on the cross
+     axis by default, so the height needs no percentage at all — and `flex: 1`
+     on the panel takes the main axis. Nothing here depends on a percentage
+     resolving against a track whose size depends on the item. */
+  display: flex;
+  /* 25px of window on every side and the book takes the rest. */
+  padding: 25px;
   animation: fade 0.18s ease;
 }
 
@@ -234,12 +66,21 @@
 .bookClosed,
 .bookOpen {
   position: relative;
-  width: min(86rem, 100%);
-  height: min(92vh, 60rem);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--line-bright);
+  /* The window less the 25px gutter on each side, stated outright. Every
+     inherited route to this — percentage heights, grid stretch, flex
+     cross-axis stretch — went through the same constrained ancestors that
+     were shrinking .overlay, so none of them could be right while that was
+     wrong. This is right regardless. */
+  flex: 1 1 auto;
+  min-width: 0;
+  height: calc(100dvh - 50px);
+  /* One page, top to bottom: the head, the work, and the one dangerous
+     button at the very foot. It was a two-column spread when the right half
+     was a textarea. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-raised);
   border: 1px solid var(--line-bright);
   border-radius: 4px;
   box-shadow: 0 30px 60px -20px color-mix(in oklab, black 90%, transparent);
@@ -265,121 +106,12 @@
   }
 }
 
+
 /* The left page is the narrower one now that the book is nearly full screen:
    the facts are a fixed amount of text and the writing wants the room. */
 .bookClosed,
 .bookOpen {
   grid-template-columns: minmax(16rem, 26rem) 1fr;
-}
-
-.leftPage,
-.rightPage {
-  background: var(--bg-raised);
-  padding: 1.6rem 1.8rem;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-/* The gutter: a page is lit from the outside edge and falls into shadow at the
-   spine, which is most of what makes two rectangles read as one open book. */
-.leftPage {
-  border-radius: 3px 0 0 3px;
-  background-image: linear-gradient(
-    to right,
-    transparent 70%,
-    color-mix(in oklab, black 30%, transparent)
-  );
-}
-
-.rightPage {
-  border-radius: 0 3px 3px 0;
-  background-image: linear-gradient(
-    to left,
-    transparent 70%,
-    color-mix(in oklab, black 30%, transparent)
-  );
-}
-
-@media (max-width: 680px) {
-  .bookClosed,
-  .bookOpen {
-    grid-template-columns: 1fr;
-    height: min(92vh, 44rem);
-  }
-
-  .leftPage,
-  .rightPage {
-    background-image: none;
-    border-radius: 3px;
-  }
-}
-
-.leftPage h3 {
-  font-size: var(--step-sub);
-  line-height: 1.15;
-  margin: 0;
-}
-
-.byline {
-  color: var(--muted);
-  margin: 0.2rem 0 1rem;
-  font-size: 0.9375rem;
-}
-
-.facts {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.45rem 0.9rem;
-  margin: 0;
-  font-size: 0.8125rem;
-  align-items: center;
-}
-
-.facts dt {
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.65rem;
-}
-
-.facts dd {
-  margin: 0;
-  font-variant-numeric: tabular-nums;
-}
-
-.took {
-  color: var(--accent);
-}
-
-.pageInputs {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--muted);
-}
-
-.pageInputs input,
-.facts select {
-  width: 4.4rem;
-  background: var(--bg);
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.12rem 0.35rem;
-}
-
-.facts select {
-  width: auto;
-}
-
-.pageInputs input:focus,
-.facts select:focus,
-.rightPage textarea:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 .stars {
@@ -390,10 +122,16 @@
 .starOff {
   background: none;
   border: 0;
-  font-size: 1rem;
+  font-size: 1.35rem;
   line-height: 1;
   cursor: pointer;
-  padding: 0 0.03rem;
+  padding: 0 0.06rem;
+  /* These sit on the cover now, not on --bg-raised. A dark outline under a
+     pale star and a pale one under a dark star means the row reads on any
+     cover rather than on most of them. */
+  text-shadow:
+    0 0 3px oklch(0% 0 0 / 0.9),
+    0 1px 3px oklch(0% 0 0 / 0.8);
 }
 
 .starOn {
@@ -401,23 +139,26 @@
 }
 
 .starOff {
-  color: var(--line-bright);
+  color: oklch(99% 0 0 / 0.38);
 }
 
 .starOff:hover {
-  color: var(--muted);
+  color: oklch(99% 0 0 / 0.75);
 }
 
-/* Last, and quiet. Removing a book is rare and irreversible. */
+/* The very last thing on the page, under everything including the sketch.
+   Removing a book is rare and irreversible, so it is as far from the work as
+   the page can put it. */
 .removeBook {
-  margin-top: auto;
-  padding-top: 1rem;
+  align-self: center;
+  margin: 0.4rem 0 0;
+  padding: 0.6rem 0 0.2rem;
   background: none;
   border: 0;
   color: var(--line-bright);
   font: inherit;
   font-size: 0.75rem;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
 }
 
@@ -425,132 +166,9 @@
   color: var(--accent);
 }
 
-.rightPage label {
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.65rem;
-  margin-bottom: 0.4rem;
-}
-
-/* Serif, and capped at a readable measure even though the page is now wide —
-   prose set across eighty characters is harder to read, not easier. */
-.rightPage textarea {
-  flex: 1 1 auto;
-  width: 100%;
-  max-width: 44rem;
-  background: none;
-  border: 0;
-  color: var(--ink);
-  font-family: ui-serif, Georgia, serif;
-  font-size: 1.0625rem;
-  line-height: 1.68;
-  resize: none;
-  padding: 0;
-}
-
-.hint {
-  color: var(--line-bright);
-  font-size: 0.65rem;
-  margin: 0.5rem 0 0;
-}
-
-.shut {
-  position: absolute;
-  top: -0.6rem;
-  right: -0.6rem;
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: 50%;
-  border: 1px solid var(--line-bright);
-  background: var(--bg);
-  color: var(--muted);
-  font-size: 1.1rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.shut:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* --- adding ------------------------------------------------------------- */
-
-.add {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 2.5rem 0 0;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
-}
-
-.add input {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.875rem;
-  padding: 0.35rem 0.6rem;
-  flex: 1 1 11rem;
-  min-width: 0;
-}
-
-.add select {
-  background: var(--bg);
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.25rem 0.3rem;
-}
-
-.add input:focus,
-.add select:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.add button {
-  background: none;
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.875rem;
-  padding: 0.35rem 0.9rem;
-  cursor: pointer;
-}
-
-.add button:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.add button:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
 .status {
   color: var(--muted);
   font-size: 0.875rem;
-}
-
-.empty {
-  color: var(--muted);
-  font-size: 0.9375rem;
-  max-width: 50ch;
-  line-height: 1.6;
-}
-
-.empty em {
-  color: var(--ink);
-  font-style: normal;
-  font-weight: 600;
 }
 
 .warn {
@@ -562,45 +180,990 @@
   margin-bottom: 1rem;
 }
 
-/* --- becoming a post ---------------------------------------------------- */
+/* --- adding ------------------------------------------------------------- */
 
-.postBlock {
-  margin-top: auto;
-  padding-top: 1.25rem;
+/* The round +, as on the habits page. One control, shut until wanted: this
+   page is read far more often than it is added to. */
+.addSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0 0 1.75rem;
 }
 
-.makePost {
-  background: none;
-  border: 1px solid var(--accent);
-  border-radius: 4px;
-  color: var(--accent);
-  font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.35rem 0.8rem;
+.addToggle,
+.addToggleOn {
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  display: grid;
+  place-items: center;
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.makePost:hover:not(:disabled) {
+.addToggle svg,
+.addToggleOn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: transform 0.18s ease, stroke 0.15s ease;
+}
+
+.addToggle:hover {
+  border-color: var(--line-bright);
+}
+
+.addToggle:hover svg {
+  stroke: var(--ink);
+}
+
+.addToggleOn {
+  border-color: var(--accent);
   background: var(--accent-dim);
 }
 
-.makePost:disabled {
-  opacity: 0.35;
-  border-color: var(--line-bright);
+.addToggleOn svg {
+  stroke: var(--accent);
+  transform: rotate(45deg);
+}
+
+.addCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 28rem;
+  max-width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--line-bright);
+  border-radius: 12px;
+  background: var(--bg-raised);
+}
+
+.addRow {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.addRow input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.addAuthor {
+  width: 100%;
+}
+
+.addCard input,
+.addCard select,
+.addCard textarea {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.4rem 0.5rem;
+}
+
+.addCard input:focus,
+.addCard select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The library's own matches. Capped at sixty in the component — three and a
+   half thousand buttons is not a list, it is a scroll. */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 16rem;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 0.2rem;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+}
+
+.result:hover {
+  background: var(--accent-dim);
+}
+
+.resultTitle {
+  font-size: 0.8125rem;
+}
+
+.resultAuthor {
+  font-size: 0.7rem;
   color: var(--muted);
+}
+
+/* What came with a library pick. The fields behind it — series, genre,
+   language — are not on the form, so without this they would arrive
+   invisibly and there would be no way to tell a picked book from a typed one. */
+.picked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--accent);
+}
+
+.picked button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.7rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.addGo {
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+}
+
+.addGo:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.addGo:disabled {
+  opacity: 0.4;
   cursor: default;
 }
 
-/* Says plainly that it is a draft. A tool that wrote to a public site on one
-   click and did not say so would be one nobody could use for a first draft. */
-.postedLine {
-  color: var(--muted);
-  font-size: 0.75rem;
-  line-height: 1.5;
-  margin: 0.5rem 0 0;
-  max-width: 34ch;
+/* --- the shelf cards ---------------------------------------------------- */
+
+.shelfCard,
+.shelfOpen {
+  margin: 0 auto 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+  overflow: hidden;
+  transition: max-width 0.18s ease;
 }
 
-.postedLine a {
+/* Shut, it is a pill in the middle of the page. Open, it is the width of the
+   column — the expansion itself, rather than a panel appearing elsewhere. */
+.shelfCard {
+  max-width: 18rem;
+}
+
+.shelfOpen {
+  max-width: 100%;
+  border-color: var(--line-bright);
+  /* The cover swings out WIDER than the spine and, at the end of a row, past
+     the card itself. Clipping it cut the book off at the card's edge. Only
+     the open card: shut, it is a pill whose rounded corners want the clip. */
+  overflow: visible;
+}
+
+.shelfPill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--step-sub);
+  padding: 0.7rem 1.1rem;
+  cursor: pointer;
+}
+
+.shelfPill:hover {
   color: var(--accent);
+}
+
+.shelfBody {
+  padding: 0.2rem 1.1rem 1.1rem;
+}
+
+.yearGroup + .yearGroup {
+  margin-top: 1.25rem;
+}
+
+.yearName {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* --- the books ---------------------------------------------------------- */
+
+/* Books standing on a shelf, bottoms aligned — they are not all the same
+   height, which is most of what stops a row of them reading as a chart.
+   No board under them: with cover art the books are the thing. */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.3rem 0.25rem;
+  /* The cover swings out WIDER than the spine it came from, over whatever is
+     beside it. Clipping that would cut the book in half mid-turn. */
+  overflow: visible;
+  padding: 0.6rem 0 0.2rem;
+}
+
+/* One book's place on the shelf. The perspective lives here rather than on
+   the row, so every book is seen head-on instead of the ones at the edges
+   being viewed from an angle. */
+.slot {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1100px;
+  transition: z-index 0s;
+}
+
+.slot:hover,
+.slot:focus-visible {
+  /* Over its neighbours while it is turned out. */
+  z-index: 5;
+}
+
+.slot:focus-visible {
+  outline: none;
+}
+
+.book3d {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  /* The left edge, so the book pivots on its spine the way it would if you
+     hooked a finger over the top and tipped it out. */
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.22, 0.75, 0.28, 1);
+}
+
+/* Taken off the shelf and turned to face the reader.
+ *
+ * THE DIRECTION IS NOT ARBITRARY. A shelved book's front cover is the face
+ * whose outward normal points to the RIGHT — the spine is the cover's left
+ * edge — so bringing it round to the reader is a turn of MINUS ninety. Plus
+ * ninety presents the back board, which is what it looked like.
+ *
+ * The translateX is the other half of it, and the part that was actually
+ * wrong before: rotating about the spine alone leaves the cover unfolding
+ * off to one side like a door, with the book still apparently on the shelf.
+ * Shifting left by half the difference between cover and spine lands the
+ * cover centred over where the book stood, so it reads as the book being
+ * taken out and turned. It comes first, so it happens in screen space
+ * rather than in the book's own turned frame. */
+.slot:hover .book3d,
+.slot:focus-visible .book3d {
+  transform: translateX(calc((var(--spine-w) - var(--cover-w)) / 2))
+    translateY(-12px)
+    rotateY(-90deg);
+}
+
+.spineFace,
+.coverFace {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border: 1px solid;
+  border-radius: 2px 3px 3px 2px;
+  overflow: hidden;
+  /* Each face is a flat sheet; without this the far one shows through the
+     near one while the book is side-on. */
+  backface-visibility: hidden;
+}
+
+.spineFace {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0;
+  box-shadow: inset -3px 0 6px oklch(0% 0 0 / 0.35);
+}
+
+/* The cover sits at ninety degrees to the spine in the book's own frame, so
+   turning the book by ninety brings it square to the reader. Hinged on the
+   spine's left edge, lying back into the shelf where the body of the book
+   actually is. Its face then points right, which is the front cover. */
+.coverFace {
+  width: var(--cover-w);
+  transform: rotateY(90deg);
+  transform-origin: left center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.9rem 0.7rem;
+  text-align: left;
+  box-shadow: 0 10px 24px oklch(0% 0 0 / 0.5);
+}
+
+.coverFace img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Binding bands, which are most of what says "book" rather than "coloured
+   rectangle". */
+.band {
+  width: 100%;
+  height: 3px;
+  background: oklch(0% 0 0 / 0.28);
+  flex: 0 0 auto;
+}
+
+.spineText {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 0;
+  overflow: hidden;
+  /* Down the spine, as it is on a shelf. */
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding: 0.35rem 0;
+}
+
+.spineTitle {
+  font-size: 0.7rem;
+  line-height: 1;
+  color: oklch(97% 0 0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 100%;
+}
+
+.spineAuthor {
+  font-size: 0.58rem;
+  line-height: 1;
+  color: oklch(97% 0 0 / 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 60%;
+}
+
+/* A pale spine wants dark type on it. */
+.spineLight .spineTitle,
+.blankLight .blankTitle {
+  color: oklch(18% 0 0);
+}
+
+.spineLight .spineAuthor,
+.blankLight .blankAuthor {
+  color: oklch(18% 0 0 / 0.7);
+}
+
+/* The book being read, which has animated out of the row into the middle of
+   the screen. Hidden rather than removed, so the row does not reflow under
+   the animation. */
+.slotGone {
+  visibility: hidden;
+}
+
+/* No cover: the derived colour and the title, which is what a hand-typed
+   book looks like. The Odyssey is not in the Calibre library, so this is the
+   normal case and not a fallback for a failure. */
+.blankTitle {
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  color: oklch(97% 0 0);
+}
+
+.blankAuthor {
+  font-size: 0.65rem;
+  color: oklch(97% 0 0 / 0.65);
+}
+
+.bare {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  margin: 0.2rem 0 0.6rem;
+}
+
+.quotes {
+  list-style: none;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quotes blockquote {
+  margin: 0;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--accent);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.quoteFoot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+  padding-left: 0.6rem;
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hidden until the quote is hovered. Removing one is rare, and a column of
+   crosses down the page is clutter inviting an accident. */
+.quoteFoot button,
+.quotes li:hover .quoteFoot button,
+.quoteFoot button:hover,
+/* --- the open book: what it is ------------------------------------------ */
+
+/* One block, running straight into the work below it: no rule, no border, no
+   scroll of its own. It is the head of one page, not a panel beside another.
+   The cover runs the whole height of it rather than only behind the title —
+   the controls sit on the book, not on grey. */
+.topMatter {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 2.1rem 1.25rem 1.4rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.bannerBed {
+  position: absolute;
+  inset: 0;
+}
+
+/* Blurred and scaled past the edges so it reads as a ground rather than as a
+   small picture with the title on it. */
+.bannerArt {
+  position: absolute;
+  inset: -12%;
+  width: 124%;
+  height: 124%;
+  object-fit: cover;
+  filter: blur(16px) saturate(1.15);
+  opacity: 0.7;
+}
+
+/* Darkened, and more so toward the foot where the controls sit. Without it a
+   pale cover makes every label on top of it unreadable. */
+.bannerShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    oklch(0% 0 0 / 0.32) 0%,
+    oklch(0% 0 0 / 0.58) 42%,
+    oklch(0% 0 0 / 0.86) 100%
+  );
+}
+
+.bannerText {
+  position: relative;
+  text-align: center;
+}
+
+/* The face comes from the genre — see fontFor(). Big, because the title is
+   the one thing on this page that does not need a label. */
+.bookTitle {
+  margin: 0;
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  line-height: 1.1;
+  color: oklch(99% 0 0);
+  text-shadow: 0 2px 14px oklch(0% 0 0 / 0.85);
+}
+
+.bookAuthor {
+  margin: 0.35rem 0 0;
+  font-size: 0.9375rem;
+  color: oklch(99% 0 0 / 0.85);
+  text-shadow: 0 1px 8px oklch(0% 0 0 / 0.8);
+}
+
+/* The series, which is why the input for it can retire. */
+.bookSeries {
+  margin: 0.2rem 0 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: oklch(99% 0 0 / 0.62);
+}
+
+/* The genre, as a mark in the corner — what is left of the input once the
+   four facts are settled. */
+.genreMark {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 1;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  border: 1px solid oklch(99% 0 0 / 0.3);
+  background: oklch(0% 0 0 / 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  color: oklch(99% 0 0 / 0.85);
+  overflow: hidden;
+}
+
+/* When it was started, as a dot in the other corner. */
+.started {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 1;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  border: 1px solid oklch(99% 0 0 / 0.35);
+  background: oklch(0% 0 0 / 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: oklch(99% 0 0);
+}
+
+.startedDay {
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.startedMonth {
+  font-size: 0.55rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* --- the controls, a narrow column -------------------------------------- */
+
+/* 30% of the panel. They are small and few, and run the full width they read
+   as a form — which this deliberately is not. */
+.controls {
+  position: relative;
+  width: 30%;
+  min-width: 17rem;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Two by two. Four short facts do not want four rows — and once they are
+   settled they are not here at all. */
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem 0.5rem;
+  width: 100%;
+}
+
+.fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.fields label span {
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: oklch(99% 0 0 / 0.6);
+}
+
+.fields input {
+  width: 100%;
+  min-width: 0;
+  background: oklch(0% 0 0 / 0.42);
+  border: 1px solid oklch(99% 0 0 / 0.22);
+  border-radius: 5px;
+  color: oklch(99% 0 0);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.4rem;
+}
+
+.fields input::placeholder {
+  color: oklch(99% 0 0 / 0.35);
+}
+
+.fields input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* --- shelf, as pills ---------------------------------------------------- */
+
+.shelfPills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.shelfOff,
+.shelfOn {
+  flex: 1 1 auto;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
+.shelfOff {
+  background: oklch(0% 0 0 / 0.4);
+  border: 1px solid oklch(99% 0 0 / 0.25);
+  color: oklch(99% 0 0 / 0.75);
+}
+
+.shelfOff:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.shelfOn {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+/* --- the work: quotes, and the page they were taken on ------------------ */
+
+/* The only thing in the panel that scrolls. The head above it does not, by
+   his rule, and the button below it must stay reachable. */
+.workArea {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.9rem 1.25rem 0.4rem;
+  overflow: hidden;
+}
+
+.quoteColumn {
+  flex: 0 0 15rem;
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.quotes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.quotes blockquote {
+  margin: 0;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--accent);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.quoteFoot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+  padding-left: 0.6rem;
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hidden until the quote is hovered. Removing one is rare, and a column of
+   crosses is clutter inviting an accident. */
+.quoteFoot button {
+  background: none;
+  border: 0;
+  color: transparent;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0 0.2rem;
+  cursor: pointer;
+}
+
+.quotes li:hover .quoteFoot button,
+.quoteFoot button:focus-visible {
+  color: var(--muted);
+}
+
+.quoteFoot button:hover {
+  color: var(--accent) !important;
+}
+
+/* The last entry in the list IS the next quote — one field, not a form. */
+.quoteNew input {
+  width: 100%;
+  background: none;
+  border: 0;
+  border-left: 2px dashed var(--line-bright);
+  border-radius: 0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  padding: 0 0 0 0.6rem;
+}
+
+.quoteNew input::placeholder {
+  color: var(--muted-2);
+}
+
+.quoteNew input:focus {
+  outline: none;
+  border-left-color: var(--accent);
+}
+
+/* --- the sketch --------------------------------------------------------- */
+
+.sketchWrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  gap: 0.6rem;
+}
+
+/* As wide as what is left. The page keeps its 4:3 so coordinates mean the
+   same thing here as they do in the sketchpad — see lib/sketch.ts. */
+/* The panel the sheet scrolls inside. The sheet itself is as tall as the
+   note needs; this is the window onto it. */
+.sketchScroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+/* Full width of the window, and whatever height its own ratio gives — set
+   inline from the page count. Never a fixed height: a letterboxed svg puts
+   the ink off the cursor, which is what the aspect-ratio avoids. */
+.sketch {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+}
+
+.tools {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  padding-top: 0.1rem;
+}
+
+.toolRow {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.tool,
+.toolOn {
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.tool svg,
+.toolOn svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tool {
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+
+.tool svg {
+  stroke: var(--muted);
+}
+
+.tool:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.tool:hover:not(:disabled) svg {
+  stroke: var(--accent);
+}
+
+.tool:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.toolOn {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+}
+
+.toolOn svg {
+  stroke: var(--accent);
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+}
+
+.swatch,
+.swatchOn {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 999px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.swatch {
+  border: 1px solid var(--line-bright);
+}
+
+/* A ring rather than a border colour: the swatch IS its colour, so the mark
+   saying it is chosen cannot be made of colour. */
+.swatchOn {
+  border: 1px solid var(--ink);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px var(--accent);
+}
+
+.thickness {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.6rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Vertical, because the tools are a column and a horizontal slider here
+   would set the width of the whole rail. */
+.thickness input {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 1.1rem;
+  height: 4.5rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.saveSketch {
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.55rem;
+  cursor: pointer;
+}
+
+.saveSketch:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.saveSketch:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.sketchStatus {
+  margin: 0;
+  max-width: 5rem;
+  font-size: 0.6rem;
+  line-height: 1.3;
+  color: var(--muted);
+  text-align: center;
 }

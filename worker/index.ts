@@ -1013,6 +1013,11 @@ export default {
               configured: true,
               habits: habits.results,
               ticks: byHabit,
+              // The whole record, for the week/month/year grids. Already read
+              // above for the streaks, so this costs nothing extra — and
+              // paging it per view would mean three more round trips to
+              // Western Europe to draw something the page already holds.
+              history: everyDay,
               streaks,
               month,
               days,
@@ -1137,11 +1142,43 @@ export default {
           const books = await db
             .prepare(
               `select id, title, author, status, pages, page,
-                      started_on, finished_on, rating, notes, post_path
+                      started_on, finished_on, rating, notes, post_path,
+                      calibre_id, series, series_index, genre, language, translator,
+                      details_done
                from books order by status, id desc`,
             )
             .all();
-          return json({ configured: true, books: books.results, today: localDay() }, 200);
+
+          // Quotes and sketch notes in one round trip each rather than one
+          // per book opened: there are tens of these, not thousands, and the
+          // page opens a book by animating a cover already on screen — going
+          // to Western Europe at that moment would stall the animation.
+          const quotes = await db
+            .prepare(
+              'select id, book_id, text, page, created_at from book_quotes order by id',
+            )
+            .all<{ id: number; book_id: number; text: string; page: number | null; created_at: string }>();
+
+          const notes = await db
+            .prepare('select path, book_id, title, created_at from book_notes order by created_at')
+            .all<{ path: string; book_id: number; title: string; created_at: string }>();
+
+          const byBook = <T extends { book_id: number }>(rows: T[]): Record<string, T[]> => {
+            const out: Record<string, T[]> = {};
+            for (const row of rows) (out[String(row.book_id)] ??= []).push(row);
+            return out;
+          };
+
+          return json(
+            {
+              configured: true,
+              books: books.results,
+              quotes: byBook(quotes.results),
+              notes: byBook(notes.results),
+              today: localDay(),
+            },
+            200,
+          );
         }
 
         if (request.method === 'POST') {
@@ -1155,6 +1192,16 @@ export default {
             page?: number | null;
             rating?: number | null;
             notes?: string;
+            calibreId?: number | null;
+            series?: string | null;
+            seriesIndex?: number | null;
+            genre?: string | null;
+            language?: string | null;
+            translator?: string | null;
+            detailsDone?: boolean;
+            text?: string;
+            path?: string;
+            quoteId?: number;
           } | null;
           if (!body) return json({ error: 'malformed body' }, 400);
 
@@ -1167,16 +1214,41 @@ export default {
                 : null;
             const status = STATUSES.includes(String(body.status)) ? String(body.status) : 'want';
 
-            await db
+            // Everything below is null for a book typed in by hand, which is
+            // the normal case: the library has 3,623 books and he has read
+            // plenty that are not in it.
+            const text = (value: unknown, max: number): string | null =>
+              typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : null;
+            const calibreId = Number.isInteger(Number(body.calibreId))
+              ? Number(body.calibreId)
+              : null;
+            const seriesIndex = Number.isFinite(Number(body.seriesIndex))
+              ? Number(body.seriesIndex)
+              : null;
+
+            const inserted = (await db
               .prepare(
-                `insert into books (title, author, status, started_on, created_at)
-                 values (?1, ?2, ?3, ?4, ?5)`,
+                `insert into books (title, author, status, started_on, created_at,
+                                    calibre_id, series, series_index, genre, language, translator)
+                 values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)`,
               )
               // Added straight to 'reading' means it was started today, which
               // is the only sensible reading of that.
-              .bind(title, author, status, status === 'reading' ? localDay() : null, new Date().toISOString())
-              .run();
-            return json({ added: true }, 200);
+              .bind(
+                title, author, status,
+                status === 'reading' ? localDay() : null,
+                new Date().toISOString(),
+                calibreId,
+                text(body.series, 200),
+                // Only meaningful with a series, and Calibre stores 1.0 for
+                // everything that has none.
+                text(body.series, 200) ? seriesIndex : null,
+                text(body.genre, 300),
+                text(body.language, 40),
+                text(body.translator, 200),
+              )
+              .run()) as { meta?: { last_row_id?: number } };
+            return json({ added: true, id: inserted.meta?.last_row_id ?? null }, 200);
           }
 
           if (body.action === 'update') {
@@ -1215,6 +1287,12 @@ export default {
                   ? undefined
                   : Math.min(Math.max(Math.floor(Number(body.rating)) || 1, 1), 5);
 
+            // coalesce, so a field the page did not send is left alone and
+            // an empty string clears one deliberately. The two are different
+            // and a form that cannot tell them apart cannot clear a typo.
+            const field = (value: unknown, max: number): string | null =>
+              typeof value === 'string' ? value.trim().slice(0, max) : null;
+
             await db
               .prepare(
                 `update books set
@@ -1224,7 +1302,16 @@ export default {
                    started_on = ?5,
                    finished_on = ?6,
                    rating = case when ?7 = 1 then ?8 else rating end,
-                   notes = coalesce(?9, notes)
+                   notes = coalesce(?9, notes),
+                   series = coalesce(?10, series),
+                   series_index = coalesce(?11, series_index),
+                   genre = coalesce(?12, genre),
+                   language = coalesce(?13, language),
+                   translator = coalesce(?14, translator),
+                   author = coalesce(?15, author),
+                   -- One way only. Settling the four facts hides the inputs;
+                   -- it is not a toggle, and nothing on the page unsets it.
+                   details_done = case when ?16 = 1 then 1 else details_done end
                  where id = ?1`,
               )
               .bind(
@@ -1237,9 +1324,77 @@ export default {
                 rating === undefined ? 0 : 1,
                 rating ?? null,
                 typeof body.notes === 'string' ? body.notes.slice(0, 4000) : null,
+                field(body.series, 200),
+                Number.isFinite(Number(body.seriesIndex)) ? Number(body.seriesIndex) : null,
+                field(body.genre, 300),
+                field(body.language, 40),
+                field(body.translator, 200),
+                field(body.author, 200),
+                body.detailsDone ? 1 : 0,
               )
               .run();
             return json({ updated: true, id, status }, 200);
+          }
+
+          /* Quotes. Their own rows, so they can be listed and counted —
+             see migration 0012 for why they are not lines in `notes`. */
+          if (body.action === 'quote-add') {
+            const id = Number(body.id);
+            const text = typeof body.text === 'string' ? body.text.trim().slice(0, 4000) : '';
+            if (!Number.isInteger(id)) return json({ error: 'which book' }, 400);
+            if (!text) return json({ error: 'nothing to keep' }, 400);
+            const page = Number.isInteger(Number(body.page)) && Number(body.page) > 0
+              ? Number(body.page)
+              : null;
+            await db
+              .prepare(
+                `insert into book_quotes (book_id, text, page, created_at)
+                 values (?1, ?2, ?3, ?4)`,
+              )
+              .bind(id, text, page, new Date().toISOString())
+              .run();
+            return json({ added: true }, 200);
+          }
+
+          if (body.action === 'quote-remove') {
+            const quoteId = Number(body.quoteId);
+            if (!Number.isInteger(quoteId)) return json({ error: 'which quote' }, 400);
+            await db.prepare('delete from book_quotes where id = ?1').bind(quoteId).run();
+            return json({ removed: true }, 200);
+          }
+
+          /* A sketchpad page kept against a book.
+             The drawing itself is a file in the `notes` collection, written
+             through /work/api/content like every other sketch — this only
+             records which book it belongs to. */
+          if (body.action === 'note-add') {
+            const id = Number(body.id);
+            const path = typeof body.path === 'string' ? body.path.trim().slice(0, 400) : '';
+            if (!Number.isInteger(id)) return json({ error: 'which book' }, 400);
+            if (!path) return json({ error: 'which sketch' }, 400);
+            const title = typeof body.title === 'string' && body.title.trim()
+              ? body.title.trim().slice(0, 300)
+              : path.split('/').pop() ?? path;
+            // The path is the key, so re-saving the same sketch against the
+            // same book updates it rather than failing on the primary key.
+            await db
+              .prepare(
+                `insert into book_notes (path, book_id, title, created_at)
+                 values (?1, ?2, ?3, ?4)
+                 on conflict(path) do update set book_id = ?2, title = ?3`,
+              )
+              .bind(path, id, title, new Date().toISOString())
+              .run();
+            return json({ linked: true }, 200);
+          }
+
+          if (body.action === 'note-remove') {
+            const path = typeof body.path === 'string' ? body.path : '';
+            if (!path) return json({ error: 'which sketch' }, 400);
+            // Unlinks only. The sketch is a file in the repo and deleting it
+            // is the sketchpad's business, not this page's.
+            await db.prepare('delete from book_notes where path = ?1').bind(path).run();
+            return json({ removed: true }, 200);
           }
 
           // A book's notes, as a draft post on the site.

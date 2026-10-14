@@ -45,10 +45,27 @@ export interface Scene {
   version: 1;
   background: string;
   items: Item[];
+  /**
+   * How many pages tall the sheet is. Optional, and absent means one.
+   *
+   * NOT a version bump: a file written before this existed has no `pages`,
+   * reads back as one page, and is exactly what it always was. A file with
+   * several opened by something that ignores this still restores every
+   * stroke — the scene JSON is whole — it would just draw them all on one
+   * page. That is why toSvg sizes the rendered svg from this: without it the
+   * second page of a note would exist in the file and be invisible in it.
+   */
+  pages?: number;
 }
 
 export function emptyScene(): Scene {
-  return { version: 1, background: '#16181d', items: [] };
+  return { version: 1, background: '#16181d', items: [], pages: 1 };
+}
+
+/** Pages, clamped to something a file could sensibly hold. */
+export function pagesOf(scene: Scene): number {
+  const n = Math.floor(scene.pages ?? 1);
+  return Number.isFinite(n) ? Math.min(Math.max(n, 1), 40) : 1;
 }
 
 export function newId(): string {
@@ -106,10 +123,13 @@ export function toSvg(scene: Scene): string {
     .join('\n  ');
 
   const embedded = JSON.stringify(scene).replace(/]]>/g, ']]]]><![CDATA[>');
+  // The sheet is as tall as the note needs. One page is the usual answer and
+  // the one every file written before this had.
+  const height = PAGE.height * pagesOf(scene);
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PAGE.width} ${PAGE.height}" width="${PAGE.width}" height="${PAGE.height}">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${PAGE.width} ${height}" width="${PAGE.width}" height="${height}">
   <metadata><sketch xmlns="https://masterroachi.com/ns/sketch"><![CDATA[${embedded}]]></sketch></metadata>
-  <rect width="${PAGE.width}" height="${PAGE.height}" fill="${xml(scene.background)}"/>
+  <rect width="${PAGE.width}" height="${height}" fill="${xml(scene.background)}"/>
   ${body}
 </svg>
 `;
@@ -132,6 +152,7 @@ export function fromSvg(svg: string): Scene | null {
     return {
       version: 1,
       background: typeof parsed.background === 'string' ? parsed.background : '#16181d',
+      pages: pagesOf(parsed),
       items: parsed.items.filter(
         (item) =>
           item &&

@@ -7,6 +7,7 @@ import {
   fromSvg,
   isBlank,
   newId,
+  pagesOf,
   toSvg,
   type Item,
   type Scene,
@@ -92,6 +93,11 @@ export default function Sketchpad() {
     element.setSelectionRange(element.value.length, element.value.length);
   }, [editing]);
 
+  /* The book this sketch belongs to, when the reading page sent us here.
+     Read from the query string rather than held in a store: the link is the
+     whole handover, so a reload or a shared URL carries it too. */
+  const [book, setBook] = useState<{ id: number; title: string } | null>(null);
+
   const loadList = useCallback(async () => {
     const response = await fetch('/work/api/content?collection=notes', { cache: 'no-store' });
     if (!response.ok) {
@@ -108,20 +114,54 @@ export default function Sketchpad() {
     void loadList();
   }, [loadList]);
 
+  /* ?book=&title= — a new sketch for a book, from the reading page.
+     ?open= — an existing one, from a book's note list.
+     Read once on mount, then taken out of the URL so a reload does not
+     reopen a page that has since been saved under another name. */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const path = params.get('open');
+    const forBook = params.get('book');
+    const forTitle = params.get('title');
+
+    if (forBook && Number.isInteger(Number(forBook))) {
+      setBook({ id: Number(forBook), title: forTitle ?? '' });
+      // A sensible default name, so saving is one click from arriving here.
+      if (forTitle) setTitle(`${forTitle} — notes`);
+    }
+    if (path) void open(path);
+    if (path || forBook) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+    // Mount only: these are a handover, not live state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /** Screen point to page coordinates. The page scales; its coordinates do not. */
   function at(event: { clientX: number; clientY: number }): [number, number] {
     const box = surface.current!.getBoundingClientRect();
+    // The svg keeps its ratio inside the box it is given (xMidYMid meet), so
+    // the drawing is centred with bars on two sides. Dividing by the
+    // element's own size ignores them and the ink lands off the cursor.
+    const tall = PAGE.height * pagesOf(scene);
+    const scale = Math.min(box.width / PAGE.width, box.height / tall);
+    const barX = (box.width - PAGE.width * scale) / 2;
+    const barY = (box.height - tall * scale) / 2;
     return [
-      ((event.clientX - box.left) / box.width) * PAGE.width,
-      ((event.clientY - box.top) / box.height) * PAGE.height,
+      (event.clientX - box.left - barX) / scale,
+      (event.clientY - box.top - barY) / scale,
     ];
   }
 
   /** Page coordinates back to CSS pixels, for positioning the text editor. */
   function onScreen(x: number, y: number) {
     const box = surface.current?.getBoundingClientRect();
-    const scale = box ? box.width / PAGE.width : 1;
-    return { left: x * scale, top: y * scale, scale };
+    if (!box) return { left: x, top: y, scale: 1 };
+    const tall = PAGE.height * pagesOf(scene);
+    const scale = Math.min(box.width / PAGE.width, box.height / tall);
+    const barX = (box.width - PAGE.width * scale) / 2;
+    const barY = (box.height - tall * scale) / 2;
+    return { left: x * scale + barX, top: y * scale + barY, scale };
   }
 
   function change(items: Item[]) {
@@ -211,7 +251,23 @@ export default function Sketchpad() {
       if (!response.ok || !data.saved) throw new Error(data.error ?? `Failed (${response.status}).`);
 
       setDirty(false);
-      setStatus('Saved. One file, committed.');
+
+      /* Record which book this belongs to, if it belongs to one.
+         After the file is written, never before: a link to a sketch that
+         failed to save would be a dead row pointing at nothing. The drawing
+         stays the repo's; D1 only holds the association. */
+      if (book) {
+        await fetch('/work/api/reading', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ action: 'note-add', id: book.id, path, title: name }),
+        }).catch(() => {
+          // The sketch is saved either way, which is the part that matters.
+          setStatus('Saved, but it could not be linked to the book.');
+        });
+      }
+
+      setStatus(book ? `Saved, and kept against ${book.title}.` : 'Saved. One file, committed.');
       await loadList();
       if (!openPath) await open(path);
     } catch (error) {
@@ -434,7 +490,10 @@ export default function Sketchpad() {
           <svg
             ref={surface}
             className={styles.surface}
-            viewBox={`0 0 ${PAGE.width} ${PAGE.height}`}
+            /* As tall as the note is. A page made on the reading page can be
+               several pages long, and drawing it at one page high would hide
+               the rest and truncate it on the next save. */
+            viewBox={`0 0 ${PAGE.width} ${PAGE.height * pagesOf(scene)}`}
             data-tool={tool}
             onPointerDown={(event) => {
               // Editing: this click is the way out of it. Blurring commits the

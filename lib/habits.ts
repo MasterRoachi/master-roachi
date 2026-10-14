@@ -84,3 +84,55 @@ export function weekStreak(days: string[], target: number, today: string): numbe
   }
   return run;
 }
+
+/** Every day of a 'YYYY-MM' month, as date strings. */
+export function monthDaysOf(month: string): string[] {
+  const [year, m] = month.split('-').map(Number);
+  // Day 0 of the next month is the last day of this one.
+  const last = new Date(Date.UTC(year, m, 0)).getUTCDate();
+  return Array.from(
+    { length: last },
+    (_, i) => `${month}-${String(i + 1).padStart(2, '0')}`,
+  );
+}
+
+/** The seven days of today's week, Monday first. */
+export function weekDays(today: string): string[] {
+  const monday = new Date(`${weekOf(today)}T00:00:00Z`);
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(monday);
+    day.setUTCDate(monday.getUTCDate() + i);
+    return day.toISOString().slice(0, 10);
+  });
+}
+
+/**
+ * How much of a month was kept, 0 to 1. What shades a cell in the year grid.
+ *
+ * A month cannot be done or not done, so the year grid is the one place the
+ * page is not binary — his call, 14 Oct 2026. A yes/no rule would have been
+ * gold almost everywhere ("ticked at all") or black almost everywhere
+ * ("flawless"), and either way twelve cells would have said nothing.
+ *
+ * ONLY ELAPSED DAYS COUNT. A month half over is measured against the half
+ * that has happened, otherwise the current month reads as a failure every
+ * time it is looked at, and next month reads as one before it starts.
+ */
+export function keptRatio(
+  days: string[],
+  cadence: string,
+  target: number | null,
+  month: string,
+  today: string,
+): number {
+  const all = monthDaysOf(month);
+  const elapsed = all.filter((day) => day <= today).length;
+  if (elapsed === 0) return 0;
+
+  const done = days.filter((day) => day.slice(0, 7) === month).length;
+  // A weekly habit owes `target` per seven days, not one per day. Measuring
+  // it against the calendar would cap a kept 1x/week habit at 14%.
+  const owed = cadence === 'weekly' ? (elapsed / 7) * Math.max(1, target ?? 1) : elapsed;
+  if (owed <= 0) return 0;
+  return Math.min(1, done / owed);
+}

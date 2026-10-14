@@ -9,7 +9,8 @@
   /* The streak bar is fixed to the foot of the window, so the column has to
      end above it or the last year card sits under the bar. */
   margin: 2rem auto 0;
-  padding-bottom: 5.5rem;
+  /* Clear of the dock — streak bar plus the three buttons. */
+  padding-bottom: 8.5rem;
 }
 
 /* --- the year pills ------------------------------------------------------ */
@@ -117,40 +118,43 @@
 
 /* Daily and weekly, side by side while there is room. They are not the same
    question — a weekly habit sitting unticked among the dailies reads as a
-   thing missed rather than a thing not due — so they are two cards and not
-   one list with a heading in the middle. */
+   thing missed rather than a thing not due — so they stay two groups.
+   No card behind them any more (14 Oct): the icons are the thing, and a panel
+   around eight of them was a box drawn around a row. */
 .decks {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin: 0.9rem 0 0.2rem;
+  justify-content: center;
+  gap: 1.1rem 2rem;
+  margin: 0.9rem 0 0.4rem;
 }
 
+/* Sized to its own icons rather than to a share of the width: a flexible
+   basis let the daily group shrink below its eight boxes, which is what was
+   wrapping them onto a second row. */
 .deck {
-  flex: 1 1 14rem;
-  min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: color-mix(in oklab, var(--bg) 35%, var(--bg-raised));
-  padding: 0.8rem;
+  flex: 0 0 auto;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
-/* The boxes wrap rather than sitting on a fixed column count: the two cards
-   are different widths and a fixed grid would leave a hole in the narrower
-   one. */
+/* ONE ROW, always — his rule. nowrap is what enforces it; the box size below
+   is what makes it fit. Eight at 2.2rem plus gaps is about 20.5rem, which
+   clears a 360px phone. */
 .boxes {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
-/* 2.6rem: a comfortable tap target, and big enough that the icon inside is
-   the thing you read rather than a speck in a checkbox. */
+/* 2.2rem: the largest that fits eight across a phone in a single row. Still
+   a usable tap target, and the icon inside is still the thing you read. */
 .box,
 .boxOn {
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: 0 0 auto;
   padding: 0;
   border-radius: 8px;
   display: grid;
@@ -198,8 +202,8 @@
 }
 
 .glyph {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
   fill: none;
   stroke: var(--muted);
   stroke-width: 1.8;
@@ -207,30 +211,165 @@
   stroke-linejoin: round;
 }
 
+.deckName {
+  margin: 0.45rem 0 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--muted);
+}
+
 /* --- the streak bar ----------------------------------------------------- */
 
-/* Pinned to the foot of the window, not to the end of the document: the runs
-   are what the page is for, and scrolling to find out whether anything is
-   being kept defeats them. One row, never wrapping — it scrolls sideways on a
-   narrow screen rather than becoming two rows and eating the page.
-   `safe center` so that when it does overflow, the first card is still
-   reachable instead of being clipped off the left. */
-.streaks {
+/* The dock: the grid, the three buttons and the streak bar, pinned together
+   to the foot of the window. Pinned, not at the end of the document, because
+   the runs are what the page is for and scrolling to find out whether
+   anything is being kept defeats them.
+   One fixed element rather than three stacked ones — they move together, so
+   they are one thing. */
+.dock {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 5;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  /* It sits over the scrolling column, so it needs a ground of its own. */
+  padding: 0.6rem 1rem 0.7rem;
+  background: var(--bg);
+}
+
+/* One row, never wrapping — it scrolls sideways on a narrow screen rather
+   than becoming two rows and eating the page. `safe center` so that when it
+   does overflow, the first card is still reachable instead of being clipped
+   off the left. */
+.streaks {
+  display: flex;
   flex-wrap: nowrap;
   justify-content: safe center;
   gap: 0.4rem;
   overflow-x: auto;
   margin: 0;
-  /* It sits over the scrolling column, so it needs a ground of its own. */
-  padding: 0.7rem 1rem;
-  background: var(--bg);
+  max-width: 100%;
+  padding: 0;
 }
+
+/* --- the three buttons -------------------------------------------------- */
+
+.views {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.view,
+.viewOn {
+  border-radius: 7px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+}
+
+/* Black, as asked — the gold is the streak bar's, and two gold rows stacked
+   would leave nothing to look at first. */
+.view {
+  background: var(--bg);
+  border: 1px solid var(--line-bright);
+  color: var(--muted);
+}
+
+.view:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.viewOn {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--bg);
+}
+
+/* --- the grid ----------------------------------------------------------- */
+
+/* Sized to the grid inside it, not to the column: a week is seven cells wide
+   and a panel stretched to sixty rems around them is mostly empty panel. It
+   still caps, so a thirty-one column month scrolls rather than running off
+   the window. */
+.sheet {
+  width: max-content;
+  max-width: min(60rem, 100%);
+  max-height: 55dvh;
+  overflow: hidden;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  background: var(--bg-raised);
+  padding: 0.7rem;
+}
+
+/* Thirty-one columns do not fit a phone, and shrinking the cells to make them
+   fit makes them unreadable. Scrolls sideways instead, with the icon column
+   pinned so a row stays identifiable. */
+.sheetScroll {
+  overflow: auto;
+  max-width: 100%;
+  max-height: calc(55dvh - 1.4rem);
+}
+
+.sheetGrid {
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+.sheetHead {
+  font-weight: 500;
+  font-size: 0.6rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 0 0 0.15rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sheetName {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--bg-raised);
+  padding: 0 0.5rem 0 0;
+  line-height: 0;
+}
+
+.cell,
+.cellFuture {
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  border-radius: 3px;
+  padding: 0;
+}
+
+/* Black is the default: a cell only gets a background when it has a value,
+   so "not done" needs no colour of its own. */
+.cell {
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+
+/* A day or month that has not happened. Barely there — not a miss. */
+.cellFuture {
+  background: none;
+  border: 1px dashed var(--line);
+  opacity: 0.35;
+}
+
+
 
 /* Gold, with black figures — his call, 14 Oct. These are the one thing on the
    page that is always on screen, so they are the one thing that is always
