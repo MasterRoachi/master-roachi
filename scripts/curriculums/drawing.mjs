@@ -1,218 +1,390 @@
-// Builds the Drawing curriculum from scripts/curriculums/drawing.md.
+// Builds the Drawing curriculum.
 //
-// Designed, not transcribed — there is no drawing curriculum on the machine —
-// but built around the library that IS there, so every milestone names the
-// book on hand that backs it. Nothing here needs buying.
+// Source: scripts/curriculums/drawing.md, which is the plan and the argument.
+// The material is in drawing-detail.json, for the reason japanese.mjs gives:
+// prose full of apostrophes and quotation marks does not belong inside a JS
+// template literal, where one stray backtick is a syntax error in a 280-lesson
+// script.
 //
-// THE COUNTS ARE THE METHOD. Drawing is the one subject in this set where
-// quantity is not a proxy for learning, it is the learning: "understand
-// gesture" is not a milestone, a hundred thirty-second gestures is. So most
-// entries carry a number, the numbers are deliberately large, and finishing
-// one means finishing it.
+// REWRITTEN 2026-10-14. The first version was 8 stages and 64 MILESTONES — not
+// lessons: each entry was a count ("100 thirty-second gestures") with a
+// paragraph beside it, median 568 characters. Superseded by the standing ruling
+// that every lesson teaches its point in full and then directs practice. The
+// counts survive, because in this subject the quantity IS the method; what
+// changed is that the teaching now precedes the count instead of pointing at a
+// book.
 //
-// Ordering has two rules that are not arbitrary. Gesture comes before anatomy,
-// because a figure built on correct muscles and no gesture is a diagram. And
-// anatomy comes after construction, because anatomy learned without
-// construction is a vocabulary with no grammar.
+// HIS FOUR RULINGS, 2026-10-14:
+//   1. THROUGH COLOUR, LIGHT AND ILLUSTRATION. Not drawing-stops-at-value.
+//   2. DIGITAL FIRST, ON THE TABLET. Not paper-first, which was recommended.
+//      Every exercise here is specified for a screenless Huion and Krita, and
+//      the no-undo discipline paper gave for free is imposed deliberately.
+//   3. THE FAMOUS ARTISTS COURSE IS ONE REFERENCE AMONG MANY — its 24 lessons
+//      sit in the library as "Unknown / intro / 1-24", 948 pages, and lessons
+//      17-24 are excluded as 1960s commercial practice.
+//   4. NO CARD DECK. The second curriculum without one, after Godot. Drawing is
+//      motor skill and judgement; the vocabulary is carried by the lessons.
 //
-// EVERY MILESTONE CARRIES ITS SUBSTANCE. A count on its own is an instruction
-// and not a lesson: "50 ears" says how many and never says that an ear is a C
-// with a Y inside it, or that placement between brow line and nose base is what
-// actually decides whether one reads. The number is the method; the detail is
-// what you are meant to be looking at while you do it that many times.
+// WHAT READING THE MACHINE FOUND. The medium ruling made the rig a research
+// subject. The Huion (256C:006D) binds to hid-generic and enumerates as a
+// MOUSE — no pen node, no pressure, relative positioning. hid-uclogic is on
+// disk and the device IS in its table; it is simply not loaded. And no painting
+// program was installed at all. Stage 1 teaches both, because a tablet that
+// reports as a mouse would teach the hand the wrong thing.
 //
-// Prints SQL. Nothing is executed here.
+// Prints SQL. Nothing is executed here — `npm run curriculum drawing`.
 
-const SOURCE = 'scripts/curriculums/drawing.md';
-
-// The substance of each milestone, keyed by its name.
-//
-// In JSON rather than in this file for the same reason as the others: the prose
-// is Markdown full of apostrophes and quotation marks, and every one would need
-// escaping inside a JS template literal. JSON needs none and the prose stays
-// editable.
 import detail from './drawing-detail.json' with { type: 'json' };
 
-/** Every key the lessons below actually asked for, so strays can be found. */
-const asked = new Set();
+const SOURCE = 'scripts/curriculums/drawing.md';
+const NAME = 'Drawing';
+/** SQL single-quoted string. An apostrophe in a title ends the literal early. */
+const q = (value) =>
+  value === null || value === undefined ? 'null' : `'${String(value).replace(/'/g, "''")}'`;
 
-/** The detail for a milestone, or null where none is written. */
+const NOW = new Date().toISOString();
+const CURRICULUM = `(select id from curriculums where name = ${q(NAME)})`;
+/** The lesson just inserted. The other scripts use the same trick. */
+const LESSON = '(select max(id) from lessons)';
+
+/** Every key asked for, so a stray one in the data file can be found. */
+const askedDetail = new Set();
+const missing = [];
+
 function detailFor(name) {
-  asked.add(name);
+  askedDetail.add(name);
   const text = detail[name];
   if (text === undefined) {
-    // Loud rather than silent: a milestone renamed here and not in
-    // the JSON would otherwise quietly lose its substance.
-    console.error(`  no detail for: ${name}`);
+    // Loud rather than silent: a lesson renamed here and not in the data file
+    // would otherwise quietly lose its material.
+    missing.push(name);
     return null;
   }
   return text;
 }
 
-/* And the other way round, which nothing used to check.
- *
- * A rename leaves the old key behind, and because the build only ever looks
- * keys UP, a stray sits there indefinitely saying nothing. Piano carried an
- * empty "— placeholder" entry from drafting for exactly this reason, found by
- * counting keys against lessons rather than by anything in the build. */
-function strays() {
-  return Object.keys(detail).filter((key) => !asked.has(key));
-}
+/** Keys in the data file that no lesson asked for — a rename left behind. */
+const strays = () => Object.keys(detail).filter((key) => !askedDetail.has(key));
+
+/**
+ * A lesson is either a bare name or [name, sources]. Sources are per-lesson
+ * rows in `sources`; the curriculum's OWN list (lesson_id is null) is
+ * dashboard-owned and no script regenerates it.
+ */
+const nameOf = (lesson) => (Array.isArray(lesson) ? lesson[0] : lesson);
+const sourcesOf = (lesson) => (Array.isArray(lesson) ? (lesson[1] ?? []) : []);
 
 const stages = [
   {
-    name: '1 · Seeing',
+    name: '1 · The tablet',
     lessons: [
-      'Pre-instruction drawings: self-portrait, your own hand, a chair — dated and kept (Edwards)',
-      'Upside-down drawing: copy a line drawing inverted (Edwards)',
-      '20 blind contour drawings of your own hand (Edwards)',
-      '20 modified contour drawings of everyday objects',
-      '10 negative-space drawings — draw the gaps, not the thing (Edwards)',
-      'Sighting: angles and proportions measured against vertical and horizontal (Edwards)',
-      'Draw one object five times across a week, without looking at the earlier attempts',
-      'Keys to Drawing: work the exercises in the first third (Dodson)',
+      ['What this curriculum is for', [{ title: 'design/cinematic-and-dialogue-visual-system.md', note: 'The five visual registers. Registers 1 and 3 -- high-resolution portraits and illustrated tableaux -- are what this curriculum exists to make possible.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'design/characters.md', note: 'The cast. Identity, costume and equipment come from here and from Terrath canon.' }]],
+      ['The tablet, and what it actually is', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['The driver problem on this machine', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }]],
+      ['Pressure, tilt and the curve', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['Mapping the active area', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }]],
+      ['Krita, and why it is the one', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['The canvas, and what size to work at', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['Brushes: the five that matter', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['Layers, and not hiding behind them', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['Hand-eye separation', [{ title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }, { title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }]],
+      ['The flip, the zoom and the greyscale check', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['Undo, and the rule about it', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['Files, versions and the sketchbook', [{ title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Nicolaides, The Natural Way to Draw', note: 'A scheduled course in contour and gesture. The schedule is the book; reading it without doing it teaches nothing.' }]],
     ],
   },
   {
-    name: '2 · Gesture',
+    name: '2 · The line',
     lessons: [
-      '100 thirty-second gestures (Vilppu, Drawing Manual)',
-      '100 more, from life if there is any life available',
-      'Line of action identified and drawn first on 50 figures',
-      'Contour and gesture combined — the first exercises (Nicolaides)',
-      "Nicolaides' first month of the schedule, as written in the book",
-      '50 one-minute gestures with weight — where the mass is sitting',
-      '20 one-minute animal gestures (Vilppu, Drawing Animals)',
+      ['What a line is', [{ title: 'Crane, Line and Form', note: 'Victorian, short, and the best thing on the shelf about what a line is for.' }, { title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Borgman, Pen and Pencil Drawing Techniques', note: 'Ink and line technique -- hatching, stipple, the marks that build tone without a grey.' }]],
+      ['The stabiliser argument', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['The ghosted line', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }]],
+      ['Arcs, curves and the elbow', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }]],
+      ['Ellipses', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }]],
+      ['Line weight, and what it is for', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Crane, Line and Form', note: 'Victorian, short, and the best thing on the shelf about what a line is for.' }, { title: 'Borgman, Pen and Pencil Drawing Techniques', note: 'Ink and line technique -- hatching, stipple, the marks that build tone without a grey.' }]],
+      ['Hatching, and tone without a grey', [{ title: 'Guptill, Sketching and Rendering in Pencil', note: 'Graphite technique: stroke, tone, texture, and the rendering vocabulary stage 14 needs.' }, { title: 'Borgman, Pen and Pencil Drawing Techniques', note: 'Ink and line technique -- hatching, stipple, the marks that build tone without a grey.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Famous Artists Course, lesson 15: Advanced line drawing and tonal painting', note: '~/Media/Books/Unknown/15 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['Aiming, and hitting the point', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }]],
+      ['Sighting and measuring', [{ title: 'Edwards, The New Drawing on the Right Side of the Brain', note: 'The course built to break symbol-drawing. Its pre-instruction drawings exist to be compared against at the end.' }, { title: 'Dodson, Keys to Drawing', note: 'Exercise-led and unusually honest about what beginners actually do wrong.' }, { title: 'Civardi, Drawing Portraits: Faces and Figures', note: 'Portraiture from observation, with proportion measured rather than felt.' }]],
+      ['Negative space', [{ title: 'Edwards, The New Drawing on the Right Side of the Brain', note: 'The course built to break symbol-drawing. Its pre-instruction drawings exist to be compared against at the end.' }, { title: 'Dodson, Keys to Drawing', note: 'Exercise-led and unusually honest about what beginners actually do wrong.' }, { title: 'Harding, On Drawing Trees and Nature', note: 'An 1800s manual on foliage, trees and landscape structure. Still unmatched on trees.' }]],
+      ['Blind and modified contour', [{ title: 'Nicolaides, The Natural Way to Draw', note: 'A scheduled course in contour and gesture. The schedule is the book; reading it without doing it teaches nothing.' }, { title: 'Edwards, The New Drawing on the Right Side of the Brain', note: 'The course built to break symbol-drawing. Its pre-instruction drawings exist to be compared against at the end.' }]],
+      ['Line economy', [{ title: 'Crane, Line and Form', note: 'Victorian, short, and the best thing on the shelf about what a line is for.' }, { title: 'Dodson, Keys to Drawing', note: 'Exercise-led and unusually honest about what beginners actually do wrong.' }, { title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }]],
+      ['Warm-ups worth the time', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Proko -- Figure Drawing Fundamentals', url: 'https://www.proko.com/course/figure-drawing-fundamentals', note: '32 of its 57 lessons are free, about 5 hours against the paid 15. The modern video companion to Loomis and Bridgman.' }]],
+      ['The line checklist', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Crane, Line and Form', note: 'Victorian, short, and the best thing on the shelf about what a line is for.' }, { title: 'Nicolaides, The Natural Way to Draw', note: 'A scheduled course in contour and gesture. The schedule is the book; reading it without doing it teaches nothing.' }]],
     ],
   },
   {
-    name: '3 · Form and construction',
+    name: '3 · Form in space',
     lessons: [
-      '50 spheres, 50 boxes, 50 cylinders — from imagination, not traced',
-      'Cross-contour lines on a sphere, a cylinder and a folded cloth',
-      'The same forms with one light source and cast shadows',
-      '50 mannequin figures from imagination (Loomis, Figure Drawing)',
-      'Block in a figure from reference, 20 times, gesture first',
-      'Vilppu: sphere, box and cylinder applied to a live figure',
-      'The figure in eight directions, standing — the Shepherds problem, by hand',
-      'Foreshortening: 20 limbs pointing at the viewer',
+      ['Why form comes before everything', [{ title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'Famous Artists Course, lesson 2: Form -- the basis of drawing', note: '~/Media/Books/Unknown/2 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['The box, and three-point space', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }]],
+      ['The 250-box discipline', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }]],
+      ['Checking convergence', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }, { title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }]],
+      ['The cylinder', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }]],
+      ['The sphere, and why it is hardest', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }]],
+      ['Cross-contour', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Hogarth, Dynamic Anatomy', note: 'Anatomy drawn for expression rather than for accuracy. Dramatic, and knows it.' }]],
+      ['Foreshortening', [{ title: 'Hogarth, Dynamic Figure Drawing', note: 'The figure in deep space and extreme foreshortening.' }, { title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Vilppu, Figure Drawing', note: 'The figure built from construction rather than from outline.' }]],
+      ['Form intersections', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }]],
+      ['Organic form', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }, { title: 'Vilppu, Drawing Animals', note: 'Gesture and construction applied to animals, in the same language as his figure work.' }]],
+      ['Texture is form', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Famous Artists Course, lesson 9: Creating variety in forms, textures and surfaces', note: '~/Media/Books/Unknown/9 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['Drawing through', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Hogarth, Dynamic Figure Drawing', note: 'The figure in deep space and extreme foreshortening.' }, { title: 'Vilppu, Figure Drawing', note: 'The figure built from construction rather than from outline.' }]],
+      ['Scale and the ground plane', [{ title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['Building a thing from primitives', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }]],
+      ['The construction checklist', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }]],
     ],
   },
   {
     name: '4 · Perspective',
     lessons: [
-      'One-point: a room from imagination, furniture included (Norling)',
-      'Two-point: a building, once with the horizon high and once low',
-      'Three-point: looking up at something tall',
-      '100 ellipses in perspective, minor axis correct',
-      'Place a figure correctly in a one-point scene, scaled to the horizon',
-      'Cast shadows from a single source in a constructed scene (D’Amelio)',
-      'A street in two-point, from imagination',
-      'One Shepherds location drawn in perspective from the map',
+      ['Why constructed perspective, after freehand', [{ title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }]],
+      ['The station point and the cone of vision', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Famous Artists Course, lesson 10: Perspective for the artist', note: '~/Media/Books/Unknown/10 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['One-point', [{ title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }, { title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Famous Artists Course, lesson 10: Perspective for the artist', note: '~/Media/Books/Unknown/10 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['Two-point', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }]],
+      ['Three-point, and when verticals converge', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Hogarth, Dynamic Figure Drawing', note: 'The figure in deep space and extreme foreshortening.' }]],
+      ['Measuring heights anywhere', [{ title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'Famous Artists Course, lesson 10: Perspective for the artist', note: '~/Media/Books/Unknown/10 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['Dividing and multiplying', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }]],
+      ['Circles in perspective', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }]],
+      ['Inclined planes', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }]],
+      ['Shadows in perspective', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }]],
+      ['Reflections', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Hamm, Drawing Scenery: Seascapes and Landscapes', note: 'Landscape composition and the structure of natural forms.' }]],
+      ['Freehand against constructed', [{ title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }]],
+      ['Perspective\'s failures', [{ title: 'Hogarth, Dynamic Figure Drawing', note: 'The figure in deep space and extreme foreshortening.' }, { title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }]],
+      ['The perspective checklist', [{ title: 'D\'Amelio, Perspective Drawing Handbook', note: 'Short, clear and complete on the system itself. Old-fashioned and correct.' }, { title: 'Norling, Perspective Made Easy', note: 'The gentlest route into one-, two- and three-point perspective.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }]],
     ],
   },
   {
-    name: '5 · Anatomy',
+    name: '5 · Gesture and force',
     lessons: [
-      'Draw the skeleton from memory, front and back (Goldfinger, Simblet)',
-      'Ribcage and pelvis as simple forms, 30 times, in rotation',
-      'The torso: constructive anatomy, front, back and side (Bridgman)',
-      'Arms: the two-bone structure and what rotation does to it',
-      'Legs: the same, with weight on one side',
-      '50 hands from life — your own is always available (Loomis, Head and Hands)',
-      '20 feet, which are harder than they look',
-      'Muscles of the back, named and drawn (Hogarth, Dynamic Anatomy)',
-      'A figure from imagination with anatomy that survives a second look',
+      ['What gesture is', [{ title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }, { title: 'Nicolaides, The Natural Way to Draw', note: 'A scheduled course in contour and gesture. The schedule is the book; reading it without doing it teaches nothing.' }, { title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }, { title: 'Famous Artists Course, lesson 5: Drawing the human figure in motion', note: '~/Media/Books/Unknown/5 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['The line of action', [{ title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Proko -- Figure Drawing Fundamentals', url: 'https://www.proko.com/course/figure-drawing-fundamentals', note: '32 of its 57 lessons are free, about 5 hours against the paid 15. The modern video companion to Loomis and Bridgman.' }]],
+      ['Thirty seconds', [{ title: 'Line of Action', url: 'https://line-of-action.com', note: 'Free timed reference: figures, animals, hands and feet, faces and expressions. Clothed or nude, any age, any build, any duration.' }, { title: 'Quickposes', url: 'https://quickposes.com', note: 'Free timed reference, with per-body-part sessions -- hands alone, feet alone -- which Line of Action does less well.' }, { title: 'Croquis Cafe', url: 'https://www.youtube.com/@CroquisCafe', note: 'Free life-class video in the traditional format: 1-2 minute gestures, 5-minute poses, 10-minute studies. A moving model, which a photograph is not.' }, { title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }]],
+      ['Force, and directional energy', [{ title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }, { title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }]],
+      ['Weight and balance', [{ title: 'Bridgman, The Human Machine', note: 'The body as mechanism: what moves, around what, and how far.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Williams, The Animator\'s Survival Kit', note: 'The standard animation text. Timing, spacing, anticipation and overlap -- and Shepherds animates at 12 fps, so it is not optional.' }]],
+      ['The three masses', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Vilppu, Figure Drawing', note: 'The figure built from construction rather than from outline.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }]],
+      ['Exaggeration, and how far', [{ title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }, { title: 'Hogarth, Dynamic Figure Drawing', note: 'The figure in deep space and extreme foreshortening.' }, { title: 'Hamm, Drawing the Head and Figure', note: 'Dense, diagrammatic, and very fast to use as a check.' }]],
+      ['Gesture of an action, not a pose', [{ title: 'Williams, The Animator\'s Survival Kit', note: 'The standard animation text. Timing, spacing, anticipation and overlap -- and Shepherds animates at 12 fps, so it is not optional.' }, { title: 'Muybridge, The Human Figure in Motion', note: 'The 1887 photographic sequences every motion reference descends from. Sequential frames of real bodies, which is what an animator needs and what a pose site cannot give.' }, { title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }]],
+      ['Gesture in animals', [{ title: 'Vilppu, Drawing Animals', note: 'Gesture and construction applied to animals, in the same language as his figure work.' }, { title: 'Hultgren, The Art of Animal Drawing', note: 'Construction, action and caricature of animals, by a Disney animator. The best single animal book here.' }, { title: 'Muybridge, The Human Figure in Motion', note: 'The 1887 photographic sequences every motion reference descends from. Sequential frames of real bodies, which is what an animator needs and what a pose site cannot give.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['Gesture failures', [{ title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }, { title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }, { title: 'Nicolaides, The Natural Way to Draw', note: 'A scheduled course in contour and gesture. The schedule is the book; reading it without doing it teaches nothing.' }]],
+      ['The gesture checklist', [{ title: 'Vilppu, Drawing Manual', note: 'Gesture and the sphere-box-cylinder approach to the figure. The spine of stages 5 and 6.' }, { title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }, { title: 'Line of Action', url: 'https://line-of-action.com', note: 'Free timed reference: figures, animals, hands and feet, faces and expressions. Clothed or nude, any age, any build, any duration.' }]],
     ],
   },
   {
-    name: '6 · Head and portrait',
+    name: '6 · The figure constructed',
     lessons: [
-      'The Loomis ball-and-plane head, 30 angles from imagination',
-      '50 eyes, from life and reference',
-      '50 noses',
-      '50 mouths',
-      '50 ears — the one everybody skips',
-      'Head proportions measured from life, not remembered',
-      'A portrait from life across three sittings',
-      'A portrait from a photograph, and the difference noted',
-      '20 expressions from imagination (Hogarth, Drawing the Human Head)',
-      'One Shepherds character drawn as a portrait, off the sprite',
+      ['From gesture to construction', [{ title: 'Vilppu, Figure Drawing', note: 'The figure built from construction rather than from outline.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }]],
+      ['Proportion, and which canon', [{ title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Hamm, Drawing the Head and Figure', note: 'Dense, diagrammatic, and very fast to use as a check.' }, { title: 'Civardi, Drawing Portraits: Faces and Figures', note: 'Portraiture from observation, with proportion measured rather than felt.' }, { title: 'Famous Artists Course, lesson 4: Drawing the human form', note: '~/Media/Books/Unknown/4 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['The Loomis mannequin', [{ title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Loomis, Fun With A Pencil', note: 'The gentlest introduction to constructed heads and figures.' }, { title: 'Tiner, Figure Drawing without Models', note: 'Drawing the figure from imagination, which is what character design actually requires.' }]],
+      ['The rib cage and pelvis', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Vilppu, Figure Drawing', note: 'The figure built from construction rather than from outline.' }]],
+      ['The spine, and what bends', [{ title: 'Bridgman, The Human Machine', note: 'The body as mechanism: what moves, around what, and how far.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
+      ['The shoulder girdle', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Bridgman, The Human Machine', note: 'The body as mechanism: what moves, around what, and how far.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['Landmarks you can feel', [{ title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }]],
+      ['Men, women, children and age', [{ title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }, { title: 'design/characters.md', note: 'The cast. Identity, costume and equipment come from here and from Terrath canon.' }]],
+      ['Foreshortening the whole figure', [{ title: 'Hogarth, Dynamic Figure Drawing', note: 'The figure in deep space and extreme foreshortening.' }, { title: 'Vilppu, Figure Drawing', note: 'The figure built from construction rather than from outline.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }]],
+      ['The eight standing directions', [{ title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'Tiner, Figure Drawing without Models', note: 'Drawing the figure from imagination, which is what character design actually requires.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }]],
+      ['The figure from imagination', [{ title: 'Tiner, Figure Drawing without Models', note: 'Drawing the figure from imagination, which is what character design actually requires.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Hogarth, Dynamic Figure Drawing', note: 'The figure in deep space and extreme foreshortening.' }]],
+      ['Proportion errors, found', [{ title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Civardi, Drawing Portraits: Faces and Figures', note: 'Portraiture from observation, with proportion measured rather than felt.' }, { title: 'Hamm, Drawing the Head and Figure', note: 'Dense, diagrammatic, and very fast to use as a check.' }]],
+      ['The figure checklist', [{ title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Vilppu, Figure Drawing', note: 'The figure built from construction rather than from outline.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }]],
     ],
   },
   {
-    name: '7 · Composition and rendering',
+    name: '7 · Anatomy: the torso',
     lessons: [
-      '20 notan studies — two values only, no detail (Dow)',
-      '20 thumbnail compositions for a single subject, then pick one',
-      'A nine-step value scale, drawn by hand and even',
-      'One drawing in five values, no more (Guptill)',
-      'Rendering: one subject taken to a finish in pencil',
-      'Picture-making: the composition chapters (Loomis, Creative Illustration)',
-      'Colour: the first exercises in Edwards’ course',
-      'One finished illustration of a Shepherds scene, composed and rendered',
+      ['How to study anatomy', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }, { title: 'Leeuwe, How to Learn Anatomy', note: 'Short, modern, and organised as a study plan rather than an atlas.' }]],
+      ['The skeleton of the torso', [{ title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }]],
+      ['The chest', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Hogarth, Dynamic Anatomy', note: 'Anatomy drawn for expression rather than for accuracy. Dramatic, and knows it.' }]],
+      ['The back', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Hogarth, Dynamic Anatomy', note: 'Anatomy drawn for expression rather than for accuracy. Dramatic, and knows it.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
+      ['The abdomen and the flank', [{ title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
+      ['The neck', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }]],
+      ['What shows at a distance', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }]],
+      ['The torso checklist', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
     ],
   },
   {
-    name: '8 · Keeping it',
+    name: '8 · Anatomy: the limbs',
     lessons: [
-      'A sketchbook page a day, every day',
-      '10 figures a day from life or reference',
-      'One finished piece a month, taken past the point it stops being fun',
-      'Redraw the stage 1 pre-instruction drawings and compare them honestly',
-      'Draw something for Shepherds every week',
-      'Draw something purely because you wanted to, every week',
+      ['The arm\'s skeleton', [{ title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
+      ['Pronation and supination', [{ title: 'Bridgman, The Human Machine', note: 'The body as mechanism: what moves, around what, and how far.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Hogarth, Dynamic Anatomy', note: 'Anatomy drawn for expression rather than for accuracy. Dramatic, and knows it.' }]],
+      ['The shoulder and upper arm', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Hogarth, Dynamic Anatomy', note: 'Anatomy drawn for expression rather than for accuracy. Dramatic, and knows it.' }]],
+      ['The leg\'s skeleton', [{ title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
+      ['The thigh and the hip', [{ title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Hogarth, Dynamic Anatomy', note: 'Anatomy drawn for expression rather than for accuracy. Dramatic, and knows it.' }]],
+      ['The knee, the calf and the ankle', [{ title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
+      ['Muscle in action', [{ title: 'Bridgman, The Human Machine', note: 'The body as mechanism: what moves, around what, and how far.' }, { title: 'Hogarth, Dynamic Anatomy', note: 'Anatomy drawn for expression rather than for accuracy. Dramatic, and knows it.' }, { title: 'Mattesi, Force: The Key to Capturing Life Through Drawing', note: 'Rhythm and directional energy. The modern counterpart to gesture and the best book here on why a drawing feels alive.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
+      ['The limbs checklist', [{ title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Leeuwe, How to Learn Anatomy', note: 'Short, modern, and organised as a study plan rather than an atlas.' }]],
+    ],
+  },
+  {
+    name: '9 · Hands and feet',
+    lessons: [
+      ['Why hands are hard', [{ title: 'Hogarth, Drawing Dynamic Hands', note: 'The whole of stage 9. Nothing else on the shelf comes close on hands.' }, { title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Famous Artists Course, lesson 6: Constructing the head and hands', note: '~/Media/Books/Unknown/6 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['The hand\'s structure', [{ title: 'Hogarth, Drawing Dynamic Hands', note: 'The whole of stage 9. Nothing else on the shelf comes close on hands.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }]],
+      ['Fingers, and the gesture of a hand', [{ title: 'Hogarth, Drawing Dynamic Hands', note: 'The whole of stage 9. Nothing else on the shelf comes close on hands.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Quickposes', url: 'https://quickposes.com', note: 'Free timed reference, with per-body-part sessions -- hands alone, feet alone -- which Line of Action does less well.' }]],
+      ['Feet, and standing', [{ title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Bridgman, Constructive Anatomy', note: 'Anatomy as interlocking masses and wedges rather than as a list of muscles. Public domain.' }, { title: 'Hogarth, Drawing Dynamic Hands', note: 'The whole of stage 9. Nothing else on the shelf comes close on hands.' }]],
+      ['Hands and feet at small sizes', [{ title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'Loomis, Figure Drawing For All It\'s Worth', note: 'The mannequin, the proportion canons and the construction method. Public domain.' }, { title: 'Grafton, Ancient and Medieval Arms and Armor', note: 'A plate book of real arms and armour. The ban on inventing equipment is why it matters.' }]],
+      ['The hands and feet checklist', [{ title: 'Hogarth, Drawing Dynamic Hands', note: 'The whole of stage 9. Nothing else on the shelf comes close on hands.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Quickposes', url: 'https://quickposes.com', note: 'Free timed reference, with per-body-part sessions -- hands alone, feet alone -- which Line of Action does less well.' }]],
+    ],
+  },
+  {
+    name: '10 · The head and the face',
+    lessons: [
+      ['Why the head is hardest', [{ title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Hogarth, Drawing the Human Head', note: 'The head in every rotation, with the planes made explicit.' }, { title: 'Edwards, The New Drawing on the Right Side of the Brain', note: 'The course built to break symbol-drawing. Its pre-instruction drawings exist to be compared against at the end.' }]],
+      ['The ball and plane', [{ title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Loomis, Fun With A Pencil', note: 'The gentlest introduction to constructed heads and figures.' }, { title: 'Hamm, Drawing the Head and Figure', note: 'Dense, diagrammatic, and very fast to use as a check.' }, { title: 'Famous Artists Course, lesson 6: Constructing the head and hands', note: '~/Media/Books/Unknown/6 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['The skull', [{ title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'Hogarth, Drawing the Human Head', note: 'The head in every rotation, with the planes made explicit.' }, { title: 'Simblet, Anatomy for the Artist', note: 'Photographs of real bodies beside the anatomy, which is what makes it useful next to Goldfinger.' }]],
+      ['The head\'s proportions', [{ title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Civardi, Drawing Portraits: Faces and Figures', note: 'Portraiture from observation, with proportion measured rather than felt.' }, { title: 'Hamm, Drawing the Head and Figure', note: 'Dense, diagrammatic, and very fast to use as a check.' }]],
+      ['The planes of the head', [{ title: 'Hogarth, Drawing the Human Head', note: 'The head in every rotation, with the planes made explicit.' }, { title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Parks, Secrets to Drawing Realistic Faces', note: 'Feature by feature, rendered. Useful where Loomis is structural.' }]],
+      ['The eye', [{ title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Parks, Secrets to Drawing Realistic Faces', note: 'Feature by feature, rendered. Useful where Loomis is structural.' }, { title: 'Faigin, The Artist\'s Complete Guide to Facial Expression', note: 'The anatomy of each emotion, muscle by muscle, including which expressions cannot be faked. Nothing else here is close.' }, { title: 'Civardi, Drawing Portraits: Faces and Figures', note: 'Portraiture from observation, with proportion measured rather than felt.' }]],
+      ['The nose and the mouth', [{ title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Parks, Secrets to Drawing Realistic Faces', note: 'Feature by feature, rendered. Useful where Loomis is structural.' }, { title: 'Faigin, The Artist\'s Complete Guide to Facial Expression', note: 'The anatomy of each emotion, muscle by muscle, including which expressions cannot be faked. Nothing else here is close.' }]],
+      ['The ear, and hair', [{ title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Parks, Secrets to Drawing Realistic Faces', note: 'Feature by feature, rendered. Useful where Loomis is structural.' }, { title: 'Civardi, Drawing Portraits: Faces and Figures', note: 'Portraiture from observation, with proportion measured rather than felt.' }]],
+      ['Likeness', [{ title: 'Civardi, Drawing Portraits: Faces and Figures', note: 'Portraiture from observation, with proportion measured rather than felt.' }, { title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Hamm, Drawing the Head and Figure', note: 'Dense, diagrammatic, and very fast to use as a check.' }]],
+      ['Age, and the face over time', [{ title: 'Faigin, The Artist\'s Complete Guide to Facial Expression', note: 'The anatomy of each emotion, muscle by muscle, including which expressions cannot be faked. Nothing else here is close.' }, { title: 'Goldfinger, Human Anatomy for Artists', note: 'The reference atlas: every muscle, its origin, insertion and surface form. To look things up in, not to read.' }, { title: 'design/characters.md', note: 'The cast. Identity, costume and equipment come from here and from Terrath canon.' }]],
+      ['Expression', [{ title: 'Faigin, The Artist\'s Complete Guide to Facial Expression', note: 'The anatomy of each emotion, muscle by muscle, including which expressions cannot be faked. Nothing else here is close.' }, { title: 'Hogarth, Drawing the Human Head', note: 'The head in every rotation, with the planes made explicit.' }, { title: 'design/cinematic-and-dialogue-visual-system.md', note: 'The five visual registers. Registers 1 and 3 -- high-resolution portraits and illustrated tableaux -- are what this curriculum exists to make possible.' }]],
+      ['Heads at every size', [{ title: 'design/cinematic-and-dialogue-visual-system.md', note: 'The five visual registers. Registers 1 and 3 -- high-resolution portraits and illustrated tableaux -- are what this curriculum exists to make possible.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }]],
+      ['The head checklist', [{ title: 'Loomis, Drawing the Head and Hands', note: 'The ball-and-plane head. The standard construction, and still the best.' }, { title: 'Hogarth, Drawing the Human Head', note: 'The head in every rotation, with the planes made explicit.' }, { title: 'Faigin, The Artist\'s Complete Guide to Facial Expression', note: 'The anatomy of each emotion, muscle by muscle, including which expressions cannot be faked. Nothing else here is close.' }]],
+    ],
+  },
+  {
+    name: '11 · Drapery, costume, equipment',
+    lessons: [
+      ['The six folds', [{ title: 'Hogarth, Dynamic Wrinkles and Drapery', note: 'The six folds, named and drawn. The only systematic treatment of cloth on the shelf.' }, { title: 'Famous Artists Course, lesson 7: Drawing clothes, draperies and costumes', note: '~/Media/Books/Unknown/7 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['Cloth over form', [{ title: 'Hogarth, Dynamic Wrinkles and Drapery', note: 'The six folds, named and drawn. The only systematic treatment of cloth on the shelf.' }, { title: 'Vilppu, Figure Drawing', note: 'The figure built from construction rather than from outline.' }, { title: 'Williams, The Animator\'s Survival Kit', note: 'The standard animation text. Timing, spacing, anticipation and overlap -- and Shepherds animates at 12 fps, so it is not optional.' }]],
+      ['Material, and what it does', [{ title: 'Hogarth, Dynamic Wrinkles and Drapery', note: 'The six folds, named and drawn. The only systematic treatment of cloth on the shelf.' }, { title: 'Famous Artists Course, lesson 7: Drawing clothes, draperies and costumes', note: '~/Media/Books/Unknown/7 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['Period dress and equipment', [{ title: 'Grafton, Ancient and Medieval Arms and Armor', note: 'A plate book of real arms and armour. The ban on inventing equipment is why it matters.' }, { title: 'Tierney, Medieval Fashions', note: 'Period dress, plate by plate -- the working clothes York would actually wear.' }, { title: 'design/characters.md', note: 'The cast. Identity, costume and equipment come from here and from Terrath canon.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['Costume as character', [{ title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'design/characters.md', note: 'The cast. Identity, costume and equipment come from here and from Terrath canon.' }, { title: 'Tiner, Figure Drawing without Models', note: 'Drawing the figure from imagination, which is what character design actually requires.' }, { title: 'Grafton, Ancient and Medieval Arms and Armor', note: 'A plate book of real arms and armour. The ban on inventing equipment is why it matters.' }]],
+      ['The drapery checklist', [{ title: 'Hogarth, Dynamic Wrinkles and Drapery', note: 'The six folds, named and drawn. The only systematic treatment of cloth on the shelf.' }, { title: 'Grafton, Ancient and Medieval Arms and Armor', note: 'A plate book of real arms and armour. The ban on inventing equipment is why it matters.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+    ],
+  },
+  {
+    name: '12 · Animals and creatures',
+    lessons: [
+      ['The quadruped skeleton', [{ title: 'Ellenberger, Atlas of Animal Anatomy for Artists', note: 'Skeleton, musculature and surface form for horse, cow, dog, lion, deer and more. The reference behind every animal drawing book.' }, { title: 'Hultgren, The Art of Animal Drawing', note: 'Construction, action and caricature of animals, by a Disney animator. The best single animal book here.' }, { title: 'Vilppu, Drawing Animals', note: 'Gesture and construction applied to animals, in the same language as his figure work.' }]],
+      ['The digitigrade leg', [{ title: 'Ellenberger, Atlas of Animal Anatomy for Artists', note: 'Skeleton, musculature and surface form for horse, cow, dog, lion, deer and more. The reference behind every animal drawing book.' }, { title: 'Hultgren, The Art of Animal Drawing', note: 'Construction, action and caricature of animals, by a Disney animator. The best single animal book here.' }, { title: 'Keane, Animating Drawing 4-Legged Animals', note: 'Quadruped gaits as drawn sequences -- walk, trot, gallop -- which is what the Prologue needs.' }]],
+      ['Animal proportion and body plans', [{ title: 'Hultgren, The Art of Animal Drawing', note: 'Construction, action and caricature of animals, by a Disney animator. The best single animal book here.' }, { title: 'Ellenberger, Atlas of Animal Anatomy for Artists', note: 'Skeleton, musculature and surface form for horse, cow, dog, lion, deer and more. The reference behind every animal drawing book.' }, { title: 'Famous Artists Course, lesson 12: Animal drawing -- the animal in action', note: '~/Media/Books/Unknown/12 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['Animal heads', [{ title: 'Hultgren, The Art of Animal Drawing', note: 'Construction, action and caricature of animals, by a Disney animator. The best single animal book here.' }, { title: 'Ellenberger, Atlas of Animal Anatomy for Artists', note: 'Skeleton, musculature and surface form for horse, cow, dog, lion, deer and more. The reference behind every animal drawing book.' }, { title: 'Vilppu, Drawing Animals', note: 'Gesture and construction applied to animals, in the same language as his figure work.' }]],
+      ['Fur, feathers and hide', [{ title: 'Hultgren, The Art of Animal Drawing', note: 'Construction, action and caricature of animals, by a Disney animator. The best single animal book here.' }, { title: 'Vilppu, Drawing Animals', note: 'Gesture and construction applied to animals, in the same language as his figure work.' }, { title: 'Harding, On Drawing Trees and Nature', note: 'An 1800s manual on foliage, trees and landscape structure. Still unmatched on trees.' }]],
+      ['Gaits', [{ title: 'Muybridge, The Human Figure in Motion', note: 'The 1887 photographic sequences every motion reference descends from. Sequential frames of real bodies, which is what an animator needs and what a pose site cannot give.' }, { title: 'Keane, Animating Drawing 4-Legged Animals', note: 'Quadruped gaits as drawn sequences -- walk, trot, gallop -- which is what the Prologue needs.' }, { title: 'Williams, The Animator\'s Survival Kit', note: 'The standard animation text. Timing, spacing, anticipation and overlap -- and Shepherds animates at 12 fps, so it is not optional.' }, { title: 'Famous Artists Course, lesson 12: Animal drawing -- the animal in action', note: '~/Media/Books/Unknown/12 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['The Prologue\'s four', [{ title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'design/characters.md', note: 'The cast. Identity, costume and equipment come from here and from Terrath canon.' }, { title: 'Hultgren, The Art of Animal Drawing', note: 'Construction, action and caricature of animals, by a Disney animator. The best single animal book here.' }, { title: 'Ellenberger, Atlas of Animal Anatomy for Artists', note: 'Skeleton, musculature and surface form for horse, cow, dog, lion, deer and more. The reference behind every animal drawing book.' }]],
+      ['Creature design', [{ title: 'O\'Connor, Dracopedia: The Bestiary', note: 'Creature design built from real taxonomy and anatomy rather than from silhouette.' }, { title: 'Fabry, Anatomy for Fantasy Artists', note: 'Anatomy pushed into invented creatures while staying structurally honest -- which is stage 12\'s problem.' }, { title: 'Ellenberger, Atlas of Animal Anatomy for Artists', note: 'Skeleton, musculature and surface form for horse, cow, dog, lion, deer and more. The reference behind every animal drawing book.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['The animal checklist', [{ title: 'Hultgren, The Art of Animal Drawing', note: 'Construction, action and caricature of animals, by a Disney animator. The best single animal book here.' }, { title: 'Ellenberger, Atlas of Animal Anatomy for Artists', note: 'Skeleton, musculature and surface form for horse, cow, dog, lion, deer and more. The reference behind every animal drawing book.' }, { title: 'Muybridge, The Human Figure in Motion', note: 'The 1887 photographic sequences every motion reference descends from. Sequential frames of real bodies, which is what an animator needs and what a pose site cannot give.' }]],
+    ],
+  },
+  {
+    name: '13 · Composition',
+    lessons: [
+      ['What composition is for', [{ title: 'Dow, Composition', note: 'Line, notan and colour as the three elements of a picture. The book that taught American illustration to compose.' }, { title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'Famous Artists Course, lesson 3: Composition -- how to make pictures', note: '~/Media/Books/Unknown/3 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['The frame', [{ title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'Dow, Composition', note: 'Line, notan and colour as the three elements of a picture. The book that taught American illustration to compose.' }, { title: 'design/cinematic-and-dialogue-visual-system.md', note: 'The five visual registers. Registers 1 and 3 -- high-resolution portraits and illustrated tableaux -- are what this curriculum exists to make possible.' }]],
+      ['Thumbnails', [{ title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'Famous Artists Course, lesson 14: Advanced pictorial composition', note: '~/Media/Books/Unknown/14 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['Notan, and the value plan', [{ title: 'Dow, Composition', note: 'Line, notan and colour as the three elements of a picture. The book that taught American illustration to compose.' }, { title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }]],
+      ['The focal point', [{ title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'Dow, Composition', note: 'Line, notan and colour as the three elements of a picture. The book that taught American illustration to compose.' }]],
+      ['Depth', [{ title: 'Hamm, Drawing Scenery: Seascapes and Landscapes', note: 'Landscape composition and the structure of natural forms.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'Harding, On Drawing Trees and Nature', note: 'An 1800s manual on foliage, trees and landscape structure. Still unmatched on trees.' }]],
+      ['Composing with figures', [{ title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'Famous Artists Course, lesson 8: Figure composition -- arranging figures in a picture', note: '~/Media/Books/Unknown/8 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }, { title: 'design/cinematic-and-dialogue-visual-system.md', note: 'The five visual registers. Registers 1 and 3 -- high-resolution portraits and illustrated tableaux -- are what this curriculum exists to make possible.' }]],
+      ['The composition checklist', [{ title: 'Dow, Composition', note: 'Line, notan and colour as the three elements of a picture. The book that taught American illustration to compose.' }, { title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }]],
+    ],
+  },
+  {
+    name: '14 · Value and rendering',
+    lessons: [
+      ['Light logic', [{ title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'Loomis, Successful Drawing', note: 'Perspective, proportion and lighting, applied. Carries more of stage 4 than it should have to, because Robertson is not on the shelf.' }, { title: 'Famous Artists Course, lesson 15: Advanced line drawing and tonal painting', note: '~/Media/Books/Unknown/15 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['The value scale', [{ title: 'Guptill, Sketching and Rendering in Pencil', note: 'Graphite technique: stroke, tone, texture, and the rendering vocabulary stage 14 needs.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }]],
+      ['Edges', [{ title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }, { title: 'Guptill, Sketching and Rendering in Pencil', note: 'Graphite technique: stroke, tone, texture, and the rendering vocabulary stage 14 needs.' }]],
+      ['Materials in value', [{ title: 'Famous Artists Course, lesson 9: Creating variety in forms, textures and surfaces', note: '~/Media/Books/Unknown/9 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }, { title: 'Guptill, Sketching and Rendering in Pencil', note: 'Graphite technique: stroke, tone, texture, and the rendering vocabulary stage 14 needs.' }, { title: 'Borgman, Pen and Pencil Drawing Techniques', note: 'Ink and line technique -- hatching, stipple, the marks that build tone without a grey.' }]],
+      ['Rendering, and when to stop', [{ title: 'Guptill, Sketching and Rendering in Pencil', note: 'Graphite technique: stroke, tone, texture, and the rendering vocabulary stage 14 needs.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }, { title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }]],
+      ['The value checklist', [{ title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'Guptill, Sketching and Rendering in Pencil', note: 'Graphite technique: stroke, tone, texture, and the rendering vocabulary stage 14 needs.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+    ],
+  },
+  {
+    name: '15 · Colour and light',
+    lessons: [
+      ['Hue, value and chroma', [{ title: 'Edwards, Color: A Course in Mastering the Art of Mixing Colors', note: 'A mixing course rather than a book about light. Carries the hue-value-chroma half of stage 15.' }, { title: 'Famous Artists Course, lesson 16: Colour -- the theory and practice of painting', note: '~/Media/Books/Unknown/16 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }, { title: 'Krita manual', url: 'https://docs.krita.org/en/', note: 'Free and complete. Tablet settings, brush engines, layers, colour management.' }]],
+      ['Colour in light and shadow', [{ title: 'Famous Artists Course, lesson 16: Colour -- the theory and practice of painting', note: '~/Media/Books/Unknown/16 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
+      ['Temperature, and the limited palette', [{ title: 'Edwards, Color: A Course in Mastering the Art of Mixing Colors', note: 'A mixing course rather than a book about light. Carries the hue-value-chroma half of stage 15.' }, { title: 'Famous Artists Course, lesson 16: Colour -- the theory and practice of painting', note: '~/Media/Books/Unknown/16 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['Local colour and the colour of light', [{ title: 'Famous Artists Course, lesson 16: Colour -- the theory and practice of painting', note: '~/Media/Books/Unknown/16 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'Edwards, Color: A Course in Mastering the Art of Mixing Colors', note: 'A mixing course rather than a book about light. Carries the hue-value-chroma half of stage 15.' }]],
+      ['Colour schemes, and restraint', [{ title: 'Dow, Composition', note: 'Line, notan and colour as the three elements of a picture. The book that taught American illustration to compose.' }, { title: 'Loomis, The Eye of the Painter', note: 'Seeing: unity, simplicity, design, colour, honesty. The nearest thing here to a book about light.' }, { title: 'Edwards, Color: A Course in Mastering the Art of Mixing Colors', note: 'A mixing course rather than a book about light. Carries the hue-value-chroma half of stage 15.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+      ['The colour checklist', [{ title: 'Famous Artists Course, lesson 16: Colour -- the theory and practice of painting', note: '~/Media/Books/Unknown/16 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }, { title: 'Edwards, Color: A Course in Mastering the Art of Mixing Colors', note: 'A mixing course rather than a book about light. Carries the hue-value-chroma half of stage 15.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }]],
+    ],
+  },
+  {
+    name: '16 · Illustration',
+    lessons: [
+      ['Taking a piece to finish', [{ title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }, { title: 'Famous Artists Course, lesson 14: Advanced pictorial composition', note: '~/Media/Books/Unknown/14 -- the 1960 course by Dorne, Ludekens, Rockwell, Fawcett and eight others. Scanned, 948 pages across 25 files.' }]],
+      ['Sequential art', [{ title: 'Eisner, Comics and Sequential Art', note: 'The grammar of the panel, the page and timing in still images.' }, { title: 'McCloud, Understanding Comics', note: 'What happens between the panels, and why the reader does most of the work.' }, { title: 'McCloud, Making Comics', note: 'The practical companion: choice of moment, frame, image, word and flow.' }, { title: 'design/cinematic-and-dialogue-visual-system.md', note: 'The five visual registers. Registers 1 and 3 -- high-resolution portraits and illustrated tableaux -- are what this curriculum exists to make possible.' }]],
+      ['Character and creature design sheets', [{ title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'design/characters.md', note: 'The cast. Identity, costume and equipment come from here and from Terrath canon.' }, { title: 'O\'Connor, Dracopedia: The Bestiary', note: 'Creature design built from real taxonomy and anatomy rather than from silhouette.' }, { title: 'Tiner, Figure Drawing without Models', note: 'Drawing the figure from imagination, which is what character design actually requires.' }]],
+      ['The illustration checklist', [{ title: 'Loomis, Creative Illustration', note: 'Composition, picture-making and the illustrator\'s working method. The spine of stages 13 and 16.' }, { title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'design/cinematic-and-dialogue-visual-system.md', note: 'The five visual registers. Registers 1 and 3 -- high-resolution portraits and illustrated tableaux -- are what this curriculum exists to make possible.' }]],
+    ],
+  },
+  {
+    name: '17 · Keeping it',
+    lessons: [
+      ['Volume, forever', [{ title: 'Drawabox', url: 'https://drawabox.com', note: 'Complete and genuinely free -- no paywall, no account. Lessons 0-7 plus the 250 Box, 250 Cylinder, 25 Texture, 25 Wheel and 100 Treasure Chest challenges. Written for ink on paper.' }, { title: 'Nicolaides, The Natural Way to Draw', note: 'A scheduled course in contour and gesture. The schedule is the book; reading it without doing it teaches nothing.' }, { title: 'Line of Action', url: 'https://line-of-action.com', note: 'Free timed reference: figures, animals, hands and feet, faces and expressions. Clothed or nude, any age, any build, any duration.' }]],
+      ['Measuring progress', [{ title: 'Edwards, The New Drawing on the Right Side of the Brain', note: 'The course built to break symbol-drawing. Its pre-instruction drawings exist to be compared against at the end.' }, { title: 'Dodson, Keys to Drawing', note: 'Exercise-led and unusually honest about what beginners actually do wrong.' }, { title: 'Nicolaides, The Natural Way to Draw', note: 'A scheduled course in contour and gesture. The schedule is the book; reading it without doing it teaches nothing.' }]],
+      ['Where this goes', [{ title: 'design/art-and-animation.md', note: 'Shepherds\' art contract. Section 2.1 forbids inventing costume, insignia, equipment, anatomy or lore to fill a gap -- the rule stage 11 teaches as a drawing discipline.' }, { title: 'design/cinematic-and-dialogue-visual-system.md', note: 'The five visual registers. Registers 1 and 3 -- high-resolution portraits and illustrated tableaux -- are what this curriculum exists to make possible.' }, { title: 'Proko -- Figure Drawing Fundamentals', url: 'https://www.proko.com/course/figure-drawing-fundamentals', note: '32 of its 57 lessons are free, about 5 hours against the paid 15. The modern video companion to Loomis and Bridgman.' }, { title: 'Ctrl+Paint', url: 'https://www.ctrlpaint.com/library', note: 'A free digital-painting video library built for exactly this transition -- traditional fundamentals onto a tablet.' }]],
     ],
   },
 ];
 
-/** SQL single-quoted string. An apostrophe in a title ends the literal early. */
-const q = (value) => `'${String(value).replace(/'/g, "''")}'`;
-
 const out = [
   '-- Generated by scripts/curriculums/drawing.mjs. Read before running.',
-  '-- Apply it with `npm run curriculum drawing`, which carries ticks and route',
-  '-- changes across the rebuild below. Running this file through wrangler by',
-  '-- hand discards every one of them.',
-  // Rebuildable without losing its place. The row is created only if it is
-  // not already there, and its modules are cleared instead — deleting the
-  // curriculum and reinserting it would take a new position at the end, and
-  // curriculum order IS the route through all the routes.
+  '-- Apply it with `npm run curriculum drawing`, which carries ticks and detail',
+  '-- typed at the dashboard across the rebuild below. Running this file through',
+  '-- wrangler by hand discards every one of them.',
+  // Rebuildable without losing its place: the row is created only if it is not
+  // already there, and its modules are cleared instead. Deleting the curriculum
+  // and reinserting it would take a new position at the end, and curriculum
+  // order IS the route through all the routes.
   `insert into curriculums (name, source, status, position, created_at)\n` +
-    `  select 'Drawing', ${q(SOURCE)}, 'active',\n` +
-    `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(new Date().toISOString())}\n` +
-    `  where not exists (select 1 from curriculums where name = 'Drawing');`,
-  `update curriculums set source = ${q(SOURCE)} where name = 'Drawing';`,
-  // Lessons first, then modules. ON DELETE CASCADE covers this wherever foreign
-  // keys are enforced — D1 enforces them — and silently does nothing where they
-  // are not, orphaning every lesson instead of removing it so that a rebuild
-  // quietly adds a second full set nobody can see, because every read joins
-  // through modules. Written out rather than relied upon.
+    `  select ${q(NAME)}, ${q(SOURCE)}, 'active',\n` +
+    `    (select coalesce(max(position), 0) + 1 from curriculums), ${q(NOW)}\n` +
+    `  where not exists (select 1 from curriculums where name = ${q(NAME)});`,
+  `update curriculums set source = ${q(SOURCE)} where name = ${q(NAME)};`,
+
+  // Lesson-scoped sources are the script's own and go before the lessons do.
+  // ON DELETE CASCADE would cover it wherever foreign keys are enforced — D1
+  // enforces them, node:sqlite does not — so it is written out rather than
+  // relied upon. The curriculum's own list, where lesson_id is null, is NOT
+  // touched: nothing could regenerate it. See migration 0009.
+  `delete from sources where lesson_id is not null and curriculum_id = ${CURRICULUM};`,
+
+  // Lessons, then modules. Same reasoning.
   `delete from lessons where module_id in\n` +
-    `  (select id from modules where curriculum_id =\n` +
-    `     (select id from curriculums where name = 'Drawing'));`,
-  `delete from modules where curriculum_id =\n` +
-    `  (select id from curriculums where name = 'Drawing');`,
+    `  (select id from modules where curriculum_id = ${CURRICULUM});`,
+  `delete from modules where curriculum_id = ${CURRICULUM};`,
 ];
 
 stages.forEach((stage, m) => {
   out.push(
+    '',
+    `-- ${stage.name}`,
     `insert into modules (curriculum_id, name, position)\n` +
-      `  values ((select id from curriculums where name = 'Drawing'), ${q(stage.name)}, ${m + 1});`,
+      `  values (${CURRICULUM}, ${q(stage.name)}, ${m + 1});`,
   );
+
   stage.lessons.forEach((lesson, l) => {
-    const text = detailFor(lesson);
+    const name = nameOf(lesson);
     out.push(
       `insert into lessons (module_id, name, position, on_route, detail)\n` +
-        `  values ((select max(id) from modules), ${q(lesson)}, ${l + 1}, 1, ` +
-        `${text === null ? 'null' : q(text)});`,
+        `  values ((select max(id) from modules), ${q(name)}, ${l + 1}, 1, ${q(detailFor(name))});`,
     );
+
+    sourcesOf(lesson).forEach((source, s) => {
+      out.push(
+        `insert into sources (curriculum_id, lesson_id, title, url, note, position)\n` +
+          `  values (${CURRICULUM}, ${LESSON}, ${q(source.title)}, ${q(source.url ?? null)},` +
+          ` ${q(source.note ?? null)}, ${s + 1});`,
+      );
+    });
   });
 });
 
-console.log(out.join('\n'));
-console.error(
-  `modules: ${stages.length}  milestones: ${stages.reduce((n, s) => n + s.lessons.length, 0)}`,
-);
+if (missing.length) {
+  console.error(`\nNo material for ${missing.length} lesson(s):`);
+  for (const name of missing) console.error(`  · ${name}`);
+  console.error('\nEvery lesson teaches its point in full. Nothing printed.');
+  process.exit(1);
+}
+for (const key of strays()) console.error(`! drawing-detail.json has no lesson: ${key}`);
 
-for (const key of strays()) console.error(`  detail for no milestone: ${key}`);
+console.log(out.join('\n'));
+
+const lessons = stages.reduce((n, s) => n + s.lessons.length, 0);
+const sources = stages.reduce(
+  (n, s) => n + s.lessons.reduce((k, lesson) => k + sourcesOf(lesson).length, 0),
+  0,
+);
+console.error(`modules: ${stages.length}  lessons: ${lessons}  lesson sources: ${sources}`);
