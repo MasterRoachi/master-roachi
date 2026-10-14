@@ -824,6 +824,139 @@ material, so a lesson runs to a few thousand words, and a paste that lost its
 last third to a `slice()` while the editor said *Saved* is a loss nothing
 afterwards can see.
 
+## Plan: the Shop, then Projects, then Writing
+
+Written 2026-10-14, after Habits and Reading were rebuilt. This is the
+remaining backend work in the order it is to be done. **One page at a time**,
+and each page starts with a question round before anything is built.
+
+Four decisions are still open — they are listed at the end, and the
+assumptions this plan runs on are stated there. Rule on them before Stage 1
+step 3 and step 4, which are the two that depend on them.
+
+### Stage 1 — Shop
+
+**Products is renamed Shop**, and stops being a copy editor. It becomes the
+store's admin: fulfilment, orders and shipping as well as the words. Product
+copy is one part of it, not the whole of it.
+
+How the shop works today, which is what the stages below are shaped around:
+
+```
+customer → /store/<slug> → PayFast payment link (a FIXED sum)
+                         → POST /api/order → KV, 180-day TTL
+                         → /store/thank-you
+him      → curl /api/orders?key=<secret>      ← this is the entire admin
+```
+
+Three facts drive the order of the work:
+
+- **There is no admin page.** `worker/index.ts` says so in a comment on
+  `/api/orders`. The orders exist and have no interface.
+- **Orders expire.** `ORDER_TTL` is 180 days, so a sale and the customer's
+  name, email and address vanish six months later.
+- **Printful is catalogue-only.** `lib/printful.ts` fetches and merges
+  products; it does not create orders. Fulfilment is entirely manual and
+  Printful never hears about a sale.
+
+**1. Orders, under `/work/shop/`.** List, detail, search, and a fulfilled
+mark. Behind Access with the rest of the backend, which also retires the
+`ORDERS_KEY`-in-the-query-string guard — that exists only because the endpoint
+is public. The biggest gap on the page: the data is already there.
+
+**2. Orders into D1.** A migration and a move off KV, so an order is a
+permanent record rather than one with six months to live. Carry across
+whatever is still in KV at the time. Keep the KV write as a fallback for the
+same reason the buy flow already treats it as non-fatal: losing the
+convenience is better than blocking a sale.
+
+**3. Fulfilment.** Push a stored order to Printful's Orders API and read
+status and tracking back onto the order. New ground — `lib/printful.ts` has no
+orders code. **Blocked until `PRINTFUL_TOKEN` is set as a Worker secret**,
+which is his to run, and the Sync button is blocked on the same thing.
+
+**4. Product copy, expanded.** Add **tagline**, **the story behind the
+design**, a **care/fit note**, and **alt text** for the art. Delete the ten
+planned designs from `site.store.planned` — they cannot hold copy, because
+copy is keyed by Printful id and they have none. That also removes the section
+from the public store page, which is built to vanish when the list is empty, so
+nothing breaks. Add **manual product ordering**, and a **warning when the
+catalogue is stale**: `fetchedAt` is 2026-09-07 and the page says nothing
+about it.
+
+**5. Live preview** of the real product page, showing what a visitor sees.
+Images on it: Printful's two or three mockups, his own uploaded artwork, and a
+3D model where one exists.
+
+**6. The design run.** The new look — round `+`, shut cards, gold — applied
+once everything that should be on the page is on it. His sequencing, and the
+right one: there is no point styling a page whose contents are still growing.
+
+The SEO panel stays. It scores his own words, because the meta description
+prefers them (`lib/product-meta.ts`).
+
+**What will still make the Shop look thin, and is not a layout problem:**
+Printful holds **one** product. Until there are more, most of the page is one
+row.
+
+### Stage 2 — Projects
+
+Question round, then build. **Decide first whether Projects and Writing stay
+one component**: both render `app/work/CollectionEditor.tsx` with different
+props, so a change to one lands on the other. One editor is one place for a
+bug about saving, which is why it was built that way.
+
+Frontmatter editing stays **line-oriented** (`lib/frontmatter.ts`). Nothing
+parses and reserialises a document; a control replaces one field's lines and
+unknown keys are shown raw and left alone. The one-textarea editor existed to
+stop a field form silently dropping keys it does not model.
+
+### Stage 3 — Writing
+
+Question round, then build.
+
+### Stage 4 — Loose ends
+
+- `npm run lint` is broken and was before any of this work — see Open Items.
+- **Odin reads 112 of 151.** Its fourteen Getting Hired lessons count now the
+  route is gone. Deleting that course is the only way to stop them, and that
+  is his call: one statement of SQL.
+- **The sprite-acus summary** still describes the retired pipeline.
+- **North Star and Sales on `/work/boards/`** — probably moot, since Boards
+  was skipped on 2026-10-14.
+
+### His alone
+
+- `npx wrangler secret put PRINTFUL_TOKEN` — blocks Sync and all of Stage 1
+  step 3.
+- `npm run github-auth` when the GitHub token lapses.
+- More than one product in Printful.
+
+### Open decisions
+
+1. **Build order.** Orders and fulfilment first, as above, or copy and preview
+   first? *Assumed: as above.*
+2. **Shipping.** Informational only, or move off fixed PayFast payment links?
+   This is the one that changes the architecture — a live Printful rate quote
+   cannot alter what a fixed-sum link charges. *Assumed: informational.*
+3. **Order retention in D1** — kept indefinitely, or aged out after a couple
+   of years? They hold names, addresses and emails. *Assumed: indefinitely.*
+4. **The public `/store/<slug>` page** — changed too, or only previewed
+   accurately? *Assumed: unchanged for now.*
+
+### One thing to settle before the library browser can ship
+
+`public/work/library.json` is an index of all 3,623 books in the Calibre
+library, and **this repository is public on GitHub**. Cloudflare Access gates
+the served path; it does nothing for the repo. The file is therefore **not
+committed**, and the reading page's library browser says "No library index.
+Run `npm run library`" until this is decided. Typing a title in by hand works
+regardless. The options: commit it and accept the listing is public, or move
+the index into D1 and serve it from `/work/api/library` behind Access, which
+keeps it out of git entirely. The same question applies to
+`public/work/books/*.webp`, though those are only the covers of books actually
+on a shelf.
+
 ## Tech Stack
 
 **Next.js (App Router) + React, statically exported.** Superseded Astro when the
@@ -917,7 +1050,11 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       `/work/boards` names every board the token reaches, including the ones no
       panel is drawn for.
 - [ ] **Reading holds one book.** *The Odyssey*, marked reading since
-      2026-10-08, and nothing else — the shelves are a bookcase with one book
-      on it. `~/Media/Books` is 3,586 files filed by author, which is a
-      library and not a reading list, so it is the wrong thing to seed from:
-      the shelves want what he is actually reading.
+      2026-10-08. The page was rebuilt on 2026-10-14 against the Calibre
+      library in `~/Media/Books` — 3,623 books, with covers — so adding one is
+      now a search rather than retyping. The shelves still want what he is
+      actually reading, and only he can put it there.
+- [ ] **The library index is not committed, and the repo is public.** See
+      "One thing to settle" under the Shop plan: `npm run library` writes
+      `public/work/library.json`, which lists everything he owns. Until it is
+      decided, the reading page's library browser is inert in production.
