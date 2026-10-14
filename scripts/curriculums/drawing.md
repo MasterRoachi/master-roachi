@@ -86,27 +86,34 @@ nothing in his work needs them.
 The medium ruling made the rig itself a research subject, and two things turned
 up that no tutorial would have told us.
 
-**The tablet is bound to the wrong driver.** `256C:006D`, a Huion, enumerates as
-`usb-HUION_Huion_Tablet-if01-event-mouse` and binds to **`hid-generic`**:
+**The tablet looks broken and is not — and the first version of this plan said
+it was.** `256C:006D`, a Huion, enumerates as
+`usb-HUION_Huion_Tablet-if01-event-mouse` and binds to **`hid-generic`**, the
+fallback driver. No pen node, no tablet node. Every sign in `/sys` and
+`/dev/input/by-id` says unsupported, no pressure, relative positioning.
+
+**All of it is misleading.** There is a second driver, in userspace:
+**OpenTabletDriver 0.6.7-2**, daemon running since 13 October. It reads the
+tablet through `hidraw` directly, which requires the kernel driver to stay out
+of the way — so it ships a modprobe override that disables it:
 
 ```
-/sys/bus/hid/devices/0003:256C:006D.0004 -> hid-generic
-/sys/bus/hid/devices/0003:256C:006D.0005 -> hid-generic
+/usr/lib/modprobe.d/99-opentabletdriver.conf
+  install wacom       /usr/bin/true
+  install hid_uclogic /usr/bin/true
 ```
 
-There is no pen node and no tablet node — only a mouse. **So there is no
-pressure sensitivity and the pointer is relative rather than absolute**, which
-is the opposite of how a graphics tablet works. The in-tree driver that should
-claim it is `hid-uclogic`, it is present at
-`/lib/modules/7.2.5-3-omarchy/kernel/drivers/hid/hid-uclogic.ko.zst`, and the
-device **is** in its table:
+`install <module> /usr/bin/true` means `modprobe hid-uclogic` **succeeds
+silently and does nothing** — the most confusing failure mode available,
+because there is no error to read. And OTD's own virtual device reports
+`ABS_X`, `ABS_Y`, `ABS_PRESSURE`, `ABS_TILT_X`, `ABS_TILT_Y` with
+`PROP=POINTER|DIRECT`. **Pressure, tilt and absolute positioning all work.**
 
-```
-alias: hid:b0003g*v0000256Cp0000006D
-```
-
-It is simply not loaded. This is an autoload problem, not an unsupported-hardware
-problem, and stage 1 teaches both the diagnosis and the fix.
+The lesson stage 1 teaches is therefore the diagnosis rather than a fix: a
+missing kernel driver and a deliberately disabled one are indistinguishable
+from `/sys`, and the two steps that tell them apart — grepping `modprobe.d`
+and reading `/proc/bus/input/devices` for a virtual device — are the two
+nobody runs.
 
 **And there is no painting program on the rig.** No Krita, no GIMP, no MyPaint,
 no Inkscape — Aseprite and Blender are the only graphics software installed.
