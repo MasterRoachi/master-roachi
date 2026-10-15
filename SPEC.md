@@ -438,13 +438,22 @@ at the back of each deck is for.
 
 ### Curriculums
 
-Eight, in `scripts/curriculums/`. 694 lessons, 341 carrying detail. In order,
-because **the order of the curriculums is the route through all of them**:
+Eight, in `scripts/curriculums/`. **2,142 lessons, 2,005 carrying detail** as
+of 2026-10-15 — 694 and 341 before the rewrites. Odin is the only one without
+detail, and that is deliberate: see below. In order, because **the order of the
+curriculums is the route through all of them**:
 Japanese, Piano, Greek, Odin, Godot, Aseprite, Drawing, South African politics.
 That is the order he asked for, set on 2026-10-12; until then they sat in the
 order they happened to be built in.
 
-**All eight are being rewritten, one at a time, from 2026-10-13.** Not expanded
+**The rewrites are finished, 2026-10-15.** Seven were rewritten between
+2026-10-13 and 2026-10-15 — Japanese, Piano, Greek, Godot, Aseprite, Drawing
+and South African politics — and **Odin is exempt**, because it is a
+transcription of someone else's course and has nothing to teach on its own.
+Drawing was the last, at 157 lessons across seventeen modules; Aseprite before
+it at 211 lessons and 587 cards.
+
+**All eight were being rewritten, one at a time, from 2026-10-13.** Not expanded
 at the edges: re-researched and re-planned to teach their subject from nothing
 to mastery, in three phases per curriculum — research the subject and the free
 resources that teach it, plan the whole thing and have it approved, then
@@ -455,8 +464,8 @@ between a transcribed curriculum, whose substance sits in the resource, and a
 designed one, which carries its own. His ruling replaces it — *"i dont want to
 open the sources, the material itself should be accessible here"* — so every
 lesson is to teach on its own, and a source becomes attribution and further
-reading rather than the place the substance lives. Japanese, Greek and Odin are
-the 353 lessons still waiting on it.
+reading rather than the place the substance lives. **Every curriculum but Odin
+now meets it.**
 
 Two consequences, built on 2026-10-13 before any of the rewriting:
 
@@ -921,9 +930,12 @@ Question round, then build.
 - **Odin reads 112 of 151.** Its fourteen Getting Hired lessons count now the
   route is gone. Deleting that course is the only way to stop them, and that
   is his call: one statement of SQL.
-- **The sprite-acus summary** still describes the retired pipeline.
+- ~~**The sprite-acus summary** still describes the retired pipeline.~~ Fixed
+  2026-10-15: the page now records the 2026-09-22 retirement.
 - **North Star and Sales on `/work/boards/`** — probably moot, since Boards
   was skipped on 2026-10-14.
+- **Three curriculums have an empty curriculum-level Sources card**: Aseprite,
+  Drawing and South African politics. Ten minutes each, and not yet asked for.
 
 ### His alone
 
@@ -931,6 +943,16 @@ Question round, then build.
   step 3.
 - `npm run github-auth` when the GitHub token lapses.
 - More than one product in Printful.
+- **Delete the two stale curriculum rows in live D1, ids 9 and 10.** They came
+  from `sa-politics.mjs` and `aseprite.mjs` using Title-Case names that did not
+  match the lower-case live rows, so `where not exists` inserted duplicates at
+  the end. They are parked at positions 98 and 99 as `paused` so they do not
+  show. The delete is blocked from this machine by the sandbox, which reads it
+  as a mass delete, so it is one statement for him to run:
+  `delete from lessons where curriculum_id in (9, 10); delete from curriculums where id in (9, 10);`
+- **Deploy the worker.** Seven commits are on `main` as of 2026-10-15 and the
+  live worker is behind them. Pushing to GitHub does not deploy — there is no
+  deploy hook and no Cloudflare token here.
 
 ### Open decisions
 
