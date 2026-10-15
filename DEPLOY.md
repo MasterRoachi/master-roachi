@@ -11,9 +11,31 @@ wrong since the Worker started answering for the store.
 npm run build && npx wrangler deploy --dry-run
 ```
 
-is the check to run before pushing anything that touches `wrangler.jsonc`. It
+is the check to run before deploying anything that touches `wrangler.jsonc`. It
 should report reading files from `out` and exit without mentioning OpenNext.
-Every push to `main` triggers a build and deploy from then on.
+
+## Deploying is a thing you do by hand
+
+```
+npm run build && npx wrangler deploy
+```
+
+run from this directory. **Pushing `main` does not deploy.** This file said it
+did — "every push to `main` triggers a build and deploy from then on" — and that
+was never true of this repository: the only workflow in `.github/workflows/` is
+`play-data.yml`, which refreshes play data and pushes when it changes. There is
+no build-and-deploy workflow, and the **Connect to Git** settings below describe
+a Cloudflare-side connection that is not firing either.
+
+The cost of believing it: eight commits sat on `main` from 13–15 October 2026 —
+four curriculum rewrites, the Calibre library moving into D1, the sprite-acus
+correction and a spec update — while the live site served none of them, because
+pushing was the only thing anyone did.
+
+Wrangler **is** authenticated on the rig (`npx wrangler whoami` lists the
+account's scopes), so there is no token to fetch and nothing to set up. The one
+warning it prints — a missing `websearch.run` OAuth scope — has nothing to do
+with deploying and can be ignored; `wrangler login` clears it.
 
 ---
 
@@ -48,7 +70,12 @@ unharmed, but the deploy fails every time.
 
 ### Build settings
 
-Set once on the Cloudflare project, under **Workers & Pages → Connect to Git**:
+These describe a Cloudflare-side Git connection that **is not deploying**, so
+treat them as the settings to check rather than a deploy path to rely on. If a
+push ever does deploy, this is the table that governs it; until then, deploy by
+hand as above.
+
+Set on the Cloudflare project, under **Workers & Pages → Connect to Git**:
 
 | Setting | Value |
 | --- | --- |
@@ -56,6 +83,11 @@ Set once on the Cloudflare project, under **Workers & Pages → Connect to Git**
 | Deploy command | `npx wrangler deploy` |
 | Build output directory | `out` |
 | Node version | 20 or newer |
+
+Worth settling one way or the other: either connect the repository properly and
+delete the by-hand instructions, or drop this table and say plainly that
+deploying is manual. Two half-documented routes is how eight commits went
+unnoticed.
 
 The dashboard's output directory is advisory — `wrangler.jsonc` declares
 `./out/`, and that is what governs. Routing is declared there too, deliberately:
