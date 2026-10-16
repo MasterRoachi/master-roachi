@@ -68,8 +68,13 @@ function Chip({
   onOpen: (card: WorkCard) => void;
   busy: boolean;
 }) {
-  const idle = daysSince(card.lastActivity);
-  const overdue = card.due !== null && Date.parse(card.due) < Date.now();
+  /* Read once on mount rather than on every render. Reading the clock during
+     render means the same card can draw differently from the same props, which
+     is what the purity rule is for - and it also let two chips in one list
+     disagree about a day boundary they crossed between renders. */
+  const [now] = useState(() => Date.now());
+  const idle = daysSince(card.lastActivity, now);
+  const overdue = card.due !== null && Date.parse(card.due) < now;
 
   return (
     <li>
@@ -143,6 +148,9 @@ function Group({
 }
 
 export default function WorkHub() {
+  /* The clock, read once. Same reasoning as Chip: due-vs-now decided during
+     render makes the output depend on when React happened to re-render. */
+  const [openedAt] = useState(() => Date.now());
   const [state, setState] = useState<State>({ phase: 'loading' });
   const [nonce, setNonce] = useState(0);
   const [active, setActive] = useState<string | null>(null);
@@ -376,14 +384,14 @@ export default function WorkHub() {
               {openCard.due && (
                 <span
                   className={
-                    Date.parse(openCard.due) < Date.now() ? styles.dueLate : styles.due
+                    Date.parse(openCard.due) < openedAt ? styles.dueLate : styles.due
                   }
                 >
                   due {new Date(openCard.due).toLocaleDateString('en-ZA')}
                 </span>
               )}
               {(() => {
-                const idle = daysSince(openCard.lastActivity);
+                const idle = daysSince(openCard.lastActivity, openedAt);
                 return idle !== null && idle >= STALE_DAYS ? (
                   <span className={styles.staleText}>{idle} days still</span>
                 ) : null;

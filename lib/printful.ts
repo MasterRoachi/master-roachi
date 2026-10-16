@@ -185,14 +185,105 @@ function readSpec(description: unknown): { spec: string[]; disclaimer: string | 
  * Centimetres only. Inches are 2.54 of them and converting at render costs
  * nothing, whereas shipping both tables doubles the data for arithmetic.
  */
-function readSizeGuide(result: any): SizeGuide | null {
-  const table = (result?.size_tables ?? []).find((t: any) => t.type === 'product_measure');
+/* ---------------------------------------------------------------------------
+ * The Printful API, as much of it as this file reads.
+ *
+ * These describe the fields used, not the full responses. The API is external
+ * and sends a great deal more; typing what we never read would be inventing a
+ * contract we cannot hold to, and it would go stale silently the first time
+ * Printful changed something we do not look at.
+ *
+ * Every field is optional on purpose. A missing one is ordinary, and every
+ * read below already guards for it with ?? or ?. — the types now say so
+ * instead of `any` quietly promising that everything is always there.
+ * ------------------------------------------------------------------------- */
+
+interface PfSizeValue {
+  /** Required: it is copied straight into SizeGuide, which names every row. */
+  size: string;
+  value?: string | null;
+  min_value?: string | null;
+  max_value?: string | null;
+}
+
+interface PfMeasurement {
+  type_label?: string | null;
+  values?: PfSizeValue[];
+}
+
+interface PfSizeTable {
+  type?: string;
+  measurements?: PfMeasurement[];
+}
+
+interface PfSizeGuideResult {
+  size_tables?: PfSizeTable[];
+}
+
+interface PfCatalogueVariant {
+  color?: string | null;
+  color_code?: string | null;
+}
+
+interface PfCatalogueResult {
+  product?: {
+    brand?: string | null;
+    model?: string | null;
+    title?: string | null;
+    description?: string | null;
+  };
+  variants?: PfCatalogueVariant[];
+}
+
+interface PfStoreResult {
+  type?: string | null;
+  name?: string | null;
+  website?: string | null;
+}
+
+interface PfStoreProduct {
+  /* id and name are not optional: the loop builds a slug and a product id out
+     of them without guarding, so a response missing either is a broken
+     response rather than an ordinary absence. */
+  id: number;
+  name: string;
+  is_ignored?: boolean;
+  external_id?: string | null;
+  thumbnail_url?: string | null;
+  /** Printful's own count, which can differ from the synced variants we see. */
+  variants?: number;
+}
+
+interface PfSyncVariant {
+  size?: string | null;
+  color?: string | null;
+  /** Read straight into parseFloat, so a variant without one is malformed. */
+  retail_price: string;
+  currency?: string;
+  availability_status?: string;
+  product?: { product_id?: number | null };
+}
+
+/** What `blank()` keeps about a catalogue entry, once it has been read. */
+interface Blank {
+  brand: string | null;
+  model: string | null;
+  title: string | null;
+  /** readSpec returns the bullet lines, which is Garment['spec']. */
+  spec: string[];
+  disclaimer: string | null;
+  sizeGuide: SizeGuide | null;
+  colors: Map<string, string>;
+}
+
+function readSizeGuide(result: PfSizeGuideResult | undefined): SizeGuide | null {
+  const table = (result?.size_tables ?? []).find((t) => t.type === 'product_measure');
   if (!table) return null;
 
   const measurements = (table.measurements ?? [])
-    .map((m: any) => ({
+    .map((m) => ({
       label: m.type_label ?? null,
-      values: (m.values ?? []).map((v: any) => ({
+      values: (m.values ?? []).map((v) => ({
         size: v.size,
         // A single figure for length, a range for anything measured around.
         value: v.value != null ? Number.parseFloat(v.value) : null,
@@ -200,7 +291,7 @@ function readSizeGuide(result: any): SizeGuide | null {
         max: v.max_value != null ? Number.parseFloat(v.max_value) : null,
       })),
     }))
-    .filter((m: any) => m.label && m.values.length > 0);
+    .filter((m) => m.label && m.values.length > 0);
 
   return measurements.length > 0 ? { unit: 'cm', measurements } : null;
 }
@@ -249,20 +340,22 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
     ...(options.storeId ? { 'X-PF-Store-Id': options.storeId } : {}),
   };
 
-  async function api(pathname: string): Promise<any> {
+  // Generic rather than `any`: each call site says what it expects back, so
+  // the shape is declared where it is known instead of lost at the boundary.
+  async function api<T>(pathname: string): Promise<T> {
     const res = await fetch(`https://api.printful.com${pathname}`, {
       headers,
       signal: AbortSignal.timeout(20000),
     });
     if (!res.ok) throw new Error(`${pathname} returned ${res.status}`);
-    return res.json();
+    return res.json() as Promise<T>;
   }
 
   /**
    * One request per distinct blank, cached, because a store with twelve
    * designs on the same tee should not ask twelve times.
    */
-  const catalogue = new Map<number, any>();
+  const catalogue = new Map<number, Blank | null>();
 
   async function blank(productId: number | null | undefined) {
     if (productId == null) return null;
@@ -270,15 +363,15 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
 
     let info = null;
     try {
-      const res = await api(`/products/${productId}`);
-      const r = res?.result ?? {};
+      const res = await api<{ result?: PfCatalogueResult }>(`/products/${productId}`);
+      const r: PfCatalogueResult = res?.result ?? {};
       const { spec, disclaimer } = readSpec(r.product?.description);
 
       // A second request and a nice-to-have, so it fails on its own without
       // costing the rest of the catalogue entry.
       let sizeGuide: SizeGuide | null = null;
       try {
-        const sizes = await api(`/products/${productId}/sizes?unit=cm`);
+        const sizes = await api<{ result?: PfSizeGuideResult }>(`/products/${productId}/sizes?unit=cm`);
         sizeGuide = readSizeGuide(sizes?.result);
       } catch (err) {
         note(`no size guide for ${productId} (${(err as Error).message})`);
@@ -295,8 +388,8 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
         sizeGuide,
         colors: new Map<string, string>(
           (r.variants ?? [])
-            .filter((v: any) => v.color && v.color_code)
-            .map((v: any) => [v.color, v.color_code]),
+            .filter((v) => v.color && v.color_code)
+            .map((v) => [v.color as string, v.color_code as string]),
         ),
       };
     } catch (err) {
@@ -312,8 +405,8 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
   // not. Reported rather than assumed, and never fatal.
   let store: StoreInfo | null = null;
   try {
-    const info = await api('/store');
-    const r = info?.result ?? {};
+    const info = await api<{ result?: PfStoreResult }>('/store');
+    const r: PfStoreResult = info?.result ?? {};
     store = { type: r.type ?? null, name: r.name ?? null, website: r.website ?? null };
     note(
       `store "${store.name ?? '?'}" type=${store.type ?? '?'}` +
@@ -323,8 +416,8 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
     note(`could not read store info (${(err as Error).message})`);
   }
 
-  const list = await api('/store/products');
-  const listed = (list?.result ?? []).filter((p: any) => !p.is_ignored);
+  const list = await api<{ result?: PfStoreProduct[] }>('/store/products');
+  const listed = (list?.result ?? []).filter((p) => !p.is_ignored);
   if (listed.length === 0) throw new Error('store has no synced products yet');
 
   const products: Product[] = [];
@@ -333,8 +426,10 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
 
   for (const p of listed) {
     // Prices live on the variants, so each product needs its own request.
-    const detail = await api(`/store/products/${p.id}`);
-    const variants = detail?.result?.sync_variants ?? [];
+    const detail = await api<{ result?: { sync_variants?: PfSyncVariant[] } }>(
+      `/store/products/${p.id}`,
+    );
+    const variants: PfSyncVariant[] = detail?.result?.sync_variants ?? [];
 
     // Every synced variant of one product sits on the same blank, so the
     // first one decides which catalogue entry to look up.
@@ -344,7 +439,7 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
     // reporting "9 options" for nine sizes of a single colour, which reads as
     // nine colourways — and hiding that the price nearly doubles from XS to
     // 5XL behind a single "from" figure.
-    const shapedVariants: Variant[] = variants.map((v: any) => ({
+    const shapedVariants: Variant[] = variants.map((v) => ({
       size: v.size ?? null,
       color: v.color ?? null,
       amount: Number.parseFloat(v.retail_price),

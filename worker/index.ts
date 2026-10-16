@@ -816,7 +816,10 @@ export default {
         // What is committed now, both to merge onto and to compare against.
         const current = await readFile(token, 'data/store.json').catch(() => null);
         const existing = current ? (JSON.parse(current.text) as Record<string, unknown>) : null;
-        const payload = mergeCatalogue(fresh, existing as any);
+        const payload = mergeCatalogue(
+          fresh,
+          existing as { products?: Record<string, unknown>[] } | null,
+        );
 
         /* Compared on the synced keys only, and with fetchedAt ignored.
          *
@@ -825,15 +828,19 @@ export default {
          * two minutes of build every time it was pressed out of curiosity.
          * Same reasoning as writeSnapshot() on the build side, and the same
          * key list, so the two agree about what a change is. */
-        const settle = (snap: any) =>
+        /* Takes either side: `payload` is a Catalogue, `existing` is whatever
+           was parsed out of the committed file. Both are read with ?? and ?.,
+           so the loosest shape that admits both is the honest one. */
+        type Settleable = { store?: unknown; products?: Record<string, unknown>[] } | null;
+        const settle = (snap: Settleable) =>
           JSON.stringify({
             store: snap?.store ?? null,
-            products: (snap?.products ?? []).map((product: any) =>
+            products: (snap?.products ?? []).map((product) =>
               Object.fromEntries(SYNCED_KEYS.map((k) => [k, product[k] ?? null])),
             ),
           });
 
-        const changed = settle(existing) !== settle(payload);
+        const changed = settle(existing) !== settle(payload as unknown as Settleable);
         let commit = '';
         if (changed) {
           const written = await writeFile(

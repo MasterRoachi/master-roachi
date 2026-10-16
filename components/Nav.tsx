@@ -17,9 +17,16 @@ export default function Nav() {
 
   // Close the menu on navigation, so tapping a link does not leave the panel
   // hanging open over the new page.
-  useEffect(() => {
+  //
+  // Adjusted during render rather than in an effect. React re-runs this
+  // component immediately with the new state and before anything is painted,
+  // so the panel never shows open on the new page for a frame the way an
+  // effect would let it.
+  const [lastPath, setLastPath] = useState(pathname);
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
 
   // Escape closes it, matching normal disclosure behaviour.
   useEffect(() => {

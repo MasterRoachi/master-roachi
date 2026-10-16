@@ -249,12 +249,17 @@ export default function CollectionEditor({
   /* A date in the future withholds the post until a build on or after it.
    * Worth saying out loud, because the post simply not appearing is otherwise
    * indistinguishable from a broken deploy. */
+  /* The clock is read once on mount, not inside the memo. A memo that calls
+     Date.now() is not a pure function of its dependencies, so it could return
+     a different answer for the same date on a later render - which is exactly
+     what a memo is supposed to rule out. */
+  const [mountedAt] = useState(() => Date.now());
   const scheduled = useMemo(() => {
     const date = values.date?.trim();
     if (!date) return null;
-    const today = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const today = new Date(mountedAt + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
     return date > today ? date : null;
-  }, [values.date]);
+  }, [values.date, mountedAt]);
 
   function openEntry(path: string) {
     if (dirty && !confirm('Discard the unsaved changes?')) return;

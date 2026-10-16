@@ -39,9 +39,15 @@ export default function WorkHeader() {
 
   // Navigating is the other way a menu is finished with. Next keeps this
   // component mounted across a route change, so nothing else closes it.
-  useEffect(() => {
+  //
+  // Adjusted during render rather than in an effect, so the menu is already
+  // shut on the first paint of the new route instead of shutting a frame after
+  // it.
+  const [lastPath, setLastPath] = useState(path);
+  if (path !== lastPath) {
+    setLastPath(path);
     setOpen(null);
-  }, [path]);
+  }
 
   return (
     <header className={styles.header}>

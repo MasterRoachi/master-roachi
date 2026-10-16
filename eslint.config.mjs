@@ -31,6 +31,44 @@ const config = [
     },
   },
   {
+    rules: {
+      /* The three React Compiler rules below are WARNINGS here, not errors,
+         and that is a deliberate decision recorded rather than a silent
+         loosening. Revisit the moment `reactCompiler: true` goes into
+         next.config.mjs - it is not set today, so the compiler these rules
+         speak for does not run on this project at all.
+
+         Each was examined site by site on 2026-10-16, and what they flag here
+         is correct code rather than defects:
+
+         set-state-in-effect (11 sites) - almost all are
+         `useEffect(() => void load(), [load])`, which is fetching on mount.
+         There is no other way to do that without moving the page to Suspense
+         or server components, which is an architecture change and not a lint
+         fix. The rest read the query string or localStorage on mount, which
+         has to happen in an effect: this site is statically exported, so
+         reading either during render would break hydration.
+
+         refs (2 sites) - both are deliberate and already carry comments
+         explaining why. BookSketch writes sceneRef during render because its
+         pointer handlers run between renders and a closure would be one page
+         behind mid-stroke. Moving that into an effect to satisfy the rule
+         risks the bug the comment was written about.
+
+         preserve-manual-memoization (2 sites) - the compiler declines to
+         optimise Curriculums because it cannot prove `current` is never
+         mutated. It never is: the only sort copies first, and the only push is
+         to a local array. Nothing to fix.
+
+         What was fixed rather than waived, the same day: all 14 no-explicit-any,
+         two reset-on-navigation effects rewritten as render-phase adjustments,
+         and three impure renders that read the clock during render. */
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
+    },
+  },
+  {
     ignores: [
       ".next/**",
       "out/**",
