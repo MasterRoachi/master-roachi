@@ -926,7 +926,7 @@ Question round, then build.
 
 ### Stage 4 — Loose ends
 
-- `npm run lint` is broken and was before any of this work — see Open Items.
+- ~~`npm run lint` is broken and was before any of this work.~~ Fixed 2026-10-16.
 - **Odin reads 112 of 151.** Its fourteen Getting Hired lessons count now the
   route is gone. Deleting that course is the only way to stop them, and that
   is his call: one statement of SQL.
@@ -1064,9 +1064,20 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       invented book titles. Answered by the rewriting above, which researches
       free resources per subject — and now at two grains, so a lesson can name
       its own chapter.
-- [ ] **`npm run lint` is broken**, and was before any of this work: Next 16
-      removed `next lint`, and the repo has no eslint config. Fixing it means
-      choosing one.
+- [x] **`npm run lint` works.** Fixed 2026-10-16. Next 16 removed `next lint`,
+      and the repo had no eslint config at all; `eslint` plus
+      `eslint-config-next` on a flat `eslint.config.mjs` restore what that
+      subcommand used to supply. 34 errors to 0 — nineteen fixed, fifteen
+      examined and recorded as warnings with the reasoning in the config.
+
+      **Three decisions live in `eslint.config.mjs`, so do not undo them by
+      tidying.** `@next/next/no-assign-module-variable` is off: a curriculum
+      has modules, so `for (const module of ...)` is this project's own
+      vocabulary, not the CommonJS global the rule guards. `no-img-element`
+      stays a warning: the site is statically exported and pulls remote images
+      from Steam, Printful and YouTube. And three React Compiler rules are
+      warnings because `reactCompiler: true` is not set in `next.config.mjs`,
+      so the compiler they speak for does not run here — revisit when it does.
 - [ ] **Which board holds the unfamiliar Trello cards.** Not North Star and not
       Sales, by his own check. The folded "can see N boards" line on
       `/work/boards` names every board the token reaches, including the ones no
