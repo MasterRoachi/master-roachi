@@ -131,21 +131,10 @@ const SHELF_PILLS: { status: Status; label: string }[] = [
   { status: 'abandoned', label: 'Put down' },
 ];
 
-/** Days from start to finish, when both are known. The reason both are stored. */
-function took(book: Book): number | null {
-  if (!book.started_on || !book.finished_on) return null;
-  const days = Math.round(
-    (Date.parse(`${book.finished_on}T00:00:00Z`) - Date.parse(`${book.started_on}T00:00:00Z`)) /
-      86_400_000,
-  );
-  return days >= 0 ? days : null;
-}
-
 export default function Reading() {
   const [books, setBooks] = useState<Book[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [configured, setConfigured] = useState(true);
-  const [today, setToday] = useState('');
 
   const [quotes, setQuotes] = useState<Record<string, Quote[]>>({});
   const [notes, setNotes] = useState<Record<string, Note[]>>({});
@@ -161,14 +150,12 @@ export default function Reading() {
    *  that have not been pulled out yet. */
   const [openShelves, setOpenShelves] = useState<Set<Status>>(new Set(['reading']));
   const [quoteText, setQuoteText] = useState('');
-  const [quotePage, setQuotePage] = useState('');
 
   const [open, setOpen] = useState<number | null>(null);
   /** Where the clicked spine was, so the open book can start there. */
   const [from, setFrom] = useState<DOMRect | null>(null);
   const [settled, setSettled] = useState(false);
   const [draft, setDraft] = useState('');
-  const [openYears, setOpenYears] = useState<Set<string>>(new Set());
   const [posting, setPosting] = useState(false);
   const [posted, setPosted] = useState<string | null>(null);
 
@@ -189,7 +176,9 @@ export default function Reading() {
       setBooks(data.books ?? []);
       setQuotes(data.quotes ?? {});
       setNotes(data.notes ?? {});
-      setToday(data.today ?? '');
+      // The API still returns `today` (the server's date, not the browser's).
+      // Nothing reads it since the per-year count came out on 2026-10-16; it is
+      // two lines to put back when something needs a server-authoritative date.
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not read them.');
     }
@@ -276,6 +265,10 @@ export default function Reading() {
    * last stored rather than from what is on the screen, and the two would
    * differ by exactly the paragraph just typed.
    */
+  // NOTE: nothing calls this yet — it is waiting on a button, not on work. The
+  // server half is live (`action: 'post'` in worker/index.ts), so this is a
+  // finished feature with no trigger. Deliberately kept when the page's other
+  // unused bindings were deleted on 2026-10-16.
   async function makePost(book: Book) {
     setPosting(true);
     try {
@@ -329,10 +322,7 @@ export default function Reading() {
   const opened = books.find((book) => book.id === open) ?? null;
   const bannerArt =
     opened?.calibre_id != null ? `/work/api/book-cover?id=${opened.calibre_id}` : null;
-  const thisYear = today.slice(0, 4);
   const done = books.filter((b) => b.status === 'read');
-  const finishedThisYear = done.filter((b) => b.finished_on?.startsWith(thisYear)).length;
-  const reading = books.filter((b) => b.status === 'reading');
 
   // Finished, by the year it was finished in — newest first, since the recent
   // year is the one being added to and the rest is a wall of older shelves.
