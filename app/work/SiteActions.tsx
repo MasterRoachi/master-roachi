@@ -71,7 +71,7 @@ export default function SiteActions() {
   const [state, setState] = useState<'idle' | 'working' | string>('idle');
 
   async function go() {
-    if (!confirm('Rebuild the site? This commits and redeploys — about five minutes.')) return;
+    if (!confirm('Rebuild the site? This commits and redeploys — about two minutes.')) return;
     setState('working');
     try {
       const response = await fetch('/work/api/rebuild', { method: 'POST' });
@@ -83,7 +83,7 @@ export default function SiteActions() {
       };
       if (data.configured === false) setState('Not connected — GITHUB_TOKEN is not set.');
       else if (!response.ok || !data.started) setState(data.error ?? `Failed (${response.status}).`);
-      else setState(`Building ${data.commit?.slice(0, 7)} — live in about five minutes.`);
+      else setState(`Building ${data.commit?.slice(0, 7)} — live in about two minutes.`);
     } catch (error) {
       setState(error instanceof Error ? error.message : 'Failed.');
     }

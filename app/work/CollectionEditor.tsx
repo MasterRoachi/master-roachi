@@ -330,7 +330,7 @@ export default function CollectionEditor({
       }
 
       setDirty(false);
-      setStatus(`Saved to ${data.path}. The deploy takes about five minutes.`);
+      setStatus(`Saved to ${data.path}. The deploy takes about two minutes.`);
       await load();
       if (data.path) {
         setOpenPath(data.path);

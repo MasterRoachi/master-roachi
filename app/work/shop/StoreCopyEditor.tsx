@@ -296,7 +296,7 @@ export default function StoreCopyEditor({
         return;
       }
       setDirty(false);
-      setStatus('Saved. The deploy takes about five minutes.');
+      setStatus('Saved. The deploy takes about two minutes.');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Save failed.');
     } finally {
@@ -335,7 +335,7 @@ export default function StoreCopyEditor({
       }
       setSyncNote(
         data.changed
-          ? `Synced ${data.products} products and committed. Reload once the deploy lands, in about five minutes.`
+          ? `Synced ${data.products} products and committed. Reload once the deploy lands, in about two minutes.`
           : `Synced — ${data.products} products, unchanged since the last sync.`,
       );
     } catch (error) {
