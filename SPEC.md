@@ -921,6 +921,21 @@ nothing breaks. Add **manual product ordering**, and a **warning when the
 catalogue is stale**: `fetchedAt` is 2026-09-07 and the page says nothing
 about it.
 
+**Step 3 is built, 2026-10-19**, on his rulings that day: a **Send to
+Printful…** button on a Paid order (nothing automatic); the order is created
+in Printful as a **draft**, which he confirms in Printful's dashboard, so a
+wrong click costs nothing; and status and tracking are **read back when
+`/work/shop` loads**, not by webhook — an order Printful reports shipped, or
+with a tracking number, becomes Fulfilled. Migration `0017`,
+`lib/printful-orders.ts`. Because the buy form takes the address as one box,
+Send opens a form with it split into Printful's fields, guessed from the text
+and checked by him; a structured address on the public buy form would remove
+that step and is not built. The variant is found by size, and a size that
+exists in more than one colour is refused rather than guessed, since the
+order does not record colour. An order in Printful cannot be stepped back to
+Received or Dismissed here. `PRINTFUL_TOKEN` is set (single-store token); its
+`orders` scope is first exercised by the first real Send.
+
 **Step 4 is built, 2026-10-19.** `lib/product-copy.ts` owns the shape: an
 entry is `{ tagline, description, story, care, alt }`, every field optional,
 and an old array entry still reads as the description, so `copy.json` was not
@@ -969,6 +984,10 @@ Question round, then build.
 
 ### Stage 4 — Loose ends
 
+- **Sync Printful does not update the store by itself** — the same fault as
+  scheduled posts below. `/work/api/store-sync` commits `data/store.json` and
+  expects the push to rebuild; it does not, so a sync shows on the store after
+  the next hand deploy.
 - **Scheduled posts do not publish by themselves.** The daily cron's
   `rebuild()` makes an empty commit on the day a post is due, on the
   assumption that a push deploys. It does not (see DEPLOY.md), so a post dated
@@ -989,8 +1008,6 @@ Question round, then build.
 
 ### His alone
 
-- `npx wrangler secret put PRINTFUL_TOKEN` — blocks Sync and all of Stage 1
-  step 3.
 - `npm run github-auth` when the GitHub token lapses.
 - More than one product in Printful.
 - **Delete the two stale curriculum rows in live D1, ids 9 and 10.** They came

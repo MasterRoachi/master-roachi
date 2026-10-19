@@ -377,6 +377,7 @@ function sqliteD1() {
   const sqlite = new DatabaseSync(':memory:');
   sqlite.exec(fs.readFileSync('migrations/0015_orders.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0016_order_retention.sql', 'utf8'));
+  sqlite.exec(fs.readFileSync('migrations/0017_order_fulfilment.sql', 'utf8'));
   const d1 = {
     sqlite,
     broken: false,
@@ -546,6 +547,109 @@ function sqliteD1() {
   await worker.fetch(post(buyer), shopEnv);
   ordersDb.broken = false;
   check('a KV fallback expires on the same 30 days', kv._ttl.at(-1) === 60 * 60 * 24 * 30, String(kv._ttl.at(-1)));
+
+  // --- sending to Printful -------------------------------------------------
+  //
+  // Printful faked at the fetch boundary. What matters: a draft is created
+  // once and only for a Paid order, the variant is found by size and refused
+  // when colour would be a guess, and the status comes back on the next read.
+  const realFetch = globalThis.fetch;
+  const printfulCalls = [];
+  let variants = [{ id: 555, size: 'L', color: 'Black Heather' }, { id: 556, size: 'M', color: 'Black Heather' }];
+  let remote = { id: 9001, status: 'draft', shipments: [] };
+  globalThis.fetch = async (input, init = {}) => {
+    const url = String(input);
+    if (!url.startsWith('https://api.printful.com')) return realFetch(input, init);
+    printfulCalls.push({ url, method: init.method ?? 'GET', body: init.body ? JSON.parse(init.body) : null });
+    const reply = (result) => new Response(JSON.stringify({ code: 200, result }), { status: 200 });
+    if (url.includes('/store/products/')) return reply({ sync_variants: variants });
+    if (url.endsWith('/orders') && init.method === 'POST') return reply(remote);
+    if (url.includes('/orders/9001')) return reply(remote);
+    return new Response(JSON.stringify({ code: 404, error: { message: 'Not found' } }), { status: 404 });
+  };
+
+  const printfulEnv = { ...shopEnv, PRINTFUL_TOKEN: 'pf-test' };
+  const sendIt = async (ref, recipient, useEnv = printfulEnv) => {
+    const response = await worker.fetch(
+      new Request('https://masterroachi.com/work/api/orders', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'cf-access-jwt-assertion': 'stub-jwt' },
+        body: JSON.stringify({ action: 'send', ref, recipient }),
+      }),
+      useEnv,
+    );
+    return { status: response.status, body: await response.json() };
+  };
+  const markIn = async (ref, status) => {
+    const response = await worker.fetch(
+      new Request('https://masterroachi.com/work/api/orders', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'cf-access-jwt-assertion': 'stub-jwt' },
+        body: JSON.stringify({ action: 'status', ref, status }),
+      }),
+      printfulEnv,
+    );
+    return { status: response.status, body: await response.json() };
+  };
+  const address = { name: 'Send Buyer', address1: '4 Test Road', city: 'Cape Town', zip: '8001', country_code: 'za' };
+
+  res = await worker.fetch(post({ ...buyer, name: 'Send Buyer', size: 'L', productId: '464722916' }), printfulEnv);
+  const sendRef = (await res.json()).ref;
+
+  let sent = await sendIt(sendRef, address, shopEnv);
+  check('sending without PRINTFUL_TOKEN is refused', sent.status === 503, JSON.stringify(sent));
+  sent = await sendIt(sendRef, address);
+  check('a Received order cannot be sent', sent.status === 409 && printfulCalls.length === 0, JSON.stringify(sent));
+
+  await markIn(sendRef, 'paid');
+  sent = await sendIt(sendRef, { ...address, city: '' });
+  check('an incomplete address is refused before Printful is asked', sent.status === 400 && printfulCalls.length === 0, JSON.stringify(sent));
+
+  sent = await sendIt(sendRef, address);
+  const created = printfulCalls.find((c) => c.method === 'POST');
+  check('a Paid order is sent', sent.status === 200 && sent.body.order?.printful_id === 9001, JSON.stringify(sent));
+  check('as a draft — no confirm', created && !('confirm' in created.body) && !created.url.includes('confirm'), JSON.stringify(created));
+  check(
+    'with the variant for its size, our reference, and the country upper-cased',
+    created?.body.items[0].sync_variant_id === 555 && created?.body.external_id === sendRef &&
+      created?.body.recipient.country_code === 'ZA',
+    JSON.stringify(created?.body),
+  );
+  check('and the status is recorded', sent.body.order?.printful_status === 'draft' && !!sent.body.order?.sent_at, JSON.stringify(sent.body.order));
+
+  sent = await sendIt(sendRef, address);
+  check('sending twice is refused', sent.status === 409 && printfulCalls.filter((c) => c.method === 'POST').length === 1, JSON.stringify(sent));
+
+  const back = await markIn(sendRef, 'received');
+  check('an order in Printful cannot go back to Received', back.status === 409, JSON.stringify(back));
+
+  remote = { id: 9001, status: 'fulfilled', shipments: [{ carrier: 'DHL', tracking_number: 'TRK1', tracking_url: 'https://track/TRK1' }] };
+  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), printfulEnv);
+  body = await res.json();
+  const shipped = body.orders.find((o) => o.ref === sendRef);
+  check(
+    'reading the page brings back status and tracking, and marks it fulfilled',
+    shipped?.status === 'fulfilled' && shipped?.tracking_number === 'TRK1' && shipped?.carrier === 'DHL' && !!shipped?.fulfilled_at,
+    JSON.stringify(shipped),
+  );
+  const asked = printfulCalls.length;
+  await worker.fetch(access('https://masterroachi.com/work/api/orders'), printfulEnv);
+  check('a settled order is not asked about again', printfulCalls.length === asked, String(printfulCalls.length - asked));
+
+  // Two colours in one size: the order cannot say which, so nothing is sent.
+  variants = [{ id: 701, size: 'M', color: 'Black' }, { id: 702, size: 'M', color: 'White' }];
+  res = await worker.fetch(post({ ...buyer, name: 'Colour Buyer', size: 'M', productId: '464722916' }), printfulEnv);
+  const colourRef = (await res.json()).ref;
+  await markIn(colourRef, 'paid');
+  sent = await sendIt(colourRef, address);
+  check(
+    'a size in two colours is refused rather than guessed',
+    sent.status === 502 && /more than one colour/.test(sent.body.error ?? '') &&
+      ordersDb.sqlite.prepare('select printful_id from orders where ref = ?').get(colourRef).printful_id === null,
+    JSON.stringify(sent),
+  );
+
+  globalThis.fetch = realFetch;
 
   res = await worker.fetch(get('https://masterroachi.com/work/store/'), env);
   check(

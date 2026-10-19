@@ -28,6 +28,14 @@ import { isEmptyNote, parseNote, sectionHeight, writtenHeight } from '../lib/car
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
+import {
+  createDraftOrder,
+  findSyncVariant,
+  isSettled,
+  PrintfulError,
+  readPrintfulOrder,
+  type Recipient,
+} from '../lib/printful-orders';
 import { joinFile, readScalar, setScalar, splitFile } from '../lib/frontmatter';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -180,6 +188,11 @@ const VOTE_TTL = 60 * 60 * 24 * 180;
  */
 const ORDER_RETENTION_DAYS = 30;
 const ORDER_TTL = 60 * 60 * 24 * ORDER_RETENTION_DAYS;
+
+/** Every column the orders page reads, in one place for the list and the one. */
+const ORDER_COLUMNS = `id, ref, created_at, product, product_id, size, price, name, email, phone,
+  address, note, status, paid_at, fulfilled_at, dismissed_at, redacted_at,
+  printful_id, printful_status, sent_at, carrier, tracking_number, tracking_url`;
 
 /** What an order can be marked. See migrations/0015_orders.sql. */
 const ORDER_STATUSES = ['received', 'paid', 'fulfilled', 'dismissed'] as const;
@@ -1350,16 +1363,57 @@ export default {
 
           // All of them. One product and a fixed-sum link make this tens of
           // rows, not thousands, so search and filtering happen on the page.
+          // Printful's status and tracking, for every order sent and not yet
+          // settled — his ruling: read back on load rather than by webhook.
+          // Tens of orders at most, so one request each is fine. A Printful
+          // that does not answer must not hide the orders.
+          let refreshFailed = false;
+          if (env.PRINTFUL_TOKEN) {
+            const auth = { token: env.PRINTFUL_TOKEN, storeId: env.PRINTFUL_STORE_ID ?? null };
+            const open = await db
+              .prepare(
+                `select ref, printful_id, printful_status from orders
+                  where printful_id is not null and status != 'dismissed'`,
+              )
+              .all<{ ref: string; printful_id: number; printful_status: string | null }>();
+            for (const row of open.results.filter((r) => !isSettled(r.printful_status))) {
+              try {
+                const state = await readPrintfulOrder(auth, row.printful_id);
+                const now = new Date().toISOString();
+                // Shipped with tracking is Fulfilled. Paid is implied — it
+                // could not have been sent otherwise.
+                const shipped = state.status === 'fulfilled' || state.trackingNumber !== null;
+                await db
+                  .prepare(
+                    `update orders set printful_status = ?2, carrier = ?3, tracking_number = ?4,
+                            tracking_url = ?5
+                            ${shipped ? `, status = 'fulfilled', fulfilled_at = coalesce(fulfilled_at, ?6),
+                              paid_at = coalesce(paid_at, ?6)` : ''}
+                      where ref = ?1`,
+                  )
+                  .bind(row.ref, state.status, state.carrier, state.trackingNumber, state.trackingUrl, now)
+                  .run();
+              } catch {
+                refreshFailed = true;
+              }
+            }
+          }
+
           const orders = await db
-            .prepare(
-              `select id, ref, created_at, product, product_id, size, price, name,
-                      email, phone, address, note, status, paid_at, fulfilled_at, dismissed_at,
-                      redacted_at
-               from orders order by created_at desc, id desc`,
-            )
+            .prepare(`select ${ORDER_COLUMNS} from orders order by created_at desc, id desc`)
             .all();
 
-          return json({ configured: true, orders: orders.results, swept, sweepFailed }, 200);
+          return json(
+            {
+              configured: true,
+              orders: orders.results,
+              swept,
+              sweepFailed,
+              refreshFailed,
+              printful: Boolean(env.PRINTFUL_TOKEN),
+            },
+            200,
+          );
         }
 
         if (request.method === 'POST') {
@@ -1367,14 +1421,81 @@ export default {
             action?: string;
             ref?: string;
             status?: string;
+            recipient?: Partial<Record<keyof Recipient, unknown>>;
           } | null;
           if (!body) return json({ error: 'malformed body' }, 400);
+
+          const one = (ref: string) =>
+            db.prepare(`select ${ORDER_COLUMNS} from orders where ref = ?1`).bind(ref).first<{
+              ref: string;
+              status: string;
+              product_id: string;
+              size: string;
+              email: string;
+              phone: string;
+              printful_id: number | null;
+              redacted_at: string | null;
+            }>();
+
+          if (body.action === 'send') {
+            const ref = typeof body.ref === 'string' ? body.ref : '';
+            const order = ref ? await one(ref) : null;
+            if (!order) return json({ error: 'no such order' }, 404);
+            if (!env.PRINTFUL_TOKEN) return json({ error: 'PRINTFUL_TOKEN is not set.' }, 503);
+            // Each refusal is the server's, not only the page's: a stale page
+            // or a double click must not create a second Printful order.
+            if (order.printful_id !== null) return json({ error: 'Already sent to Printful.' }, 409);
+            if (order.status !== 'paid') return json({ error: 'Only a Paid order can be sent.' }, 409);
+            if (order.redacted_at) return json({ error: 'The address has been removed.' }, 409);
+
+            const given = body.recipient ?? {};
+            const recipient: Recipient = {
+              name: field(given.name),
+              address1: field(given.address1),
+              address2: field(given.address2) || undefined,
+              city: field(given.city),
+              state_code: field(given.state_code, 8) || undefined,
+              country_code: field(given.country_code, 2).toUpperCase(),
+              zip: field(given.zip, 16),
+              email: order.email || undefined,
+              phone: order.phone || undefined,
+            };
+            if (!recipient.name || !recipient.address1 || !recipient.city || !recipient.zip ||
+                !/^[A-Z]{2}$/.test(recipient.country_code)) {
+              return json({ error: 'Name, street, city, postcode and a two-letter country are required.' }, 400);
+            }
+
+            try {
+              const auth = { token: env.PRINTFUL_TOKEN, storeId: env.PRINTFUL_STORE_ID ?? null };
+              const variant = await findSyncVariant(auth, order.product_id, order.size);
+              const state = await createDraftOrder(auth, { ref: order.ref, recipient, syncVariantId: variant });
+              await db
+                .prepare(
+                  `update orders set printful_id = ?2, printful_status = ?3, sent_at = ?4
+                    where ref = ?1 and printful_id is null`,
+                )
+                .bind(order.ref, state.id, state.status, new Date().toISOString())
+                .run();
+            } catch (error) {
+              const message = error instanceof Error ? error.message : 'Printful refused it.';
+              return json({ error: message }, error instanceof PrintfulError ? 502 : 500);
+            }
+            return json({ order: await one(ref) }, 200);
+          }
 
           if (body.action === 'status') {
             const ref = typeof body.ref === 'string' ? body.ref : '';
             const status = body.status as OrderStatus;
             if (!ref || !ORDER_STATUSES.includes(status)) {
               return json({ error: 'a reference and a known status are required' }, 400);
+            }
+            // Once it is in Printful, taking it back to Received or Dismissed
+            // here would leave a live Printful order this page no longer
+            // admits to. Cancel it in Printful first.
+            const existing = await one(ref);
+            if (existing?.printful_id !== null && existing?.printful_id !== undefined &&
+                (status === 'received' || status === 'dismissed')) {
+              return json({ error: 'It is in Printful. Cancel it there first.' }, 409);
             }
 
             // Each mark keeps the time it was first made; stepping back
@@ -1393,15 +1514,7 @@ export default {
               .bind(ref, now, status)
               .run();
 
-            const order = await db
-              .prepare(
-                `select id, ref, created_at, product, product_id, size, price, name,
-                        email, phone, address, note, status, paid_at, fulfilled_at, dismissed_at,
-                        redacted_at
-                 from orders where ref = ?1`,
-              )
-              .bind(ref)
-              .first();
+            const order = await one(ref);
             if (!order) return json({ error: 'no such order' }, 404);
             return json({ order }, 200);
           }

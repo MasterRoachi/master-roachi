@@ -38,6 +38,88 @@ interface Order {
   dismissed_at: string | null;
   /** When the personal details were blanked: 30 days after submission. */
   redacted_at: string | null;
+  /** Set once it has been sent to Printful, as a draft. */
+  printful_id: number | null;
+  printful_status: string | null;
+  sent_at: string | null;
+  carrier: string | null;
+  tracking_number: string | null;
+  tracking_url: string | null;
+}
+
+/** The address as Printful wants it, filled in from the one box and checked by hand. */
+interface Recipient {
+  name: string;
+  address1: string;
+  address2: string;
+  city: string;
+  state_code: string;
+  zip: string;
+  country_code: string;
+}
+
+/* Country names a customer is likely to type, to the code Printful wants.
+   Anything else is left for him to fill in; South Africa is the default
+   because it is where nearly every order goes. */
+const COUNTRIES: Record<string, string> = {
+  'south africa': 'ZA',
+  'rsa': 'ZA',
+  'za': 'ZA',
+  'namibia': 'NA',
+  'botswana': 'BW',
+  'united kingdom': 'GB',
+  'uk': 'GB',
+  'united states': 'US',
+  'usa': 'US',
+  'australia': 'AU',
+  'new zealand': 'NZ',
+  'canada': 'CA',
+  'greece': 'GR',
+};
+
+/**
+ * A first guess at the parts of a free-text address.
+ *
+ * The buy form takes the address as one box, and Printful wants it in fields.
+ * This is only the guess the form opens with — he reads it and corrects it
+ * before anything is sent, which is the point of the form.
+ */
+function guessRecipient(order: Order): Recipient {
+  const lines = order.address
+    .split(/\n|,/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  let country_code = 'ZA';
+  const last = lines.at(-1)?.toLowerCase();
+  if (last && COUNTRIES[last]) {
+    country_code = COUNTRIES[last];
+    lines.pop();
+  }
+  let zip = '';
+  // The last line that is only a postcode. Not findLastIndex: the project's
+  // TypeScript lib stops short of ES2023.
+  const zipAt = lines.map((line) => /^\d{4,6}$/.test(line)).lastIndexOf(true);
+  if (zipAt >= 0) {
+    zip = lines[zipAt];
+    lines.splice(zipAt, 1);
+  } else {
+    // "Cape Town 8001" — a postcode at the end of the city line.
+    const match = lines.at(-1)?.match(/^(.*\S)\s+(\d{4,6})$/);
+    if (match) {
+      zip = match[2];
+      lines[lines.length - 1] = match[1];
+    }
+  }
+  const city = lines.length > 1 ? (lines.pop() ?? '') : '';
+  return {
+    name: order.name,
+    address1: lines.shift() ?? '',
+    address2: lines.join(', '),
+    city,
+    state_code: '',
+    zip,
+    country_code,
+  };
 }
 
 type View = 'open' | Status | 'all';
@@ -64,6 +146,8 @@ const NEXT: Record<Status, { to: Status; label: string }[]> = {
     { to: 'paid', label: 'Mark paid' },
     { to: 'dismissed', label: 'Dismiss — never paid' },
   ],
+  // Fulfilled by hand is still here for an order shipped some other way;
+  // one sent to Printful is marked fulfilled when Printful ships it.
   paid: [
     { to: 'fulfilled', label: 'Mark fulfilled' },
     { to: 'received', label: 'Undo paid' },
@@ -97,6 +181,9 @@ export default function Orders() {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  /** The order whose Send form is open, and what it holds. */
+  const [sending, setSending] = useState<{ ref: string; recipient: Recipient } | null>(null);
+  const [printful, setPrintful] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -109,6 +196,8 @@ export default function Orders() {
           orders: Order[];
           swept?: number;
           sweepFailed?: boolean;
+          refreshFailed?: boolean;
+          printful?: boolean;
         };
         if (!live) return;
         if (!data.configured) {
@@ -117,8 +206,11 @@ export default function Orders() {
           return;
         }
         setOrders(data.orders);
+        setPrintful(Boolean(data.printful));
         if (data.sweepFailed) {
           setNote('Orders still in KV could not be carried across this time. Those in D1 are all here.');
+        } else if (data.refreshFailed) {
+          setNote('Printful did not answer for every order sent, so some statuses may be behind.');
         }
       } catch (error) {
         if (live) setProblem(error instanceof Error ? error.message : 'Could not read the orders.');
@@ -164,6 +256,27 @@ export default function Orders() {
       setOrders((current) => (current ?? []).map((o) => (o.ref === ref ? data.order! : o)));
     } catch (error) {
       setNote(error instanceof Error ? error.message : 'Could not save.');
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function send(ref: string, recipient: Recipient) {
+    setBusy(ref);
+    setNote(null);
+    try {
+      const response = await fetch('/work/api/orders', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'send', ref, recipient }),
+      });
+      const data = (await response.json().catch(() => ({}))) as { order?: Order; error?: string };
+      if (!response.ok || !data.order) throw new Error(data.error ?? `Could not send (${response.status}).`);
+      setOrders((current) => (current ?? []).map((o) => (o.ref === ref ? data.order! : o)));
+      setSending(null);
+      setNote('Sent to Printful as a draft. Confirm it in Printful to have it printed and charged.');
+    } catch (error) {
+      setNote(error instanceof Error ? error.message : 'Could not send.');
     } finally {
       setBusy(null);
     }
@@ -311,10 +424,99 @@ export default function Orders() {
                           <dd>{stamp(order.dismissed_at)}</dd>
                         </>
                       )}
+                      {order.printful_id !== null && (
+                        <>
+                          <dt>Printful</dt>
+                          <dd>
+                            Order {order.printful_id} · {order.printful_status ?? 'unknown'}
+                            {order.sent_at && <span className={styles.muted}> · sent {stamp(order.sent_at)}</span>}
+                            {order.printful_status === 'draft' && (
+                              <span className={styles.muted}> — confirm it in Printful to have it printed</span>
+                            )}
+                          </dd>
+                        </>
+                      )}
+                      {order.tracking_number && (
+                        <>
+                          <dt>Tracking</dt>
+                          <dd>
+                            {order.carrier && `${order.carrier} · `}
+                            {order.tracking_url ? (
+                              <a href={order.tracking_url} target="_blank" rel="noreferrer">
+                                {order.tracking_number}
+                              </a>
+                            ) : (
+                              order.tracking_number
+                            )}
+                          </dd>
+                        </>
+                      )}
                     </dl>
 
+                    {sending?.ref === order.ref && (
+                      <form
+                        className={styles.send}
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          void send(order.ref, sending.recipient);
+                        }}
+                      >
+                        <p className={styles.sendNote}>
+                          Split from the address as typed — check every field. It goes to Printful as a
+                          draft; nothing is printed or charged until you confirm it there.
+                        </p>
+                        {(
+                          [
+                            ['name', 'Name'],
+                            ['address1', 'Street'],
+                            ['address2', 'More (optional)'],
+                            ['city', 'City'],
+                            ['state_code', 'State (US, CA, AU only)'],
+                            ['zip', 'Postcode'],
+                            ['country_code', 'Country (two letters)'],
+                          ] as [keyof Recipient, string][]
+                        ).map(([key, label]) => (
+                          <label key={key} className={styles.sendField}>
+                            <span>{label}</span>
+                            <input
+                              type="text"
+                              value={sending.recipient[key]}
+                              maxLength={key === 'country_code' ? 2 : 200}
+                              onChange={(event) =>
+                                setSending({
+                                  ref: order.ref,
+                                  recipient: { ...sending.recipient, [key]: event.target.value },
+                                })
+                              }
+                            />
+                          </label>
+                        ))}
+                        <div className={styles.actions}>
+                          <button type="submit" disabled={busy === order.ref}>
+                            {busy === order.ref ? 'Sending…' : 'Send as a draft'}
+                          </button>
+                          <button type="button" onClick={() => setSending(null)}>
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
                     <div className={styles.actions}>
-                      {NEXT[order.status].map((step) => (
+                      {order.status === 'paid' && order.printful_id === null && printful && !order.redacted_at && (
+                        <button
+                          type="button"
+                          disabled={busy === order.ref || sending?.ref === order.ref}
+                          onClick={() => setSending({ ref: order.ref, recipient: guessRecipient(order) })}
+                        >
+                          Send to Printful…
+                        </button>
+                      )}
+                      {NEXT[order.status]
+                        // In Printful, stepping back to Received would leave
+                        // an order there this page no longer admits to.
+                        .filter((step) => order.printful_id === null || step.to !== 'received')
+                        .map((step) => (
                         <button
                           key={step.to}
                           type="button"
