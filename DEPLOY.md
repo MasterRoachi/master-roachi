@@ -14,28 +14,55 @@ npm run build && npx wrangler deploy --dry-run
 is the check to run before deploying anything that touches `wrangler.jsonc`. It
 should report reading files from `out` and exit without mentioning OpenNext.
 
-## Deploying is a thing you do by hand
+## Pushing `main` deploys
+
+His ruling, 2026-10-19. `.github/workflows/deploy.yml` runs on every push to
+`main`: lint, the worker tests, `npm run build` (which is also the typecheck),
+then `wrangler d1 migrations apply --remote`, then `wrangler deploy`. One run at
+a time, never cancelled half-way.
+
+**It needs two repository secrets**, under GitHub → Settings → Secrets and
+variables → Actions:
+
+| | |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → *Edit Cloudflare Workers* template, **plus Account → D1 → Edit** for the migrations |
+| `CLOUDFLARE_ACCOUNT_ID` | the account id `npx wrangler whoami` prints |
+
+Without the token the workflow still checks and builds, then skips the deploy
+with a notice — so until both exist, **pushing does not deploy**, as before.
+
+What it means, said plainly:
+
+- **Pushing is deploying.** From the rig, from an agent session, from the
+  backend's own commits. That last is the point: Save in the editors, Rebuild
+  the site, Sync Printful and the daily scheduled-post check all commit and
+  were written expecting a deploy to follow.
+- **Migrations go out with the code**, before it. A migration is now applied
+  by pushing it; write one as if it were being run against live, because it
+  is.
+- **A broken commit is not deployed** if lint, the tests or the build catch
+  it. The live site stays on the last good deploy and the run goes red.
+- **What deploys is what is committed.** The build has no Steam,
+  RetroAchievements or Printful keys, so each fetch script keeps the committed
+  `data/*.json`. Fresh data arrives by commit: `play-data.yml` nightly, which
+  starts this workflow after it pushes (a `GITHUB_TOKEN` push fires no other
+  workflow by itself), or Sync Printful.
+
+By hand still works, and is the fallback when Actions is down:
 
 ```
 npm run build && npx wrangler deploy
 ```
 
-run from this directory. **Pushing `main` does not deploy.** This file said it
-did — "every push to `main` triggers a build and deploy from then on" — and that
-was never true of this repository: the only workflow in `.github/workflows/` is
-`play-data.yml`, which refreshes play data and pushes when it changes. There is
-no build-and-deploy workflow, and the **Connect to Git** settings below describe
-a Cloudflare-side connection that is not firing either.
+run from this directory. Wrangler is authenticated on the rig. It has twice
+answered a D1 call with `7403 The given account is not valid or is not
+authorized` and then succeeded on the next try; `npx wrangler login` refreshes
+it if that stops being occasional.
 
-The cost of believing it: eight commits sat on `main` from 13–15 October 2026 —
-four curriculum rewrites, the Calibre library moving into D1, the sprite-acus
-correction and a spec update — while the live site served none of them, because
-pushing was the only thing anyone did.
-
-Wrangler **is** authenticated on the rig (`npx wrangler whoami` lists the
-account's scopes), so there is no token to fetch and nothing to set up. The one
-warning it prints — a missing `websearch.run` OAuth scope — has nothing to do
-with deploying and can be ignored; `wrangler login` clears it.
+**History.** Until 2026-10-19 this was by hand only, and for a stretch before
+that this file claimed pushing deployed when nothing did: eight commits sat on
+`main` from 13–15 October 2026 while the live site served none of them.
 
 ---
 
@@ -68,31 +95,15 @@ It then installs OpenNext, rewrites the project config, and fails looking for
 edits happen inside the throwaway build container, so the repository is
 unharmed, but the deploy fails every time.
 
-### Build settings
+### Cloudflare's own Git connection is not the deploy path
 
-These describe a Cloudflare-side Git connection that **is not deploying**, so
-treat them as the settings to check rather than a deploy path to rely on. If a
-push ever does deploy, this is the table that governs it; until then, deploy by
-hand as above.
+`deploy.yml` is. The dashboard's **Workers & Pages → Connect to Git** was once
+described here as the deploy path and never fired. If it is ever connected, it
+and the workflow would both deploy every push — disconnect one.
 
-Set on the Cloudflare project, under **Workers & Pages → Connect to Git**:
-
-| Setting | Value |
-| --- | --- |
-| Build command | `npm run build` |
-| Deploy command | `npx wrangler deploy` |
-| Build output directory | `out` |
-| Node version | 20 or newer |
-
-Worth settling one way or the other: either connect the repository properly and
-delete the by-hand instructions, or drop this table and say plainly that
-deploying is manual. Two half-documented routes is how eight commits went
-unnoticed.
-
-The dashboard's output directory is advisory — `wrangler.jsonc` declares
-`./out/`, and that is what governs. Routing is declared there too, deliberately:
-**a deploy overwrites the dashboard**, which is how `workers.dev` kept coming
-back on after being switched off by hand.
+`wrangler.jsonc` declares `./out/`, and that is what governs. Routing is
+declared there too, deliberately: **a deploy overwrites the dashboard**, which
+is how `workers.dev` kept coming back on after being switched off by hand.
 
 ### The daily cron
 
@@ -112,12 +123,13 @@ fail-closed behaviour as everything else here.
 
 ### Secrets
 
-Four, none of them in the repo. `npx wrangler secret list` names them:
+Five, none of them in the repo. `npx wrangler secret list` names them:
 
 | | What it is for | Set it with |
 | --- | --- | --- |
 | `GITHUB_TOKEN` | the backend committing to this repo | `npm run github-auth` |
 | `TRELLO_KEY`, `TRELLO_TOKEN` | what `/work/boards` reads | `npm run trello-auth` |
+| `PRINTFUL_TOKEN` | Sync Printful, and sending orders to Printful as drafts. A single-store private token from developers.printful.com/tokens, scopes `orders` and `sync_products/read` | `npx wrangler secret put PRINTFUL_TOKEN` |
 | `VOTE_SALT` | salting the voter hash, which is guessable without it | `npx wrangler secret put VOTE_SALT` |
 
 Every one of them **fails closed**: a missing secret makes its endpoint serve

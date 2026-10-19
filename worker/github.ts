@@ -3,9 +3,9 @@
 // The site is a static export, so there is no database behind the published
 // pages — a blog post IS a file in content/writing, and changing one means
 // changing the repo. The backend therefore commits, and the deploy happens by
-// itself: Workers Builds is wired to this repository, and a push is what
-// triggers a build. See .github/workflows/play-data.yml, which relies on the
-// same thing.
+// itself: .github/workflows/deploy.yml deploys every push to main (since
+// 2026-10-19 — before that nothing did, and every commit here waited for a
+// hand deploy).
 //
 // That makes GITHUB_TOKEN the most dangerous credential on this Worker. It can
 // commit to a repository that publishes itself. It should be a fine-grained
@@ -68,8 +68,9 @@ function fromBase64(encoded: string): string {
 /**
  * Commit messages that cannot suppress their own deploy.
  *
- * Cloudflare Workers Builds honours CI-skip tokens and scans the WHOLE
- * message, body included. A post committed with one of those in its title
+ * GitHub Actions honours CI-skip tokens in the commit message, and so did
+ * Cloudflare Workers Builds before it — which scanned the WHOLE message, body
+ * included. A post committed with one of those in its title
  * would land in the repo and then cancel the build that was meant to publish
  * it — the content would be saved and the site would never show it, with
  * nothing anywhere saying why. The tokens are defused rather than rejected,
@@ -310,14 +311,14 @@ export async function writeFiles(
 }
 
 /**
- * Make the site rebuild, by giving Workers Builds a push to build.
+ * Make the site rebuild, by giving deploy.yml a push to build.
  *
- * Several things on this site only change at build time — the store comes
- * from Printful, the play strip from Steam and RetroAchievements, the videos
- * from YouTube — and all of them are fetched by the `prebuild` script that
- * runs ahead of `next build`. There is no way to refresh them without a
- * build, and no deploy hook: a push is the only trigger, which is what
- * .github/workflows/play-data.yml depends on too.
+ * What a rebuild is for changed on 2026-10-19. The build in deploy.yml runs
+ * without the Steam, RetroAchievements and Printful keys, so it deploys the
+ * committed data/*.json rather than fetching fresh — fresh data arrives by
+ * commit (play-data.yml, Sync Printful). A rebuild is now for what depends on
+ * the DATE rather than on data: a post scheduled for today is withheld by
+ * whichever build ran before today, and only a new build lets it out.
  *
  * So this commits nothing. It writes a new commit pointing at the SAME tree
  * as its parent — an empty commit — which is a new sha, which is a push, which

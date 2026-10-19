@@ -984,27 +984,12 @@ Question round, then build.
 
 ### Stage 4 — Loose ends
 
-- **Sync Printful does not update the store by itself** — the same fault as
-  scheduled posts below. `/work/api/store-sync` commits `data/store.json` and
-  expects the push to rebuild; it does not, so a sync shows on the store after
-  the next hand deploy.
-- **Scheduled posts do not publish by themselves.** The daily cron's
-  `rebuild()` makes an empty commit on the day a post is due, on the
-  assumption that a push deploys. It does not (see DEPLOY.md), so a post dated
-  in the future goes live only at the next hand deploy after its date. Found
-  2026-10-19; not yet fixed. Fixing it means either a deploy the Worker can
-  trigger, or giving up on scheduling.
-
-- ~~`npm run lint` is broken and was before any of this work.~~ Fixed 2026-10-16.
-- **Odin reads 112 of 151.** Its fourteen Getting Hired lessons count now the
-  route is gone. Deleting that course is the only way to stop them, and that
-  is his call: one statement of SQL.
-- ~~**The sprite-acus summary** still describes the retired pipeline.~~ Fixed
-  2026-10-15: the page now records the 2026-09-22 retirement.
-- **North Star and Sales on `/work/boards/`** — probably moot, since Boards
-  was skipped on 2026-10-14.
-- **Three curriculums have an empty curriculum-level Sources card**: Aseprite,
-  Drawing and South African politics. Ten minutes each, and not yet asked for.
+- ~~**Sync Printful, scheduled posts, Rebuild and every editor's Save did not
+  reach the site by themselves.**~~ Each commits and expects the push to
+  deploy, and nothing deployed a push. Ruled 2026-10-19: pushing `main` deploys,
+  through `.github/workflows/deploy.yml` (lint, tests, build, D1 migrations,
+  deploy). **Live once his two GitHub secrets exist** — see His alone; until
+  then the workflow checks and builds and skips the deploy.
 
 ### His alone
 
@@ -1017,9 +1002,12 @@ Question round, then build.
   show. The delete is blocked from this machine by the sandbox, which reads it
   as a mass delete, so it is one statement for him to run:
   `delete from lessons where curriculum_id in (9, 10); delete from curriculums where id in (9, 10);`
-- **Deploy the worker** after each batch of work. Live is `1b1fbb0`, deployed
-  2026-10-19. This session's sandbox refuses `wrangler deploy` and remote
-  migrations as production actions, so those are his to run even when agreed. Pushing to GitHub does not deploy — there is no
+- **Create the Cloudflare API token and the two GitHub secrets** that switch on
+  deploy-on-push: `CLOUDFLARE_API_TOKEN` (the *Edit Cloudflare Workers*
+  template plus Account → D1 → Edit) and `CLOUDFLARE_ACCOUNT_ID`. See
+  DEPLOY.md. Until then, deploying stays by hand — and the agent sandbox
+  refuses `wrangler deploy` and remote migrations as production actions, so
+  those are his to run. Pushing to GitHub does not deploy — there is no
   deploy hook and no Cloudflare token here.
 
 ### Open decisions

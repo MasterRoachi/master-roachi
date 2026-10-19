@@ -154,8 +154,9 @@ interface Env {
   /**
    * Commits content to the repo, which publishes it.
    *
-   * The most powerful secret here by a distance: Workers Builds deploys on
-   * push, so anything committed with this goes live by itself. A fine-grained
+   * The most powerful secret here by a distance: .github/workflows/deploy.yml
+   * deploys every push to main, so anything committed with this goes live by
+   * itself. A fine-grained
    * token, this repository only, Contents: read and write, nothing else.
    *
    *   npx wrangler secret put GITHUB_TOKEN
