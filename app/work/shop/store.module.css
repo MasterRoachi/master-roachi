@@ -1,24 +1,27 @@
-/* Product copy: the writing on the left, what the page will say on the right.
+/* Products: one shut card per product, in the language of Habits, Reading
+   and the orders tab — centred, gold only for what waits on him (a product
+   with no description), and a round + to add art.
    Tokens from app/globals.css. */
+
+/* --- the head: what needs writing, Sync, Save --------------------------- */
 
 .toolbar {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin: 1.5rem 0 0.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--line);
+  gap: 0.8rem;
+  margin: 0 0 0.75rem;
 }
 
 .counts {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--ink);
+  color: var(--muted);
+  text-align: center;
 }
 
 .counts strong {
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
@@ -28,24 +31,22 @@
 }
 
 .warn {
-  color: oklch(82% 0.16 85);
-}
-
-.muted {
-  color: var(--muted);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .actions {
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
 }
 
 .actions button {
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 999px;
   color: var(--ink);
-  padding: 0.4rem 0.8rem;
+  padding: 0.4rem 1.1rem;
   font: inherit;
   font-size: 0.875rem;
   cursor: pointer;
@@ -55,6 +56,14 @@
   border-color: var(--accent);
 }
 
+/* Save is gold while there is something to save, and only then. */
+.actions button.save:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
 .actions button:disabled {
   opacity: 0.45;
   cursor: default;
@@ -62,23 +71,25 @@
 
 .fetched,
 .orphans {
-  margin: 0.5rem 0 0;
+  margin: 0.5rem auto 0;
+  max-width: 40rem;
   font-size: 0.8125rem;
   line-height: 1.6;
   color: var(--muted);
+  text-align: center;
 }
 
 .orphans {
   margin-top: 2rem;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--line);
 }
 
 .status,
 .message {
+  margin: 0.75rem auto 0;
+  max-width: 40rem;
   font-size: 0.875rem;
   color: var(--muted);
-  margin: 1rem 0;
+  text-align: center;
 }
 
 .dirty {
@@ -86,26 +97,114 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: oklch(82% 0.16 85);
+  color: var(--accent);
 }
 
-/* The preview is the reason to look right, so it gets real width — but below
-   a tablet, two columns means neither is usable. */
-.split {
+/* --- one card per product ------------------------------------------------- */
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.75rem 0 4rem;
+}
+
+.card,
+.cardOpen {
+  width: 100%;
+  margin: 0 auto 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+  transition: max-width 0.18s ease, border-color 0.15s ease;
+}
+
+/* Shut, a pill in the middle of the page; open, the width of the column. */
+.card {
+  max-width: 36rem;
+  overflow: hidden;
+}
+
+.cardOpen {
+  max-width: 100%;
+  border-color: var(--line-bright);
+}
+
+.card[data-waiting],
+.cardOpen[data-waiting] {
+  border-color: var(--accent);
+}
+
+.cardHeadRow {
+  display: flex;
+  align-items: center;
+}
+
+.cardHead {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name state'
+    'facts facts';
+  align-items: baseline;
+  gap: 0.2rem 1rem;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  padding: 0.8rem 1.1rem;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.cardHead:hover .cardName {
+  color: var(--accent);
+}
+
+.cardName {
+  grid-area: name;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cardFacts {
+  grid-area: facts;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.cardState {
+  grid-area: state;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+[data-waiting] .cardState {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Open: the fields on the left, what the page will say on the right. Below a
+   tablet, two columns means neither is usable. */
+.cardBody {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
   gap: 2rem;
-  margin: 1.5rem 0 4rem;
   align-items: start;
+  padding: 1rem 1.1rem 1.25rem;
+  border-top: 1px solid var(--line);
 }
 
 @media (max-width: 900px) {
-  .split {
+  .cardBody {
     grid-template-columns: 1fr;
   }
 }
 
-.column {
+.cardMain {
   min-width: 0;
 }
 
@@ -113,7 +212,7 @@
   display: grid;
   gap: 1rem;
   position: sticky;
-  top: 1.5rem;
+  top: 1rem;
 }
 
 @media (max-width: 900px) {
@@ -122,42 +221,8 @@
   }
 }
 
-.product {
-  margin: 0 0 1.75rem;
-  padding: 1rem;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: color-mix(in oklch, var(--bg-raised) 50%, transparent);
-}
-
-/* Which one the right-hand column is describing. Without this the preview
-   changes as you move between boxes with nothing saying why. */
-.product.current {
-  border-color: var(--accent);
-}
-
-.productHead {
-  margin-bottom: 0.75rem;
-}
-
-.name {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 500;
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.id {
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-
 .facts {
-  margin: 0.3rem 0 0;
+  margin: 0 0 0.9rem;
   font-size: 0.8125rem;
   color: var(--muted);
 }
@@ -166,7 +231,8 @@
   color: inherit;
 }
 
-/* The art, as a grid of everything this product has. */
+/* --- the art: everything this product has, and a round + to add ----------- */
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
@@ -180,7 +246,7 @@
   display: grid;
   gap: 0.3rem;
   padding: 0;
-  background: var(--bg-raised);
+  background: var(--bg);
   border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
@@ -191,8 +257,7 @@
   text-align: center;
 }
 
-.tile:hover,
-.uploadTile:hover {
+.tile:hover {
   border-color: var(--accent);
 }
 
@@ -208,11 +273,15 @@
   line-height: 1.3;
 }
 
+/* No box around it: the round + is the control, as on Habits and Reading,
+   with the file input laid invisibly over the whole tile. */
 .uploadTile {
   align-content: center;
+  justify-items: center;
   aspect-ratio: 4 / 5;
-  border-style: dashed;
-  padding: 0.5rem;
+  background: none;
+  border: 0;
+  gap: 0.5rem;
 }
 
 .uploadTile input {
@@ -220,6 +289,39 @@
   inset: 0;
   opacity: 0;
   cursor: pointer;
+}
+
+.plus {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  display: grid;
+  place-items: center;
+  transition: border-color 0.15s ease;
+}
+
+.plus svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.uploadTile:hover .plus {
+  border-color: var(--accent);
+}
+
+.uploadTile:hover .plus svg {
+  stroke: var(--accent);
+}
+
+.uploadLabel,
+.uploadBusy {
+  font-size: 0.75rem;
 }
 
 .productText {
@@ -284,9 +386,9 @@
 
 /* Reordering the store. Small, because it is rare. */
 .move {
-  float: right;
   display: flex;
   gap: 0.25rem;
+  padding-right: 0.8rem;
 }
 
 .move button {
@@ -310,10 +412,12 @@
 }
 
 .stale {
-  margin: 0.5rem 0 0;
+  margin: 0.5rem auto 0;
+  max-width: 40rem;
+  text-align: center;
   font-size: 0.8125rem;
   line-height: 1.6;
-  color: oklch(82% 0.16 85);
+  color: var(--accent);
 }
 
 .previewTagline {

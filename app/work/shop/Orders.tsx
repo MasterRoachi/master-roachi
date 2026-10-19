@@ -181,6 +181,25 @@ const NEXT: Record<Status, { to: Status; label: string }[]> = {
   dismissed: [{ to: 'received', label: 'Restore' }],
 };
 
+/**
+ * Whether an order is waiting on him — the gold ones. Received wants checking
+ * against PayFast; Paid and unsent wants sending; a Printful draft wants
+ * confirming in Printful. Everything else is either done or not his move.
+ */
+function waiting(order: Order): boolean {
+  if (order.status === 'received') return true;
+  if (order.status !== 'paid') return false;
+  return order.printful_id === null || order.printful_status === 'draft';
+}
+
+/** The status as one short phrase, with where it is in Printful when that matters. */
+function stateOf(order: Order): string {
+  if (order.status === 'paid' && order.printful_status === 'draft') return 'Paid · confirm in Printful';
+  if (order.status === 'paid' && order.printful_id !== null) return `Paid · Printful ${order.printful_status ?? ''}`.trim();
+  if (order.status === 'paid') return 'Paid · to send';
+  return LABEL[order.status];
+}
+
 /* South African time, which is the only time he reads these in. Fixed to the
    zone rather than the browser's, for the same reason worker/db.ts does. */
 const when = new Intl.DateTimeFormat('en-ZA', {
@@ -252,6 +271,8 @@ export default function Orders() {
     return out;
   }, [orders]);
 
+  const waitingCount = useMemo(() => (orders ?? []).filter(waiting).length, [orders]);
+
   const shown = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return (orders ?? []).filter((order) => {
@@ -322,14 +343,15 @@ export default function Orders() {
   return (
     <>
       <div className={styles.toolbar}>
+        {/* The one number worth gold: how many want something from him. */}
         <p className={styles.counts}>
-          <strong>{orders.length}</strong> orders
+          {waitingCount > 0 ? (
+            <span className={styles.waitingCount}>{waitingCount} waiting on you</span>
+          ) : (
+            <span>Nothing waiting on you</span>
+          )}
           <span className={styles.sep}>·</span>
-          <span className={counts.received ? styles.warn : undefined}>{counts.received} received</span>
-          <span className={styles.sep}>·</span>
-          <span className={counts.paid ? styles.warn : undefined}>{counts.paid} paid, not fulfilled</span>
-          <span className={styles.sep}>·</span>
-          {counts.fulfilled} fulfilled
+          {orders.length} orders, {counts.fulfilled} fulfilled
         </p>
         <input
           type="search"
@@ -364,23 +386,29 @@ export default function Orders() {
             : 'Nothing matches.'}
         </p>
       ) : (
-        <ul className={styles.list}>
+        // One shut card per order, as Reading's shelves are: a pill in the
+        // middle of the page until opened, then the width of the column.
+        <div className={styles.cards}>
           {shown.map((order) => {
             const expanded = open === order.ref;
             return (
-              <li key={order.ref} className={`${styles.order} ${styles[order.status]}`}>
+              <section
+                key={order.ref}
+                className={`${expanded ? styles.cardOpen : styles.card} ${styles[order.status]}`}
+                data-waiting={waiting(order) || undefined}
+              >
                 <button
                   type="button"
-                  className={styles.row}
+                  className={styles.cardHead}
                   aria-expanded={expanded}
                   onClick={() => setOpen(expanded ? null : order.ref)}
                 >
-                  <span className={styles.badge}>{LABEL[order.status]}</span>
                   <span className={styles.who}>{order.redacted_at ? 'Details removed' : order.name}</span>
                   <span className={styles.what}>
                     {order.product || 'Unknown product'} · {order.size}
-                    {order.price ? ` · ${order.price}` : ''}
+                    {order.total !== null ? ` · R${order.total}` : order.price ? ` · ${order.price}` : ''}
                   </span>
+                  <span className={styles.badge}>{stateOf(order)}</span>
                   <span className={styles.when}>{stamp(order.created_at)}</span>
                 </button>
 
@@ -552,6 +580,7 @@ export default function Orders() {
                       {order.status === 'paid' && order.printful_id === null && printful && !order.redacted_at && (
                         <button
                           type="button"
+                          className={styles.primary}
                           disabled={busy === order.ref || sending?.ref === order.ref}
                           onClick={() => setSending({ ref: order.ref, recipient: guessRecipient(order) })}
                         >
@@ -565,6 +594,8 @@ export default function Orders() {
                         .map((step) => (
                         <button
                           key={step.to}
+                          // Marking Paid is the next step on a Received order.
+                          className={order.status === 'received' && step.to === 'paid' ? styles.primary : undefined}
                           type="button"
                           disabled={busy === order.ref}
                           onClick={() => void mark(order.ref, step.to)}
@@ -583,10 +614,10 @@ export default function Orders() {
                     </div>
                   </div>
                 )}
-              </li>
+              </section>
             );
           })}
-        </ul>
+        </div>
       )}
     </>
   );

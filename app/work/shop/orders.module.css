@@ -1,61 +1,69 @@
-/* The shop's tabs, and the orders under the first of them.
-   Tokens from app/globals.css. */
+/* The shop: its two tabs, and the orders under the first of them.
+   In the language of Habits and Reading (2026-10-14): centred pills, shut
+   cards that open to the width of the column, and gold for what is waiting
+   on him and nothing else. Tokens from app/globals.css. */
+
+/* --- the tabs ----------------------------------------------------------- */
 
 .tabs {
   display: flex;
-  gap: 0.25rem;
-  margin-top: 1.5rem;
-  border-bottom: 1px solid var(--line);
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 2rem 0 1.75rem;
 }
 
 .tab,
 .tabOn {
-  background: none;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  color: var(--muted);
-  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
   font: inherit;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  padding: 0.4rem 1.2rem;
   cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.tab {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  color: var(--muted);
 }
 
 .tab:hover {
+  border-color: var(--accent);
   color: var(--ink);
 }
 
 .tabOn {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: var(--bg);
+  font-weight: 600;
 }
+
+/* --- the head of the orders: what waits, search, which ------------------- */
 
 .toolbar {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin: 1.5rem 0 0.75rem;
+  gap: 0.9rem;
+  margin: 0 0 1rem;
 }
 
 .counts {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--ink);
+  color: var(--muted);
+  text-align: center;
 }
 
-.counts strong {
-  font-variant-numeric: tabular-nums;
+.waitingCount {
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .sep {
   margin: 0 0.45rem;
-  color: var(--muted);
-}
-
-.warn {
-  color: var(--accent);
 }
 
 .muted {
@@ -63,143 +71,183 @@
 }
 
 .search {
+  width: min(100%, 22rem);
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 999px;
   color: var(--ink);
-  padding: 0.4rem 0.7rem;
+  padding: 0.5rem 1rem;
   font: inherit;
   font-size: 0.875rem;
-  width: min(100%, 18rem);
+  text-align: center;
 }
 
 .search:focus {
   border-color: var(--accent);
   outline: none;
+  text-align: left;
 }
 
 .views {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--line);
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 0 0 1.75rem;
 }
 
 .pill,
 .pillOn {
-  background: none;
-  border: 1px solid var(--line);
   border-radius: 999px;
-  color: var(--muted);
-  padding: 0.3rem 0.85rem;
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.8rem;
   cursor: pointer;
 }
 
+.pill {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
 .pill:hover {
-  border-color: var(--accent);
+  border-color: var(--line-bright);
   color: var(--ink);
 }
 
 .pillOn {
-  border-color: var(--accent);
-  background: var(--accent-dim);
-  color: var(--ink);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: var(--bg);
+  font-weight: 600;
 }
 
 .message {
-  margin: 1rem 0 0;
+  margin: 1rem auto 0;
+  max-width: 34rem;
   font-size: 0.875rem;
   color: var(--muted);
+  text-align: center;
 }
 
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* --- one card per order --------------------------------------------------- */
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.order {
-  border-bottom: 1px solid var(--line);
+.card,
+.cardOpen {
+  width: 100%;
+  margin: 0 auto 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+  overflow: hidden;
+  transition: max-width 0.18s ease, border-color 0.15s ease;
 }
 
-.row {
+/* Shut, it is a pill in the middle of the page. Open, it is the width of the
+   column — the expansion itself, as a Reading shelf opens. */
+.card {
+  max-width: 36rem;
+}
+
+.cardOpen {
+  max-width: 100%;
+  border-color: var(--line-bright);
+}
+
+/* Gold is what waits on him: received and unchecked, paid and unsent, or a
+   draft in Printful still to confirm. Nothing else is gold. */
+.card[data-waiting],
+.cardOpen[data-waiting] {
+  border-color: var(--accent);
+}
+
+.cardHead {
   display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'who badge'
+    'what when';
   align-items: baseline;
-  gap: 0.75rem;
+  gap: 0.2rem 1rem;
   width: 100%;
   background: none;
   border: 0;
   color: var(--ink);
-  padding: 0.75rem 0;
+  padding: 0.8rem 1.1rem;
   font: inherit;
-  font-size: 0.9375rem;
   text-align: left;
   cursor: pointer;
 }
 
-.row:hover .who {
+.cardHead:hover .who {
   color: var(--accent);
 }
 
-.who,
-.what {
+.who {
+  grid-area: who;
+  font-size: 1rem;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.what,
-.when {
-  color: var(--muted);
+.what {
+  grid-area: what;
   font-size: 0.8125rem;
-}
-
-.when {
-  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .badge {
-  justify-self: start;
-  border: 1px solid var(--line-bright);
-  border-radius: 999px;
-  padding: 0.1rem 0.55rem;
+  grid-area: badge;
+  justify-self: end;
   font-size: 0.75rem;
   color: var(--muted);
+  white-space: nowrap;
 }
 
-/* Status is the colour: gold where something is waiting on him, plain where
-   it is done, faded where it never happened. */
-.received .badge {
-  border-color: var(--accent);
-  color: var(--ink);
+[data-waiting] .badge {
+  color: var(--accent);
+  font-weight: 600;
 }
 
-.paid .badge {
-  border-color: var(--accent);
-  background: var(--accent-dim);
-  color: var(--ink);
+.when {
+  grid-area: when;
+  justify-self: end;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .dismissed .who,
 .dismissed .what {
   text-decoration: line-through;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
+/* --- an open order -------------------------------------------------------- */
+
 .detail {
-  padding: 0 0 1.25rem;
+  padding: 0.2rem 1.1rem 1.1rem;
+  border-top: 1px solid var(--line);
 }
 
 .fields {
   display: grid;
   grid-template-columns: 7rem minmax(0, 1fr);
-  gap: 0.35rem 1rem;
-  margin: 0;
+  gap: 0.4rem 1rem;
+  margin: 0.9rem 0 0;
   font-size: 0.875rem;
 }
 
@@ -229,17 +277,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 1.1rem;
 }
 
 .actions button {
-  background: var(--bg-raised);
+  background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 999px;
   color: var(--ink);
-  padding: 0.4rem 0.8rem;
+  padding: 0.4rem 0.95rem;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   cursor: pointer;
 }
 
@@ -247,38 +295,26 @@
   border-color: var(--accent);
 }
 
+/* The one next step, where there is one, is the gold button. */
+.actions button.primary:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
 .actions button:disabled {
   opacity: 0.45;
   cursor: default;
 }
 
-@media (max-width: 640px) {
-  .row {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 0.25rem 0.75rem;
-  }
-
-  .what,
-  .when {
-    grid-column: 2;
-  }
-
-  .fields {
-    grid-template-columns: 1fr;
-    gap: 0.1rem;
-  }
-
-  .fields dd {
-    margin-bottom: 0.5rem;
-  }
-}
-
-/* Sending to Printful: the address split into the fields Printful wants. */
+/* Sending to Printful: the address in the fields Printful wants. */
 .send {
   margin-top: 1rem;
   padding: 0.9rem;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
+  background: var(--bg);
   display: grid;
   gap: 0.5rem;
 }
@@ -315,6 +351,15 @@
 }
 
 @media (max-width: 640px) {
+  .fields {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+
+  .fields dd {
+    margin-bottom: 0.5rem;
+  }
+
   .sendField {
     grid-template-columns: 1fr;
     gap: 0.2rem;

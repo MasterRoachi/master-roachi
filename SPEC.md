@@ -972,6 +972,20 @@ after the deploy, as they reach everyone.
 Images on it: Printful's two or three mockups, his own uploaded artwork, and a
 3D model where one exists.
 
+**Step 6, the design run — started 2026-10-19.** His order: `/work/shop`
+first, then the public pages. His rulings: the backend in the Habits and
+Reading language, literally — **orders and products are shut cards**, a pill
+in the middle of the page that opens to the width of the column, as a Reading
+shelf does; tabs and filters are centred pills; **gold only for what waits on
+him** (an order Received, Paid and unsent, or a Printful draft to confirm; a
+product with no description), a gold count of those at the top, and the one
+next-step button gold; a **round +** for uploading art. An open product card
+holds everything about it: art, the five fields, and the preview and SEO
+column beside them. **Done for `/work/shop`.** The public store, product,
+thank-you and policies pages stay **Fabled Threads' own look, refined** — its
+pink and blue, halftone and cartoon voice kept, layout, type and spacing
+tightened. Not started.
+
 **6. The design run.** The new look — round `+`, shut cards, gold — applied
 once everything that should be on the page is on it. His sequencing, and the
 right one: there is no point styling a page whose contents are still growing.
