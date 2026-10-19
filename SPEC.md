@@ -929,8 +929,15 @@ wrong click costs nothing; and status and tracking are **read back when
 with a tracking number, becomes Fulfilled. Migration `0017`,
 `lib/printful-orders.ts`. Because the buy form takes the address as one box,
 Send opens a form with it split into Printful's fields, guessed from the text
-and checked by him; a structured address on the public buy form would remove
-that step and is not built. The variant is found by size, and a size that
+and checked by him. **Since later the same day the buy form asks in those
+fields** — country first (any of the 245 Printful ships to, South Africa
+first), then street, unit or suburb, city, postal code, and a state only for
+the US, Canada, Australia, Japan and Brazil. `lib/address.ts` is the one
+definition the form and the Worker both check against; `data/countries.json`
+comes from Printful's public `/countries` (`npm run countries`). Migration
+`0018` stores the fields; the Send form fills from them exactly, and still
+guesses for older orders. The old one-box address is still accepted, from
+pages cached before the change. The variant is found by size, and a size that
 exists in more than one colour is refused rather than guessed, since the
 order does not record colour. An order in Printful cannot be stepped back to
 Received or Dismissed here. `PRINTFUL_TOKEN` is set (single-store token); its
@@ -988,27 +995,30 @@ Question round, then build.
   reach the site by themselves.**~~ Each commits and expects the push to
   deploy, and nothing deployed a push. Ruled 2026-10-19: pushing `main` deploys,
   through `.github/workflows/deploy.yml` (lint, tests, build, D1 migrations,
-  deploy). **Live once his two GitHub secrets exist** — see His alone; until
-  then the workflow checks and builds and skips the deploy.
+  deploy). Both GitHub secrets were set 2026-10-19, which switched it on.
+- ~~`npm run lint` is broken and was before any of this work.~~ Fixed 2026-10-16.
+- **Odin reads 112 of 151.** Its fourteen Getting Hired lessons count now the
+  route is gone. Deleting that course is the only way to stop them, and that
+  is his call: one statement of SQL.
+- ~~**The sprite-acus summary** still describes the retired pipeline.~~ Fixed
+  2026-10-15: the page now records the 2026-09-22 retirement.
+- **North Star and Sales on `/work/boards/`** — probably moot, since Boards
+  was skipped on 2026-10-14.
+- ~~**Three curriculums have an empty curriculum-level Sources card**~~ Filled
+  2026-10-19 in live D1 from each curriculum's most-cited lesson sources, with
+  their existing notes: Aseprite 18 (all of them), Drawing 16 (cited 9+ times),
+  South African politics 21 (cited 16+ times). Those lists are dashboard-owned
+  and no script writes them, so they survive a rebuild.
+- ~~**Two stale curriculum rows, ids 9 and 10**~~ — already gone when checked
+  on 2026-10-19; no curriculum name is duplicated. Live D1 holds **13**
+  curriculums, not the eight this spec describes: Zulu, Shona, Theology,
+  Philosophy and History exist there with no script in `scripts/curriculums/`
+  and no curriculum-level sources.
 
 ### His alone
 
 - `npm run github-auth` when the GitHub token lapses.
 - More than one product in Printful.
-- **Delete the two stale curriculum rows in live D1, ids 9 and 10.** They came
-  from `sa-politics.mjs` and `aseprite.mjs` using Title-Case names that did not
-  match the lower-case live rows, so `where not exists` inserted duplicates at
-  the end. They are parked at positions 98 and 99 as `paused` so they do not
-  show. The delete is blocked from this machine by the sandbox, which reads it
-  as a mass delete, so it is one statement for him to run:
-  `delete from lessons where curriculum_id in (9, 10); delete from curriculums where id in (9, 10);`
-- **Create the Cloudflare API token and the two GitHub secrets** that switch on
-  deploy-on-push: `CLOUDFLARE_API_TOKEN` (the *Edit Cloudflare Workers*
-  template plus Account → D1 → Edit) and `CLOUDFLARE_ACCOUNT_ID`. See
-  DEPLOY.md. Until then, deploying stays by hand — and the agent sandbox
-  refuses `wrangler deploy` and remote migrations as production actions, so
-  those are his to run. Pushing to GitHub does not deploy — there is no
-  deploy hook and no Cloudflare token here.
 
 ### Open decisions
 

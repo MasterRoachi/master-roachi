@@ -170,7 +170,8 @@ a.buy:hover {
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -188,7 +189,8 @@ a.buy:hover {
 }
 
 .field input:focus-visible,
-.field textarea:focus-visible {
+.field textarea:focus-visible,
+.field select:focus-visible {
   outline: none;
   border-color: color-mix(in oklch, var(--accent-a) 65%, var(--line));
 }
@@ -224,4 +226,33 @@ a.buy:hover {
   font-size: 0.78rem;
   line-height: 1.6;
   color: var(--muted-2);
+}
+
+/* A native select keeps its own arrow; this only matches it to the inputs. */
+.field select {
+  appearance: auto;
+}
+
+.field select option {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* City and postal code share a row where there is room for both. */
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 420px) {
+  .pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+.problem {
+  margin: 0;
+  font-size: 0.86rem;
+  color: oklch(78% 0.15 30);
 }

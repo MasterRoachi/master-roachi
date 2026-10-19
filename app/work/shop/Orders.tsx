@@ -45,6 +45,13 @@ interface Order {
   carrier: string | null;
   tracking_number: string | null;
   tracking_url: string | null;
+  /** The address in Printful's fields, for orders from the form since 2026-10-19. */
+  address1: string | null;
+  address2: string | null;
+  city: string | null;
+  state_code: string | null;
+  zip: string | null;
+  country_code: string | null;
 }
 
 /** The address as Printful wants it, filled in from the one box and checked by hand. */
@@ -78,13 +85,25 @@ const COUNTRIES: Record<string, string> = {
 };
 
 /**
- * A first guess at the parts of a free-text address.
+ * The address as Printful wants it.
  *
- * The buy form takes the address as one box, and Printful wants it in fields.
- * This is only the guess the form opens with — he reads it and corrects it
- * before anything is sent, which is the point of the form.
+ * Exact for an order from the buy form since 2026-10-19, which asks in these
+ * fields. For an older one, which has only the free-text box, a first guess at
+ * the parts — he reads it and corrects it before anything is sent, which is
+ * the point of the form either way.
  */
 function guessRecipient(order: Order): Recipient {
+  if (order.address1 && order.city && order.zip && order.country_code) {
+    return {
+      name: order.name,
+      address1: order.address1,
+      address2: order.address2 ?? '',
+      city: order.city,
+      state_code: order.state_code ?? '',
+      zip: order.zip,
+      country_code: order.country_code,
+    };
+  }
   const lines = order.address
     .split(/\n|,/)
     .map((line) => line.trim())
@@ -462,7 +481,9 @@ export default function Orders() {
                         }}
                       >
                         <p className={styles.sendNote}>
-                          Split from the address as typed — check every field. It goes to Printful as a
+                          {order.address1
+                            ? 'As the customer entered it — check it once more.'
+                            : 'Split from the address as typed — check every field.'} It goes to Printful as a
                           draft; nothing is printed or charged until you confirm it there.
                         </p>
                         {(

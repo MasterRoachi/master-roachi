@@ -20,6 +20,7 @@
     "covers": "node scripts/covers.mjs",
     "achievements": "node --env-file-if-exists=.env.local scripts/achievements.mjs",
     "logo": "node scripts/logo.mjs",
+    "countries": "node scripts/countries.mjs",
     "library": "node scripts/library.mjs",
     "book-covers": "node scripts/book-covers.mjs",
     "tool-icons": "node scripts/tool-icons.mjs",

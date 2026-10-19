@@ -37,6 +37,7 @@ import {
   type Recipient,
 } from '../lib/printful-orders';
 import { joinFile, readScalar, setScalar, splitFile } from '../lib/frontmatter';
+import { addressProblem, addressText, readAddress, type Address } from '../lib/address';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -193,7 +194,8 @@ const ORDER_TTL = 60 * 60 * 24 * ORDER_RETENTION_DAYS;
 /** Every column the orders page reads, in one place for the list and the one. */
 const ORDER_COLUMNS = `id, ref, created_at, product, product_id, size, price, name, email, phone,
   address, note, status, paid_at, fulfilled_at, dismissed_at, redacted_at,
-  printful_id, printful_status, sent_at, carrier, tracking_number, tracking_url`;
+  printful_id, printful_status, sent_at, carrier, tracking_number, tracking_url,
+  address1, address2, city, state_code, zip, country_code`;
 
 /** What an order can be marked. See migrations/0015_orders.sql. */
 const ORDER_STATUSES = ['received', 'paid', 'fulfilled', 'dismissed'] as const;
@@ -212,6 +214,8 @@ interface OrderRecord {
   phone: string;
   address: string;
   note: string;
+  /** In Printful's fields, from the buy form since 2026-10-19. Absent on older orders. */
+  structured?: Address | null;
 }
 
 /**
@@ -222,8 +226,9 @@ function insertOrder(db: D1Database, order: OrderRecord) {
   return db
     .prepare(
       `insert or ignore into orders
-         (ref, created_at, product, product_id, size, price, name, email, phone, address, note)
-       values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)`,
+         (ref, created_at, product, product_id, size, price, name, email, phone, address, note,
+          address1, address2, city, state_code, zip, country_code)
+       values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17)`,
     )
     .bind(
       order.ref,
@@ -237,6 +242,12 @@ function insertOrder(db: D1Database, order: OrderRecord) {
       order.phone,
       order.address,
       order.note,
+      order.structured?.address1 ?? null,
+      order.structured?.address2 ?? null,
+      order.structured?.city ?? null,
+      order.structured?.state_code ?? null,
+      order.structured?.zip ?? null,
+      order.structured?.country_code ?? null,
     );
 }
 
@@ -252,7 +263,9 @@ async function redactOrders(db: D1Database, now: Date = new Date()): Promise<voi
   await db
     .prepare(
       `update orders
-          set name = '', email = '', phone = '', address = '', note = '', redacted_at = ?2
+          set name = '', email = '', phone = '', address = '', note = '',
+              address1 = null, address2 = null, city = null, state_code = null, zip = null,
+              country_code = null, redacted_at = ?2
         where redacted_at is null and created_at < ?1`,
     )
     .bind(cutoff, now.toISOString())
@@ -292,6 +305,7 @@ async function sweepOrders(kv: KVNamespace, db: D1Database): Promise<number> {
           phone: order.phone ?? '',
           address: order.address,
           note: order.note ?? '',
+          structured: order.structured ?? null,
         });
       } catch {
         // A value that is not JSON is not an order; leave it where it is.
@@ -513,13 +527,24 @@ export default {
         note: field(body.note, 600),
       };
 
+      // The address in fields, from the buy form since 2026-10-19; or one
+      // block of text, from a product page cached before that. Both are
+      // accepted, and the fields are checked as Printful would check them.
+      let structured: Address | null = null;
+      if (body.address && typeof body.address === 'object') {
+        structured = readAddress(body.address);
+        const problem = addressProblem(structured);
+        if (problem) return json({ error: problem }, 400);
+        order.address = addressText(structured);
+      }
+
       if (!order.name || !order.email || !order.address || !order.size) {
         return json({ error: 'Name, email, address and size are required.' }, 400);
       }
 
       const ref = reference();
       const at = new Date().toISOString();
-      const record: OrderRecord = { ...order, ref, at };
+      const record: OrderRecord = { ...order, ref, at, structured };
 
       // D1 is the record. KV only when D1 is missing or failed, and the next
       // read of /work/api/orders carries it across.

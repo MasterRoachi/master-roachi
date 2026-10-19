@@ -378,6 +378,7 @@ function sqliteD1() {
   sqlite.exec(fs.readFileSync('migrations/0015_orders.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0016_order_retention.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0017_order_fulfilment.sql', 'utf8'));
+  sqlite.exec(fs.readFileSync('migrations/0018_order_address.sql', 'utf8'));
   const d1 = {
     sqlite,
     broken: false,
@@ -506,6 +507,42 @@ function sqliteD1() {
   marked = await mark('NOSUCHRF', 'paid');
   check('an unknown order is a 404', marked.status === 404, String(marked.status));
 
+  // --- the address in fields ------------------------------------------------
+  //
+  // The buy form asks in Printful's fields since 2026-10-19, checked against
+  // the same lib/address.ts the form uses. The old one-box address must still
+  // be accepted, from a product page cached before the deploy.
+  const fielded = { ...buyer, name: 'Fields Buyer' };
+  res = await worker.fetch(
+    post({ ...fielded, address: { address1: '5 Long St', address2: 'Gardens', city: 'Cape Town', zip: '8001', country_code: 'za' } }),
+    shopEnv,
+  );
+  body = await res.json();
+  const fieldRow = ordersDb.sqlite.prepare('select * from orders where ref = ?').get(body.ref);
+  check(
+    'an address in fields is stored in fields',
+    fieldRow?.address1 === '5 Long St' && fieldRow?.city === 'Cape Town' && fieldRow?.country_code === 'ZA',
+    JSON.stringify(fieldRow),
+  );
+  check(
+    'and as one block of text for the orders page',
+    fieldRow?.address === '5 Long St\nGardens\nCape Town\n8001\nSouth Africa',
+    JSON.stringify(fieldRow?.address),
+  );
+  res = await worker.fetch(post({ ...fielded, address: { address1: '1 Main', city: 'X', zip: '1', country_code: 'XX' } }), shopEnv);
+  check('a country Printful does not ship to is refused', res.status === 400, String(res.status));
+  res = await worker.fetch(post({ ...fielded, address: { address1: '1 Main', city: 'Austin', zip: '78701', country_code: 'US' } }), shopEnv);
+  body = await res.json();
+  check('a US address without a state is refused, with a reason', res.status === 400 && /state/i.test(body.error ?? ''), JSON.stringify(body));
+  res = await worker.fetch(
+    post({ ...fielded, address: { address1: '1 Main', city: 'Austin', zip: '78701', country_code: 'US', state_code: 'tx' } }),
+    shopEnv,
+  );
+  check('with one it is accepted', res.status === 200, String(res.status));
+  res = await worker.fetch(post({ ...fielded, address: '9 Text Road\nDurban' }), shopEnv);
+  body = await res.json();
+  check('the old one-box address is still accepted', res.status === 200 && body.stored === true, JSON.stringify(body));
+
   // --- thirty days ---------------------------------------------------------
   //
   // His ruling, 2026-10-19: personal details go 30 days after submission,
@@ -516,7 +553,8 @@ function sqliteD1() {
   const redacted = body.orders.find((o) => o.ref === 'OLDREF22');
   check(
     'an order over 30 days old loses its personal details',
-    redacted?.name === '' && redacted?.email === '' && redacted?.address === '' && redacted?.phone === '' && !!redacted?.redacted_at,
+    redacted?.name === '' && redacted?.email === '' && redacted?.address === '' && redacted?.phone === '' &&
+      redacted?.address1 === null && redacted?.zip === null && !!redacted?.redacted_at,
     JSON.stringify(redacted),
   );
   check(

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { BuyOption } from '@/lib/store';
+import { COUNTRIES, countryOf } from '@/lib/address';
 import styles from './BuyPanel.module.css';
 
 /** Where the thank-you page looks for what was just bought. */
@@ -143,6 +144,11 @@ export default function BuyPanel({
  * the sense that a customer who replied to an email got a shirt; this asks
  * while they are still here and still paying attention.
  *
+ * The address is asked in Printful's own fields — country first, because it
+ * decides whether a state is needed — so an order can go to Printful without
+ * being split by hand. lib/address.ts is the one definition, shared with the
+ * Worker that checks it.
+ *
  * The address is posted to the Worker and then the customer goes to PayFast.
  * A failure to store is deliberately not fatal: the link opens anyway and the
  * thank-you page falls back to asking by email, because losing an address is
@@ -160,11 +166,15 @@ function DeliveryForm({
   onSent: (ref: string | null) => void;
 }) {
   const [sending, setSending] = useState(false);
+  const [country, setCountry] = useState('ZA');
+  const [problem, setProblem] = useState<string | null>(null);
+  const states = countryOf(country)?.states ?? [];
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (sending) return;
     setSending(true);
+    setProblem(null);
 
     const data = new FormData(event.currentTarget);
     let ref: string | null = null;
@@ -181,11 +191,25 @@ function DeliveryForm({
           name: data.get('name'),
           email: data.get('email'),
           phone: data.get('phone'),
-          address: data.get('address'),
+          address: {
+            address1: data.get('address1'),
+            address2: data.get('address2'),
+            city: data.get('city'),
+            state_code: data.get('state_code') ?? '',
+            zip: data.get('zip'),
+            country_code: country,
+          },
           note: data.get('note'),
         }),
       });
-      const body = (await res.json()) as { ref?: string };
+      const body = (await res.json()) as { ref?: string; error?: string };
+      // A 400 is the address being refused, and the customer can fix that
+      // here — so it stops them, where a Worker that is down does not.
+      if (res.status === 400) {
+        setProblem(body.error ?? 'Something in the address is missing.');
+        setSending(false);
+        return;
+      }
       ref = body.ref ?? null;
     } catch {
       // Offline, blocked, or the Worker is down. Carry on to PayFast.
@@ -219,16 +243,63 @@ function DeliveryForm({
       </label>
 
       <label className={styles.field}>
-        <span>Delivery address</span>
-        <textarea
-          name="address"
+        <span>Country</span>
+        <select
+          name="country_code"
           required
-          rows={4}
-          maxLength={600}
-          autoComplete="street-address"
-          placeholder={'Street\nSuburb\nCity\nPostal code\nCountry'}
-        />
+          autoComplete="country"
+          value={country}
+          onChange={(event) => setCountry(event.target.value)}
+        >
+          {COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.name}
+            </option>
+          ))}
+        </select>
       </label>
+
+      <label className={styles.field}>
+        <span>Street address</span>
+        <input name="address1" required autoComplete="address-line1" maxLength={200} />
+      </label>
+
+      <label className={styles.field}>
+        <span>
+          {country === 'ZA' ? 'Suburb, unit or complex' : 'Apartment, unit or building'} <em>optional</em>
+        </span>
+        <input name="address2" autoComplete="address-line2" maxLength={200} />
+      </label>
+
+      <div className={styles.pair}>
+        <label className={styles.field}>
+          <span>City</span>
+          <input name="city" required autoComplete="address-level2" maxLength={100} />
+        </label>
+
+        <label className={styles.field}>
+          <span>Postal code</span>
+          <input name="zip" required autoComplete="postal-code" maxLength={16} />
+        </label>
+      </div>
+
+      {/* Only where Printful needs one: the US, Canada, Australia, Japan and
+          Brazil. Keyed by country so switching country clears the choice. */}
+      {states.length > 0 && (
+        <label className={styles.field} key={country}>
+          <span>{country === 'CA' ? 'Province' : 'State'}</span>
+          <select name="state_code" required autoComplete="address-level1" defaultValue="">
+            <option value="" disabled>
+              Choose…
+            </option>
+            {states.map((state) => (
+              <option key={state.code} value={state.code}>
+                {state.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <label className={styles.field}>
         <span>
@@ -243,6 +314,12 @@ function DeliveryForm({
         </span>
         <input name="note" maxLength={600} />
       </label>
+
+      {problem && (
+        <p className={styles.problem} role="alert">
+          {problem}
+        </p>
+      )}
 
       <button className={styles.buy} type="submit" disabled={sending}>
         {sending ? 'One moment…' : `Continue to pay ${option.label} ↗`}
