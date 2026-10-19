@@ -992,8 +992,11 @@ which halves the page; the small print (delivery line, PayFast note, "Printed
 on", the size table's numbers) is larger and at `--muted` rather than
 `--muted-2`; on phones the shirt stage is capped so the name and price are on
 the first screen; and the shirt sits at the top of its column rather than
-drifting to the middle when the address form opens. Store front, thank-you
-and policies still to do.
+drifting to the middle when the address form opens. **The store front is
+done** too, on his picks: one price line ("R500 – R680 · 9 sizes") instead of
+the ladder; See it as the same solid pink pill; "Drag it to turn it" under the
+shirt and the model's licence credit at the foot of the page; the delivery
+line and the blank's line readable. Thank-you and policies still to do.
 
 **6. The design run.** The new look — round `+`, shut cards, gold — applied
 once everything that should be on the page is on it. His sequencing, and the

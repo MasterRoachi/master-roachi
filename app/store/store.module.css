@@ -69,18 +69,23 @@
 }
 
 /* Only worth saying where there is something to drag. */
+.stageCol {
+  min-width: 0;
+}
+
 .turn {
-  margin: 18px 0 0;
-  font-size: 0.78rem;
+  margin: 14px 0 0;
+  font-size: 0.75rem;
   letter-spacing: 0.1em;
+  text-align: center;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 
 /* The model's licence requires the credit to travel with it wherever it is
    shown, so this is small but not hidden. */
 .credit {
-  margin: 8px 0 0;
+  margin: clamp(40px, 6vw, 72px) 0 0;
   font-size: 0.72rem;
   line-height: 1.5;
   color: var(--muted-2);
@@ -105,44 +110,24 @@
 }
 
 .actions .buyButton {
-  margin-top: 0;
-}
-
-.actions .pending {
-  margin-top: 0;
-  padding-top: 0;
-}
-
-/* Second action: present, but not competing with the primary pill. */
-.secondary {
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: color-mix(in oklch, var(--accent-a) 80%, var(--ink));
-  transition: color 0.18s ease;
-}
-
-.secondary:hover {
-  color: var(--ink);
-}
-
-.buyButton {
   display: inline-block;
   margin-top: 26px;
-  border: 1px solid color-mix(in oklch, var(--accent-a) 55%, var(--line));
+  border: 1px solid var(--accent-a);
   border-radius: 999px;
-  padding: 13px 28px;
-  font-size: 0.76rem;
-  font-weight: 700;
+  background: var(--accent-a);
+  padding: 14px 30px;
+  font-size: 0.8rem;
+  font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: color-mix(in oklch, var(--accent-a) 82%, var(--ink));
-  transition: border-color 0.18s ease, color 0.18s ease;
+  /* Dark on the pink, as Buy is on the product page: the way in is the
+     brightest thing in the feature. */
+  color: oklch(14% 0.02 340);
+  transition: filter 0.18s ease;
 }
+
 .buyButton:hover {
-  border-color: var(--accent-a);
-  color: var(--ink);
+  filter: brightness(1.08);
 }
 
 /* --- shelves ------------------------------------------------------------ */
@@ -313,38 +298,16 @@ a.product:hover .art img {
   color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
 }
 
-/* Sizes grouped by price. A table would be heavier furniture than five rows
-   deserve, and a definition list already means "term, value". */
-.ladder {
-  margin: 16px 0 0;
-  display: grid;
-  /* The size run column takes what it needs and no more, so the prices line
-     up against it rather than floating in the middle of the panel. */
-  grid-template-columns: auto auto;
-  justify-content: start;
-  gap: 4px 20px;
-  font-size: 0.88rem;
-}
-
-.band {
-  display: contents;
-}
-
-.band dt {
+.sizeCount {
+  font-size: 0.95rem;
+  font-weight: 500;
   color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.band dd {
-  margin: 0;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
 }
 
 .garment {
   margin: 16px 0 0;
-  font-size: 0.82rem;
-  color: var(--muted-2);
+  font-size: 0.875rem;
+  color: var(--muted);
 }
 
 /* --- sections ----------------------------------------------------------- */
@@ -377,10 +340,11 @@ a.product:hover .art img {
   font-size: clamp(1.2rem, 2.4vw, 1.6rem);
 }
 
-/* Sits directly under the price. Small and muted — it is a reassurance, not
-   a claim competing with the number above it. */
+/* Sits directly under the price. Muted — it is a reassurance, not a claim
+   competing with the number above it — but readable on a phone, which at
+   --muted-2 and 0.8rem it was not. */
 .shipping {
   margin: 6px 0 0;
-  font-size: 0.8rem;
-  color: var(--muted-2);
+  font-size: 0.9rem;
+  color: var(--muted);
 }

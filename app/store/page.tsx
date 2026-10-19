@@ -15,10 +15,8 @@ import {
   isBuyable,
   categoryOf,
   productPath,
-  money,
   sizesOf,
   sizeRun,
-  priceLadder,
   priceSummary,
   isSoldOut,
   garmentLabel,
@@ -79,6 +77,7 @@ export default function StorePage() {
 
         {lead && (
           <div className={styles.feature}>
+            <div className={styles.stageCol}>
             <div className={styles.stage}>
               {/* The flat cut-out is the floor: it is what shows before
                   three.js arrives, where WebGL is unavailable, and under
@@ -104,6 +103,10 @@ export default function StorePage() {
                 />
               )}
             </div>
+            {/* Under the shirt, as on the product page: it describes the
+                thing above it, not the product. */}
+            {leadModel && <p className={styles.turn}>Drag it to turn it.</p>}
+            </div>
 
             <div className={styles.featureBody}>
               <p className="eyebrow">Latest</p>
@@ -111,7 +114,12 @@ export default function StorePage() {
 
               {priceSummary(lead) && (
                 <>
-                  <p className={styles.priceLine}>{priceSummary(lead)}</p>
+                  {/* One line, not a ladder: sizes and their prices are
+                      chosen together on the product page now. */}
+                  <p className={styles.priceLine}>
+                    {priceSummary(lead)}
+                    <span className={styles.sizeCount}> · {sizesOf(lead).length} sizes</span>
+                  </p>
                   <p className={styles.shipping}>
                     {CHECKOUT === 'payfast' ? 'Delivery quoted for your address' : 'Worldwide delivery included'}
                   </p>
@@ -120,29 +128,11 @@ export default function StorePage() {
 
               <Swatches colors={lead.colors ?? []} />
 
-              {/* The size ladder, rather than a single "from" figure. This
-                  shirt runs $16.00 to $26.00 and someone who wears a 5XL
-                  should not discover that at checkout. */}
-              {priceLadder(lead).length > 1 && (
-                <dl className={styles.ladder}>
-                  {priceLadder(lead).map((band) => (
-                    <div key={band.sizes.join()} className={styles.band}>
-                      <dt>{sizeRun(band.sizes)}</dt>
-                      <dd>{money(band.amount, band.currency)}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
 
               {garmentLabel(lead) && (
                 <p className={styles.garment}>{garmentLabel(lead)}</p>
               )}
 
-              {leadModel && <p className={styles.turn}>Drag it to turn it.</p>}
-              {/* Required by the model's licence, not optional politeness —
-                  and only where the model is shown. CC BY 4.0, see
-                  public/store/tshirt-license.txt. */}
-              {leadModel && <ModelCredit model={leadModel} className={styles.credit} />}
               <div className={styles.actions}>
                 {/* The product page is where the detail lives — size guide,
                     what the blank actually is, why it cannot be bought yet —
@@ -260,6 +250,12 @@ export default function StorePage() {
             </p>
           </div>
         </section>
+
+        {/* Required by the model's licence, not optional politeness — and only
+            where the model is shown. CC BY 4.0, see public/store/tshirt-license.txt.
+            At the foot of the page rather than in the feature, where it read as
+            part of the product. */}
+        {leadModel && <ModelCredit model={leadModel} className={styles.credit} />}
       </div>
     </div>
   );
