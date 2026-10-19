@@ -56,6 +56,16 @@ execFileSync(
 );
 const dbLib = await import(pathToFileURL(dbBundle).href);
 
+// Product copy's file shape grew from an array to an object on 2026-10-19,
+// and the old shape has to keep reading — the live file was not converted.
+const productCopyBundle = path.join(os.tmpdir(), 'master-roachi-product-copy-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/product-copy.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${productCopyBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const productCopy = await import(pathToFileURL(productCopyBundle).href);
+
 // Reading a lesson's blocks, which is the ceiling on what a lesson can teach
 // now that the material itself lives in `detail`. Silent when wrong: a fence
 // misread does not throw, it shows a program as one run-together line, which
@@ -247,13 +257,17 @@ const hub = await import(pathToFileURL(hubBundle).href);
 /** Just enough KV for these paths. */
 function fakeKV() {
   const map = new Map();
+  /** The expirationTtl of every put, in order. */
+  const ttl = [];
   return {
     _map: map,
+    _ttl: ttl,
     async get(k) {
       return map.has(k) ? map.get(k) : null;
     },
-    async put(k, v) {
+    async put(k, v, options) {
       map.set(k, v);
+      ttl.push(options?.expirationTtl);
     },
     async delete(k) {
       map.delete(k);
@@ -358,10 +372,11 @@ check('the old keyed order list serves the 404 page', (await res.text()) === '40
 // fake: the status marks are SQL (coalesce, clearing on undo), and a fake that
 // pattern-matched the statements would test the fake.
 
-/** Enough of the D1 API over node:sqlite, with the orders migration applied. */
+/** Enough of the D1 API over node:sqlite, with the orders migrations applied. */
 function sqliteD1() {
   const sqlite = new DatabaseSync(':memory:');
   sqlite.exec(fs.readFileSync('migrations/0015_orders.sql', 'utf8'));
+  sqlite.exec(fs.readFileSync('migrations/0016_order_retention.sql', 'utf8'));
   const d1 = {
     sqlite,
     broken: false,
@@ -489,6 +504,48 @@ function sqliteD1() {
 
   marked = await mark('NOSUCHRF', 'paid');
   check('an unknown order is a 404', marked.status === 404, String(marked.status));
+
+  // --- thirty days ---------------------------------------------------------
+  //
+  // His ruling, 2026-10-19: personal details go 30 days after submission,
+  // whatever the status; the sale stays. OLDREF22 was submitted 2026-09-01,
+  // so the reads above have already redacted it — this checks what they left.
+  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), shopEnv);
+  body = await res.json();
+  const redacted = body.orders.find((o) => o.ref === 'OLDREF22');
+  check(
+    'an order over 30 days old loses its personal details',
+    redacted?.name === '' && redacted?.email === '' && redacted?.address === '' && redacted?.phone === '' && !!redacted?.redacted_at,
+    JSON.stringify(redacted),
+  );
+  check(
+    'and keeps the sale',
+    redacted?.product === 'Roachi Shirt' && redacted?.size === 'M' && redacted?.price === 'R500' && redacted?.status === 'dismissed',
+    JSON.stringify(redacted),
+  );
+  check(
+    'a recent order keeps its details',
+    body.orders.find((o) => o.ref === d1Ref)?.name === 'D1 Buyer',
+    JSON.stringify(body.orders.find((o) => o.ref === d1Ref)),
+  );
+
+  // The cron does the same on its own, without GITHUB_TOKEN.
+  ordersDb.sqlite.prepare(
+    "update orders set created_at = '2026-01-01T00:00:00.000Z' where ref = ?",
+  ).run(d1Ref);
+  const waited = [];
+  await worker.scheduled({ scheduledTime: Date.now(), cron: '10 2 * * *' }, shopEnv, {
+    waitUntil: (promise) => waited.push(promise),
+    passThroughOnException: () => {},
+  });
+  await Promise.all(waited);
+  const cronned = ordersDb.sqlite.prepare('select * from orders where ref = ?').get(d1Ref);
+  check('the daily cron redacts too', cronned.name === '' && !!cronned.redacted_at, JSON.stringify(cronned));
+
+  ordersDb.broken = true;
+  await worker.fetch(post(buyer), shopEnv);
+  ordersDb.broken = false;
+  check('a KV fallback expires on the same 30 days', kv._ttl.at(-1) === 60 * 60 * 24 * 30, String(kv._ttl.at(-1)));
 
   res = await worker.fetch(get('https://masterroachi.com/work/store/'), env);
   check(
@@ -2428,10 +2485,26 @@ globalThis.fetch = preGh;
   );
 
   const back = sketch.fromSvg(svg);
+  // `pages` arrived on 2026-10-14 as an optional field, and fromSvg fills in
+  // one page for a file written before it — so a scene without it comes back
+  // with it. That is the format working, not a loss.
+  // Compared with sorted keys: fromSvg rebuilds the object, so its key order
+  // is its own and says nothing about whether anything was lost.
+  const canonical = (value) =>
+    JSON.stringify(value, (_key, v) =>
+      v && typeof v === 'object' && !Array.isArray(v)
+        ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a.localeCompare(b)))
+        : v,
+    );
   check(
     'a sketch round-trips exactly',
-    JSON.stringify(back) === JSON.stringify(scene),
+    canonical(back) === canonical({ ...scene, pages: 1 }),
     JSON.stringify(back),
+  );
+  check(
+    'a two-page sketch keeps both pages',
+    sketch.fromSvg(sketch.toSvg({ ...scene, pages: 2 }))?.pages === 2,
+    String(sketch.fromSvg(sketch.toSvg({ ...scene, pages: 2 }))?.pages),
   );
   check(
     'text with ]]> in it survives the CDATA boundary',
@@ -5330,6 +5403,42 @@ globalThis.fetch = preGh;
   globalThis.fetch = preGh;
 }
 
+// --- product copy ------------------------------------------------------------
+{
+  const legacy = productCopy.readCopy(['  One.  ', '', 'Two.']);
+  check(
+    'an array entry still reads, as the description',
+    JSON.stringify(legacy.description) === '["One.","Two."]' && legacy.tagline === '' && legacy.story.length === 0,
+    JSON.stringify(legacy),
+  );
+  const full = productCopy.readCopy({ tagline: ' Hi ', description: ['A'], story: ['B', 7], care: 'Wash cold', alt: 'A face' });
+  check(
+    'an object entry reads every field, and drops what is not text',
+    full.tagline === 'Hi' && full.story.length === 1 && full.care === 'Wash cold' && full.alt === 'A face',
+    JSON.stringify(full),
+  );
+  check('junk reads as empty copy', productCopy.readCopy(42).description.length === 0, '');
+  check(
+    'writing leaves empty fields out',
+    JSON.stringify(productCopy.writeCopy({ ...productCopy.emptyCopy(), tagline: 'Hi', story: ['', 'B'] })) ===
+      '{"tagline":"Hi","story":["B"]}',
+    JSON.stringify(productCopy.writeCopy({ ...productCopy.emptyCopy(), tagline: 'Hi', story: ['', 'B'] })),
+  );
+  check('nothing written is null, so the entry is removed', productCopy.writeCopy(productCopy.emptyCopy()) === null, '');
+  const ids = (items) => items.map((item) => item.id).join(',');
+  const items = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }];
+  check(
+    'saved order first, then the rest in arrival order, and unknown ids skipped',
+    ids(productCopy.inOrder(items, (item) => item.id, ['c', 'gone', 'a'])) === 'c,a,b,d',
+    ids(productCopy.inOrder(items, (item) => item.id, ['c', 'gone', 'a'])),
+  );
+  check(
+    '$order is read as strings only',
+    JSON.stringify(productCopy.readOrder({ $order: ['1', 2, '3'] })) === '["1","3"]',
+    JSON.stringify(productCopy.readOrder({ $order: ['1', 2, '3'] })),
+  );
+}
+
 // --- anything else falls through to the site -------------------------------
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
@@ -5343,6 +5452,7 @@ fs.rmSync(bundle, { force: true });
 fs.rmSync(sketchBundle, { force: true });
 fs.rmSync(habitsBundle, { force: true });
 fs.rmSync(dbBundle, { force: true });
+fs.rmSync(productCopyBundle, { force: true });
 fs.rmSync(iconBundle, { force: true });
 fs.rmSync(spineBundle, { force: true });
 fs.rmSync(postBundle, { force: true });

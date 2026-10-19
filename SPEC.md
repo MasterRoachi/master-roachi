@@ -869,8 +869,9 @@ Three facts drive the order of the work:
   products; it does not create orders. Fulfilment is entirely manual and
   Printful never hears about a sale.
 
-**Steps 1 and 2 are built, 2026-10-19** — not yet deployed, and live D1 needs
-migration `0015_orders.sql` applied before the deploy. Orders are a D1 table;
+**Steps 1 and 2 are built and live, 2026-10-19** — migration `0015_orders.sql`
+applied to live D1, the worker deployed at `1b1fbb0`, and the `ORDERS_KEY`
+secret deleted. Orders are a D1 table;
 `/api/order` writes there and falls back to KV only when D1 fails;
 `/work/api/orders` sweeps KV into D1 on every read (idempotent on the
 reference) and sets status; `/work/shop/` has the Orders and Products tabs;
@@ -920,6 +921,21 @@ nothing breaks. Add **manual product ordering**, and a **warning when the
 catalogue is stale**: `fetchedAt` is 2026-09-07 and the page says nothing
 about it.
 
+**Step 4 is built, 2026-10-19.** `lib/product-copy.ts` owns the shape: an
+entry is `{ tagline, description, story, care, alt }`, every field optional,
+and an old array entry still reads as the description, so `copy.json` was not
+converted — the editor writes the new shape on its next save. `$order` holds
+his store order; `getStore()` applies it, so the store index, the sitemap and
+the editor all follow it. The public page shows the tagline under the name,
+the story as its own section, the care note above the size guide, and the alt
+text on the product image. The ten planned designs are gone from `site.ts`,
+with the "Still being drawn" section and the editor's unsynced rows. The
+catalogue warning shows past 14 days. Two editor changes he should know about:
+the list is now in store order rather than no-copy-first, because a list
+sorted by one rule cannot also be the one you reorder; and the numbered
+paragraph-split list under the box is gone — the preview column on the right
+shows the same paragraphs.
+
 **5. Live preview** of the real product page, showing what a visitor sees.
 Images on it: Printful's two or three mockups, his own uploaded artwork, and a
 3D model where one exists.
@@ -953,6 +969,13 @@ Question round, then build.
 
 ### Stage 4 — Loose ends
 
+- **Scheduled posts do not publish by themselves.** The daily cron's
+  `rebuild()` makes an empty commit on the day a post is due, on the
+  assumption that a push deploys. It does not (see DEPLOY.md), so a post dated
+  in the future goes live only at the next hand deploy after its date. Found
+  2026-10-19; not yet fixed. Fixing it means either a deploy the Worker can
+  trigger, or giving up on scheduling.
+
 - ~~`npm run lint` is broken and was before any of this work.~~ Fixed 2026-10-16.
 - **Odin reads 112 of 151.** Its fourteen Getting Hired lessons count now the
   route is gone. Deleting that course is the only way to stop them, and that
@@ -977,21 +1000,31 @@ Question round, then build.
   show. The delete is blocked from this machine by the sandbox, which reads it
   as a mass delete, so it is one statement for him to run:
   `delete from lessons where curriculum_id in (9, 10); delete from curriculums where id in (9, 10);`
-- **Deploy the worker.** Seven commits were on `main` and not live as of
-  2026-10-15, and four more have landed since (the lint work, 2026-10-16). Pushing to GitHub does not deploy — there is no
+- **Deploy the worker** after each batch of work. Live is `1b1fbb0`, deployed
+  2026-10-19. This session's sandbox refuses `wrangler deploy` and remote
+  migrations as production actions, so those are his to run even when agreed. Pushing to GitHub does not deploy — there is no
   deploy hook and no Cloudflare token here.
 
 ### Open decisions
 
-1. **Build order.** Orders and fulfilment first, as above, or copy and preview
-   first? *Assumed: as above.*
-2. **Shipping.** Informational only, or move off fixed PayFast payment links?
-   This is the one that changes the architecture — a live Printful rate quote
-   cannot alter what a fixed-sum link charges. *Assumed: informational.*
-3. **Order retention in D1** — kept indefinitely, or aged out after a couple
-   of years? They hold names, addresses and emails. *Assumed: indefinitely.*
-4. **The public `/store/<slug>` page** — changed too, or only previewed
-   accurately? *Assumed: unchanged for now.*
+Ruled 2026-10-19, except 2.
+
+1. **Build order.** ~~Orders and fulfilment first, or copy and preview
+   first?~~ Settled by doing it: orders first, and fulfilment waits on
+   `PRINTFUL_TOKEN`, which he will set after step 4.
+2. **Shipping — still open; he is not sure.** Informational only, or move off
+   fixed PayFast payment links? This is the one that changes the architecture
+   — a live Printful rate quote cannot alter what a fixed-sum link charges.
+   *Assumed: informational.* Nothing in steps 3–5 depends on it.
+3. **Order retention — 30 days from submission, then the personal details
+   are removed.** Name, email, phone, address and note are blanked; product,
+   size, price, status and dates stay, so what sold is still on record. Chosen
+   over "30 days after the order is closed", knowing that an order still in
+   the post on day 30 loses its address. Migration `0016`, `redactOrders` in
+   the daily cron and on every read of `/work/api/orders`, the KV fallback's
+   TTL on the same 30 days, and the wording on `/policies/`.
+4. **The public `/store/<slug>` page changes too.** Tagline, story, care/fit
+   note and alt text appear on the real page, not only in the preview.
 
 ### Settled: the library index lives in D1
 

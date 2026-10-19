@@ -96,6 +96,15 @@
   margin: 6px 0 16px;
 }
 
+/* His one line under the name. Pulls the name's bottom margin back up so the
+   two read as a pair rather than as a heading and a paragraph. */
+.tagline {
+  margin: -8px 0 18px;
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
 .priceLine {
   margin: 0;
   font-size: 1.5rem;
@@ -227,6 +236,13 @@
 
 .blurb p {
   margin: 0 0 14px;
+}
+
+.care {
+  max-width: var(--measure);
+  margin: 14px 0 18px;
+  line-height: 1.65;
+  color: var(--ink);
 }
 
 .blurb p:last-child {

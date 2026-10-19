@@ -20,7 +20,7 @@ import {
   priceSummary,
   isSoldOut,
   garmentLabel,
-  blurbOf,
+  copyOf,
   hasArtwork,
   type StoreProduct,
 } from '@/lib/store';
@@ -59,7 +59,9 @@ export async function generateMetadata({
       storeName: site.store.name,
       garment,
       price,
-      blurb: blurbOf(product),
+      // The tagline leads where there is one: it is the shortest thing he has
+      // written about the design, which is what a snippet wants.
+      blurb: [copyOf(product).tagline, ...copyOf(product).description].filter(Boolean),
     }),
     // A card built for this product by scripts/og.mjs — the garment on the
     // site's ground with its name and price, at the 1200x630 every platform
@@ -86,7 +88,11 @@ export default async function ProductPage({
   const soldOut = isSoldOut(product);
   const options = buyOptions(product);
   const spec = product.garment?.spec ?? [];
-  const blurb = blurbOf(product);
+  const copy = copyOf(product);
+  const blurb = copy.description;
+  // His description of the art where he has written one; the name otherwise,
+  // which says what it is called and nothing about what it shows.
+  const alt = copy.alt || product.name;
   // Which 3D garment stands for this product, if any.
   const model = modelFor(product);
 
@@ -121,7 +127,7 @@ export default async function ProductPage({
                 <img
                   className={styles.stageFlat}
                   src={product.art ?? product.thumbnail ?? undefined}
-                  alt={product.name}
+                  alt={alt}
                   loading="eager"
                   decoding="async"
                 />
@@ -134,7 +140,7 @@ export default async function ProductPage({
                   printBand={model.printBand}
                   print={product.print}
                   fabric={product.fabric ?? undefined}
-                  alt={`${product.name}, which can be turned`}
+                  alt={`${alt}, which can be turned`}
                 />
               )}
             </div>
@@ -147,6 +153,7 @@ export default async function ProductPage({
           <div className={styles.detail}>
             <p className="eyebrow">{site.store.name}</p>
             <h1 className={styles.name}>{product.name}</h1>
+            {copy.tagline && <p className={styles.tagline}>{copy.tagline}</p>}
 
             {priceSummary(product) && (
               <>
@@ -202,6 +209,17 @@ export default async function ProductPage({
           </section>
         )}
 
+        {copy.story.length > 0 && (
+          <section className={styles.section}>
+            <p className="eyebrow">The story</p>
+            <div className={styles.blurb}>
+              {copy.story.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          </section>
+        )}
+
         {spec.length > 0 && (
           <section className={styles.section}>
             <p className="eyebrow">The blank</p>
@@ -219,11 +237,14 @@ export default async function ProductPage({
           </section>
         )}
 
-        {product.sizeGuide && sizes.length > 0 && (
+        {((product.sizeGuide && sizes.length > 0) || copy.care) && (
           <section className={styles.section}>
             <p className="eyebrow">Fit</p>
-            <h2 className="section-title">Size guide</h2>
-            <SizeTable guide={product.sizeGuide} sizes={sizes} />
+            <h2 className="section-title">{copy.care ? 'Fit and care' : 'Size guide'}</h2>
+            {/* His note before Printful's table: how it actually wears is the
+                thing a measurement chart cannot say. */}
+            {copy.care && <p className={styles.care}>{copy.care}</p>}
+            {product.sizeGuide && sizes.length > 0 && <SizeTable guide={product.sizeGuide} sizes={sizes} />}
           </section>
         )}
 

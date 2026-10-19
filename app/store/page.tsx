@@ -21,6 +21,7 @@ import {
   priceSummary,
   isSoldOut,
   garmentLabel,
+  copyOf,
   type StoreProduct,
 } from '@/lib/store';
 import { modelFor } from '@/lib/models';
@@ -41,7 +42,8 @@ const ACCENT_2 = 'oklch(80% 0.14 230)';
 export default function StorePage() {
   const { products } = getStore();
 
-  // The newest real product leads. Everything else falls onto its shelf.
+  // The first product leads: his order where he has set one in /work/shop,
+  // Printful's otherwise. Everything else falls onto its shelf.
   const lead = products[0] ?? null;
   // The newest thing on the rail will not always be a t-shirt.
   const leadModel = lead ? modelFor(lead) : null;
@@ -53,14 +55,6 @@ export default function StorePage() {
       items: rest.filter((p) => categoryOf(p) === category),
     }))
     .filter((s) => s.items.length > 0);
-
-  // Designs that are still only a plan, grouped the same way the shelves are.
-  const planned = site.store.categories
-    .map((category) => ({
-      category,
-      items: site.store.planned.filter((p) => p.category === category),
-    }))
-    .filter((g) => g.items.length > 0);
 
   return (
     <div
@@ -105,7 +99,7 @@ export default function StorePage() {
                   printBand={leadModel.printBand}
                   print={lead.print}
                   fabric={lead.fabric ?? undefined}
-                  alt={`${lead.name}, which can be turned`}
+                  alt={`${copyOf(lead).alt || lead.name}, which can be turned`}
                 />
               )}
             </div>
@@ -263,28 +257,6 @@ export default function StorePage() {
             </p>
           </div>
         </section>
-
-        {planned.length > 0 && (
-          <section className={styles.section}>
-            <p className="eyebrow">Soon</p>
-            <h2 className="section-title">Still being drawn</h2>
-            {/* A list, not a grid of empty product cards. These have no price
-                and no mockup because they do not exist yet, and a card shaped
-                like a purchase implies otherwise. */}
-            <div className={styles.plannedGroups}>
-              {planned.map(({ category, items }) => (
-                <div key={category} className={styles.plannedGroup}>
-                  <h3 className={styles.plannedHead}>{category}</h3>
-                  <ul className={styles.planned}>
-                    {items.map(({ name }) => (
-                      <li key={name}>{name}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
     </div>
   );

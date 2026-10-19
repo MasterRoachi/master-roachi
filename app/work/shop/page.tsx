@@ -30,10 +30,9 @@ export const metadata: Metadata = pageMeta({
 export default function WorkShopPage() {
   const { products, fetchedAt } = getStore();
 
-  const synced: EditorProduct[] = products.map((product) => ({
+  const editorProducts: EditorProduct[] = products.map((product) => ({
     id: String(product.id),
     name: product.name,
-    synced: true,
     href: productPath(product),
     price: priceSummary(product),
     garment: garmentLabel(product),
@@ -48,29 +47,13 @@ export default function WorkShopPage() {
     ].filter(Boolean) as EditorProduct['images'],
   }));
 
-  /* The designs that exist as a decision and not yet as a product.
-   *
-   * Listed because he asked to see everything, synced or not, and marked
-   * read-only because copy is keyed by Printful id and these have none —
-   * there is nowhere to save words for a product that does not exist. The
-   * Sync button is what turns one of these into a row that can be written in.
-   */
-  const planned: EditorProduct[] = site.store.planned.map((design) => ({
-    id: `planned:${design.name}`,
-    name: design.name,
-    synced: false,
-    category: design.category,
-    images: [],
-    variantCount: 0,
-  }));
-
   return (
     <div className="shell">
       <ShopTabs
         orders={<Orders />}
         products={
           <StoreCopyEditor
-            products={[...synced, ...planned]}
+            products={editorProducts}
             fetchedAt={fetchedAt ?? null}
             storeName={site.store.name}
             siteName={site.name}

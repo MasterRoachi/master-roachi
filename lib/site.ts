@@ -105,34 +105,6 @@ export const site = {
      * falls into the first.
      */
     categories: ['Tees', 'Hoodies', 'Prints'] as string[],
-
-    /**
-     * Designs that exist as a plan rather than a product.
-     *
-     * These used to be rendered as full product cards with invented prices and
-     * option counts, marked "Placeholder". Ten of them made up roughly three
-     * quarters of the page on a phone — each one a tall empty box of nearly
-     * invisible diagonal stripes — so a store with one real shirt read as a
-     * store where ten things had failed to load.
-     *
-     * Now they are a list, which is what they are. No price, because there is
-     * no price: quoting one for a design that does not exist is the sort of
-     * small lie the rest of this site is written to avoid.
-     *
-     * Empty is a supported state — the section simply does not appear.
-     */
-    planned: [
-      { name: 'Turtle Hermit', category: 'Tees' },
-      { name: 'Saturday Morning', category: 'Tees' },
-      { name: 'Kame House Crest', category: 'Tees' },
-      { name: 'Late Night Rerun', category: 'Tees' },
-      { name: 'Study Well', category: 'Hoodies' },
-      { name: 'Coal Black Heavyweight', category: 'Hoodies' },
-      { name: 'Rest Plenty', category: 'Hoodies' },
-      { name: 'Terrath, Mapped', category: 'Prints' },
-      { name: 'The Twelve', category: 'Prints' },
-      { name: 'Shepherds Key Art', category: 'Prints' },
-    ] as { name: string; category: string }[],
   },
 
   socials: {

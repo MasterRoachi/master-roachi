@@ -5,6 +5,7 @@ import pricing from './pricing.json';
 // Authored product copy, keyed by Printful id. In content/ rather than in this
 // file so that a form can edit it without rewriting TypeScript.
 import storeCopy from '../content/store/copy.json';
+import { inOrder, readCopy, readOrder, type ProductCopy } from './product-copy';
 
 // Reads the Printful catalogue written by scripts/printful.mjs at build time.
 // Nothing here runs at request time — the site is a static export, so the
@@ -137,7 +138,17 @@ export function getStore(): StoreSnapshot {
   try {
     const file = path.join(process.cwd(), 'data', 'store.json');
     if (!fs.existsSync(file)) return EMPTY;
-    return JSON.parse(fs.readFileSync(file, 'utf8')) as StoreSnapshot;
+    const snapshot = JSON.parse(fs.readFileSync(file, 'utf8')) as StoreSnapshot;
+    // In his order where he has set one (`$order` in content/store/copy.json),
+    // and Printful's for anything he has not placed.
+    return {
+      ...snapshot,
+      products: inOrder(
+        snapshot.products,
+        (product) => String(product.id),
+        readOrder(storeCopy as Record<string, unknown>),
+      ),
+    };
   } catch {
     // A malformed snapshot should not take the build down.
     return EMPTY;
@@ -370,12 +381,16 @@ export function sizeRun(sizes: string[]): string {
  * What the design is, in his own words — the one part of a product page that
  * does not come out of an API. Empty is the normal state for a new product.
  */
+export function copyOf(product: StoreProduct): ProductCopy {
+  // An id with no entry is the normal state for a freshly synced product, and
+  // comes back as empty copy rather than as something the page tries to
+  // render. See lib/product-copy.ts for the shape.
+  return readCopy((storeCopy as Record<string, unknown>)[String(product.id)]);
+}
+
+/** The description paragraphs alone. */
 export function blurbOf(product: StoreProduct): string[] {
-  const entry = (storeCopy as Record<string, unknown>)[String(product.id)];
-  // $comment is documentation living in the same object, and an id that has no
-  // entry is the normal state for a freshly synced product. Both have to come
-  // back as "no copy" rather than as something the page tries to render.
-  return Array.isArray(entry) ? (entry as string[]) : [];
+  return copyOf(product).description;
 }
 
 /** Something to show in the stage, turnable or not. */

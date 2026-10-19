@@ -4,6 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import SeoPanel from '@/components/SeoPanel';
 import { productMetaDescription } from '@/lib/product-meta';
 import { paragraphsIn } from '@/lib/seo-score';
+import {
+  inOrder,
+  ORDER_KEY,
+  readCopy,
+  readOrder,
+  writeCopy,
+  type ProductCopy,
+} from '@/lib/product-copy';
 import styles from './store.module.css';
 
 // A box per product, rather than the raw JSON.
@@ -20,6 +28,11 @@ import styles from './store.module.css';
 // REPORTED at the foot of the page, because preserving something invisibly
 // and never mentioning it is how it sits there for a year.
 //
+// Five fields per product since 2026-10-19 (Shop step 4): a tagline, the
+// description, the story behind the design, a fit-and-care note, and alt text
+// for the art. All optional; lib/product-copy.ts owns the file's shape. The
+// up and down arrows set `$order`, which is the order the public store shows.
+//
 // The layout is the writing on the left and, on the right, what the page will
 // actually say plus how it scores. That pairing is the reason the meta
 // description now prefers his own words (lib/product-meta.ts): while it was
@@ -31,16 +44,46 @@ const PATH = 'content/store/copy.json';
 const UPLOAD_LIMIT = 2_000_000;
 /** Beyond this nothing on a product page gets better, and the file gets worse. */
 const MAX_EDGE = 1600;
+/** A catalogue older than this is flagged: prices and stock may have moved. */
+const STALE_DAYS = 14;
+
+/** One product's copy as the boxes hold it: paragraphs as one text each. */
+interface Draft {
+  tagline: string;
+  description: string;
+  story: string;
+  care: string;
+  alt: string;
+}
+
+const BLANK: Draft = { tagline: '', description: '', story: '', care: '', alt: '' };
+
+function toDraft(copy: ProductCopy): Draft {
+  return {
+    tagline: copy.tagline,
+    description: copy.description.join('\n\n'),
+    story: copy.story.join('\n\n'),
+    care: copy.care,
+    alt: copy.alt,
+  };
+}
+
+function fromDraft(draft: Draft | undefined): ProductCopy {
+  return {
+    tagline: draft?.tagline ?? '',
+    description: paragraphsIn(draft?.description ?? ''),
+    story: paragraphsIn(draft?.story ?? ''),
+    care: draft?.care ?? '',
+    alt: draft?.alt ?? '',
+  };
+}
 
 export interface EditorProduct {
   id: string;
   name: string;
-  /** False for a design that exists in site.ts and not yet in Printful. */
-  synced: boolean;
   href?: string;
   price?: string | null;
   garment?: string | null;
-  category?: string;
   variantCount: number;
   images: { key: string; label: string; src: string }[];
 }
@@ -71,7 +114,9 @@ export default function StoreCopyEditor({
   siteName: string;
 }) {
   const [loaded, setLoaded] = useState<Loaded | null>(null);
-  const [copy, setCopy] = useState<Record<string, string>>({});
+  const [copy, setCopy] = useState<Record<string, Draft>>({});
+  /** The saved store order, as ids. Products not in it follow, in Printful's order. */
+  const [order, setOrder] = useState<string[]>([]);
   const [dirty, setDirty] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -82,8 +127,6 @@ export default function StoreCopyEditor({
   /** Uploads made in this session, so a tile appears before the deploy lands. */
   const [uploads, setUploads] = useState<Record<string, string>>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
-
-  const synced = useMemo(() => products.filter((p) => p.synced), [products]);
 
   useEffect(() => {
     let live = true;
@@ -108,10 +151,11 @@ export default function StoreCopyEditor({
         setCopy(
           Object.fromEntries(
             Object.entries(parsed)
-              .filter(([key, value]) => key !== '$comment' && Array.isArray(value))
-              .map(([key, value]) => [key, (value as string[]).join('\n\n')]),
+              .filter(([key]) => !key.startsWith('$'))
+              .map(([key, value]) => [key, toDraft(readCopy(value))]),
           ),
         );
+        setOrder(readOrder(parsed));
       } catch (error) {
         if (live) setStatus(error instanceof Error ? error.message : 'Could not load it.');
       }
@@ -135,21 +179,25 @@ export default function StoreCopyEditor({
     return () => window.removeEventListener('keydown', onKey);
   }, [viewing]);
 
-  /* Which products still need words, and which cannot have them.
-   *
-   * Counted over everything rather than over the synced ones, because the
-   * question being answered is "what is left to do", and nine designs that
-   * are not in Printful yet are nine things left to do. */
+  /* Which products still need words — a description, which is the one field
+   * the page is thin without. */
   const stats = useMemo(() => {
-    const written = synced.filter((p) => (copy[p.id] ?? '').trim().length > 0).length;
+    const written = products.filter((p) => fromDraft(copy[p.id]).description.length > 0).length;
     return {
       total: products.length,
-      synced: synced.length,
-      unsynced: products.length - synced.length,
       written,
-      needWriting: synced.length - written,
+      needWriting: products.length - written,
     };
-  }, [products, synced, copy]);
+  }, [products, copy]);
+
+  /* How old the baked catalogue is. fetchedAt sat at 2026-09-07 for weeks
+   * with nothing on the page saying so, while prices could have moved. */
+  const staleDays = useMemo(() => {
+    if (!fetchedAt) return null;
+    // eslint-disable-next-line react-hooks/purity -- an age is relative to now by definition
+    const age = Math.floor((Date.now() - new Date(fetchedAt).getTime()) / 86_400_000);
+    return age > STALE_DAYS ? age : null;
+  }, [fetchedAt]);
 
   /* Copy belonging to no listed product.
    *
@@ -159,32 +207,45 @@ export default function StoreCopyEditor({
    * dialog. $comment is documentation, not copy. */
   const orphans = useMemo(() => {
     if (!loaded) return [];
-    const listed = new Set(synced.map((p) => p.id));
+    const listed = new Set(products.map((p) => p.id));
     return Object.entries(loaded.raw)
-      .filter(([key, value]) => key !== '$comment' && Array.isArray(value) && !listed.has(key))
-      .map(([key, value]) => ({ id: key, words: (value as string[]).join(' ').split(/\s+/).length }));
-  }, [loaded, synced]);
+      .filter(([key]) => !key.startsWith('$') && !listed.has(key))
+      .map(([key, value]) => {
+        const words = Object.values(writeCopy(readCopy(value)) ?? {}).flat().join(' ').trim();
+        return { id: key, words: words ? words.split(/\s+/).length : 0 };
+      });
+  }, [loaded, products]);
 
-  /* No-copy first, his call: the page's job is to find what still needs words.
+  /* In the store's own order, so the arrows move what they appear to move.
    *
-   * Then written products, then the unsynced designs — which stay last
-   * whatever else happens, because nothing can be done about them here. The
-   * sort is stable within each band, so Printful's own order survives. */
-  const ordered = useMemo(() => {
-    const rank = (product: EditorProduct) => {
-      if (!product.synced) return 2;
-      return (copy[product.id] ?? '').trim() ? 1 : 0;
-    };
-    return [...products].sort((a, b) => rank(a) - rank(b));
-  }, [products, copy]);
+   * This replaced "no copy first" (his earlier call) on 2026-10-19, when the
+   * order became something this page sets: a list sorted by one rule cannot
+   * also be the list you reorder. What still needs words is in the counts. */
+  const ordered = useMemo(() => inOrder(products, (p) => p.id, order), [products, order]);
 
   const current = useMemo(
-    () => synced.find((p) => p.id === active) ?? synced[0] ?? null,
-    [synced, active],
+    () => products.find((p) => p.id === active) ?? ordered[0] ?? null,
+    [products, ordered, active],
   );
 
-  /** The paragraphs as the save will split them, which is what the page shows. */
-  const paragraphsFor = useCallback((id: string) => paragraphsIn(copy[id] ?? ''), [copy]);
+  /** One product's copy as the save will write it, which is what the page shows. */
+  const copyFor = useCallback((id: string) => fromDraft(copy[id]), [copy]);
+
+  function edit(id: string, field: keyof Draft, value: string) {
+    setCopy({ ...copy, [id]: { ...BLANK, ...copy[id], [field]: value } });
+    setDirty(true);
+  }
+
+  /** Move one product up or down, and keep the whole order — every id. */
+  function move(id: string, by: -1 | 1) {
+    const ids = ordered.map((p) => p.id);
+    const from = ids.indexOf(id);
+    const to = from + by;
+    if (from < 0 || to < 0 || to >= ids.length) return;
+    [ids[from], ids[to]] = [ids[to], ids[from]];
+    setOrder(ids);
+    setDirty(true);
+  }
 
   /** Exactly what the product page's meta description will be. */
   const descriptionFor = useCallback(
@@ -194,9 +255,9 @@ export default function StoreCopyEditor({
         storeName,
         garment: product.garment,
         price: product.price,
-        blurb: paragraphsIn(copy[product.id] ?? ''),
+        blurb: [copyFor(product.id).tagline, ...copyFor(product.id).description].filter(Boolean),
       }),
-    [copy, storeName],
+    [copyFor, storeName],
   );
 
   async function save() {
@@ -206,11 +267,13 @@ export default function StoreCopyEditor({
     try {
       // Rebuilt from raw, so $comment and any unlisted product's copy survive.
       const next: Record<string, unknown> = { ...loaded.raw };
-      for (const [id, text] of Object.entries(copy)) {
-        const paragraphs = paragraphsIn(text);
-        if (paragraphs.length) next[id] = paragraphs;
+      for (const [id, draft] of Object.entries(copy)) {
+        const written = writeCopy(fromDraft(draft));
+        if (written) next[id] = written;
         else delete next[id];
       }
+      if (order.length) next[ORDER_KEY] = order;
+      else delete next[ORDER_KEY];
 
       const response = await fetch('/work/api/content', {
         method: 'POST',
@@ -369,12 +432,6 @@ export default function StoreCopyEditor({
               <span className={styles.warn}>{stats.needWriting} need writing</span>
             </>
           )}
-          {stats.unsynced > 0 && (
-            <>
-              <span className={styles.sep}>·</span>
-              <span className={styles.muted}>{stats.unsynced} not synced</span>
-            </>
-          )}
           {dirty && <span className={styles.dirty}>unsaved</span>}
         </p>
         <div className={styles.actions}>
@@ -394,15 +451,24 @@ export default function StoreCopyEditor({
         {fetchedAt ? `, from a catalogue fetched ${new Date(fetchedAt).toISOString().slice(0, 10)}` : ''}.
         Syncing commits a new one; the list here changes once that deploy lands.
       </p>
+      {staleDays !== null && (
+        <p className={styles.stale}>
+          The catalogue is {staleDays} days old. Prices, sizes and stock on the store are as Printful had them
+          then — sync before trusting them.
+        </p>
+      )}
       {syncNote && <p className={styles.message}>{syncNote}</p>}
 
       <div className={styles.split}>
         <div className={styles.column}>
-          {ordered.map((product) => {
-            const paragraphs = paragraphsFor(product.id);
-            const words = (copy[product.id] ?? '').trim()
-              ? (copy[product.id] ?? '').trim().split(/\s+/).length
-              : 0;
+          {ordered.map((product, index) => {
+            const draft = copy[product.id] ?? BLANK;
+            const written = copyFor(product.id);
+            const words = [draft.tagline, draft.description, draft.story, draft.care]
+              .join(' ')
+              .trim()
+              .split(/\s+/)
+              .filter(Boolean).length;
             const images = uploads[product.id]
               ? [
                   { key: 'pending', label: 'Uploaded (pending deploy)', src: uploads[product.id] },
@@ -413,43 +479,46 @@ export default function StoreCopyEditor({
             return (
               <article
                 key={product.id}
-                className={`${styles.product} ${product.id === current?.id ? styles.current : ''} ${
-                  product.synced ? '' : styles.unsynced
-                }`}
-                onFocusCapture={() => product.synced && setActive(product.id)}
-                onClick={() => product.synced && setActive(product.id)}
+                className={`${styles.product} ${product.id === current?.id ? styles.current : ''}`}
+                onFocusCapture={() => setActive(product.id)}
+                onClick={() => setActive(product.id)}
               >
                 <header className={styles.productHead}>
                   <h2 className={styles.name}>
                     {product.name}
-                    {product.synced ? (
-                      <span className={styles.id}>{product.id}</span>
-                    ) : (
-                      <span className={styles.badge}>not synced</span>
-                    )}
+                    <span className={styles.id}>{product.id}</span>
                   </h2>
+                  {/* The store's order. Only worth showing with more than one. */}
+                  {ordered.length > 1 && (
+                    <div className={styles.move}>
+                      <button
+                        type="button"
+                        aria-label={`Move ${product.name} up`}
+                        disabled={index === 0}
+                        onClick={() => move(product.id, -1)}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`Move ${product.name} down`}
+                        disabled={index === ordered.length - 1}
+                        onClick={() => move(product.id, 1)}
+                      >
+                        ↓
+                      </button>
+                    </div>
+                  )}
                   <p className={styles.facts}>
-                    {product.synced ? (
+                    {product.price ?? 'no price'}
+                    <span className={styles.sep}>·</span>
+                    {product.variantCount} variant{product.variantCount === 1 ? '' : 's'}
+                    {product.href && (
                       <>
-                        {product.price ?? 'no price'}
                         <span className={styles.sep}>·</span>
-                        {product.variantCount} variant{product.variantCount === 1 ? '' : 's'}
-                        {product.href && (
-                          <>
-                            <span className={styles.sep}>·</span>
-                            <a href={product.href} target="_blank" rel="noreferrer">
-                              view page
-                            </a>
-                          </>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {product.category}
-                        <span className={styles.sep}>·</span>
-                        <span className={styles.muted}>
-                          a design, not a product yet — sync to write copy for it
-                        </span>
+                        <a href={product.href} target="_blank" rel="noreferrer">
+                          view page
+                        </a>
                       </>
                     )}
                   </p>
@@ -472,63 +541,98 @@ export default function StoreCopyEditor({
                     </button>
                   ))}
 
-                  {product.synced && (
-                    <label className={styles.uploadTile}>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(event) => {
-                          const file = event.target.files?.[0];
-                          // Cleared so choosing the same file twice fires again.
-                          event.target.value = '';
-                          if (file) void upload(product, file);
-                        }}
-                      />
-                      <span>{uploadingId === product.id ? 'Converting…' : '+ Upload art'}</span>
-                    </label>
-                  )}
-
-                  {images.length === 0 && !product.synced && (
-                    <p className={styles.noArt}>No art until it is synced.</p>
-                  )}
-                </div>
-
-                {product.synced && (
-                  <>
-                    <textarea
-                      id={`copy-${product.id}`}
-                      className={styles.productText}
-                      spellCheck
-                      value={copy[product.id] ?? ''}
-                      placeholder="No copy yet — the description falls back to the supplier's words about the blank."
-                      onFocus={() => setActive(product.id)}
+                  <label className={styles.uploadTile}>
+                    <input
+                      type="file"
+                      accept="image/*"
                       onChange={(event) => {
-                        setCopy({ ...copy, [product.id]: event.target.value });
-                        setDirty(true);
+                        const file = event.target.files?.[0];
+                        // Cleared so choosing the same file twice fires again.
+                        event.target.value = '';
+                        if (file) void upload(product, file);
                       }}
                     />
+                    <span>{uploadingId === product.id ? 'Converting…' : '+ Upload art'}</span>
+                  </label>
+                </div>
 
-                    <p className={styles.meta}>
-                      {words} word{words === 1 ? '' : 's'}
+                <label className={styles.field}>
+                  <span className={styles.fieldName}>Tagline</span>
+                  <input
+                    type="text"
+                    className={styles.line}
+                    spellCheck
+                    maxLength={140}
+                    value={draft.tagline}
+                    placeholder="One line under the name."
+                    onFocus={() => setActive(product.id)}
+                    onChange={(event) => edit(product.id, 'tagline', event.target.value)}
+                  />
+                </label>
+
+                <label className={styles.field}>
+                  <span className={styles.fieldName}>Description</span>
+                  <textarea
+                    id={`copy-${product.id}`}
+                    className={styles.productText}
+                    spellCheck
+                    value={draft.description}
+                    placeholder="What the design is. Without it, the description falls back to the supplier's words about the blank."
+                    onFocus={() => setActive(product.id)}
+                    onChange={(event) => edit(product.id, 'description', event.target.value)}
+                  />
+                </label>
+
+                <label className={styles.field}>
+                  <span className={styles.fieldName}>The story</span>
+                  <textarea
+                    className={`${styles.productText} ${styles.medium}`}
+                    spellCheck
+                    value={draft.story}
+                    placeholder="Where it came from. Its own section on the page; none at all if empty."
+                    onFocus={() => setActive(product.id)}
+                    onChange={(event) => edit(product.id, 'story', event.target.value)}
+                  />
+                </label>
+
+                <label className={styles.field}>
+                  <span className={styles.fieldName}>Fit and care</span>
+                  <textarea
+                    className={`${styles.productText} ${styles.short}`}
+                    spellCheck
+                    value={draft.care}
+                    placeholder="How it fits and how to wash it. Shown above the size guide."
+                    onFocus={() => setActive(product.id)}
+                    onChange={(event) => edit(product.id, 'care', event.target.value)}
+                  />
+                </label>
+
+                <label className={styles.field}>
+                  <span className={styles.fieldName}>Alt text</span>
+                  <input
+                    type="text"
+                    className={styles.line}
+                    spellCheck
+                    maxLength={250}
+                    value={draft.alt}
+                    placeholder={`What the art shows. Falls back to "${product.name}".`}
+                    onFocus={() => setActive(product.id)}
+                    onChange={(event) => edit(product.id, 'alt', event.target.value)}
+                  />
+                </label>
+
+                <p className={styles.meta}>
+                  {words} word{words === 1 ? '' : 's'}
+                  <span className={styles.sep}>·</span>
+                  {written.description.length} description paragraph
+                  {written.description.length === 1 ? '' : 's'}
+                  {written.story.length > 0 && (
+                    <>
                       <span className={styles.sep}>·</span>
-                      {paragraphs.length} paragraph{paragraphs.length === 1 ? '' : 's'}
-                    </p>
-
-                    {/* Every line break becomes a paragraph on save, single or
-                        double, so the splits are shown rather than left to be
-                        discovered on the live page. */}
-                    {paragraphs.length > 0 && (
-                      <ol className={styles.splits}>
-                        {paragraphs.map((paragraph, index) => (
-                          <li key={index}>
-                            <span className={styles.splitNumber}>{index + 1}</span>
-                            {paragraph}
-                          </li>
-                        ))}
-                      </ol>
-                    )}
-                  </>
-                )}
+                      {written.story.length} story paragraph{written.story.length === 1 ? '' : 's'}
+                    </>
+                  )}
+                </p>
               </article>
             );
           })}
@@ -563,17 +667,38 @@ export default function StoreCopyEditor({
                 </p>
 
                 <h3 className={styles.previewHead}>On the page</h3>
-                {paragraphsFor(current.id).length > 0 ? (
+                {copyFor(current.id).tagline && (
+                  <p className={styles.previewTagline}>{copyFor(current.id).tagline}</p>
+                )}
+                {copyFor(current.id).description.length > 0 ? (
                   <div className={styles.previewBody}>
-                    {paragraphsFor(current.id).map((paragraph, index) => (
+                    {copyFor(current.id).description.map((paragraph, index) => (
                       <p key={index}>{paragraph}</p>
                     ))}
                   </div>
                 ) : (
                   <p className={styles.previewEmpty}>
-                    No section at all — the product page shows the garment and the price, and nothing
-                    in your own words.
+                    No description — the product page shows the garment and the price, and nothing in
+                    your own words about the design.
                   </p>
+                )}
+                {copyFor(current.id).story.length > 0 && (
+                  <>
+                    <h3 className={styles.previewHead}>The story</h3>
+                    <div className={styles.previewBody}>
+                      {copyFor(current.id).story.map((paragraph, index) => (
+                        <p key={index}>{paragraph}</p>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {copyFor(current.id).care && (
+                  <>
+                    <h3 className={styles.previewHead}>Fit and care</h3>
+                    <div className={styles.previewBody}>
+                      <p>{copyFor(current.id).care}</p>
+                    </div>
+                  </>
                 )}
               </section>
 
@@ -582,19 +707,24 @@ export default function StoreCopyEditor({
                   kind: 'product',
                   title: `${current.name} — ${siteName}`,
                   description: descriptionFor(current),
-                  body: copy[current.id] ?? '',
+                  body: [
+                    copyFor(current.id).tagline,
+                    ...copyFor(current.id).description,
+                    ...copyFor(current.id).story,
+                    copyFor(current.id).care,
+                  ]
+                    .filter(Boolean)
+                    .join('\n\n'),
                   focus: current.name,
-                  // Alt text on a product page is generated from the name, so
-                  // it is never missing — reported honestly rather than
-                  // omitted, so the check is visibly passing instead of absent.
-                  images: current.images.map((image) => ({
-                    alt: `${current.name} — ${image.label}`,
-                  })),
+                  // The product image's alt is his alt text where written and
+                  // the name otherwise, so it is never missing — reported as
+                  // what the page will actually carry.
+                  images: [{ alt: copyFor(current.id).alt || current.name }],
                 }}
               />
             </>
           ) : (
-            <p className={styles.status}>Nothing synced yet, so there is nothing to preview.</p>
+            <p className={styles.status}>No products yet, so there is nothing to preview.</p>
           )}
         </aside>
       </div>

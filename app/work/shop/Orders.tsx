@@ -11,6 +11,9 @@ import styles from './orders.module.css';
 // a payment happened. Hence "Open" as the default view — received and paid,
 // the two that still want something from him — rather than everything.
 //
+// Personal details are blanked 30 days after an order is submitted — his
+// ruling, 2026-10-19 — so an old order shows what sold and not who bought it.
+//
 // Search and filtering are here rather than in SQL: one product and a fixed
 // payment link make this tens of rows, and the whole list is one request.
 
@@ -33,6 +36,8 @@ interface Order {
   paid_at: string | null;
   fulfilled_at: string | null;
   dismissed_at: string | null;
+  /** When the personal details were blanked: 30 days after submission. */
+  redacted_at: string | null;
 }
 
 type View = 'open' | Status | 'all';
@@ -233,7 +238,7 @@ export default function Orders() {
                   onClick={() => setOpen(expanded ? null : order.ref)}
                 >
                   <span className={styles.badge}>{LABEL[order.status]}</span>
-                  <span className={styles.who}>{order.name}</span>
+                  <span className={styles.who}>{order.redacted_at ? 'Details removed' : order.name}</span>
                   <span className={styles.what}>
                     {order.product || 'Unknown product'} · {order.size}
                     {order.price ? ` · ${order.price}` : ''}
@@ -246,20 +251,35 @@ export default function Orders() {
                     <dl className={styles.fields}>
                       <dt>Reference</dt>
                       <dd className={styles.ref}>{order.ref}</dd>
-                      <dt>Email</dt>
-                      <dd>
-                        <a href={`mailto:${order.email}?subject=${encodeURIComponent(`Your order ${order.ref}`)}`}>
-                          {order.email}
-                        </a>
-                      </dd>
+                      {order.redacted_at ? (
+                        <>
+                          <dt>Customer</dt>
+                          <dd className={styles.muted}>
+                            Removed {stamp(order.redacted_at)}, 30 days after the order.
+                          </dd>
+                        </>
+                      ) : (
+                        <>
+                          <dt>Email</dt>
+                          <dd>
+                            <a href={`mailto:${order.email}?subject=${encodeURIComponent(`Your order ${order.ref}`)}`}>
+                              {order.email}
+                            </a>
+                          </dd>
+                        </>
+                      )}
                       {order.phone && (
                         <>
                           <dt>Phone</dt>
                           <dd>{order.phone}</dd>
                         </>
                       )}
-                      <dt>Address</dt>
-                      <dd className={styles.address}>{order.address}</dd>
+                      {!order.redacted_at && (
+                        <>
+                          <dt>Address</dt>
+                          <dd className={styles.address}>{order.address}</dd>
+                        </>
+                      )}
                       {order.note && (
                         <>
                           <dt>Note</dt>
@@ -304,12 +324,14 @@ export default function Orders() {
                           {step.label}
                         </button>
                       ))}
-                      <button
-                        type="button"
-                        onClick={() => void copy(`${order.name}\n${order.address}`, 'Address')}
-                      >
-                        Copy address
-                      </button>
+                      {!order.redacted_at && (
+                        <button
+                          type="button"
+                          onClick={() => void copy(`${order.name}\n${order.address}`, 'Address')}
+                        >
+                          Copy address
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}

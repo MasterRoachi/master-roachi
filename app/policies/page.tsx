@@ -305,9 +305,11 @@ export default function PoliciesPage() {
             </p>
             <p>
               Order details are held in a Cloudflare database, the same
-              storage the rest of this site runs on, and are kept as the record
-              of the sale. Nobody but me can read them: the page that lists
-              them is behind a login. Email me and yours will be deleted.
+              storage the rest of this site runs on. Your name, email, phone
+              number and address are deleted automatically 30 days after the
+              order; what was bought, and when, is kept as the record of the
+              sale. Nobody but me can read them: the page that lists them is
+              behind a login. Email me to have yours deleted sooner.
             </p>
             <p>
               Payment card details are entered on{' '}

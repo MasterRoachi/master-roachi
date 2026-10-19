@@ -171,14 +171,15 @@ interface Env {
 const VOTE_TTL = 60 * 60 * 24 * 180;
 
 /**
- * How long an order written to the KV FALLBACK is kept.
+ * How long an order's personal details are kept: 30 days from submission.
  *
- * Only a fallback now: the record is the row in D1, and the KV copy only has
- * to survive until /work/api/orders next sweeps it across. Six months is
- * kept anyway, so an order written while D1 was down for a long time is not
- * lost before anyone looks.
+ * His ruling, 2026-10-19. After this the name, email, phone, address and note
+ * are blanked in D1 (redactOrders), and the KV fallback copy expires on the
+ * same clock — a fallback must not outlive the record it stands in for.
+ * Stated on /policies/ under Privacy, which has to stay true.
  */
-const ORDER_TTL = 60 * 60 * 24 * 180;
+const ORDER_RETENTION_DAYS = 30;
+const ORDER_TTL = 60 * 60 * 24 * ORDER_RETENTION_DAYS;
 
 /** What an order can be marked. See migrations/0015_orders.sql. */
 const ORDER_STATUSES = ['received', 'paid', 'fulfilled', 'dismissed'] as const;
@@ -223,6 +224,25 @@ function insertOrder(db: D1Database, order: OrderRecord) {
       order.address,
       order.note,
     );
+}
+
+/**
+ * Blank the personal details of every order older than the retention window.
+ *
+ * Keeps the sale — product, size, price, status and its dates — and stamps
+ * redacted_at so the page can say why the name is empty. Idempotent: an
+ * order already redacted is left alone.
+ */
+async function redactOrders(db: D1Database, now: Date = new Date()): Promise<void> {
+  const cutoff = new Date(now.getTime() - ORDER_RETENTION_DAYS * 86_400_000).toISOString();
+  await db
+    .prepare(
+      `update orders
+          set name = '', email = '', phone = '', address = '', note = '', redacted_at = ?2
+        where redacted_at is null and created_at < ?1`,
+    )
+    .bind(cutoff, now.toISOString())
+    .run();
 }
 
 /**
@@ -1323,13 +1343,18 @@ export default {
               sweepFailed = true;
             }
           }
+          // The cron does this daily; doing it here too means the page never
+          // shows details that are due to be gone, whatever the cron did.
+          // After the sweep, so a stale KV order is redacted on arrival.
+          await redactOrders(db);
 
           // All of them. One product and a fixed-sum link make this tens of
           // rows, not thousands, so search and filtering happen on the page.
           const orders = await db
             .prepare(
               `select id, ref, created_at, product, product_id, size, price, name,
-                      email, phone, address, note, status, paid_at, fulfilled_at, dismissed_at
+                      email, phone, address, note, status, paid_at, fulfilled_at, dismissed_at,
+                      redacted_at
                from orders order by created_at desc, id desc`,
             )
             .all();
@@ -1371,7 +1396,8 @@ export default {
             const order = await db
               .prepare(
                 `select id, ref, created_at, product, product_id, size, price, name,
-                        email, phone, address, note, status, paid_at, fulfilled_at, dismissed_at
+                        email, phone, address, note, status, paid_at, fulfilled_at, dismissed_at,
+                        redacted_at
                  from orders where ref = ?1`,
               )
               .bind(ref)
@@ -2718,6 +2744,13 @@ export default {
    * blamed on anything but the time zone.
    */
   async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    // Order retention, on its own so a missing GITHUB_TOKEN below does not
+    // stop it. A failure is retried tomorrow and by the next read of the page.
+    if (env.DB) {
+      const db = env.DB;
+      ctx.waitUntil(redactOrders(db).catch(() => undefined));
+    }
+
     ctx.waitUntil(
       (async () => {
         const token = env.GITHUB_TOKEN;
