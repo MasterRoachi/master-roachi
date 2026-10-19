@@ -95,11 +95,21 @@ It then installs OpenNext, rewrites the project config, and fails looking for
 edits happen inside the throwaway build container, so the repository is
 unharmed, but the deploy fails every time.
 
-### Cloudflare's own Git connection is not the deploy path
+### Cloudflare's own Git connection is disconnected
 
-`deploy.yml` is. The dashboard's **Workers & Pages → Connect to Git** was once
-described here as the deploy path and never fired. If it is ever connected, it
-and the workflow would both deploy every push — disconnect one.
+`deploy.yml` is the deploy path. Cloudflare's **Workers Builds** connection
+turned out to be live after all: on 2026-10-19 every push carried a "Workers
+Builds: master-roachi" check beside the Action, so each push deployed twice —
+and Workers Builds deploys without applying migrations first, so new code
+could go live ahead of the column it reads. He disconnected it the same day.
+If it is ever reconnected, the two will both deploy every push again.
+
+**What the build fetches is all committed**, so nothing is lost with it:
+`play-data.yml` refreshes `data/steam.json`, `data/retro.json` and, since
+2026-10-19, the achievement grids (`data/achievements/`,
+`public/achievements/`) nightly and commits them; `data/store.json` comes by
+Sync Printful; `data/shared-games.json` is hand-kept. A Cloudflare build that
+had the keys refreshed these for that one deploy and committed nothing.
 
 `wrangler.jsonc` declares `./out/`, and that is what governs. Routing is
 declared there too, deliberately: **a deploy overwrites the dashboard**, which
