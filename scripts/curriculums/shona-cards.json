@@ -1,0 +1,537 @@
+{
+ "High and low tone": [
+  {
+   "kind": "word",
+   "front": "mbira",
+   "back": "rock-rabbit, dassie (high–low) · the hand-xylophone (low–low)",
+   "reading": "mbíra · mbira",
+   "extra": "Carter, Lesson I. The same letters, two words, by tone."
+  },
+  {
+   "kind": "word",
+   "front": "nhanga",
+   "back": "pumpkin (high–high) · yard (low–high)",
+   "reading": "nhanga",
+   "extra": "FSI Unit 1, Note 2. Tone alone separates them."
+  },
+  {
+   "kind": "word",
+   "front": "kuchera",
+   "back": "to dig · to draw [water] — by tone",
+   "reading": "kuchera",
+   "extra": "FSI Unit 1, Note 2. Carter: chérá! draw water! · cherá! dig!"
+  },
+  {
+   "kind": "word",
+   "front": "gúrú",
+   "back": "big",
+   "reading": "gúrú",
+   "extra": "Carter, Lesson I. Compare gurú, an animal's stomach, and guru, a burrow."
+  }
+ ],
+ "The w-sounds: ngw, mw, pw": [
+  {
+   "kind": "word",
+   "front": "vapwere",
+   "back": "children",
+   "reading": "vapwéré",
+   "extra": "FSI Unit 1. pw has a k-like or scraping element — not an English w."
+  }
+ ],
+ "The whistled sounds: zv and sv": [
+  {
+   "kind": "word",
+   "front": "zvakanaka",
+   "back": "well, fine (adverb)",
+   "reading": "zvakánáka",
+   "extra": "FSI Unit 1. zv: z with the lips nearly closed (FSI) — or, by Carter, the tongue curled back."
+  },
+  {
+   "kind": "word",
+   "front": "zvakanaka kwazvo",
+   "back": "very good!",
+   "reading": "Zvákánáka kwázvo",
+   "extra": "Carter, Lesson I. Zvákánáka alone: good!"
+  }
+ ],
+ "The heavy h, and mh and nh": [
+  {
+   "kind": "word",
+   "front": "mhuri",
+   "back": "family",
+   "reading": "mhuri",
+   "extra": "FSI Unit 2. mh = m + the voiced, low h. Class 9/10."
+  }
+ ],
+ "Good morning": [
+  {
+   "kind": "word",
+   "front": "mangwanani",
+   "back": "good morning",
+   "reading": "mangwánaní",
+   "extra": "FSI Unit 1 · Carter: Mangwánaní-i."
+  },
+  {
+   "kind": "word",
+   "front": "baba",
+   "back": "father; sir",
+   "reading": "babá",
+   "extra": "FSI Unit 1 · Carter."
+  },
+  {
+   "kind": "word",
+   "front": "mai",
+   "back": "mother; madam",
+   "reading": "mái",
+   "extra": "FSI Unit 1."
+  },
+  {
+   "kind": "word",
+   "front": "here?",
+   "back": "the yes/no question marker",
+   "reading": "heré?",
+   "extra": "FSI and Carter. Not English \"here\": it makes a statement a question."
+  },
+  {
+   "kind": "sentence",
+   "front": "Marara here?",
+   "back": "Did you sleep [well]? (the morning greeting)",
+   "reading": "Marárá heré-e? (Carter) · Mẉarárá heré? (FSI)",
+   "extra": "The standard drops the w FSI dots."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndarara zvangu.",
+   "back": "I slept fine.",
+   "reading": "Ndarára zvángù",
+   "extra": "FSI Unit 1. Carter answers with we: Áiwá, tarárà zvédú."
+  }
+ ],
+ "Asking after the children": [
+  {
+   "kind": "word",
+   "front": "senyi",
+   "back": "how (FSI's form)",
+   "reading": "sẹ́nyi",
+   "extra": "FSI Units 1–3. The dot under the n: some speakers leave it out."
+  },
+  {
+   "kind": "sentence",
+   "front": "Varara senyi vapwere?",
+   "back": "How did the children sleep?",
+   "reading": "Várǎrà sẹ́nyi vapwéré?",
+   "extra": "FSI Unit 1. ǎ: low in the central reading."
+  },
+  {
+   "kind": "sentence",
+   "front": "Varara zvavo zvakanaka.",
+   "back": "They slept well.",
+   "reading": "Várǎrà zvávó zvakánáka.",
+   "extra": "FSI Unit 1."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mhuri yarara zvakanaka here?",
+   "back": "How did the family sleep?",
+   "reading": "Mhurì yárǎrǎ zvakánáka heré?",
+   "extra": "FSI Unit 2. ya-, not va-: mhuri is class 9."
+  }
+ ],
+ "Forms of address": [
+  {
+   "kind": "word",
+   "front": "shewe",
+   "back": "a courteous form of address used by women",
+   "reading": "shéwe",
+   "extra": "FSI Unit 2."
+  },
+  {
+   "kind": "word",
+   "front": "chirombowe",
+   "back": "a courteous form of address used by men",
+   "reading": "chirombówe",
+   "extra": "FSI Unit 2. Raised to chīrombówe after a high tone."
+  },
+  {
+   "kind": "word",
+   "front": "aiwa",
+   "back": "a courteous opener: diffidence or dissent",
+   "reading": "áiwá",
+   "extra": "FSI Unit 2 · Carter: Áiwá. It begins a polite answer."
+  },
+  {
+   "kind": "word",
+   "front": "zvitambo",
+   "back": "fit, having life — \"very well\"",
+   "reading": "zvitámbó",
+   "extra": "FSI Unit 2. Áiwá zvitámbó: oh, very well indeed."
+  },
+  {
+   "kind": "word",
+   "front": "mwana",
+   "back": "child, offspring",
+   "reading": "mwaná",
+   "extra": "FSI Unit 4. Class 1/2. mwanángu: my child."
+  }
+ ],
+ "I slept, you slept, they slept": [
+  {
+   "kind": "grammar",
+   "front": "nd- / w- / (w-) · t- / mw- / v-",
+   "back": "subject prefixes, past tense: I / you / he·she · we / you (pl.) / they",
+   "reading": "1st and 2nd low; 3rd high",
+   "extra": "FSI Unit 2, Note 3. ndarárá I slept · warárá you slept · tarárá we slept · mwarárá you (pl.) slept · várǎrǎ they slept."
+  },
+  {
+   "kind": "word",
+   "front": "-rara",
+   "back": "to sleep (stem)",
+   "reading": "-rárá",
+   "extra": "FSI Unit 2. A high verb."
+  },
+  {
+   "kind": "sentence",
+   "front": "Tarara zvakanaka.",
+   "back": "We slept well.",
+   "reading": "Tarárá zvakánáka.",
+   "extra": "FSI Unit 2 drill."
+  }
+ ],
+ "Saying it gently: zvangu, zvavo, zvayo": [
+  {
+   "kind": "word",
+   "front": "zvangu",
+   "back": "\"as for me\" — makes an answer gentle or respectful",
+   "reading": "zvángu",
+   "extra": "FSI Unit 2, Note 4. Manyika: h- instead of zv-."
+  },
+  {
+   "kind": "word",
+   "front": "zvavo",
+   "back": "\"as for them\" (people, class 2)",
+   "reading": "zvávó",
+   "extra": "FSI Unit 2."
+  },
+  {
+   "kind": "word",
+   "front": "zvedu",
+   "back": "\"as for us\"",
+   "reading": "zvédú",
+   "extra": "Carter, Lesson I: Áiwá, tarárà zvédú."
+  }
+ ],
+ "Concord: the first look": [
+  {
+   "kind": "grammar",
+   "front": "concord",
+   "back": "the words around a noun take the form of its class",
+   "reading": null,
+   "extra": "FSI Unit 2, Note 5: Vapwéré várǎrǎ zvávó · Mhurì yárǎrǎ zváyo."
+  },
+  {
+   "kind": "sentence",
+   "front": "Vapwere varara zvavo.",
+   "back": "The children slept.",
+   "reading": "Vapwéré várǎrǎ` zvávó.",
+   "extra": "FSI Unit 2. va- agrees with vapwere."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mhuri yarara zvayo.",
+   "back": "The family slept.",
+   "reading": "Mhurì yárǎrǎ` zváyo.",
+   "extra": "FSI Unit 2. ya- and zvayo agree with mhuri (class 9)."
+  }
+ ],
+ "Good afternoon: spending the day": [
+  {
+   "kind": "word",
+   "front": "masikati",
+   "back": "good afternoon, good (mid-)day",
+   "reading": "masíkatí",
+   "extra": "FSI Unit 3 · Carter: Masíkatí-i."
+  },
+  {
+   "kind": "word",
+   "front": "manheru",
+   "back": "good evening",
+   "reading": "manherú",
+   "extra": "Carter, Lesson I."
+  },
+  {
+   "kind": "word",
+   "front": "muzvare",
+   "back": "an unmarried girl over 12; \"Miss\"",
+   "reading": "muzváré",
+   "extra": "FSI Units 3–4. Plural vazváré."
+  },
+  {
+   "kind": "word",
+   "front": "-swera",
+   "back": "to spend the day (stem)",
+   "reading": "-swera",
+   "extra": "FSI Unit 3. A low verb."
+  },
+  {
+   "kind": "sentence",
+   "front": "Maswera here?",
+   "back": "Have you spent the day well? (the midday greeting)",
+   "reading": "Maswérá heré-e? (Carter) · Mẉaswéra heré? (FSI)",
+   "extra": "Carter, Lesson I."
+  },
+  {
+   "kind": "sentence",
+   "front": "Vaswera zvavo zvirinane.",
+   "back": "He is better. ('He spent the day better.')",
+   "reading": "Váswéra zvávó zvirínáne.",
+   "extra": "FSI Unit 3."
+  }
+ ],
+ "High verbs and low verbs": [
+  {
+   "kind": "grammar",
+   "front": "high verbs · low verbs",
+   "back": "about half of Shona verbs follow one tone pattern (like -rara), almost all the rest another (like -swera)",
+   "reading": null,
+   "extra": "FSI Unit 3, Note 1. Learn which with every verb."
+  },
+  {
+   "kind": "word",
+   "front": "kurara",
+   "back": "to sleep (high verb)",
+   "reading": "kurárá",
+   "extra": "FSI Unit 3."
+  },
+  {
+   "kind": "word",
+   "front": "kuswera",
+   "back": "to spend the day (low verb)",
+   "reading": "kuswera",
+   "extra": "FSI Unit 3."
+  },
+  {
+   "kind": "word",
+   "front": "zvirinane",
+   "back": "better",
+   "reading": "zvirínáne",
+   "extra": "FSI Unit 3."
+  }
+ ],
+ "\"If you also\": the polite return": [
+  {
+   "kind": "sentence",
+   "front": "Taswera zvedu kana maswerao.",
+   "back": "We spent the day well, if you did too. ('Fine, and you?')",
+   "reading": "Áiwá, taswérà zvédú kana másweráo",
+   "extra": "Carter, Lesson I. FSI's version: Ndaswéra zvángu kana mẉásweráwo. -wo / -o: also."
+  }
+ ],
+ "The plural of respect": [
+  {
+   "kind": "grammar",
+   "front": "respect plural",
+   "back": "the 2nd and 3rd person plural used for one person, as respect",
+   "reading": null,
+   "extra": "FSI Unit 3, Note 3. Babá váswéra sényi? — va-, plural, for one father."
+  }
+ ],
+ "Sons, daughters, girls and boys": [
+  {
+   "kind": "word",
+   "front": "mukunda",
+   "back": "daughter",
+   "reading": "mukúnda",
+   "extra": "FSI Unit 4. Class 1/2: plural vakúnda."
+  },
+  {
+   "kind": "word",
+   "front": "mukorore",
+   "back": "son",
+   "reading": "mukóróre",
+   "extra": "FSI Unit 4. Plural vakóróre."
+  },
+  {
+   "kind": "word",
+   "front": "mhandara",
+   "back": "a girl of 14 or more (honorific)",
+   "reading": "mhandara",
+   "extra": "FSI Unit 4. Plural the same."
+  },
+  {
+   "kind": "word",
+   "front": "mujaha",
+   "back": "a boy of 14 or more",
+   "reading": "mujahá",
+   "extra": "FSI Unit 4. Plural majahá."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mupenyu zvake.",
+   "back": "She/he is all right. ('a living [thing]')",
+   "reading": "Múpenyú zváké",
+   "extra": "FSI Unit 4."
+  }
+ ],
+ "Noun classes: the table": [
+  {
+   "kind": "grammar",
+   "front": "mu- · va-",
+   "back": "noun classes 1 · 2: people (singular · plural)",
+   "reading": null,
+   "extra": "FSI Unit 4. mukóróre · vakóróre; mwaná · vana."
+  },
+  {
+   "kind": "grammar",
+   "front": "mu- · mi-",
+   "back": "noun classes 3 · 4",
+   "reading": null,
+   "extra": "FSI Unit 4."
+  },
+  {
+   "kind": "grammar",
+   "front": "(none) · ma-",
+   "back": "noun classes 5 · 6",
+   "reading": null,
+   "extra": "FSI Unit 4. mujahá (1) · majahá (6) uses 6 as its plural."
+  },
+  {
+   "kind": "grammar",
+   "front": "chi- · zvi-",
+   "back": "noun classes 7 · 8",
+   "reading": null,
+   "extra": "FSI Unit 4."
+  },
+  {
+   "kind": "grammar",
+   "front": "(nasal) · (same)",
+   "back": "noun classes 9 · 10: singular and plural alike",
+   "reading": null,
+   "extra": "FSI Unit 4. mhuri, mhandara."
+  }
+ ],
+ "Which \"they slept\"?": [
+  {
+   "kind": "grammar",
+   "front": "wa- · ya-",
+   "back": "\"he/she\" past-tense subject prefix: class 1 · class 9",
+   "reading": null,
+   "extra": "FSI Unit 4, Note 2. Mukúnda wárǎrǎ · Mhandara yárǎrǎ."
+  },
+  {
+   "kind": "grammar",
+   "front": "va- · dza- · a-",
+   "back": "\"they\": class 2 · class 10 · class 6",
+   "reading": null,
+   "extra": "FSI Unit 4, Note 2. vakúnda várǎrǎ · mhandara dzárǎrǎ · majahá árǎrǎ."
+  }
+ ],
+ "The pro-verbs: how, like that, like this": [
+  {
+   "kind": "word",
+   "front": "-dini",
+   "back": "to do or say what or how (pro-verb)",
+   "reading": "-díni",
+   "extra": "FSI Unit 4, Note 3. Ask your partner for their form of \"how are you?\"."
+  },
+  {
+   "kind": "word",
+   "front": "-daro",
+   "back": "to do or say like that (pro-verb)",
+   "reading": "-dáro",
+   "extra": "FSI Unit 4, Note 3."
+  },
+  {
+   "kind": "word",
+   "front": "-dai",
+   "back": "to do or say like this (pro-verb)",
+   "reading": "-dái",
+   "extra": "FSI Unit 4, Note 3."
+  },
+  {
+   "kind": "sentence",
+   "front": "Makadini?",
+   "back": "How are you? (pl. or respectful)",
+   "reading": "Mẉakádiní?",
+   "extra": "FSI Unit 4. Reply: Áiwá, kana mẉákadíniwó."
+  },
+  {
+   "kind": "sentence",
+   "front": "Wakadini?",
+   "back": "How are you? (to one person, plainly)",
+   "reading": "Wakádiní?",
+   "extra": "FSI Unit 4. Reply: Áiwá, kana wákadíniwó."
+  }
+ ],
+ "Leaving, thanks, and getting by": [
+  {
+   "kind": "word",
+   "front": "chisarai",
+   "back": "goodbye (said by the one leaving: \"stay behind\")",
+   "reading": "Chísaraí",
+   "extra": "Carter, Lesson I."
+  },
+  {
+   "kind": "word",
+   "front": "fambai zvenyu zvakanaka",
+   "back": "have a good journey (said to the one leaving)",
+   "reading": "Fámbáí zvényú zvakánáka",
+   "extra": "Carter, Lesson I."
+  },
+  {
+   "kind": "word",
+   "front": "ava mangwana",
+   "back": "see you tomorrow",
+   "reading": "Ává mangwáná",
+   "extra": "Carter, Lesson I. Lit. it has become tomorrow."
+  },
+  {
+   "kind": "word",
+   "front": "mazviita",
+   "back": "thank you",
+   "reading": "Mazvíítá",
+   "extra": "Carter, Lesson I."
+  },
+  {
+   "kind": "word",
+   "front": "ndapota",
+   "back": "please",
+   "reading": "Ndapóta",
+   "extra": "Carter, Lesson I."
+  },
+  {
+   "kind": "word",
+   "front": "ndine urombo",
+   "back": "I'm sorry",
+   "reading": "Ndiné úrombó",
+   "extra": "Carter, Lesson I. Lit. I have poverty. ú underlined in Carter: a raised low."
+  },
+  {
+   "kind": "word",
+   "front": "hongu",
+   "back": "yes",
+   "reading": "Hóngu",
+   "extra": "Carter, Lesson I. Also Eé."
+  },
+  {
+   "kind": "word",
+   "front": "kwete",
+   "back": "no",
+   "reading": "Kwéte",
+   "extra": "Carter, Lesson I."
+  },
+  {
+   "kind": "word",
+   "front": "hamheno",
+   "back": "I don't know",
+   "reading": "Hamhénó",
+   "extra": "Carter, Lesson I."
+  },
+  {
+   "kind": "word",
+   "front": "handina kunzwa",
+   "back": "I didn't understand",
+   "reading": "Handíná kunzwá",
+   "extra": "Carter, Lesson I."
+  }
+ ]
+}

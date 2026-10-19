@@ -438,10 +438,15 @@ at the back of each deck is for.
 
 ### Curriculums
 
-Eight with scripts in `scripts/curriculums/` — and **thirteen in live D1**
-(checked 2026-10-19): Zulu, Shona, Theology, Philosophy and History exist there
-with no script, so a rebuild cannot recreate them and they have no
-curriculum-level sources. **2,142 lessons, 2,005 carrying detail** as
+Nine with scripts in `scripts/curriculums/`, **thirteen in live D1**
+(checked 2026-10-19). **Shona** got its script on 2026-10-19 — his choice of
+the five empty ones to build first, from zero, Standard Shona with dialects
+named where met, and a speaking partner — and has Stage 1 written (28 lessons,
+71 cards), every form and tone read from the FSI and Carter page images; see
+`scripts/curriculums/shona.md`. **Zulu, Theology, Philosophy and History** are
+still names with nothing in them and no script. His scope for the three
+subjects: Orthodox theology, the Western philosophical canon, a world history
+survey; Zulu from zero. **2,142 lessons, 2,005 carrying detail** as
 of 2026-10-15 — 694 and 341 before the rewrites. Odin is the only one without
 detail, and that is deliberate: see below. In order, because **the order of the
 curriculums is the route through all of them**:
