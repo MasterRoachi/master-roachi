@@ -76,6 +76,16 @@ execFileSync(
 );
 const payfast = await import(pathToFileURL(payfastBundle).href);
 
+// The body as sections: the promise is that an untouched body saves as the
+// identical string, so it is tested against every real body in the repo.
+const sectionsBundle = path.join(os.tmpdir(), 'master-roachi-sections-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/body-sections.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${sectionsBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const bodySections = await import(pathToFileURL(sectionsBundle).href);
+
 // Reading a lesson's blocks, which is the ceiling on what a lesson can teach
 // now that the material itself lives in `detail`. Silent when wrong: a fence
 // misread does not throw, it shows a program as one run-together line, which
@@ -5750,6 +5760,38 @@ globalThis.fetch = preGh;
   check('empty fields are left out', !signed.some(([key]) => key === 'cancel_url'), JSON.stringify(signed.map(([k]) => k)));
 }
 
+// --- the body as sections ----------------------------------------------------
+{
+  const bodies = ['content/projects', 'content/writing'].flatMap((dir) =>
+    fs.readdirSync(dir).filter((f) => f.endsWith('.mdx')).map((f) => {
+      const text = fs.readFileSync(`${dir}/${f}`, 'utf8');
+      return { f, body: text.slice(text.indexOf('\n---', 3) + 4) };
+    }),
+  );
+  const broken = bodies.filter(({ body }) => bodySections.joinSections(bodySections.splitSections(body)) !== body);
+  check(`every real body round-trips exactly (${bodies.length})`, bodies.length > 5 && broken.length === 0, broken.map((b) => b.f).join(', '));
+
+  const split = bodySections.splitSections('Intro.\n\n## One\n\nA\n\n### Sub\n\nB\n\n## Two\n\nC\n');
+  check(
+    'an opening, then a section per ## heading, with ### kept inside',
+    split.opening === 'Intro.\n\n' && split.sections.length === 2 && split.sections[0].heading === 'One' &&
+      split.sections[0].text.includes('### Sub'),
+    JSON.stringify(split),
+  );
+  check(
+    'a section shows without the heading line\'s break, and saves with it',
+    bodySections.withBreak(bodySections.shownText(split.sections[1].text)) === split.sections[1].text,
+    JSON.stringify(split.sections[1].text),
+  );
+  const edited = { ...split, sections: [{ ...split.sections[0], text: '\n\nno break at the end' }, split.sections[1]] };
+  check(
+    'a heading after an edited section still starts its own line',
+    bodySections.joinSections(edited).includes('no break at the end\n## Two'),
+    JSON.stringify(bodySections.joinSections(edited)),
+  );
+  check('a body with no headings is all opening', bodySections.splitSections('Just text.\n').sections.length === 0, '');
+}
+
 // --- product copy ------------------------------------------------------------
 {
   const legacy = productCopy.readCopy(['  One.  ', '', 'Two.']);
@@ -5801,6 +5843,7 @@ fs.rmSync(habitsBundle, { force: true });
 fs.rmSync(dbBundle, { force: true });
 fs.rmSync(productCopyBundle, { force: true });
 fs.rmSync(payfastBundle, { force: true });
+fs.rmSync(sectionsBundle, { force: true });
 fs.rmSync(iconBundle, { force: true });
 fs.rmSync(spineBundle, { force: true });
 fs.rmSync(postBundle, { force: true });

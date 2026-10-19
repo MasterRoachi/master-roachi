@@ -29,6 +29,8 @@ export default function Page() {
         seo
         prose
         orderable
+        sections
+        previewBase="/projects/"
         siteName={site.name}
         art={{ collection: 'project-art', dir: 'public/projects' }}
       />

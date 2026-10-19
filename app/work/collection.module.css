@@ -1,133 +1,224 @@
-/* The collection editor: list, fields and body, and what it will look like.
-   Tokens from app/globals.css. */
+/* The collection editor — Projects and Writing — in the language of Habits,
+   Reading and the Shop since Stage 2 (2026-10-19): a round + for a new entry,
+   one shut card per entry that opens to the width of the column, gold only
+   for what would be flagged, and inside an open card the fields and body
+   beside what the page will say. Tokens from app/globals.css. */
 
-.layout {
-  display: grid;
-  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr) minmax(300px, 370px);
-  gap: 1.75rem;
-  margin: 1.5rem 0 4rem;
-  align-items: start;
+.page {
+  margin: 2rem auto 4rem;
 }
 
-/* Three columns need a wide screen; two is the sensible middle, and one is
-   what a phone can actually use. */
-@media (max-width: 1200px) {
-  .layout {
-    grid-template-columns: minmax(160px, 210px) minmax(0, 1fr);
-  }
+/* --- a new entry, and the grid's order --------------------------------- */
 
-  .aside {
-    grid-column: 1 / -1;
-  }
+.addSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
 }
 
-@media (max-width: 760px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.list ul {
-  list-style: none;
-  margin: 0.75rem 0 0;
+.addToggle,
+.addToggleOn {
+  width: 2.4rem;
+  height: 2.4rem;
   padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
   display: grid;
-  gap: 0.2rem;
-}
-
-.list li {
-  border-radius: 6px;
-}
-
-.list button {
-  display: grid;
-  gap: 0.15rem;
-  width: 100%;
-  background: none;
-  border: 0;
-  border-radius: 6px;
-  padding: 0.4rem 0.45rem;
-  color: var(--muted);
-  font: inherit;
-  text-align: left;
+  place-items: center;
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.list button:hover {
-  background: var(--bg-raised);
-  color: var(--ink);
+.addToggle svg,
+.addToggleOn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: transform 0.18s ease, stroke 0.15s ease;
 }
 
-.current {
-  background: var(--bg-raised);
-  color: var(--ink) !important;
-  box-shadow: inset 2px 0 0 var(--accent);
+.addToggle:hover {
+  border-color: var(--line-bright);
 }
 
-.entryTitle {
-  display: block;
-  font-size: 0.9375rem;
-  line-height: 1.3;
+.addToggle:hover svg {
+  stroke: var(--ink);
 }
 
-.entryMeta {
+.addToggleOn {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.addToggleOn svg {
+  stroke: var(--accent);
+  transform: rotate(45deg);
+}
+
+.orderBar {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
   color: var(--muted);
 }
 
-/* The status reads at a glance, which is the reason the list is not
-   alphabetical any more. */
-.entryMeta [data-status='parked'],
-.entryMeta [data-status='concept'] {
-  color: oklch(70% 0.02 260);
-}
-
-.entryMeta [data-status='building'],
-.entryMeta [data-status='ongoing'] {
-  color: oklch(82% 0.16 85);
-}
-
-.entryMeta [data-status='released'] {
-  color: oklch(78% 0.15 150);
-}
-
-.draggingRow {
-  opacity: 0.5;
-}
-
-.listNote {
-  margin: 0.75rem 0 0;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  color: var(--muted);
-}
-
-.listNote button,
-.new {
-  display: block;
-  width: 100%;
-  margin-top: 0.4rem;
+.orderBar button {
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 999px;
   color: var(--ink);
-  padding: 0.4rem 0.6rem;
+  padding: 0.35rem 0.95rem;
   font: inherit;
   font-size: 0.8125rem;
   cursor: pointer;
 }
 
-.listNote button:hover,
-.new:hover {
+/* --- one card per entry -------------------------------------------------- */
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card,
+.cardOpen {
+  width: 100%;
+  margin: 0 auto 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+  transition: max-width 0.18s ease, border-color 0.15s ease;
+}
+
+.card {
+  max-width: 36rem;
+  overflow: hidden;
+}
+
+.cardOpen {
+  max-width: 100%;
+  border-color: var(--line-bright);
+}
+
+.card[data-waiting],
+.cardOpen[data-waiting] {
   border-color: var(--accent);
 }
 
-.main {
+.cardHeadRow {
+  display: flex;
+  align-items: center;
+}
+
+.cardHead {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'name state'
+    'facts facts';
+  align-items: baseline;
+  gap: 0.2rem 1rem;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  padding: 0.8rem 1.1rem;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cardHead:hover .cardName {
+  color: var(--accent);
+}
+
+.cardName {
+  grid-area: name;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cardFacts {
+  grid-area: facts;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cardState {
+  grid-area: state;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-waiting] .cardState {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.move {
+  display: flex;
+  gap: 0.25rem;
+  padding-right: 0.8rem;
+}
+
+.move button {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  width: 1.9rem;
+  height: 1.9rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.move button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.move button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Open: the fields and body on the left, the previews on the right. Below a
+   tablet, two columns means neither is usable. */
+.cardBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 370px);
+  gap: 2rem;
+  align-items: start;
+  padding: 0.25rem 1.1rem 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.cardBodyPlain {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+  .cardBody {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cardMain {
   min-width: 0;
 }
 
@@ -462,18 +553,17 @@
   margin: 1rem 0;
 }
 
-/* The right-hand column. */
+/* The column beside the fields: what the page will say, and how it scores. */
 .aside {
   display: grid;
   gap: 1rem;
   position: sticky;
-  top: 1.5rem;
+  top: 1rem;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 900px) {
   .aside {
     position: static;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 
@@ -568,19 +658,6 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   margin-bottom: 0.6rem;
-}
-
-/* No preview column — Writing, until its own turn comes. Without this the
-   third track still takes its share and the body column is squeezed for a
-   column that is not there. */
-.layoutPlain {
-  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr);
-}
-
-@media (max-width: 760px) {
-  .layoutPlain {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* A notice, not a warning: nothing is wrong, something is about to happen. */
@@ -720,4 +797,156 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   margin-bottom: 0.5rem;
+}
+
+/* Save is gold while there is something to save, and only then. */
+.barButtons button.save:not(:disabled),
+.orderBar button.save:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+/* --- the body, as its opening and sections -------------------------------- */
+
+.bodyHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5rem 0 0.4rem;
+}
+
+.bodyHead .bodyLabel {
+  margin: 0;
+}
+
+.quietLink {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.quietLink:hover {
+  color: var(--ink);
+}
+
+.sections {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.sectionCard {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.sectionLabel {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sectionHeadRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sectionHash {
+  color: var(--muted);
+  font-family: ui-monospace, monospace;
+  font-size: 0.875rem;
+}
+
+.sectionHeading {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  font-weight: 600;
+}
+
+.sectionHeading:focus,
+.sectionText:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sectionTools {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.sectionTools button {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  width: 1.8rem;
+  height: 1.8rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.sectionTools button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.sectionTools button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.sectionText {
+  width: 100%;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.sectionInsert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.sectionInsert select {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  padding: 0.25rem 0.4rem;
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.sections .addSection {
+  margin: 0.3rem 0 0;
 }

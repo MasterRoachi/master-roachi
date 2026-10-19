@@ -13,6 +13,7 @@ import {
   type ProductCopy,
 } from '@/lib/product-copy';
 import PagePreview from './PagePreview';
+import { PREVIEW_MESSAGE } from '@/components/LiveCopy';
 import styles from './store.module.css';
 
 // A box per product, rather than the raw JSON.
@@ -779,7 +780,8 @@ export default function StoreCopyEditor({
           <PagePreview
             href={product.href}
             name={product.name}
-            copy={copyFor(product.id)}
+            type={PREVIEW_MESSAGE}
+            payload={copyFor(product.id)}
             onClose={() => setPreviewing(null)}
           />
         ) : null;

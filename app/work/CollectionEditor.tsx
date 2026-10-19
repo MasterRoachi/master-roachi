@@ -15,6 +15,17 @@ import {
   type SplitFile,
 } from '@/lib/frontmatter';
 import { isOklch } from '@/lib/oklch';
+import { ENTRY_PREVIEW } from '@/components/LiveEntry';
+import {
+  joinSections,
+  newSection,
+  shownText,
+  splitBlock,
+  splitSections,
+  withBreak,
+  type Sections,
+} from '@/lib/body-sections';
+import PagePreview from './shop/PagePreview';
 import ProsePanel from './ProsePanel';
 import FrontmatterFields from './FrontmatterFields';
 import styles from './collection.module.css';
@@ -64,6 +75,8 @@ export default function CollectionEditor({
   orderable,
   projects,
   prose,
+  sections: bodySections,
+  previewBase,
 }: {
   collection: string;
   noun: string;
@@ -78,12 +91,19 @@ export default function CollectionEditor({
    * would have been a third branch in here instead of a line at the call site.
    */
   art?: { collection: string; dir: string };
-  /** Whether the list sets the public order by dragging. Projects only. */
+  /** Whether the cards set the public order, by ↑ and ↓. Projects only. */
   orderable?: boolean;
   /** Real project slugs, for a post pointing at one. */
   projects?: readonly string[];
   /** Run the style and grammar checks on the body. Prose collections. */
   prose?: boolean;
+  /**
+   * Edit the body as an opening and its `## ` sections (lib/body-sections.ts),
+   * with the whole text one toggle away. Projects, since Stage 2.
+   */
+  sections?: boolean;
+  /** Where an entry's live page is, for Preview the page: '/projects/'. */
+  previewBase?: string;
 }) {
   const [entries, setEntries] = useState<Entry[] | null>(null);
   const [configured, setConfigured] = useState(true);
@@ -97,8 +117,11 @@ export default function CollectionEditor({
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
+  /** The body as one text rather than as sections, where sections are on. */
+  const [rawBody, setRawBody] = useState(false);
+  /** Whether the real page is open in the preview frame. */
+  const [previewing, setPreviewing] = useState(false);
   const [order, setOrder] = useState<string[] | null>(null);
-  const [dragging, setDragging] = useState<string | null>(null);
   const bodyRef = useRef<HTMLTextAreaElement | null>(null);
 
   const fields = useMemo(() => fieldsFor(collection), [collection]);
@@ -181,9 +204,15 @@ export default function CollectionEditor({
         weight: Number(readScalar(lines, 'weight') ?? '0') || 0,
         date: readScalar(lines, 'date') ?? '',
         draft: isDraft(entry.text),
+        // What would be flagged if it were opened — the gold on a shut card.
+        problems: warningsFor(
+          collection,
+          Object.fromEntries(fields.map((field) => [field.key, readScalar(lines, field.key) ?? ''])),
+          { images, isOklch, projects },
+        ).length,
       };
     });
-  }, [entries]);
+  }, [entries, collection, fields, images, projects]);
 
   /* Ordered the way the public side orders it, which is the point: the grid is
    * highest weight first and the blog is newest first.
@@ -287,6 +316,26 @@ export default function CollectionEditor({
     setIsNew(true);
     setDirty(false);
     setStatus(null);
+  }
+
+  /** Shut the open card. */
+  function close() {
+    if (dirty && !confirm('Discard the unsaved changes?')) return;
+    setOpenPath(null);
+    setDraftFile(null);
+    setIsNew(false);
+    setDirty(false);
+    setPreviewing(false);
+  }
+
+  /** One step up or down the grid; saved with Save order, in one commit. */
+  function move(path: string, by: -1 | 1) {
+    const paths = listed.map((entry) => entry.path);
+    const from = paths.indexOf(path);
+    const to = from + by;
+    if (from < 0 || to < 0 || to >= paths.length) return;
+    [paths[from], paths[to]] = [paths[to], paths[from]];
+    setOrder(paths);
   }
 
   function edit(next: Partial<SplitFile>) {
@@ -493,6 +542,13 @@ export default function CollectionEditor({
     });
   }
 
+  /* What the preview frame shows: memoised on its contents, so the frame is
+     sent a draft when the words change and not on every render. */
+  const previewPayload = useMemo(
+    () => (draftFile ? { title: values.title ?? '', summary: values.summary ?? '', body: draftFile.body } : null),
+    [draftFile, values.title, values.summary],
+  );
+
   if (entries === null) return <p className={styles.status}>Reading the repo…</p>;
 
   if (!configured) {
@@ -507,93 +563,206 @@ export default function CollectionEditor({
   const draft = draftFile ? readScalar(draftFile.frontmatter, 'draft') === 'true' : false;
   const mine = images.filter((path) => !slug || path.includes(slug));
   const artPrefix = art ? `${art.dir.replace(/^public/, '')}/` : '/';
+  const parts: Sections | null = draftFile && bodySections && !rawBody ? splitSections(draftFile.body) : null;
+  const setParts = (next: Sections) => edit({ body: joinSections(next) });
 
-  return (
-    <div className={`${styles.layout} ${draftFile && seo ? '' : styles.layoutPlain}`}>
-      <aside className={styles.list}>
-        {template && (
-          <button type="button" className={styles.new} onClick={startNew}>
-            New {noun}
+  /* The body: as an opening and its sections, or as one text. */
+  const bodyEditor = draftFile ? (
+    <>
+      <div className={styles.bodyHead}>
+        <span className={styles.bodyLabel}>Body</span>
+        {bodySections && (
+          <button type="button" className={styles.quietLink} onClick={() => setRawBody((was) => !was)}>
+            {rawBody ? 'Edit as sections' : 'Edit as one text'}
           </button>
         )}
+      </div>
 
-        {ordering && (
-          <p className={styles.listNote}>
-            Drag to set the order of the grid.
-            {order && (
-              <button type="button" onClick={() => void saveOrder()} disabled={busy}>
-                Save order
+      {parts ? (
+        <div className={styles.sections}>
+          <label className={styles.sectionCard}>
+            <span className={styles.sectionLabel}>Opening</span>
+            <textarea
+              className={styles.sectionText}
+              value={parts.opening}
+              spellCheck
+              rows={Math.min(14, Math.max(4, parts.opening.split('\n').length + 1))}
+              onChange={(event) => setParts({ ...parts, opening: event.target.value })}
+            />
+          </label>
+
+          {parts.sections.map((section, i) => (
+            <div key={i} className={styles.sectionCard}>
+              <div className={styles.sectionHeadRow}>
+                <span className={styles.sectionHash} aria-hidden="true">
+                  ##
+                </span>
+                <input
+                  className={styles.sectionHeading}
+                  value={section.heading}
+                  aria-label="Section heading"
+                  onChange={(event) => {
+                    const sections = [...parts.sections];
+                    sections[i] = { ...section, heading: event.target.value };
+                    setParts({ ...parts, sections });
+                  }}
+                />
+                <span className={styles.sectionTools}>
+                  <button
+                    type="button"
+                    aria-label="Move section up"
+                    disabled={i === 0}
+                    onClick={() => {
+                      const sections = [...parts.sections];
+                      [sections[i - 1], sections[i]] = [sections[i], sections[i - 1]];
+                      setParts({ ...parts, sections });
+                    }}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Move section down"
+                    disabled={i === parts.sections.length - 1}
+                    onClick={() => {
+                      const sections = [...parts.sections];
+                      [sections[i + 1], sections[i]] = [sections[i], sections[i + 1]];
+                      setParts({ ...parts, sections });
+                    }}
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Remove section"
+                    onClick={() => {
+                      if (!confirm(`Remove the section "${section.heading}"?`)) return;
+                      setParts({ ...parts, sections: parts.sections.filter((_, k) => k !== i) });
+                    }}
+                  >
+                    ✕
+                  </button>
+                </span>
+              </div>
+              <textarea
+                className={styles.sectionText}
+                value={shownText(section.text)}
+                spellCheck
+                rows={Math.min(18, Math.max(4, section.text.split('\n').length + 1))}
+                onChange={(event) => {
+                  const sections = [...parts.sections];
+                  sections[i] = { ...section, text: withBreak(event.target.value) };
+                  setParts({ ...parts, sections });
+                }}
+              />
+              {/* An image beside text, as the page's <Split> — the one block
+                  every project page reaches for. Appended to the section. */}
+              {mine.length > 0 && (
+                <div className={styles.sectionInsert}>
+                  <span>Image beside text:</span>
+                  <select
+                    defaultValue=""
+                    aria-label="Image for a new image block"
+                    onChange={(event) => {
+                      const [src, side] = event.target.value.split('|');
+                      event.target.value = '';
+                      if (!src) return;
+                      const sections = [...parts.sections];
+                      const text = section.text.endsWith('\n\n') ? section.text : `${section.text.replace(/\n*$/, '')}\n\n`;
+                      sections[i] = { ...section, text: `${text}${splitBlock(src, side as 'left' | 'right')}\n` };
+                      setParts({ ...parts, sections });
+                    }}
+                  >
+                    <option value="">add one…</option>
+                    {mine.flatMap((path) => [
+                      <option key={`${path}|left`} value={`${path}|left`}>
+                        {path.replace(artPrefix, '')} — image left
+                      </option>,
+                      <option key={`${path}|right`} value={`${path}|right`}>
+                        {path.replace(artPrefix, '')} — image right
+                      </option>,
+                    ])}
+                  </select>
+                </div>
+              )}
+            </div>
+          ))}
+
+          <div className={styles.addSection}>
+            <button
+              type="button"
+              className={styles.addToggle}
+              aria-label="Add a section"
+              title="Add a section"
+              onClick={() => setParts({ ...parts, sections: [...parts.sections, newSection()] })}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+            <span className={styles.hint}>Add a section</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          {mine.length > 0 && (
+            <p className={styles.insertRow}>
+              Insert an image:
+              {mine.map((path) => (
+                <button key={path} type="button" onClick={() => insertImage(path)}>
+                  {path.replace(artPrefix, '')}
+                </button>
+              ))}
+            </p>
+          )}
+          <textarea
+            id="entry-body"
+            ref={bodyRef}
+            className={styles.body}
+            value={draftFile.body}
+            spellCheck
+            onChange={(event) => edit({ body: event.target.value })}
+          />
+        </>
+      )}
+    </>
+  ) : null;
+
+  /* Everything inside an open card: the fields, the body, and beside them
+     what the page will say and how it scores. */
+  const openBody = draftFile ? (
+    <div className={`${styles.cardBody} ${seo ? '' : styles.cardBodyPlain}`}>
+      <div className={styles.cardMain}>
+        <div className={styles.bar}>
+          <span className={styles.barName}>
+            {openPath ? name(openPath) : `New ${noun}`}
+            {draft && <span className={styles.draftTag}>draft</span>}
+            {dirty && <span className={styles.dirty}>unsaved</span>}
+          </span>
+          <span className={styles.barButtons}>
+            {previewBase && openPath && (
+              <button type="button" className={styles.quiet} onClick={() => setPreviewing(true)}>
+                Preview the page
               </button>
             )}
-          </p>
-        )}
-
-        <ul>
-          {listed.map((entry) => (
-            <li
-              key={entry.path}
-              draggable={ordering}
-              onDragStart={() => setDragging(entry.path)}
-              onDragEnd={() => setDragging(null)}
-              onDragOver={(event) => {
-                if (!ordering || !dragging || dragging === entry.path) return;
-                event.preventDefault();
-                const from = listed.findIndex((one) => one.path === dragging);
-                const to = listed.findIndex((one) => one.path === entry.path);
-                if (from === -1 || to === -1) return;
-                const next = listed.map((one) => one.path);
-                next.splice(to, 0, ...next.splice(from, 1));
-                setOrder(next);
-              }}
-              className={dragging === entry.path ? styles.draggingRow : undefined}
+            {/* Status is the visible state of a project and draft is a
+                separate thing — one is "what stage is this at", the other is
+                "is this page on the site at all". No project has ever used
+                draft, so it is the quiet button. */}
+            <button
+              type="button"
+              className={styles.quiet}
+              onClick={() => void save(!draft)}
+              disabled={busy}
+              title={draft ? 'Clear draft: true and publish it' : 'Set draft: true and take the page down'}
             >
-              <button
-                type="button"
-                className={openPath === entry.path ? styles.current : undefined}
-                onClick={() => openEntry(entry.path)}
-              >
-                <span className={styles.entryTitle}>{entry.title}</span>
-                <span className={styles.entryMeta}>
-                  {entry.kind ?? entry.track ?? ''}
-                  {entry.status && <span data-status={entry.status}>{entry.status}</span>}
-                  {entry.draft && <span className={styles.draftTag}>draft</span>}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </aside>
-
-      <div className={styles.main}>
-        {!draftFile ? (
-          <p className={styles.status}>Pick one, or start a new {noun}.</p>
-        ) : (
-          <>
-            <div className={styles.bar}>
-              <span className={styles.barName}>
-                {openPath ? name(openPath) : `New ${noun}`}
-                {draft && <span className={styles.draftTag}>draft</span>}
-                {dirty && <span className={styles.dirty}>unsaved</span>}
-              </span>
-              <span className={styles.barButtons}>
-                <button type="button" onClick={() => void save()} disabled={busy || !dirty}>
-                  {busy ? 'Working…' : 'Save'}
-                </button>
-                {/* Status is the visible state of a project and draft is a
-                    separate thing — one is "what stage is this at", the other
-                    is "is this page on the site at all". No project has ever
-                    used draft, so it is the quiet button. */}
-                <button
-                  type="button"
-                  className={styles.quiet}
-                  onClick={() => void save(!draft)}
-                  disabled={busy}
-                  title={draft ? 'Clear draft: true and publish it' : 'Set draft: true and take the page down'}
-                >
-                  {draft ? 'Publish' : 'Hide page'}
-                </button>
-              </span>
-            </div>
+              {draft ? 'Publish' : 'Hide page'}
+            </button>
+            <button type="button" className={styles.save} onClick={() => void save()} disabled={busy || !dirty}>
+              {busy ? 'Working…' : 'Save'}
+            </button>
+          </span>
+        </div>
 
             {trackMoved && (
               <p className={styles.notice}>
@@ -651,35 +820,12 @@ export default function CollectionEditor({
               </p>
             </details>
 
-            <label className={styles.bodyLabel} htmlFor="entry-body">
-              Body
-            </label>
-            {mine.length > 0 && (
-              <p className={styles.insertRow}>
-                Insert an image:
-                {mine.map((path) => (
-                  <button key={path} type="button" onClick={() => insertImage(path)}>
-                    {path.replace(artPrefix, '')}
-                  </button>
-                ))}
-              </p>
-            )}
-            <textarea
-              id="entry-body"
-              ref={bodyRef}
-              className={styles.body}
-              value={draftFile.body}
-              spellCheck
-              onChange={(event) => edit({ body: event.target.value })}
-            />
+        {bodyEditor}
 
-            {status && <p className={styles.message}>{status}</p>}
-          </>
-        )}
-        {!draftFile && status && <p className={styles.message}>{status}</p>}
+        {status && <p className={styles.message}>{status}</p>}
       </div>
 
-      {draftFile && seo && (
+      {seo && (
         <aside className={styles.aside}>
           <section className={styles.preview}>
             <h2 className={styles.previewHead}>In the grid</h2>
@@ -743,7 +889,9 @@ export default function CollectionEditor({
             )}
 
             <p className={styles.hint}>
-              The body is not rendered here: it is MDX, and the components in it only run at build.
+              {previewBase
+                ? 'The body is rendered in Preview the page: the real page, with this draft in it.'
+                : 'The body is not rendered here: it is MDX, and the components in it only run at build.'}
             </p>
           </section>
 
@@ -752,6 +900,18 @@ export default function CollectionEditor({
               body={draftFile.body}
               wordTarget={collection === 'writing' ? 500 : undefined}
               onSelect={(start, end) => {
+                // A finding is a place in the whole body, so it is shown in
+                // the one-text box: switch to it first if sections are open.
+                if (!bodyRef.current && bodySections) {
+                  setRawBody(true);
+                  requestAnimationFrame(() => {
+                    const area = bodyRef.current;
+                    if (!area) return;
+                    area.focus();
+                    area.setSelectionRange(start, end);
+                  });
+                  return;
+                }
                 const area = bodyRef.current;
                 if (!area) return;
                 area.focus();
@@ -784,6 +944,118 @@ export default function CollectionEditor({
             }}
           />
         </aside>
+      )}
+    </div>
+  ) : null;
+
+  return (
+    <div className={styles.page}>
+      {/* A new entry, as the round + Habits and Reading use: shut until wanted. */}
+      {template && (
+        <section className={styles.addSection}>
+          <button
+            type="button"
+            className={isNew ? styles.addToggleOn : styles.addToggle}
+            aria-expanded={isNew}
+            aria-label={isNew ? 'Close' : `New ${noun}`}
+            title={isNew ? 'Close' : `New ${noun}`}
+            onClick={() => (isNew ? close() : startNew())}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </section>
+      )}
+
+      {ordering && order && (
+        <p className={styles.orderBar}>
+          The grid&rsquo;s order has changed.
+          <button type="button" className={styles.save} onClick={() => void saveOrder()} disabled={busy}>
+            Save order
+          </button>
+          <button type="button" onClick={() => setOrder(null)} disabled={busy}>
+            Undo
+          </button>
+        </p>
+      )}
+
+      {!draftFile && status && <p className={styles.message}>{status}</p>}
+
+      {/* One shut card per entry, as the Shop's are: a pill in the middle of
+          the page that opens to the width of the column. Gold where something
+          on it would be flagged if opened. */}
+      <div className={styles.cards}>
+        {isNew && draftFile && (
+          <section className={styles.cardOpen}>
+            <div className={styles.cardHeadRow}>
+              <button type="button" className={styles.cardHead} aria-expanded onClick={close}>
+                <span className={styles.cardName}>New {noun}</span>
+              </button>
+            </div>
+            {openBody}
+          </section>
+        )}
+
+        {listed.map((entry, index) => {
+          const isOpen = !isNew && openPath === entry.path;
+          return (
+            <section
+              key={entry.path}
+              className={isOpen ? styles.cardOpen : styles.card}
+              data-waiting={entry.problems > 0 || undefined}
+            >
+              <div className={styles.cardHeadRow}>
+                <button
+                  type="button"
+                  className={styles.cardHead}
+                  aria-expanded={isOpen}
+                  onClick={() => (isOpen ? close() : openEntry(entry.path))}
+                >
+                  <span className={styles.cardName}>{entry.title}</span>
+                  <span className={styles.cardFacts}>
+                    {[entry.kind ?? entry.track, entry.status].filter(Boolean).join(' · ')}
+                    {entry.draft && <span className={styles.draftTag}>draft</span>}
+                  </span>
+                  <span className={styles.cardState}>
+                    {entry.problems > 0 ? `${entry.problems} to fix` : entry.date}
+                  </span>
+                </button>
+                {ordering && (
+                  <span className={styles.move}>
+                    <button
+                      type="button"
+                      aria-label={`Move ${entry.title} up`}
+                      disabled={index === 0}
+                      onClick={() => move(entry.path, -1)}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Move ${entry.title} down`}
+                      disabled={index === listed.length - 1}
+                      onClick={() => move(entry.path, 1)}
+                    >
+                      ↓
+                    </button>
+                  </span>
+                )}
+              </div>
+              {isOpen && openBody}
+            </section>
+          );
+        })}
+      </div>
+
+      {previewing && previewBase && openPath && draftFile && (
+        <PagePreview
+          href={`${previewBase}${slug}/`}
+          name={values.title || slug}
+          type={ENTRY_PREVIEW}
+          payload={previewPayload}
+          onClose={() => setPreviewing(false)}
+        />
       )}
     </div>
   );

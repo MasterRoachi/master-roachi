@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { usePreviewDraft } from './usePreviewDraft';
 import type { ProductCopy } from '@/lib/product-copy';
 
 // The parts of a product page that are his words, able to show a draft.
@@ -16,28 +17,7 @@ import type { ProductCopy } from '@/lib/product-copy';
 
 export const PREVIEW_MESSAGE = 'product-copy-preview';
 
-function useLiveCopy(initial: ProductCopy): ProductCopy {
-  const [copy, setCopy] = useState(initial);
-
-  useEffect(() => {
-    const previewing =
-      window.parent !== window && new URLSearchParams(window.location.search).get('preview') === '1';
-    if (!previewing) return;
-
-    const onMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return;
-      const data = event.data as { type?: string; copy?: ProductCopy } | null;
-      if (data?.type === PREVIEW_MESSAGE && data.copy) setCopy(data.copy);
-    };
-    window.addEventListener('message', onMessage);
-    // Asks for the draft once listening, so a frame that loads after the
-    // editor last sent does not sit on the built copy until the next keystroke.
-    window.parent.postMessage({ type: `${PREVIEW_MESSAGE}:ready` }, window.location.origin);
-    return () => window.removeEventListener('message', onMessage);
-  }, []);
-
-  return copy;
-}
+const useLiveCopy = (initial: ProductCopy) => usePreviewDraft(PREVIEW_MESSAGE, initial);
 
 export function LiveTagline({ initial, className }: { initial: ProductCopy; className?: string }) {
   const copy = useLiveCopy(initial);

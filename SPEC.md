@@ -1026,7 +1026,26 @@ row.
 
 ### Stage 2 — Projects
 
-Question round, then build. **Decide first whether Projects and Writing stay
+**Built, 2026-10-19.** His rulings in the question round: **Projects and
+Writing stay one editor** (`CollectionEditor.tsx`) — one place for a saving
+bug, and Writing gets the same look in Stage 3 anyway; **shut cards, like the
+Shop** — a round + for a new project, one card per project ordered by ↑/↓ and
+saved in one commit, gold where something on it would be flagged if opened,
+and inside an open card the fields and body beside the grid card, search
+result, page-top, social card, prose and SEO panels; **Preview the page**,
+the real `/projects/<slug>/` in a frame with the draft in it — title, summary
+and the **whole MDX body**, compiled in the browser by `@mdx-js/mdx` with the
+site's own components and plugins (`components/LiveEntry.tsx`), loaded only
+inside the preview frame so no visitor downloads it; and **fields for the
+body** — an opening, then one card per `##` section with its heading, its text,
+↑/↓/✕, and "image beside text" to append a `<Split>` (`lib/body-sections.ts`).
+Section text is kept verbatim and only the heading line is a field, so an
+untouched body saves as the identical string — tested against all eleven real
+bodies. "Edit as one text" is one click away, and a prose finding opens it at
+the place. Sections and preview are props, on for Projects only; Writing has
+the shut cards and the one-text body until Stage 3 rules on it.
+
+Before that, it said: question round, then build. **Decide first whether Projects and Writing stay
 one component**: both render `app/work/CollectionEditor.tsx` with different
 props, so a change to one lands on the other. One editor is one place for a
 bug about saving, which is why it was built that way.

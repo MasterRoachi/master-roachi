@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Mdx from '@/components/Mdx';
+import { LiveBody, LiveEntryText } from '@/components/LiveEntry';
 import PostCard from '@/components/PostCard';
 import Starfield from '@/components/Starfield';
 import ProjectPieces from '@/components/ProjectPieces';
@@ -110,8 +111,10 @@ export default async function ProjectPage({
             </span>
           </div>
 
-          <h1 className={styles.title}>{fm.title}</h1>
-          <p className={styles.summary}>{fm.summary}</p>
+          {/* Live, so /work/projects can preview a draft in this exact page;
+              for a visitor they are the built text. components/LiveEntry.tsx. */}
+          <LiveEntryText field="title" as="h1" initial={fm.title} className={styles.title} />
+          <LiveEntryText field="summary" initial={fm.summary} className={styles.summary} />
 
           {fm.stack && fm.stack.length > 0 && (
             <div className={styles.stack}>
@@ -167,7 +170,9 @@ export default async function ProjectPage({
       )}
 
       <article className={`shell ${styles.body}`}>
-        <Mdx source={entry.body} />
+        <LiveBody>
+          <Mdx source={entry.body} />
+        </LiveBody>
       </article>
 
       {related.length > 0 && (

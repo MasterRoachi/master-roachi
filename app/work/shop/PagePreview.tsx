@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { PREVIEW_MESSAGE } from '@/components/LiveCopy';
-import type { ProductCopy } from '@/lib/product-copy';
 import styles from './store.module.css';
 
-// Shop step 5: the real product page, with the draft in it.
+// The real page, with the draft in it — a product page from Shop step 5, a
+// project page from Stage 2. `type` names what the page listens for
+// (components/usePreviewDraft.ts) and `payload` is the draft.
 //
 // Not a mock-up of the page: the deployed /store/<slug>/ in a frame, opened
 // with ?preview=1, which makes its copy sections listen for a draft from this
@@ -24,12 +24,14 @@ const WIDTHS = [
 export default function PagePreview({
   href,
   name,
-  copy,
+  type,
+  payload,
   onClose,
 }: {
   href: string;
   name: string;
-  copy: ProductCopy;
+  type: string;
+  payload: unknown;
   onClose: () => void;
 }) {
   const frame = useRef<HTMLIFrameElement>(null);
@@ -38,16 +40,15 @@ export default function PagePreview({
   // Send the draft on every change, and whenever the page asks — it asks once
   // it is listening, which is after this effect may already have run.
   useEffect(() => {
-    const send = () =>
-      frame.current?.contentWindow?.postMessage({ type: PREVIEW_MESSAGE, copy }, window.location.origin);
+    const send = () => frame.current?.contentWindow?.postMessage({ type, payload }, window.location.origin);
     send();
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
-      if ((event.data as { type?: string } | null)?.type === `${PREVIEW_MESSAGE}:ready`) send();
+      if ((event.data as { type?: string } | null)?.type === `${type}:ready`) send();
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [copy]);
+  }, [type, payload]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
