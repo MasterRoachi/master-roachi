@@ -15,10 +15,7 @@ import {
   getStoreProducts,
   findProduct,
   buyOptions,
-  money,
   sizesOf,
-  sizeRun,
-  priceLadder,
   priceSummary,
   isSoldOut,
   garmentLabel,
@@ -87,7 +84,6 @@ export default async function ProductPage({
   if (!product) notFound();
 
   const sizes = sizesOf(product);
-  const ladder = priceLadder(product);
   const soldOut = isSoldOut(product);
   const options = buyOptions(product);
   const spec = product.garment?.spec ?? [];
@@ -171,16 +167,6 @@ export default async function ProductPage({
 
             <Swatches colors={product.colors ?? []} />
 
-            {ladder.length > 1 && (
-              <dl className={styles.ladder}>
-                {ladder.map((band) => (
-                  <div key={band.sizes.join()} className={styles.band}>
-                    <dt>{sizeRun(band.sizes)}</dt>
-                    <dd>{money(band.amount, band.currency)}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
 
             {/* Sizes, price and the button are one thing now: a payment link
                 is a fixed sum, so which size is chosen decides where Buy
@@ -223,10 +209,18 @@ export default async function ProductPage({
           bodyClassName={styles.blurb}
         />
 
+        {/* Shut until wanted: the blank and the size guide are reference, and
+            open they made two thirds of the page. A native <details>, so it
+            works with no script and the browser's find opens it. */}
         {spec.length > 0 && (
-          <section className={styles.section}>
-            <p className="eyebrow">The blank</p>
-            <h2 className="section-title">What it is printed on</h2>
+          <details className={styles.fold}>
+            <summary className={styles.foldHead}>
+              <span>
+                <span className="eyebrow">The blank</span>
+                <span className={styles.foldTitle}>What it is printed on</span>
+              </span>
+              <span className={styles.foldPlus} aria-hidden="true" />
+            </summary>
             <ul className={styles.spec}>
               {spec.map((line) => (
                 <li key={line}>{line}</li>
@@ -237,12 +231,19 @@ export default async function ProductPage({
                 {product.garment.disclaimer}
               </p>
             )}
-          </section>
+          </details>
         )}
 
         {/* His note before Printful's table: how it actually wears is the
             thing a measurement chart cannot say. */}
-        <LiveFit initial={copy} sectionClassName={styles.section} careClassName={styles.care}>
+        <LiveFit
+          initial={copy}
+          foldClassName={styles.fold}
+          headClassName={styles.foldHead}
+          titleClassName={styles.foldTitle}
+          plusClassName={styles.foldPlus}
+          careClassName={styles.care}
+        >
           {product.sizeGuide && sizes.length > 0 ? (
             <SizeTable guide={product.sizeGuide} sizes={sizes} />
           ) : null}

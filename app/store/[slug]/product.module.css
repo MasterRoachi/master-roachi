@@ -49,6 +49,15 @@
     grid-template-columns: minmax(0, 1fr);
     max-width: 760px;
   }
+
+  /* The shirt stays at the top of its column. Centred, it drifted to the
+     middle of the page the moment the address form opened under the sizes.
+     Not sticky: html and body's overflow-x: hidden in globals.css makes body
+     a scroll container that never scrolls, so nothing on the site can stick
+     — the nav included, though it is written as sticky. */
+  .top {
+    align-items: start;
+  }
 }
 
 /* Holds the flat image and the canvas on top of each other, so one can fade
@@ -214,8 +223,8 @@
 
 .garment {
   margin: 22px 0 0;
-  font-size: 0.82rem;
-  color: var(--muted-2);
+  font-size: 0.875rem;
+  color: var(--muted);
 }
 
 /* --- sections ------------------------------------------------------------ */
@@ -328,6 +337,112 @@
    a claim competing with the number above it. */
 .shipping {
   margin: 6px 0 0;
-  font-size: 0.8rem;
-  color: var(--muted-2);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* --- reference, shut until wanted ---------------------------------------- */
+
+/* The blank and the size guide. A card in the store's own colours, shut by
+   default, the same idea as the backend's cards: open, they were two thirds
+   of the page, and most visitors want neither. */
+.fold {
+  margin-top: clamp(28px, 4vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: oklch(12% 0.01 340 / 0.55);
+  padding: 0 clamp(18px, 2.6vw, 28px);
+}
+
+.fold[open] {
+  border-color: color-mix(in oklch, var(--accent-a) 40%, var(--line));
+  padding-bottom: clamp(18px, 2.6vw, 28px);
+}
+
+.foldHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: clamp(16px, 2.2vw, 22px);
+  cursor: pointer;
+  list-style: none;
+}
+
+.foldHead::-webkit-details-marker {
+  display: none;
+}
+
+.foldHead > span:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.foldHead .eyebrow {
+  margin: 0;
+}
+
+.foldTitle {
+  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+/* A round + in the store's pink, turning to a × when open. */
+.foldPlus {
+  position: relative;
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--accent-a) 50%, var(--line));
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.foldPlus::before,
+.foldPlus::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent-a);
+  transform: translate(-50%, -50%);
+}
+
+.foldPlus::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.foldHead:hover .foldPlus {
+  background: color-mix(in oklch, var(--accent-a) 14%, transparent);
+}
+
+.fold[open] .foldPlus {
+  transform: rotate(45deg);
+  background: color-mix(in oklch, var(--accent-a) 18%, transparent);
+}
+
+.fold .spec,
+.fold .disclaimer {
+  margin-top: 0;
+}
+
+.fold .disclaimer {
+  margin-top: 18px;
+}
+
+/* --- phones: the name and price on the first screen ----------------------- */
+
+/* The shirt filled the whole first screen, with the price below it. Capped to
+   a little over half the screen's height, keeping its 4:5 by narrowing. */
+@media (max-width: 819px) {
+  .stage {
+    width: min(100%, calc(56svh * 0.8));
+    max-height: 56svh;
+    margin-inline: auto;
+  }
 }

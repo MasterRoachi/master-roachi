@@ -108,7 +108,10 @@ export default function BuyPanel({
             disabled={!o.available}
             onClick={() => setSize(o.size)}
           >
-            {o.size}
+            {/* The price on the chip, so the size and what it costs are read
+                in one place — the separate price ladder went for this. */}
+            <span className={styles.sizeName}>{o.size}</span>
+            <span className={styles.sizePrice}>{o.label}</span>
           </button>
         ))}
       </div>

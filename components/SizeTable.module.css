@@ -100,7 +100,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
   background: oklch(15% 0.01 340 / 0.5);
 }
 

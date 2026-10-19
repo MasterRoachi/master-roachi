@@ -984,7 +984,16 @@ holds everything about it: art, the five fields, and the preview and SEO
 column beside them. **Done for `/work/shop`.** The public store, product,
 thank-you and policies pages stay **Fabled Threads' own look, refined** — its
 pink and blue, halftone and cartoon voice kept, layout, type and spacing
-tightened. Not started.
+tightened. **The product page is done**, on his picks: each size chip carries
+its own price and the price ladder is gone; Buy (and the checkout's buttons) is
+a solid pink pill, the one bright control on the page; the blank and the size
+guide are shut cards (native `<details>`, a round pink + that turns to ×),
+which halves the page; the small print (delivery line, PayFast note, "Printed
+on", the size table's numbers) is larger and at `--muted` rather than
+`--muted-2`; on phones the shirt stage is capped so the name and price are on
+the first screen; and the shirt sits at the top of its column rather than
+drifting to the middle when the address form opens. Store front, thank-you
+and policies still to do.
 
 **6. The design run.** The new look — round `+`, shut cards, gold — applied
 once everything that should be on the page is on it. His sequencing, and the
@@ -1026,6 +1035,14 @@ Question round, then build.
   is his call: one statement of SQL.
 - ~~**The sprite-acus summary** still describes the retired pipeline.~~ Fixed
   2026-10-15: the page now records the 2026-09-22 retirement.
+- **The site nav has never been sticky, though it is written to be.** Found
+  2026-10-19. `components/Nav.module.css` is `position: sticky`, transparent,
+  "the page runs under the nav"; but `overflow-x: hidden` on `html, body` in
+  `globals.css` makes body a scroll container that never scrolls, so nothing
+  on the site can stick, and since 2 September the nav has simply scrolled
+  away. `overflow-x: clip` would switch the written design on everywhere —
+  with page content visible through the transparent nav, as it was designed —
+  so it is his call, not a fix. Left as it is.
 - **North Star and Sales on `/work/boards/`** — probably moot, since Boards
   was skipped on 2026-10-14.
 - ~~**Three curriculums have an empty curriculum-level Sources card**~~ Filled

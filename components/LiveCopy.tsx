@@ -74,17 +74,24 @@ export function LiveSection({
 }
 
 /**
- * Fit and care: his note above Printful's size table. The table is passed in
- * as children so it stays rendered on the server; only the note is live.
+ * Fit and care: his note above Printful's size table, in a card shut until
+ * opened. The table is passed in as children so it stays rendered on the
+ * server; only the note is live.
  */
 export function LiveFit({
   initial,
-  sectionClassName,
+  foldClassName,
+  headClassName,
+  titleClassName,
+  plusClassName,
   careClassName,
   children,
 }: {
   initial: ProductCopy;
-  sectionClassName?: string;
+  foldClassName?: string;
+  headClassName?: string;
+  titleClassName?: string;
+  plusClassName?: string;
   careClassName?: string;
   /** The size guide, or nothing when the product has none. */
   children?: ReactNode;
@@ -92,11 +99,16 @@ export function LiveFit({
   const copy = useLiveCopy(initial);
   if (!copy.care && !children) return null;
   return (
-    <section className={sectionClassName}>
-      <p className="eyebrow">Fit</p>
-      <h2 className="section-title">{copy.care ? 'Fit and care' : 'Size guide'}</h2>
+    <details className={foldClassName}>
+      <summary className={headClassName}>
+        <span>
+          <span className="eyebrow">Fit</span>
+          <span className={titleClassName}>{copy.care ? 'Fit and care' : 'Size guide'}</span>
+        </span>
+        <span className={plusClassName} aria-hidden="true" />
+      </summary>
       {copy.care && <p className={careClassName}>{copy.care}</p>}
       {children}
-    </section>
+    </details>
   );
 }
