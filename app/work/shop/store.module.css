@@ -69,7 +69,6 @@
   cursor: default;
 }
 
-.fetched,
 .orphans {
   margin: 0.5rem auto 0;
   max-width: 40rem;

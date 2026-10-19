@@ -128,6 +128,21 @@ export default function StoreCopyEditor({
   const [previewing, setPreviewing] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [syncNote, setSyncNote] = useState<string | null>(null);
+  /** When Sync last ran, from D1. Later than fetchedAt whenever a sync found nothing new. */
+  const [checkedAt, setCheckedAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    fetch('/work/api/store-sync', { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { checkedAt?: string | null } | null) => {
+        if (live && data?.checkedAt) setCheckedAt(data.checkedAt);
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, []);
   /** Uploads made in this session, so a tile appears before the deploy lands. */
   const [uploads, setUploads] = useState<Record<string, string>>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
@@ -194,14 +209,17 @@ export default function StoreCopyEditor({
     };
   }, [products, copy]);
 
-  /* How old the baked catalogue is. fetchedAt sat at 2026-09-07 for weeks
-   * with nothing on the page saying so, while prices could have moved. */
+  /* How long since the catalogue was last checked against Printful. The later
+   * of the baked fetchedAt and the last sync: a sync that finds nothing new
+   * commits nothing, so fetchedAt alone never moved and the warning never
+   * cleared. */
   const staleDays = useMemo(() => {
-    if (!fetchedAt) return null;
+    const times = [fetchedAt, checkedAt].filter(Boolean).map((t) => new Date(t as string).getTime());
+    if (times.length === 0) return null;
     // eslint-disable-next-line react-hooks/purity -- an age is relative to now by definition
-    const age = Math.floor((Date.now() - new Date(fetchedAt).getTime()) / 86_400_000);
+    const age = Math.floor((Date.now() - Math.max(...times)) / 86_400_000);
     return age > STALE_DAYS ? age : null;
-  }, [fetchedAt]);
+  }, [fetchedAt, checkedAt]);
 
   /* Copy belonging to no listed product.
    *
@@ -321,6 +339,7 @@ export default function StoreCopyEditor({
         synced?: boolean;
         changed?: boolean;
         products?: number;
+        checkedAt?: string;
         error?: string;
       };
 
@@ -332,6 +351,7 @@ export default function StoreCopyEditor({
         setSyncNote(data.error ?? `Sync failed (${response.status}).`);
         return;
       }
+      if (data.checkedAt) setCheckedAt(data.checkedAt);
       setSyncNote(
         data.changed
           ? `Synced ${data.products} products and committed. Reload once the deploy lands, in about two minutes.`
@@ -443,13 +463,6 @@ export default function StoreCopyEditor({
         </div>
       </div>
 
-      {/* A product synced into Printful today is not here until a rebuild, and
-          an absence with no explanation reads as a bug. */}
-      <p className={styles.fetched}>
-        Product list baked at build time
-        {fetchedAt ? `, from a catalogue fetched ${new Date(fetchedAt).toISOString().slice(0, 10)}` : ''}.
-        Syncing commits a new one; the list here changes once that deploy lands.
-      </p>
       {staleDays !== null && (
         <p className={styles.stale}>
           The catalogue is {staleDays} days old. Prices, sizes and stock on the store are as Printful had them

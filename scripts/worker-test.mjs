@@ -390,6 +390,7 @@ function sqliteD1() {
   sqlite.exec(fs.readFileSync('migrations/0017_order_fulfilment.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0018_order_address.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0019_order_checkout.sql', 'utf8'));
+  sqlite.exec(fs.readFileSync('migrations/0020_store_syncs.sql', 'utf8'));
   const d1 = {
     sqlite,
     broken: false,
@@ -838,6 +839,19 @@ function sqliteD1() {
   globalThis.fetch = payfastFetch;
 
   globalThis.fetch = realFetch;
+
+  // --- when the store was last checked --------------------------------------
+  //
+  // A sync that finds nothing new commits nothing, so the catalogue's own date
+  // never moved and the stale warning never cleared. The last check is in D1.
+  res = await worker.fetch(access('https://masterroachi.com/work/api/store-sync'), shopEnv);
+  body = await res.json();
+  check('with no sync yet, nothing has been checked', body.checkedAt === null, JSON.stringify(body));
+  ordersDb.sqlite.prepare("insert into store_syncs (synced_at, changed, products) values ('2026-10-19T10:00:00.000Z', 0, 1)").run();
+  ordersDb.sqlite.prepare("insert into store_syncs (synced_at, changed, products) values ('2026-10-19T12:00:00.000Z', 0, 1)").run();
+  res = await worker.fetch(access('https://masterroachi.com/work/api/store-sync'), shopEnv);
+  body = await res.json();
+  check('the last check is the latest sync, changed or not', body.checkedAt === '2026-10-19T12:00:00.000Z', JSON.stringify(body));
 
   res = await worker.fetch(get('https://masterroachi.com/work/store/'), env);
   check(
@@ -3625,8 +3639,16 @@ check(
   String(res.status),
 );
 
+// GET reads when it was last checked (migrations/0020) rather than syncing;
+// only POST touches Printful. Here there is no D1, so nothing is known.
 res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/store-sync'), syncEnv);
-check('sync refuses GET', res.status === 405, String(res.status));
+body = await res.json();
+check('a GET reads the last check and does not sync', res.status === 200 && body.checkedAt === null && !('synced' in body), JSON.stringify(body));
+res = await worker.fetch(
+  new Request('https://masterroachi.com/work/api/store-sync', { method: 'PUT', headers: { 'cf-access-jwt-assertion': 'stub-jwt' } }),
+  syncEnv,
+);
+check('sync refuses anything but GET and POST', res.status === 405, String(res.status));
 
 res = await worker.fetch(
   new Request('https://masterroachi.com/work/api/store-sync', {

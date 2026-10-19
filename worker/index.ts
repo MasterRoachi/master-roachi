@@ -1184,6 +1184,17 @@ export default {
       const throughAccess = request.headers.has('cf-access-jwt-assertion');
       const local = url.hostname !== APEX;
       if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      // When it was last checked, which the stale-catalogue warning goes by.
+      // See migrations/0020_store_syncs.sql.
+      if (request.method === 'GET') {
+        const last = env.DB
+          ? await env.DB.prepare('select synced_at from store_syncs order by id desc limit 1')
+              .first<{ synced_at: string }>()
+              .catch(() => null)
+          : null;
+        return json({ checkedAt: last?.synced_at ?? null }, 200);
+      }
       if (request.method !== 'POST') return json({ error: 'method not allowed' }, 405);
 
       const token = env.GITHUB_TOKEN;
@@ -1248,6 +1259,14 @@ export default {
           commit = written.commit;
         }
 
+        // Checked, whether or not anything changed. Not fatal: a sync that
+        // worked should not report failure because the note of it did not.
+        const checkedAt = new Date().toISOString();
+        await env.DB?.prepare('insert into store_syncs (synced_at, changed, products) values (?1, ?2, ?3)')
+          .bind(checkedAt, changed ? 1 : 0, payload.products.length)
+          .run()
+          .catch(() => undefined);
+
         return json(
           {
             configured: true,
@@ -1256,6 +1275,7 @@ export default {
             commit,
             products: payload.products.length,
             fetchedAt: payload.fetchedAt,
+            checkedAt,
             log,
           },
           200,
