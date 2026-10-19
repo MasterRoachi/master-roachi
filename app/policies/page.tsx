@@ -214,16 +214,27 @@ export default function PoliciesPage() {
             </p>
 
             <h3>Cost</h3>
-            <p>
-              Included in the price of the item, everywhere. Shipping a shirt
-              costs between about five and thirteen US dollars depending on
-              where it is going — least to the United Kingdom and Europe, most
-              to South Africa — and rather than make the customer work that out
-              at checkout, the worst case is built into the price and the same
-              number is charged to everyone. Buyers in cheap-to-reach countries
-              are subsidising buyers in expensive ones, which is the trade for
-              a price that does not change when you enter your address.
-            </p>
+            {/* Follows lib/pricing.json's `checkout`, as Prices above does. */}
+            {CHECKOUT === 'payfast' ? (
+              <p>
+                Quoted by the printer for your address before you pay, and
+                shown beside the total. It is the printer&rsquo;s own rate for
+                that address, converted to rand — what delivery actually costs
+                to where you are, rather than one figure built into every
+                price.
+              </p>
+            ) : (
+              <p>
+                Included in the price of the item, everywhere. Shipping a shirt
+                costs between about five and thirteen US dollars depending on
+                where it is going — least to the United Kingdom and Europe, most
+                to South Africa — and rather than make the customer work that out
+                at checkout, the worst case is built into the price and the same
+                number is charged to everyone. Buyers in cheap-to-reach countries
+                are subsidising buyers in expensive ones, which is the trade for
+                a price that does not change when you enter your address.
+              </p>
+            )}
 
             <h3>Tracking</h3>
             <p>

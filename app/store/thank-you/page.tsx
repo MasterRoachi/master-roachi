@@ -45,7 +45,9 @@ export default function ThankYouPage() {
         <PageHeader
           eyebrow={site.store.name}
           title="Thank you — that worked"
-          lede="Your payment went through. There is one thing left for you to do."
+          // Whether anything is left to do is the box's to say: usually
+          // nothing, since the address arrives before payment.
+          lede="Your payment went through."
         />
 
         {/* First, not last. Nothing can be posted until this arrives, so it

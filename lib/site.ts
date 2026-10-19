@@ -57,7 +57,7 @@ export const site = {
      */
     coolingOffDays: 7,
     /** Bumped when the terms change, so a customer can see which they agreed to. */
-    updated: '2026-09-08',
+    updated: '2026-10-19',
   },
 
   store: {

@@ -999,7 +999,16 @@ shirt and the model's licence credit at the foot of the page; the delivery
 line and the blank's line readable. **The thank-you page is done**: Email my
 address as the solid pink pill, the small print readable, and step 2 reworded
 to be true now that orders go to Printful from `/work/shop` ("I check it and
-send it to the printer myself, usually the same day…"). Policies still to do.
+send it to the printer myself, usually the same day…"), and its subtitle
+cut to "Your payment went through." — it said there was one thing left to do
+above a box saying there was nothing. **The policies page is done**, in the
+site's own look rather than Fabled Threads' (it is the site's legal page,
+linked from every footer): brighter body text and headings; the
+delivery-cost paragraph now follows `checkout` as Prices does, so switching
+on PayFast cannot leave it saying delivery is built in; and **Last updated is
+2026-10-19**, because the privacy section changed that day and the terms say
+the version published when an order was placed is the one that applies.
+**The design run is complete.**
 
 **6. The design run.** The new look — round `+`, shut cards, gold — applied
 once everything that should be on the page is on it. His sequencing, and the

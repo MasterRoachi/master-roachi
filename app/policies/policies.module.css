@@ -69,7 +69,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 
 .facts dd {
@@ -85,15 +85,18 @@
 
 /* --- the written policies ------------------------------------------------- */
 
+/* Brighter than --muted: this is the page people read to the end before
+   paying, and at --muted a screen of it was a strain. */
 .prose {
   max-width: var(--measure);
-  color: var(--muted);
+  color: color-mix(in oklch, var(--muted) 65%, var(--ink));
   line-height: 1.75;
 }
 
 .prose h3 {
-  margin: 30px 0 10px;
-  font-size: 1.02rem;
+  margin: 32px 0 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--ink);
 }
 
@@ -124,7 +127,7 @@
 }
 
 .back a {
-  color: var(--muted-2);
+  color: var(--muted);
   transition: color 0.18s ease;
 }
 
