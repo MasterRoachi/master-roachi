@@ -2,14 +2,27 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  /* Fully transparent — no bar, no rule, no scrim. The page runs under the
-     nav and nothing marks where it ends.
+  /* Fully transparent at the top of a page — no bar, no rule, no scrim. Once
+     scrolled it gains one; see [data-scrolled] below.
 
      The scrim that used to sit here bought legibility over whatever scrolls
      beneath. Without it that job falls to the links themselves, so they carry
      a shadow instead: invisible against the dark page, enough to hold an edge
      if something pale passes under them. */
   background: transparent;
+  transition:
+    background-color 0.2s ease,
+    backdrop-filter 0.2s ease;
+}
+
+/* Once the page has scrolled and something can pass under it. The nav has
+   been sticky since 2026-10-19 (globals.css), and over a page of text the
+   link shadows alone did not hold. */
+.nav[data-scrolled] {
+  background: color-mix(in oklch, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--line) 60%, transparent);
 }
 
 .inner {

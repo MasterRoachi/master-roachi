@@ -38,6 +38,15 @@
      are sized to fit and never show this scrollbar at all. */
   overflow-y: auto;
   overflow-x: hidden;
+  /* Scrolls without showing a bar — his rule for the backend's panes, and
+     the right one: a bar that appears and disappears as a page's length
+     changes is the page moving under the cursor. The wheel, the trackpad
+     and the keyboard all still scroll it. */
+  scrollbar-width: none;
   /* Room at the foot so a pane's last line is not flush against the edge. */
   padding-bottom: 1rem;
+}
+
+.content :global(.shell)::-webkit-scrollbar {
+  display: none;
 }

@@ -24,6 +24,12 @@ import path from 'node:path';
 
 const MARK = 'public/logo-mark-lg.webp';
 
+// The font. SVG text is drawn with whatever fontconfig resolves, so without
+// this each machine drew these in its own system font and every build redrew
+// every image. Set before sharp loads, because fontconfig reads it once.
+// See scripts/fonts/fonts.conf.
+process.env.FONTCONFIG_FILE ??= path.join(process.cwd(), 'scripts', 'fonts', 'fonts.conf');
+
 let sharp;
 try {
   sharp = (await import('sharp')).default;
@@ -68,10 +74,10 @@ for (const [file, size, pad] of [
 // --- the share card ---------------------------------------------------------
 //
 // 1200x630 is what every platform crops to. The mark sits left of the
-// wordmark and tagline, which are drawn as SVG text — no font file is loaded,
-// so this uses whatever the rendering machine has rather than Archivo. At this
-// size, in a card nobody studies, that is a fair trade for not shipping a
-// font-loading step.
+// wordmark and tagline, which are drawn as SVG text in Archivo — the site's
+// own face, from scripts/fonts/ (see FONTCONFIG_FILE above). It used to be
+// whatever the rendering machine had, which made these images different on
+// every machine that built them.
 const OG_W = 1200;
 const OG_H = 630;
 const markSize = 300;
@@ -83,9 +89,9 @@ const mark = await sharp(MARK)
 const text = Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}">
   <style>
-    .name { font: 800 92px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .name { font: 800 92px Archivo, system-ui, -apple-system, "Segoe UI", sans-serif;
             fill: #f7f7f5; letter-spacing: -3px; }
-    .line { font: 600 38px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .line { font: 600 38px Archivo, system-ui, -apple-system, "Segoe UI", sans-serif;
             fill: #d9a441; letter-spacing: 1px; }
   </style>
   <text class="name" x="470" y="300">Master Roachi</text>
@@ -225,13 +231,13 @@ if (fs.existsSync(STORE)) {
     const label = Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}">
   <style>
-    .eyebrow { font: 700 26px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .eyebrow { font: 700 26px Archivo, system-ui, -apple-system, "Segoe UI", sans-serif;
                fill: #e0509f; letter-spacing: 4px; }
-    .name { font: 800 ${nameSize}px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .name { font: 800 ${nameSize}px Archivo, system-ui, -apple-system, "Segoe UI", sans-serif;
             fill: #f7f7f5; letter-spacing: -2px; }
-    .price { font: 700 40px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .price { font: 700 40px Archivo, system-ui, -apple-system, "Segoe UI", sans-serif;
              fill: #e0509f; }
-    .foot { font: 600 26px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .foot { font: 600 26px Archivo, system-ui, -apple-system, "Segoe UI", sans-serif;
             fill: #8b8b8f; }
   </style>
   <!-- Cleared by more than the eyebrow's own height: the title's cap top sits
@@ -295,8 +301,8 @@ const GOLD = '#d9a441';
  * Break a title across lines that will fit.
  *
  * SVG has no text wrapping, so this measures the only way available without
- * loading a font: an average glyph is about 0.52 of the point size in the
- * sans-serif this draws with. It is an estimate, which is why the box it
+ * measuring the font: an average glyph is about 0.52 of the point size in
+ * Archivo at these weights. It is an estimate, which is why the box it
  * targets is narrower than the space actually available — a title that wraps
  * one word early looks intentional, one that overruns the card does not.
  */
@@ -379,9 +385,9 @@ async function entryCard({ title, eyebrow, cover, out }) {
   const text = Buffer.from(`
 <svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}">
   <style>
-    .eyebrow { font: 700 25px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .eyebrow { font: 700 25px Archivo, system-ui, -apple-system, "Segoe UI", sans-serif;
                fill: ${GOLD}; letter-spacing: 4px; }
-    .t { font: 800 ${size}px system-ui, -apple-system, "Segoe UI", sans-serif;
+    .t { font: 800 ${size}px Archivo, system-ui, -apple-system, "Segoe UI", sans-serif;
          fill: #f7f7f5; letter-spacing: -1.5px; }
   </style>
   <text class="eyebrow" x="80" y="${lastBaseline - lines.length * lead - 26}">${esc(

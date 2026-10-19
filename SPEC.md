@@ -438,7 +438,10 @@ at the back of each deck is for.
 
 ### Curriculums
 
-Eight, in `scripts/curriculums/`. **2,142 lessons, 2,005 carrying detail** as
+Eight with scripts in `scripts/curriculums/` — and **thirteen in live D1**
+(checked 2026-10-19): Zulu, Shona, Theology, Philosophy and History exist there
+with no script, so a rebuild cannot recreate them and they have no
+curriculum-level sources. **2,142 lessons, 2,005 carrying detail** as
 of 2026-10-15 — 694 and 341 before the rewrites. Odin is the only one without
 detail, and that is deliberate: see below. In order, because **the order of the
 curriculums is the route through all of them**:
@@ -1045,21 +1048,28 @@ Question round, then build.
   through `.github/workflows/deploy.yml` (lint, tests, build, D1 migrations,
   deploy). Both GitHub secrets were set 2026-10-19, which switched it on.
 - ~~`npm run lint` is broken and was before any of this work.~~ Fixed 2026-10-16.
-- **Odin reads 112 of 151.** Its fourteen Getting Hired lessons count now the
-  route is gone. Deleting that course is the only way to stop them, and that
-  is his call: one statement of SQL.
+- ~~**Odin reads 112 of 151.**~~ Stale when checked on 2026-10-19: Getting
+  Hired was already deleted on 2026-10-13, from `odin.mjs` and from live D1,
+  and Odin reads 112 of 137 (see Curriculums).
 - ~~**The sprite-acus summary** still describes the retired pipeline.~~ Fixed
   2026-10-15: the page now records the 2026-09-22 retirement.
-- **The site nav has never been sticky, though it is written to be.** Found
-  2026-10-19. `components/Nav.module.css` is `position: sticky`, transparent,
-  "the page runs under the nav"; but `overflow-x: hidden` on `html, body` in
-  `globals.css` makes body a scroll container that never scrolls, so nothing
-  on the site can stick, and since 2 September the nav has simply scrolled
-  away. `overflow-x: clip` would switch the written design on everywhere —
-  with page content visible through the transparent nav, as it was designed —
-  so it is his call, not a fix. Left as it is.
-- **North Star and Sales on `/work/boards/`** — probably moot, since Boards
-  was skipped on 2026-10-14.
+- ~~**The site nav has never been sticky, though it is written to be.**~~
+  Switched on 2026-10-19 at his word: `overflow-x: clip` rather than `hidden`
+  on `html, body`, which had made body a scroll container that never scrolls.
+  With content now passing under it, he chose a **scrim once scrolled** —
+  transparent at the top of a page as designed, a dark blurred band once
+  anything can pass beneath. Checked for sideways overflow on six pages at
+  desktop and phone widths: none. The product page's shirt column is sticky
+  again with it.
+- ~~**North Star and Sales on `/work/boards/`**~~ Moot, ruled 2026-10-19.
+- ~~**The share images changed on every build.**~~ Fixed 2026-10-19. Their text
+  was SVG in `system-ui`, so each machine drew it in its own font — Segoe UI
+  in the committed ones, Liberation Sans here. Archivo, the site's own face,
+  now lives in `scripts/fonts/` with its OFL licence, and `og.mjs` points
+  fontconfig at it; two renders are byte-identical, and the cards match the
+  site's type for the first time.
+- ~~**The backend's scrolling column showed a bar.**~~ Hidden 2026-10-19, by
+  his rule for the backend's panes.
 - ~~**Three curriculums have an empty curriculum-level Sources card**~~ Filled
   2026-10-19 in live D1 from each curriculum's most-cited lesson sources, with
   their existing notes: Aseprite 18 (all of them), Drawing 16 (cited 9+ times),
@@ -1194,9 +1204,8 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       `scripts/curriculums/<name>.mjs` and `-detail.json`, so a rebuild keeps
       it. The prerequisites are done (code blocks, tables, lesson sources, the
       duplicate-name guard).
-- [ ] **`PRINTFUL_TOKEN` is not set as a Worker secret**, so the store's Sync
-      button reports "not switched on". The feature is built and unreachable
-      until `npx wrangler secret put PRINTFUL_TOKEN` is run.
+- [x] **`PRINTFUL_TOKEN` is set as a Worker secret**, 2026-10-19: a
+      single-store private token, scopes `orders` and `sync_products/read`.
 - [x] **Five curriculums have no sources.** Answered by the rewrites, which
       gave every lesson its own sources. What is left is smaller and is under
       Stage 4: Aseprite, Drawing and SA politics have an empty

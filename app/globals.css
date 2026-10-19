@@ -44,10 +44,16 @@
   box-sizing: border-box;
 }
 
+/* clip, not hidden — his ruling, 2026-10-19, to switch the sticky nav on.
+   hidden stopped the sideways panning but also made body a scroll container
+   that never scrolls (html does), so nothing on the site could be
+   position: sticky, and from 2 September the nav, written as sticky, simply
+   scrolled away. clip clips without becoming a scroll container; on the root
+   it is still treated as hidden, so the panning stays stopped. */
 html,
 body {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 html {

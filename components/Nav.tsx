@@ -38,6 +38,19 @@ export default function Nav() {
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  /* A scrim once the page has scrolled — his ruling, 2026-10-19, when the
+   * nav was switched to sticky. Transparent at the top of a page, as it was
+   * designed; once anything can pass under it, a dark blurred band fades in,
+   * because a link shadow could not hold its own over a page of text. Passive
+   * and coalesced to one state change per crossing, not one per scroll event. */
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   /* The backend wears its own header and no site nav.
    *
    * BELOW every hook on purpose. Returning early above one changes the hook
@@ -70,7 +83,7 @@ export default function Nav() {
     href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
-    <header className={styles.nav}>
+    <header className={styles.nav} data-scrolled={scrolled || undefined}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label={`${site.name} — home`}>
           <Logo size={34} />

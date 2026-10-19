@@ -2,7 +2,9 @@
 .page {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  /* clip, not hidden: hidden would make this a scroll container, and the
+     sticky shirt column would stick to a box that never scrolls. */
+  overflow: clip;
   padding-bottom: clamp(80px, 10vw, 120px);
 }
 
@@ -50,13 +52,16 @@
     max-width: 760px;
   }
 
-  /* The shirt stays at the top of its column. Centred, it drifted to the
-     middle of the page the moment the address form opened under the sizes.
-     Not sticky: html and body's overflow-x: hidden in globals.css makes body
-     a scroll container that never scrolls, so nothing on the site can stick
-     — the nav included, though it is written as sticky. */
+  /* The shirt stays at the top of its column, and in view while the buying
+     column grows. Centred, it drifted to the middle of the page the moment
+     the address form opened under the sizes. Below the sticky nav. */
   .top {
     align-items: start;
+  }
+
+  .stageCol {
+    position: sticky;
+    top: 88px;
   }
 }
 
