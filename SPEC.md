@@ -1217,12 +1217,13 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [ ] **Actual writing.** Scaffolding only
 - [ ] Swap the sigil for an Orthodox cross — every use goes through
       `components/Sigil.tsx`, so it stays a one-file change
-- [ ] **Japanese: the kanji track.** All eleven stages are written and live —
-      381 lessons, 397 lesson sources, 466 cards — but the kanji track is 159
-      of 2,136. Four modules of eight-character sets exist; roughly 250 more
-      lessons would finish it, frequency-ordered, each set taught through the
-      words its readings appear in. That is the only part of
-      `scripts/curriculums/japanese.md` still outstanding.
+- [x] **Japanese: the kanji track.** Complete 2026-10-19: all 2,136 jōyō
+      kanji across 267 lessons, the last 247 generated from KANJIDIC2 and
+      JMdict (CC BY-SA, attributed) by `scripts/curriculums/kanji-track.mjs`
+      into `japanese-kanji.json`, frequency-ordered, in five modules cut at
+      500 / 1,000 / 1,500 / 2,000 / the tail. Applied to live D1: 629 lessons,
+      2,443 cards, every card's review history kept. See
+      `scripts/curriculums/japanese.md`.
 - [ ] **FSRS is unoptimised**, and will be until there is a review history
       worth optimising against. `ts-fsrs` ships an optimiser that takes one;
       `card_reviews` exists to be handed to it. Nothing to do yet except keep
