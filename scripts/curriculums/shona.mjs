@@ -152,6 +152,30 @@ const stages = [
       ['Stage 2 in conversation', [FSI_TEXT, fsiUnit(6), fsiUnit(8)]],
     ],
   },
+  {
+    name: 'Stage 3 · Being, doing, this and that, and not',
+    lessons: [
+      ['Selling bananas', [FSI_TEXT, fsiUnit(9)]],
+      ['-ri: am, is, are', [FSI_TEXT, fsiUnit(9)]],
+      ['I am doing: -ri with the infinitive', [FSI_TEXT, fsiUnit(9)]],
+      ['What? The ending -nyi', [FSI_TEXT, fsiUnit(9)]],
+      ['This and that: the demonstratives', [FSI_TEXT, fsiUnit(9)]],
+      ['How much is this one?', [FSI_TEXT, fsiUnit(9)]],
+      ['Looking for someone', [FSI_TEXT, fsiUnit(10)]],
+      ['The past of today', [FSI_TEXT, fsiUnit(10)]],
+      ['What did you do today?', [FSI_TEXT, fsiUnit(10)]],
+      ['The -i- tense: used to, and would like', [FSI_TEXT, fsiUnit(10)]],
+      ['Which path goes to town?', [FSI_TEXT, fsiUnit(11)]],
+      ['Relative verbs: the one that …', [FSI_TEXT, fsiUnit(11)]],
+      ['Adjectives that are verbs', [FSI_TEXT, fsiUnit(11)]],
+      ['It is, that is the one: ndi-', [FSI_TEXT, fsiUnit(11)]],
+      ['Who is doing it?', [FSI_TEXT, fsiUnit(11)]],
+      ['I don\'t speak Shona well', [FSI_TEXT, fsiUnit(12)]],
+      ['Not: the negative of -no-', [FSI_TEXT, fsiUnit(12)]],
+      ['Can\'t, and don\'t want to', [FSI_TEXT, fsiUnit(12)]],
+      ['Stage 3 in conversation', [FSI_TEXT, fsiUnit(10), fsiUnit(11), fsiUnit(12)]],
+    ],
+  },
 ];
 
 const out = [

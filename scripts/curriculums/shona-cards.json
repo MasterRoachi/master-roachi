@@ -1441,5 +1441,622 @@
    "reading": "Vákáti ácháenda kuófisi.",
    "extra": "FSI Unit 8."
   }
+ ],
+ "Selling bananas": [
+  {
+   "kind": "word",
+   "front": "-tengesa",
+   "back": "to sell",
+   "reading": "-téngésá",
+   "extra": "FSI Unit 9. A high verb."
+  },
+  {
+   "kind": "word",
+   "front": "-tenga",
+   "back": "to buy",
+   "reading": "-téngá",
+   "extra": "FSI Unit 9. A high verb."
+  },
+  {
+   "kind": "word",
+   "front": "hobo",
+   "back": "banana",
+   "reading": "hobó",
+   "extra": "FSI Unit 9. Class 5; plural mahobó (6)."
+  },
+  {
+   "kind": "word",
+   "front": "mari",
+   "back": "money",
+   "reading": "marí",
+   "extra": "FSI Unit 9. Class 9."
+  },
+  {
+   "kind": "sentence",
+   "front": "Anoita marinyi?",
+   "back": "How much are they? ('They do what money?')",
+   "reading": "Ánoita marínyi?",
+   "extra": "FSI Unit 9. Class 6 subject: the bananas."
+  },
+  {
+   "kind": "sentence",
+   "front": "Muri kunyanya kani.",
+   "back": "You're (asking) too much.",
+   "reading": "Murí kūnyanya kani.",
+   "extra": "FSI Unit 9. -nyanya: be excessive; kani: polite emphasis."
+  },
+  {
+   "kind": "word",
+   "front": "-siya",
+   "back": "to leave",
+   "reading": "-síyá",
+   "extra": "FSI Units 9–10. tamúsíyá: goodbye (\"we have left you\")."
+  }
+ ],
+ "-ri: am, is, are": [
+  {
+   "kind": "word",
+   "front": "-ri",
+   "back": "am, is, are",
+   "reading": "-rí",
+   "extra": "FSI Unit 9, Note 1. Defective: ends in -i, takes no tense prefix."
+  },
+  {
+   "kind": "sentence",
+   "front": "Uripi?",
+   "back": "Where are you?",
+   "reading": "Urípi?",
+   "extra": "FSI Unit 9. Answer: Ndirí pánó — I'm here."
+  },
+  {
+   "kind": "sentence",
+   "front": "Vana vari mumba here?",
+   "back": "Are the children in the house?",
+   "reading": "Vaná várí mumbá heré?",
+   "extra": "FSI Unit 9."
+  }
+ ],
+ "I am doing: -ri with the infinitive": [
+  {
+   "kind": "grammar",
+   "front": "-ri + infinitive",
+   "back": "am …ing: what one is doing now",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 2. Ndirí kuténgésá māhobó: I'm selling bananas."
+  },
+  {
+   "kind": "sentence",
+   "front": "Muri kuitenyi?",
+   "back": "What are you doing?",
+   "reading": "Murí kūitenyí?",
+   "extra": "FSI Units 5, 9. Ndirí kūita basa: I'm working."
+  },
+  {
+   "kind": "word",
+   "front": "-bika",
+   "back": "to cook",
+   "reading": "-bika",
+   "extra": "FSI Unit 9. A low verb."
+  },
+  {
+   "kind": "word",
+   "front": "-verenga",
+   "back": "to read, count",
+   "reading": "-verenga",
+   "extra": "FSI Unit 9. A low verb."
+  },
+  {
+   "kind": "word",
+   "front": "-tamba",
+   "back": "to play",
+   "reading": "-támbá",
+   "extra": "FSI Unit 9. A high verb."
+  },
+  {
+   "kind": "word",
+   "front": "-geza",
+   "back": "to wash",
+   "reading": "-geza",
+   "extra": "FSI Unit 9. A low verb."
+  },
+  {
+   "kind": "word",
+   "front": "-bereka",
+   "back": "to carry a child on the back",
+   "reading": "-bereka",
+   "extra": "FSI Unit 9."
+  },
+  {
+   "kind": "word",
+   "front": "-rera",
+   "back": "to care for (a child)",
+   "reading": "-rera",
+   "extra": "FSI Unit 9."
+  },
+  {
+   "kind": "word",
+   "front": "-tema",
+   "back": "to cut",
+   "reading": "-témá",
+   "extra": "FSI Unit 9. kutémá mití: to cut trees."
+  },
+  {
+   "kind": "word",
+   "front": "muti",
+   "back": "tree; medicine; wood",
+   "reading": "mutí",
+   "extra": "FSI Unit 9. Classes 3, 4: mití."
+  },
+  {
+   "kind": "word",
+   "front": "huni",
+   "back": "firewood (a piece of)",
+   "reading": "húní",
+   "extra": "FSI Unit 9. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "ruva",
+   "back": "flower",
+   "reading": "ruva",
+   "extra": "FSI Unit 9. Class 5; plural maruva (6)."
+  }
+ ],
+ "What? The ending -nyi": [
+  {
+   "kind": "grammar",
+   "front": "-nyi",
+   "back": "\"what?\" fixed to the end of a word: marínyi, basanyí, kuitenyí",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 3. Westerly -yi, easterly -nyi. On a verb, -a becomes -e."
+  }
+ ],
+ "This and that: the demonstratives": [
+  {
+   "kind": "grammar",
+   "front": "uyu · uyo",
+   "back": "this · that (classes 1, 3)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4. Distal = proximal with -o."
+  },
+  {
+   "kind": "grammar",
+   "front": "ava · avo",
+   "back": "these · those (class 2)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4."
+  },
+  {
+   "kind": "grammar",
+   "front": "iyi · iyo",
+   "back": "this · that (classes 4, 9)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4. iyi marí: this money."
+  },
+  {
+   "kind": "grammar",
+   "front": "iri · iro",
+   "back": "this · that (class 5)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4."
+  },
+  {
+   "kind": "grammar",
+   "front": "aya · ayo",
+   "back": "these · those (class 6)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4. aya mahobó: these bananas."
+  },
+  {
+   "kind": "grammar",
+   "front": "ichi · icho",
+   "back": "this · that (class 7)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4."
+  },
+  {
+   "kind": "grammar",
+   "front": "izvi · izvo",
+   "back": "these · those (class 8)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4."
+  },
+  {
+   "kind": "grammar",
+   "front": "idzi · idzo",
+   "back": "these · those (class 10)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4."
+  },
+  {
+   "kind": "grammar",
+   "front": "apa · apo",
+   "back": "here · there (class 16)",
+   "reading": null,
+   "extra": "FSI Unit 9, Note 4. umu: in here; umo: in there."
+  }
+ ],
+ "How much is this one?": [
+  {
+   "kind": "sentence",
+   "front": "Iri hobo rinoita marinyi?",
+   "back": "How much is this banana?",
+   "reading": "Iri hobó rínóita marínyi?",
+   "extra": "FSI Unit 9. Class 5: iri … rí-."
+  },
+  {
+   "kind": "sentence",
+   "front": "Idzi sipo dzinoita marinyi?",
+   "back": "How much are these soaps?",
+   "reading": "Idzi sípo dzínóita marínyi?",
+   "extra": "FSI Unit 9. Class 10: idzi … dzí-."
+  }
+ ],
+ "Looking for someone": [
+  {
+   "kind": "word",
+   "front": "-tsvaka",
+   "back": "to look for, seek",
+   "reading": "-tsvaka",
+   "extra": "FSI Unit 10. A low verb."
+  },
+  {
+   "kind": "word",
+   "front": "-taura",
+   "back": "to speak",
+   "reading": "-taura",
+   "extra": "FSI Unit 10. A low verb."
+  },
+  {
+   "kind": "word",
+   "front": "vanaani?",
+   "back": "who (plural)?",
+   "reading": "vanaaní",
+   "extra": "FSI Unit 10. Plural of aní."
+  },
+  {
+   "kind": "sentence",
+   "front": "Muri kutsvaka ani?",
+   "back": "Who are you looking for?",
+   "reading": "Murí kūtsvaka aní?",
+   "extra": "FSI Unit 10."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndaida kutaura navo.",
+   "back": "I wanted to talk with him.",
+   "reading": "Ndaídâ kutaura navó.",
+   "extra": "FSI Unit 10. navó: with him (respect plural)."
+  }
+ ],
+ "The past of today": [
+  {
+   "kind": "grammar",
+   "front": "past of today (hodiernal)",
+   "back": "subject prefix of -ka- straight onto the stem: ndatáura, I spoke (today)",
+   "reading": null,
+   "extra": "FSI Unit 10, Note 2. For today or last night; -ka- for before. The tense of the greetings."
+  },
+  {
+   "kind": "word",
+   "front": "chinhambwe",
+   "back": "a short time ago",
+   "reading": "chinhambwe",
+   "extra": "FSI Unit 10. Ndasvíka chinhambwe chapérá: I arrived a short while ago."
+  },
+  {
+   "kind": "word",
+   "front": "mambakwedza",
+   "back": "dawn",
+   "reading": "mambákwedzá",
+   "extra": "FSI Unit 10."
+  },
+  {
+   "kind": "word",
+   "front": "mangwanani ano",
+   "back": "this morning",
+   "reading": "mangwánaní áno",
+   "extra": "FSI Unit 10."
+  }
+ ],
+ "What did you do today?": [
+  {
+   "kind": "word",
+   "front": "-ona",
+   "back": "to see",
+   "reading": "-óná",
+   "extra": "FSI Unit 10. A high verb. Ndaóná: I saw (today)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Nguva yapera.",
+   "back": "The time is up.",
+   "reading": "Ngúvá yápěrǎ.",
+   "extra": "FSI Unit 10. Past of today; class 9."
+  },
+  {
+   "kind": "sentence",
+   "front": "Basa rapera.",
+   "back": "The work is finished.",
+   "reading": "Basa rápěrǎ.",
+   "extra": "FSI Unit 10. Class 5."
+  },
+  {
+   "kind": "sentence",
+   "front": "Waita basa rako here?",
+   "back": "Did you do your work (today)?",
+   "reading": "Waíta basa rákó heré?",
+   "extra": "FSI Unit 10. Ndaíta basa rángu: I did my work."
+  }
+ ],
+ "The -i- tense: used to, and would like": [
+  {
+   "kind": "grammar",
+   "front": "-i-",
+   "back": "tense prefix: used to (past habitual); or a polite, oblique present",
+   "reading": null,
+   "extra": "FSI Unit 10, Note 1. Ndaígǎra: I used to live. -ka- prefixes, -no- tones."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndaingada…",
+   "back": "I would like …",
+   "reading": "Ndaíngadą…",
+   "extra": "FSI Unit 10. -i- with -nga-: the only two tense prefixes together."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mwaidenyi?",
+   "back": "What did you want? (a polite \"what do you want?\")",
+   "reading": "Mwaídenyí?",
+   "extra": "FSI Unit 10. Standard drops the w."
+  }
+ ],
+ "Which path goes to town?": [
+  {
+   "kind": "word",
+   "front": "nzira",
+   "back": "path, way",
+   "reading": "nzira",
+   "extra": "FSI Unit 11. Classes 9, 10."
+  },
+  {
+   "kind": "sentence",
+   "front": "Nzira inoenda kupi?",
+   "back": "Where does the path go?",
+   "reading": "Nzira ínoenda kúpǐ?",
+   "extra": "FSI Unit 11."
+  },
+  {
+   "kind": "sentence",
+   "front": "Imba yako iripi?",
+   "back": "Where is your house?",
+   "reading": "Imbá yákó írípí?",
+   "extra": "FSI Unit 11."
+  },
+  {
+   "kind": "word",
+   "front": "kwazvo",
+   "back": "very; quite so, yes indeed",
+   "reading": "kwázvo",
+   "extra": "FSI Units 11–12. zvakánáka kwázvo: very well."
+  }
+ ],
+ "Relative verbs: the one that …": [
+  {
+   "kind": "grammar",
+   "front": "relative verb",
+   "back": "third person with a LOW subject prefix: \"the one who/that …\"",
+   "reading": null,
+   "extra": "FSI Unit 11, Note 1. Ánosándá: he works · ànósándá: who works. 1st/2nd person sound the same."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndiani anosanda muofisi?",
+   "back": "Who works in an office?",
+   "reading": "Ndíaní ànósándá muófisi?",
+   "extra": "FSI Unit 11. Relative: low à-."
+  }
+ ],
+ "Adjectives that are verbs": [
+  {
+   "kind": "word",
+   "front": "mugwagwa",
+   "back": "road",
+   "reading": "mugwagwa · muvhá",
+   "extra": "FSI Unit 11. Classes 3, 4."
+  },
+  {
+   "kind": "word",
+   "front": "-refu",
+   "back": "long, tall",
+   "reading": "~refú",
+   "extra": "FSI Unit 11. A strong adjective."
+  },
+  {
+   "kind": "word",
+   "front": "-pamhi",
+   "back": "wide",
+   "reading": "~pamhí",
+   "extra": "FSI Unit 11."
+  },
+  {
+   "kind": "word",
+   "front": "-pfupi",
+   "back": "short",
+   "reading": "~pfúpi",
+   "extra": "FSI Unit 11."
+  },
+  {
+   "kind": "word",
+   "front": "-tsva",
+   "back": "new",
+   "reading": "~tsvá",
+   "extra": "FSI Unit 11."
+  },
+  {
+   "kind": "grammar",
+   "front": "nzira yakanaka",
+   "back": "relative low (yà-): \"a good path\"; indicative high (yá-): \"the path is good\"",
+   "reading": null,
+   "extra": "FSI Unit 11, Note 2. Most English adjectives are Shona relative verbs."
+  }
+ ],
+ "It is, that is the one: ndi-": [
+  {
+   "kind": "grammar",
+   "front": "ndi- + concord",
+   "back": "it is, that is the one: ndíye (1), ndívo (2), ndíwo (3, 6), ndíro (5), ndícho (7), ndíyo (9), ndídzo (10)",
+   "reading": null,
+   "extra": "FSI Unit 11, Note 3. Mostly the distal demonstrative's ending."
+  },
+  {
+   "kind": "grammar",
+   "front": "ndini · ndiwe · ndiye",
+   "back": "it is I · it is you · it is he/she",
+   "reading": null,
+   "extra": "FSI Unit 11, Note 3. Plural: ndísú (tísú), ndímwí, ndívo."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndicho chikoro chenyu here?",
+   "back": "Is that your school?",
+   "reading": "Ndícho chikóro chényu heré?",
+   "extra": "FSI Unit 11. Class 7."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndiye anovaka dzimba.",
+   "back": "He is the one who builds houses.",
+   "reading": "Ndíye ànóváká dzimbá.",
+   "extra": "FSI Unit 11. ndi- + a relative verb."
+  }
+ ],
+ "Who is doing it?": [
+  {
+   "kind": "sentence",
+   "front": "Ari kubika ndiani?",
+   "back": "Who is the one who is cooking?",
+   "reading": "Àrí kūbika ndíaní?",
+   "extra": "FSI Unit 11. Relative àrí, then ndíaní."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndivanaani vakaita basa rake?",
+   "back": "Who (all) did his work?",
+   "reading": "Ndívanaaní vàkáíta basa ráké?",
+   "extra": "FSI Unit 11."
+  }
+ ],
+ "I don't speak Shona well": [
+  {
+   "kind": "sentence",
+   "front": "Handitauri chiShona zvakanaka.",
+   "back": "I don't speak Shona well.",
+   "reading": "Handítaúrí chiShóna zvakánáka.",
+   "extra": "FSI Unit 12."
+  },
+  {
+   "kind": "sentence",
+   "front": "Unotaura zvakanaka kwazvo.",
+   "back": "You speak very well.",
+   "reading": "Unótǎura zvakánáka kwázvo.",
+   "extra": "FSI Unit 12."
+  },
+  {
+   "kind": "word",
+   "front": "chiShona",
+   "back": "the Shona language; Shona ways",
+   "reading": "chiShóna",
+   "extra": "FSI Unit 12. Class 7."
+  },
+  {
+   "kind": "word",
+   "front": "mutauro",
+   "back": "language",
+   "reading": "mutauro",
+   "extra": "FSI Unit 12. Classes 3, 4."
+  },
+  {
+   "kind": "word",
+   "front": "-dzidzira",
+   "back": "to study",
+   "reading": "-dzídzírá",
+   "extra": "FSI Unit 12."
+  },
+  {
+   "kind": "word",
+   "front": "-pedza",
+   "back": "to finish",
+   "reading": "-pédzá",
+   "extra": "FSI Unit 12. Wapédzá heré kūtaura? Have you finished speaking?"
+  },
+  {
+   "kind": "word",
+   "front": "-ziva",
+   "back": "to know",
+   "reading": "-zívá",
+   "extra": "FSI Unit 12. Handízívi: I don't know."
+  },
+  {
+   "kind": "word",
+   "front": "chirungu",
+   "back": "a European language, English",
+   "reading": "chirungu",
+   "extra": "FSI Unit 12. Class 7. FSI: chiNgézi is English proper."
+  }
+ ],
+ "Not: the negative of -no-": [
+  {
+   "kind": "grammar",
+   "front": "ha- + subject prefix … -i",
+   "back": "negative of the -no- tense: handítaúrí, I don't speak",
+   "reading": null,
+   "extra": "FSI Unit 12, Note 1. Subject prefix high; final -i (or -e by dialect); no -no-."
+  },
+  {
+   "kind": "grammar",
+   "front": "handi- · hau- · haa- · hati- · hamu- · hava-",
+   "back": "negative subject prefixes: I · you · he/she · we · you (pl.) · they",
+   "reading": null,
+   "extra": "FSI Unit 12, Note 1."
+  },
+  {
+   "kind": "sentence",
+   "front": "Handizivi.",
+   "back": "I don't know.",
+   "reading": "Handízívi.",
+   "extra": "FSI Unit 12."
+  }
+ ],
+ "Can't, and don't want to": [
+  {
+   "kind": "word",
+   "front": "-gona",
+   "back": "to be able, can",
+   "reading": "-gona",
+   "extra": "FSI Unit 12. A low verb. Handígoní: I can't."
+  },
+  {
+   "kind": "sentence",
+   "front": "Handidi.",
+   "back": "I don't want (to).",
+   "reading": "Handídí.",
+   "extra": "FSI Unit 12. Negative of -dá."
+  },
+  {
+   "kind": "sentence",
+   "front": "Havagoni kuverenga.",
+   "back": "They can't read.",
+   "reading": "Havágoní kūverenga.",
+   "extra": "FSI Unit 12."
+  },
+  {
+   "kind": "sentence",
+   "front": "Haazivi kuchaira.",
+   "back": "He doesn't know how to drive.",
+   "reading": "Haázívi kūchaira.",
+   "extra": "FSI Unit 12. -zívá + infinitive: know how to."
+  }
  ]
 }

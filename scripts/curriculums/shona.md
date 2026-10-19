@@ -1,6 +1,6 @@
 # Shona — the plan
 
-**Status: approved 2026-10-19. Stages 1–2 are written (56 lessons, 193
+**Status: approved 2026-10-19. Stages 1–3 are written (75 lessons, 276
 cards); the rest is a plan, built a stage at a time.**
 
 His rulings so far: Shona is the first of the five empty curriculums to be
@@ -89,8 +89,8 @@ after another.
 | --- | --- | --- |
 | 1 | The sounds, tone, and greeting someone | 25 |
 | 2 | Who, where, when, and how many (FSI Units 5–8) — **written, 28** | 30 |
-| 3 | FSI from Unit 9: the today-tense, demonstratives, relatives, the first negatives | 35 |
-| 4 | Agreement in full, and the rest of the tenses | 35 |
+| 3 | Being, doing, this and that, and not (FSI Units 9–12) — **written, 19** | 35 |
+| 4 | FSI from Unit 13: more negatives, the imperative, *na-*, object prefixes | 35 |
 | 5 | The negatives in every tense | 35 |
 | 6 | Object concords and the verb's extensions | 30 |
 | 7 | Relatives, the subjunctive, and reading the Bible | 30 |
@@ -134,6 +134,14 @@ locatives and where-questions; the -ka- tense, days, numbers and their
 concords, periods and "ago"; -ndo- and -zo-; the -cha- tense, one-syllable
 verbs and possessives of both kinds; the store and the -nga- tense; the
 pronouns, places to go, the strong adjectives and direct-only reported speech.
+
+**Stage 3** draws on FSI Units 9–12: buying at a stall; *-rí* "be", alone and
+with an infinitive for "am doing"; the "what?" ending *-nyi*; the
+demonstratives of every class; the past of today (the greetings' tense, at
+last explained) and the *-i-* "used to"; relative verbs, made by tone alone,
+and with them most English adjectives and the *ndí-* "it is" forms; and the
+negative of the *-no-* tense, with *-gona*, *-dá* and *-zívá*. FSI's 1965
+coinage is named as history and not carded.
 
 **A Stage 1 correction, from Unit 5's table.** Stage 1 gave FSI's *w-* (he,
 she) and *mw-* (you, pl.) as the past prefixes; Unit 5 labels both
