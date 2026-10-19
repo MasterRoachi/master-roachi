@@ -37,9 +37,9 @@ export const WORK_SECTIONS: WorkSection[] = [
     what: 'The public side of the site.',
     tools: [
       {
-        href: '/work/store/',
-        name: 'Products',
-        what: 'What each design is, in your own words.',
+        href: '/work/shop/',
+        name: 'Shop',
+        what: 'Orders, and what each design is in your own words.',
       },
       {
         href: '/work/projects/',

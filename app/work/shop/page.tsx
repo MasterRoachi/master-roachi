@@ -3,9 +3,12 @@ import { pageMeta } from '@/lib/seo';
 import { site } from '@/lib/site';
 import { getStore, garmentLabel, priceSummary, productPath } from '@/lib/store';
 import StoreCopyEditor, { type EditorProduct } from './StoreCopyEditor';
+import Orders from './Orders';
+import ShopTabs from './ShopTabs';
 
-// Products — the one part of a product page that is not a number out of
-// Printful, which is the copy.
+// Shop — the store's admin. Two tabs: Orders, live from D1, and Products,
+// the one part of a product page that is not a number out of Printful, which
+// is the copy. It was /work/store, and only the copy, until 2026-10-19.
 //
 // The product LIST is read at build time, because products come from Printful
 // and only change when the store is synced. That used to mean "a new product
@@ -18,13 +21,13 @@ import StoreCopyEditor, { type EditorProduct } from './StoreCopyEditor';
 // edits and a stale copy of it would overwrite newer text.
 
 export const metadata: Metadata = pageMeta({
-  path: '/work/store/',
-  title: 'Products',
-  description: 'What each design is, in your own words.',
+  path: '/work/shop/',
+  title: 'Shop',
+  description: 'Orders, and what each design is in your own words.',
   noIndex: true,
 });
 
-export default function WorkStorePage() {
+export default function WorkShopPage() {
   const { products, fetchedAt } = getStore();
 
   const synced: EditorProduct[] = products.map((product) => ({
@@ -63,11 +66,16 @@ export default function WorkStorePage() {
 
   return (
     <div className="shell">
-      <StoreCopyEditor
-        products={[...synced, ...planned]}
-        fetchedAt={fetchedAt ?? null}
-        storeName={site.store.name}
-        siteName={site.name}
+      <ShopTabs
+        orders={<Orders />}
+        products={
+          <StoreCopyEditor
+            products={[...synced, ...planned]}
+            fetchedAt={fetchedAt ?? null}
+            storeName={site.store.name}
+            siteName={site.name}
+          />
+        }
       />
     </div>
   );

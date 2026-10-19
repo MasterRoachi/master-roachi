@@ -112,13 +112,12 @@ fail-closed behaviour as everything else here.
 
 ### Secrets
 
-Five, none of them in the repo. `npx wrangler secret list` names them:
+Four, none of them in the repo. `npx wrangler secret list` names them:
 
 | | What it is for | Set it with |
 | --- | --- | --- |
 | `GITHUB_TOKEN` | the backend committing to this repo | `npm run github-auth` |
 | `TRELLO_KEY`, `TRELLO_TOKEN` | what `/work/boards` reads | `npm run trello-auth` |
-| `ORDERS_KEY` | reading store orders back out of KV | `npx wrangler secret put ORDERS_KEY` |
 | `VOTE_SALT` | salting the voter hash, which is guessable without it | `npx wrangler secret put VOTE_SALT` |
 
 Every one of them **fails closed**: a missing secret makes its endpoint serve
@@ -126,6 +125,11 @@ the 404 page rather than answer. `GITHUB_TOKEN` expires — when the backend's
 editor starts reporting a failure to list files, rotate it with
 `npm run github-auth`, and run that in your own terminal rather than through an
 agent session, since it asks for a token.
+
+`ORDERS_KEY` was a fifth. It guarded the public `/api/orders` list, which was
+removed on 2026-10-19 when orders moved into D1 and `/work/shop/`. If
+`wrangler secret list` still names it, it is unused:
+`npx wrangler secret delete ORDERS_KEY`.
 
 ---
 

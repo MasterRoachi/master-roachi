@@ -92,20 +92,17 @@ interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
   VOTES?: KVNamespace;
   /**
-   * Where an order's delivery details go.
+   * The fallback for an order's delivery details.
    *
    * PayFast's shareable links take money without asking where to send
    * anything, and the amount does not identify the size — R500 covers XS to
    * XL. So the address is collected here first, and the customer only reaches
    * PayFast once there is something to post to.
+   *
+   * Orders live in D1 (`orders`, migration 0015). This is written only when
+   * D1 cannot be, and /work/api/orders sweeps it into D1 on every read.
    */
   ORDERS?: KVNamespace;
-  /**
-   * Guards the order list. Without it /api/orders answers 404 rather than
-   * handing anyone the customers' addresses — a missing secret must fail
-   * closed, not open.
-   */
-  ORDERS_KEY?: string;
   /**
    * Salts the voter hash. Without it the hash of a given IP is guessable, so
    * someone could test whether a particular address had voted. Optional
@@ -130,7 +127,7 @@ interface Env {
   TRELLO_TOKEN?: string;
 
   /**
-   * Printful, for the Sync button on /work/store.
+   * Printful, for the Sync button on /work/shop.
    *
    * The build script reads the same token from .env.local, but the build has
    * never had it — data/store.json sat committed and a month stale while
@@ -174,14 +171,104 @@ interface Env {
 const VOTE_TTL = 60 * 60 * 24 * 180;
 
 /**
- * How long a delivery address is kept.
+ * How long an order written to the KV FALLBACK is kept.
  *
- * Six months: long enough to cover the order, a slow delivery and a return
- * inside the fault window, and short enough that this is not a permanent
- * archive of where customers live. Stated on /policies/ under Privacy, which
- * has to stay true.
+ * Only a fallback now: the record is the row in D1, and the KV copy only has
+ * to survive until /work/api/orders next sweeps it across. Six months is
+ * kept anyway, so an order written while D1 was down for a long time is not
+ * lost before anyone looks.
  */
 const ORDER_TTL = 60 * 60 * 24 * 180;
+
+/** What an order can be marked. See migrations/0015_orders.sql. */
+const ORDER_STATUSES = ['received', 'paid', 'fulfilled', 'dismissed'] as const;
+type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+/** An order as /api/order shapes it, and as the KV fallback holds it. */
+interface OrderRecord {
+  ref: string;
+  at: string;
+  product: string;
+  productId: string;
+  size: string;
+  price: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  note: string;
+}
+
+/**
+ * One order into D1. `insert or ignore` on the reference, so sweeping the
+ * same KV entry twice is harmless — it is the same order.
+ */
+function insertOrder(db: D1Database, order: OrderRecord) {
+  return db
+    .prepare(
+      `insert or ignore into orders
+         (ref, created_at, product, product_id, size, price, name, email, phone, address, note)
+       values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)`,
+    )
+    .bind(
+      order.ref,
+      order.at,
+      order.product,
+      order.productId,
+      order.size,
+      order.price,
+      order.name,
+      order.email,
+      order.phone,
+      order.address,
+      order.note,
+    );
+}
+
+/**
+ * Whatever is in KV, into D1.
+ *
+ * Both the orders that were in KV when D1 took over and any written since as
+ * a fallback. The KV entries are left to expire rather than deleted: the
+ * sweep is idempotent, and a delete is the one step here that could lose an
+ * order if it ran before the insert had really landed.
+ */
+async function sweepOrders(kv: KVNamespace, db: D1Database): Promise<number> {
+  let cursor: string | undefined;
+  const found: OrderRecord[] = [];
+  do {
+    const page = await kv.list({ prefix: 'order:', cursor, limit: 1000 });
+    for (const entry of page.keys) {
+      const value = await kv.get(entry.name);
+      if (!value) continue;
+      try {
+        const order = JSON.parse(value) as Partial<OrderRecord>;
+        if (!order.ref || !order.at || !order.name || !order.email || !order.address || !order.size) {
+          continue;
+        }
+        found.push({
+          ref: order.ref,
+          at: order.at,
+          product: order.product ?? '',
+          productId: order.productId ?? '',
+          size: order.size,
+          price: order.price ?? '',
+          name: order.name,
+          email: order.email,
+          phone: order.phone ?? '',
+          address: order.address,
+          note: order.note ?? '',
+        });
+      } catch {
+        // A value that is not JSON is not an order; leave it where it is.
+      }
+    }
+    cursor = page.list_complete ? undefined : page.cursor;
+  } while (cursor);
+
+  if (found.length > 0) await db.batch(found.map((order) => insertOrder(db, order)));
+  return found.length;
+}
 
 /**
  * How big an uploaded image may be.
@@ -360,12 +447,11 @@ export default {
     if (route === '/api/order') {
       if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);
 
-      const orders = env.ORDERS;
       // The buy flow treats this as non-fatal and sends the customer on to
       // PayFast regardless — the thank-you page then asks for the address by
       // email, which is where this started. Losing the convenience is better
       // than blocking a sale.
-      if (!orders) return json({ stored: false, reason: 'not-configured' }, 200);
+      if (!env.DB && !env.ORDERS) return json({ stored: false, reason: 'not-configured' }, 200);
 
       const raw = await request.text();
       if (raw.length > ORDER_MAX_BYTES) {
@@ -398,40 +484,25 @@ export default {
       }
 
       const ref = reference();
-      await orders.put(
-        `order:${new Date().toISOString()}:${ref}`,
-        JSON.stringify({ ...order, ref, at: new Date().toISOString() }),
-        { expirationTtl: ORDER_TTL },
-      );
+      const at = new Date().toISOString();
+      const record: OrderRecord = { ...order, ref, at };
+
+      // D1 is the record. KV only when D1 is missing or failed, and the next
+      // read of /work/api/orders carries it across.
+      if (env.DB) {
+        try {
+          await insertOrder(env.DB, record).run();
+          return json({ stored: true, ref }, 200);
+        } catch {
+          // Fall through to KV.
+        }
+      }
+      if (!env.ORDERS) return json({ stored: false, reason: 'not-stored' }, 200);
+      await env.ORDERS.put(`order:${at}:${ref}`, JSON.stringify(record), {
+        expirationTtl: ORDER_TTL,
+      });
 
       return json({ stored: true, ref }, 200);
-    }
-
-    // --- reading them back --------------------------------------------------
-    //
-    // There is no admin page; this is the whole of it. Guarded by a secret
-    // compared in full rather than by a prefix, and answering 404 rather than
-    // 401 when it is wrong, so probing cannot tell the difference between a
-    // bad key and no endpoint.
-    if (route === '/api/orders') {
-      const key = url.searchParams.get('key') ?? '';
-      const expected = env.ORDERS_KEY ?? '';
-      if (!expected || key !== expected) {
-        return env.ASSETS.fetch(request);
-      }
-
-      const orders = env.ORDERS;
-      if (!orders) return json({ configured: false, orders: [] }, 200);
-
-      const page = await orders.list({ prefix: 'order:', limit: 200 });
-      const rows = [];
-      for (const entry of page.keys) {
-        const value = await orders.get(entry.name);
-        if (value) rows.push(JSON.parse(value));
-      }
-      // Newest first: the key carries an ISO timestamp, so this sorts by time.
-      rows.reverse();
-      return json({ configured: true, count: rows.length, orders: rows }, 200);
     }
 
     // --- the work hub -------------------------------------------------------
@@ -1214,6 +1285,107 @@ export default {
         });
       } catch {
         return new Response(null, { status: 404 });
+      }
+    }
+
+    // --- /work/store moved ----------------------------------------------------
+    //
+    // Products became Shop on 2026-10-19, and its orders tab with it. A
+    // bookmark to the old page should land on the new one, not the 404.
+    if (route === '/work/store') {
+      return Response.redirect(new URL('/work/shop/', url).toString(), 301);
+    }
+
+    // --- orders --------------------------------------------------------------
+    //
+    // The shop's admin. It replaced `/api/orders?key=<secret>`, which was the
+    // whole interface until 2026-10-19 and needed its secret only because it
+    // was public. Here the one Access policy covers it like everything else.
+    if (route === '/work/api/orders') {
+      const throughAccess = request.headers.has('cf-access-jwt-assertion');
+      const local = url.hostname !== APEX;
+      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+
+      const db = env.DB;
+      if (!db) return json({ configured: false, orders: [] }, 200);
+
+      try {
+        if (request.method === 'GET') {
+          // Small enough to sweep on every read: a handful of KV keys, and
+          // usually none. A failed sweep must not hide the orders already in
+          // D1, so it is reported rather than thrown.
+          let swept = 0;
+          let sweepFailed = false;
+          if (env.ORDERS) {
+            try {
+              swept = await sweepOrders(env.ORDERS, db);
+            } catch {
+              sweepFailed = true;
+            }
+          }
+
+          // All of them. One product and a fixed-sum link make this tens of
+          // rows, not thousands, so search and filtering happen on the page.
+          const orders = await db
+            .prepare(
+              `select id, ref, created_at, product, product_id, size, price, name,
+                      email, phone, address, note, status, paid_at, fulfilled_at, dismissed_at
+               from orders order by created_at desc, id desc`,
+            )
+            .all();
+
+          return json({ configured: true, orders: orders.results, swept, sweepFailed }, 200);
+        }
+
+        if (request.method === 'POST') {
+          const body = (await request.json().catch(() => null)) as {
+            action?: string;
+            ref?: string;
+            status?: string;
+          } | null;
+          if (!body) return json({ error: 'malformed body' }, 400);
+
+          if (body.action === 'status') {
+            const ref = typeof body.ref === 'string' ? body.ref : '';
+            const status = body.status as OrderStatus;
+            if (!ref || !ORDER_STATUSES.includes(status)) {
+              return json({ error: 'a reference and a known status are required' }, 400);
+            }
+
+            // Each mark keeps the time it was first made; stepping back
+            // clears the marks after it, so Paid → Received is a real undo.
+            // Fulfilled implies Paid — nothing ships unpaid.
+            const now = new Date().toISOString();
+            const sets: Record<OrderStatus, string> = {
+              received: 'paid_at = null, fulfilled_at = null, dismissed_at = null',
+              paid: 'paid_at = coalesce(paid_at, ?2), fulfilled_at = null, dismissed_at = null',
+              fulfilled:
+                'paid_at = coalesce(paid_at, ?2), fulfilled_at = coalesce(fulfilled_at, ?2), dismissed_at = null',
+              dismissed: 'paid_at = null, fulfilled_at = null, dismissed_at = coalesce(dismissed_at, ?2)',
+            };
+            await db
+              .prepare(`update orders set status = ?3, ${sets[status]} where ref = ?1`)
+              .bind(ref, now, status)
+              .run();
+
+            const order = await db
+              .prepare(
+                `select id, ref, created_at, product, product_id, size, price, name,
+                        email, phone, address, note, status, paid_at, fulfilled_at, dismissed_at
+                 from orders where ref = ?1`,
+              )
+              .bind(ref)
+              .first();
+            if (!order) return json({ error: 'no such order' }, 404);
+            return json({ order }, 200);
+          }
+
+          return json({ error: 'unknown action' }, 400);
+        }
+
+        return json({ error: 'GET or POST only' }, 405);
+      } catch {
+        return json({ error: 'the orders table could not be read' }, 500);
       }
     }
 

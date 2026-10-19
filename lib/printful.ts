@@ -2,7 +2,7 @@
 //
 // Extracted from scripts/printful.mjs so that the build script and the Worker
 // can both sync the store without two copies of the same transformation. There
-// was no shared copy while only the build could sync; the moment /work/store
+// was no shared copy while only the build could sync; the moment /work/shop
 // grew a Sync button there were two callers, and two ports of this logic would
 // have drifted the first time Printful changed a field.
 //
@@ -83,7 +83,7 @@ export interface Catalogue {
  * The keys this module owns, and the only ones a sync may overwrite.
  *
  * `art`, `print` and `fabric` are hung off the same products by
- * scripts/store-art.mjs, and `artwork` by an upload from /work/store. None of
+ * scripts/store-art.mjs, and `artwork` by an upload from /work/shop. None of
  * them come from Printful, so a sync that wrote its own object wholesale would
  * silently delete the artwork — which is most of what the store page shows.
  * Both callers merge on this list rather than naming the foreign keys, so a

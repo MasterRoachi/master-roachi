@@ -1,0 +1,274 @@
+/* The shop's tabs, and the orders under the first of them.
+   Tokens from app/globals.css. */
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab,
+.tabOn {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--muted);
+  padding: 0.5rem 0.9rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tabOn {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.counts {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--ink);
+}
+
+.counts strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.sep {
+  margin: 0 0.45rem;
+  color: var(--muted);
+}
+
+.warn {
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.search {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.4rem 0.7rem;
+  font: inherit;
+  font-size: 0.875rem;
+  width: min(100%, 18rem);
+}
+
+.search:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.pill,
+.pillOn {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  padding: 0.3rem 0.85rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.pill:hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.pillOn {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--ink);
+}
+
+.message {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.order {
+  border-bottom: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  align-items: baseline;
+  gap: 0.75rem;
+  width: 100%;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  padding: 0.75rem 0;
+  font: inherit;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:hover .who {
+  color: var(--accent);
+}
+
+.who,
+.what {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.what,
+.when {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.when {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.badge {
+  justify-self: start;
+  border: 1px solid var(--line-bright);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* Status is the colour: gold where something is waiting on him, plain where
+   it is done, faded where it never happened. */
+.received .badge {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.paid .badge {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--ink);
+}
+
+.dismissed .who,
+.dismissed .what {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.detail {
+  padding: 0 0 1.25rem;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 0.35rem 1rem;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.fields dt {
+  color: var(--muted);
+}
+
+.fields dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.fields a {
+  color: var(--ink);
+}
+
+.ref {
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}
+
+.address {
+  white-space: pre-line;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.actions button {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.actions button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.actions button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.25rem 0.75rem;
+  }
+
+  .what,
+  .when {
+    grid-column: 2;
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+
+  .fields dd {
+    margin-bottom: 0.5rem;
+  }
+}

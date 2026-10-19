@@ -19,7 +19,7 @@
 // A missing token, an unreachable API or an empty store all leave the
 // committed data/store.json alone and let the build continue.
 //
-// THE SHAPING LIVES IN lib/printful.ts, not here. /work/store grew a Sync
+// THE SHAPING LIVES IN lib/printful.ts, not here. /work/shop grew a Sync
 // button that does the same job from the Worker, and two ports of this
 // transformation would have drifted the first time Printful changed a field.
 // This file is now the build's half: environment, disk, and the decision not
@@ -65,7 +65,7 @@ try {
 
 // Merged rather than written wholesale. store-art.mjs runs straight after this
 // and hangs `art`, `print` and `fabric` off these same products, and an upload
-// from /work/store adds `artwork` — none of it from Printful. Writing the raw
+// from /work/shop adds `artwork` — none of it from Printful. Writing the raw
 // catalogue dropped all of that and relied on store-art.mjs running next to
 // put it back, which is true in a build and not true of `npm run store` on its
 // own. Merging keeps the artwork whoever runs this.

@@ -2,7 +2,7 @@
 //
 // Its own module, with no imports, for one reason: two very different callers
 // need the identical string. The product page composes it at build time from
-// the copy on disk, and /work/store composes it from the textarea on every
+// the copy on disk, and /work/shop composes it from the textarea on every
 // keystroke so the SEO panel can score what the page WILL say. Anything living
 // in lib/store.ts would drag content/store/copy.json and the whole catalogue
 // into the browser bundle to get at one pure function.

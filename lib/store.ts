@@ -73,7 +73,7 @@ export interface StoreProduct {
    */
   art?: string | null;
   /**
-   * Art uploaded by hand from /work/store, which beats everything above it.
+   * Art uploaded by hand from /work/shop, which beats everything above it.
    *
    * A separate field and a separate filename on purpose: store-art.mjs
    * rewrites `art` from Printful's mockup on every build, so an upload stored

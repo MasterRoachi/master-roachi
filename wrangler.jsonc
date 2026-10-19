@@ -93,12 +93,10 @@
 	// working until it was done. Give it its own id whenever that is worth
 	// doing; nothing in the Worker cares which namespace it lands in.
 	//
-	// Reading orders back needs a secret, set once the Worker is deployed:
-	//
-	//   npx wrangler secret put ORDERS_KEY
-	//
-	// Without it /api/orders serves the 404 page instead of a list of
-	// customers' addresses. A missing secret fails closed.
+	// ORDERS is only the fallback now. Orders live in D1 (migration 0015) and
+	// are read at /work/shop/ behind Access; KV is written when D1 cannot be,
+	// and swept into D1 on the next read. The ORDERS_KEY secret and the public
+	// /api/orders endpoint it guarded were removed on 2026-10-19.
 	// The backend's own data: habits, and the trackers that follow. Not in git,
 	// because a daily tick is not worth a commit and a deploy.
 	//

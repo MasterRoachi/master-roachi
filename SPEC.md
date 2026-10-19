@@ -205,7 +205,7 @@ backend.
 | `/work/sketchpad` | Write and draw on one page, saved as one file |
 | `/work/writing` | Posts. Editing one commits it, and the commit publishes it |
 | `/work/projects` | The project pages behind `/projects` |
-| `/work/store` | What each design is, in your own words |
+| `/work/shop` | Orders, and what each design is in your own words |
 
 Writing, Projects and Product copy edit files in this repository through the
 GitHub API, so an edit is a commit and the commit triggers the deploy — MDX for
@@ -849,7 +849,8 @@ step 3 and step 4, which are the two that depend on them.
 store's admin: fulfilment, orders and shipping as well as the words. Product
 copy is one part of it, not the whole of it.
 
-How the shop works today, which is what the stages below are shaped around:
+How the shop worked when this plan was written, which is what the stages
+below are shaped around (steps 1 and 2 have since replaced the admin line):
 
 ```
 customer → /store/<slug> → PayFast payment link (a FIXED sum)
@@ -868,6 +869,17 @@ Three facts drive the order of the work:
   products; it does not create orders. Fulfilment is entirely manual and
   Printful never hears about a sale.
 
+**Steps 1 and 2 are built, 2026-10-19** — not yet deployed, and live D1 needs
+migration `0015_orders.sql` applied before the deploy. Orders are a D1 table;
+`/api/order` writes there and falls back to KV only when D1 fails;
+`/work/api/orders` sweeps KV into D1 on every read (idempotent on the
+reference) and sets status; `/work/shop/` has the Orders and Products tabs;
+`/work/store` redirects there; `/api/orders` and `ORDERS_KEY` are gone. The
+privacy text on `/policies/` now says orders are kept as the record of the sale
+rather than deleted after six months, which follows open decision 3's
+assumption — change it if that is ruled otherwise. Tested in
+`scripts/worker-test.mjs` against real SQLite with the real migration.
+
 **1. Orders, under `/work/shop/`.** List, detail, search, and a fulfilled
 mark. Behind Access with the rest of the backend, which also retires the
 `ORDERS_KEY`-in-the-query-string guard — that exists only because the endpoint
@@ -883,6 +895,21 @@ convenience is better than blocking a sale.
 status and tracking back onto the order. New ground — `lib/printful.ts` has no
 orders code. **Blocked until `PRINTFUL_TOKEN` is set as a Worker secret**,
 which is his to run, and the Sync button is blocked on the same thing.
+
+**Ruled 2026-10-19, in the question round for steps 1 and 2:**
+
+- **Steps 1 and 2 are one piece of work.** The page is built on D1 from the
+  start: migration first, the KV orders copied across, then the page reads D1.
+  Nothing is built over KV only to be moved.
+- **An order has three states: Received, Paid, Fulfilled.** `/api/order`
+  writes the order *before* the customer reaches PayFast, so a stored order is
+  a filled-in form, not a sale. He marks Paid by hand after checking PayFast;
+  unpaid ones can be filtered out or dismissed.
+- **`/work/store` becomes `/work/shop`**, one page with two tabs, Orders and
+  Products (the copy editor). Orders opens first.
+- **`/api/orders?key=` is removed in the same change**, along with
+  `ORDERS_KEY` from the code and docs. Deleting the secret from Cloudflare is
+  his to do.
 
 **4. Product copy, expanded.** Add **tagline**, **the story behind the
 design**, a **care/fit note**, and **alt text** for the art. Delete the ten
@@ -950,8 +977,8 @@ Question round, then build.
   show. The delete is blocked from this machine by the sandbox, which reads it
   as a mass delete, so it is one statement for him to run:
   `delete from lessons where curriculum_id in (9, 10); delete from curriculums where id in (9, 10);`
-- **Deploy the worker.** Seven commits are on `main` as of 2026-10-15 and the
-  live worker is behind them. Pushing to GitHub does not deploy — there is no
+- **Deploy the worker.** Seven commits were on `main` and not live as of
+  2026-10-15, and four more have landed since (the lint work, 2026-10-16). Pushing to GitHub does not deploy — there is no
   deploy hook and no Cloudflare token here.
 
 ### Open decisions
@@ -966,18 +993,14 @@ Question round, then build.
 4. **The public `/store/<slug>` page** — changed too, or only previewed
    accurately? *Assumed: unchanged for now.*
 
-### One thing to settle before the library browser can ship
+### Settled: the library index lives in D1
 
-`public/work/library.json` is an index of all 3,623 books in the Calibre
-library, and **this repository is public on GitHub**. Cloudflare Access gates
-the served path; it does nothing for the repo. The file is therefore **not
-committed**, and the reading page's library browser says "No library index.
-Run `npm run library`" until this is decided. Typing a title in by hand works
-regardless. The options: commit it and accept the listing is public, or move
-the index into D1 and serve it from `/work/api/library` behind Access, which
-keeps it out of git entirely. The same question applies to
-`public/work/books/*.webp`, though those are only the covers of books actually
-on a shelf.
+Ruled 2026-10-14. The Calibre index (3,623 books) was never committed, because
+**this repository is public on GitHub** and Access gates only the served path.
+It now lives in D1: `library_books` and `library_covers` (migration `0014`),
+served from `/work/api/library` and `/work/api/book-cover` behind Access.
+`npm run library` and `npm run book-covers` write to D1, and `public/work/` is
+gone. Nothing about his books goes into git.
 
 ## Tech Stack
 
@@ -1044,8 +1067,9 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       worth optimising against. `ts-fsrs` ships an optimiser that takes one;
       `card_reviews` exists to be handed to it. Nothing to do yet except keep
       the log.
-- [ ] **Rewrite the remaining seven curriculums**, one at a time, in route
-      order:
+- [x] **Rewrite the remaining seven curriculums.** Finished 2026-10-15 —
+      see "The rewrites are finished" under Curriculums. Odin is exempt. The
+      original item, in route order:
       Piano, Greek, Odin, Godot, Aseprite, Drawing, SA politics.
       Three phases each — research the subject and the free resources that
       teach it, plan the whole curriculum and have it approved, then implement.
@@ -1053,11 +1077,14 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       itself in the lesson rather than a pointer to a book. Through
       `scripts/curriculums/<name>.mjs` and `-detail.json`, so a rebuild keeps
       it. The prerequisites are done (code blocks, tables, lesson sources, the
-      duplicate-name guard); nothing of the rewriting itself is started.
+      duplicate-name guard).
 - [ ] **`PRINTFUL_TOKEN` is not set as a Worker secret**, so the store's Sync
       button reports "not switched on". The feature is built and unreachable
       until `npx wrangler secret put PRINTFUL_TOKEN` is run.
-- [ ] **Five curriculums have no sources.** Japanese, Greek and Odin carry real
+- [x] **Five curriculums have no sources.** Answered by the rewrites, which
+      gave every lesson its own sources. What is left is smaller and is under
+      Stage 4: Aseprite, Drawing and SA politics have an empty
+      *curriculum-level* Sources card. The original item: Japanese, Greek and Odin carry real
       ones; Piano, Godot, Aseprite, Drawing and SA politics were carrying the
       path of the document that DESIGNED them, which is not something he
       studies from, so those rows were deleted rather than replaced with
@@ -1087,7 +1114,6 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       library in `~/Media/Books` — 3,623 books, with covers — so adding one is
       now a search rather than retyping. The shelves still want what he is
       actually reading, and only he can put it there.
-- [ ] **The library index is not committed, and the repo is public.** See
-      "One thing to settle" under the Shop plan: `npm run library` writes
-      `public/work/library.json`, which lists everything he owns. Until it is
-      decided, the reading page's library browser is inert in production.
+- [x] **The library index is not committed, and the repo is public.** Settled
+      2026-10-14: it moved into D1 behind Access. See "Settled: the library
+      index lives in D1" under the Shop plan.

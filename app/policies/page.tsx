@@ -304,11 +304,10 @@ export default function PoliciesPage() {
               shared further, or used for marketing.
             </p>
             <p>
-              Order details are held in Cloudflare KV, the same storage the
-              rest of this site runs on, and are deleted automatically six
-              months after the order. Nobody but me can read them: the endpoint
-              that lists them is behind a secret and serves the 404 page
-              without it.
+              Order details are held in a Cloudflare database, the same
+              storage the rest of this site runs on, and are kept as the record
+              of the sale. Nobody but me can read them: the page that lists
+              them is behind a login. Email me and yours will be deleted.
             </p>
             <p>
               Payment card details are entered on{' '}

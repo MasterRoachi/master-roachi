@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { pathToFileURL } from 'node:url';
 
 // Run from the repo root: node scripts/worker-test.mjs
@@ -272,7 +273,6 @@ const ORDERS = fakeKV();
 const env = {
   ASSETS: { fetch: async () => new Response('404 page', { status: 404 }) },
   ORDERS,
-  ORDERS_KEY: 's3cret',
 };
 
 const post = (body) =>
@@ -345,22 +345,158 @@ check('address capped at 600', capped.address.length === 600, String(capped.addr
 res = await worker.fetch(get('https://masterroachi.com/api/order'), env);
 check('GET /api/order refused', res.status === 405, String(res.status));
 
-// --- reading orders back ---------------------------------------------------
-res = await worker.fetch(get('https://masterroachi.com/api/orders'), env);
-check('no key serves the 404 page', res.status === 404, String(res.status));
+// --- the keyed list is gone ------------------------------------------------
+//
+// /api/orders?key= was the whole admin until 2026-10-19. It is removed, not
+// just unlinked: the path now falls through to the site like any other.
+res = await worker.fetch(get('https://masterroachi.com/api/orders?key=s3cret'), { ...env, ORDERS_KEY: 's3cret' });
+check('the old keyed order list serves the 404 page', (await res.text()) === '404 page', String(res.status));
 
-res = await worker.fetch(get('https://masterroachi.com/api/orders?key=wrong'), env);
-check('wrong key serves the 404 page', res.status === 404, String(res.status));
+// --- orders in D1 ------------------------------------------------------------
+//
+// Against real SQLite with the real migration rather than a string-matching
+// fake: the status marks are SQL (coalesce, clearing on undo), and a fake that
+// pattern-matched the statements would test the fake.
 
-res = await worker.fetch(get('https://masterroachi.com/api/orders?key=s3cret'), env);
-body = await res.json();
-check('correct key lists orders', res.status === 200 && body.count === 2, JSON.stringify(body.count));
-check(
-  'newest first',
-  body.orders[0]?.name?.startsWith('NNN'),
-  body.orders[0]?.name?.slice(0, 6),
-);
-check('order carries its reference', body.orders.some((o) => o.ref === savedRef), savedRef);
+/** Enough of the D1 API over node:sqlite, with the orders migration applied. */
+function sqliteD1() {
+  const sqlite = new DatabaseSync(':memory:');
+  sqlite.exec(fs.readFileSync('migrations/0015_orders.sql', 'utf8'));
+  const d1 = {
+    sqlite,
+    broken: false,
+    prepare(sql) {
+      if (d1.broken) throw new Error('D1 is down');
+      let values = [];
+      const statement = {
+        bind(...bound) {
+          values = bound;
+          return statement;
+        },
+        async all() {
+          return { results: sqlite.prepare(sql).all(...values) };
+        },
+        async first() {
+          return sqlite.prepare(sql).get(...values) ?? null;
+        },
+        async run() {
+          return sqlite.prepare(sql).run(...values);
+        },
+      };
+      return statement;
+    },
+    async batch(statements) {
+      for (const statement of statements) await statement.run();
+    },
+  };
+  return d1;
+}
+
+{
+  const ordersDb = sqliteD1();
+  const kv = fakeKV();
+  const shopEnv = { ...env, ORDERS: kv, DB: ordersDb };
+  // viaAccess is declared further down the file; this block runs before it.
+  const access = (url) => new Request(url, { headers: { 'cf-access-jwt-assertion': 'stub-jwt' } });
+  const rows = () => ordersDb.sqlite.prepare('select * from orders order by id').all();
+  const buyer = { product: 'Roachi Shirt', size: 'L', name: 'D1 Buyer', email: 'd1@example.com', address: '2 Test Road' };
+
+  res = await worker.fetch(post(buyer), shopEnv);
+  body = await res.json();
+  check('an order goes into D1', body.stored === true && rows().length === 1, JSON.stringify(body));
+  check('and not into KV while D1 works', kv._map.size === 0, String(kv._map.size));
+  check('a new order is Received', rows()[0]?.status === 'received', rows()[0]?.status);
+  const d1Ref = body.ref;
+
+  ordersDb.broken = true;
+  res = await worker.fetch(post({ ...buyer, name: 'Fallback Buyer' }), shopEnv);
+  body = await res.json();
+  ordersDb.broken = false;
+  check('D1 failing falls back to KV', body.stored === true && kv._map.size === 1, JSON.stringify(body));
+  const fallbackRef = body.ref;
+
+  res = await worker.fetch(post(buyer), { ...shopEnv, DB: undefined, ORDERS: undefined });
+  body = await res.json();
+  check('neither bound still does not block a sale', body.stored === false, JSON.stringify(body));
+
+  // An order from before D1, as the old code wrote it.
+  await kv.put(
+    'order:2026-09-01T10:00:00.000Z:OLDREF22',
+    JSON.stringify({ product: 'Roachi Shirt', productId: '1', size: 'M', price: 'R500', name: 'Old Buyer',
+      email: 'old@example.com', phone: '', address: '3 Old Road', note: '', ref: 'OLDREF22', at: '2026-09-01T10:00:00.000Z' }),
+  );
+  await kv.put('order:junk', 'not json');
+
+  res = await worker.fetch(get('https://masterroachi.com/work/api/orders'), shopEnv);
+  check('orders without Access serve the 404 page', (await res.text()) === '404 page', String(res.status));
+
+  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), { ...shopEnv, DB: undefined });
+  body = await res.json();
+  check('orders with no database answer configured:false', body.configured === false, JSON.stringify(body));
+
+  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), shopEnv);
+  body = await res.json();
+  check('reading sweeps KV into D1', body.orders.length === 3 && body.swept === 2, JSON.stringify({ n: body.orders.length, swept: body.swept }));
+  check(
+    'the fallback and the pre-D1 order are both carried across',
+    [d1Ref, fallbackRef, 'OLDREF22'].every((ref) => body.orders.some((o) => o.ref === ref)),
+    body.orders.map((o) => o.ref).join(','),
+  );
+  check('newest first', body.orders.at(-1)?.ref === 'OLDREF22', body.orders.map((o) => o.ref).join(','));
+
+  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), shopEnv);
+  body = await res.json();
+  check('sweeping twice does not duplicate', body.orders.length === 3, String(body.orders.length));
+
+  const mark = async (ref, status) => {
+    const response = await worker.fetch(
+      new Request('https://masterroachi.com/work/api/orders', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'cf-access-jwt-assertion': 'stub-jwt' },
+        body: JSON.stringify({ action: 'status', ref, status }),
+      }),
+      shopEnv,
+    );
+    return { status: response.status, body: await response.json() };
+  };
+
+  let marked = await mark(d1Ref, 'paid');
+  check('mark paid', marked.body.order?.status === 'paid' && !!marked.body.order?.paid_at, JSON.stringify(marked.body));
+  const paidAt = marked.body.order?.paid_at;
+
+  marked = await mark(d1Ref, 'fulfilled');
+  check(
+    'fulfilled keeps the time it was paid',
+    marked.body.order?.status === 'fulfilled' && marked.body.order?.paid_at === paidAt && !!marked.body.order?.fulfilled_at,
+    JSON.stringify(marked.body.order),
+  );
+
+  marked = await mark(d1Ref, 'received');
+  check(
+    'stepping back to received clears the marks',
+    marked.body.order?.status === 'received' && marked.body.order?.paid_at === null && marked.body.order?.fulfilled_at === null,
+    JSON.stringify(marked.body.order),
+  );
+
+  marked = await mark(fallbackRef, 'fulfilled');
+  check('fulfilled straight from received implies paid', !!marked.body.order?.paid_at, JSON.stringify(marked.body.order));
+
+  marked = await mark('OLDREF22', 'dismissed');
+  check('dismiss', marked.body.order?.status === 'dismissed' && !!marked.body.order?.dismissed_at, JSON.stringify(marked.body.order));
+
+  marked = await mark(d1Ref, 'shipped');
+  check('an unknown status is refused', marked.status === 400, String(marked.status));
+
+  marked = await mark('NOSUCHRF', 'paid');
+  check('an unknown order is a 404', marked.status === 404, String(marked.status));
+
+  res = await worker.fetch(get('https://masterroachi.com/work/store/'), env);
+  check(
+    '/work/store redirects to /work/shop/',
+    res.status === 301 && res.headers.get('location') === 'https://masterroachi.com/work/shop/',
+    `${res.status} ${res.headers.get('location')}`,
+  );
+}
 
 // --- no KV bound -----------------------------------------------------------
 res = await worker.fetch(post({ size: 'M', name: 'a', email: 'b@c.d', address: 'e' }), {
