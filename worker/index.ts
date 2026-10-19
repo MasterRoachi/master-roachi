@@ -32,12 +32,16 @@ import {
   createDraftOrder,
   findSyncVariant,
   isSettled,
+  shippingRates,
   PrintfulError,
   readPrintfulOrder,
   type Recipient,
 } from '../lib/printful-orders';
 import { joinFile, readScalar, setScalar, splitFile } from '../lib/frontmatter';
 import { addressProblem, addressText, readAddress, type Address } from '../lib/address';
+import { CURRENCY, deliveryPrice, itemPrice } from '../lib/price';
+import { amountString, notificationSigned, notificationString, payfastHost, signCheckout } from '../lib/payfast';
+import storeSnapshot from '../data/store.json';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -153,6 +157,23 @@ interface Env {
   PRINTFUL_STORE_ID?: string;
 
   /**
+   * PayFast's checkout, for live delivery quotes (his ruling, 2026-10-19).
+   * From the PayFast dashboard, Settings → Integration:
+   *
+   *   npx wrangler secret put PAYFAST_MERCHANT_ID
+   *   npx wrangler secret put PAYFAST_MERCHANT_KEY
+   *   npx wrangler secret put PAYFAST_PASSPHRASE
+   *
+   * PAYFAST_SANDBOX = "true" sends checkouts to sandbox.payfast.co.za with
+   * the sandbox merchant instead. Without all three, /api/checkout answers
+   * that it is not switched on, and the store keeps its payment links.
+   */
+  PAYFAST_MERCHANT_ID?: string;
+  PAYFAST_MERCHANT_KEY?: string;
+  PAYFAST_PASSPHRASE?: string;
+  PAYFAST_SANDBOX?: string;
+
+  /**
    * Commits content to the repo, which publishes it.
    *
    * The most powerful secret here by a distance: .github/workflows/deploy.yml
@@ -195,7 +216,80 @@ const ORDER_TTL = 60 * 60 * 24 * ORDER_RETENTION_DAYS;
 const ORDER_COLUMNS = `id, ref, created_at, product, product_id, size, price, name, email, phone,
   address, note, status, paid_at, fulfilled_at, dismissed_at, redacted_at,
   printful_id, printful_status, sent_at, carrier, tracking_number, tracking_url,
-  address1, address2, city, state_code, zip, country_code`;
+  address1, address2, city, state_code, zip, country_code,
+  item_amount, shipping_amount, total, currency, shipping_method, shipping_name, pf_payment_id`;
+
+/** What a checkout costs, worked out here and never taken from the browser. */
+interface Quote {
+  item: number;
+  delivery: number;
+  total: number;
+  currency: string;
+  method: { id: string; name: string; minDays: number | null; maxDays: number | null };
+}
+
+class QuoteError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
+/**
+ * The price of one size, delivered to one address.
+ *
+ * The product and its USD price come from data/store.json, bundled into this
+ * Worker — the same catalogue the page was built from. Delivery is Printful's
+ * cheapest rate to the address, in USD, converted the same way. Both go
+ * through lib/price.ts in 'payfast' mode: no delivery inside the item price,
+ * because it is quoted on top.
+ */
+async function quoteFor(env: Env, productId: string, size: string, address: Address): Promise<Quote> {
+  const product = (storeSnapshot as { products: { id: number; name: string; variants?: { size: string | null; amount: number; available: boolean }[] }[] }).products
+    .find((p) => String(p.id) === productId);
+  const variant = product?.variants?.find((v) => v.size === size);
+  if (!product || !variant) throw new QuoteError('That product or size is not for sale.', 404);
+  if (!variant.available) throw new QuoteError('That size is sold out.', 409);
+  const item = itemPrice(productId, size, variant.amount, 'payfast');
+  if (item === null) throw new QuoteError('No price is set yet.', 503);
+  if (!env.PRINTFUL_TOKEN) throw new QuoteError('Delivery cannot be quoted yet.', 503);
+
+  const auth = { token: env.PRINTFUL_TOKEN, storeId: env.PRINTFUL_STORE_ID ?? null };
+  const sync = await findSyncVariant(auth, productId, size);
+  if (sync.variantId === null) throw new QuoteError('Delivery cannot be quoted for this product.', 502);
+  const rates = await shippingRates(
+    auth,
+    {
+      address1: address.address1,
+      city: address.city,
+      country_code: address.country_code,
+      state_code: address.state_code || undefined,
+      zip: address.zip,
+    },
+    sync.variantId,
+  );
+  const cheapest = rates[0];
+  if (!cheapest) throw new QuoteError('Printful does not deliver to that address.', 422);
+  const delivery = deliveryPrice(cheapest.rate);
+  if (delivery === null) throw new QuoteError('No price is set yet.', 503);
+
+  return {
+    item,
+    delivery,
+    total: item + delivery,
+    currency: CURRENCY,
+    method: { id: cheapest.id, name: cheapest.name, minDays: cheapest.minDays, maxDays: cheapest.maxDays },
+  };
+}
+
+/** Whatever went wrong with a quote, as a response the buy form can show. */
+function quoteFailure(error: unknown): Response {
+  if (error instanceof QuoteError) return json({ error: error.message }, error.status);
+  if (error instanceof PrintfulError) return json({ error: 'Delivery could not be quoted just now. Try again shortly.' }, 502);
+  return json({ error: 'Something went wrong working out the price.' }, 500);
+}
 
 /** What an order can be marked. See migrations/0015_orders.sql. */
 const ORDER_STATUSES = ['received', 'paid', 'fulfilled', 'dismissed'] as const;
@@ -562,6 +656,177 @@ export default {
       });
 
       return json({ stored: true, ref }, 200);
+    }
+
+    // --- a delivery quote ----------------------------------------------------
+    //
+    // Public: the buy form asks before showing a total. Live from Printful on
+    // every ask, so it cannot be stale; at one product and a handful of
+    // customers that is well inside Printful's 120 calls a minute.
+    if (route === '/api/quote') {
+      if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);
+      const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+      if (!body) return json({ error: 'Expected a JSON body.' }, 400);
+      const address = readAddress(body.address);
+      const problem = addressProblem(address);
+      if (problem) return json({ error: problem }, 400);
+      try {
+        const quote = await quoteFor(env, field(body.productId, 32), field(body.size, 16), address);
+        return json({ quote }, 200);
+      } catch (error) {
+        return quoteFailure(error);
+      }
+    }
+
+    // --- checkout ------------------------------------------------------------
+    //
+    // The order is stored, with every amount worked out here, BEFORE the
+    // customer goes to PayFast — so the notification that comes back can be
+    // checked against what was asked for. The answer is the signed form the
+    // browser posts to PayFast; the browser never chooses the amount.
+    if (route === '/api/checkout') {
+      if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);
+      const merchantId = env.PAYFAST_MERCHANT_ID;
+      const merchantKey = env.PAYFAST_MERCHANT_KEY;
+      const passphrase = env.PAYFAST_PASSPHRASE;
+      if (!merchantId || !merchantKey || !passphrase || !env.DB) {
+        return json({ error: 'Checkout is not switched on.' }, 503);
+      }
+
+      const raw = await request.text();
+      if (raw.length > ORDER_MAX_BYTES) return json({ error: 'Too large.' }, 413);
+      let body: Record<string, unknown>;
+      try {
+        body = JSON.parse(raw) as Record<string, unknown>;
+      } catch {
+        return json({ error: 'Expected a JSON body.' }, 400);
+      }
+
+      const productId = field(body.productId, 32);
+      const size = field(body.size, 16);
+      const name = field(body.name);
+      const email = field(body.email);
+      if (!name || !email || !productId || !size) {
+        return json({ error: 'Name, email and size are required.' }, 400);
+      }
+      const address = readAddress(body.address);
+      const problem = addressProblem(address);
+      if (problem) return json({ error: problem }, 400);
+
+      let quote: Quote;
+      try {
+        quote = await quoteFor(env, productId, size, address);
+      } catch (error) {
+        return quoteFailure(error);
+      }
+
+      const productName = field(body.product) || 'Order';
+      const ref = reference();
+      const at = new Date().toISOString();
+      const record: OrderRecord = {
+        ref,
+        at,
+        product: productName,
+        productId,
+        size,
+        price: `R${quote.total}`,
+        name,
+        email,
+        phone: field(body.phone, 40),
+        address: addressText(address),
+        note: field(body.note, 600),
+        structured: address,
+      };
+      await env.DB.batch([
+        insertOrder(env.DB, record),
+        env.DB.prepare(
+          `update orders set item_amount = ?2, shipping_amount = ?3, total = ?4, currency = ?5,
+                  shipping_method = ?6, shipping_name = ?7
+            where ref = ?1`,
+        ).bind(ref, quote.item, quote.delivery, quote.total, quote.currency, quote.method.id, quote.method.name),
+      ]);
+
+      // Back to the product page on a cancel, if the form said which one.
+      const page = field(body.page, 120);
+      const cancelPath = /^\/store\/[a-z0-9-]+\/$/.test(page) ? page : '/store/';
+      const [first, ...rest] = name.split(/\s+/);
+      const fields = signCheckout(
+        {
+          merchant_id: merchantId,
+          merchant_key: merchantKey,
+          return_url: `${url.origin}/store/thank-you/?ref=${ref}`,
+          cancel_url: `${url.origin}${cancelPath}`,
+          notify_url: `${url.origin}/api/payfast/notify`,
+          name_first: first,
+          name_last: rest.join(' '),
+          email_address: email,
+          m_payment_id: ref,
+          amount: amountString(quote.total),
+          item_name: `${productName} (${size})`.slice(0, 100),
+          item_description: `Order ${ref}, ${quote.method.name}`.slice(0, 255),
+        },
+        passphrase,
+      );
+
+      return json(
+        { ref, quote, action: `${payfastHost(env.PAYFAST_SANDBOX === 'true')}/eng/process`, fields },
+        200,
+      );
+    }
+
+    // --- PayFast's word that it was paid -------------------------------------
+    //
+    // PayFast posts here (the ITN) when a payment completes. Believed only if
+    // all three hold, as PayFast's own SDK checks: the signature, made with
+    // the passphrase only PayFast and this Worker know; PayFast's validate
+    // endpoint confirming it sent exactly this; and the amount matching what
+    // this Worker asked for. Then — and only then — the order is Paid.
+    //
+    // The SDK's fourth check, the sender's IP, needs DNS lookups a Worker
+    // does not have; the validate call is the stronger form of the same
+    // question, asked of PayFast directly.
+    if (route === '/api/payfast/notify') {
+      if (request.method !== 'POST') return new Response(null, { status: 405 });
+      const passphrase = env.PAYFAST_PASSPHRASE;
+      if (!passphrase || !env.DB) return new Response(null, { status: 503 });
+
+      const entries = [...new URLSearchParams(await request.text()).entries()];
+      if (!notificationSigned(entries, passphrase)) return new Response(null, { status: 400 });
+
+      const confirmed = await fetch(`${payfastHost(env.PAYFAST_SANDBOX === 'true')}/eng/query/validate`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: notificationString(entries),
+        signal: AbortSignal.timeout(15000),
+      })
+        .then(async (r) => r.ok && (await r.text()).trim() === 'VALID')
+        .catch(() => false);
+      // Not 200, so PayFast retries — a validate call that failed is not a
+      // payment that failed.
+      if (!confirmed) return new Response(null, { status: 502 });
+
+      const given = Object.fromEntries(entries);
+      const order = await env.DB.prepare('select ref, status, total from orders where ref = ?1')
+        .bind(given.m_payment_id ?? '')
+        .first<{ ref: string; status: string; total: number | null }>();
+      if (!order || order.total === null) return new Response(null, { status: 404 });
+      if (Math.abs(Number.parseFloat(given.amount_gross ?? '') - order.total) > 0.01) {
+        return new Response(null, { status: 400 });
+      }
+
+      if (given.payment_status === 'COMPLETE') {
+        // Only Received becomes Paid: a notification repeated after he has
+        // already fulfilled the order must not move it backwards.
+        await env.DB.prepare(
+          `update orders set pf_payment_id = ?2,
+                  status = case when status = 'received' then 'paid' else status end,
+                  paid_at = coalesce(paid_at, ?3)
+            where ref = ?1`,
+        )
+          .bind(order.ref, given.pf_payment_id ?? null, new Date().toISOString())
+          .run();
+      }
+      return new Response(null, { status: 200 });
     }
 
     // --- the work hub -------------------------------------------------------
@@ -1461,6 +1726,7 @@ export default {
               phone: string;
               printful_id: number | null;
               redacted_at: string | null;
+              shipping_method: string | null;
             }>();
 
           if (body.action === 'send') {
@@ -1494,7 +1760,12 @@ export default {
             try {
               const auth = { token: env.PRINTFUL_TOKEN, storeId: env.PRINTFUL_STORE_ID ?? null };
               const variant = await findSyncVariant(auth, order.product_id, order.size);
-              const state = await createDraftOrder(auth, { ref: order.ref, recipient, syncVariantId: variant });
+              const state = await createDraftOrder(auth, {
+                ref: order.ref,
+                recipient,
+                syncVariantId: variant.id,
+                shipping: order.shipping_method,
+              });
               await db
                 .prepare(
                   `update orders set printful_id = ?2, printful_status = ?3, sent_at = ?4

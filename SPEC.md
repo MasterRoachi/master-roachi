@@ -1029,6 +1029,8 @@ Question round, then build.
 
 - `npm run github-auth` when the GitHub token lapses.
 - More than one product in Printful.
+- **PayFast: set a passphrase**, then the steps in DEPLOY.md under "Switching
+  on the PayFast checkout" — sandbox first, then live, then flip `checkout`.
 
 ### Open decisions
 
@@ -1037,10 +1039,20 @@ Ruled 2026-10-19, except 2.
 1. **Build order.** ~~Orders and fulfilment first, or copy and preview
    first?~~ Settled by doing it: orders first, and fulfilment waits on
    `PRINTFUL_TOKEN`, which he will set after step 4.
-2. **Shipping — still open; he is not sure.** Informational only, or move off
-   fixed PayFast payment links? This is the one that changes the architecture
-   — a live Printful rate quote cannot alter what a fixed-sum link charges.
-   *Assumed: informational.* Nothing in steps 3–5 depends on it.
+2. **Shipping — live quotes at a PayFast checkout**, ruled later on
+   2026-10-19, with the delivery built into today's prices taken out
+   (`deliveryUsd` stops being added) and Printful's real rate quoted on top,
+   converted at `usdToZar` and rounded up. **Built, and off** until his
+   PayFast passphrase and keys are set: `checkout` in `lib/pricing.json` is
+   `"links"`, and one change to `"payfast"` switches prices, wording and the
+   buy form together — the payment links are keyed by exact amounts, so the
+   two must not move separately. `/api/quote`, `/api/checkout` (amounts worked
+   out by the Worker, order stored before PayFast, signed form returned) and
+   `/api/payfast/notify` (signature, PayFast's validate, amount — then Paid by
+   itself). Migration `0019`. `?checkout=payfast` on a product page shows the
+   new form on that one load, for trying it against the sandbox on the live
+   site. DEPLOY.md has the switch-on steps. The draft sent to Printful names
+   the shipping method that was quoted.
 3. **Order retention — 30 days from submission, then the personal details
    are removed.** Name, email, phone, address and note are blanked; product,
    size, price, status and dates stay, so what sold is still on record. Chosen

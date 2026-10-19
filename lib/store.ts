@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { site } from './site';
-import pricing from './pricing.json';
 // Authored product copy, keyed by Printful id. In content/ rather than in this
 // file so that a form can edit it without rewriting TypeScript.
 import storeCopy from '../content/store/copy.json';
 import { inOrder, readCopy, readOrder, type ProductCopy } from './product-copy';
+import { CURRENCY, itemPrice } from './price';
 
 // Reads the Printful catalogue written by scripts/printful.mjs at build time.
 // Nothing here runs at request time — the site is a static export, so the
@@ -264,28 +264,11 @@ export function sellingPrice(
   product: StoreProduct,
   size: string,
 ): { amount: number; currency: string } | null {
-  const currency = pricing.currency;
-
-  const override = (pricing.overrides as Record<string, Record<string, number>>)[
-    String(product.id)
-  ]?.[size];
-  if (Number.isFinite(override)) return { amount: override, currency };
-
-  const rate = pricing.usdToZar;
-  if (!rate) return null;
-
+  // lib/price.ts, which the Worker's checkout uses too, so a page and a
+  // charge cannot disagree.
   const variant = (product.variants ?? []).find((v) => v.size === size);
-  if (!variant || !Number.isFinite(variant.amount)) return null;
-
-  // Delivery is added before conversion rather than to Printful retail prices,
-  // so Printful stays a supplier figure and the markup lives in one place.
-  const cost = variant.amount + (pricing.deliveryUsd || 0);
-
-  // Rounded up, never down: rounding a converted price down quietly sells at a
-  // loss on every order of that size.
-  const step = pricing.roundUpTo || 1;
-  const amount = Math.ceil((cost * rate) / step) * step;
-  return { amount, currency };
+  const amount = itemPrice(product.id, size, variant?.amount);
+  return amount === null ? null : { amount, currency: CURRENCY };
 }
 
 /**

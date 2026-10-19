@@ -47,10 +47,17 @@ export default function OrderDetails({ email }: { email: string }) {
     } catch {
       // No storage, or nothing worth reading. The blank template covers it.
     }
+    // PayFast's checkout returns here with the reference in the URL, and that
+    // order was stored with its address before the customer left — so the
+    // reference alone is enough to confirm, even with storage blocked.
+    const ref = new URLSearchParams(window.location.search).get('ref');
+    if (ref && /^[A-Z0-9]{8}$/.test(ref)) {
+      setOrder((found) => (found?.ref === ref ? found : { product: '', size: '', price: '', ref, at: Date.now() }));
+    }
     setReady(true);
   }, []);
 
-  const known = order
+  const known = order?.size
     ? `${order.product} — ${order.size} (${order.price})`
     : null;
 
@@ -85,7 +92,13 @@ export default function OrderDetails({ email }: { email: string }) {
         <p className="eyebrow">Nothing else to do</p>
         <h2 className={styles.title}>I have your address</h2>
         <p className={styles.why}>
-          Your order is <strong>{known}</strong>, reference{' '}
+          {known ? (
+            <>
+              Your order is <strong>{known}</strong>, reference{' '}
+            </>
+          ) : (
+            <>Your order&rsquo;s reference is </>
+          )}
           <code className={styles.ref}>{order.ref}</code>. Quote that if you
           need to write about it. Everything below happens without you.
         </p>

@@ -75,8 +75,14 @@ async function call<T>(auth: PrintfulAuth, pathname: string, init?: { method: st
  * day a second colour is synced, this says so instead of printing the wrong
  * shirt.
  */
-export async function findSyncVariant(auth: PrintfulAuth, productId: string, size: string): Promise<number> {
-  const data = await call<{ result?: { sync_variants?: { id: number; size?: string | null; color?: string | null }[] } }>(
+export async function findSyncVariant(
+  auth: PrintfulAuth,
+  productId: string,
+  size: string,
+): Promise<{ id: number; variantId: number | null }> {
+  const data = await call<{
+    result?: { sync_variants?: { id: number; variant_id?: number | null; size?: string | null; color?: string | null }[] };
+  }>(
     auth,
     `/store/products/${encodeURIComponent(productId)}`,
   );
@@ -89,7 +95,57 @@ export async function findSyncVariant(auth: PrintfulAuth, productId: string, siz
       409,
     );
   }
-  return matches[0].id;
+  // `id` is the sync variant, which an order names; `variantId` is the
+  // catalogue variant, which a shipping quote needs.
+  return { id: matches[0].id, variantId: matches[0].variant_id ?? null };
+}
+
+/** One way Printful can send it, priced. */
+export interface ShippingRate {
+  id: string;
+  name: string;
+  /** In `currency`, as a number. Printful sends it as a string. */
+  rate: number;
+  currency: string;
+  minDays: number | null;
+  maxDays: number | null;
+}
+
+/**
+ * What delivery to this address costs, cheapest first.
+ *
+ * In USD, asked for explicitly: the store converts to rand itself, at the
+ * rate in lib/pricing.json, the same way it converts the product price.
+ */
+export async function shippingRates(
+  auth: PrintfulAuth,
+  recipient: Pick<Recipient, 'address1' | 'city' | 'country_code' | 'state_code' | 'zip'>,
+  variantId: number,
+): Promise<ShippingRate[]> {
+  const data = await call<{
+    result?: {
+      id: string;
+      name: string;
+      rate: string;
+      currency: string;
+      minDeliveryDays?: number;
+      maxDeliveryDays?: number;
+    }[];
+  }>(auth, '/shipping/rates', {
+    method: 'POST',
+    body: { recipient, items: [{ variant_id: variantId, quantity: 1 }], currency: 'USD' },
+  });
+  return (data.result ?? [])
+    .map((r) => ({
+      id: r.id,
+      name: r.name,
+      rate: Number.parseFloat(r.rate),
+      currency: r.currency,
+      minDays: r.minDeliveryDays ?? null,
+      maxDays: r.maxDeliveryDays ?? null,
+    }))
+    .filter((r) => Number.isFinite(r.rate) && r.currency === 'USD')
+    .sort((a, b) => a.rate - b.rate);
 }
 
 function stateOf(result: {
@@ -113,15 +169,17 @@ function stateOf(result: {
  */
 export async function createDraftOrder(
   auth: PrintfulAuth,
-  order: { ref: string; recipient: Recipient; syncVariantId: number },
+  order: { ref: string; recipient: Recipient; syncVariantId: number; shipping?: string | null },
 ): Promise<PrintfulOrderState> {
-  // No `confirm` parameter: Printful's default is a draft.
+  // No `confirm` parameter: Printful's default is a draft. `shipping` is the
+  // method the customer was quoted and paid for, where there was a quote.
   const data = await call<{ result: Parameters<typeof stateOf>[0] }>(auth, '/orders', {
     method: 'POST',
     body: {
       external_id: order.ref,
       recipient: order.recipient,
       items: [{ sync_variant_id: order.syncVariantId, quantity: 1 }],
+      ...(order.shipping ? { shipping: order.shipping } : {}),
     },
   });
   return stateOf(data.result);

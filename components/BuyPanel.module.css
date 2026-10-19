@@ -256,3 +256,40 @@ a.buy:hover {
   font-size: 0.86rem;
   color: oklch(78% 0.15 30);
 }
+
+/* The quote: item, delivery and total, before the button that pays it. */
+.quote {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: oklch(12% 0.01 340 / 0.6);
+  font-size: 0.9rem;
+}
+
+.quote div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.quote dt {
+  color: var(--muted);
+}
+
+.quote dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.quoteTotal {
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+  font-weight: 600;
+}
+
+.quoteTotal dt {
+  color: var(--ink);
+}

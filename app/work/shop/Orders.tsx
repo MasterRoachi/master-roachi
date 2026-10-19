@@ -52,6 +52,12 @@ interface Order {
   state_code: string | null;
   zip: string | null;
   country_code: string | null;
+  /** What a PayFast checkout charged, worked out by the Worker. Null for a payment-link order. */
+  item_amount: number | null;
+  shipping_amount: number | null;
+  total: number | null;
+  shipping_name: string | null;
+  pf_payment_id: string | null;
 }
 
 /** The address as Printful wants it, filled in from the one box and checked by hand. */
@@ -423,6 +429,25 @@ export default function Orders() {
                         {order.product}
                         {order.product_id && <span className={styles.muted}> · Printful {order.product_id}</span>}
                       </dd>
+                      {order.total !== null && (
+                        <>
+                          <dt>Charged</dt>
+                          <dd>
+                            R{order.total} — R{order.item_amount} for the item, R{order.shipping_amount} delivery
+                            {order.shipping_name && <span className={styles.muted}> ({order.shipping_name})</span>}
+                          </dd>
+                          <dt>PayFast</dt>
+                          <dd>
+                            {order.pf_payment_id ? (
+                              `Paid, payment ${order.pf_payment_id}`
+                            ) : (
+                              <span className={styles.muted}>
+                                No payment yet — PayFast marks it Paid here itself when one comes through.
+                              </span>
+                            )}
+                          </dd>
+                        </>
+                      )}
                       <dt>Submitted</dt>
                       <dd>{stamp(order.created_at)}</dd>
                       {order.paid_at && (

@@ -1,3 +1,4 @@
+import { CHECKOUT } from '@/lib/price';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
@@ -111,7 +112,9 @@ export default function StorePage() {
               {priceSummary(lead) && (
                 <>
                   <p className={styles.priceLine}>{priceSummary(lead)}</p>
-                  <p className={styles.shipping}>Worldwide delivery included</p>
+                  <p className={styles.shipping}>
+                    {CHECKOUT === 'payfast' ? 'Delivery quoted for your address' : 'Worldwide delivery included'}
+                  </p>
                 </>
               )}
 

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
 import PageHeader from '@/components/PageHeader';
 import { site } from '@/lib/site';
+import { CHECKOUT } from '@/lib/price';
 import styles from './policies.module.css';
 
 // Terms, delivery and returns.
@@ -124,13 +125,26 @@ export default function PoliciesPage() {
             </p>
 
             <h3>Prices</h3>
-            <p>
-              Prices are shown per size on each product page, in the currency
-              displayed there, and they <strong>include worldwide delivery</strong>.
-              The figure on the product page is the figure you pay. There is no
-              shipping added at checkout, no handling fee, and no surcharge for
-              being far away.
-            </p>
+            {/* Two true statements, one per way of paying. lib/pricing.json's
+                `checkout` decides which, so this cannot drift from the price. */}
+            {CHECKOUT === 'payfast' ? (
+              <p>
+                Prices are shown per size on each product page, in the
+                currency displayed there, and are for the item. Delivery is
+                quoted for your address by the printer before you pay, and
+                shown beside the total — <strong>the total you see before
+                paying is the figure you pay</strong>. There is no handling
+                fee.
+              </p>
+            ) : (
+              <p>
+                Prices are shown per size on each product page, in the currency
+                displayed there, and they <strong>include worldwide delivery</strong>.
+                The figure on the product page is the figure you pay. There is no
+                shipping added at checkout, no handling fee, and no surcharge for
+                being far away.
+              </p>
+            )}
             <p>
               Import duties and taxes on international orders are set by the
               destination country, are not collected here, and are the

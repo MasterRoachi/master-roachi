@@ -1,3 +1,4 @@
+import { CHECKOUT } from '@/lib/price';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -22,6 +23,7 @@ import {
   isSoldOut,
   garmentLabel,
   copyOf,
+  productPath,
   hasArtwork,
   type StoreProduct,
 } from '@/lib/store';
@@ -161,7 +163,9 @@ export default async function ProductPage({
                 {/* Said next to the number rather than in the policy alone.
                     A price that turns out to exclude postage is the single
                     most common way an online store feels like a trick. */}
-                <p className={styles.shipping}>Worldwide delivery included</p>
+                <p className={styles.shipping}>
+                  {CHECKOUT === 'payfast' ? 'Delivery quoted for your address' : 'Worldwide delivery included'}
+                </p>
               </>
             )}
 
@@ -186,6 +190,8 @@ export default async function ProductPage({
               soldOut={soldOut}
               name={product.name}
               productId={String(product.id)}
+              checkout={CHECKOUT}
+              page={productPath(product)}
             />
 
             {garmentLabel(product) && (

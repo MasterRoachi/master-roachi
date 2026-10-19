@@ -34,4 +34,6 @@
   # script or frame. The two exceptions are unavoidable — Next injects inline
   # bootstrap scripts and CSS-in-JS style tags, hence 'unsafe-inline' on both,
   # and Steam and Printful serve the game and product art over https.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
+  # form-action names PayFast because the checkout is a form posted to it
+  # (live and sandbox) — without that the browser refuses the submit.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://www.payfast.co.za https://sandbox.payfast.co.za; frame-ancestors 'self'; upgrade-insecure-requests

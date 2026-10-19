@@ -66,6 +66,16 @@ execFileSync(
 );
 const productCopy = await import(pathToFileURL(productCopyBundle).href);
 
+// PayFast's signature, where a wrong character fails a customer's payment
+// with nothing but "signature mismatch".
+const payfastBundle = path.join(os.tmpdir(), 'master-roachi-payfast-bundle.mjs');
+execFileSync(
+  'npx',
+  ['esbuild', 'lib/payfast.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${payfastBundle}`],
+  { stdio: 'pipe', shell: true },
+);
+const payfast = await import(pathToFileURL(payfastBundle).href);
+
 // Reading a lesson's blocks, which is the ceiling on what a lesson can teach
 // now that the material itself lives in `detail`. Silent when wrong: a fence
 // misread does not throw, it shows a program as one run-together line, which
@@ -379,6 +389,7 @@ function sqliteD1() {
   sqlite.exec(fs.readFileSync('migrations/0016_order_retention.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0017_order_fulfilment.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0018_order_address.sql', 'utf8'));
+  sqlite.exec(fs.readFileSync('migrations/0019_order_checkout.sql', 'utf8'));
   const d1 = {
     sqlite,
     broken: false,
@@ -593,7 +604,10 @@ function sqliteD1() {
   // when colour would be a guess, and the status comes back on the next read.
   const realFetch = globalThis.fetch;
   const printfulCalls = [];
-  let variants = [{ id: 555, size: 'L', color: 'Black Heather' }, { id: 556, size: 'M', color: 'Black Heather' }];
+  let variants = [
+    { id: 555, variant_id: 4012, size: 'L', color: 'Black Heather' },
+    { id: 556, variant_id: 4011, size: 'M', color: 'Black Heather' },
+  ];
   let remote = { id: 9001, status: 'draft', shipments: [] };
   globalThis.fetch = async (input, init = {}) => {
     const url = String(input);
@@ -601,6 +615,12 @@ function sqliteD1() {
     printfulCalls.push({ url, method: init.method ?? 'GET', body: init.body ? JSON.parse(init.body) : null });
     const reply = (result) => new Response(JSON.stringify({ code: 200, result }), { status: 200 });
     if (url.includes('/store/products/')) return reply({ sync_variants: variants });
+    if (url.endsWith('/shipping/rates')) {
+      return reply([
+        { id: 'STANDARD', name: 'Flat Rate (Estimated delivery: 7–14 business days)', rate: '12.49', currency: 'USD', minDeliveryDays: 7, maxDeliveryDays: 14 },
+        { id: 'EXPRESS', name: 'Express', rate: '31.20', currency: 'USD' },
+      ]);
+    }
     if (url.endsWith('/orders') && init.method === 'POST') return reply(remote);
     if (url.includes('/orders/9001')) return reply(remote);
     return new Response(JSON.stringify({ code: 404, error: { message: 'Not found' } }), { status: 404 });
@@ -686,6 +706,136 @@ function sqliteD1() {
       ordersDb.sqlite.prepare('select printful_id from orders where ref = ?').get(colourRef).printful_id === null,
     JSON.stringify(sent),
   );
+
+  // --- quote, checkout, and PayFast's notification ------------------------
+  //
+  // His ruling, 2026-10-19: delivery quoted live, paid at PayFast's checkout.
+  // The amounts are the Worker's own — L is $16, so R280 at 17.5 rounded up
+  // to R10; Printful's cheapest rate, $12.49, is R220; R500 in all.
+  variants = [
+    { id: 555, variant_id: 4012, size: 'L', color: 'Black Heather' },
+    { id: 556, variant_id: 4011, size: 'M', color: 'Black Heather' },
+  ];
+  const where = { address1: '5 Long St', city: 'Cape Town', zip: '8001', country_code: 'ZA' };
+  const postTo = (route, payload, useEnv) =>
+    worker.fetch(
+      new Request(`https://masterroachi.com${route}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'cf-visitor': '{"scheme":"https"}' },
+        body: JSON.stringify(payload),
+      }),
+      useEnv,
+    );
+
+  res = await postTo('/api/quote', { productId: '464722916', size: 'L', address: where }, printfulEnv);
+  body = await res.json();
+  check(
+    'a quote is the item, the cheapest delivery, and their sum',
+    body.quote?.item === 280 && body.quote?.delivery === 220 && body.quote?.total === 500 && body.quote?.method.id === 'STANDARD',
+    JSON.stringify(body),
+  );
+  const ratesCall = printfulCalls.filter((c) => c.url.endsWith('/shipping/rates')).at(-1);
+  check(
+    'asked of Printful in USD, by catalogue variant',
+    ratesCall?.body.currency === 'USD' && ratesCall?.body.items[0].variant_id === 4012 && ratesCall?.body.recipient.country_code === 'ZA',
+    JSON.stringify(ratesCall?.body),
+  );
+  res = await postTo('/api/quote', { productId: '464722916', size: 'L', address: { ...where, zip: '' } }, printfulEnv);
+  check('a quote without a postal code is refused', res.status === 400, String(res.status));
+  res = await postTo('/api/quote', { productId: '999', size: 'L', address: where }, printfulEnv);
+  check('a quote for no such product is a 404', res.status === 404, String(res.status));
+
+  const buyerPay = { product: 'Roachi Shirt', productId: '464722916', size: 'L', name: 'Pay Buyer Smith', email: 'pay@example.com', address: where, page: '/store/roachi-shirt/' };
+  res = await postTo('/api/checkout', buyerPay, printfulEnv);
+  check('checkout without the PayFast secrets is not switched on', res.status === 503, String(res.status));
+
+  const payEnv = {
+    ...printfulEnv,
+    PAYFAST_MERCHANT_ID: '10000100',
+    PAYFAST_MERCHANT_KEY: '46f0cd694581a',
+    PAYFAST_PASSPHRASE: 'jt7NOE43FZPn',
+    PAYFAST_SANDBOX: 'true',
+  };
+  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, payEnv);
+  body = await res.json();
+  const payRef = body.ref;
+  const signedFields = Object.fromEntries(body.fields ?? []);
+  check('checkout posts to the sandbox', body.action === 'https://sandbox.payfast.co.za/eng/process', body.action);
+  check('the amount is the Worker\'s, not the browser\'s', signedFields.amount === '500.00', signedFields.amount);
+  check(
+    'the fields carry the order and the way back',
+    signedFields.m_payment_id === payRef && signedFields.return_url === `https://masterroachi.com/store/thank-you/?ref=${payRef}` &&
+      signedFields.cancel_url === 'https://masterroachi.com/store/roachi-shirt/' && signedFields.notify_url === 'https://masterroachi.com/api/payfast/notify' &&
+      signedFields.name_first === 'Pay' && signedFields.name_last === 'Buyer Smith',
+    JSON.stringify(signedFields),
+  );
+  const resigned = payfast.signCheckout(Object.fromEntries((body.fields ?? []).filter(([k]) => k !== 'signature')), 'jt7NOE43FZPn');
+  check('and are signed', !!signedFields.signature && resigned.at(-1)[1] === signedFields.signature, signedFields.signature);
+  const payRow = () => ordersDb.sqlite.prepare('select * from orders where ref = ?').get(payRef);
+  check(
+    'the order is stored before PayFast, with every amount',
+    payRow()?.total === 500 && payRow()?.item_amount === 280 && payRow()?.shipping_amount === 220 &&
+      payRow()?.shipping_method === 'STANDARD' && payRow()?.status === 'received' && payRow()?.zip === '8001',
+    JSON.stringify(payRow()),
+  );
+
+  // PayFast's notification, signed as PayFast signs it: posted fields in
+  // order, the passphrase last.
+  let validateAnswer = 'VALID';
+  const validateCalls = [];
+  const payfastFetch = globalThis.fetch;
+  globalThis.fetch = async (input, init = {}) => {
+    if (String(input) === 'https://sandbox.payfast.co.za/eng/query/validate') {
+      validateCalls.push(init.body);
+      return new Response(validateAnswer, { status: 200 });
+    }
+    return payfastFetch(input, init);
+  };
+  const itn = (overrides = {}, passphrase = 'jt7NOE43FZPn') => {
+    const entries = Object.entries({
+      m_payment_id: payRef,
+      pf_payment_id: '1089250',
+      payment_status: 'COMPLETE',
+      item_name: 'Roachi Shirt (L)',
+      amount_gross: '500.00',
+      amount_fee: '-11.50',
+      amount_net: '488.50',
+      name_first: 'Pay',
+      email_address: 'pay@example.com',
+      merchant_id: '10000100',
+      ...overrides,
+    });
+    const base = payfast.notificationString(entries) + `&passphrase=${payfast.phpUrlencode(passphrase)}`;
+    const form = new URLSearchParams([...entries, ['signature', payfast.md5(base)]]);
+    return worker.fetch(
+      new Request('https://masterroachi.com/api/payfast/notify', {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: form.toString(),
+      }),
+      payEnv,
+    );
+  };
+
+  res = await itn({}, 'not-the-passphrase');
+  check('a notification signed with the wrong passphrase is refused', res.status === 400 && payRow().status === 'received', String(res.status));
+  res = await itn({ amount_gross: '5.00' });
+  check('a notification for the wrong amount is refused', res.status === 400 && payRow().status === 'received', String(res.status));
+  validateAnswer = 'INVALID';
+  res = await itn();
+  check('one PayFast will not confirm is not believed, and is retried', res.status === 502 && payRow().status === 'received', String(res.status));
+  validateAnswer = 'VALID';
+  res = await itn();
+  check(
+    'a confirmed notification marks the order Paid',
+    res.status === 200 && payRow().status === 'paid' && payRow().pf_payment_id === '1089250' && !!payRow().paid_at,
+    JSON.stringify(payRow()),
+  );
+  check('and what was confirmed is exactly what was posted', validateCalls.at(-1)?.startsWith(`m_payment_id=${payRef}&pf_payment_id=1089250`), validateCalls.at(-1));
+  ordersDb.sqlite.prepare("update orders set status = 'fulfilled' where ref = ?").run(payRef);
+  await itn();
+  check('a repeated notification does not move a fulfilled order back', payRow().status === 'fulfilled', payRow().status);
+  globalThis.fetch = payfastFetch;
 
   globalThis.fetch = realFetch;
 
@@ -5545,6 +5695,39 @@ globalThis.fetch = preGh;
   globalThis.fetch = preGh;
 }
 
+// --- PayFast's signature -------------------------------------------------------
+//
+// The reference value is Python's hashlib over urllib's quote_plus, which
+// encodes as PHP's urlencode does (with ~ as %7E) — computed outside this code,
+// so a mistake here cannot agree with itself.
+{
+  check('md5 of nothing', payfast.md5('') === 'd41d8cd98f00b204e9800998ecf8427e', payfast.md5(''));
+  check(
+    'md5 of the quick brown fox',
+    payfast.md5('The quick brown fox jumps over the lazy dog') === '9e107d9d372bb6826bd81d3542a419d6',
+    payfast.md5('The quick brown fox jumps over the lazy dog'),
+  );
+  check("urlencode is PHP's", payfast.phpUrlencode("a b+c~(d)*!'") === 'a+b%2Bc%7E%28d%29%2A%21%27', payfast.phpUrlencode("a b+c~(d)*!'"));
+  const signed = payfast.signCheckout(
+    {
+      // Deliberately out of order: signing order is PayFast's, not ours.
+      item_description: "It's (really) ~fine~ *ok*!",
+      merchant_id: '10000100',
+      merchant_key: '46f0cd694581a',
+      return_url: 'https://masterroachi.com/store/thank-you/?ref=AB23',
+      name_first: 'Thabo',
+      email_address: 't+1@example.com',
+      m_payment_id: 'AB23CDEF',
+      amount: '500.00',
+      item_name: 'Roachi Shirt (L) — order AB23CDEF',
+      cancel_url: '',
+    },
+    'jt7NOE43FZPn',
+  );
+  check('a checkout signature matches the reference', signed.at(-1)[1] === '7787a252398909764afb52559721699c', signed.at(-1)[1]);
+  check('empty fields are left out', !signed.some(([key]) => key === 'cancel_url'), JSON.stringify(signed.map(([k]) => k)));
+}
+
 // --- product copy ------------------------------------------------------------
 {
   const legacy = productCopy.readCopy(['  One.  ', '', 'Two.']);
@@ -5595,6 +5778,7 @@ fs.rmSync(sketchBundle, { force: true });
 fs.rmSync(habitsBundle, { force: true });
 fs.rmSync(dbBundle, { force: true });
 fs.rmSync(productCopyBundle, { force: true });
+fs.rmSync(payfastBundle, { force: true });
 fs.rmSync(iconBundle, { force: true });
 fs.rmSync(spineBundle, { force: true });
 fs.rmSync(postBundle, { force: true });

@@ -129,6 +129,7 @@ Five, none of them in the repo. `npx wrangler secret list` names them:
 | --- | --- | --- |
 | `GITHUB_TOKEN` | the backend committing to this repo | `npm run github-auth` |
 | `TRELLO_KEY`, `TRELLO_TOKEN` | what `/work/boards` reads | `npm run trello-auth` |
+| `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE` | the PayFast checkout — see "Switching on the PayFast checkout" below. Not set yet | `npx wrangler secret put PAYFAST_…` |
 | `PRINTFUL_TOKEN` | Sync Printful, and sending orders to Printful as drafts. A single-store private token from developers.printful.com/tokens, scopes `orders` and `sync_products/read` | `npx wrangler secret put PRINTFUL_TOKEN` |
 | `VOTE_SALT` | salting the voter hash, which is guessable without it | `npx wrangler secret put VOTE_SALT` |
 
@@ -142,6 +143,35 @@ agent session, since it asks for a token.
 removed on 2026-10-19 when orders moved into D1 and `/work/shop/`. If
 `wrangler secret list` still names it, it is unused:
 `npx wrangler secret delete ORDERS_KEY`.
+
+### Switching on the PayFast checkout
+
+Built 2026-10-19 and **off** until this is done. Delivery is then quoted live
+from Printful for the customer's address and paid at PayFast's checkout,
+instead of being built into a fixed payment link.
+
+1. In the PayFast dashboard, **Settings → Integration**: set a **passphrase**,
+   and note the merchant ID and merchant key there.
+2. Try it in the sandbox first, on the live site, without customers seeing
+   it. Set the sandbox merchant (sandbox.payfast.co.za → your sandbox
+   account's Integration page) as the three secrets, plus
+   `npx wrangler secret put PAYFAST_SANDBOX` with the value `true`. Then open
+   a product page with `?checkout=payfast` on the end: that one page load
+   shows the new form. Pay with the sandbox's test card, and the order should
+   turn **Paid** on `/work/shop` by itself.
+3. Set the three secrets again with the **live** values, and
+   `npx wrangler secret delete PAYFAST_SANDBOX`.
+4. Set `"checkout": "payfast"` in `lib/pricing.json` and push. That one value
+   drops delivery out of the prices, switches the product pages, the store and
+   `/policies/` to "delivery quoted for your address", and gives every visitor
+   the checkout. The old payment links in `lib/site.ts` stop being used.
+
+How it is kept honest: `/api/checkout` works out every amount itself
+(`lib/price.ts`, the same function the pages use) and stores the order before
+the customer leaves; `/api/payfast/notify` believes a payment only when the
+signature is right, PayFast's `/eng/query/validate` confirms it, and the amount
+matches what was stored. The signature code is `lib/payfast.ts`, from PayFast's
+own PHP SDK, tested against an independently computed value.
 
 ---
 
