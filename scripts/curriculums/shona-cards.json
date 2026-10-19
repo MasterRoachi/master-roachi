@@ -2058,5 +2058,602 @@
    "reading": "Haázívi kūchaira.",
    "extra": "FSI Unit 12. -zívá + infinitive: know how to."
   }
+ ],
+ "Shona for the lesson itself": [
+  {
+   "kind": "sentence",
+   "front": "Mazvinzwa here?",
+   "back": "Do you understand? ('Have you heard it?')",
+   "reading": "Mwazvíṇzwá heré? (FSI)",
+   "extra": "FSI Unit 13. Standard drops the w."
+  },
+  {
+   "kind": "sentence",
+   "front": "Handina kuzvinzwa.",
+   "back": "I didn't understand (it).",
+   "reading": "Handíná kuzvíṇzwá.",
+   "extra": "FSI Unit 13. Past negative; zvi- is an object prefix."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mungataura zvishoma here?",
+   "back": "(Can you) please speak slowly?",
+   "reading": "Mungátáūrą zvishoma heré?",
+   "extra": "FSI Unit 13. -nga- as a polite request."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mwatinyi?",
+   "back": "What did you say?",
+   "reading": "Mwatíṇyi?",
+   "extra": "FSI Unit 13. Standard drops the w."
+  },
+  {
+   "kind": "word",
+   "front": "-nzwa",
+   "back": "to hear, feel, perceive, understand",
+   "reading": "-ṇzwá",
+   "extra": "FSI Unit 13. A high verb."
+  },
+  {
+   "kind": "word",
+   "front": "izwi",
+   "back": "voice, word",
+   "reading": "izwí",
+   "extra": "FSI Unit 13. Class 5; plural mazwí (6)."
+  },
+  {
+   "kind": "word",
+   "front": "mudzidza",
+   "back": "student",
+   "reading": "mudzídza",
+   "extra": "FSI Unit 13. Classes 1, 2."
+  },
+  {
+   "kind": "word",
+   "front": "-dzidza",
+   "back": "to learn",
+   "reading": "-dzídzá",
+   "extra": "FSI Unit 13."
+  },
+  {
+   "kind": "word",
+   "front": "-pinda",
+   "back": "to enter; to surpass",
+   "reading": "-pinda",
+   "extra": "FSI Unit 13. A low verb."
+  },
+  {
+   "kind": "word",
+   "front": "pasi",
+   "back": "underneath, floor, ground, the earth",
+   "reading": "pasí",
+   "extra": "FSI Unit 13. Class 16. Garáí pasí: sit down."
+  },
+  {
+   "kind": "word",
+   "front": "-isa",
+   "back": "to put",
+   "reading": "-isa",
+   "extra": "FSI Unit 13."
+  },
+  {
+   "kind": "word",
+   "front": "bhuku",
+   "back": "book",
+   "reading": "bhúku",
+   "extra": "FSI Unit 13. Class 5; plural mabhúku (6)."
+  },
+  {
+   "kind": "word",
+   "front": "-shoma",
+   "back": "few, little",
+   "reading": "~shoma",
+   "extra": "FSI Units 13, 16. zvishoma: slowly, softly."
+  }
+ ],
+ "Didn't: the past negative": [
+  {
+   "kind": "grammar",
+   "front": "ha- + SP + na ku-",
+   "back": "past negative, for both -ka- and today's past: handíná kuenda, I didn't go",
+   "reading": null,
+   "extra": "FSI Unit 13, Note 1. Also handízí ku- and handísa- in some areas."
+  },
+  {
+   "kind": "sentence",
+   "front": "Handina kuenda navo.",
+   "back": "I didn't go with them.",
+   "reading": "Handíná kūenda navó.",
+   "extra": "FSI Unit 13."
+  },
+  {
+   "kind": "sentence",
+   "front": "Harina kunaka.",
+   "back": "It (class 5) is not good.",
+   "reading": "Harína kūnaka.",
+   "extra": "FSI Unit 13. Negative of rákánaka."
+  }
+ ],
+ "Commands": [
+  {
+   "kind": "grammar",
+   "front": "imperative",
+   "back": "stem + -i (some: -nyi) for several or respect; bare stem to one: Taurai! · Taura!",
+   "reading": null,
+   "extra": "FSI Unit 13, Note 2. Low verb: first syllable low; otherwise stem high."
+  },
+  {
+   "kind": "sentence",
+   "front": "Pindai.",
+   "back": "Come in!",
+   "reading": "Pindáiˣ.",
+   "extra": "FSI Unit 13."
+  },
+  {
+   "kind": "sentence",
+   "front": "Garai pasi.",
+   "back": "Sit down!",
+   "reading": "Garáí pasí.",
+   "extra": "FSI Unit 13."
+  },
+  {
+   "kind": "sentence",
+   "front": "Taurai mumashure mwangu.",
+   "back": "Repeat after me.",
+   "reading": "Taúráí mūmasúre mwángu.",
+   "extra": "FSI Unit 13. mw-: class 18, agreeing with mu- \"in\"."
+  },
+  {
+   "kind": "sentence",
+   "front": "Isai mabhuku pasi.",
+   "back": "Put your books down.",
+   "reading": "Isáí mabhúku pasí.",
+   "extra": "FSI Unit 13."
+  }
+ ],
+ "Again: -zve": [
+  {
+   "kind": "grammar",
+   "front": "-zve",
+   "back": "again — an enclitic; its tone is opposite to the syllable before it",
+   "reading": null,
+   "extra": "FSI Unit 13, Note 3. Taúráizvé: speak again."
+  },
+  {
+   "kind": "sentence",
+   "front": "Tauraizve.",
+   "back": "Please say it again.",
+   "reading": "Taúráizvé.",
+   "extra": "FSI Unit 13. Also Itáizvé: do it again."
+  }
+ ],
+ "What do you have? At the vegetable stall": [
+  {
+   "kind": "sentence",
+   "front": "Munenyi?",
+   "back": "What do you have?",
+   "reading": "Munéṇyi?",
+   "extra": "FSI Unit 14. -ne: have."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mungandipa matatu here?",
+   "back": "Can you give me three?",
+   "reading": "Mungándǐpą mātatú heré?",
+   "extra": "FSI Unit 14. -ndi-: me; -pa: give."
+  },
+  {
+   "kind": "sentence",
+   "front": "Tambiranyi.",
+   "back": "Here you are. ('Receive!')",
+   "reading": "Támbíráṇyí.",
+   "extra": "FSI Unit 14."
+  },
+  {
+   "kind": "word",
+   "front": "-pa",
+   "back": "to give",
+   "reading": "-pá",
+   "extra": "FSI Units 14–16. Ndinókúpá: I give you."
+  },
+  {
+   "kind": "word",
+   "front": "-tambira",
+   "back": "to receive",
+   "reading": "-tambira",
+   "extra": "FSI Unit 14."
+  },
+  {
+   "kind": "word",
+   "front": "simo",
+   "back": "vegetable",
+   "reading": "símó",
+   "extra": "FSI Unit 14. Class 5; plural masímó (6)."
+  },
+  {
+   "kind": "word",
+   "front": "mbatata",
+   "back": "potato",
+   "reading": "mbatáta",
+   "extra": "FSI Unit 14. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "nzungu",
+   "back": "groundnuts",
+   "reading": "nzungú",
+   "extra": "FSI Unit 14. Class 10."
+  },
+  {
+   "kind": "word",
+   "front": "muriwo",
+   "back": "relish eaten with sadza; vegetable",
+   "reading": "muríwó",
+   "extra": "FSI Unit 14. Classes 3, 4."
+  },
+  {
+   "kind": "word",
+   "front": "dima",
+   "back": "sweet potato",
+   "reading": "dima",
+   "extra": "FSI Units 14–15. Class 5; plural madima (6)."
+  },
+  {
+   "kind": "word",
+   "front": "nyemba",
+   "back": "cow peas",
+   "reading": "nyemba",
+   "extra": "FSI Unit 14. Class 10."
+  },
+  {
+   "kind": "word",
+   "front": "raranji",
+   "back": "orange",
+   "reading": "ráranji",
+   "extra": "FSI Unit 14. Class 5; plural maráranji (6)."
+  }
+ ],
+ "And, with: na": [
+  {
+   "kind": "grammar",
+   "front": "na + noun",
+   "back": "and, with: no- before classes 1, 3, 11, 13–15; na- before 2, 6, 12; ne- otherwise",
+   "reading": null,
+   "extra": "FSI Unit 14, Note 1. nomwana · navana · nehobo. Manyika: ne- throughout."
+  }
+ ],
+ "Having: -ne": [
+  {
+   "kind": "grammar",
+   "front": "SP + na",
+   "back": "\"have\" = \"be with\": ndine, une, ane, tine, mune, vane; ine (9)…",
+   "reading": null,
+   "extra": "FSI Unit 14. Tiné nzungu: we have groundnuts. Vowel as for na."
+  },
+  {
+   "kind": "sentence",
+   "front": "Tine nzungu.",
+   "back": "We have groundnuts.",
+   "reading": "Tiné nzungu.",
+   "extra": "FSI Unit 14."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndine mbatata, nzungu nekabichi.",
+   "back": "I have potatoes, groundnuts and cabbage.",
+   "reading": "Ndiné mbatáta, nzungú nékábichi.",
+   "extra": "FSI Unit 14."
+  },
+  {
+   "kind": "sentence",
+   "front": "Vana vana makore mana.",
+   "back": "The children are four years old.",
+   "reading": "Váną makoré mána.",
+   "extra": "FSI Unit 14. \"have four years\"."
+  }
+ ],
+ "Friends are coming": [
+  {
+   "kind": "word",
+   "front": "shamwari",
+   "back": "friend",
+   "reading": "shámwarí",
+   "extra": "FSI Unit 15. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "-gadzira",
+   "back": "to prepare, fix",
+   "reading": "-gadzira",
+   "extra": "FSI Unit 15. -gadzirira: prepare for."
+  },
+  {
+   "kind": "word",
+   "front": "chinhu",
+   "back": "thing",
+   "reading": "chinhu",
+   "extra": "FSI Unit 15. Class 7; plural zvinhu (8)."
+  },
+  {
+   "kind": "word",
+   "front": "-zhinji",
+   "back": "many",
+   "reading": "~zhínjí",
+   "extra": "FSI Unit 15. zvinhu zvizhínjí: many things."
+  },
+  {
+   "kind": "word",
+   "front": "-mwa",
+   "back": "to drink",
+   "reading": "-mwá",
+   "extra": "FSI Unit 15."
+  },
+  {
+   "kind": "word",
+   "front": "-dya",
+   "back": "to eat",
+   "reading": "-dyá",
+   "extra": "FSI Unit 15."
+  },
+  {
+   "kind": "word",
+   "front": "mupunga",
+   "back": "rice",
+   "reading": "mupungá",
+   "extra": "FSI Unit 15. Class 3."
+  },
+  {
+   "kind": "word",
+   "front": "muchero",
+   "back": "fruit",
+   "reading": "muchero",
+   "extra": "FSI Unit 15. Classes 3, 4."
+  },
+  {
+   "kind": "word",
+   "front": "hama",
+   "back": "kin, relative",
+   "reading": "hámá",
+   "extra": "FSI Unit 15. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "nhasi",
+   "back": "today",
+   "reading": "nhási",
+   "extra": "FSI Unit 15."
+  },
+  {
+   "kind": "word",
+   "front": "sadza",
+   "back": "sadza, thick porridge; food",
+   "reading": "sadza",
+   "extra": "FSI Unit 15. Class 5."
+  },
+  {
+   "kind": "sentence",
+   "front": "Chinyizve chimwe?",
+   "back": "What else?",
+   "reading": "Chíṇyizvé chīmwe?",
+   "extra": "FSI Unit 15. ~mwè (low): other."
+  }
+ ],
+ "Me, you, him, them: object prefixes": [
+  {
+   "kind": "grammar",
+   "front": "-ndi- · -ku- · -mu-",
+   "back": "object prefixes: me · you (sg.) · him, her",
+   "reading": null,
+   "extra": "FSI Unit 15. Before the verb stem: ndinókúpá, I give you."
+  },
+  {
+   "kind": "grammar",
+   "front": "-ti- · -mu- · -va-",
+   "back": "object prefixes: us · you (pl.) · them",
+   "reading": null,
+   "extra": "FSI Unit 15. Muchávagádzirirenyí? What will you fix for them?"
+  },
+  {
+   "kind": "grammar",
+   "front": "object prefix for things",
+   "back": "same consonant and vowel as the -no- subject prefix: -chi- (7), -zvi- (8), -ri- (5), -i- (9), -dzi- (10)…",
+   "reading": null,
+   "extra": "FSI Unit 15. Ndachíǒnǎ: I saw it (class 7)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndamuona mumba.",
+   "back": "I saw him/her in the house.",
+   "reading": "Ndamúona mumbá.",
+   "extra": "FSI Unit 15."
+  }
+ ],
+ "Object prefixes and tone": [
+  {
+   "kind": "grammar",
+   "front": "object prefix tone",
+   "back": "before a low stem: high, lifting the stem (ndinóchígádzǐra); before a high stem: low centrally (ndinóchǐténgésá)",
+   "reading": null,
+   "extra": "FSI Unit 15. Compare ndinógadzira, no object."
+  }
+ ],
+ "Do you know me?": [
+  {
+   "kind": "sentence",
+   "front": "Unondiziva here?",
+   "back": "Do you know me?",
+   "reading": "Unóndǐzívá heré?",
+   "extra": "FSI Unit 15. -ndi-: me."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndinokuziva.",
+   "back": "I know you.",
+   "reading": "Ndinókǔzívá.",
+   "extra": "FSI Unit 15. -ku-: you (sg.)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndinochida.",
+   "back": "I like it (class 7).",
+   "reading": "Ndinochida.",
+   "extra": "FSI Unit 15. Unóda ichi chikóro heré?"
+  }
+ ],
+ "Not, with an object": [
+  {
+   "kind": "sentence",
+   "front": "Handina kuvaona.",
+   "back": "I didn't see him (respect) / them.",
+   "reading": "Handíná kuváǒnǎ.",
+   "extra": "FSI Unit 15. -va-: them, or one person with respect."
+  },
+  {
+   "kind": "sentence",
+   "front": "Handiriverengi.",
+   "back": "I don't/won't read it (class 5).",
+   "reading": "Handíríverengi.",
+   "extra": "FSI Unit 15."
+  }
+ ],
+ "My house is small": [
+  {
+   "kind": "sentence",
+   "front": "Imba yangu idiki.",
+   "back": "My house is small.",
+   "reading": "Imbá yángu ídįkį.",
+   "extra": "FSI Unit 16. Independent form of ~díki."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ine mipanda mingani?",
+   "back": "How many rooms does it have?",
+   "reading": "Íne mipanda minganí?",
+   "extra": "FSI Unit 16."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndinofunga kudaro.",
+   "back": "I think so.",
+   "reading": "Ndinófǔnga kudáro.",
+   "extra": "FSI Unit 16. Unófǔnga kudáro heré? Do you think so?"
+  },
+  {
+   "kind": "word",
+   "front": "mupanda",
+   "back": "room",
+   "reading": "mupanda",
+   "extra": "FSI Unit 16. Classes 3, 4."
+  },
+  {
+   "kind": "word",
+   "front": "chete",
+   "back": "only",
+   "reading": "chéte",
+   "extra": "FSI Unit 16. Mitatú chéte: only three."
+  },
+  {
+   "kind": "word",
+   "front": "fafitera",
+   "back": "window",
+   "reading": "fáfitera",
+   "extra": "FSI Unit 16. Class 5; plural mafáfitera (6)."
+  },
+  {
+   "kind": "word",
+   "front": "mushonga",
+   "back": "medicine; polish",
+   "reading": "mushongá",
+   "extra": "FSI Unit 16. Classes 3, 4."
+  },
+  {
+   "kind": "word",
+   "front": "-vamba",
+   "back": "to begin",
+   "reading": "-vamba",
+   "extra": "FSI Unit 16. -vamba + infinitive: begin to."
+  },
+  {
+   "kind": "word",
+   "front": "ruoko",
+   "back": "hand, arm",
+   "reading": "ruókó",
+   "extra": "FSI Unit 16. Class 11 (or muókó, 3); plural maókó (6)."
+  },
+  {
+   "kind": "word",
+   "front": "muviri",
+   "back": "body",
+   "reading": "muviri",
+   "extra": "FSI Unit 16. Classes 3, 4."
+  },
+  {
+   "kind": "word",
+   "front": "mbatya",
+   "back": "clothes",
+   "reading": "mbatyá",
+   "extra": "FSI Unit 16. Classes 9, 10. Also nhumbí."
+  },
+  {
+   "kind": "word",
+   "front": "ndiro",
+   "back": "dish, plate",
+   "reading": "ndíró",
+   "extra": "FSI Unit 16. Class 9; plural 6 or 10."
+  }
+ ],
+ "It is small: the independent form": [
+  {
+   "kind": "grammar",
+   "front": "independent form",
+   "back": "a noun or adjective with a HIGH prefix is a whole sentence: ídíki, it is small",
+   "reading": null,
+   "extra": "FSI Unit 16, Note 1. Imbá yángu ídíki: my house is small."
+  },
+  {
+   "kind": "grammar",
+   "front": "i- (dummy prefix)",
+   "back": "independent form of class 5, 9, 10 words: íhobó, íshúka, íhǔrǔ",
+   "reading": null,
+   "extra": "FSI Unit 16, Note 1."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ikabichi.",
+   "back": "It's cabbage.",
+   "reading": "Íkábichi.",
+   "extra": "FSI Unit 16."
+  },
+  {
+   "kind": "sentence",
+   "front": "Uyu mugwagwa murefu.",
+   "back": "This road is long.",
+   "reading": "Uyu mugwagwa múrefú.",
+   "extra": "FSI Unit 16."
+  }
+ ],
+ "About to: the -o- form, and beginning": [
+  {
+   "kind": "grammar",
+   "front": "-o- form",
+   "back": "about to: ndódá kuvamba, I'm about to begin",
+   "reading": null,
+   "extra": "FSI Unit 16, Note 2. Like today's past, but first syllable high. Not the same as -no-."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndoda kuvamba.",
+   "back": "I'm about to begin.",
+   "reading": "Ndódǎ kuvamba.",
+   "extra": "FSI Unit 16."
+  },
+  {
+   "kind": "sentence",
+   "front": "Makavamba rini kudzidzira chiShona?",
+   "back": "When did you begin to study Shona?",
+   "reading": "Mwakávámba ríni kudzídzírá chiShóna?",
+   "extra": "FSI Unit 16. Standard drops the w."
+  }
  ]
 }

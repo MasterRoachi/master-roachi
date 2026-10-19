@@ -176,6 +176,27 @@ const stages = [
       ['Stage 3 in conversation', [FSI_TEXT, fsiUnit(10), fsiUnit(11), fsiUnit(12)]],
     ],
   },
+  {
+    name: 'Stage 4 · Commands, having, and him, her, it',
+    lessons: [
+      ['Shona for the lesson itself', [FSI_TEXT, fsiUnit(13)]],
+      ['Didn\'t: the past negative', [FSI_TEXT, fsiUnit(13)]],
+      ['Commands', [FSI_TEXT, fsiUnit(13)]],
+      ['Again: -zve', [FSI_TEXT, fsiUnit(13)]],
+      ['What do you have? At the vegetable stall', [FSI_TEXT, fsiUnit(14)]],
+      ['And, with: na', [FSI_TEXT, fsiUnit(14)]],
+      ['Having: -ne', [FSI_TEXT, fsiUnit(14)]],
+      ['Friends are coming', [FSI_TEXT, fsiUnit(15)]],
+      ['Me, you, him, them: object prefixes', [FSI_TEXT, fsiUnit(15)]],
+      ['Object prefixes and tone', [FSI_TEXT, fsiUnit(15)]],
+      ['Do you know me?', [FSI_TEXT, fsiUnit(15)]],
+      ['Not, with an object', [FSI_TEXT, fsiUnit(15), fsiUnit(16)]],
+      ['My house is small', [FSI_TEXT, fsiUnit(16)]],
+      ['It is small: the independent form', [FSI_TEXT, fsiUnit(16)]],
+      ['About to: the -o- form, and beginning', [FSI_TEXT, fsiUnit(16)]],
+      ['Stage 4 in conversation', [FSI_TEXT, fsiUnit(13), fsiUnit(16)]],
+    ],
+  },
 ];
 
 const out = [

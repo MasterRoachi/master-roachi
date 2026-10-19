@@ -1,6 +1,6 @@
 # Shona — the plan
 
-**Status: approved 2026-10-19. Stages 1–3 are written (75 lessons, 276
+**Status: approved 2026-10-19. Stages 1–4 are written (91 lessons, 357
 cards); the rest is a plan, built a stage at a time.**
 
 His rulings so far: Shona is the first of the five empty curriculums to be
@@ -90,8 +90,8 @@ after another.
 | 1 | The sounds, tone, and greeting someone | 25 |
 | 2 | Who, where, when, and how many (FSI Units 5–8) — **written, 28** | 30 |
 | 3 | Being, doing, this and that, and not (FSI Units 9–12) — **written, 19** | 35 |
-| 4 | FSI from Unit 13: more negatives, the imperative, *na-*, object prefixes | 35 |
-| 5 | The negatives in every tense | 35 |
+| 4 | Commands, having, and him, her, it (FSI Units 13–16) — **written, 16** | 35 |
+| 5 | FSI from Unit 17: *ku-* and *kwa-*, ordinals, *-wo*, and the tenses' negatives | 35 |
 | 6 | Object concords and the verb's extensions | 30 |
 | 7 | Relatives, the subjunctive, and reading the Bible | 30 |
 | 8 | Proverbs, idiom, and respect | 25 |
@@ -142,6 +142,14 @@ last explained) and the *-i-* "used to"; relative verbs, made by tone alone,
 and with them most English adjectives and the *ndí-* "it is" forms; and the
 negative of the *-no-* tense, with *-gona*, *-dá* and *-zívá*. FSI's 1965
 coinage is named as history and not carded.
+
+**Stage 4** draws on FSI Units 13–16: classroom Shona; the past negative
+(*handíná ku-*); commands, singular and plural; *-zve* "again"; *na* "and,
+with" and its vowels; *-ne* "have"; object prefixes for persons and classes,
+with their tones; the independent form, which makes a noun or adjective a
+sentence; and the *-o-* "about to". FSI's **ˣ** — tone that varies between
+speakers but not east from west — is written after its syllable and left to
+the speaking partner.
 
 **A Stage 1 correction, from Unit 5's table.** Stage 1 gave FSI's *w-* (he,
 she) and *mw-* (you, pl.) as the past prefixes; Unit 5 labels both
