@@ -996,7 +996,10 @@ drifting to the middle when the address form opens. **The store front is
 done** too, on his picks: one price line ("R500 – R680 · 9 sizes") instead of
 the ladder; See it as the same solid pink pill; "Drag it to turn it" under the
 shirt and the model's licence credit at the foot of the page; the delivery
-line and the blank's line readable. Thank-you and policies still to do.
+line and the blank's line readable. **The thank-you page is done**: Email my
+address as the solid pink pill, the small print readable, and step 2 reworded
+to be true now that orders go to Printful from `/work/shop` ("I check it and
+send it to the printer myself, usually the same day…"). Policies still to do.
 
 **6. The design run.** The new look — round `+`, shut cards, gold — applied
 once everything that should be on the page is on it. His sequencing, and the

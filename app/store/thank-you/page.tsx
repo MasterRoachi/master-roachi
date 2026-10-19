@@ -64,11 +64,9 @@ export default function ThankYouPage() {
           <li>
             <h2>I raise the order</h2>
             <p>
-              By hand, usually the same day. There is no
-              automated pipeline between this site and the printer yet, which
-              is the honest reason this step has my name on it rather than a
-              robot&rsquo;s. You will get a note back confirming the size and
-              where it is going.
+              I check it and send it to the printer myself, usually the same
+              day. You will get a note back confirming the size and where it
+              is going.
             </p>
           </li>
           <li>
