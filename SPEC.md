@@ -1057,7 +1057,22 @@ stop a field form silently dropping keys it does not model.
 
 ### Stage 3 — Writing
 
-Question round, then build.
+**Built, 2026-10-19.** His rulings: Writing gets **what Projects has** — the
+body as an opening and its `##` sections, and **Preview the page**, the real
+`/writing/<slug>/` with the draft's title, summary and compiled body in it
+(draft posts' pages are built, only withheld from listings, so a draft
+previews too); **Drafts / Published / All pills** over the cards, opening on
+Drafts — three of the five posts are drafts and those are what is being worked
+on — newest first in each; and **gold only for flagged problems**, as on
+Projects: draft is a label, not gold, and a future date reads "scheduled" on
+the card. Props on the shared editor (`sections`, `previewBase`,
+`draftViews`), so Projects is unchanged by the pills.
+
+**The backend plan in this section is complete**: the Shop (steps 1–6),
+Projects and Writing. What is left is in Stage 4, His alone, the PayFast
+switch-on, and Open Items.
+
+Before that, it said: question round, then build.
 
 ### Stage 4 — Loose ends
 

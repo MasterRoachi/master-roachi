@@ -77,6 +77,7 @@ export default function CollectionEditor({
   prose,
   sections: bodySections,
   previewBase,
+  draftViews,
 }: {
   collection: string;
   noun: string;
@@ -104,6 +105,12 @@ export default function CollectionEditor({
   sections?: boolean;
   /** Where an entry's live page is, for Preview the page: '/projects/'. */
   previewBase?: string;
+  /**
+   * Drafts / Published / All pills over the cards, opening on Drafts. Writing,
+   * since Stage 3: most of its posts are drafts, and those are what is being
+   * worked on.
+   */
+  draftViews?: boolean;
 }) {
   const [entries, setEntries] = useState<Entry[] | null>(null);
   const [configured, setConfigured] = useState(true);
@@ -121,6 +128,8 @@ export default function CollectionEditor({
   const [rawBody, setRawBody] = useState(false);
   /** Whether the real page is open in the preview frame. */
   const [previewing, setPreviewing] = useState(false);
+  /** Which posts the pills show, where there are pills. */
+  const [view, setView] = useState<'drafts' | 'published' | 'all'>('drafts');
   const [order, setOrder] = useState<string[] | null>(null);
   const bodyRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -236,6 +245,14 @@ export default function CollectionEditor({
 
   const ordering = Boolean(orderable);
 
+  /* What the pills let through. Ordering, where it exists, still works on the
+     whole list — the pills are a view, not a different order. */
+  const shown = useMemo(() => {
+    if (!draftViews || view === 'all') return listed;
+    return listed.filter((entry) => (view === 'drafts' ? entry.draft : !entry.draft));
+  }, [listed, draftViews, view]);
+  const draftCount = useMemo(() => listed.filter((entry) => entry.draft).length, [listed]);
+
   const current = entries?.find((entry) => entry.path === openPath) ?? null;
   const lines = draftFile?.frontmatter ?? [];
   const slug = openPath ? name(openPath) : '';
@@ -283,6 +300,8 @@ export default function CollectionEditor({
      a different answer for the same date on a later render - which is exactly
      what a memo is supposed to rule out. */
   const [mountedAt] = useState(() => Date.now());
+  /** Today in South Africa, for marking a post scheduled. */
+  const todayLocal = new Date(mountedAt + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const scheduled = useMemo(() => {
     const date = values.date?.trim();
     if (!date) return null;
@@ -980,6 +999,28 @@ export default function CollectionEditor({
         </p>
       )}
 
+      {draftViews && (
+        <div className={styles.views} role="group" aria-label="Show">
+          {(
+            [
+              ['drafts', `Drafts${draftCount ? ` ${draftCount}` : ''}`],
+              ['published', 'Published'],
+              ['all', 'All'],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              className={view === key ? styles.pillOn : styles.pill}
+              aria-pressed={view === key}
+              onClick={() => setView(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {!draftFile && status && <p className={styles.message}>{status}</p>}
 
       {/* One shut card per entry, as the Shop's are: a pill in the middle of
@@ -997,7 +1038,13 @@ export default function CollectionEditor({
           </section>
         )}
 
-        {listed.map((entry, index) => {
+        {draftViews && shown.length === 0 && (
+          <p className={styles.message}>
+            {view === 'drafts' ? 'No drafts — everything is published.' : 'Nothing published yet.'}
+          </p>
+        )}
+
+        {shown.map((entry, index) => {
           const isOpen = !isNew && openPath === entry.path;
           return (
             <section
@@ -1018,7 +1065,11 @@ export default function CollectionEditor({
                     {entry.draft && <span className={styles.draftTag}>draft</span>}
                   </span>
                   <span className={styles.cardState}>
-                    {entry.problems > 0 ? `${entry.problems} to fix` : entry.date}
+                    {entry.problems > 0
+                      ? `${entry.problems} to fix`
+                      : entry.date > todayLocal
+                        ? `scheduled ${entry.date}`
+                        : entry.date}
                   </span>
                 </button>
                 {ordering && (

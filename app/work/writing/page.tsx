@@ -29,6 +29,9 @@ export default function Page() {
         template={collection.template?.(new Date().toISOString().slice(0, 10))}
         seo
         prose
+        sections
+        previewBase="/writing/"
+        draftViews
         siteName={site.name}
         art={{ collection: 'writing-art', dir: 'public/writing' }}
         // The real slugs, so pointing a post at a project is a choice from a

@@ -3,6 +3,7 @@ import { pageMeta } from '@/lib/seo';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Mdx from '@/components/Mdx';
+import { LiveBody, LiveEntryText } from '@/components/LiveEntry';
 import { getAllSlugs, getAnyEntry, getProjects, isScheduled } from '@/lib/content';
 import { formatDate, TRACK_LABEL, TRACK_COLOUR } from '@/lib/format';
 import GlyphField from '@/components/GlyphField';
@@ -96,8 +97,10 @@ export default async function PostPage({
             </span>
           ))}
         </div>
-        <h1 className={styles.title}>{fm.title}</h1>
-        <p className="lede">{fm.summary}</p>
+        {/* Live, so /work/writing can preview a draft in this exact page;
+            for a visitor they are the built text. components/LiveEntry.tsx. */}
+        <LiveEntryText field="title" as="h1" initial={fm.title} className={styles.title} />
+        <LiveEntryText field="summary" initial={fm.summary} className="lede" />
         {project && (
           <p className={styles.attached}>
             Part of{' '}
@@ -121,7 +124,9 @@ export default async function PostPage({
         </figure>
       )}
 
-        <Mdx source={entry.body} />
+        <LiveBody>
+          <Mdx source={entry.body} />
+        </LiveBody>
       </article>
     </div>
   );

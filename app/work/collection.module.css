@@ -950,3 +950,40 @@
 .sections .addSection {
   margin: 0.3rem 0 0;
 }
+
+/* --- Drafts / Published / All, over Writing's cards ------------------------ */
+
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 0 0 1.5rem;
+}
+
+.pill,
+.pillOn {
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.35rem 1rem;
+  cursor: pointer;
+}
+
+.pill {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.pill:hover {
+  border-color: var(--line-bright);
+  color: var(--ink);
+}
+
+.pillOn {
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
