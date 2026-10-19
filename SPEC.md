@@ -958,6 +958,16 @@ sorted by one rule cannot also be the one you reorder; and the numbered
 paragraph-split list under the box is gone — the preview column on the right
 shows the same paragraphs.
 
+**Step 5 is built, 2026-10-19**, as he chose it: the real page with the
+draft in it, and no gallery. **Preview the page** in the Products tab opens
+the deployed `/store/<slug>/?preview=1` in a frame, desktop or phone width,
+and sends the unsaved copy into it as he types. The page's tagline,
+description, story and fit-and-care are client components
+(`components/LiveCopy.tsx`) that render the built copy and, only in that
+framed `?preview=1` state and only from this origin, swap in a draft.
+Everything else in the frame is the live page. Art and a re-sync reach it
+after the deploy, as they reach everyone.
+
 **5. Live preview** of the real product page, showing what a visitor sees.
 Images on it: Printful's two or three mockups, his own uploaded artwork, and a
 3D model where one exists.

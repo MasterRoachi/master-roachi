@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { pageMeta } from '@/lib/seo';
 import { productMetaDescription } from '@/lib/product-meta';
+import { LiveFit, LiveSection, LiveTagline } from '@/components/LiveCopy';
 import HalftoneField from '@/components/HalftoneField';
 import ShirtViewerMount from '@/components/ShirtViewerMount';
 import Swatches from '@/components/Swatches';
@@ -89,7 +90,6 @@ export default async function ProductPage({
   const options = buyOptions(product);
   const spec = product.garment?.spec ?? [];
   const copy = copyOf(product);
-  const blurb = copy.description;
   // His description of the art where he has written one; the name otherwise,
   // which says what it is called and nothing about what it shows.
   const alt = copy.alt || product.name;
@@ -153,7 +153,7 @@ export default async function ProductPage({
           <div className={styles.detail}>
             <p className="eyebrow">{site.store.name}</p>
             <h1 className={styles.name}>{product.name}</h1>
-            {copy.tagline && <p className={styles.tagline}>{copy.tagline}</p>}
+            <LiveTagline initial={copy} className={styles.tagline} />
 
             {priceSummary(product) && (
               <>
@@ -196,29 +196,26 @@ export default async function ProductPage({
           </div>
         </div>
 
-        {blurb.length > 0 && (
-          /* No heading. It is four sentences about a drawing, and titling it
-             "About this design" would be more furniture than the words. */
-          <section className={styles.section}>
-            <p className="eyebrow">The design</p>
-            <div className={styles.blurb}>
-              {blurb.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* His words. Live components, so /work/shop can preview a draft in
+            this exact page; for a visitor they are the built text. See
+            components/LiveCopy.tsx. No heading on the design: it is four
+            sentences about a drawing, and a title would be more furniture
+            than the words. */}
+        <LiveSection
+          initial={copy}
+          field="description"
+          eyebrow="The design"
+          sectionClassName={styles.section}
+          bodyClassName={styles.blurb}
+        />
 
-        {copy.story.length > 0 && (
-          <section className={styles.section}>
-            <p className="eyebrow">The story</p>
-            <div className={styles.blurb}>
-              {copy.story.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-            </div>
-          </section>
-        )}
+        <LiveSection
+          initial={copy}
+          field="story"
+          eyebrow="The story"
+          sectionClassName={styles.section}
+          bodyClassName={styles.blurb}
+        />
 
         {spec.length > 0 && (
           <section className={styles.section}>
@@ -237,16 +234,13 @@ export default async function ProductPage({
           </section>
         )}
 
-        {((product.sizeGuide && sizes.length > 0) || copy.care) && (
-          <section className={styles.section}>
-            <p className="eyebrow">Fit</p>
-            <h2 className="section-title">{copy.care ? 'Fit and care' : 'Size guide'}</h2>
-            {/* His note before Printful's table: how it actually wears is the
-                thing a measurement chart cannot say. */}
-            {copy.care && <p className={styles.care}>{copy.care}</p>}
-            {product.sizeGuide && sizes.length > 0 && <SizeTable guide={product.sizeGuide} sizes={sizes} />}
-          </section>
-        )}
+        {/* His note before Printful's table: how it actually wears is the
+            thing a measurement chart cannot say. */}
+        <LiveFit initial={copy} sectionClassName={styles.section} careClassName={styles.care}>
+          {product.sizeGuide && sizes.length > 0 ? (
+            <SizeTable guide={product.sizeGuide} sizes={sizes} />
+          ) : null}
+        </LiveFit>
 
         <section className={styles.section}>
           <p className="eyebrow">How this works</p>

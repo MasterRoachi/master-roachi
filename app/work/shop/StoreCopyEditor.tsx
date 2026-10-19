@@ -12,6 +12,7 @@ import {
   writeCopy,
   type ProductCopy,
 } from '@/lib/product-copy';
+import PagePreview from './PagePreview';
 import styles from './store.module.css';
 
 // A box per product, rather than the raw JSON.
@@ -122,6 +123,8 @@ export default function StoreCopyEditor({
   const [busy, setBusy] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [viewing, setViewing] = useState<Viewing | null>(null);
+  /** Which product's real page is open in the preview frame, if any. */
+  const [previewing, setPreviewing] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [syncNote, setSyncNote] = useState<string | null>(null);
   /** Uploads made in this session, so a tile appears before the deploy lands. */
@@ -653,6 +656,15 @@ export default function StoreCopyEditor({
           {current ? (
             <>
               <section className={styles.preview}>
+                {current.href && (
+                  <button
+                    type="button"
+                    className={styles.previewOpen}
+                    onClick={() => setPreviewing(current.id)}
+                  >
+                    Preview the page
+                  </button>
+                )}
                 <h2 className={styles.previewHead}>How it will read</h2>
                 <p className={styles.previewTitle}>
                   {current.name} — {siteName}
@@ -730,6 +742,18 @@ export default function StoreCopyEditor({
       </div>
 
       {status && <p className={styles.message}>{status}</p>}
+
+      {previewing && (() => {
+        const product = products.find((p) => p.id === previewing);
+        return product?.href ? (
+          <PagePreview
+            href={product.href}
+            name={product.name}
+            copy={copyFor(product.id)}
+            onClose={() => setPreviewing(null)}
+          />
+        ) : null;
+      })()}
 
       {viewing && (
         <div
