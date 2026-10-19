@@ -441,8 +441,9 @@ at the back of each deck is for.
 Nine with scripts in `scripts/curriculums/`, **thirteen in live D1**
 (checked 2026-10-19). **Shona** got its script on 2026-10-19 — his choice of
 the five empty ones to build first, from zero, Standard Shona with dialects
-named where met, and a speaking partner — and has Stage 1 written (28 lessons,
-71 cards), every form and tone read from the FSI and Carter page images; see
+named where met, and a speaking partner — and has Stages 1–2 written (56
+lessons, 193 cards; Stage 2 is FSI Units 5–8, the first four tenses), every
+form and tone read from the FSI and Carter page images; see
 `scripts/curriculums/shona.md`. **Zulu, Theology, Philosophy and History** are
 still names with nothing in them and no script. His scope for the three
 subjects: Orthodox theology, the Western philosophical canon, a world history

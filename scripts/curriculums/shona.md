@@ -1,7 +1,7 @@
 # Shona — the plan
 
-**Status: approved 2026-10-19. Stage 1 is written (28 lessons, 71 cards); the
-rest is a plan, built a stage at a time.**
+**Status: approved 2026-10-19. Stages 1–2 are written (56 lessons, 193
+cards); the rest is a plan, built a stage at a time.**
 
 His rulings so far: Shona is the first of the five empty curriculums to be
 built; **from zero**, zero to mastery, like Japanese and Greek; and the same
@@ -88,10 +88,10 @@ after another.
 | # | Stage | Roughly |
 | --- | --- | --- |
 | 1 | The sounds, tone, and greeting someone | 25 |
-| 2 | The first noun classes, and "to be" | 30 |
-| 3 | The present: subject concords and the everyday verb | 35 |
-| 4 | Agreement: possessives, adjectives, demonstratives, numbers | 35 |
-| 5 | Time: the pasts, the future, and the negatives | 35 |
+| 2 | Who, where, when, and how many (FSI Units 5–8) — **written, 28** | 30 |
+| 3 | FSI from Unit 9: the today-tense, demonstratives, relatives, the first negatives | 35 |
+| 4 | Agreement in full, and the rest of the tenses | 35 |
+| 5 | The negatives in every tense | 35 |
 | 6 | Object concords and the verb's extensions | 30 |
 | 7 | Relatives, the subjunctive, and reading the Bible | 30 |
 | 8 | Proverbs, idiom, and respect | 25 |
@@ -120,6 +120,25 @@ tone, the morning and midday greetings in both forms, the tone rules met in
 them, the subject prefixes of the past, concord, the plural of respect, the
 noun-class table, the pro-verbs, leaving and courtesies, and a closing lesson
 of real greetings with his partner.
+
+**The stages follow FSI's units, not the first guess.** The plan first had
+Stage 2 as "the first noun classes, and 'to be'"; FSI's Units 5–8 teach the
+tenses instead (-no-, -ka-, -cha-, -nga-), with places, numbers, possessives
+and strong adjectives beside them, so Stage 2 follows FSI and the later rows
+are retitled to match. Their titles past Stage 3 stay rough until the units
+are read.
+
+**Stage 2** draws on FSI Units 5–8: meeting and asking who, where and what
+work; the -no- tense with every class's subject prefix and its tones;
+locatives and where-questions; the -ka- tense, days, numbers and their
+concords, periods and "ago"; -ndo- and -zo-; the -cha- tense, one-syllable
+verbs and possessives of both kinds; the store and the -nga- tense; the
+pronouns, places to go, the strong adjectives and direct-only reported speech.
+
+**A Stage 1 correction, from Unit 5's table.** Stage 1 gave FSI's *w-* (he,
+she) and *mw-* (you, pl.) as the past prefixes; Unit 5 labels both
+**eastern**. The two lessons now give the central *á-* and *ma-* as the
+standard.
 
 ## Cards
 

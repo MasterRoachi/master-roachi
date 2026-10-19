@@ -533,5 +533,913 @@
    "reading": "Handíná kunzwá",
    "extra": "Carter, Lesson I."
   }
+ ],
+ "Meeting on the road: who are you?": [
+  {
+   "kind": "word",
+   "front": "masanga",
+   "back": "hello — a greeting between travellers who meet",
+   "reading": "masangá",
+   "extra": "FSI Unit 5. Class 6."
+  },
+  {
+   "kind": "word",
+   "front": "munhu",
+   "back": "person",
+   "reading": "munhu",
+   "extra": "FSI Unit 5. Classes 1, 2."
+  },
+  {
+   "kind": "word",
+   "front": "ani?",
+   "back": "who?",
+   "reading": "aní",
+   "extra": "FSI Unit 5. ndíaní? who is it?"
+  },
+  {
+   "kind": "sentence",
+   "front": "Munhu ndiani?",
+   "back": "Who are you? ('Who is the person?')",
+   "reading": "Munhu ndíaní?",
+   "extra": "FSI Unit 5. The answer: Ndíní …, It is I …"
+  }
+ ],
+ "Where do you live?": [
+  {
+   "kind": "word",
+   "front": "-gara",
+   "back": "to live, sit, stay",
+   "reading": "-gara",
+   "extra": "FSI Unit 5. A low verb."
+  },
+  {
+   "kind": "word",
+   "front": "papi?",
+   "back": "where?",
+   "reading": "pápǐ",
+   "extra": "FSI Unit 5. Or the ending -pí on the verb."
+  },
+  {
+   "kind": "word",
+   "front": "-ita",
+   "back": "to do",
+   "reading": "-ita",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "apo",
+   "back": "there",
+   "reading": "apo",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "-sanda",
+   "back": "to work",
+   "reading": "-sándá",
+   "extra": "FSI Unit 5. A high verb."
+  },
+  {
+   "kind": "sentence",
+   "front": "Munogara papi?",
+   "back": "Where do you live?",
+   "reading": "Munógǎra pápǐ? · Munógǎrepí?",
+   "extra": "FSI Unit 5."
+  }
+ ],
+ "The -no- tense: now, usually, or later": [
+  {
+   "kind": "grammar",
+   "front": "-no-",
+   "back": "tense prefix: general present or future",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 1. Ndinósándá: I work."
+  },
+  {
+   "kind": "grammar",
+   "front": "ndi- · u- · a- · ti- · mu- · va-",
+   "back": "subject prefixes with -no- (and -cha-, -nga-): I · you · he/she · we · you (pl.) · they",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 1."
+  },
+  {
+   "kind": "grammar",
+   "front": "nda- · wa- · a- · ta- · ma- · va-",
+   "back": "subject prefixes in the past (and -ka-): central forms",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 1. Eastern: wa- for he/she, mwa- for you (pl.)."
+  }
+ ],
+ "Subject prefixes for every class": [
+  {
+   "kind": "grammar",
+   "front": "ri- / ra-",
+   "back": "class 5 subject prefix (-no- / past)",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 1."
+  },
+  {
+   "kind": "grammar",
+   "front": "chi- / cha-",
+   "back": "class 7 subject prefix (-no- / past)",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 1."
+  },
+  {
+   "kind": "grammar",
+   "front": "zvi- / zva-",
+   "back": "class 8 subject prefix (-no- / past)",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 1."
+  },
+  {
+   "kind": "grammar",
+   "front": "i- / ya-",
+   "back": "class 9 (and 4) subject prefix (-no- / past)",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 1."
+  },
+  {
+   "kind": "grammar",
+   "front": "dzi- / dza-",
+   "back": "class 10 subject prefix (-no- / past)",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 1."
+  }
+ ],
+ "The tones of the -no- tense": [
+  {
+   "kind": "grammar",
+   "front": "tone of -no-",
+   "back": "low between a high subject prefix and a high verb stem; high everywhere else",
+   "reading": null,
+   "extra": "FSI Unit 5. Vánosándá · Tinósándá · Vánógara."
+  }
+ ],
+ "What do you do? Work and its verbs": [
+  {
+   "kind": "word",
+   "front": "basa",
+   "back": "work",
+   "reading": "basa",
+   "extra": "FSI Unit 5. Classes 5, 6."
+  },
+  {
+   "kind": "sentence",
+   "front": "Munoita basanyi?",
+   "back": "What work do you do?",
+   "reading": "Munóíta basanyí?",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "kurima",
+   "back": "to plough, raise crops (low verb)",
+   "reading": "kurima",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "kuchaira",
+   "back": "to drive (a vehicle) (low verb)",
+   "reading": "kuchaira",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "kurapa",
+   "back": "to heal, do medical work (low verb)",
+   "reading": "kurapa",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "kuvaka",
+   "back": "to build (high verb)",
+   "reading": "kuváká",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "kudzidzisa",
+   "back": "to teach (high verb)",
+   "reading": "kudzídzísá",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "kunyora",
+   "back": "to write (high verb)",
+   "reading": "kunyórá",
+   "extra": "FSI Unit 5."
+  },
+  {
+   "kind": "word",
+   "front": "chikoro",
+   "back": "school",
+   "reading": "chikóro",
+   "extra": "FSI Unit 5. Class 7; plural zvikóro (8)."
+  }
+ ],
+ "Places: in, at, to": [
+  {
+   "kind": "word",
+   "front": "pano",
+   "back": "here",
+   "reading": "pánó",
+   "extra": "FSI Unit 5. Class 16."
+  },
+  {
+   "kind": "word",
+   "front": "kure",
+   "back": "far",
+   "reading": "kure",
+   "extra": "FSI Unit 5. Class 17."
+  },
+  {
+   "kind": "word",
+   "front": "patyo",
+   "back": "near",
+   "reading": "patyo",
+   "extra": "FSI Unit 5. Class 16. Also petyo."
+  },
+  {
+   "kind": "word",
+   "front": "guta",
+   "back": "city",
+   "reading": "guta",
+   "extra": "FSI Unit 5. Classes 5, 6. muguta: in the city."
+  },
+  {
+   "kind": "grammar",
+   "front": "mu- · ku- · pa-",
+   "back": "locative prefixes: in · to/at · at/on",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 2. muHaráre, kure, pakámba."
+  },
+  {
+   "kind": "grammar",
+   "front": "mwa- · kwa-",
+   "back": "locative prefixes on place names that were people or rivers",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 2. mwáRusápi, kwáMutáre."
+  }
+ ],
+ "\"Where?\" questions": [
+  {
+   "kind": "grammar",
+   "front": "-pi",
+   "back": "enclitic \"where?\" on the verb, whose -a becomes -e",
+   "reading": null,
+   "extra": "FSI Unit 5, Note 3. Unógǎrepí? — where do you live?"
+  },
+  {
+   "kind": "word",
+   "front": "kupi?",
+   "back": "where? (to/at where)",
+   "reading": "kúpǐ",
+   "extra": "FSI Unit 5, Note 3. Like pápǐ."
+  }
+ ],
+ "When did you come?": [
+  {
+   "kind": "word",
+   "front": "mufundisi",
+   "back": "teacher, pastor, missionary",
+   "reading": "mufúndísi",
+   "extra": "FSI Unit 6. Classes 1, 2."
+  },
+  {
+   "kind": "word",
+   "front": "-uya",
+   "back": "to come",
+   "reading": "-úyá",
+   "extra": "FSI Unit 6. A high verb."
+  },
+  {
+   "kind": "word",
+   "front": "rini?",
+   "back": "when?",
+   "reading": "ríni",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-svika",
+   "back": "to arrive",
+   "reading": "-svika",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-enda",
+   "back": "to go",
+   "reading": "-enda",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-funga",
+   "back": "to think",
+   "reading": "-funga",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-bva",
+   "back": "to go or come from",
+   "reading": "-bvá",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "na",
+   "back": "with, and",
+   "reading": "na",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "kana",
+   "back": "if, or, when",
+   "reading": "kana",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "sentence",
+   "front": "Makauya rini pano?",
+   "back": "When did you come here?",
+   "reading": "Mwakáǔyǎ` ríni pánó?",
+   "extra": "FSI Unit 6. The standard drops the w (Unit 5: ma-, not mwa-)."
+  }
+ ],
+ "The -ka- tense: yesterday or before": [
+  {
+   "kind": "grammar",
+   "front": "-ka-",
+   "back": "tense prefix: the past, the day before or earlier (or a state)",
+   "reading": null,
+   "extra": "FSI Unit 6, Note 1. Ndakásvíka: I arrived. Takes the past-tense subject prefixes."
+  }
+ ],
+ "The days of the week": [
+  {
+   "kind": "word",
+   "front": "Musumbunuko",
+   "back": "Monday",
+   "reading": "Músūmbunuko",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "Chipiri",
+   "back": "Tuesday (\"the second\")",
+   "reading": "Chípirí",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "Chitatu",
+   "back": "Wednesday (\"the third\")",
+   "reading": "Chítatú",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "China",
+   "back": "Thursday (\"the fourth\")",
+   "reading": "Chína",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "Chishanu",
+   "back": "Friday (\"the fifth\")",
+   "reading": "Chíshánǔ",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "Mugobera",
+   "back": "Saturday",
+   "reading": "Mugobéra",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "Sondo",
+   "back": "Sunday; week",
+   "reading": "Sóndo · Svóndo",
+   "extra": "FSI Unit 6. As \"week\": class 5, plural masyóndo."
+  },
+  {
+   "kind": "word",
+   "front": "musi",
+   "back": "day",
+   "reading": "musí",
+   "extra": "FSI Unit 6. Classes 3, 4. musí weChína: on Thursday."
+  }
+ ],
+ "Numbers from one to ten": [
+  {
+   "kind": "word",
+   "front": "-mwe",
+   "back": "one",
+   "reading": "~mwé",
+   "extra": "FSI Unit 6. Takes the noun's concord: rímwé, mumwé."
+  },
+  {
+   "kind": "word",
+   "front": "-viri",
+   "back": "two",
+   "reading": "~yirí (FSI)",
+   "extra": "FSI Unit 6. The dot under y: some leave it out. vaná vāyirí: two children."
+  },
+  {
+   "kind": "word",
+   "front": "-tatu",
+   "back": "three",
+   "reading": "~tatú",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-na",
+   "back": "four",
+   "reading": "~na · ~rongomuna",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-shanu",
+   "back": "five",
+   "reading": "~shánǔ",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-tanhatu",
+   "back": "six",
+   "reading": "~tánhatu",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-nomwe",
+   "back": "seven",
+   "reading": "~nomwé",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-sere",
+   "back": "eight",
+   "reading": "~séré",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "-pfumbamwe",
+   "back": "nine",
+   "reading": "~pfumbamwe",
+   "extra": "FSI Unit 6."
+  },
+  {
+   "kind": "word",
+   "front": "gumi",
+   "back": "ten (a noun: does not agree)",
+   "reading": "gúmí",
+   "extra": "FSI Unit 6. vaná gúmí: ten children."
+  }
+ ],
+ "Numbers agree with what they count": [
+  {
+   "kind": "grammar",
+   "front": "numerals agree",
+   "back": "numbers 1–9 take the counted noun's concord; gumi (ten) does not",
+   "reading": null,
+   "extra": "FSI Unit 6, Note 5. mwaná mumwé · vaná vāyirí · makoré māyirí · vaná gúmí."
+  },
+  {
+   "kind": "word",
+   "front": "-ngani?",
+   "back": "how many?",
+   "reading": "~nganí",
+   "extra": "FSI Units 7–8. Agrees: vaná vānganí? símbi nganí?"
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndingada simbi imwe.",
+   "back": "I'd like one iron.",
+   "reading": "Ndingádą símbi ímwé.",
+   "extra": "FSI Unit 8. Class 9: ímwé; class 10 \"two\": mbirí."
+  }
+ ],
+ "Weeks, months and years": [
+  {
+   "kind": "word",
+   "front": "gore",
+   "back": "year",
+   "reading": "goré",
+   "extra": "FSI Unit 6. Class 5; plural makoré (6)."
+  },
+  {
+   "kind": "word",
+   "front": "mwedzi",
+   "back": "month",
+   "reading": "mwedzí",
+   "extra": "FSI Unit 6. Classes 3, 4 — the plural looks the same."
+  },
+  {
+   "kind": "word",
+   "front": "zuva",
+   "back": "day; sun",
+   "reading": "zúvá",
+   "extra": "FSI Unit 6. Class 5; plural mazúvá (6)."
+  },
+  {
+   "kind": "word",
+   "front": "-ose",
+   "back": "whole, all",
+   "reading": "~ọ́se (~ésé)",
+   "extra": "FSI Unit 6. goré rọ́se: all year."
+  }
+ ],
+ "\"Ago\": the time that has ended": [
+  {
+   "kind": "grammar",
+   "front": "… -kapera",
+   "back": "\"ago\": a time word + the -ka- form of -pera \"come to an end\", agreeing with it",
+   "reading": null,
+   "extra": "FSI Unit 6, Note 4. mazúvá mātatú akápěrǎ: three days ago."
+  },
+  {
+   "kind": "word",
+   "front": "-pera",
+   "back": "to come to an end",
+   "reading": "-pérá",
+   "extra": "FSI Unit 6. A high verb."
+  },
+  {
+   "kind": "sentence",
+   "front": "Takasvika masondo matatu akapera.",
+   "back": "We arrived three weeks ago.",
+   "reading": "Takásvíka masóndo matatú akápěrǎ.",
+   "extra": "FSI Unit 6."
+  }
+ ],
+ "-ndo- and -zo-: go and do, and do later": [
+  {
+   "kind": "grammar",
+   "front": "-ndo-",
+   "back": "aspect prefix: go and do; or keep doing longer than expected",
+   "reading": null,
+   "extra": "FSI Unit 6, Note 2. kundodzídzísá: to go and teach."
+  },
+  {
+   "kind": "grammar",
+   "front": "-zo-",
+   "back": "aspect prefix: later, not immediately",
+   "reading": null,
+   "extra": "FSI Unit 6, Note 3. Ndinózōenda: I will (later) go."
+  }
+ ],
+ "A large family": [
+  {
+   "kind": "word",
+   "front": "mukomana",
+   "back": "boy",
+   "reading": "mukómaná",
+   "extra": "FSI Unit 7. Classes 1, 2: vakómaná."
+  },
+  {
+   "kind": "word",
+   "front": "musikana",
+   "back": "girl",
+   "reading": "musíkaná",
+   "extra": "FSI Unit 7. Classes 1, 2: vasíkaná."
+  },
+  {
+   "kind": "word",
+   "front": "imba",
+   "back": "house",
+   "reading": "imbá",
+   "extra": "FSI Units 4, 7. Classes 9, 10 (some: dzimbá, 10)."
+  },
+  {
+   "kind": "word",
+   "front": "-ti",
+   "back": "to say, do; \"I suppose\"",
+   "reading": "-ti",
+   "extra": "FSI Unit 7. Ndinóti: I suppose. A low verb."
+  },
+  {
+   "kind": "sentence",
+   "front": "Vana vana vangani?",
+   "back": "How many children do they have?",
+   "reading": "Váną vaná vānganí?",
+   "extra": "FSI Unit 7."
+  }
+ ],
+ "The -cha- tense: will, and still": [
+  {
+   "kind": "grammar",
+   "front": "-cha-",
+   "back": "tense prefix: future (\"will\"), or \"still\" with some verbs",
+   "reading": null,
+   "extra": "FSI Unit 7, Note 1. Váchásvika: they will arrive. -no- prefixes, -ka- tones."
+  },
+  {
+   "kind": "word",
+   "front": "mangwana",
+   "back": "tomorrow",
+   "reading": "mangwáná",
+   "extra": "FSI Unit 7 · Carter: Ává mangwáná — see you tomorrow."
+  },
+  {
+   "kind": "word",
+   "front": "gare gare",
+   "back": "by and by, later",
+   "reading": "garé garé",
+   "extra": "FSI Unit 7."
+  },
+  {
+   "kind": "sentence",
+   "front": "Vachasvika mangwana.",
+   "back": "They will arrive tomorrow.",
+   "reading": "Váchásvika mangwáná.",
+   "extra": "FSI Unit 7."
+  }
+ ],
+ "One-syllable verbs": [
+  {
+   "kind": "word",
+   "front": "-da",
+   "back": "to want, like",
+   "reading": "-dá",
+   "extra": "FSI Unit 7. A one-syllable high verb."
+  },
+  {
+   "kind": "grammar",
+   "front": "one-syllable verbs",
+   "back": "few; mostly high (-dá want); -ti say is low; some dialects lower -dá after a high",
+   "reading": null,
+   "extra": "FSI Unit 7, Note 2. ndinósándá but ndinódà."
+  }
+ ],
+ "My, your, his: possessives": [
+  {
+   "kind": "grammar",
+   "front": "-angu · -ako · -ake",
+   "back": "my · your (sg.) · his, her",
+   "reading": "-ángù · -ákó · -áké",
+   "extra": "FSI Unit 7, Note 3. The prefix agrees with the thing possessed: imbá yángu."
+  },
+  {
+   "kind": "grammar",
+   "front": "-edu · -enyu · -avo",
+   "back": "our · your (pl.) · their",
+   "reading": "-édú · -ényú · -ávó",
+   "extra": "FSI Unit 7, Note 3. mhuri yávó: their family."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndinoda imba yangu.",
+   "back": "I want my house.",
+   "reading": "Ndinódâ imbá yángu.",
+   "extra": "FSI Unit 7. y- agrees with imba (9)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Baba vangu",
+   "back": "my father (respect plural v-)",
+   "reading": "babá vángu",
+   "extra": "FSI Unit 7."
+  }
+ ],
+ "Its, of it: possessives for every class": [
+  {
+   "kind": "grammar",
+   "front": "-a- + owner's concord + -o",
+   "back": "possessive for a thing as owner: ~áyò (9), ~áchò (7), ~árò (5)…",
+   "reading": null,
+   "extra": "FSI Unit 7, Note 3. Two concords: owned + owner. basa ráyò · vaná váchò."
+  }
+ ],
+ "At the store: what would you like?": [
+  {
+   "kind": "sentence",
+   "front": "Chinyi chaungada?",
+   "back": "What would you like?",
+   "reading": "Chínyi cheúngadą́?",
+   "extra": "FSI Unit 8. ą: a or e by dialect."
+  },
+  {
+   "kind": "word",
+   "front": "chitoro",
+   "back": "store, shop",
+   "reading": "chitóro",
+   "extra": "FSI Unit 8. Classes 7, 8."
+  },
+  {
+   "kind": "word",
+   "front": "nguva",
+   "back": "time",
+   "reading": "ngúvá",
+   "extra": "FSI Unit 8. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "munyu",
+   "back": "salt",
+   "reading": "munyú",
+   "extra": "FSI Unit 8. Class 3."
+  },
+  {
+   "kind": "word",
+   "front": "shuka",
+   "back": "sugar",
+   "reading": "shúka",
+   "extra": "FSI Unit 8. Class 9."
+  },
+  {
+   "kind": "word",
+   "front": "zingwa",
+   "back": "bread, loaf",
+   "reading": "zingwa",
+   "extra": "FSI Unit 8. Classes 5, 6."
+  },
+  {
+   "kind": "word",
+   "front": "sipo",
+   "back": "soap",
+   "reading": "sípo",
+   "extra": "FSI Unit 8. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "mbeu",
+   "back": "seed",
+   "reading": "mbéú",
+   "extra": "FSI Unit 8. Classes 9, 10."
+  }
+ ],
+ "The -nga- tense: can, may, would like": [
+  {
+   "kind": "grammar",
+   "front": "-nga-",
+   "back": "potential: can, may, might; a polite \"would like\"",
+   "reading": null,
+   "extra": "FSI Unit 8, Note 1. Ndingádą símbi: I'd like an iron. Some dialects end it in -e."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndingaenda newe here?",
+   "back": "May I go with you?",
+   "reading": "Ndingáéndąwó newé heré?",
+   "extra": "FSI Unit 8."
+  }
+ ],
+ "I, you, he, we, they": [
+  {
+   "kind": "word",
+   "front": "ini",
+   "back": "I",
+   "reading": "iní",
+   "extra": "FSI Unit 8."
+  },
+  {
+   "kind": "word",
+   "front": "iwe",
+   "back": "you (sg.)",
+   "reading": "iwé",
+   "extra": "FSI Unit 8. newé: with you."
+  },
+  {
+   "kind": "word",
+   "front": "iye",
+   "back": "he, she",
+   "reading": "íye",
+   "extra": "FSI Unit 8."
+  },
+  {
+   "kind": "word",
+   "front": "isu",
+   "back": "we",
+   "reading": "isú",
+   "extra": "FSI Unit 8."
+  },
+  {
+   "kind": "word",
+   "front": "imi",
+   "back": "you (pl. or honorific)",
+   "reading": "imwí (FSI)",
+   "extra": "FSI Unit 8. The dot under w: some leave it out."
+  },
+  {
+   "kind": "word",
+   "front": "ivo",
+   "back": "they",
+   "reading": "ívo",
+   "extra": "FSI Unit 8."
+  }
+ ],
+ "Places one might go": [
+  {
+   "kind": "word",
+   "front": "musha",
+   "back": "home",
+   "reading": "mushá",
+   "extra": "FSI Unit 8. Classes 3, 4. kumushá: (to) home."
+  },
+  {
+   "kind": "word",
+   "front": "chechi",
+   "back": "church",
+   "reading": "chéchi",
+   "extra": "FSI Unit 8. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "munda",
+   "back": "field",
+   "reading": "munda",
+   "extra": "FSI Units 1, 8. Classes 3, 4."
+  },
+  {
+   "kind": "word",
+   "front": "rwizi",
+   "back": "river",
+   "reading": "rwizí",
+   "extra": "FSI Unit 8. Class 11; plural ndwizí (10)."
+  },
+  {
+   "kind": "word",
+   "front": "tsime",
+   "back": "well (for water)",
+   "reading": "tsíme",
+   "extra": "FSI Unit 8. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "danga",
+   "back": "cattle kraal",
+   "reading": "dangá",
+   "extra": "FSI Unit 8. Class 5; plural matangá (6)."
+  }
+ ],
+ "Big, small, narrow, white: strong adjectives": [
+  {
+   "kind": "grammar",
+   "front": "strong adjectives",
+   "back": "about two dozen; take the noun's own prefix; classes 5, 9, 10 learnt separately",
+   "reading": null,
+   "extra": "FSI Unit 8. muguta gúrú · imbá húrú · chitóro chikúrú."
+  },
+  {
+   "kind": "word",
+   "front": "-kuru",
+   "back": "large, important",
+   "reading": "~kúrú (5: gúrú · 9/10: húrú)",
+   "extra": "FSI Unit 7. A strong adjective."
+  },
+  {
+   "kind": "word",
+   "front": "-diki",
+   "back": "small",
+   "reading": "~díki (also ~dóko, ~dúku)",
+   "extra": "FSI Unit 7. A strong adjective."
+  },
+  {
+   "kind": "word",
+   "front": "-tete",
+   "back": "narrow",
+   "reading": "~téte (5: déte · 9/10: nhéte)",
+   "extra": "FSI Unit 7."
+  },
+  {
+   "kind": "word",
+   "front": "-chena",
+   "back": "white",
+   "reading": "~chená (5: jená)",
+   "extra": "FSI Unit 7."
+  }
+ ],
+ "He said \"I will go\": reported speech": [
+  {
+   "kind": "grammar",
+   "front": "direct quotation only",
+   "back": "Shona reports speech with the speaker's own words: Wákáti ndinódâ kuenda",
+   "reading": null,
+   "extra": "FSI Unit 8. -ti (say) + the original sentence."
+  },
+  {
+   "kind": "sentence",
+   "front": "Vakati achaenda kuofisi.",
+   "back": "They said he would go to the office.",
+   "reading": "Vákáti ácháenda kuófisi.",
+   "extra": "FSI Unit 8."
+  }
  ]
 }
