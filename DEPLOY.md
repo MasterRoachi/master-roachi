@@ -156,11 +156,11 @@ removed on 2026-10-19 when orders moved into D1 and `/work/shop/`. If
 
 ### Switching on the PayFast checkout
 
-Built 2026-10-19 and **off** until this is done. Delivery is then quoted live
+Built 2026-10-19, tested in the sandbox and **switched on 2026-10-21**. Delivery is then quoted live
 from Printful for the customer's address and paid at PayFast's checkout,
 instead of being built into a fixed payment link.
 
-1. In the PayFast dashboard, **Settings → Integration**: set a **passphrase**,
+1. In the PayFast dashboard, **Settings → Developer Settings** (the sandbox calls it Integration): set a **passphrase**,
    and note the merchant ID and merchant key there.
 2. Try it in the sandbox first, on the live site, without customers seeing
    it. Set the sandbox merchant (sandbox.payfast.co.za → your sandbox
@@ -170,7 +170,7 @@ instead of being built into a fixed payment link.
    shows the new form. Pay with the sandbox's test card, and the order should
    turn **Paid** on `/work/shop` by itself.
 3. Set the three secrets again with the **live** values, and
-   `npx wrangler secret delete PAYFAST_SANDBOX`.
+   `npx wrangler secret delete PAYFAST_SANDBOX` (or set it to anything but `true`). Pay with an email that is not the merchant's own: PayFast refuses a merchant paying itself.
 4. Set `"checkout": "payfast"` in `lib/pricing.json` and push. That one value
    drops delivery out of the prices, switches the product pages, the store and
    `/policies/` to "delivery quoted for your address", and gives every visitor

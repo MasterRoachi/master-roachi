@@ -43,7 +43,7 @@
     "so the price and the way it is charged cannot change separately: the links",
     "are keyed by exact rand amounts and break the moment prices move."
   ],
-  "checkout": "links",
+  "checkout": "payfast",
   "currency": "ZAR",
   "usdToZar": 17.5,
   "deliveryUsd": 12.5,
