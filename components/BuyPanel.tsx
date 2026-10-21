@@ -442,6 +442,7 @@ function CheckoutForm({
         const body = (await res.json().catch(() => ({}))) as { quote?: Quote; error?: string };
         if (!res.ok || !body.quote) throw new Error(body.error ?? 'Delivery could not be quoted just now.');
         setQuote(body.quote);
+        setBusy(false);
         return;
       }
 
