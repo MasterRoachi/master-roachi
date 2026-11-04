@@ -467,14 +467,14 @@ at the back of each deck is for.
 
 ### Curriculums
 
-**History** was planned and written in full on 2026-11-04 (12 stages, 359 lessons, 1,291 cards; see `scripts/curriculums/history.md`), **Philosophy** the same day (14 stages, 375 lessons, 1,219 cards; `scripts/curriculums/philosophy.md`), **Theology** the same day (12 stages, 318 lessons, 979 cards; `scripts/curriculums/theology.md`). **Polemics** is to be its own curriculum, his ruling, and Zulu waits. Nine with scripts in `scripts/curriculums/` before that, **thirteen in live D1**
+**History** was planned and written in full on 2026-11-04 (12 stages, 359 lessons, 1,291 cards; see `scripts/curriculums/history.md`), **Philosophy** the same day (14 stages, 375 lessons, 1,219 cards; `scripts/curriculums/philosophy.md`), **Theology** the same day (12 stages, 318 lessons, 979 cards; `scripts/curriculums/theology.md`). **Polemics** the same day as its own curriculum, his ruling (13 stages, 287 lessons, 814 cards; `scripts/curriculums/polemics.md`), so **fourteen in live D1**; Zulu waits. Nine with scripts in `scripts/curriculums/` before that, **thirteen in live D1**
 (checked 2026-10-19). **Shona** got its script on 2026-10-19 — his choice of
 the five empty ones to build first, from zero, Standard Shona with dialects
-named where met, and a speaking partner — and has Stages 1–4 written (91
-lessons, 357 cards, following FSI Units 1–16), every
+named where met, and a speaking partner — and has Stages 1–5 written (110
+lessons, 451 cards, following FSI Units 1–20), every
 form and tone read from the FSI and Carter page images; see
-`scripts/curriculums/shona.md`. **Zulu, Theology, Philosophy and History** are
-still names with nothing in them and no script. His scope for the three
+`scripts/curriculums/shona.md`. **Zulu** is still a name with nothing in it and no script; History, Philosophy
+and Theology are written, above. His scope for the three
 subjects: Orthodox theology, the Western philosophical canon, a world history
 survey; Zulu from zero. **2,142 lessons, 2,005 carrying detail** as
 of 2026-10-15 — 694 and 341 before the rewrites. Odin is the only one without

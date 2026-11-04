@@ -197,6 +197,30 @@ const stages = [
       ['Stage 4 in conversation', [FSI_TEXT, fsiUnit(13), fsiUnit(16)]],
     ],
   },
+  {
+    name: 'Stage 5 · In and at, ever, too, and all',
+    lessons: [
+      ['Going to the hospital', [FSI_TEXT, fsiUnit(17)]],
+      ['Pa-, ku-, mu-: the place classes', [FSI_TEXT, fsiUnit(17)]],
+      ['There are many: a place as the subject', [FSI_TEXT, fsiUnit(17)]],
+      ['At our place, at whose place: kwa-', [FSI_TEXT, fsiUnit(17), fsiUnit(19)]],
+      ['Just, for a while, ever: -mbo-', [FSI_TEXT, fsiUnit(17)]],
+      ['The first sign, the second town: ordinals', [FSI_TEXT, fsiUnit(17)]],
+      ['Are you enjoying the sadza?', [FSI_TEXT, fsiUnit(18)]],
+      ['Too, also: -wo', [FSI_TEXT, fsiUnit(18)]],
+      ['With me, with him: na and the pronouns', [FSI_TEXT, fsiUnit(18)]],
+      ['Put it on the table, take it out of the pot', [FSI_TEXT, fsiUnit(18)]],
+      ['All of us, every one: -ose', [FSI_TEXT, fsiUnit(18)]],
+      ['Yes and no in every tense', [FSI_TEXT, fsiUnit(18)]],
+      ['Groundnuts by the sack', [FSI_TEXT, fsiUnit(19)]],
+      ['With it, with them: na and the class pronouns', [FSI_TEXT, fsiUnit(19)]],
+      ['Of millet, of rice: the linking prefix', [FSI_TEXT, fsiUnit(19)]],
+      ['Sentences without a verb', [FSI_TEXT, fsiUnit(19), fsiUnit(20)]],
+      ['Peanut butter soup', [FSI_TEXT, fsiUnit(20)]],
+      ['What is it like? -dini again', [FSI_TEXT, fsiUnit(20)]],
+      ['Stage 5 in conversation', [FSI_TEXT, fsiUnit(17), fsiUnit(18), fsiUnit(19), fsiUnit(20)]],
+    ],
+  },
 ];
 
 const out = [

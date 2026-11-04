@@ -1,6 +1,6 @@
 # Shona — the plan
 
-**Status: approved 2026-10-19. Stages 1–4 are written (91 lessons, 357
+**Status: approved 2026-10-19. Stages 1–5 are written (110 lessons, 451
 cards); the rest is a plan, built a stage at a time.**
 
 His rulings so far: Shona is the first of the five empty curriculums to be
@@ -91,7 +91,7 @@ after another.
 | 2 | Who, where, when, and how many (FSI Units 5–8) — **written, 28** | 30 |
 | 3 | Being, doing, this and that, and not (FSI Units 9–12) — **written, 19** | 35 |
 | 4 | Commands, having, and him, her, it (FSI Units 13–16) — **written, 16** | 35 |
-| 5 | FSI from Unit 17: *ku-* and *kwa-*, ordinals, *-wo*, and the tenses' negatives | 35 |
+| 5 | In and at, ever, too, and all (FSI Units 17–20) — **written, 19** | 35 |
 | 6 | Object concords and the verb's extensions | 30 |
 | 7 | Relatives, the subjunctive, and reading the Bible | 30 |
 | 8 | Proverbs, idiom, and respect | 25 |
@@ -150,6 +150,20 @@ with their tones; the independent form, which makes a noun or adjective a
 sentence; and the *-o-* "about to". FSI's **ˣ** — tone that varies between
 speakers but not east from west — is written after its syllable and left to
 the speaking partner.
+
+**Stage 5** draws on FSI Units 17–20: the hospital dialogue and directions;
+the place classes 16, 17 and 18 (*pa-*, *ku-*, *mu-*) as classes, with a place
+as subject and *pane/kune/mune* "there is"; *kwa-* for someone's place
+(*kwedu*, *kwaani?*); the aspect prefix *-mbo-* "just, ever"; ordinals with
+*-chi-*; a meal and the kitchen; the enclitic *-wo* "too"; *na* with the
+personal and the class pronouns; *~ose* "all"; Unit 18's drills setting every
+tense beside its negative (with the new *ha-* + *-ri* + infinitive); the
+linking prefix "of"; sentences with no verb; cooking; and *-dini* again. The
+plan's "the tenses' negatives" is only those drills — the units teach no new
+negative tense, so the title follows what they do teach. Two lines of the
+Unit 19 dialogue are given untoned: their stacked marks do not print clearly
+enough to copy. FSI spells Stage 4's *muriwo* as *murivo* in Unit 20; the
+lesson says they are one word.
 
 **A Stage 1 correction, from Unit 5's table.** Stage 1 gave FSI's *w-* (he,
 she) and *mw-* (you, pl.) as the past prefixes; Unit 5 labels both

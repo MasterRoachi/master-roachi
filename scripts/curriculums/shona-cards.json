@@ -2655,5 +2655,699 @@
    "reading": "Mwakávámba ríni kudzídzírá chiShóna?",
    "extra": "FSI Unit 16. Standard drops the w."
   }
+ ],
+ "Going to the hospital": [
+  {
+   "kind": "sentence",
+   "front": "Muri kuendepi nhasi?",
+   "back": "Where are you going today?",
+   "reading": "Murí kūendepí nhási?",
+   "extra": "FSI Unit 17. -ri + infinitive, with -pi on the end."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndiri kuenda kwaMutare.",
+   "back": "I'm going to Mutare.",
+   "reading": "Ndirí kūenda kwáMutáre.",
+   "extra": "FSI Unit 17."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndiani aripo?",
+   "back": "Who is there?",
+   "reading": "Ndíaní arípó?",
+   "extra": "FSI Unit 17. Answer: Hapánába, no one [special]."
+  },
+  {
+   "kind": "word",
+   "front": "mutenda",
+   "back": "patient, sick person",
+   "reading": "muténda",
+   "extra": "FSI Unit 17. Classes 1, 2."
+  },
+  {
+   "kind": "word",
+   "front": "-maira",
+   "back": "to visit (e.g. a sick person)",
+   "reading": "-máírá",
+   "extra": "FSI Unit 17. Chéte kumáírá vaténda: just to visit the patients."
+  },
+  {
+   "kind": "word",
+   "front": "rudyi",
+   "back": "right (hand)",
+   "reading": "rudyí",
+   "extra": "FSI Unit 17. kurudyí: to the right."
+  },
+  {
+   "kind": "word",
+   "front": "runzere",
+   "back": "left (hand)",
+   "reading": "runzeré",
+   "extra": "FSI Unit 17. Class 11; also munzeré (3). kurunzeré: to the left."
+  }
+ ],
+ "Pa-, ku-, mu-: the place classes": [
+  {
+   "kind": "grammar",
+   "front": "pa- (16) · ku- (17) · mu- (18)",
+   "back": "the place classes: definite place · less definite place, or there being · inside",
+   "reading": null,
+   "extra": "FSI Unit 17, Note 1. Not English \"at\" and \"to\": pa- and ku- differ in how definite, not in motion."
+  },
+  {
+   "kind": "sentence",
+   "front": "Hapana nzira.",
+   "back": "There is no path [here]. (No thoroughfare.)",
+   "reading": "Hapáná nzīra.",
+   "extra": "FSI Unit 17. Class 16: a definite place."
+  },
+  {
+   "kind": "sentence",
+   "front": "Hakuna nzira.",
+   "back": "There is no path, no way.",
+   "reading": "Hakúná nzīra.",
+   "extra": "FSI Unit 17. Class 17: there being, in general."
+  },
+  {
+   "kind": "word",
+   "front": "kuno",
+   "back": "around here",
+   "reading": "kúnó",
+   "extra": "FSI Unit 17. Class 17; cf. pánó here (16), múnó in here (18)."
+  },
+  {
+   "kind": "word",
+   "front": "muno",
+   "back": "in here",
+   "reading": "múnó",
+   "extra": "FSI Unit 17. Class 18."
+  }
+ ],
+ "There are many: a place as the subject": [
+  {
+   "kind": "grammar",
+   "front": "pane · kune · mune",
+   "back": "there is, there are (at · around · in): place prefix + na",
+   "reading": null,
+   "extra": "FSI Unit 17. The vowel of na as in Stage 4: páná vaténda, múną matíkítí. Negative: hapána, hakúná."
+  },
+  {
+   "kind": "sentence",
+   "front": "Pahosipitari pana vatenda vazhinji here?",
+   "back": "Are there many patients at the hospital?",
+   "reading": "Pahósipitari páná vaténda vazhínjí heré?",
+   "extra": "FSI Unit 17."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mumba mune mbatata ngani?",
+   "back": "How many potatoes are there in the house?",
+   "reading": "Mumbá múné mbatáta nganí?",
+   "extra": "FSI Unit 17. \"In-house has how many potatoes?\""
+  },
+  {
+   "kind": "sentence",
+   "front": "MuHarare mune vanhu vazhinji kupinda mwaMutare.",
+   "back": "In Harare there are more people than in Mutare.",
+   "reading": "MuHaráre múne vanhu vazhínjí kūpinda mẉáMutáre.",
+   "extra": "FSI Unit 17. kupinda, to surpass: more than."
+  }
+ ],
+ "At our place, at whose place: kwa-": [
+  {
+   "kind": "grammar",
+   "front": "kwa- + person",
+   "back": "at someone's place, their home: kwaBaba Marata, kwedu (ours), kwaani? (whose?)",
+   "reading": null,
+   "extra": "FSI Units 17, 19. ku- for other places: kuHarare, kuguta."
+  },
+  {
+   "kind": "sentence",
+   "front": "Kwedu hakuna madima.",
+   "back": "At our place there are no sweet potatoes.",
+   "reading": "Kwédú hakúná mādima.",
+   "extra": "FSI Unit 17. Class 17 as subject."
+  },
+  {
+   "kind": "sentence",
+   "front": "Kwenyu hakuna ndodzi here?",
+   "back": "Are there no peas at your place?",
+   "reading": "Kwényú hakúná ndodzí heré?",
+   "extra": "FSI Unit 17."
+  },
+  {
+   "kind": "sentence",
+   "front": "Riri kwaani nhasi?",
+   "back": "Whose place is it (the work party) at today?",
+   "reading": "Rírí kwáaní nhási?",
+   "extra": "FSI Unit 19. Answer: KwáváChemusango, at the Chemusangos'."
+  },
+  {
+   "kind": "word",
+   "front": "jangano",
+   "back": "work party",
+   "reading": "jangano",
+   "extra": "FSI Unit 19, untoned. Class 5 (rírí). Váenda kujangano: he has gone to the work party."
+  }
+ ],
+ "Just, for a while, ever: -mbo-": [
+  {
+   "kind": "grammar",
+   "front": "-mbo-",
+   "back": "just, for a while, without insisting; in a -ka- question, \"ever\"",
+   "reading": null,
+   "extra": "FSI Unit 17, Note 2. After the tense, before the stem: ndinódâ kumboóná, I just want to see."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndinoda kumboona vatenda.",
+   "back": "I just want to see the patients.",
+   "reading": "Ndinódâ kumboóná vaténda.",
+   "extra": "FSI Unit 17."
+  },
+  {
+   "kind": "sentence",
+   "front": "Makambosvikapo here?",
+   "back": "Have you ever been there?",
+   "reading": "Mẉakámbósvikapo heré? (FSI)",
+   "extra": "FSI Unit 17. Standard drops the w. -po: there."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndichamboenda.",
+   "back": "I'll go [now, but I'll probably be back].",
+   "reading": "Ndichámbóenda.",
+   "extra": "FSI Unit 17. -mbo-: for a while."
+  }
+ ],
+ "The first sign, the second town: ordinals": [
+  {
+   "kind": "grammar",
+   "front": "-chi- + number",
+   "back": "ordinal: chipiri second, chitatu third…, with a linking prefix before it: guta rechipiri",
+   "reading": null,
+   "extra": "FSI Unit 17, Group 8. First: rọkutángá, from -tángá, to do first."
+  },
+  {
+   "kind": "grammar",
+   "front": "wechipiri · rechipiri · chechipiri · yechipiri · rwechipiri",
+   "back": "\"second\", agreeing with classes 3 · 5 · 7 · 9 · 11",
+   "reading": null,
+   "extra": "FSI Unit 17, Group 7. mugwagwa wechípiri, guta rechípirí."
+  },
+  {
+   "kind": "sentence",
+   "front": "Takasvika kuguta rechipiri.",
+   "back": "We reached the second town.",
+   "reading": "Takásvíka kuguta rechípirí.",
+   "extra": "FSI Unit 17."
+  },
+  {
+   "kind": "word",
+   "front": "-tanga",
+   "back": "to do first",
+   "reading": "-tángá",
+   "extra": "FSI Unit 17. Bandéra rọkutángá: the first signboard."
+  },
+  {
+   "kind": "word",
+   "front": "bandera",
+   "back": "signboard",
+   "reading": "bandéra",
+   "extra": "FSI Unit 17. Classes 5, 6."
+  }
+ ],
+ "Are you enjoying the sadza?": [
+  {
+   "kind": "sentence",
+   "front": "Muri kufara here nesadza rezviyo?",
+   "back": "Are you enjoying the sadza [made] of millet?",
+   "reading": "Murí kufárá heré nesádza rêzvǐyô?",
+   "extra": "FSI Unit 18. -fara + na: be glad with, enjoy."
+  },
+  {
+   "kind": "sentence",
+   "front": "Tose tinorida kwazvo.",
+   "back": "We all like it very much.",
+   "reading": "Tọ́sé tinórída kwázvo.",
+   "extra": "FSI Unit 18. -ri-: object prefix for sadza (5)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mai mabika zvakanaka.",
+   "back": "Mother, you have cooked well.",
+   "reading": "Mái mẉabíka zvakánáka. (FSI)",
+   "extra": "FSI Unit 18. Standard drops the w; plural of respect."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndigashidzewo.",
+   "back": "Hand [it] to me.",
+   "reading": "Ndígashídzewó.",
+   "extra": "FSI Unit 18. -gashidza: cause to receive."
+  },
+  {
+   "kind": "word",
+   "front": "-fara",
+   "back": "to be glad",
+   "reading": "-fárá",
+   "extra": "FSI Unit 18."
+  },
+  {
+   "kind": "word",
+   "front": "zviyo",
+   "back": "millet",
+   "reading": "zviyó",
+   "extra": "FSI Unit 18. Class 8. sadza rêzvǐyô: sadza of millet."
+  },
+  {
+   "kind": "word",
+   "front": "-edza",
+   "back": "to try",
+   "reading": "-edza",
+   "extra": "FSI Unit 18."
+  },
+  {
+   "kind": "word",
+   "front": "mvura",
+   "back": "rain, water",
+   "reading": "mvúrá",
+   "extra": "FSI Unit 18. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "tafura",
+   "back": "table",
+   "reading": "táfura",
+   "extra": "FSI Unit 18. Classes 9, 10. patáfura: on the table."
+  },
+  {
+   "kind": "word",
+   "front": "-unza",
+   "back": "to bring",
+   "reading": "-únzá",
+   "extra": "FSI Unit 18. Únzá mvúrá: bring water."
+  }
+ ],
+ "Too, also: -wo": [
+  {
+   "kind": "grammar",
+   "front": "-wo",
+   "back": "too, also; also softens a request. Tone opposite to the syllable before it; no vowel change",
+   "reading": null,
+   "extra": "FSI Unit 18, Note 1. Ndatáurawó: I spoke too."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndiri kuda kumboedzawo.",
+   "back": "I want to try a little too.",
+   "reading": "Ndirí kudá kūmboedzawó.",
+   "extra": "FSI Unit 18. -mbo- and -wo together."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndataurawo.",
+   "back": "I spoke too.",
+   "reading": "Ndatáurawó.",
+   "extra": "FSI Unit 18. Answer to Mẉatáura, you spoke."
+  }
+ ],
+ "With me, with him: na and the pronouns": [
+  {
+   "kind": "grammar",
+   "front": "neni · newe · naye · nesu · nemi · navo",
+   "back": "with me · you · him, her · us · you (pl.) · them",
+   "reading": null,
+   "extra": "FSI Unit 18, Note 2. ne- for 1st and 2nd person, na- for 3rd. FSI: nemẉí."
+  },
+  {
+   "kind": "sentence",
+   "front": "Baba vanoda kutaura neni.",
+   "back": "Father wants to talk with me.",
+   "reading": "Babá vánodá kūtaura není.",
+   "extra": "FSI Unit 18."
+  },
+  {
+   "kind": "sentence",
+   "front": "Neniwo ndingaida.",
+   "back": "And I'd like some too.",
+   "reading": "Neníwo ndingáǐdá.",
+   "extra": "FSI Unit 18. -i-: it (the water, 9)."
+  }
+ ],
+ "Put it on the table, take it out of the pot": [
+  {
+   "kind": "sentence",
+   "front": "Isa mupunga patafura.",
+   "back": "Put the rice on the table.",
+   "reading": "Isá mūpungá patáfura.",
+   "extra": "FSI Unit 18. Únzá … patáfura: bring … to the table."
+  },
+  {
+   "kind": "sentence",
+   "front": "Bvisa mupunga muhari.",
+   "back": "Remove the rice from the pot.",
+   "reading": "Bvisá mūpungá muhárí.",
+   "extra": "FSI Unit 18. Isá … muhárí: put … into the pot."
+  },
+  {
+   "kind": "sentence",
+   "front": "Isa mupunga pachoto.",
+   "back": "Put the rice on the fire.",
+   "reading": "Isá mūpungá pāchotó.",
+   "extra": "FSI Unit 18."
+  },
+  {
+   "kind": "sentence",
+   "front": "Takaedza kugadzira kofi.",
+   "back": "We tried to make coffee.",
+   "reading": "Takáédza kugadzira kófi.",
+   "extra": "FSI Unit 18. -edza + infinitive: try to."
+  },
+  {
+   "kind": "word",
+   "front": "hari",
+   "back": "cooking pot",
+   "reading": "hárí",
+   "extra": "FSI Unit 18. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "choto",
+   "back": "fireplace",
+   "reading": "chotó",
+   "extra": "FSI Unit 18. Classes 7, 8. pāchotó: on the fire."
+  }
+ ],
+ "All of us, every one: -ose": [
+  {
+   "kind": "grammar",
+   "front": "tose · mose · vose",
+   "back": "all of us · all of you · all of them: ~ose takes the concord",
+   "reading": null,
+   "extra": "FSI Unit 18. FSI: tọ́sé, mẉọ́sé, vọ́sé; ~ẹ́sé in some areas."
+  },
+  {
+   "kind": "sentence",
+   "front": "Vanotaura nguva dzose.",
+   "back": "They talk all the time.",
+   "reading": "Vánótaura ngúvá dzọ́sé.",
+   "extra": "FSI Unit 18. Class 10, agreeing with ngúvá."
+  },
+  {
+   "kind": "sentence",
+   "front": "Tinoenda navo kwose.",
+   "back": "We go everywhere with them.",
+   "reading": "Tinóěnda návo kwọ́sé.",
+   "extra": "FSI Unit 18. kwọ́sé: all places (17)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Handinzwi zvose.",
+   "back": "I don't understand everything.",
+   "reading": "Handíṇzwi zvọ́sé.",
+   "extra": "FSI Unit 18. zvọ́sé: all things (8)."
+  }
+ ],
+ "Yes and no in every tense": [
+  {
+   "kind": "grammar",
+   "front": "ha- + SP + ri + infinitive",
+   "back": "is not doing (now): hamuri kubika, you aren't cooking",
+   "reading": null,
+   "extra": "FSI Unit 18, Group 10. FSI: Hamuriˣ kūbika."
+  },
+  {
+   "kind": "sentence",
+   "front": "Hatimboridi.",
+   "back": "We don't like it at all.",
+   "reading": "Hatímborídí.",
+   "extra": "FSI Unit 18. -mbo- in a negative: at all. -ri-: it (5)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Hatina kumborida.",
+   "back": "We didn't like it.",
+   "reading": "Hatíná kūmborídá.",
+   "extra": "FSI Unit 18."
+  },
+  {
+   "kind": "sentence",
+   "front": "Hamubiki zvakanaka.",
+   "back": "You don't cook well.",
+   "reading": "Hamúbikí zvakánáka.",
+   "extra": "FSI Unit 18. Affirmative: Munóbǐka zvakánáka."
+  },
+  {
+   "kind": "word",
+   "front": "nezuro",
+   "back": "yesterday",
+   "reading": "nezúro",
+   "extra": "FSI Unit 18, as a cue for the -ka- tense and the past negative."
+  }
+ ],
+ "Groundnuts by the sack": [
+  {
+   "kind": "sentence",
+   "front": "Ndakarima nzungu.",
+   "back": "I have [grown] groundnuts.",
+   "reading": "Ndakáríma nzungú.",
+   "extra": "FSI Unit 19."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndiani anodzida?",
+   "back": "Who wants them?",
+   "reading": "Ndíaní unódzǐdá? (FSI, eastern u-)",
+   "extra": "FSI Unit 19. -dzi-: them (nzungu, 10)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndaingada masaki mana.",
+   "back": "I'd like four sacks.",
+   "reading": "Ndaíngadą māsakí māna.",
+   "extra": "FSI Unit 19."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mune mhunga here?",
+   "back": "Do you have any millet?",
+   "reading": "Muné mhūnga heré?",
+   "extra": "FSI Unit 19."
+  },
+  {
+   "kind": "word",
+   "front": "saki",
+   "back": "sack",
+   "reading": "sakí",
+   "extra": "FSI Unit 19. Class 5; plural masakí (6)."
+  },
+  {
+   "kind": "word",
+   "front": "mhunga",
+   "back": "millet",
+   "reading": "mhunga",
+   "extra": "FSI Unit 19. Class 9. Cf. zviyó (8), also millet; pfunde, sorghum."
+  },
+  {
+   "kind": "word",
+   "front": "pondo",
+   "back": "pound (money or weight)",
+   "reading": "póndo",
+   "extra": "FSI Unit 19. Classes 9, 10."
+  },
+  {
+   "kind": "word",
+   "front": "asi",
+   "back": "but",
+   "reading": "así",
+   "extra": "FSI Unit 19."
+  },
+  {
+   "kind": "word",
+   "front": "musika",
+   "back": "market",
+   "reading": "musika",
+   "extra": "FSI Unit 19. Classes 3, 4."
+  }
+ ],
+ "With it, with them: na and the class pronouns": [
+  {
+   "kind": "grammar",
+   "front": "iwo · iyo · iro · icho · izvo",
+   "back": "class pronouns, \"it, they\": classes 3 and 6 · 4 · 5 · 7 · 8 — tone low–high",
+   "reading": null,
+   "extra": "FSI Unit 19, Note 1. Spelled like the distal demonstratives, except 3 and 6."
+  },
+  {
+   "kind": "grammar",
+   "front": "nawo · nayo · nadzo · nazvo",
+   "back": "with it, with them: na + class pronoun",
+   "reading": null,
+   "extra": "FSI Unit 19. náwo (6), náyo (9, 4), nádzo (10), názvo (8). Also nawo."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndingazouya nawo mangwana.",
+   "back": "I can bring them tomorrow.",
+   "reading": "Ndingázoúyą náwo mangwáná.",
+   "extra": "FSI Unit 19. \"come with them\": the sacks (6)."
+  }
+ ],
+ "Of millet, of rice: the linking prefix": [
+  {
+   "kind": "grammar",
+   "front": "concord + linking vowel (\"of\")",
+   "back": "the first noun's concord, then the vowel na would take: saki remhunga, a sack of millet; masaki emhunga, sacks of millet",
+   "reading": null,
+   "extra": "FSI Unit 19, Note 3. Same tone and vowel rules as na (Stage 4)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndaingada saki rimwe remhunga.",
+   "back": "I'd like one sack of millet.",
+   "reading": "Ndaíngadą sakí rímwé remhúnga.",
+   "extra": "FSI Unit 19."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndaingada masaki maviri ezviyo.",
+   "back": "I'd like two sacks of millet (zviyo).",
+   "reading": "Ndaíngadą masakí māviri êzvǐyô.",
+   "extra": "FSI Unit 19. Class 6 concord is a vowel: e-."
+  }
+ ],
+ "Sentences without a verb": [
+  {
+   "kind": "sentence",
+   "front": "Nzungu pondo ina rimwe.",
+   "back": "The nuts [are] four pounds a bag.",
+   "reading": "Nzungú póndo ina rímwé.",
+   "extra": "FSI Unit 19, Note 2. No verb; rímwé agrees with sakí (5)."
+  },
+  {
+   "kind": "sentence",
+   "front": "Muto wedovi kunaka!",
+   "back": "Peanut butter soup [is] good!",
+   "reading": "Muto wêdǒvî kunaka!",
+   "extra": "FSI Unit 20, Note 2. Only an infinitive, \"to become good\"."
+  },
+  {
+   "kind": "grammar",
+   "front": "noun + infinitive",
+   "back": "a sentence with no finite verb: muto wedovi kunaka, the soup [is] good",
+   "reading": null,
+   "extra": "FSI Unit 20, Note 2. Also a price after a noun: nzungu pondo ina."
+  },
+  {
+   "kind": "sentence",
+   "front": "Icho choto chikuru asi hachina kunaka.",
+   "back": "That fireplace is large but it is not good.",
+   "reading": "Icho chotó chíkǔrǔ así hachíná kūnaka.",
+   "extra": "FSI Unit 19, Group 4."
+  }
+ ],
+ "Peanut butter soup": [
+  {
+   "kind": "sentence",
+   "front": "Isa dovi pachingwa.",
+   "back": "Put peanut butter on the bread.",
+   "reading": "Isá doví pāchingwa.",
+   "extra": "FSI Unit 20."
+  },
+  {
+   "kind": "sentence",
+   "front": "Zvinonaka.",
+   "back": "It is delicious.",
+   "reading": "Zvínónaka.",
+   "extra": "FSI Unit 20. Class 8, with no noun before it."
+  },
+  {
+   "kind": "sentence",
+   "front": "Ndinonyanya kuda nyama.",
+   "back": "I like meat best.",
+   "reading": "Ndinónyánya kudá nyāma.",
+   "extra": "FSI Unit 20. -nyanya + infinitive: do most."
+  },
+  {
+   "kind": "word",
+   "front": "dovi",
+   "back": "peanut butter",
+   "reading": "doví",
+   "extra": "FSI Unit 20. Class 5. muto wêdǒvî: peanut butter soup."
+  },
+  {
+   "kind": "word",
+   "front": "chingwa",
+   "back": "bread",
+   "reading": "chingwa",
+   "extra": "FSI Unit 20. Classes 7, 8."
+  },
+  {
+   "kind": "word",
+   "front": "mbuya",
+   "back": "grandmother",
+   "reading": "mbúya",
+   "extra": "FSI Unit 20. Classes 1a, 2a."
+  },
+  {
+   "kind": "word",
+   "front": "nyama",
+   "back": "meat",
+   "reading": "nyama",
+   "extra": "FSI Unit 20. Class 9."
+  },
+  {
+   "kind": "word",
+   "front": "-gocha",
+   "back": "to broil",
+   "reading": "-gocha",
+   "extra": "FSI Unit 20. Also -bvúrá."
+  },
+  {
+   "kind": "word",
+   "front": "-vidza",
+   "back": "to boil",
+   "reading": "-vidza",
+   "extra": "FSI Unit 20. Also -virisa."
+  },
+  {
+   "kind": "word",
+   "front": "-kanga",
+   "back": "to fry",
+   "reading": "-kángá",
+   "extra": "FSI Unit 20."
+  }
+ ],
+ "What is it like? -dini again": [
+  {
+   "kind": "grammar",
+   "front": "-dini: indicative · relative",
+   "back": "Chakadini? what is it like? · …chakadini? like what? — tones alternate, from high in the indicative, low in the relative",
+   "reading": null,
+   "extra": "FSI Unit 20, Note 1. Chákàdínì? · chàkádìní?"
+  },
+  {
+   "kind": "sentence",
+   "front": "Chitoro chenyu chakadini?",
+   "back": "What is your store like?",
+   "reading": "Chitóro chényú chákadíni?",
+   "extra": "FSI Unit 20. Indicative."
+  },
+  {
+   "kind": "sentence",
+   "front": "Mune imba yakadini?",
+   "back": "What sort of house do you have?",
+   "reading": "Muné imbá yakádiní?",
+   "extra": "FSI Unit 20. Relative, after a noun."
+  },
+  {
+   "kind": "sentence",
+   "front": "Tine huru kwazvo.",
+   "back": "We have a very large [one].",
+   "reading": "Tiné húrú kwázvo.",
+   "extra": "FSI Unit 20."
+  }
  ]
 }
