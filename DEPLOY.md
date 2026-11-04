@@ -172,6 +172,7 @@ them:
 | `PAYFAST_SANDBOX` | the sandbox switch from step 2 below. **Still listed on 2026-11-04**; step 3 says delete it or set it to anything but `true`. A secret's value cannot be read back, so whether it is `true` is unconfirmed | `npx wrangler secret delete PAYFAST_SANDBOX` |
 | `PRINTFUL_TOKEN` | Sync Printful, and sending orders to Printful as drafts. A single-store private token from developers.printful.com/tokens, scopes `orders` and `sync_products/read` | `npx wrangler secret put PRINTFUL_TOKEN` |
 | `VOTE_SALT` | salting the voter hash, which is guessable without it | `npx wrangler secret put VOTE_SALT` |
+| `OHANA_ACCESS_TEAM`, `OHANA_ACCESS_AUD` | verifying Ohana's Access token on `/share/ohana` — see "Ohana's way in" below. Not set yet | `npx wrangler secret put OHANA_ACCESS_…` |
 
 Every one of them **fails closed**: a missing secret makes its endpoint serve
 the 404 page rather than answer. `GITHUB_TOKEN` expires — when the backend's
@@ -317,6 +318,34 @@ allow-list are actually tested. Run it before deploying a change to
 `worker/`.
 
 ---
+
+### Ohana's way in
+
+Built 2026-11-04. Ohana, the household app, reads the curriculums marked his,
+hers or both (`curriculums.audience`, migration 0021; set from the dashboard's
+curriculum card) and ticks lessons and answers cards there, through
+`/share/ohana/*` (`worker/share-ohana.ts`). It changes his study history, so
+the Worker **verifies** the Access token there — signature against the team's
+keys, audience, issuer, expiry — unlike `/work`, which only checks the header
+is present. Until the steps below are done it answers with the 404 page.
+
+Done by hand in the Zero Trust dashboard, since Wrangler has no Access scope:
+
+1. **Access → Service Auth → Service Tokens**: create one for Ohana. Its
+   Client ID and Client Secret go to Ohana, never into this repo.
+2. **Access → Applications → Add → Self-hosted**: domain `masterroachi.com`,
+   path `share/ohana`. One policy, action **Service Auth**, include that
+   service token and nothing else.
+3. Copy the application's **Audience (AUD) tag**, and the team domain
+   (`<team>.cloudflareaccess.com`), then:
+
+```
+npx wrangler secret put OHANA_ACCESS_TEAM   # <team>.cloudflareaccess.com
+npx wrangler secret put OHANA_ACCESS_AUD    # the AUD tag
+```
+
+Ohana then sends `CF-Access-Client-Id` and `CF-Access-Client-Secret`; Access
+swaps them for the token the Worker checks.
 
 ## Afterwards
 

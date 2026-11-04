@@ -5832,6 +5832,160 @@ globalThis.fetch = preGh;
 res = await worker.fetch(get('https://masterroachi.com/store/'), env);
 check('other paths hit ASSETS', (await res.text()) === '404 page', '');
 
+
+// --- /share/ohana -------------------------------------------------------------
+//
+// Every migration applied, so the audience column and the cards are real. The
+// Access token is signed for real with a throwaway key, and the team's certs
+// endpoint is answered by a stubbed fetch: what is tested is the verification,
+// not a stand-in for it.
+{
+  const sqlite = new DatabaseSync(':memory:');
+  for (const file of fs.readdirSync('migrations').filter((f) => f.endsWith('.sql')).sort()) {
+    sqlite.exec(fs.readFileSync(path.join('migrations', file), 'utf8'));
+  }
+  const db = {
+    sqlite,
+    prepare(sql) {
+      let values = [];
+      const statement = {
+        bind(...bound) { values = bound; return statement; },
+        async all() { return { results: sqlite.prepare(sql).all(...values) }; },
+        async first() { return sqlite.prepare(sql).get(...values) ?? null; },
+        async run() { const r = sqlite.prepare(sql).run(...values); return { meta: { changes: r.changes } }; },
+      };
+      return statement;
+    },
+    async batch(statements) { for (const s of statements) await s.run(); },
+  };
+
+  const now = new Date().toISOString();
+  sqlite.exec(`
+    insert into curriculums (id, name, status, position, created_at, audience) values
+      (1, 'Piano', 'active', 1, '${now}', 'both'),
+      (2, 'Secret', 'active', 2, '${now}', null);
+    insert into modules (id, curriculum_id, name, position) values (10, 1, 'Stage 1', 1), (20, 2, 'Stage 1', 1);
+    insert into lessons (id, module_id, name, position, detail) values
+      (100, 10, 'Middle C', 1, '**Find it.**'), (101, 10, 'Scales', 2, null), (200, 20, 'Hidden', 1, null);
+    insert into sources (curriculum_id, lesson_id, title, url, position) values
+      (1, null, 'Whole course', 'https://example.org', 1), (1, 100, 'Lesson only', null, 1);
+    insert into cards (id, curriculum_id, lesson_id, kind, front, back, due, created_at) values
+      (1000, 1, 100, 'word', 'C', 'the white key left of two black', '${now}', '${now}'),
+      (1001, 1, 100, 'word', 'D', 'next one up', '${now}', '${now}'),
+      (2000, 2, 200, 'word', 'X', 'not shared', '${now}', '${now}');
+  `);
+
+  const TEAM = 'roachi.cloudflareaccess.com';
+  const AUD = 'ohana-aud-tag';
+  const pair = await crypto.subtle.generateKey(
+    { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
+    true,
+    ['sign', 'verify'],
+  );
+  const jwk = { ...(await crypto.subtle.exportKey('jwk', pair.publicKey)), kid: 'k1' };
+  const b64u = (bytes) => Buffer.from(bytes).toString('base64url');
+  const sign = async (claims, kid = 'k1') => {
+    const head = b64u(JSON.stringify({ alg: 'RS256', kid }));
+    const body = b64u(JSON.stringify(claims));
+    const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', pair.privateKey, new TextEncoder().encode(`${head}.${body}`));
+    return `${head}.${body}.${b64u(new Uint8Array(sig))}`;
+  };
+  const exp = Math.floor(Date.now() / 1000) + 600;
+  const good = await sign({ aud: [AUD], iss: `https://${TEAM}`, exp });
+
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (input) =>
+    String(input) === `https://${TEAM}/cdn-cgi/access/certs`
+      ? new Response(JSON.stringify({ keys: [jwk] }), { status: 200 })
+      : new Response('no', { status: 500 });
+
+  const ohanaEnv = { ...env, DB: db, OHANA_ACCESS_TEAM: TEAM, OHANA_ACCESS_AUD: AUD };
+  const call = (route, { token = good, method = 'GET', body } = {}) =>
+    worker.fetch(
+      new Request(`https://masterroachi.com/share/ohana${route}`, {
+        method,
+        headers: { ...(token ? { 'cf-access-jwt-assertion': token } : {}), 'content-type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      }),
+      ohanaEnv,
+    );
+
+  let r = await call('/curriculums', { token: null });
+  check('ohana: no token serves the 404 page', (await r.text()) === '404 page');
+  r = await call('/curriculums', { token: await sign({ aud: ['someone-else'], iss: `https://${TEAM}`, exp }) });
+  check('ohana: a token for another app serves the 404 page', (await r.text()) === '404 page');
+  r = await call('/curriculums', { token: await sign({ aud: [AUD], iss: `https://${TEAM}`, exp: 1000 }) });
+  check('ohana: an expired token serves the 404 page', (await r.text()) === '404 page');
+  r = await call('/curriculums', { token: good.slice(0, -4) + 'AAAA' });
+  check('ohana: a forged signature serves the 404 page', (await r.text()) === '404 page');
+  r = await worker.fetch(new Request('https://masterroachi.com/share/ohana/curriculums', { headers: { 'cf-access-jwt-assertion': good } }), env);
+  check('ohana: unconfigured fails closed', (await r.text()) === '404 page');
+
+  r = await call('/curriculums');
+  let body = await r.json();
+  check('ohana: lists only shared curriculums', r.status === 200 && body.curriculums.length === 1 && body.curriculums[0].name === 'Piano', JSON.stringify(body).slice(0, 200));
+  const piano = body.curriculums[0];
+  check('ohana: carries audience and lessons by module', piano.audience === 'both' && piano.modules[0].lessons.length === 2 && piano.modules[0].lessons[0].detail === '**Find it.**');
+  check('ohana: curriculum-level sources only', piano.sources.length === 1 && piano.sources[0].title === 'Whole course');
+  check('ohana: locked cards are neither due nor new', piano.due_cards === 0 && piano.new_cards === 0, JSON.stringify(piano));
+
+  r = await call('/cards/due?curriculum_id=1');
+  body = await r.json();
+  check('ohana: nothing to study before the lesson is ticked', r.status === 200 && body.cards.length === 0);
+
+  r = await call('/lessons/done', { method: 'POST', body: { curriculum_id: 1, module: 'Stage 1', lesson: 'Middle C', done: true } });
+  body = await r.json();
+  const ticked = body.modules?.[0]?.lessons?.[0];
+  check('ohana: ticking stamps today', r.status === 200 && /^\d{4}-\d{2}-\d{2}$/.test(ticked?.done_on ?? ''), JSON.stringify(ticked));
+  check('ohana: ticking unlocks the lesson\'s cards', body.new_cards === 2, String(body.new_cards));
+  sqlite.prepare(`update lessons set done_on = '2026-01-01' where id = 100`).run();
+  r = await call('/lessons/done', { method: 'POST', body: { curriculum_id: 1, module: 'Stage 1', lesson: 'Middle C', done: true } });
+  body = await r.json();
+  check('ohana: ticking a ticked lesson keeps its date', body.modules[0].lessons[0].done_on === '2026-01-01');
+  r = await call('/lessons/done', { method: 'POST', body: { curriculum_id: 2, module: 'Stage 1', lesson: 'Hidden', done: true } });
+  check('ohana: an unshared curriculum cannot be ticked', r.status === 404);
+  r = await call('/lessons/done', { method: 'POST', body: { curriculum_id: 1, module: 'Stage 1', lesson: 'Nope', done: true } });
+  check('ohana: an unknown lesson is 404', r.status === 404);
+
+  r = await call('/cards/due?curriculum_id=1&limit=20');
+  body = await r.json();
+  check('ohana: unlocked new cards are due, with what to show', body.cards.length === 2 && body.cards[0].front === 'C' && 'reading' in body.cards[0] && !('stability' in body.cards[0]), JSON.stringify(body));
+
+  r = await call('/cards/review', { method: 'POST', body: { card_id: 1000, rating: 2 } });
+  check('ohana: only Again and Good are ratings', r.status === 400);
+  r = await call('/cards/review', { method: 'POST', body: { card_id: 2000, rating: 3 } });
+  check('ohana: a card in an unshared curriculum is 404', r.status === 404);
+  r = await call('/cards/review', { method: 'POST', body: { card_id: 1000, rating: 3 } });
+  body = await r.json();
+  const reviewed = sqlite.prepare('select state, reps from cards where id = 1000').get();
+  const logged = sqlite.prepare('select rating, state, day from card_reviews where card_id = 1000').all();
+  check('ohana: a review schedules the card', r.status === 200 && body.ok === true && reviewed.reps === 1 && reviewed.state !== 0, JSON.stringify(reviewed));
+  check('ohana: a review is logged with the state before it', logged.length === 1 && logged[0].rating === 3 && logged[0].state === 0, JSON.stringify(logged));
+
+  // The /work dashboard goes through the same shared function.
+  r = await worker.fetch(
+    new Request('https://masterroachi.com/work/api/curriculums', {
+      method: 'POST',
+      headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'toggle-lesson', id: 101 }),
+    }),
+    { ...env, DB: db },
+  );
+  body = await r.json();
+  check('work: toggle-lesson still ticks through the shared function', r.status === 200 && body.done === true && typeof body.day === 'string', JSON.stringify(body));
+  r = await worker.fetch(
+    new Request('https://masterroachi.com/work/api/curriculums', {
+      method: 'POST',
+      headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+      body: JSON.stringify({ action: 'set-audience', id: 2, audience: 'hers' }),
+    }),
+    { ...env, DB: db },
+  );
+  check('work: set-audience shares a curriculum', r.status === 200 && sqlite.prepare('select audience from curriculums where id = 2').get().audience === 'hers');
+
+  globalThis.fetch = realFetch;
+}
+
 const failed = results.filter((r) => !r.pass);
 for (const r of results) {
   console.log(`  ${r.pass ? 'pass' : 'FAIL'}  ${r.label}${r.pass ? '' : '   → ' + r.detail}`);

@@ -57,6 +57,8 @@ export interface Curriculum {
   name: string;
   source: string | null;
   status: 'active' | 'paused' | 'done';
+  /** Who it is for in Ohana; null is not shared. Migration 0021. */
+  audience?: 'his' | 'hers' | 'both' | null;
   modules: Module[];
   sources?: Source[];
   /**

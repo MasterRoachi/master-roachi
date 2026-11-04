@@ -21,10 +21,16 @@ import {
   freshScheduling,
   isCardKind,
   ratingFor,
-  review,
   type Card,
 } from '../lib/cards';
 import { isEmptyNote, parseNote, sectionHeight, writtenHeight } from '../lib/card-note';
+import {
+  answerWrites,
+  CARD_COLUMNS,
+  introducedToday as introducedTodayIn,
+  setLessonDone,
+} from './curriculum-ops';
+import { shareOhana } from './share-ohana';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
@@ -196,6 +202,14 @@ interface Env {
    * not set up rather than erroring.
    */
   DB?: D1Database;
+
+  /**
+   * Ohana's way in to the shared curriculums: the Access team domain and the
+   * Audience tag of the Access application covering /share/ohana. Worker
+   * secrets. Unset, /share/ohana answers with the 404 page.
+   */
+  OHANA_ACCESS_TEAM?: string;
+  OHANA_ACCESS_AUD?: string;
 }
 
 /** Votes lapse after six months, so an abandoned poll empties itself. */
@@ -579,6 +593,13 @@ export default {
     // added the slash, voting would fail silently and the page would fall back
     // to a plain list with no error to explain it.
     const route = url.pathname.replace(/\/+$/, '');
+
+    // --- Ohana ----------------------------------------------------------------
+    //
+    // The shared curriculums, read and studied from the household app. Its own
+    // module, with its own token check: see worker/share-ohana.ts.
+    const shared = await shareOhana(request, env, route);
+    if (shared) return shared;
 
     // --- an order's delivery details ---------------------------------------
     //
@@ -2216,7 +2237,7 @@ export default {
           const [curriculums, modules, lessons, cardCounts, sources] = await Promise.all([
             db
               .prepare(
-                `select id, name, source, status, position from curriculums
+                `select id, name, source, status, position, audience from curriculums
                  order by position, id`,
               )
               .all(),
@@ -2491,34 +2512,12 @@ export default {
             if (!isDay(day)) return json({ error: 'not a date' }, 400);
             if (day > localDay()) return json({ error: 'that day has not happened' }, 400);
 
-            const next = lesson.done_on ? null : day;
-            await db.prepare(`update lessons set done_on = ?2 where id = ?1`).bind(id, next).run();
-
             /* Ticking a lesson UNLOCKS the cards it teaches — "auto", his
-             * choice, so that finishing a lesson and forgetting its cards is
-             * not possible. The cards already exist, built with the
-             * curriculum; `unlocked_on` is what makes them reviewable, which
-             * is how 2,136 kanji can sit in the database without 2,136 cards
-             * arriving on day one.
-             *
-             * Unticking does NOT lock them again. A card that has been
-             * answered has a review history, and hiding it because a tick was
-             * clicked twice would be a worse answer than leaving it in the
-             * pile. `unlocked_on is null` also means a re-tick cannot move a
-             * date that is already set. */
-            let unlocked = 0;
-            if (next !== null) {
-              const result = (await db
-                .prepare(
-                  `update cards set unlocked_on = ?2
-                    where lesson_id = ?1 and unlocked_on is null`,
-                )
-                .bind(id, next)
-                .run()) as { meta?: { changes?: number } };
-              unlocked = Number(result?.meta?.changes ?? 0);
-            }
-
-            return json({ done: next !== null, day: next, unlocked }, 200);
+             * choice. The cards already exist, built with the curriculum;
+             * `unlocked_on` is what makes them reviewable, which is how 2,136
+             * kanji can sit in the database without 2,136 cards arriving on
+             * day one. The rule lives in setLessonDone(), shared with Ohana. */
+            return json(await setLessonDone(db, id, !lesson.done_on, day), 200);
           }
 
           /* Sources: what a curriculum, or one of its lessons, is studied
@@ -2701,6 +2700,21 @@ export default {
             return json({ renamed: true }, 200);
           }
 
+          // Who a curriculum is for in Ohana: his, hers or both, or null
+          // for not shared. "Both" is one shared progress (migration 0021).
+          if (action === 'set-audience') {
+            const id = Number(body.id);
+            const audience = body.audience === null ? null : String(body.audience);
+            if (!Number.isInteger(id) || (audience !== null && !['his', 'hers', 'both'].includes(audience))) {
+              return json({ error: 'needs an id and his, hers, both or null' }, 400);
+            }
+            await db
+              .prepare(`update curriculums set audience = ?2 where id = ?1`)
+              .bind(id, audience)
+              .run();
+            return json({ updated: true }, 200);
+          }
+
           if (action === 'set-status') {
             const id = Number(body.id);
             const status = String(body.status);
@@ -2754,11 +2768,6 @@ export default {
       const today = localDay();
       const nowIso = new Date().toISOString();
 
-      const CARD_COLUMNS =
-        `id, curriculum_id, lesson_id, kind, front, back, reading, extra,
-         due, stability, difficulty, scheduled_days, learning_steps, reps,
-         lapses, state, last_review, unlocked_on`;
-
       /** The decks, with the four numbers the list shows. */
       const decksOf = async () =>
         (
@@ -2789,19 +2798,7 @@ export default {
        * this morning is in learning by lunchtime, so counting the pile would
        * let the allowance refill itself all day long.
        */
-      const introducedToday = async (deck: number) =>
-        Number(
-          (
-            await db
-              .prepare(
-                `select count(*) as n from card_reviews r
-                   join cards k on k.id = r.card_id
-                  where r.day = ?1 and r.state = 0 and k.curriculum_id = ?2`,
-              )
-              .bind(today, deck)
-              .first<{ n: number }>()
-          )?.n ?? 0,
-        );
+      const introducedToday = (deck: number) => introducedTodayIn(db, deck, today);
 
       /** A card's note, which is drawn beside it. */
       const noteFor = async (card: number) =>
@@ -2900,7 +2897,6 @@ export default {
             }
 
             const now = new Date();
-            const next = review(card, rating, now);
 
             /* THE NOTE SAVES WITH THE ANSWER, which is his rule: "the note
              * should automatically save when i say good or again". So it rides
@@ -2946,36 +2942,9 @@ export default {
               }
             }
 
-            await db.batch([
-              ...writes,
-              db
-                .prepare(
-                  `update cards set due = ?2, stability = ?3, difficulty = ?4,
-                          scheduled_days = ?5, learning_steps = ?6, reps = ?7,
-                          lapses = ?8, state = ?9, last_review = ?10
-                    where id = ?1`,
-                )
-                .bind(
-                  id,
-                  next.due,
-                  next.stability,
-                  next.difficulty,
-                  next.scheduled_days,
-                  next.learning_steps,
-                  next.reps,
-                  next.lapses,
-                  next.state,
-                  next.last_review,
-                ),
-              db
-                .prepare(
-                  `insert into card_reviews (card_id, rating, state, reviewed_at, day)
-                   values (?1, ?2, ?3, ?4, ?5)`,
-                )
-                // `card.state`, the state BEFORE the answer: that is what an
-                // optimiser needs and the update above has already lost it.
-                .bind(id, rating, card.state, now.toISOString(), today),
-            ]);
+            // The schedule and the log, from answerWrites() — shared with
+            // Ohana, so a review is the same review from either app.
+            await db.batch([...writes, ...answerWrites(db, card, rating, now, today)]);
 
             const following = (await nextCard(card.curriculum_id)) ?? null;
             return json(

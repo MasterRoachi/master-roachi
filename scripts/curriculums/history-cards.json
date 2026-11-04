@@ -1,0 +1,386 @@
+{
+  "What history is": [
+    {
+      "kind": "word",
+      "front": "historía",
+      "back": "Greek: **inquiry** — finding out by asking. Herodotus's word, 430s BC."
+    },
+    {
+      "kind": "grammar",
+      "front": "The past and history: the difference",
+      "back": "The **past** is everything that happened, mostly unrecorded. **History** is what can be said about it **from the evidence that survives**."
+    },
+    {
+      "kind": "word",
+      "front": "Prehistory",
+      "back": "The human past **before writing** (writing begins about **3200 BC** in Mesopotamia and Egypt). Studied from bones, tools, DNA and the ground."
+    }
+  ],
+  "The world at a glance": [
+    {
+      "kind": "grammar",
+      "front": "Why do the first civilisations all sit on rivers?",
+      "back": "Flooding rivers fed farmland: **Tigris-Euphrates, Nile, Indus, Yellow River**."
+    },
+    {
+      "kind": "word",
+      "front": "The steppe",
+      "back": "The belt of grassland across Eurasia from Hungary to Mongolia — **the highway of horse peoples**."
+    },
+    {
+      "kind": "grammar",
+      "front": "How does the Mercator map mislead?",
+      "back": "It keeps directions true for sailors but **swells land near the poles**: Africa is about **14 times** the size of Greenland, though they look similar."
+    }
+  ],
+  "Evidence: primary and secondary sources": [
+    {
+      "kind": "word",
+      "front": "Primary source",
+      "back": "Evidence **from the time being studied**: a letter, coin, inscription, skeleton."
+    },
+    {
+      "kind": "word",
+      "front": "Secondary source",
+      "back": "An account **written later**, using primary sources: an interpretation."
+    },
+    {
+      "kind": "grammar",
+      "front": "Five questions to ask of any source",
+      "back": "**Who** made it? **When?** **For whom?** **Why?** **What does it leave out?**"
+    }
+  ],
+  "Primary source: Herodotus says why he wrote": [
+    {
+      "kind": "word",
+      "front": "Herodotus",
+      "back": "Greek of Halicarnassus, born about **484 BC**; wrote the *Histories* (about 430 BC) on the **Greek–Persian wars**. The father of history."
+    },
+    {
+      "kind": "grammar",
+      "front": "Herodotus's two purposes, in his opening",
+      "back": "That deeds **not be forgotten**, and **\"especially that the causes may be remembered\"** — why, not just what."
+    }
+  ],
+  "Counting years: BC, AD, BCE and CE": [
+    {
+      "kind": "word",
+      "front": "Dionysius Exiguus",
+      "back": "Monk in Rome who in **AD 525** worked out counting years **from the birth of Christ**."
+    },
+    {
+      "kind": "grammar",
+      "front": "Is there a year zero?",
+      "back": "**No.** 1 BC is followed by AD 1."
+    },
+    {
+      "kind": "word",
+      "front": "BCE / CE",
+      "back": "**The same numbers** as BC / AD, with religiously neutral labels."
+    },
+    {
+      "kind": "word",
+      "front": "AH (Islamic calendar)",
+      "back": "Counted from the **Hijra**, AD **622**; lunar years."
+    }
+  ],
+  "Dating without writing: layers, tree rings and radiocarbon": [
+    {
+      "kind": "word",
+      "front": "Stratigraphy",
+      "back": "Dating by layers: **newer on top of older**. Gives order, not years."
+    },
+    {
+      "kind": "word",
+      "front": "Dendrochronology",
+      "back": "Dating by **tree-ring** patterns; reaches back about **12,000 years** in Europe."
+    },
+    {
+      "kind": "grammar",
+      "front": "Radiocarbon dating: how and how far",
+      "back": "Carbon-14 in once-living things decays with a **half-life of about 5,730 years**; works to about **50,000 years**; must be **calibrated**. Willard **Libby**, late 1940s."
+    }
+  ],
+  "Why things happen: cause, consequence and chance": [
+    {
+      "kind": "grammar",
+      "front": "A trigger is not a cause — example",
+      "back": "The assassination of **Franz Ferdinand** (28 June **1914**) triggered the First World War; alliances, arms races and nationalism were the causes."
+    },
+    {
+      "kind": "word",
+      "front": "Contingency",
+      "back": "**Chance**: things that could have gone otherwise — weather, illness, a late message."
+    },
+    {
+      "kind": "grammar",
+      "front": "The hindsight trap",
+      "back": "Knowing the ending makes it look **inevitable**; people at the time faced an **open future**."
+    }
+  ],
+  "When historians disagree": [
+    {
+      "kind": "grammar",
+      "front": "Four reasons historians disagree",
+      "back": "**New evidence**, **different questions**, **thin or one-sided sources**, and **their own times**."
+    },
+    {
+      "kind": "grammar",
+      "front": "The fall of Rome: the four readings",
+      "back": "**Decline from within** (Gibbon), **murder from outside**, **transformation** not fall, and **collapse after all** (Ward-Perkins, from archaeology)."
+    },
+    {
+      "kind": "grammar",
+      "front": "Revising and denying",
+      "back": "All good history is **revised from evidence**; propaganda **denies** evidence."
+    }
+  ],
+  "Deep time: the Earth and the first hominins": [
+    {
+      "kind": "word",
+      "front": "Hominin",
+      "back": "Humans and their extinct relatives **after the split from the chimpanzee line**, about **7–6 million years ago**."
+    },
+    {
+      "kind": "word",
+      "front": "Sahelanthropus",
+      "back": "Chad, about **7 million years ago**: perhaps the earliest hominin."
+    },
+    {
+      "kind": "grammar",
+      "front": "Did humans descend from chimpanzees?",
+      "back": "**No** — we share a **common ancestor** (and about 98–99% of our DNA)."
+    }
+  ],
+  "Standing up: the australopithecines": [
+    {
+      "kind": "word",
+      "front": "Lucy",
+      "back": "*Australopithecus afarensis*, **Hadar, Ethiopia, 1974**; about **3.2 million years** old; walked upright and still climbed."
+    },
+    {
+      "kind": "word",
+      "front": "Laetoli footprints",
+      "back": "Tanzania, about **3.66 million years** ago; found 1978 (Mary Leakey): the oldest direct evidence of **upright walking**."
+    },
+    {
+      "kind": "word",
+      "front": "Taung Child",
+      "back": "South Africa, **1924**, Raymond **Dart**: *Australopithecus africanus*; his claim that **Africa is the cradle of humankind** was rejected for decades, then proved right."
+    }
+  ],
+  "The first tools": [
+    {
+      "kind": "word",
+      "front": "Oldowan",
+      "back": "The first stone-flake tools, from about **2.6 million years ago** (Gona, Ethiopia); named after **Olduvai Gorge**."
+    },
+    {
+      "kind": "word",
+      "front": "Acheulean hand-axe",
+      "back": "Teardrop tool worked on both faces, from about **1.76 million years ago**; used for over **a million years**."
+    },
+    {
+      "kind": "word",
+      "front": "Homo habilis",
+      "back": "\"Handy man\", about **2.4–1.6 million years ago**; the first species placed in *Homo*."
+    }
+  ],
+  "Homo erectus and the first journeys out of Africa": [
+    {
+      "kind": "word",
+      "front": "Homo erectus",
+      "back": "From about **1.9 million years ago**; human body proportions; **the first hominin to leave Africa**."
+    },
+    {
+      "kind": "word",
+      "front": "Dmanisi",
+      "back": "Georgia: hominin skulls about **1.8 million years** old — early humans already outside Africa."
+    },
+    {
+      "kind": "word",
+      "front": "Homo floresiensis",
+      "back": "\"The hobbit\": a tiny hominin on the island of **Flores**, alive until about **50,000 years ago**."
+    }
+  ],
+  "Fire": [
+    {
+      "kind": "word",
+      "front": "Wonderwerk Cave",
+      "back": "South Africa: burnt bone and ash deep in a cave, about **1 million years** old — early evidence of fire use."
+    },
+    {
+      "kind": "grammar",
+      "front": "Five things fire changed",
+      "back": "**Cooking**, **warmth**, **protection** from predators, **light** (time to talk and teach), and **tools**."
+    }
+  ],
+  "Our cousins: Neanderthals, Denisovans and the rest": [
+    {
+      "kind": "word",
+      "front": "Neanderthals",
+      "back": "Europe and western Asia, about **400,000–40,000 years ago**; brains as large as ours; named after a valley in Germany (1856)."
+    },
+    {
+      "kind": "word",
+      "front": "Denisovans",
+      "back": "A human group known mainly **from DNA** in a finger bone from Denisova Cave, Siberia (**2010**)."
+    },
+    {
+      "kind": "grammar",
+      "front": "How much Neanderthal is in us?",
+      "back": "People outside Africa carry about **1–2% Neanderthal DNA**, from interbreeding."
+    },
+    {
+      "kind": "word",
+      "front": "Homo naledi",
+      "back": "Rising Star cave, South Africa: small-brained, yet alive **335,000–236,000 years ago**."
+    }
+  ],
+  "Homo sapiens in Africa": [
+    {
+      "kind": "word",
+      "front": "Jebel Irhoud",
+      "back": "Morocco: the oldest *Homo sapiens* fossils, about **300,000 years** old (dated 2017)."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why do Africans hold the most human genetic diversity?",
+      "back": "Humanity **grew up in Africa**; those who left were a **small sample** of it."
+    },
+    {
+      "kind": "grammar",
+      "front": "Anatomical and behavioural modernity",
+      "back": "The **modern body** came by about 300,000–100,000 years ago; **symbols, art and ornaments** appeared gradually, first in Africa."
+    }
+  ],
+  "The first symbols: Blombos and the beads": [
+    {
+      "kind": "word",
+      "front": "Blombos Cave",
+      "back": "Western Cape, South Africa: **engraved ochre** and **shell beads**, about **75,000 years** old; a paint workshop about **100,000**."
+    },
+    {
+      "kind": "grammar",
+      "front": "Why a bead matters more than a hand-axe",
+      "back": "A bead is useful only because **people agree what it means** — shared symbols are the root of language, ritual, law and trade."
+    }
+  ],
+  "Out of Africa: the great dispersal": [
+    {
+      "kind": "word",
+      "front": "The great dispersal",
+      "back": "About **70,000–50,000 years ago**, the small population from which **almost everyone outside Africa** descends left Africa."
+    },
+    {
+      "kind": "word",
+      "front": "Bab-el-Mandeb",
+      "back": "The strait at the mouth of the **Red Sea**: the proposed **southern route** out of Africa."
+    },
+    {
+      "kind": "grammar",
+      "front": "Modern humans reached Europe by about…",
+      "back": "**45,000 years ago.**"
+    }
+  ],
+  "The Ice Age world": [
+    {
+      "kind": "word",
+      "front": "Last Glacial Maximum",
+      "back": "The coldest point of the last Ice Age, about **26,000–20,000 years ago**; seas about **120 m lower**."
+    },
+    {
+      "kind": "word",
+      "front": "Beringia",
+      "back": "The Ice Age land bridge between **Siberia and Alaska**."
+    },
+    {
+      "kind": "word",
+      "front": "Holocene",
+      "back": "The warm, stable period since about **11,700 years ago**, in which farming became possible."
+    },
+    {
+      "kind": "word",
+      "front": "Megafauna",
+      "back": "Giant Ice Age animals — mammoths, woolly rhinos, giant sloths, giant kangaroos — mostly gone by **10,000 years ago**."
+    }
+  ],
+  "Into Australia and the Americas": [
+    {
+      "kind": "grammar",
+      "front": "When did people reach Australia?",
+      "back": "Certainly by about **50,000 years ago**; possibly **65,000** (Madjedbebe, debated). The first known **sea crossings**."
+    },
+    {
+      "kind": "word",
+      "front": "Lake Mungo",
+      "back": "New South Wales: remains about **42,000 years** old, including the world's **oldest known cremation**."
+    },
+    {
+      "kind": "word",
+      "front": "Monte Verde",
+      "back": "Chile, about **14,500 years ago**: the site that ended \"Clovis first\"."
+    },
+    {
+      "kind": "word",
+      "front": "White Sands footprints",
+      "back": "New Mexico: human footprints dated about **23,000–21,000 years ago** (debated)."
+    }
+  ],
+  "How hunter-gatherers lived": [
+    {
+      "kind": "grammar",
+      "front": "The size of a hunter-gatherer band",
+      "back": "About **20–50 people**, within a wider network of a few hundred to a thousand."
+    },
+    {
+      "kind": "word",
+      "front": "The original affluent society",
+      "back": "Marshall **Sahlins** (1966): hunter-gatherers worked few hours and had much leisure. Later work: **longer hours than he said; the truth in between**."
+    },
+    {
+      "kind": "grammar",
+      "front": "Were all hunter-gatherers mobile and equal?",
+      "back": "**No** — on the rich Pacific coast of North America they lived in **permanent villages**, ranked by wealth, with slaves."
+    }
+  ],
+  "Cave art and the first figurines": [
+    {
+      "kind": "word",
+      "front": "Sulawesi cave art",
+      "back": "Indonesia: paintings at least **45,500–51,200 years** old — older than any in Europe."
+    },
+    {
+      "kind": "word",
+      "front": "Chauvet",
+      "back": "France, about **36,000 years** old: lions, rhinos, horses with shading and perspective."
+    },
+    {
+      "kind": "word",
+      "front": "Lion-Man",
+      "back": "Hohlenstein-Stadel, Germany, about **40,000 years** old: a man with a lion's head, in mammoth ivory — an imagined being."
+    },
+    {
+      "kind": "grammar",
+      "front": "Readings of cave art",
+      "back": "**Hunting magic**, **shamanism** (Lewis-Williams, from San rock art), **storytelling or marking territory** — no one knows."
+    }
+  ],
+  "Connections: the world at the end of the Ice Age": [
+    {
+      "kind": "word",
+      "front": "Natufians",
+      "back": "Levant, about **12,000 years ago**: hunter-gatherers in **stone villages** harvesting wild cereals — on the edge of farming."
+    },
+    {
+      "kind": "word",
+      "front": "Jōmon",
+      "back": "Japan: hunter-gatherers making some of the **world's oldest pottery** (over **15,000 years** old)."
+    },
+    {
+      "kind": "grammar",
+      "front": "World population at the end of the Ice Age",
+      "back": "Perhaps **a few million** — estimates range from about 1 to 10 million."
+    }
+  ]
+}

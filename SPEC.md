@@ -403,6 +403,17 @@ Two columns carry decisions worth knowing about:
   resource, a **designed** one has nowhere else to keep it. So Godot, Drawing,
   Aseprite and SA politics carry detail; Greek, Japanese and Odin do not.
 
+### Curriculums in Ohana
+
+Ruled 2026-11-04. A curriculum is **his, hers or both** in Ohana, the household
+app (`curriculums.audience`; null is not shared). Piano is both; every other is
+his. "Both" is **one shared progress**: a lesson ticked or a card answered by
+either of them is done for both, and per-person progress would be a schema
+change. Ohana ticks lessons and answers cards through `/share/ohana`, using
+the same functions as the dashboard (`worker/curriculum-ops.ts`), so the two
+cannot disagree; FSRS and the dates stay on this side. Access setup is in
+DEPLOY.md under "Ohana's way in".
+
 ### The curriculums dashboard
 
 **A deck of cards.** It was a column of wide cards each carrying a ring, a

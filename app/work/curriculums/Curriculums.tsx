@@ -70,6 +70,12 @@ const NEXT_STATUS: Record<string, 'active' | 'paused' | 'done'> = {
 
 const STATUS_MARK: Record<string, string> = { active: '▶', paused: '॥', done: '✓' };
 
+/** Who it is for in Ohana, cycled the same way: not shared → his → hers → both. */
+const AUDIENCES = [null, 'his', 'hers', 'both'] as const;
+const AUDIENCE_LABEL: Record<string, string> = { his: 'His', hers: 'Hers', both: 'Both' };
+const nextAudience = (now: Curriculum['audience']) =>
+  AUDIENCES[(AUDIENCES.indexOf(now ?? null) + 1) % AUDIENCES.length];
+
 type Layer = 'stages' | 'sources' | 'grid' | 'detail';
 
 /* How long the finishing flourish takes, in milliseconds.
@@ -571,6 +577,21 @@ export default function Curriculums() {
                     }}
                   >
                     {STATUS_MARK[one.status] ?? '▶'}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.audience}
+                    tabIndex={isFront ? 0 : -1}
+                    aria-label={`${one.name} in Ohana: ${one.audience ? AUDIENCE_LABEL[one.audience] : 'not shared'} — click to change`}
+                    title="Who it is for in Ohana"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (!isFront) return;
+                      void act({ action: 'set-audience', id: one.id, audience: nextAudience(one.audience) });
+                    }}
+                  >
+                    {one.audience ? AUDIENCE_LABEL[one.audience] : '—'}
                   </button>
                 </div>
               </div>

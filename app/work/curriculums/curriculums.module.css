@@ -487,6 +487,26 @@
   padding: 0;
 }
 
+.audience {
+  position: absolute;
+  top: 1rem;
+  right: 3.6rem;
+  height: 2.2rem;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--card-ink) 35%, transparent);
+  background: color-mix(in oklch, var(--card-ink) 8%, transparent);
+  color: var(--card-ink);
+  font: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.audience:hover {
+  background: color-mix(in oklch, var(--card-ink) 18%, transparent);
+}
+
 .statusDot:hover {
   background: color-mix(in oklch, var(--card-ink) 18%, transparent);
 }
