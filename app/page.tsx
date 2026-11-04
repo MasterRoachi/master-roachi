@@ -7,7 +7,7 @@ import PursuitCarousel from '@/components/PursuitCarousel';
 import ProjectDeck from '@/components/ProjectDeck';
 import PostCard from '@/components/PostCard';
 import {
-  getProjects,
+  getOwnProjects,
   getWriting,
   toSummary,
   toProjectSummary,
@@ -27,10 +27,11 @@ export const metadata: Metadata = pageMeta({
 });
 
 export default function HomePage() {
-  const allProjects = getProjects();
+  // His own work only: a client's shop is never "what I'm building".
+  const allProjects = getOwnProjects();
   // Weight puts active work first, so the homepage leads with what is being
-  // built rather than what happens to be newest. The cap is high enough that
-  // nothing is hidden while the list is short.
+  // built rather than what happens to be newest. The cap keeps the deck to
+  // six; the rest are one click away on /projects/.
   const projects = allProjects.slice(0, 6).map(toProjectSummary);
   const posts = getWriting().slice(0, 3).map(toSummary);
 

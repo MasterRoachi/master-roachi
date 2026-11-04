@@ -95,6 +95,34 @@ It then installs OpenNext, rewrites the project config, and fails looking for
 edits happen inside the throwaway build container, so the repository is
 unharmed, but the deploy fails every time.
 
+### Other names on the zone
+
+Since 2026-11-03 the zone also carries names that are not the site. They belong
+to other projects; leave them alone when working on this one.
+
+| Name | Record | For |
+| --- | --- | --- |
+| `narthex` | A → `152.53.141.208`, **DNS only** | Narthex, the app, on a netcup server |
+| `narthexclasses` | A → `152.53.141.208`, **DNS only** | Narthex's video server |
+| `ohana` | made by the `ohana` Worker's custom domain | Ohana (was Roachi's Riches, once meant for `riches.`), behind its own Access app |
+
+The two Narthex records must **never be proxied**: Jitsi needs UDP, and Caddy
+issues its own certificates. Never add a record for `ohana` by hand; a Worker
+custom domain fails if one exists.
+
+**Mail**, as public DNS answered on 2026-11-04. Email Routing still receives
+(`route1–3.mx.cloudflare.net`, its DKIM key at `cf2024-1._domainkey`). Narthex
+is moving its sending from Brevo to **Resend**. Resend's records are in:
+`resend._domainkey` (TXT) and a `send` subdomain with its own MX and SPF TXT.
+Brevo's are still there until Narthex finishes the move: DKIM CNAMEs
+`brevo1._domainkey` and `brevo2._domainkey` (DNS only), a `brevo-code:` TXT at
+the apex, `include:spf.brevo.com` in the apex SPF, and DMARC `p=none` reporting
+to Brevo. There is **one SPF record** at the apex; whatever a sender needs is
+merged into it, never added as a second `v=spf1`.
+
+Zone changes (DNS, Access) are made **by hand in the dashboard**. Wrangler's
+login on the rig has no DNS or Access scope, and no other token exists.
+
 ### Cloudflare's own Git connection is disconnected
 
 `deploy.yml` is the deploy path. Cloudflare's **Workers Builds** connection
@@ -133,13 +161,15 @@ fail-closed behaviour as everything else here.
 
 ### Secrets
 
-Five, none of them in the repo. `npx wrangler secret list` names them:
+Nine on 2026-11-04, none of them in the repo. `npx wrangler secret list` names
+them:
 
 | | What it is for | Set it with |
 | --- | --- | --- |
 | `GITHUB_TOKEN` | the backend committing to this repo | `npm run github-auth` |
 | `TRELLO_KEY`, `TRELLO_TOKEN` | what `/work/boards` reads | `npm run trello-auth` |
-| `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE` | the PayFast checkout — see "Switching on the PayFast checkout" below. Not set yet | `npx wrangler secret put PAYFAST_…` |
+| `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE` | the PayFast checkout — see "Switching on the PayFast checkout" below. Set, with the live values, since 2026-10-21 | `npx wrangler secret put PAYFAST_…` |
+| `PAYFAST_SANDBOX` | the sandbox switch from step 2 below. **Still listed on 2026-11-04**; step 3 says delete it or set it to anything but `true`. A secret's value cannot be read back, so whether it is `true` is unconfirmed | `npx wrangler secret delete PAYFAST_SANDBOX` |
 | `PRINTFUL_TOKEN` | Sync Printful, and sending orders to Printful as drafts. A single-store private token from developers.printful.com/tokens, scopes `orders` and `sync_products/read` | `npx wrangler secret put PRINTFUL_TOKEN` |
 | `VOTE_SALT` | salting the voter hash, which is guessable without it | `npx wrangler secret put VOTE_SALT` |
 
@@ -149,10 +179,9 @@ editor starts reporting a failure to list files, rotate it with
 `npm run github-auth`, and run that in your own terminal rather than through an
 agent session, since it asks for a token.
 
-`ORDERS_KEY` was a fifth. It guarded the public `/api/orders` list, which was
-removed on 2026-10-19 when orders moved into D1 and `/work/shop/`. If
-`wrangler secret list` still names it, it is unused:
-`npx wrangler secret delete ORDERS_KEY`.
+`ORDERS_KEY` was another. It guarded the public `/api/orders` list, which was
+removed on 2026-10-19 when orders moved into D1 and `/work/shop/`; by
+2026-11-04 it was gone from `wrangler secret list`.
 
 ### Switching on the PayFast checkout
 
@@ -293,7 +322,9 @@ allow-list are actually tested. Run it before deploying a change to
 
 - Confirm `/rss.xml`, `/sitemap.xml` and `/robots.txt` resolve.
 - Send a test mail to `roachi@masterroachi.com` and confirm it arrives.
-  Receive-only: replies come from the destination inbox's own address.
+  The site itself sends nothing; replies come from the destination inbox's
+  own address. (Narthex sends from the domain, through Resend as it moves off
+  Brevo — see "Other names on the zone".)
 - Submit the sitemap in Google Search Console.
 
 ---

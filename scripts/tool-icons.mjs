@@ -27,6 +27,12 @@ const TOOLS = [
   ['css', 'CSS'],
   ['claude', 'Claude'],
   ['cursor', 'Cursor'],
+  ['rust', 'Rust'],
+  ['kotlin', 'Kotlin'],
+  ['android', 'Android'],
+  ['expo', 'Expo'],
+  ['supabase', 'Supabase'],
+  ['cloudflare', 'Cloudflare'],
 ];
 
 // LinkedIn is deliberately absent: simple-icons removed it after LinkedIn

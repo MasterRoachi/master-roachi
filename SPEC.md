@@ -83,18 +83,35 @@ a server behind it. Everything else above is a static file.
 
 ### Projects
 
-Five, with more coming. Status vocabulary: `released`, `building`, `ongoing`,
-`concept`, `parked`. The earlier live-or-coming-soon binary could not describe
-a store that is open, a world being written, or a game in early development —
-which is most of what there is.
+Brought up to date with his repositories on 2026-11-04. Status vocabulary:
+`released`, `building`, `ongoing`, `concept`, `parked`. The earlier
+live-or-coming-soon binary could not describe a store that is open, a world
+being written, or a game in early development — which is most of what there is.
 
 | Project | Status | What |
 | --- | --- | --- |
-| Shepherds We Shall Be | building | 2D pixel art ARPG, solo, Godot |
-| Fabled Threads | building | Print-on-demand store — anime and early-2000s cartoon inspired illustrations |
-| Cultus Botanicus | building | Reboot of Plant Tycoon |
-| Terrath | ongoing | Worldbuilding |
-| The Odin Project | released | Eight foundations exercises |
+| Shepherds We Shall Be | building | Eli, the orb and the signal — Terrath's main game |
+| The Lost Sheep: Black Pastures | building | York before Shepherds; the mayor with a radio |
+| Terrath | ongoing | The world, kept by him and Timon |
+| Fabled Threads | released | The store at `/store/`, taking payments since 2026-10-21 |
+| Cultus Botanicus | parked | Nursery and breeding game in Terrath, inspired by Plant Tycoon |
+| Greg and Larry's Tools | building | Painting, sound and 3D programs made for the two of them |
+| Sprite-acus | parked | Shelved, due a rework |
+| The Odin Project | ongoing | Twenty-four exercises |
+
+**For others.** Work done for clients carries `client: true` and is listed
+after his own projects under its own heading on `/projects/`, never on the
+homepage, the About tally or the pager between his own pages. Business names
+only — never the individuals behind them — and no prices or client data. A
+client site behind a holding page gets no outbound `link` until it opens.
+
+**The voice: written for general people, not developers or AI.** His ruling,
+2026-11-04. Games and the world are told as stories — who you are, where you
+are, what you are trying to do — not as engines, systems or build progress;
+the status badge says how far along a thing is. Tools and client work say what
+they do for a person. Languages, engines, test counts, milestones and acronyms
+stay out of the prose. **The stack icons stay** in page headers and on cards —
+he likes them — so keep each `stack` list true.
 
 Ordering is by explicit `weight`, so active work leads rather than whatever is
 newest.
@@ -119,7 +136,8 @@ One collection, several views. A post carries a `track` — `code`, `gaming`,
 One pipeline rather than three parallel ones. Devlog entries are just posts with
 `track: devlog` and a project attached.
 
-No real posts yet — `content/writing/` holds clearly-labelled scaffolding marked
+Two real posts so far, both on the `gaming` track (the BioShock walkthrough and
+the Diablo II breakdown). The theology entries are still scaffolding marked
 `draft: true`, which never reaches the deployed site.
 
 ### Gaming and Orthodoxy
@@ -1125,8 +1143,10 @@ Before that, it said: question round, then build.
 
 - `npm run github-auth` when the GitHub token lapses.
 - More than one product in Printful.
-- **PayFast: set a passphrase**, then the steps in DEPLOY.md under "Switching
-  on the PayFast checkout" — sandbox first, then live, then flip `checkout`.
+- ~~**PayFast: set a passphrase**, then the steps in DEPLOY.md under "Switching
+  on the PayFast checkout".~~ Done — the checkout went live 2026-10-21. One
+  loose end: `PAYFAST_SANDBOX` is still a Worker secret (2026-11-04), and step 3
+  says to delete it.
 
 ### Open decisions
 
@@ -1206,16 +1226,23 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 
 ## Open Items
 
-- [ ] **Terrath, Fabled Threads and Cultus Botanicus descriptions** are
+- [x] **Terrath and Cultus Botanicus rewritten** 2026-11-04 from their own
+      repositories, as stories (see "The voice" under Projects). Fabled Threads
+      has no page of its own — its card goes to `/store/`. The original item:
+      **Terrath, Fabled Threads and Cultus Botanicus descriptions** were
       placeholders written from one line each. Terrath is the thinnest. The
       TODO comments this item used to point at do not exist — there is no TODO
       anywhere in `content/` or `lib/`, so the only record of which three are
       thin is this line.
-- [ ] **Fabled Threads storefront URL**, and confirm whether it is actually
+- [x] Answered 2026-11-04: the storefront is `/store/`, open with the PayFast
+      checkout since 2026-10-21, so the status is `released`. The original
+      item: **Fabled Threads storefront URL**, and confirm whether it is actually
       building or already open
 - [ ] **Cultus Botanicus engine/stack** — the name itself is now settled
 - [ ] **lib/pursuits.ts needs confirming** — seeded from July 2026 data
-- [ ] **Sprite-acus needs rewriting, not just parking.** Set to
+- [x] Rewritten 2026-10-14 and again 2026-11-04: shelved, due a rework, and the
+      link to its private repository removed. The original item:
+      **Sprite-acus needs rewriting, not just parking.** Set to
       `status: parked` on 2026-10-12 so it stops reading as live work; its
       summary still says "Built because I cannot draw", which stopped being the
       story when the Shepherds art went fully hand-drawn in September.

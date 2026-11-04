@@ -135,6 +135,9 @@ const MOTIF = {
   },
 };
 
+// Client apps share the tool motif: an app is a tool someone else carries.
+MOTIF.App = MOTIF.Tool;
+
 /* --- read the projects ----------------------------------------------------- */
 
 const files = fs.existsSync(CONTENT)

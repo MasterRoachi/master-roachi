@@ -1,76 +1,39 @@
 ---
 title: Sprite-acus
-summary: Generate a character however you like, hand it over, get back an animated pixel art sprite a game engine will take. Parked — the game it was built for now draws its art by hand.
+summary: A helper that turned a picture of a character into moving pixel art a game could use. Shelved for now — the game it was made for draws its art by hand.
 date: 2026-09-02
 status: parked
 kind: Tool
 weight: 75
 accent: "oklch(62% 0.20 28)"
 accent2: "oklch(78% 0.13 80)"
-repo: https://github.com/MasterRoachi/sprite-acus
 stack: ["Python"]
 cover: /projects/sprite-acus.webp
 ---
 
-Sprite-acus turns a generated character into sprites a game engine will take.
+Sprite-acus took a picture of a character and turned it into pixel art that
+moves — the frames a game needs to make someone walk, swing a sword, or fall
+over.
 
-The workflow is: generate a character however you like — I used AI — then hand
-the render to Sprite-acus, and what comes back is an animated pixel art sprite
-a game engine will actually take.
-
-Generating the picture is the easy half. The half that used to eat an evening
-is everything after it: slicing the page into frames on an exact grid rather
-than a guessed one, cropping and scaling each figure the same way, pulling
-every colour onto the project's palette, and writing it all out indexed, with
-the kind of transparency an engine expects rather than the kind an image editor
-produces.
-
-## What you get back
+Making the picture was the easy half. The half that used to eat an evening was
+everything after it: cutting the picture into frames, making every frame the
+same size, and getting every colour to match the rest of the game. Sprite-acus
+did that part.
 
 <Split src="/projects/art/sprite-acus-sprite.webp" alt="A pixel art gladiator sprite produced by the tool." side="right">
 
-For one page — one character, one action, one direction — you get numbered PNG
-frames, a contact sheet to actually look at, an editable Aseprite file to do
-the cleanup in, and a report recording every input and output.
-
-It works with or without a master palette. Given one, every sprite is pulled
-onto it, which is what a project with locked colours needs and what this was
-built for. Given none, it takes the colours from the page itself and lets you
-say how many.
+What came back was never quite finished. It always needed a touch-up by hand,
+and closing that gap was the next job. It would be dishonest to describe it any
+other way.
 
 </Split>
 
 ## Where it honestly is
 
-Parked, and super alpha where it stopped.
+Shelved, and due a rework before it is picked up again.
 
-It came out of the sprite tool inside
-[Shepherds We Shall Be](/projects/shepherds-we-shall-be/), pulled out and made
-project-agnostic. In September 2026 Shepherds retired the whole generated-art
-pipeline: its art is drawn by hand now, with Timon, and nothing Sprite-acus
-produced is approved art in that project any more. So the tool lost the thing
-it was being built against.
-
-What it does, it still does. It also still hands you something that needs a
-pass in Aseprite before it is finished — that is what the editable file is for.
-Closing that gap was what would have come next, and "a click or two" was always
-the goal rather than the state. It would be dishonest to describe it any other
-way, and more dishonest to leave this page implying work is in progress when it
-is not.
-
-## What it will not do
-
-It does not generate the source image. That is on you and whatever you generate
-with — Sprite-acus starts where that finishes.
-
-<Split src="/projects/sprite-acus-b.webp" side="left">
-
-It also will not clean pixel clusters, make artistic decisions, produce the
-final authoritative master, or import anything into an engine. A successful
-conversion means mechanically valid, never artistically approved.
-
-That distinction is deliberate rather than a shortfall. A tool that quietly
-decided which pixels an artist meant would be worse than one that hands over a
-scaffold and gets out of the way.
-
-</Split>
+It was made for [Shepherds We Shall Be](/projects/shepherds-we-shall-be/), and
+in September Shepherds stopped using generated art altogether: its art is drawn
+by hand now, with Timon. So the tool lost the thing it was being built for, and
+by late October it was plain it was not working as well as it should. It went
+on the shelf rather than on a page pretending otherwise.

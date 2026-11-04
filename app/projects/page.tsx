@@ -3,7 +3,11 @@ import { pageMeta } from '@/lib/seo';
 import Starfield from '@/components/Starfield';
 import PageHeader from '@/components/PageHeader';
 import ProjectCard from '@/components/ProjectCard';
-import { getProjects, toProjectSummary } from '@/lib/content';
+import {
+  getClientProjects,
+  getOwnProjects,
+  toProjectSummary,
+} from '@/lib/content';
 import CyclingQuote from '@/components/CyclingQuote';
 import LaptopIcon from '@/components/LaptopIcon';
 import { quotes } from '@/lib/quotes';
@@ -18,7 +22,10 @@ export const metadata: Metadata = pageMeta({
 });
 
 export default function ProjectsPage() {
-  const projects = getProjects().map(toProjectSummary);
+  const projects = getOwnProjects().map(toProjectSummary);
+  // Work done for other people sits after his own, in a section of its own,
+  // so a client's shop is never read as one of his projects.
+  const others = getClientProjects().map(toProjectSummary);
 
   // Highest weight leads. Everything else keeps its order beneath, so adding a
   // project changes the page by adding to it rather than rearranging it.
@@ -57,6 +64,24 @@ export default function ProjectsPage() {
               <ProjectCard key={entry.slug} entry={entry} />
             ))}
           </div>
+        )}
+
+        {others.length > 0 && (
+          <section className={styles.others} aria-labelledby="for-others">
+            <p className="eyebrow">For others</p>
+            <h2 id="for-others" className="section-title">
+              Built for other people
+            </h2>
+            <p className={styles.othersLede}>
+              Shops and apps I&rsquo;ve made, or helped make, for people and
+              businesses I know.
+            </p>
+            <div className={cards.grid}>
+              {others.map((entry) => (
+                <ProjectCard key={entry.slug} entry={entry} />
+              ))}
+            </div>
+          </section>
         )}
       </div>
     </div>

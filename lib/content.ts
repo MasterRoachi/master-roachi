@@ -81,6 +81,13 @@ export interface Frontmatter {
     tags?: string[];
   }[];
 
+  /**
+   * Built for someone else — a client's shop or app. Listed under "For
+   * others" on /projects/, after his own work, and never counted as what he
+   * is building: the homepage, the About tally and the pager skip it.
+   */
+  client?: boolean;
+
   /** Hidden from listings and marked noindex; still visible in `next dev`. */
   draft?: boolean;
 }
@@ -212,6 +219,21 @@ function byWeightThenNewest(a: Entry, b: Entry): number {
 
 export function getProjects(): Entry[] {
   return publishable(readCollection('projects')).sort(byWeightThenNewest);
+}
+
+/** Work done for a client rather than his own — see `client` above. */
+export function isClient(entry: Entry): boolean {
+  return entry.frontmatter.client === true;
+}
+
+/** His own projects: what the homepage and About mean by "projects". */
+export function getOwnProjects(): Entry[] {
+  return getProjects().filter((e) => !isClient(e));
+}
+
+/** Client work, in the same weight order. */
+export function getClientProjects(): Entry[] {
+  return getProjects().filter(isClient);
 }
 
 export function getWriting(track?: Track): Entry[] {

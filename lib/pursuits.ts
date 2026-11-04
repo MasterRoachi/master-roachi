@@ -35,7 +35,7 @@ export const currentlyReading: {
   author: string;
   note?: string;
 } | null = {
-  title: 'The Iliad',
+  title: 'The Odyssey',
   author: 'Homer',
 };
 
@@ -129,10 +129,15 @@ export const orthodoxReading: ReadingItem[] = [
     status: 'reading',
   },
   {
+    title: 'The Odyssey',
+    author: 'Homer',
+    status: 'reading',
+  },
+  {
     title: 'The Iliad',
     author: 'Homer',
     cover: '/books/the-iliad.webp',
-    status: 'reading',
+    status: 'finished',
   },
   {
     title: "The Hitchhiker's Guide to the Galaxy",

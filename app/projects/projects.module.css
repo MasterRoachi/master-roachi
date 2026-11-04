@@ -8,3 +8,14 @@
 .lead {
   margin-bottom: clamp(16px, 2vw, 24px);
 }
+
+/* Client work, after his own: a clear break, then its own heading. */
+.others {
+  margin-top: clamp(72px, 9vw, 120px);
+}
+
+.othersLede {
+  max-width: 56ch;
+  margin: 0 0 clamp(20px, 2.5vw, 32px);
+  color: var(--muted, inherit);
+}

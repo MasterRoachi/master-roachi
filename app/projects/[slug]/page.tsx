@@ -11,6 +11,7 @@ import {
   getAnyEntry,
   getAllSlugs,
   getProjectPages,
+  isClient,
   getWritingForProject,
   toSummary,
 } from '@/lib/content';
@@ -62,7 +63,11 @@ export default async function ProjectPage({
   // pages matches the order they were browsed in — but only those that have a
   // page to move to. Fabled Threads sits in that order and has no page, so the
   // unfiltered list sent "next project" from Shepherds straight to a 404.
-  const all = getProjectPages();
+  // Within its own group, too: his work pages lead to his work, client pages
+  // to client pages, matching the two sections of the index.
+  const all = getProjectPages().filter(
+    (p) => isClient(p) === (fm.client === true),
+  );
   const i = all.findIndex((p) => p.slug === slug);
   const prev = i > 0 ? all[i - 1] : null;
   const nextUp = i >= 0 && i < all.length - 1 ? all[i + 1] : null;

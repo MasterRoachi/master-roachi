@@ -8,7 +8,7 @@ import AboutFacets, { type Facet } from '@/components/AboutFacets';
 import ToolIcons from '@/components/ToolIcons';
 import SocialLinks from '@/components/SocialLinks';
 import { quotes } from '@/lib/quotes';
-import { getProjects, getWriting } from '@/lib/content';
+import { getOwnProjects, getWriting } from '@/lib/content';
 import { getPerfectRuns } from '@/lib/perfect';
 import { orthodoxReading } from '@/lib/pursuits';
 import { getStore } from '@/lib/store';
@@ -50,7 +50,7 @@ export default function AboutPage() {
   const plural = (n: number, one: string, many: string) =>
     n === 1 ? one : many;
 
-  const projects = getProjects().length;
+  const projects = getOwnProjects().length;
   const written = getWriting().length;
   const books = orthodoxReading.length;
   const rail = getStore().products.length;
