@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Archivo, Reggae_One } from 'next/font/google';
+import localFont from 'next/font/local';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import StructuredData from '@/components/StructuredData';
@@ -8,11 +8,17 @@ import './globals.css';
 
 // One grotesque doing all the work, per the visual direction. Archivo holds up
 // at both ends — heavy and tight at display sizes, readable at body sizes —
-// which is what lets the design drop to a single family. Self-hosted at build
-// time by next/font, so there is no request to Google at runtime.
-const sans = Archivo({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+// which is what lets the design drop to a single family.
+//
+// LOCAL FILES, NOT next/font/google. The Google loader downloads the fonts at
+// build time, and on 4 November 2026 that download failed in CI twice and took
+// two deploys down with it. These are the same Latin-subset woff2 files Google
+// serves (Archivo variable, 400–800; Reggae One 400), committed with their OFL
+// licences in app/fonts/, so a build needs nothing from the network.
+const sans = localFont({
+  src: './fonts/archivo-latin.woff2',
+  weight: '400 800',
+  style: 'normal',
   variable: '--font-sans',
   display: 'swap',
 });
@@ -23,12 +29,10 @@ const sans = Archivo({
 // site with a shop on it cannot honour — least of all on its own name. Reggae
 // One is SIL Open Font License, so commercial use is permitted, and unusually
 // for a display face it holds up at the 0.95rem the nav runs at.
-//
-// Self-hosted by next/font at build time, like Archivo: no request leaves for
-// Google when somebody loads the site.
-const display = Reggae_One({
-  subsets: ['latin'],
+const display = localFont({
+  src: './fonts/reggae-one-latin.woff2',
   weight: '400',
+  style: 'normal',
   variable: '--font-display',
   display: 'swap',
 });

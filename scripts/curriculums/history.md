@@ -6,9 +6,13 @@ written: 2026-11-04
 
 # History — the plan
 
-**Status: proposed 2026-11-04, for his approval. Nothing is written or applied
-yet.** Built a stage at a time, like Shona; only what is written reaches the
-database.
+**Status: complete, 2026-11-04. 12 stages, 359 lessons, 1,291 cards, 945
+lesson sources, all applied.** Approved the same day with the full length kept.
+Stages 2–12 were written in parallel from one brief and merged by a script that
+refuses a repeated lesson name or card front across stages, a lesson under
+1,200 characters, and any note that reveals a private library. Every primary-
+source quotation was fetched from a public-domain text and checked word for
+word; anything that could not be fetched is paraphrased and says so.
 
 His rulings: a **world survey**, **from zero**, **chronological with every
 region in each age**, **South Africa kept brief** (SA Politics covers it in
