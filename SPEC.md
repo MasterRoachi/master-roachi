@@ -467,7 +467,7 @@ at the back of each deck is for.
 
 ### Curriculums
 
-**History** was planned and written in full on 2026-11-04 (12 stages, 359 lessons, 1,291 cards; see `scripts/curriculums/history.md`), **Philosophy** the same day (14 stages, 375 lessons, 1,219 cards; `scripts/curriculums/philosophy.md`), and Zulu waits by his ruling. Nine with scripts in `scripts/curriculums/` before that, **thirteen in live D1**
+**History** was planned and written in full on 2026-11-04 (12 stages, 359 lessons, 1,291 cards; see `scripts/curriculums/history.md`), **Philosophy** the same day (14 stages, 375 lessons, 1,219 cards; `scripts/curriculums/philosophy.md`), **Theology** the same day (12 stages, 318 lessons, 979 cards; `scripts/curriculums/theology.md`). **Polemics** is to be its own curriculum, his ruling, and Zulu waits. Nine with scripts in `scripts/curriculums/` before that, **thirteen in live D1**
 (checked 2026-10-19). **Shona** got its script on 2026-10-19 — his choice of
 the five empty ones to build first, from zero, Standard Shona with dialects
 named where met, and a speaking partner — and has Stages 1–4 written (91
