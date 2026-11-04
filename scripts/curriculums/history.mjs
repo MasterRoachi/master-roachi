@@ -73,10 +73,6 @@ const sourcesOf = (lesson) => (Array.isArray(lesson) ? (lesson[1] ?? []) : []);
 
 // The stages, each lesson with its own sources. Generated from the stage
 // files when the curriculum is written; edit the lesson there, not here.
-// The stages, each lesson with its own sources. Generated from the stage
-// files when the curriculum is written; edit the lesson there, not here.
-// The stages, each lesson with its own sources. Generated from the stage
-// files when the curriculum is written; edit the lesson there, not here.
 const stages = [
   {
     "name": "Stage 1 · How history is known, and the first humans",

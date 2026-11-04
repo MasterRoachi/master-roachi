@@ -16,8 +16,7 @@ word; anything that could not be fetched is paraphrased and says so.
 
 His rulings: a **world survey**, **from zero**, **chronological with every
 region in each age**, **South Africa kept brief** (SA Politics covers it in
-depth, and this points across), and **any free resource**, meaning free online
-or already on his shelves.
+depth, and this points across), and **any free resource**, meaning free online or a printed book.
 
 ## Goal
 
@@ -63,7 +62,7 @@ narrative.
 - **Our World in Data** (CC BY): population, life expectancy and wealth over
   time, for the modern stages' numbers.
 
-**On his shelves** (depth and further reading):
+**Printed books** (depth and further reading):
 - *Ancient Near East:* Kuhrt's *The Persian Empire* (sources) and *Hellenism in
   the East*; Dalley's *The City of Babylon*; Toro's *Pax Assyriaca*.
 - *Rome and Byzantium:* Gibbon's *Decline and Fall*; Kaldellis's *The New Roman
@@ -111,7 +110,7 @@ Shona's was, and it gets corrected as each stage is written.
 - **Contested points are marked as contested**: the strongest readings, and
   what would decide between them.
 - **Further reading per lesson**: the OpenStax chapter, the primary source, and
-  where his shelf goes deeper.
+  a printed book for depth.
 
 ## Cards
 
