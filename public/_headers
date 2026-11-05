@@ -10,8 +10,8 @@
 # on hashed assets, where the first directive wins and the intent is lost.
 
 # Content-hashed build output — the filename changes whenever the content does,
-# so these can never go stale. Includes the self-hosted Cinzel and Manrope
-# woff2 files under _next/static/media/.
+# so these can never go stale. Includes the self-hosted Archivo and Reggae One
+# woff2 files (app/fonts/, through next/font/local) under _next/static/media/.
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
@@ -29,11 +29,20 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   # Nothing here needs a camera, a microphone or a location.
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
-  # Everything is first-party and self-hosted: next/font inlines the woff2
-  # files under _next/static/media, there is no analytics, and no third-party
-  # script or frame. The two exceptions are unavoidable — Next injects inline
-  # bootstrap scripts and CSS-in-JS style tags, hence 'unsafe-inline' on both,
-  # and Steam and Printful serve the game and product art over https.
+  # Everything is first-party and self-hosted: next/font serves the woff2
+  # files from _next/static/media, there is no analytics, and no third-party
+  # script or frame. Steam and Printful serve the game and product art over
+  # https.
+  #
+  # 'unsafe-inline' on script-src is a floor, not the rule. Next injects inline
+  # bootstrap scripts that differ per page, and a static export has no nonce,
+  # so this header has to allow them. But scripts/csp.mjs runs after every
+  # build and gives each page a <meta> policy listing the SHA-256 of exactly
+  # its own inline scripts. A browser enforces both policies, so an injected
+  # inline script is refused by the meta even though this header allows it.
+  # Take 'unsafe-inline' out of here and every page breaks: this header has no
+  # hashes, and the browser would need both to agree. style-src keeps
+  # 'unsafe-inline' for real, for the style tags.
   # form-action names PayFast because the checkout is a form posted to it
   # (live and sandbox) — without that the browser refuses the submit.
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://www.payfast.co.za https://sandbox.payfast.co.za; frame-ancestors 'self'; upgrade-insecure-requests

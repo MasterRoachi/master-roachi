@@ -34,7 +34,7 @@ const NAME = 'The Odin Project';
 // Foundations is not here. It is taken before a path is chosen and is not part
 // of this one, and it is long finished — Odin Recipes, the landing page,
 // Rock Paper Scissors, Etch-a-Sketch and the calculator are all in
-// ~/Work/Master Roachi/odin-projects.
+// ~/Work/Master Roachi/Learning/odin-projects.
 const courses = [
   {
     course: 'Intermediate HTML and CSS',
@@ -366,7 +366,7 @@ for (const { course, sections } of courses) {
 /* WHAT IS ALREADY DONE IS STILL NOT TICKED HERE, and that is deliberate.
  *
  * Five of the six courses are finished and so is the first NodeJS project —
- * twenty-four projects sit in ~/Work/Master Roachi/odin-projects, and the
+ * twenty-four projects sit in ~/Work/Master Roachi/Learning/odin-projects, and the
  * handoff notes in that repository walk through the JavaScript CS section,
  * testing, Advanced HTML and CSS, React, databases and NodeJS in order.
  *

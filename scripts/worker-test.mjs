@@ -378,6 +378,15 @@ check('address capped at 600', capped.address.length === 600, String(capped.addr
 // --- GET is not allowed ----------------------------------------------------
 res = await worker.fetch(get('https://masterroachi.com/api/order'), env);
 check('GET /api/order refused', res.status === 405, String(res.status));
+// _headers reaches static assets only; what the Worker writes itself is
+// covered by worker/security-headers.ts, and went out bare before it.
+check(
+  'a Worker response carries the security headers',
+  res.headers.get('x-content-type-options') === 'nosniff' &&
+    res.headers.get('strict-transport-security')?.startsWith('max-age=') &&
+    /default-src 'none'/.test(res.headers.get('content-security-policy') ?? ''),
+  res.headers.get('content-security-policy'),
+);
 
 // --- the keyed list is gone ------------------------------------------------
 //

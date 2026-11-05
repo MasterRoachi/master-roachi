@@ -57,7 +57,7 @@ where you are and a 1-to-32 sequence across the six would say nothing.
 Foundations is not in it. It is taken before a path is chosen and is not part
 of this one, and it is long finished — Odin Recipes, the landing page, Rock
 Paper Scissors, Etch-a-Sketch and the calculator are all in
-`~/Work/Master Roachi/odin-projects`.
+`~/Work/Master Roachi/Learning/odin-projects`.
 
 ## Six courses, not seven
 

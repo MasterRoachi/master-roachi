@@ -31,6 +31,7 @@ import {
   setLessonDone,
 } from './curriculum-ops';
 import { shareOhana } from './share-ohana';
+import { secured } from './security-headers';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
@@ -547,8 +548,9 @@ async function currentChoice(
   return null;
 }
 
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+// Every response the Worker gives, wrapped once at the door rather than at each
+// of its many returns: see worker/security-headers.ts.
+async function handle(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
     // One address for the site.
@@ -3121,6 +3123,11 @@ export default {
     }
 
     return json({ error: 'Method not allowed.' }, 405);
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    return secured(await handle(request, env));
   },
 
   /**

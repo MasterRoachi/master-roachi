@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/csp.mjs",
     "start": "next start",
     "preview": "npx serve@latest out",
     "lint": "eslint",

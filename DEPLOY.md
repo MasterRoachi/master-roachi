@@ -81,6 +81,14 @@ that this file claimed pushing deployed when nothing did: eight commits sat on
 `wrangler.jsonc` is load-bearing and its comments carry the reasoning for each
 of those. Read it before changing any of them.
 
+**Security headers come from two places.** `public/_headers` covers the static
+assets, and `worker/security-headers.ts` covers everything the Worker answers
+itself. Each page's inline scripts are pinned by hash in a `<meta>` policy that
+`scripts/csp.mjs` writes into `out/` as `postbuild`. `npm run build` runs it
+on its own, but a bare `next build` skips it. **Deploy only an `out/` built
+with `npm run build`**, or the pages go out with only the header's
+`'unsafe-inline'` standing guard.
+
 Without it, `wrangler deploy` runs its own framework detection, sees Next.js,
 assumes a server-rendered app, and hits an interactive prompt it answers on
 your behalf:

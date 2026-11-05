@@ -467,22 +467,36 @@ at the back of each deck is for.
 
 ### Curriculums
 
-**History** was planned and written in full on 2026-11-04 (12 stages, 359 lessons, 1,291 cards; see `scripts/curriculums/history.md`), **Philosophy** the same day (14 stages, 375 lessons, 1,219 cards; `scripts/curriculums/philosophy.md`), **Theology** the same day (12 stages, 318 lessons, 979 cards; `scripts/curriculums/theology.md`). **Polemics** the same day as its own curriculum, his ruling (13 stages, 287 lessons, 814 cards; `scripts/curriculums/polemics.md`), so **fourteen in live D1**; Zulu waits. Nine with scripts in `scripts/curriculums/` before that, **thirteen in live D1**
-(checked 2026-10-19). **Shona** got its script on 2026-10-19 — his choice of
-the five empty ones to build first, from zero, Standard Shona with dialects
-named where met, and a speaking partner — and has Stages 1–5 written (110
-lessons, 451 cards, following FSI Units 1–20), every
-form and tone read from the FSI and Carter page images; see
-`scripts/curriculums/shona.md`. **Zulu** is still a name with nothing in it and no script; History, Philosophy
-and Theology are written, above. His scope for the three
-subjects: Orthodox theology, the Western philosophical canon, a world history
-survey; Zulu from zero. **2,142 lessons, 2,005 carrying detail** as
-of 2026-10-15 — 694 and 341 before the rewrites. Odin is the only one without
-detail, and that is deliberate: see below. In order, because **the order of the
-curriculums is the route through all of them**:
-Japanese, Piano, Greek, Odin, Godot, Aseprite, Drawing, South African politics.
-That is the order he asked for, set on 2026-10-12; until then they sat in the
-order they happened to be built in.
+**Fourteen curriculums in live D1, and thirteen with scripts** in
+`scripts/curriculums/` — **3,838 lessons, 3,701 carrying detail**, counted
+from live D1 on 2026-11-05 (2,142 and 2,005 on 2026-10-15; 694 and 341 before
+the rewrites). The 137 without detail are all Odin's, and that is deliberate:
+see below. **Zulu** is the only one with no script and nothing in it — a name
+waiting its turn, from zero. The rest, by date:
+
+- **Shona**, from 2026-10-19 — his choice of the five empty ones to build
+  first, from zero: Standard Shona with dialects named where met, and a
+  speaking partner. **Written in full 2026-11-05**: twelve stages, 280 lessons,
+  1,239 cards. Stages 1–10 follow FSI's whole course, Units 1–49, every form
+  and tone read from the page images; Stage 11 reads the Shona Bible
+  (Biblica, CC BY-SA, beside the public-domain BSB); Stage 12 is Ad astra. The
+  proverbs stage waits for a source. See `scripts/curriculums/shona.md`.
+  Stages 6–12 are in the repo and **not yet in live D1** until
+  `npm run curriculum shona` is run; the totals above count live D1.
+- **History**, 2026-11-04: a world history survey, 12 stages, 359 lessons,
+  1,291 cards (`history.md`).
+- **Philosophy**, the same day: the Western canon, 14 stages, 375 lessons,
+  1,219 cards (`philosophy.md`).
+- **Theology**, the same day: Orthodox, 12 stages, 318 lessons, 979 cards
+  (`theology.md`).
+- **Polemics**, the same day, as its own curriculum at his ruling: 13 stages,
+  287 lessons, 814 cards (`polemics.md`).
+
+In order, because **the order of the curriculums is the route through all of
+them**: Japanese, Piano, Greek, Odin, Godot, Aseprite, Drawing, South African
+politics, then Zulu, Shona, Theology, Philosophy, History and Polemics, as
+they sit in D1. The first eight are the order he asked for, set on 2026-10-12;
+until then they sat in the order they happened to be built in.
 
 **The rewrites are finished, 2026-10-15.** Seven were rewritten between
 2026-10-13 and 2026-10-15 — Japanese, Piano, Greek, Godot, Aseprite, Drawing
@@ -1148,7 +1162,8 @@ Before that, it said: question round, then build.
   on 2026-10-19; no curriculum name is duplicated. Live D1 holds **13**
   curriculums, not the eight this spec describes: Zulu, Shona, Theology,
   Philosophy and History exist there with no script in `scripts/curriculums/`
-  and no curriculum-level sources.
+  and no curriculum-level sources. Since then all but Zulu have scripts, and
+  Polemics made it 14 (see Curriculums).
 
 ### His alone
 
@@ -1321,3 +1336,26 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [x] **The library index is not committed, and the repo is public.** Settled
       2026-10-14: it moved into D1 behind Access. See "Settled: the library
       index lives in D1" under the Shop plan.
+- [ ] **A fourth door on `/work`, Clients.** Planned 2026-11-04 and waiting on
+      the go from the client app's own session, which comes after that app is
+      live on its own subdomain behind its own Access app. The site side is
+      small: a `clients` key and WORK_SECTIONS entry whose three tools are
+      absolute links, an `outside` flag on WorkTool so they render as a plain
+      `<a>` (next/link would prefetch RSC payloads from the other Worker), an
+      icon in DoorIcon, door sizing taken from a count rather than a fixed
+      three (about 74px a door at 360px wide), the "three doors" comments
+      rewritten, and one row in DEPLOY.md's zone table. Nothing in `worker/`
+      or `wrangler.jsonc`. The door ships only once the subdomain answers.
+- [x] **The CSP allows inline script, and Worker responses carry no security
+      headers.** Fixed 2026-11-05. `scripts/csp.mjs` runs as `postbuild` and
+      gives every page in `out/` a `<meta>` policy listing the SHA-256 of
+      exactly its own inline scripts; the browser enforces it alongside the
+      header, so the header's `'unsafe-inline'` no longer lets an injected
+      script run. (Next's experimental `sri` only covers external chunks, and
+      nonces need a server.) Checked in headless Chromium: 40 pages, no page's
+      own script blocked, a planted inline script refused. The Worker's own
+      responses now go through `worker/security-headers.ts`, which fills in
+      whatever is missing — a `default-src 'none'` policy, `DENY` framing,
+      nosniff, HSTS, referrer and permissions — and leaves asset responses
+      alone, since `_headers` already reached those. The `_headers` comment
+      names Archivo and Reggae One now.
