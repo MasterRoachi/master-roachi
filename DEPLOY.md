@@ -106,23 +106,21 @@ unharmed, but the deploy fails every time.
 ### Other names on the zone
 
 Since 2026-11-03 the zone also carries names that are not the site. They belong
-to other projects; leave them alone when working on this one.
+to other projects, which are deliberately not named in this public repository;
+the dashboard shows them. Leave them alone when working on this one.
 
-| Name | Record | For |
+| Kind | Record | Rule |
 | --- | --- | --- |
-| `narthex` | A → `152.53.141.208`, **DNS only** | Narthex, the app, on a netcup server |
-| `narthexclasses` | A → `152.53.141.208`, **DNS only** | Narthex's video server |
-| `ohana` | made by the `ohana` Worker's custom domain | Ohana (was Roachi's Riches, once meant for `riches.`), behind its own Access app |
-
-The two Narthex records must **never be proxied**: Jitsi needs UDP, and Caddy
-issues its own certificates. Never add a record for `ohana` by hand; a Worker
-custom domain fails if one exists.
+| Two A records | another project's own server, **DNS only** | **never proxy them**: the service needs UDP and issues its own certificates |
+| A Worker custom domain | made by another Worker, behind its own Access app | never add a record for it by hand; a custom domain fails if one exists |
+| `clients` | Custom Domain on another Worker, behind its own Access app | the `/work` Clients door links here; never add a record by hand |
+| `pay` | Custom Domain on another Worker (public, no Access) | never add a record by hand |
 
 **Mail**, as public DNS answered on 2026-11-04. Email Routing still receives
-(`route1–3.mx.cloudflare.net`, its DKIM key at `cf2024-1._domainkey`). Narthex
-is moving its sending from Brevo to **Resend**. Resend's records are in:
+(`route1–3.mx.cloudflare.net`, its DKIM key at `cf2024-1._domainkey`). Another
+project is moving its sending from Brevo to **Resend**. Resend's records are in:
 `resend._domainkey` (TXT) and a `send` subdomain with its own MX and SPF TXT.
-Brevo's are still there until Narthex finishes the move: DKIM CNAMEs
+Brevo's are still there until that move finishes: DKIM CNAMEs
 `brevo1._domainkey` and `brevo2._domainkey` (DNS only), a `brevo-code:` TXT at
 the apex, `include:spf.brevo.com` in the apex SPF, and DMARC `p=none` reporting
 to Brevo. There is **one SPF record** at the apex; whatever a sender needs is
@@ -360,8 +358,8 @@ swaps them for the token the Worker checks.
 - Confirm `/rss.xml`, `/sitemap.xml` and `/robots.txt` resolve.
 - Send a test mail to `roachi@masterroachi.com` and confirm it arrives.
   The site itself sends nothing; replies come from the destination inbox's
-  own address. (Narthex sends from the domain, through Resend as it moves off
-  Brevo — see "Other names on the zone".)
+  own address. (Another project sends from the domain, through Resend as it
+  moves off Brevo — see "Other names on the zone".)
 - Submit the sitemap in Google Search Console.
 
 ---

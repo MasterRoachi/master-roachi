@@ -6,19 +6,20 @@ import { WORK_SECTIONS } from '@/lib/work-tools';
 import DoorIcon from './DoorIcon';
 import styles from './doors.module.css';
 
-// The front door, which is now three doors.
+// The front door, which is now four doors.
 //
 // It was one list of nine links — Boards, Habits, Reading, Curriculums, Cards,
 // Sketchpad, Writing, Projects, Product copy — read top to bottom every
 // morning to find the one you came for. Nine unrelated things in a column is
 // the same amount of reading whichever one you want.
 //
-// Three doors instead, and the nine live behind whichever one they belong to.
+// Doors instead, and the tools live behind whichever one they belong to.
 // Picking a door does not navigate: it opens its three in a tray UNDER the
 // row, with a gold arrow pointing down out of whichever door is open — so the
 // choice and its consequence are both on screen, and which door the tray
 // belongs to is said rather than implied. Only one is ever open — this is a
-// menu, not an accordion of everything.
+// menu, not an accordion of everything. The fourth, Clients, opens onto links
+// that leave the site for the CRM's own subdomain: see lib/work-tools.ts.
 //
 // They handle like the project cards on /projects — see components/ProjectCard
 // and Card.module.css, which this follows deliberately so the backend's one
@@ -33,7 +34,7 @@ const TILT = 5;
  * Where the cursor is, as CSS custom properties on the door it is over.
  *
  * Properties rather than React state, for ProjectCard's reason: pointermove
- * fires continuously, and re-rendering three doors on every one of those to
+ * fires continuously, and re-rendering every door on each of those to
  * move a highlight would be waste.
  */
 function track(event: PointerEvent<HTMLButtonElement>) {
@@ -70,6 +71,9 @@ export default function WorkDoors() {
   return (
     <div
       className={styles.doors}
+      // How many doors, so the row, the tray and the arrow all size from the
+      // count rather than from a three written into the CSS.
+      style={{ '--doors': WORK_SECTIONS.length } as React.CSSProperties}
       // Escape closes it, because the panel is a menu and a menu that can only
       // be dismissed by clicking the thing that opened it is a trap.
       onKeyDown={(event) => {
@@ -116,16 +120,23 @@ export default function WorkDoors() {
         <div className={styles.tray}>
           {section ? (
             <div key={section.key}>
-              <p className={styles.trayWhat}>{section.what}</p>
+              <p className={styles.trayWhat}>
+                {section.href ? <a href={section.href}>{section.what}</a> : section.what}
+              </p>
               <ul>
-                {section.tools.map((tool) => (
-                  <li key={tool.href}>
-                    <Link href={tool.href}>
+                {section.tools.map((tool) => {
+                  const inner = (
+                    <>
                       <span className={styles.toolName}>{tool.name}</span>
                       <span className={styles.toolWhat}>{tool.what}</span>
-                    </Link>
-                  </li>
-                ))}
+                    </>
+                  );
+                  return (
+                    <li key={tool.href}>
+                      {tool.outside ? <a href={tool.href}>{inner}</a> : <Link href={tool.href}>{inner}</Link>}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ) : null}

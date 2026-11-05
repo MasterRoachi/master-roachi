@@ -468,9 +468,9 @@ at the back of each deck is for.
 ### Curriculums
 
 **Fourteen curriculums in live D1, and thirteen with scripts** in
-`scripts/curriculums/` — **3,838 lessons, 3,701 carrying detail**, counted
-from live D1 on 2026-11-05 (2,142 and 2,005 on 2026-10-15; 694 and 341 before
-the rewrites). The 137 without detail are all Odin's, and that is deliberate:
+`scripts/curriculums/` — **4,008 lessons, 3,871 carrying detail** in live D1
+on 2026-11-05, after Shona's Stages 6–12 (3,838 and 3,701 counted that morning;
+2,142 and 2,005 on 2026-10-15; 694 and 341 before the rewrites). The 137 without detail are all Odin's, and that is deliberate:
 see below. **Zulu** is the only one with no script and nothing in it — a name
 waiting its turn, from zero. The rest, by date:
 
@@ -481,8 +481,7 @@ waiting its turn, from zero. The rest, by date:
   and tone read from the page images; Stage 11 reads the Shona Bible
   (Biblica, CC BY-SA, beside the public-domain BSB); Stage 12 is Ad astra. The
   proverbs stage waits for a source. See `scripts/curriculums/shona.md`.
-  Stages 6–12 are in the repo and **not yet in live D1** until
-  `npm run curriculum shona` is run; the totals above count live D1.
+  Applied to live D1 the same day.
 - **History**, 2026-11-04: a world history survey, 12 stages, 359 lessons,
   1,291 cards (`history.md`).
 - **Philosophy**, the same day: the Western canon, 14 stages, 375 lessons,
@@ -1336,16 +1335,16 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 - [x] **The library index is not committed, and the repo is public.** Settled
       2026-10-14: it moved into D1 behind Access. See "Settled: the library
       index lives in D1" under the Shop plan.
-- [ ] **A fourth door on `/work`, Clients.** Planned 2026-11-04 and waiting on
-      the go from the client app's own session, which comes after that app is
-      live on its own subdomain behind its own Access app. The site side is
-      small: a `clients` key and WORK_SECTIONS entry whose three tools are
-      absolute links, an `outside` flag on WorkTool so they render as a plain
-      `<a>` (next/link would prefetch RSC payloads from the other Worker), an
-      icon in DoorIcon, door sizing taken from a count rather than a fixed
-      three (about 74px a door at 360px wide), the "three doors" comments
-      rewritten, and one row in DEPLOY.md's zone table. Nothing in `worker/`
-      or `wrangler.jsonc`. The door ships only once the subdomain answers.
+- [x] **A fourth door on `/work`, Clients.** Built 2026-11-05, on the go from
+      the client app's session once its subdomain answered behind its own
+      Access app. A `clients` section in `lib/work-tools.ts` whose three tools
+      are absolute links with `outside: true`, rendered as a plain `<a>` in the
+      doors and the header (next/link would prefetch RSC payloads from the
+      other Worker); the eyebrow links to the app's home. A briefcase in
+      DoorIcon, the door row sized from a `--doors` count set by WorkDoors
+      (about 74px a door at 360px wide), the "three doors" comments rewritten,
+      and rows in DEPLOY.md's zone table. Nothing in `worker/` or
+      `wrangler.jsonc`.
 - [x] **The CSP allows inline script, and Worker responses carry no security
       headers.** Fixed 2026-11-05. `scripts/csp.mjs` runs as `postbuild` and
       gives every page in `out/` a `<meta>` policy listing the SHA-256 of

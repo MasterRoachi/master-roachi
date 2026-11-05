@@ -38,6 +38,15 @@ const PATHS: Record<WorkSection['key'], React.ReactNode> = {
       <path d="M14.8 11.6h1.8M14.8 16.6h1.8" />
     </>
   ),
+  // A briefcase: the business, kept apart from the rest by its own door.
+  clients: (
+    <>
+      <rect x="3" y="7" width="18" height="13" rx="2" />
+      <path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" />
+      <path d="M3 12.5h18" />
+      <path d="M11 12.5v1.5h2v-1.5" />
+    </>
+  ),
 };
 
 export default function DoorIcon({ section }: { section: WorkSection['key'] }) {

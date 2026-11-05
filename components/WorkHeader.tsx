@@ -85,6 +85,10 @@ export default function WorkHeader() {
                 <ul className={styles.menu}>
                   {section.tools.map((tool) => (
                     <li key={tool.href}>
+                      {tool.outside ? (
+                        // Another origin: see lib/work-tools.ts.
+                        <a href={tool.href}>{tool.name}</a>
+                      ) : (
                       <Link
                         href={tool.href}
                         // Trailing slashes are on (next.config.mjs sets
@@ -98,6 +102,7 @@ export default function WorkHeader() {
                       >
                         {tool.name}
                       </Link>
+                      )}
                     </li>
                   ))}
                 </ul>

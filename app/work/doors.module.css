@@ -1,11 +1,12 @@
-/* The three doors on the work home. Tokens from app/globals.css.
+/* The doors on the work home. Tokens from app/globals.css.
 
    GOLD FACES, which is the one place on the site the accent is used as a
    surface rather than as a line or a word. It is allowed here because the work
-   home holds exactly three things and nothing else to compete with: on a page
-   of cards it would be noise, on a page of three doors it is the page.
+   home holds four doors and nothing else to compete with: on a page of cards
+   it would be noise, on a page of doors it is the page.
 
-   Everything is laid out from the two numbers below, so the row, the tray
+   Everything is laid out from the numbers below — --doors, the count, is set
+   by WorkDoors.tsx from the list itself — so the row, the tray
    under it and the arrow between them stay in step without any of them
    measuring anything. */
 
@@ -14,9 +15,9 @@
   --door-w: clamp(112px, 13vw, 168px);
   --door-ratio: 5 / 7;
   --door-gap: clamp(14px, 2vw, 26px);
-  /* Three doors and the two gaps between them — the width the tray and the
-     arrow strip both take, so the arrow can point at a door by arithmetic. */
-  --row-w: calc(3 * var(--door-w) + 2 * var(--door-gap));
+  /* Every door and the gaps between them — the width the tray and the arrow
+     strip both take, so the arrow can point at a door by arithmetic. */
+  --row-w: calc(var(--doors, 4) * var(--door-w) + (var(--doors, 4) - 1) * var(--door-gap));
 
   flex: 1;
   min-height: 0;
@@ -242,14 +243,41 @@
   line-height: 1.4;
 }
 
+/* An eyebrow that is a link (Clients, to the CRM's Today): still an eyebrow,
+   not one more row of the tray, so it undoes the tool links' block styling. */
+.trayWhat a,
+.trayWhat a:hover,
+.trayWhat a:focus-visible {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 0.2em;
+}
+
+.trayWhat a:hover,
+.trayWhat a:focus-visible {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
 /* --- narrow ------------------------------------------------------------- */
 
 /* Nothing about the shape changes on a phone — the tray was always under the
    row — so only the two numbers everything is built from do. */
 @media (max-width: 720px) {
   .doors {
-    --door-w: clamp(84px, 26vw, 120px);
+    /* The phone's width shared between the doors, after the side gutters and
+       the gaps: about 74px a door at 360px wide with four. */
     --door-gap: 10px;
+    --door-w: clamp(
+      64px,
+      calc((100vw - 2rem - (var(--doors, 4) - 1) * var(--door-gap)) / var(--doors, 4)),
+      120px
+    );
     padding-block: 1.25rem;
   }
 

@@ -1,7 +1,7 @@
 /* The work home's furniture: the two site-wide actions at its foot.
 
-   The nine-link list that used to live here is gone — the home is three doors
-   now, styled in doors.module.css. */
+   The nine-link list that used to live here is gone — the home is doors now,
+   styled in doors.module.css. */
 
 /* Holds the actions against the bottom of the shell, so the doors get the
    whole middle of the viewport and this stays a footnote. */
