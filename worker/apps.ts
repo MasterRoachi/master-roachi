@@ -141,6 +141,31 @@ export function routeApexWork(url: URL): AppDecision | null {
   return owner ? { kind: 'redirect', location: `https://${owner.host}${target}${url.search}` } : { kind: 'notfound' };
 }
 
+/**
+ * A public page served into an editor's preview frame on admin, with eval
+ * allowed (2026-11-11, his call: option 1 of the three put to him).
+ *
+ * The preview draws the unsaved body by compiling its MDX in the browser
+ * (components/LiveEntry.tsx), and the compiler runs its output with
+ * `new Function`, which the site's policy forbids. Two policies apply to every
+ * page, the header from public/_headers and the <meta> that scripts/csp.mjs
+ * writes, and a script runs only if both allow it, so both get 'unsafe-eval'.
+ * Only here: on admin, behind Access, with ?preview=1 (routeApp), where the
+ * code being run is his own draft. Every other page keeps the strict policy.
+ */
+export async function previewPage(response: Response): Promise<Response> {
+  if (!(response.headers.get('content-type') ?? '').includes('text/html')) return response;
+  const html = (await response.text()).replace(
+    /(<meta[^>]*http-equiv="Content-Security-Policy"[^>]*content="script-src 'self')/i,
+    "$1 'unsafe-eval'",
+  );
+  const out = new Response(html, response);
+  const policy = out.headers.get('content-security-policy');
+  if (policy) out.headers.set('content-security-policy', policy.replace("script-src 'self'", "script-src 'self' 'unsafe-eval'"));
+  out.headers.delete('content-length');
+  return out;
+}
+
 /** The web app manifest for one app: what the phone installs. */
 export function manifestFor(app: WorkApp): string {
   return JSON.stringify({

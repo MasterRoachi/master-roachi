@@ -5888,6 +5888,20 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   check('apps: and the RSC payloads in those folders', kind('https://learn.masterroachi.com/work/cards/index.txt') === 'pass' && kind('https://admin.masterroachi.com/work/index.txt') === 'pass', '');
   check('apps: admin serves a public page for an editor\'s preview frame', ['https://admin.masterroachi.com/projects/terrath/?preview=1', 'https://admin.masterroachi.com/writing/some-post/?preview=1', 'https://admin.masterroachi.com/store/roachi-shirt/?preview=1'].every((u) => kind(u) === 'pass'), '');
   check('apps: but only with ?preview=1, and only on admin', at('https://admin.masterroachi.com/projects/terrath/')?.location === 'https://masterroachi.com/projects/terrath/' && kind('https://learn.masterroachi.com/projects/terrath/?preview=1') === 'redirect', JSON.stringify(at('https://admin.masterroachi.com/projects/terrath/')));
+  // The preview frame's policy: eval allowed in both the header and the meta
+  // policy, and only there (previewPage is called only for admin previews).
+  {
+    const page = new Response(
+      `<html><head><meta data-inline-hashes http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-x='"></head></html>`,
+      { headers: { 'content-type': 'text/html; charset=utf-8', 'content-security-policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; frame-ancestors 'self'" } },
+    );
+    const out = await apps.previewPage(page);
+    const html = await out.text();
+    check('apps: a preview page allows eval in its meta policy', html.includes(`content="script-src 'self' 'unsafe-eval' 'sha256-x='"`), html);
+    check('apps: and in its header, with the rest of the policy kept', out.headers.get('content-security-policy') === "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; frame-ancestors 'self'", out.headers.get('content-security-policy'));
+    const css = new Response('a{}', { headers: { 'content-type': 'text/css', 'content-security-policy': "script-src 'self'" } });
+    check('apps: anything that is not a page passes through untouched', (await apps.previewPage(css)).headers.get('content-security-policy') === "script-src 'self'", '');
+  }
   check('apps: another app\'s page forwards to that app', at('https://admin.masterroachi.com/work/cards/?deck=2')?.location === 'https://learn.masterroachi.com/work/cards/?deck=2', JSON.stringify(at('https://admin.masterroachi.com/work/cards/?deck=2')));
   check('apps: admin\'s doors at /work/ do not swallow learn\'s', at('https://admin.masterroachi.com/work/learn/')?.location === 'https://learn.masterroachi.com/work/learn/', '');
   check('apps: a public page on an app address goes to the apex', at('https://tools.masterroachi.com/projects/')?.location === 'https://masterroachi.com/projects/', '');

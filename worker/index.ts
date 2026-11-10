@@ -54,7 +54,7 @@ import type { PaymentResult, TillRpc } from './till-rpc';
 import type { LeadsRpc } from './enquiry-rpc';
 import { handleEnquiry } from './enquiry';
 import { accessTokenValid } from './access';
-import { manifestFor, routeApexWork, routeApp } from './apps';
+import { manifestFor, previewPage, routeApexWork, routeApp } from './apps';
 import { appForHost } from '../lib/work-tools';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -653,6 +653,16 @@ async function handle(request: Request, env: Env): Promise<Response> {
         });
       }
       if (app.kind === 'asset') return env.ASSETS.fetch(new Request(new URL(app.path, url), request));
+      // A public page in an editor's preview frame on admin: see previewPage().
+      // routeApp passes such a page only on admin and only with ?preview=1.
+      if (
+        app.kind === 'pass' &&
+        url.hostname !== APEX &&
+        url.searchParams.get('preview') === '1' &&
+        !url.pathname.startsWith('/work/')
+      ) {
+        return previewPage(await env.ASSETS.fetch(request));
+      }
       // Any path the asset binding does not hold serves the 404 page.
       if (app.kind === 'notfound') return env.ASSETS.fetch(new Request(new URL('/__not-in-this-app__', url), request));
     }
