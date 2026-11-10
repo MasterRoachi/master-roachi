@@ -34,7 +34,8 @@ export type ToolKey =
   | 'cards'
   | 'reading'
   | 'habits'
-  | 'sketchpad';
+  | 'sketchpad'
+  | 'kame';
 
 export interface WorkTool {
   key: ToolKey;
@@ -145,6 +146,15 @@ export const WORK_APPS: WorkApp[] = [
     tools: [
       { key: 'habits', href: '/work/habits/', name: 'Habits', what: 'What got done, and what did not.' },
       { key: 'sketchpad', href: '/work/sketchpad/', name: 'Sketchpad', what: 'Write and draw on one page. Saved as one file.' },
+      // Its own Worker on its own address, behind its own Access app, as
+      // Clients is (his go, 2026-11-11).
+      {
+        key: 'kame',
+        href: 'https://kame.masterroachi.com/',
+        name: 'Kame',
+        what: 'Focus blocks, on their own address.',
+        outside: true,
+      },
     ],
     apis: [
       '/work/api/habits',

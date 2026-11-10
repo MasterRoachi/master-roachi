@@ -10,8 +10,8 @@ import styles from './doors.module.css';
 //
 // His ruling, 2026-11-10: the backend is three apps (admin, learn, tools), and
 // tapping any of their icons opens a page of doors, so learn shows three,
-// tools shows two (Kame joins when it is rebuilt), and each grows by a door as
-// a tool is added. This replaced four doors that opened trays of three, which
+// tools shows three (Kame joined on 2026-11-11, on its own address), and each
+// grows by a door as a tool is added. This replaced four doors that opened trays of three, which
 // was a menu inside a menu once each app only holds its own handful.
 //
 // DOORS THAT SAY WHAT IS WAITING (his pick, 2026-11-10, redesign page, Admin

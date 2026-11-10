@@ -88,6 +88,14 @@ const TOOLS: Record<ToolKey, React.ReactNode> = {
       <path d="M19.5 6.5l-8 8-2.5.5.5-2.5 8-8a1.4 1.4 0 0 1 2 2z" />
     </>
   ),
+  // A focus dial: a ring, its top mark, and a hand part-way round.
+  kame: (
+    <>
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 2.5v2.5M10 2.5h4" />
+      <path d="M12 13l3.5-3.5" />
+    </>
+  ),
 };
 
 /** The app marks, after their phone icons: keys, an open book, an hourglass. */
