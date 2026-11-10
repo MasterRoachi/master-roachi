@@ -39,6 +39,17 @@ function isAsset(path: string): boolean {
   return ext !== 'html' && ext !== 'txt';
 }
 
+/** Old backend addresses that moved, kept so a bookmark still lands. */
+const MOVED: Record<string, string> = {
+  // Products became Shop on 2026-10-19.
+  '/work/store/': '/work/shop/',
+};
+
+function moved(path: string): string | null {
+  const key = path.endsWith('/') ? path : `${path}/`;
+  return MOVED[key] ?? null;
+}
+
 /** Whether a page path belongs to an app: its doors page, or one of its tools. */
 function owns(app: WorkApp, path: string): boolean {
   const folder = folderOf(path);
@@ -87,6 +98,12 @@ export function routeApp(url: URL): AppDecision | null {
   // Scripts, styles, fonts and images are the public site's own and harmless.
   if (isAsset(path)) return { kind: 'pass' };
 
+  const renamed = moved(path);
+  if (renamed) {
+    const to = WORK_APPS.find((candidate) => owns(candidate, renamed));
+    if (to) return { kind: 'redirect', location: `https://${to.host}${renamed}` };
+  }
+
   if (owns(app, path)) return { kind: 'pass' };
   const other = WORK_APPS.find((candidate) => candidate !== app && owns(candidate, path));
   if (other) return { kind: 'redirect', location: `https://${other.host}${path}${url.search}` };
@@ -94,6 +111,25 @@ export function routeApp(url: URL): AppDecision | null {
   // Anything else is the public site, which lives on the apex.
   if (!path.startsWith('/work/')) return { kind: 'redirect', location: `https://${APEX}${path}${url.search}` };
   return { kind: 'notfound' };
+}
+
+/**
+ * masterroachi.com/work after the move (2026-11-10): every backend page
+ * forwards to the app that owns it, and the private APIs no longer answer on
+ * the public site's address. /share/ohana is left alone until Ohana moves to
+ * learn. Null for anything else, which carries on as before.
+ */
+export function routeApexWork(url: URL): AppDecision | null {
+  if (url.hostname !== APEX) return null;
+  const path = url.pathname === '/work' ? '/work/' : url.pathname;
+  const route = path.replace(/\/+$/, '');
+  if (route.startsWith('/share/ohana') || route === '/share/ohana') return null;
+  if (route === '/api/work' || route.startsWith('/work/api/')) return { kind: 'notfound' };
+  if (!path.startsWith('/work/')) return null;
+  const target = moved(path) ?? path;
+  const owner = WORK_APPS.find((candidate) => owns(candidate, target));
+  // Permanent: the backend lives on the apps' addresses from now on.
+  return owner ? { kind: 'redirect', location: `https://${owner.host}${target}${url.search}` } : { kind: 'notfound' };
 }
 
 /** The web app manifest for one app: what the phone installs. */

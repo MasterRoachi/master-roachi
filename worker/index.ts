@@ -53,7 +53,8 @@ import type { PaymentResult, TillRpc } from './till-rpc';
 import type { LeadsRpc } from './enquiry-rpc';
 import { handleEnquiry } from './enquiry';
 import { accessTokenValid } from './access';
-import { manifestFor, routeApp } from './apps';
+import { manifestFor, routeApexWork, routeApp } from './apps';
+import { appForHost } from '../lib/work-tools';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -74,8 +75,9 @@ function isLocal(hostname: string): boolean {
  * - this machine passes, as dev always has;
  * - with WORK_ACCESS_AUD set, the Access token is verified for real
  *   (signature, audience, issuer, expiry), on every hostname;
- * - without it, the apex keeps the old presence check so /work does not lock
- *   him out before the tag is set, and every other hostname is refused.
+ * - without it, the apex and the three apps' addresses (all behind Access)
+ *   fall back to the old presence check, and every other hostname is refused.
+ *   The tag is set in production (2026-11-10), so this is only a fallback.
  *
  * WORK_ACCESS_AUD may hold several Audience tags, comma-separated, so the
  * old /work application and the new one covering the three apps both pass
@@ -90,7 +92,8 @@ async function privateAllowed(request: Request, url: URL, env: Env): Promise<boo
     }
     return false;
   }
-  return url.hostname === APEX && request.headers.has('cf-access-jwt-assertion');
+  // Not configured: the presence check, and only where Access stands in front.
+  return (url.hostname === APEX || appForHost(url.hostname) !== null) && request.headers.has('cf-access-jwt-assertion');
 }
 
 // The only server-side code on the site.
@@ -655,9 +658,9 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // The three backend apps on their own addresses (2026-11-10). Each is
     // served only its own pages and APIs; see worker/apps.ts. Every other
     // hostname carries on below exactly as before.
-    const app = routeApp(url);
+    const app = routeApp(url) ?? routeApexWork(url);
     if (app) {
-      if (app.kind === 'redirect') return Response.redirect(app.location, 302);
+      if (app.kind === 'redirect') return Response.redirect(app.location, url.hostname === APEX ? 301 : 302);
       if (app.kind === 'manifest') {
         return new Response(manifestFor(app.app), {
           headers: { 'content-type': 'application/manifest+json; charset=utf-8', 'cache-control': 'no-cache' },

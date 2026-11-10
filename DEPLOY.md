@@ -425,7 +425,7 @@ address only its own pages and APIs, its own `/manifest.webmanifest`, and its
 own icon at `/icon.png` and `/apple-icon.png` (from `public/app-icons/`, cut
 from `design/app-icons/`). A page belonging to another app forwards there.
 
-**Built 2026-11-10; no address points here yet.** What's left, in order:
+**Live 2026-11-10.** The steps, as they went:
 
 1. **Access application:** one, covering `admin.masterroachi.com`,
    `learn.masterroachi.com` and `tools.masterroachi.com`, allowing only him,
@@ -438,8 +438,11 @@ from `design/app-icons/`). A page belonging to another app forwards there.
 2. **The addresses:** add the three as `custom_domain` routes in
    `wrangler.jsonc` and push. Only after step 1, so no address ever answers
    without Access in front.
-3. **Install** each app on his phone. Then forward `masterroachi.com/work/...`
-   to the apps, and remove the old `/work` Access application.
+3. **Done 2026-11-10:** the apps are live and installed, and
+   `masterroachi.com/work/...` forwards (301) each page to its app
+   (`routeApexWork` in `worker/apps.ts`). The private APIs no longer answer
+   on the apex. What's left is taking the `masterroachi.com/work` hostname off
+   the Access application, which only forwards now.
 4. **Ohana's link** moves to `learn.masterroachi.com/share/ohana` from Ohana's
    side. The old address is retired after that.
 

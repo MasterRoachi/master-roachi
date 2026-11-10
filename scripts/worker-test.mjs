@@ -475,14 +475,14 @@ function sqliteD1() {
   );
   await kv.put('order:junk', 'not json');
 
-  res = await worker.fetch(get('https://masterroachi.com/work/api/orders'), shopEnv);
+  res = await worker.fetch(get('https://admin.masterroachi.com/work/api/orders'), shopEnv);
   check('orders without Access serve the 404 page', (await res.text()) === '404 page', String(res.status));
 
-  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), { ...shopEnv, DB: undefined });
+  res = await worker.fetch(access('https://admin.masterroachi.com/work/api/orders'), { ...shopEnv, DB: undefined });
   body = await res.json();
   check('orders with no database answer configured:false', body.configured === false, JSON.stringify(body));
 
-  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), shopEnv);
+  res = await worker.fetch(access('https://admin.masterroachi.com/work/api/orders'), shopEnv);
   body = await res.json();
   check('reading sweeps KV into D1', body.orders.length === 3 && body.swept === 2, JSON.stringify({ n: body.orders.length, swept: body.swept }));
   check(
@@ -492,13 +492,13 @@ function sqliteD1() {
   );
   check('newest first', body.orders.at(-1)?.ref === 'OLDREF22', body.orders.map((o) => o.ref).join(','));
 
-  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), shopEnv);
+  res = await worker.fetch(access('https://admin.masterroachi.com/work/api/orders'), shopEnv);
   body = await res.json();
   check('sweeping twice does not duplicate', body.orders.length === 3, String(body.orders.length));
 
   const mark = async (ref, status) => {
     const response = await worker.fetch(
-      new Request('https://masterroachi.com/work/api/orders', {
+      new Request('https://admin.masterroachi.com/work/api/orders', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'cf-access-jwt-assertion': 'stub-jwt' },
         body: JSON.stringify({ action: 'status', ref, status }),
@@ -579,7 +579,7 @@ function sqliteD1() {
   // His ruling, 2026-10-19: personal details go 30 days after submission,
   // whatever the status; the sale stays. OLDREF22 was submitted 2026-09-01,
   // so the reads above have already redacted it — this checks what they left.
-  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), shopEnv);
+  res = await worker.fetch(access('https://admin.masterroachi.com/work/api/orders'), shopEnv);
   body = await res.json();
   const redacted = body.orders.find((o) => o.ref === 'OLDREF22');
   check(
@@ -649,7 +649,7 @@ function sqliteD1() {
   const printfulEnv = { ...shopEnv, PRINTFUL_TOKEN: 'pf-test' };
   const sendIt = async (ref, recipient, useEnv = printfulEnv) => {
     const response = await worker.fetch(
-      new Request('https://masterroachi.com/work/api/orders', {
+      new Request('https://admin.masterroachi.com/work/api/orders', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'cf-access-jwt-assertion': 'stub-jwt' },
         body: JSON.stringify({ action: 'send', ref, recipient }),
@@ -660,7 +660,7 @@ function sqliteD1() {
   };
   const markIn = async (ref, status) => {
     const response = await worker.fetch(
-      new Request('https://masterroachi.com/work/api/orders', {
+      new Request('https://admin.masterroachi.com/work/api/orders', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'cf-access-jwt-assertion': 'stub-jwt' },
         body: JSON.stringify({ action: 'status', ref, status }),
@@ -702,7 +702,7 @@ function sqliteD1() {
   check('an order in Printful cannot go back to Received', back.status === 409, JSON.stringify(back));
 
   remote = { id: 9001, status: 'fulfilled', shipments: [{ carrier: 'DHL', tracking_number: 'TRK1', tracking_url: 'https://track/TRK1' }] };
-  res = await worker.fetch(access('https://masterroachi.com/work/api/orders'), printfulEnv);
+  res = await worker.fetch(access('https://admin.masterroachi.com/work/api/orders'), printfulEnv);
   body = await res.json();
   const shipped = body.orders.find((o) => o.ref === sendRef);
   check(
@@ -711,7 +711,7 @@ function sqliteD1() {
     JSON.stringify(shipped),
   );
   const asked = printfulCalls.length;
-  await worker.fetch(access('https://masterroachi.com/work/api/orders'), printfulEnv);
+  await worker.fetch(access('https://admin.masterroachi.com/work/api/orders'), printfulEnv);
   check('a settled order is not asked about again', printfulCalls.length === asked, String(printfulCalls.length - asked));
 
   // Two colours in one size: the order cannot say which, so nothing is sent.
@@ -1039,19 +1039,19 @@ function sqliteD1() {
   //
   // A sync that finds nothing new commits nothing, so the catalogue's own date
   // never moved and the stale warning never cleared. The last check is in D1.
-  res = await worker.fetch(access('https://masterroachi.com/work/api/store-sync'), shopEnv);
+  res = await worker.fetch(access('https://admin.masterroachi.com/work/api/store-sync'), shopEnv);
   body = await res.json();
   check('with no sync yet, nothing has been checked', body.checkedAt === null, JSON.stringify(body));
   ordersDb.sqlite.prepare("insert into store_syncs (synced_at, changed, products) values ('2026-10-19T10:00:00.000Z', 0, 1)").run();
   ordersDb.sqlite.prepare("insert into store_syncs (synced_at, changed, products) values ('2026-10-19T12:00:00.000Z', 0, 1)").run();
-  res = await worker.fetch(access('https://masterroachi.com/work/api/store-sync'), shopEnv);
+  res = await worker.fetch(access('https://admin.masterroachi.com/work/api/store-sync'), shopEnv);
   body = await res.json();
   check('the last check is the latest sync, changed or not', body.checkedAt === '2026-10-19T12:00:00.000Z', JSON.stringify(body));
 
   res = await worker.fetch(get('https://masterroachi.com/work/store/'), env);
   check(
-    '/work/store redirects to /work/shop/',
-    res.status === 301 && res.headers.get('location') === 'https://masterroachi.com/work/shop/',
+    '/work/store redirects to Shop, in the admin app',
+    res.status === 301 && res.headers.get('location') === 'https://admin.masterroachi.com/work/shop/',
     `${res.status} ${res.headers.get('location')}`,
   );
 }
@@ -1088,14 +1088,14 @@ const workEnv = {
 const viaAccess = (url) =>
   new Request(url, { headers: { 'cf-access-jwt-assertion': 'stub-jwt' } });
 
-res = await worker.fetch(get('https://masterroachi.com/api/work'), workEnv);
+res = await worker.fetch(get('https://admin.masterroachi.com/api/work'), workEnv);
 check(
   'work hub without Access serves the 404 page',
   (await res.text()) === '404 page',
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/api/work'), env);
+res = await worker.fetch(viaAccess('https://admin.masterroachi.com/api/work'), env);
 body = await res.json();
 check(
   'work hub with no Trello secrets answers configured:false',
@@ -1218,7 +1218,7 @@ globalThis.fetch = async (input) => {
   return realFetch(input);
 };
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/api/work'), workEnv);
+res = await worker.fetch(viaAccess('https://admin.masterroachi.com/api/work'), workEnv);
 body = await res.json();
 const shepherds = body.boards?.find((b) => b.name === 'Shepherds');
 const odd = body.boards?.find((b) => b.name === 'Odd One');
@@ -1342,14 +1342,14 @@ const ghFetch = async (input, init = {}) => {
 const preGh = globalThis.fetch;
 globalThis.fetch = ghFetch;
 
-res = await worker.fetch(get('https://masterroachi.com/work/api/content'), ghEnv);
+res = await worker.fetch(get('https://admin.masterroachi.com/work/api/content'), ghEnv);
 check(
   'content API without Access serves the 404 page',
   (await res.text()) === '404 page',
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/content?collection=writing'), env);
+res = await worker.fetch(viaAccess('https://admin.masterroachi.com/work/api/content?collection=writing'), env);
 body = await res.json();
 check(
   'no GitHub token answers configured:false',
@@ -1357,7 +1357,7 @@ check(
   JSON.stringify(body),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/content?collection=writing'), ghEnv);
+res = await worker.fetch(viaAccess('https://admin.masterroachi.com/work/api/content?collection=writing'), ghEnv);
 body = await res.json();
 check(
   'listing returns only .mdx posts',
@@ -1375,7 +1375,7 @@ for (const bad of [
   'content/writing/nested/post.mdx',
 ]) {
   res = await worker.fetch(
-    viaAccess(`https://masterroachi.com/work/api/content?collection=writing&path=${encodeURIComponent(bad)}`),
+    viaAccess(`https://admin.masterroachi.com/work/api/content?collection=writing&path=${encodeURIComponent(bad)}`),
     ghEnv,
   );
   check(`read refuses ${bad}`, res.status === 400, String(res.status));
@@ -1383,7 +1383,7 @@ for (const bad of [
 
 res = await worker.fetch(
   viaAccess(
-    'https://masterroachi.com/work/api/content?collection=writing&path=content/writing/the-road-in.mdx',
+    'https://admin.masterroachi.com/work/api/content?collection=writing&path=content/writing/the-road-in.mdx',
   ),
   ghEnv,
 );
@@ -1395,7 +1395,7 @@ check(
 );
 
 // --- writing ---------------------------------------------------------------
-const postContent = (payload, url = 'https://masterroachi.com/work/api/content') =>
+const postContent = (payload, url = 'https://admin.masterroachi.com/work/api/content') =>
   new Request(url, {
     method: 'POST',
     headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
@@ -1504,7 +1504,7 @@ globalThis.fetch = async (input, init = {}) => {
 };
 
 res = await worker.fetch(
-  new Request('https://masterroachi.com/work/api/rebuild', { method: 'POST' }),
+  new Request('https://admin.masterroachi.com/work/api/rebuild', { method: 'POST' }),
   ghEnv,
 );
 check(
@@ -1513,11 +1513,11 @@ check(
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/rebuild'), ghEnv);
+res = await worker.fetch(viaAccess('https://admin.masterroachi.com/work/api/rebuild'), ghEnv);
 check('rebuild refuses GET', res.status === 405, String(res.status));
 
 res = await worker.fetch(
-  new Request('https://masterroachi.com/work/api/rebuild', {
+  new Request('https://admin.masterroachi.com/work/api/rebuild', {
     method: 'POST',
     headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
   }),
@@ -1532,7 +1532,7 @@ check(
 
 rebuildCalls.length = 0;
 res = await worker.fetch(
-  new Request('https://masterroachi.com/work/api/rebuild', {
+  new Request('https://admin.masterroachi.com/work/api/rebuild', {
     method: 'POST',
     headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
   }),
@@ -1569,7 +1569,7 @@ globalThis.fetch = ghFetch;
 // Unknown collections cannot be read or written, so a new directory is only
 // reachable once lib/collections.ts says so.
 res = await worker.fetch(
-  viaAccess('https://masterroachi.com/work/api/content?collection=secrets'),
+  viaAccess('https://admin.masterroachi.com/work/api/content?collection=secrets'),
   ghEnv,
 );
 check('an unknown collection is refused', res.status === 400, String(res.status));
@@ -1580,7 +1580,7 @@ check('writing to an unknown collection is refused', res.status === 400, String(
 // The guard is per collection: a projects path is not a writing path.
 res = await worker.fetch(
   viaAccess(
-    'https://masterroachi.com/work/api/content?collection=writing&path=content/projects/terrath.mdx',
+    'https://admin.masterroachi.com/work/api/content?collection=writing&path=content/projects/terrath.mdx',
   ),
   ghEnv,
 );
@@ -1715,7 +1715,7 @@ check(
 // through a TextDecoder hands back a mangled string nothing can use.
 res = await worker.fetch(
   viaAccess(
-    'https://masterroachi.com/work/api/content?collection=store-art&path=public/store/missing-art.webp',
+    'https://admin.masterroachi.com/work/api/content?collection=store-art&path=public/store/missing-art.webp',
   ),
   ghEnv,
 );
@@ -1806,14 +1806,14 @@ globalThis.fetch = async (input) =>
     : new Response('nope', { status: 404 });
 
 res = await worker.fetch(
-  viaAccess('https://masterroachi.com/work/api/version'),
+  viaAccess('https://admin.masterroachi.com/work/api/version'),
   stampEnv('head-sha'),
 );
 body = await res.json();
 check('a matching stamp reads as current', body.current === true, JSON.stringify(body));
 
 res = await worker.fetch(
-  viaAccess('https://masterroachi.com/work/api/version'),
+  viaAccess('https://admin.masterroachi.com/work/api/version'),
   stampEnv('older-sha'),
 );
 body = await res.json();
@@ -1824,7 +1824,7 @@ check(
 );
 
 res = await worker.fetch(
-  viaAccess('https://masterroachi.com/work/api/version'),
+  viaAccess('https://admin.masterroachi.com/work/api/version'),
   stampEnv(null),
 );
 body = await res.json();
@@ -1834,7 +1834,7 @@ check(
   JSON.stringify(body),
 );
 
-res = await worker.fetch(get('https://masterroachi.com/work/api/version'), stampEnv('x'));
+res = await worker.fetch(get('https://admin.masterroachi.com/work/api/version'), stampEnv('x'));
 check(
   'version without Access serves the 404 page',
   (await res.text()) === '404 page',
@@ -2213,14 +2213,14 @@ const postJson = (url, payload) =>
     body: JSON.stringify(payload),
   });
 
-res = await worker.fetch(get('https://masterroachi.com/work/api/habits'), dbEnv());
+res = await worker.fetch(get('https://tools.masterroachi.com/work/api/habits'), dbEnv());
 check(
   'habits without Access serves the 404 page',
   (await res.text()) === '404 page',
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/habits'), env);
+res = await worker.fetch(viaAccess('https://tools.masterroachi.com/work/api/habits'), env);
 body = await res.json();
 check(
   'habits with no database answers configured:false',
@@ -2228,7 +2228,7 @@ check(
   JSON.stringify(body),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/habits'), dbEnv());
+res = await worker.fetch(viaAccess('https://tools.masterroachi.com/work/api/habits'), dbEnv());
 body = await res.json();
 const todayFromServer = body.today;
 check(
@@ -2248,7 +2248,7 @@ check(
 );
 
 res = await worker.fetch(
-  viaAccess('https://masterroachi.com/work/api/habits?month=2026-02'),
+  viaAccess('https://tools.masterroachi.com/work/api/habits?month=2026-02'),
   dbEnv(),
 );
 body = await res.json();
@@ -2262,7 +2262,7 @@ check(
 // is readable either way, so it falls back rather than failing.
 for (const bad of ['2026-13', 'February', '2026-2', '']) {
   res = await worker.fetch(
-    viaAccess(`https://masterroachi.com/work/api/habits?month=${encodeURIComponent(bad)}`),
+    viaAccess(`https://tools.masterroachi.com/work/api/habits?month=${encodeURIComponent(bad)}`),
     dbEnv(),
   );
   body = await res.json();
@@ -2275,7 +2275,7 @@ for (const bad of ['2026-13', 'February', '2026-2', '']) {
 
 // The page never names a date, so the default has to be today.
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', { action: 'toggle', id: 1 }),
+  postJson('https://tools.masterroachi.com/work/api/habits', { action: 'toggle', id: 1 }),
   dbEnv(),
 );
 body = await res.json();
@@ -2286,7 +2286,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', { action: 'toggle', id: 1 }),
+  postJson('https://tools.masterroachi.com/work/api/habits', { action: 'toggle', id: 1 }),
   dbEnv(),
 );
 body = await res.json();
@@ -2296,7 +2296,7 @@ check('and the row is gone', DB._ticks.size === 0, JSON.stringify([...DB._ticks]
 // Tomorrow is always a mistake, usually a timezone one. Refused, not clamped.
 const tomorrow = new Date(Date.now() + 86_400_000 * 2).toISOString().slice(0, 10);
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', {
+  postJson('https://tools.masterroachi.com/work/api/habits', {
     action: 'toggle',
     id: 1,
     day: tomorrow,
@@ -2308,14 +2308,14 @@ check('and nothing was written', DB._ticks.size === 0, JSON.stringify([...DB._ti
 
 for (const bad of ['8 October', '2026-13-99x', '', '2026/10/08']) {
   res = await worker.fetch(
-    postJson('https://masterroachi.com/work/api/habits', { action: 'toggle', id: 1, day: bad }),
+    postJson('https://tools.masterroachi.com/work/api/habits', { action: 'toggle', id: 1, day: bad }),
     dbEnv(),
   );
   check(`a malformed day is refused: ${JSON.stringify(bad)}`, res.status === 400, String(res.status));
 }
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', { action: 'toggle' }),
+  postJson('https://tools.masterroachi.com/work/api/habits', { action: 'toggle' }),
   dbEnv(),
 );
 check('a toggle with no habit is refused', res.status === 400, String(res.status));
@@ -2323,7 +2323,7 @@ check('a toggle with no habit is refused', res.status === 400, String(res.status
 // A daily habit must not be stored with a target, or it is half a weekly one.
 DB = fakeD1();
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', {
+  postJson('https://tools.masterroachi.com/work/api/habits', {
     action: 'add',
     name: '  Pray  ',
     target: 4,
@@ -2339,7 +2339,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', {
+  postJson('https://tools.masterroachi.com/work/api/habits', {
     action: 'add',
     name: 'Gym',
     cadence: 'weekly',
@@ -2354,7 +2354,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', { action: 'add', name: '   ' }),
+  postJson('https://tools.masterroachi.com/work/api/habits', { action: 'add', name: '   ' }),
   dbEnv(),
 );
 check('a nameless habit is refused', res.status === 400, String(res.status));
@@ -2362,7 +2362,7 @@ check('a nameless habit is refused', res.status === 400, String(res.status));
 // Archive, never delete: the ticks are the history.
 DB = fakeD1();
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', { action: 'archive', id: 1 }),
+  postJson('https://tools.masterroachi.com/work/api/habits', { action: 'archive', id: 1 }),
   dbEnv(),
 );
 check(
@@ -2373,7 +2373,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', { action: 'burn it all' }),
+  postJson('https://tools.masterroachi.com/work/api/habits', { action: 'burn it all' }),
   dbEnv(),
 );
 check('an unknown action is refused', res.status === 400, String(res.status));
@@ -2382,7 +2382,7 @@ check('an unknown action is refused', res.status === 400, String(res.status));
 // a blank cell with nothing saying why.
 DB = fakeD1();
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', {
+  postJson('https://tools.masterroachi.com/work/api/habits', {
     action: 'add',
     name: 'Read',
     icon: 'definitely-not-an-icon',
@@ -2396,7 +2396,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/habits', {
+  postJson('https://tools.masterroachi.com/work/api/habits', {
     action: 'add',
     name: 'Pray',
     icon: 'cross',
@@ -2419,14 +2419,14 @@ check(
 
 DB = fakeD1();
 
-res = await worker.fetch(get('https://masterroachi.com/work/api/library'), dbEnv());
+res = await worker.fetch(get('https://learn.masterroachi.com/work/api/library'), dbEnv());
 check(
   'the library without Access serves the 404 page',
   (await res.text()) === '404 page',
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/library'), env);
+res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/library'), env);
 body = await res.json();
 check(
   'the library with no database answers configured:false',
@@ -2434,7 +2434,7 @@ check(
   JSON.stringify(body),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/library'), dbEnv());
+res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/library'), dbEnv());
 body = await res.json();
 check('the library answers with its books', body.books.length === 2, JSON.stringify(body).slice(0, 120));
 check(
@@ -2454,21 +2454,21 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/library', { anything: true }),
+  postJson('https://learn.masterroachi.com/work/api/library', { anything: true }),
   dbEnv(),
 );
 check('the library refuses anything but GET', res.status === 405, String(res.status));
 
 // --- a book's cover --------------------------------------------------------
 
-res = await worker.fetch(get('https://masterroachi.com/work/api/book-cover?id=491'), dbEnv());
+res = await worker.fetch(get('https://learn.masterroachi.com/work/api/book-cover?id=491'), dbEnv());
 check(
   'a cover without Access serves the 404 page',
   (await res.text()) === '404 page',
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/book-cover?id=491'), dbEnv());
+res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/book-cover?id=491'), dbEnv());
 check(
   'a shelved cover comes back as webp',
   res.status === 200 && res.headers.get('content-type') === 'image/webp',
@@ -2480,12 +2480,12 @@ check(
   String(res.headers.get('cache-control')),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/book-cover?id=12'), dbEnv());
+res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/book-cover?id=12'), dbEnv());
 check('a book with no cover is a 404, not an error', res.status === 404, String(res.status));
 
 for (const bad of ['', '0', '-3', 'abc', '1.5']) {
   res = await worker.fetch(
-    viaAccess(`https://masterroachi.com/work/api/book-cover?id=${bad}`),
+    viaAccess(`https://learn.masterroachi.com/work/api/book-cover?id=${bad}`),
     dbEnv(),
   );
   check(`a cover id of "${bad}" is refused`, res.status === 400, String(res.status));
@@ -2499,14 +2499,14 @@ for (const bad of ['', '0', '-3', 'abc', '1.5']) {
 
 DB = fakeD1();
 
-res = await worker.fetch(get('https://masterroachi.com/work/api/reading'), dbEnv());
+res = await worker.fetch(get('https://learn.masterroachi.com/work/api/reading'), dbEnv());
 check(
   'reading without Access serves the 404 page',
   (await res.text()) === '404 page',
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/reading'), env);
+res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/reading'), env);
 body = await res.json();
 check(
   'reading with no database answers configured:false',
@@ -2515,7 +2515,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'add', title: '  Dune  ' }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'add', title: '  Dune  ' }),
   dbEnv(),
 );
 check(
@@ -2527,7 +2527,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', {
+  postJson('https://learn.masterroachi.com/work/api/reading', {
     action: 'add',
     title: 'Confessions',
     author: 'Augustine',
@@ -2542,13 +2542,13 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'add', title: '   ' }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'add', title: '   ' }),
   dbEnv(),
 );
 check('a titleless book is refused', res.status === 400, String(res.status));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'add', title: 'x', status: 'devoured' }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'add', title: 'x', status: 'devoured' }),
   dbEnv(),
 );
 check(
@@ -2560,7 +2560,7 @@ check(
 // Book 1 already has started_on 2026-09-01 and no finished_on.
 DB = fakeD1();
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', {
+  postJson('https://learn.masterroachi.com/work/api/reading', {
     action: 'update',
     id: 1,
     status: 'read',
@@ -2579,7 +2579,7 @@ DB = fakeD1();
 DB._books[0].status = 'read';
 DB._books[0].finished_on = '2026-09-20';
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', {
+  postJson('https://learn.masterroachi.com/work/api/reading', {
     action: 'update',
     id: 1,
     status: 'reading',
@@ -2594,7 +2594,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', {
+  postJson('https://learn.masterroachi.com/work/api/reading', {
     action: 'update',
     id: 1,
     rating: 99,
@@ -2605,7 +2605,7 @@ bound = DB._books.find((b) => b.id === 1)?._update;
 check('a rating is clamped to five', bound?.[7] === 5, JSON.stringify(bound?.[7]));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', {
+  postJson('https://learn.masterroachi.com/work/api/reading', {
     action: 'update',
     id: 1,
     rating: null,
@@ -2620,7 +2620,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 1, page: 55 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'update', id: 1, page: 55 }),
   dbEnv(),
 );
 bound = DB._books.find((b) => b.id === 1)?._update;
@@ -2638,7 +2638,7 @@ check(
 
 DB = fakeD1();
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 1, pages: 320 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'update', id: 1, pages: 320 }),
   dbEnv(),
 );
 bound = DB._books.find((b) => b.id === 1)?._update;
@@ -2646,7 +2646,7 @@ check('the page total is settable', bound?.[2] === 320, JSON.stringify(bound?.[2
 
 DB = fakeD1();
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', {
+  postJson('https://learn.masterroachi.com/work/api/reading', {
     action: 'update',
     id: 1,
     notes: 'Slower than it looks. Worth the second read.',
@@ -2666,14 +2666,14 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 1, notes: '' }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'update', id: 1, notes: '' }),
   dbEnv(),
 );
 bound = DB._books.find((b) => b.id === 1)?._update;
 check('an empty note clears rather than being ignored', bound?.[8] === '', JSON.stringify(bound?.[8]));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', {
+  postJson('https://learn.masterroachi.com/work/api/reading', {
     action: 'update',
     id: 1,
     pages: 9999999,
@@ -2684,13 +2684,13 @@ bound = DB._books.find((b) => b.id === 1)?._update;
 check('an absurd page total is clamped', bound?.[2] === 100000, JSON.stringify(bound?.[2]));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'update', id: 404 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'update', id: 404 }),
   dbEnv(),
 );
 check('updating a book that is not there is a 404', res.status === 404, String(res.status));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'remove', id: 1 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'remove', id: 1 }),
   dbEnv(),
 );
 check(
@@ -2700,7 +2700,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'incinerate' }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'incinerate' }),
   dbEnv(),
 );
 check('an unknown reading action is refused', res.status === 400, String(res.status));
@@ -2712,14 +2712,14 @@ check('an unknown reading action is refused', res.status === 400, String(res.sta
 
 DB = fakeD1();
 
-res = await worker.fetch(get('https://masterroachi.com/work/api/curriculums'), dbEnv());
+res = await worker.fetch(get('https://learn.masterroachi.com/work/api/curriculums'), dbEnv());
 check(
   'curriculums without Access serves the 404 page',
   (await res.text()) === '404 page',
   String(res.status),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/curriculums'), env);
+res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/curriculums'), env);
 body = await res.json();
 check(
   'curriculums with no database answers configured:false',
@@ -2727,7 +2727,7 @@ check(
   JSON.stringify(body),
 );
 
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/curriculums'), dbEnv());
+res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/curriculums'), dbEnv());
 body = await res.json();
 check(
   'the three levels come back nested, not as a flat join',
@@ -2738,7 +2738,7 @@ check(
 // --- the import ------------------------------------------------------------
 DB = fakeD1();
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
+  postJson('https://learn.masterroachi.com/work/api/curriculums', {
     action: 'import',
     curriculum_id: 1,
     outline: 'Foundations\n  - Intro to Web\n  - Installations\n1. JavaScript\n   1) Organizing\nNodeJS\n* Mini Message Board',
@@ -2759,7 +2759,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
+  postJson('https://learn.masterroachi.com/work/api/curriculums', {
     action: 'import',
     curriculum_id: 1,
     outline: '   \n\n  ',
@@ -2770,7 +2770,7 @@ check('an empty outline is refused', res.status === 400, String(res.status));
 
 // A whole pasted web page must not write ten thousand rows unnoticed.
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
+  postJson('https://learn.masterroachi.com/work/api/curriculums', {
     action: 'import',
     curriculum_id: 1,
     outline: Array.from({ length: 300 }, (_, i) => `Module ${i}`).join('\n'),
@@ -2782,7 +2782,7 @@ check('an oversized import is refused', res.status === 400, String(res.status));
 // --- ticking a lesson ------------------------------------------------------
 DB = fakeD1();
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 1 }),
+  postJson('https://learn.masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 1 }),
   dbEnv(),
 );
 body = await res.json();
@@ -2793,14 +2793,14 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 1 }),
+  postJson('https://learn.masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 1 }),
   dbEnv(),
 );
 body = await res.json();
 check('ticking again clears the day', body.done === false && body.day === null, JSON.stringify(body));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
+  postJson('https://learn.masterroachi.com/work/api/curriculums', {
     action: 'toggle-lesson',
     id: 1,
     day: '2099-01-01',
@@ -2810,7 +2810,7 @@ res = await worker.fetch(
 check('a lesson cannot be done in the future', res.status === 400, String(res.status));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 9999 }),
+  postJson('https://learn.masterroachi.com/work/api/curriculums', { action: 'toggle-lesson', id: 9999 }),
   dbEnv(),
 );
 check('ticking a lesson that is not there is a 404', res.status === 404, String(res.status));
@@ -2821,7 +2821,7 @@ check('ticking a lesson that is not there is a 404', res.status === 404, String(
 // name coming out of the request body.
 for (const kind of ['curriculums', 'sqlite_master', 'lessons; drop table lessons', '']) {
   res = await worker.fetch(
-    postJson('https://masterroachi.com/work/api/curriculums', {
+    postJson('https://learn.masterroachi.com/work/api/curriculums', {
       action: 'remove',
       kind,
       id: 1,
@@ -2832,7 +2832,7 @@ for (const kind of ['curriculums', 'sqlite_master', 'lessons; drop table lessons
 }
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
+  postJson('https://learn.masterroachi.com/work/api/curriculums', {
     action: 'rename',
     kind: 'lesson',
     id: 1,
@@ -2843,7 +2843,7 @@ res = await worker.fetch(
 check('a valid kind renames', res.status === 200, String(res.status));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
+  postJson('https://learn.masterroachi.com/work/api/curriculums', {
     action: 'set-status',
     id: 1,
     status: 'abandoned',
@@ -2853,13 +2853,13 @@ res = await worker.fetch(
 check('an invalid curriculum status is refused', res.status === 400, String(res.status));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'add-curriculum', name: '  ' }),
+  postJson('https://learn.masterroachi.com/work/api/curriculums', { action: 'add-curriculum', name: '  ' }),
   dbEnv(),
 );
 check('a nameless curriculum is refused', res.status === 400, String(res.status));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'add-module', name: 'x' }),
+  postJson('https://learn.masterroachi.com/work/api/curriculums', { action: 'add-module', name: 'x' }),
   dbEnv(),
 );
 check('a module with no curriculum is refused', res.status === 400, String(res.status));
@@ -2872,7 +2872,7 @@ check('a module with no curriculum is refused', res.status === 400, String(res.s
 globalThis.fetch = ghFetch;
 
 res = await worker.fetch(
-  viaAccess('https://masterroachi.com/work/api/content?collection=notes'),
+  viaAccess('https://admin.masterroachi.com/work/api/content?collection=notes'),
   ghEnv,
 );
 body = await res.json();
@@ -3373,7 +3373,7 @@ globalThis.fetch = ghFetch;
 const postEnv = { ...env, DB, GITHUB_TOKEN: 'ghtok' };
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
   postEnv,
 );
 check(
@@ -3388,7 +3388,7 @@ const postEnv2 = { ...env, DB, GITHUB_TOKEN: 'ghtok' };
 
 commits.length = 0;
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
   postEnv2,
 );
 body = await res.json();
@@ -3413,7 +3413,7 @@ check(
 // slug and the site grows a duplicate nobody asked for.
 commits.length = 0;
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
   postEnv2,
 );
 body = await res.json();
@@ -3425,14 +3425,14 @@ check(
 check('and nothing was committed the second time', commits.length === 0, String(commits.length));
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 4040 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'post', id: 4040 }),
   postEnv2,
 );
 check('posting a book that is not there is a 404', res.status === 404, String(res.status));
 
 // Without the token there is nowhere to write it, and saying so beats a 502.
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
+  postJson('https://learn.masterroachi.com/work/api/reading', { action: 'post', id: 1 }),
   { ...env, DB: fakeD1() },
 );
 check('with no GitHub token it refuses clearly', res.status === 400, String(res.status));
@@ -3615,7 +3615,7 @@ DB = fakeD1();
 DB._curriculums.push({ id: 2, name: 'Second', source: null, status: 'active', position: 2 });
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'move', id: 2, direction: 'up' }),
+  postJson('https://learn.masterroachi.com/work/api/curriculums', { action: 'move', id: 2, direction: 'up' }),
   dbEnv(),
 );
 check(
@@ -3629,7 +3629,7 @@ check(
 // At the end is not an error — the button is simply at its limit, and a 400
 // would make it look broken.
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'move', id: 2, direction: 'up' }),
+  postJson('https://learn.masterroachi.com/work/api/curriculums', { action: 'move', id: 2, direction: 'up' }),
   dbEnv(),
 );
 body = await res.json();
@@ -3640,7 +3640,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', { action: 'move', id: 999, direction: 'up' }),
+  postJson('https://learn.masterroachi.com/work/api/curriculums', { action: 'move', id: 999, direction: 'up' }),
   dbEnv(),
 );
 check('moving a curriculum that is not there is a 404', res.status === 404, String(res.status));
@@ -3652,7 +3652,7 @@ DB._modules.push({ id: 2, curriculum_id: 1, name: 'Second', position: 2 });
 DB._modules.push({ id: 3, curriculum_id: 99, name: 'Elsewhere', position: 1 });
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
+  postJson('https://learn.masterroachi.com/work/api/curriculums', {
     action: 'move',
     kind: 'module',
     id: 2,
@@ -3674,7 +3674,7 @@ check(
 );
 
 res = await worker.fetch(
-  postJson('https://masterroachi.com/work/api/curriculums', {
+  postJson('https://learn.masterroachi.com/work/api/curriculums', {
     action: 'move',
     kind: 'module',
     id: 3,
@@ -3825,7 +3825,7 @@ globalThis.fetch = printfulFetch;
 const syncEnv = { ...ghEnv, PRINTFUL_TOKEN: 'pftok' };
 
 res = await worker.fetch(
-  new Request('https://masterroachi.com/work/api/store-sync', { method: 'POST' }),
+  new Request('https://admin.masterroachi.com/work/api/store-sync', { method: 'POST' }),
   syncEnv,
 );
 check(
@@ -3836,17 +3836,17 @@ check(
 
 // GET reads when it was last checked (migrations/0020) rather than syncing;
 // only POST touches Printful. Here there is no D1, so nothing is known.
-res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/store-sync'), syncEnv);
+res = await worker.fetch(viaAccess('https://admin.masterroachi.com/work/api/store-sync'), syncEnv);
 body = await res.json();
 check('a GET reads the last check and does not sync', res.status === 200 && body.checkedAt === null && !('synced' in body), JSON.stringify(body));
 res = await worker.fetch(
-  new Request('https://masterroachi.com/work/api/store-sync', { method: 'PUT', headers: { 'cf-access-jwt-assertion': 'stub-jwt' } }),
+  new Request('https://admin.masterroachi.com/work/api/store-sync', { method: 'PUT', headers: { 'cf-access-jwt-assertion': 'stub-jwt' } }),
   syncEnv,
 );
 check('sync refuses anything but GET and POST', res.status === 405, String(res.status));
 
 res = await worker.fetch(
-  new Request('https://masterroachi.com/work/api/store-sync', {
+  new Request('https://admin.masterroachi.com/work/api/store-sync', {
     method: 'POST',
     headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
   }),
@@ -3861,7 +3861,7 @@ check(
 
 committedStore = null;
 res = await worker.fetch(
-  new Request('https://masterroachi.com/work/api/store-sync', {
+  new Request('https://admin.masterroachi.com/work/api/store-sync', {
     method: 'POST',
     headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
   }),
@@ -3941,7 +3941,7 @@ globalThis.fetch = async (input, init = {}) => {
 
 committedStore = null;
 res = await worker.fetch(
-  new Request('https://masterroachi.com/work/api/store-sync', {
+  new Request('https://admin.masterroachi.com/work/api/store-sync', {
     method: 'POST',
     headers: { 'cf-access-jwt-assertion': 'stub-jwt' },
   }),
@@ -4205,7 +4205,7 @@ globalThis.fetch = preGh;
 
   const reorder = (order, env = ghEnv) =>
     worker.fetch(
-      new Request('https://masterroachi.com/work/api/reorder', {
+      new Request('https://admin.masterroachi.com/work/api/reorder', {
         method: 'POST',
         headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
         body: JSON.stringify({ collection: 'projects', order }),
@@ -4214,12 +4214,12 @@ globalThis.fetch = preGh;
     );
 
   res = await worker.fetch(
-    new Request('https://masterroachi.com/work/api/reorder', { method: 'POST' }),
+    new Request('https://admin.masterroachi.com/work/api/reorder', { method: 'POST' }),
     ghEnv,
   );
   check('reorder without Access serves the 404 page', (await res.text()) === '404 page', String(res.status));
 
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/reorder'), ghEnv);
+  res = await worker.fetch(viaAccess('https://admin.masterroachi.com/work/api/reorder'), ghEnv);
   check('reorder refuses GET', res.status === 405, String(res.status));
 
   res = await reorder(['content/projects/a.mdx', '.github/workflows/x.mdx']);
@@ -4874,7 +4874,7 @@ globalThis.fetch = preGh;
   DB = fakeD1();
   const dbEnv = { ...env, DB };
 
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/curriculums'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/curriculums'), dbEnv);
   body = await res.json();
   check(
     'a curriculum carries its sources',
@@ -4885,7 +4885,7 @@ globalThis.fetch = preGh;
 
   const post = (payload) =>
     worker.fetch(
-      new Request('https://masterroachi.com/work/api/curriculums', {
+      new Request('https://learn.masterroachi.com/work/api/curriculums', {
         method: 'POST',
         headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
         body: JSON.stringify(payload),
@@ -4962,7 +4962,7 @@ globalThis.fetch = preGh;
   res = await post({ action: 'add-source', curriculum_id: 1, lesson_id: 'one', title: 'Nope' });
   check('a lesson id that is not a number is refused', res.status === 400, String(res.status));
 
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/curriculums'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/curriculums'), dbEnv);
   body = await res.json();
   const lesson = body.curriculums?.[0]?.modules?.[0]?.lessons?.[0];
   check(
@@ -5266,7 +5266,7 @@ globalThis.fetch = preGh;
 
   const setDetail = (source, detail) =>
     worker.fetch(
-      new Request('https://masterroachi.com/work/api/curriculums', {
+      new Request('https://learn.masterroachi.com/work/api/curriculums', {
         method: 'POST',
         headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
         body: JSON.stringify({ action: 'set-detail', id: 1, detail }),
@@ -5340,10 +5340,10 @@ globalThis.fetch = preGh;
   DB = fakeD1();
   const dbEnv = { ...env, DB };
 
-  res = await worker.fetch(get('https://masterroachi.com/work/api/cards'), dbEnv);
+  res = await worker.fetch(get('https://learn.masterroachi.com/work/api/cards'), dbEnv);
   check('cards without Access serves the 404 page', (await res.text()) === '404 page', String(res.status));
 
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards'), dbEnv);
   body = await res.json();
   check('a deck is listed for a curriculum that has cards', body.decks?.length === 1, JSON.stringify(body.decks));
   check(
@@ -5353,7 +5353,7 @@ globalThis.fetch = preGh;
   );
   check('no deck asked for means no card served', body.card === null, JSON.stringify(body.card));
 
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards?deck=1'), dbEnv);
   body = await res.json();
   check('asking for a deck serves one card', body.card?.id === 1, JSON.stringify(body.card));
   check('and never the locked one', body.card?.id !== 2, JSON.stringify(body.card));
@@ -5361,7 +5361,7 @@ globalThis.fetch = preGh;
 
   const post = (payload) =>
     worker.fetch(
-      new Request('https://masterroachi.com/work/api/cards', {
+      new Request('https://learn.masterroachi.com/work/api/cards', {
         method: 'POST',
         headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
         body: JSON.stringify(payload),
@@ -5408,7 +5408,7 @@ globalThis.fetch = preGh;
     JSON.stringify(DB._cards.at(-1)),
   );
 
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards?deck=1'), dbEnv);
   body = await res.json();
   check(
     'the day\'s allowance is spent, so no new card is offered',
@@ -5419,7 +5419,7 @@ globalThis.fetch = preGh;
   res = await post({ action: 'new-per-day', curriculum_id: 1, value: null });
   check('and clearing it puts the deck back on the default', DB._curriculums[0].new_per_day === null, '');
 
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards?deck=1'), dbEnv);
   body = await res.json();
   check('which offers the next new card again', body.card?.front === '本', JSON.stringify(body.card));
 
@@ -5435,7 +5435,7 @@ globalThis.fetch = preGh;
   /* Ticking a lesson unlocks what it taught. Card 2 has been locked all the
      way through this block, which is what makes this test mean something. */
   res = await worker.fetch(
-    new Request('https://masterroachi.com/work/api/curriculums', {
+    new Request('https://learn.masterroachi.com/work/api/curriculums', {
       method: 'POST',
       headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
       body: JSON.stringify({ action: 'toggle-lesson', id: 1 }),
@@ -5593,7 +5593,7 @@ globalThis.fetch = preGh;
 
   const post = (payload) =>
     worker.fetch(
-      new Request('https://masterroachi.com/work/api/cards', {
+      new Request('https://learn.masterroachi.com/work/api/cards', {
         method: 'POST',
         headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
         body: JSON.stringify(payload),
@@ -5601,7 +5601,7 @@ globalThis.fetch = preGh;
       dbEnv,
     );
 
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards?deck=1'), dbEnv);
   body = await res.json();
   check('a card with nothing written has no note', body.note === null, JSON.stringify(body.note));
 
@@ -5629,13 +5629,13 @@ globalThis.fetch = preGh;
   /* Again schedules the card a minute out, so nothing is due in the instant
      after answering — which is itself worth asserting, because a relearning
      card served back immediately would be an infinite loop. */
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards?deck=1'), dbEnv);
   body = await res.json();
   check('a card answered Again is not served again in the same second', body.card === null, JSON.stringify(body.card));
 
   // A minute later. The card comes back, and the note must come back with it.
   DB._cards[0].due = '2026-10-13T00:00:00.000Z';
-  res = await worker.fetch(viaAccess('https://masterroachi.com/work/api/cards?deck=1'), dbEnv);
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards?deck=1'), dbEnv);
   body = await res.json();
   check('the card comes back with its note', body.card?.id === 1 && body.note !== null, JSON.stringify(body.card));
   check(
@@ -5699,7 +5699,7 @@ globalThis.fetch = preGh;
   DB = fakeD1();
   const env2 = { ...env, DB };
   res = await worker.fetch(
-    new Request('https://masterroachi.com/work/api/cards', {
+    new Request('https://learn.masterroachi.com/work/api/cards', {
       method: 'POST',
       headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -5858,7 +5858,7 @@ globalThis.fetch = preGh;
   const trelloEnv = { ...env, TRELLO_KEY: 'k', TRELLO_TOKEN: 't' };
   const post = (body, useEnv = trelloEnv) =>
     worker.fetch(
-      new Request('https://masterroachi.com/api/work', {
+      new Request('https://admin.masterroachi.com/api/work', {
         method: 'POST',
         headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
         body: JSON.stringify(body),
@@ -5867,7 +5867,7 @@ globalThis.fetch = preGh;
     );
 
   res = await worker.fetch(
-    new Request('https://masterroachi.com/api/work', { method: 'POST' }),
+    new Request('https://admin.masterroachi.com/api/work', { method: 'POST' }),
     trelloEnv,
   );
   check('a move without Access serves the 404 page', (await res.text()) === '404 page', String(res.status));
@@ -6114,15 +6114,17 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
     const workEnvAud = { ...env, DB: db, WORK_ACCESS_TEAM: TEAM, WORK_ACCESS_AUD: `old-work-aud, ${AUD}` };
     const isOpen = async (res) => res.status === 200 && (await res.clone().text()) !== '404 page';
     r = await ver('admin.masterroachi.com', 'anything');
-    check('private: another hostname with no Audience tag set is refused, header or not', !(await isOpen(r)), String(r.status));
+    check('private: with no Audience tag set, an app address falls back to the header check', await isOpen(r), String(r.status));
+    r = await ver('admin.masterroachi.com', null);
+    check('private: and with no header is refused', !(await isOpen(r)), String(r.status));
+    r = await ver('somewhere-else.example', 'anything');
+    check('private: a hostname that is neither the site nor an app is refused, header or not', !(await isOpen(r)), String(r.status));
     r = await ver('masterroachi.com', 'anything');
-    check('private: the apex keeps the old header check until the tag is set', await isOpen(r), String(r.status));
-    r = await ver('masterroachi.com', null);
-    check('private: the apex with no header is refused', !(await isOpen(r)), String(r.status));
+    check('private: the public site no longer answers the private APIs at all', !(await isOpen(r)), String(r.status));
     r = await ver('admin.masterroachi.com', good, workEnvAud);
     check('private: a real token for a listed Audience passes on an app hostname', await isOpen(r), String(r.status));
-    r = await ver('masterroachi.com', 'anything', workEnvAud);
-    check('private: with the tag set, a header alone no longer passes, even on the apex', !(await isOpen(r)), String(r.status));
+    r = await ver('admin.masterroachi.com', 'anything', workEnvAud);
+    check('private: with the tag set, a header alone no longer passes', !(await isOpen(r)), String(r.status));
     r = await ver('learn.masterroachi.com', await sign({ aud: ['someone-else'], iss: `https://${TEAM}`, exp }), workEnvAud);
     check('private: a token for another Access app is refused', !(await isOpen(r)), String(r.status));
     r = await ver('localhost', null);
@@ -6172,7 +6174,7 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
 
   // The /work dashboard goes through the same shared function.
   r = await worker.fetch(
-    new Request('https://masterroachi.com/work/api/curriculums', {
+    new Request('https://learn.masterroachi.com/work/api/curriculums', {
       method: 'POST',
       headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
       body: JSON.stringify({ action: 'toggle-lesson', id: 101 }),
@@ -6182,7 +6184,7 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   body = await r.json();
   check('work: toggle-lesson still ticks through the shared function', r.status === 200 && body.done === true && typeof body.day === 'string', JSON.stringify(body));
   r = await worker.fetch(
-    new Request('https://masterroachi.com/work/api/curriculums', {
+    new Request('https://learn.masterroachi.com/work/api/curriculums', {
       method: 'POST',
       headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
       body: JSON.stringify({ action: 'set-audience', id: 2, audience: 'hers' }),
@@ -6222,6 +6224,12 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   check('apps: the site\'s icons answer with the app\'s own', at('https://admin.masterroachi.com/apple-icon.png')?.path === '/app-icons/admin-180.png' && at('https://learn.masterroachi.com/icon.png')?.path === '/app-icons/learn-192.png' && at('https://tools.masterroachi.com/app-icon-512.png')?.path === '/app-icons/tools-512.png', '');
   check('apps: every icon the manifests name exists', ['admin', 'learn', 'tools'].every((a) => [180, 192, 512].every((n) => fs.existsSync(`public/app-icons/${a}-${n}.png`))), '');
   check('apps: an unknown icon size is not found', kind('https://admin.masterroachi.com/app-icon-64.png') === 'notfound', '');
+  const apex = (u) => apps.routeApexWork(new URL(u));
+  check('apex: /work forwards to the admin doors', apex('https://masterroachi.com/work')?.location === 'https://admin.masterroachi.com/work/' && apex('https://masterroachi.com/work/')?.location === 'https://admin.masterroachi.com/work/', JSON.stringify(apex('https://masterroachi.com/work')));
+  check('apex: each tool forwards to its own app, query kept', apex('https://masterroachi.com/work/cards/?deck=3')?.location === 'https://learn.masterroachi.com/work/cards/?deck=3' && apex('https://masterroachi.com/work/habits/')?.location === 'https://tools.masterroachi.com/work/habits/', '');
+  check('apex: an old bookmark forwards through its rename', apex('https://masterroachi.com/work/store/')?.location === 'https://admin.masterroachi.com/work/shop/', '');
+  check('apex: the private APIs no longer answer on the public site', apex('https://masterroachi.com/work/api/cards')?.kind === 'notfound' && apex('https://masterroachi.com/api/work')?.kind === 'notfound', '');
+  check('apex: Ohana\'s link and the public site carry on', apex('https://masterroachi.com/share/ohana/curriculums') === null && apex('https://masterroachi.com/projects/') === null && apex('https://admin.masterroachi.com/work/') === null, '');
   fs.rmSync(appsBundle, { force: true });
 }
 
