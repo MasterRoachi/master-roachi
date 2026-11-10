@@ -6087,7 +6087,7 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   const ohanaEnv = { ...env, DB: db, OHANA_ACCESS_TEAM: TEAM, OHANA_ACCESS_AUD: AUD };
   const call = (route, { token = good, method = 'GET', body } = {}) =>
     worker.fetch(
-      new Request(`https://masterroachi.com/share/ohana${route}`, {
+      new Request(`https://learn.masterroachi.com/share/ohana${route}`, {
         method,
         headers: { ...(token ? { 'cf-access-jwt-assertion': token } : {}), 'content-type': 'application/json' },
         body: body === undefined ? undefined : JSON.stringify(body),
@@ -6103,7 +6103,7 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   check('ohana: an expired token serves the 404 page', (await r.text()) === '404 page');
   r = await call('/curriculums', { token: good.slice(0, -4) + 'AAAA' });
   check('ohana: a forged signature serves the 404 page', (await r.text()) === '404 page');
-  r = await worker.fetch(new Request('https://masterroachi.com/share/ohana/curriculums', { headers: { 'cf-access-jwt-assertion': good } }), env);
+  r = await worker.fetch(new Request('https://learn.masterroachi.com/share/ohana/curriculums', { headers: { 'cf-access-jwt-assertion': good } }), env);
   check('ohana: unconfigured fails closed', (await r.text()) === '404 page');
 
   // The /work APIs on the three app hostnames (2026-11-10). Before, every
@@ -6229,7 +6229,8 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   check('apex: each tool forwards to its own app, query kept', apex('https://masterroachi.com/work/cards/?deck=3')?.location === 'https://learn.masterroachi.com/work/cards/?deck=3' && apex('https://masterroachi.com/work/habits/')?.location === 'https://tools.masterroachi.com/work/habits/', '');
   check('apex: an old bookmark forwards through its rename', apex('https://masterroachi.com/work/store/')?.location === 'https://admin.masterroachi.com/work/shop/', '');
   check('apex: the private APIs no longer answer on the public site', apex('https://masterroachi.com/work/api/cards')?.kind === 'notfound' && apex('https://masterroachi.com/api/work')?.kind === 'notfound', '');
-  check('apex: Ohana\'s link and the public site carry on', apex('https://masterroachi.com/share/ohana/curriculums') === null && apex('https://masterroachi.com/projects/') === null && apex('https://admin.masterroachi.com/work/') === null, '');
+  check('apex: Ohana\'s old address is retired', apex('https://masterroachi.com/share/ohana/curriculums')?.kind === 'notfound' && apex('https://masterroachi.com/share/ohana')?.kind === 'notfound', '');
+  check('apex: the public site carries on', apex('https://masterroachi.com/projects/') === null && apex('https://admin.masterroachi.com/work/') === null, '');
   fs.rmSync(appsBundle, { force: true });
 }
 

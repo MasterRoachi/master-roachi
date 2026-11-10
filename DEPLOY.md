@@ -441,10 +441,12 @@ from `design/app-icons/`). A page belonging to another app forwards there.
 3. **Done 2026-11-10:** the apps are live and installed, and
    `masterroachi.com/work/...` forwards (301) each page to its app
    (`routeApexWork` in `worker/apps.ts`). The private APIs no longer answer
-   on the apex. What's left is taking the `masterroachi.com/work` hostname off
-   the Access application, which only forwards now.
-4. **Ohana's link** moves to `learn.masterroachi.com/share/ohana` from Ohana's
-   side. The old address is retired after that.
+   on the apex, and the `masterroachi.com/work` hostname is off the Access
+   application.
+4. **Done 2026-11-10:** Ohana's link is `learn.masterroachi.com/share/ohana`,
+   guarded by its own service-token Access application, and Ohana points
+   there (Sigma-T4's side). The apex `/share/ohana` is retired and answers
+   not found.
 
 
 ## Afterwards

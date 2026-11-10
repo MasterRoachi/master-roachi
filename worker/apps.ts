@@ -116,15 +116,18 @@ export function routeApp(url: URL): AppDecision | null {
 /**
  * masterroachi.com/work after the move (2026-11-10): every backend page
  * forwards to the app that owns it, and the private APIs no longer answer on
- * the public site's address. /share/ohana is left alone until Ohana moves to
- * learn. Null for anything else, which carries on as before.
+ * the public site's address; nor does Ohana's /share/ohana, which is on learn.
+ * Null for anything else, which carries on as before.
  */
 export function routeApexWork(url: URL): AppDecision | null {
   if (url.hostname !== APEX) return null;
   const path = url.pathname === '/work' ? '/work/' : url.pathname;
   const route = path.replace(/\/+$/, '');
-  if (route.startsWith('/share/ohana') || route === '/share/ohana') return null;
-  if (route === '/api/work' || route.startsWith('/work/api/')) return { kind: 'notfound' };
+  // Ohana moved to learn.masterroachi.com/share/ohana on 2026-11-10, and the
+  // apex address was retired the same day.
+  if (route === '/api/work' || route.startsWith('/work/api/') || route === '/share/ohana' || route.startsWith('/share/ohana/')) {
+    return { kind: 'notfound' };
+  }
   if (!path.startsWith('/work/')) return null;
   const target = moved(path) ?? path;
   const owner = WORK_APPS.find((candidate) => owns(candidate, target));
