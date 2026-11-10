@@ -36,19 +36,12 @@
   outline-offset: 2px;
 }
 
+/* The app's own mark (AppMark in WorkHeader.tsx): no box, its height fixed
+   and its width its own, since Learn's book is wide. */
 .mark {
-  width: 2rem;
-  height: 2rem;
-  display: grid;
-  place-items: center;
-  border: 1.5px solid var(--accent);
-  border-radius: 9px;
-  color: var(--accent);
-}
-
-.mark svg {
-  width: 1.2rem;
-  height: 1.2rem;
+  display: block;
+  height: 30px;
+  width: auto;
 }
 
 .name {
@@ -264,6 +257,13 @@
     gap: 11px;
     padding: 0.2rem 0.4rem 1rem;
     text-decoration: none;
+  }
+
+  .brandMark {
+    flex: none;
+    display: block;
+    height: 30px;
+    width: auto;
   }
 
   .brandText {

@@ -79,11 +79,18 @@ export function routeApp(url: URL): AppDecision | null {
   if (path === '/' || path === '') return { kind: 'redirect', location: `https://${app.host}${app.home}` };
   if (path === '/manifest.webmanifest') return { kind: 'manifest', app };
 
-  // The site's own icons, as every page links them (app/icon.png and
-  // app/apple-icon.png), answered with this app's icon instead, so the phone
-  // shows the keys, the book or the hourglass rather than the site's face.
+  // The site's own icons, as every page links them (app/icon.png,
+  // app/apple-icon.png and app/favicon.ico), answered with this app's icon
+  // instead: the ring of keys, the book and candle, the compass (his picks,
+  // 2026-11-11, drawn in the lantern's style). The tab gets the close crop,
+  // cut so its lines survive at 32px.
   if (path === '/apple-icon.png') return { kind: 'asset', path: `/app-icons/${app.key}-180.png` };
-  if (path === '/icon.png') return { kind: 'asset', path: `/app-icons/${app.key}-192.png` };
+  if (path === '/icon.png') return { kind: 'asset', path: `/app-icons/${app.key}-favicon-48.png` };
+  if (path === '/favicon.ico') return { kind: 'asset', path: `/app-icons/${app.key}-favicon-32.png` };
+
+  // The maskable one is its own drawing, shrunk into the middle of the square,
+  // because Admin's keys reach past the safe zone in the plain 512.
+  if (path === '/app-icon-maskable-512.png') return { kind: 'asset', path: `/app-icons/${app.key}-maskable-512.png` };
 
   // The app's own icon at one fixed path, for its manifest.
   const icon = /^\/app-icon-(\d+)\.png$/.exec(path);
@@ -181,9 +188,9 @@ export function manifestFor(app: WorkApp): string {
     icons: [
       { src: '/app-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/app-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-      // The motif sits inside the middle 70% on solid black, so the same
-      // image survives Android's circle and squircle masks.
-      { src: '/app-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      // Its own image: the drawing inside the middle 64% on solid black, so
+      // it survives Android's circle and squircle masks.
+      { src: '/app-icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
   });
 }

@@ -192,7 +192,13 @@ These rulings close the small differences between the three products. Measuremen
   - Background `color-mix(in oklch, var(--bg) 78%, transparent)` with `backdrop-filter: blur(12px)`.
   - A hairline on its right, as a shadow: `box-shadow: 1px 0 0 color-mix(in oklch, var(--line) 60%, transparent)`.
 - **Brand block, at the top.**
-  - The product's mark at 30px: the site's logo for Admin, Learn and Tools; the lantern for Clients, its flame in the CRM's pink (his ruling in Sigma's session, 11 Nov); the 悟 sigil for Kame. The same mark leads the phone top bar.
+  - The product's own mark, 30px tall, its width its own. All but Kame's are drawn in the lantern's line-art style, each with its one touch of colour in the app's accent (his picks, 11 Nov):
+    - Admin: a ring of keys, a gold Orthodox cross on one key.
+    - Learn: an open book with a candle, its flame blue.
+    - Tools: a hand drawing an arc with a compass, the arc teal.
+    - Clients: the lantern, its flame pink.
+    - Kame: the 悟 sigil, as it was.
+  - The mark is a transparent cut-out of the light lines only. The same mark leads the phone top bar. The app's icon (manifest, home screen, tab) is the same drawing on solid `#060606`.
   - Beside it, the product's own name in Reggae One, `1.15rem`, `--ink`: Admin, Learn, Tools, Clients or Kame.
   - Under the name, a `0.8rem` `--muted` line reading **Master Roachi ↗**, linking to masterroachi.com. It turns `--accent` on hover.
   - Nothing else: no extra eyebrow repeating the app's name.

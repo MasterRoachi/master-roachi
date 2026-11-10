@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import { appForPath, toolFor, WORK_APPS, type ToolKey, type WorkApp } from '@/lib/work-tools';
 import DoorIcon, { AppIcon } from '@/app/work/DoorIcon';
 import { COUNTS } from '@/app/work/home/sources';
-import Logo from '@/components/Logo';
 import styles from './WorkHeader.module.css';
 
 // The backend's own header, and all the chrome it has.
@@ -75,7 +74,9 @@ export default function WorkHeader() {
         aria-controls={panelId}
         onClick={() => setOpen((was) => !was)}
       >
-        <span className={styles.mark}>{here ? <DoorIcon tool={here.key} /> : <AppIcon app={app.key} />}</span>
+        {/* The app's own mark leads the phone top bar (DESIGN.md, the frame):
+            the keys, the book and candle, the compass. */}
+        <AppMark app={app} className={styles.mark} />
         <span className={styles.name}>{here?.name ?? app.name}</span>
         <span className={styles.caret} aria-hidden="true" />
       </button>
@@ -129,6 +130,19 @@ export default function WorkHeader() {
       </nav>
     </header>
     </>
+  );
+}
+
+/**
+ * The app's own mark (his picks, 2026-11-11, in the lantern's style): the
+ * light lines only, on transparency, so it sits on any of the backend's
+ * surfaces. Cut to 128px tall; Learn's book is wide. Decorative, since the
+ * app's name is always beside it.
+ */
+function AppMark({ app, className }: { app: WorkApp; className: string }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- a fixed local PNG; next/image needs a loader in a static export.
+    <img src={`/app-icons/${app.key}-mark.png`} alt="" className={className} decoding="async" />
   );
 }
 
@@ -189,7 +203,7 @@ function SideNav({ app, here, atHome }: { app: WorkApp; here: ToolKey | null; at
           in the wordmark face, and "Master Roachi ↗" under it, back to the
           public site. The same block as the CRM's and Kame's. */}
       <a className={styles.brand} href="https://masterroachi.com/" title="masterroachi.com">
-        <Logo size={30} />
+        <AppMark app={app} className={styles.brandMark} />
         <span className={styles.brandText}>
           <span className={styles.wordmark}>{app.name}</span>
           <span className={styles.brandBack}>Master Roachi ↗</span>
