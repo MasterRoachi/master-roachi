@@ -80,6 +80,21 @@
 		{
 			"pattern": "www.masterroachi.com",
 			"custom_domain": true
+		},
+		// The three backend apps (2026-11-10), each served only its own pages
+		// and APIs by worker/apps.ts. Added only after the Access application
+		// covering them existed, so none ever answered without Access in front.
+		{
+			"pattern": "admin.masterroachi.com",
+			"custom_domain": true
+		},
+		{
+			"pattern": "learn.masterroachi.com",
+			"custom_domain": true
+		},
+		{
+			"pattern": "tools.masterroachi.com",
+			"custom_domain": true
 		}
 	],
 	// Where the "what should I play next" votes live. A namespace id is an

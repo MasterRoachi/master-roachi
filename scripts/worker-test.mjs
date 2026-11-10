@@ -6194,6 +6194,37 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   globalThis.fetch = realFetch;
 }
 
+// --- the three apps on their own addresses (2026-11-10) -----------------------
+{
+  const appsBundle = path.join(os.tmpdir(), 'master-roachi-apps-bundle.mjs');
+  execFileSync(
+    'npx',
+    ['esbuild', 'worker/apps.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${appsBundle}`],
+    { stdio: 'pipe', shell: true },
+  );
+  const apps = await import(pathToFileURL(appsBundle).href);
+  const at = (u) => apps.routeApp(new URL(u));
+  const kind = (u) => at(u)?.kind;
+
+  check('apps: the public site and localhost are not apps', at('https://masterroachi.com/work/') === null && at('http://localhost:8788/work/') === null, '');
+  check('apps: "/" opens each app on its doors', at('https://learn.masterroachi.com/')?.location === 'https://learn.masterroachi.com/work/learn/' && at('https://admin.masterroachi.com/')?.location === 'https://admin.masterroachi.com/work/', JSON.stringify(at('https://learn.masterroachi.com/')));
+  check('apps: an app serves its own doors and tools', ['https://admin.masterroachi.com/work/', 'https://admin.masterroachi.com/work/shop/', 'https://learn.masterroachi.com/work/cards/', 'https://tools.masterroachi.com/work/sketchpad/'].every((u) => kind(u) === 'pass'), '');
+  check('apps: and the RSC payloads in those folders', kind('https://learn.masterroachi.com/work/cards/index.txt') === 'pass' && kind('https://admin.masterroachi.com/work/index.txt') === 'pass', '');
+  check('apps: another app\'s page forwards to that app', at('https://admin.masterroachi.com/work/cards/?deck=2')?.location === 'https://learn.masterroachi.com/work/cards/?deck=2', JSON.stringify(at('https://admin.masterroachi.com/work/cards/?deck=2')));
+  check('apps: admin\'s doors at /work/ do not swallow learn\'s', at('https://admin.masterroachi.com/work/learn/')?.location === 'https://learn.masterroachi.com/work/learn/', '');
+  check('apps: a public page on an app address goes to the apex', at('https://tools.masterroachi.com/projects/')?.location === 'https://masterroachi.com/projects/', '');
+  check('apps: each app reaches only its own APIs', kind('https://learn.masterroachi.com/work/api/cards') === 'pass' && kind('https://admin.masterroachi.com/work/api/cards') === 'notfound' && kind('https://tools.masterroachi.com/work/api/orders') === 'notfound' && kind('https://admin.masterroachi.com/api/work') === 'pass', '');
+  check('apps: Ohana\'s link answers on learn only', kind('https://learn.masterroachi.com/share/ohana/curriculums') === 'pass' && kind('https://admin.masterroachi.com/share/ohana/curriculums') === 'notfound', '');
+  check('apps: shared files still load', kind('https://tools.masterroachi.com/_next/static/chunks/main.js') === 'pass' && kind('https://tools.masterroachi.com/fonts/archivo.woff2') === 'pass', '');
+  check('apps: each app has its own install file', at('https://tools.masterroachi.com/manifest.webmanifest')?.app?.key === 'tools', '');
+  const m = JSON.parse(apps.manifestFor(at('https://learn.masterroachi.com/manifest.webmanifest').app));
+  check('apps: which opens on its doors, full screen, on black', m.start_url === '/work/learn/' && m.display === 'standalone' && m.background_color === '#000000' && m.icons.some((i) => i.purpose === 'maskable'), JSON.stringify(m));
+  check('apps: the site\'s icons answer with the app\'s own', at('https://admin.masterroachi.com/apple-icon.png')?.path === '/app-icons/admin-180.png' && at('https://learn.masterroachi.com/icon.png')?.path === '/app-icons/learn-192.png' && at('https://tools.masterroachi.com/app-icon-512.png')?.path === '/app-icons/tools-512.png', '');
+  check('apps: every icon the manifests name exists', ['admin', 'learn', 'tools'].every((a) => [180, 192, 512].every((n) => fs.existsSync(`public/app-icons/${a}-${n}.png`))), '');
+  check('apps: an unknown icon size is not found', kind('https://admin.masterroachi.com/app-icon-64.png') === 'notfound', '');
+  fs.rmSync(appsBundle, { force: true });
+}
+
 // --- the store front's "on sale" ---------------------------------------------
 //
 // The store page and the buy panel must agree. From the PayFast switch on

@@ -415,6 +415,35 @@ npx wrangler secret put OHANA_ACCESS_AUD    # the AUD tag
 Ohana then sends `CF-Access-Client-Id` and `CF-Access-Client-Secret`; Access
 swaps them for the token the Worker checks.
 
+### The three apps: admin, learn, tools
+
+His ruling, 2026-11-10: the backend becomes three apps on their own
+addresses, each installed on his phone with its own icon, and each opening on
+its own page of doors. One Worker and one build serve all three.
+`lib/work-tools.ts` lists what each app holds. `worker/apps.ts` gives each
+address only its own pages and APIs, its own `/manifest.webmanifest`, and its
+own icon at `/icon.png` and `/apple-icon.png` (from `public/app-icons/`, cut
+from `design/app-icons/`). A page belonging to another app forwards there.
+
+**Built 2026-11-10; no address points here yet.** What's left, in order:
+
+1. **Access application:** one, covering `admin.masterroachi.com`,
+   `learn.masterroachi.com` and `tools.masterroachi.com`, allowing only him,
+   with a session of one month. Set from his own terminal (not through `!`,
+   which uploads empty values):
+   `npx wrangler secret put WORK_ACCESS_TEAM` (the team domain) and
+   `npx wrangler secret put WORK_ACCESS_AUD` (the new app's Audience tag and
+   the old `/work` app's, comma-separated). From then on every private API
+   verifies the token. See `privateAllowed()` in `worker/index.ts`.
+2. **The addresses:** add the three as `custom_domain` routes in
+   `wrangler.jsonc` and push. Only after step 1, so no address ever answers
+   without Access in front.
+3. **Install** each app on his phone. Then forward `masterroachi.com/work/...`
+   to the apps, and remove the old `/work` Access application.
+4. **Ohana's link** moves to `learn.masterroachi.com/share/ohana` from Ohana's
+   side. The old address is retired after that.
+
+
 ## Afterwards
 
 - Confirm `/rss.xml`, `/sitemap.xml` and `/robots.txt` resolve.

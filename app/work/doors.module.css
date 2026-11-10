@@ -2,12 +2,11 @@
 
    GOLD FACES, which is the one place on the site the accent is used as a
    surface rather than as a line or a word. It is allowed here because the work
-   home holds four doors and nothing else to compete with: on a page of cards
+   home holds its doors and nothing else to compete with: on a page of cards
    it would be noise, on a page of doors it is the page.
 
    Everything is laid out from the numbers below — --doors, the count, is set
-   by WorkDoors.tsx from the list itself — so the row, the tray
-   under it and the arrow between them stay in step without any of them
+   by WorkDoors.tsx from the list itself — so the row sizes itself without
    measuring anything. */
 
 .doors {
@@ -15,9 +14,6 @@
   --door-w: clamp(112px, 13vw, 168px);
   --door-ratio: 5 / 7;
   --door-gap: clamp(14px, 2vw, 26px);
-  /* Every door and the gaps between them — the width the tray and the arrow
-     strip both take, so the arrow can point at a door by arithmetic. */
-  --row-w: calc(var(--doors, 4) * var(--door-w) + (var(--doors, 4) - 1) * var(--door-gap));
 
   flex: 1;
   min-height: 0;
@@ -31,6 +27,9 @@
   display: flex;
   gap: var(--door-gap);
   flex: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 /* --- a door ------------------------------------------------------------- */
@@ -61,6 +60,7 @@
   border-radius: 14px;
   padding: 1rem;
   cursor: pointer;
+  text-decoration: none;
 
   /* The same perspective and the same tilt as a project card.
      NOT transform-style: preserve-3d, which this had and which made the icon
@@ -84,8 +84,7 @@
 /* Floats up, and the shadow grows with it so the lift reads as height rather
    than as the card jumping. An open door stays lifted. */
 .door:hover,
-.door:focus-visible,
-.door[data-open] {
+.door:focus-visible {
   --lift: -10px;
   box-shadow: 0 20px 40px oklch(0% 0 0 / 0.55);
 }
@@ -141,144 +140,71 @@
   line-height: 1;
 }
 
-/* --- what a door opens -------------------------------------------------- */
+/* --- the app, and the others ------------------------------------------- */
 
-/* The arrow and the tray together, so one rule opens both. */
-.below {
-  width: var(--row-w);
-  max-width: 100%;
-  flex: none;
-  overflow: hidden;
-  opacity: 0;
-  max-height: 0;
-  transition:
-    max-height 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.22s ease;
-}
-
-.below[data-open] {
-  /* A known three links. Generous enough that a long second line never
-     clips. */
-  max-height: 26rem;
-  opacity: 1;
-}
-
-/* The gap the arrow hangs in, between the row and the tray. */
-.caretStrip {
-  position: relative;
-  height: 1.55rem;
-}
-
-/* Points down, from the door that is open into the tray below it. Gold,
-   because it belongs to the door and not to the tray. */
-.caret {
-  position: absolute;
-  bottom: 0;
-  /* The centre of door --col, counted from zero. The row's own arithmetic, so
-     nothing has to be measured. */
-  left: calc(var(--col) * (var(--door-w) + var(--door-gap)) + var(--door-w) / 2);
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-inline: 10px solid transparent;
-  border-top: 10px solid var(--accent);
-  /* Slides across when you go straight from one door to another, rather than
-     reappearing somewhere else. */
-  transition: left 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.tray {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: clamp(0.9rem, 1.6vw, 1.15rem) clamp(1rem, 1.8vw, 1.35rem);
-}
-
-.trayWhat {
-  margin: 0 0 0.75rem;
-  color: var(--muted-2);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
+.appName {
+  margin: 0 0 clamp(18px, 3vw, 32px);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  line-height: 1.5;
-}
-
-.tray ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.15rem;
-}
-
-.tray a {
-  display: grid;
-  gap: 0.1rem;
-  padding: 0.4rem 0.6rem;
-  margin-inline: -0.6rem;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.16s ease;
-}
-
-.tray a:hover,
-.tray a:focus-visible {
-  background: var(--accent-dim);
-}
-
-.toolName {
-  color: var(--ink);
-  font-size: 1.1rem;
-  line-height: 1.25;
-}
-
-.tray a:hover .toolName,
-.tray a:focus-visible .toolName {
-  color: var(--accent);
-}
-
-.toolWhat {
   color: var(--muted);
-  font-size: 0.82rem;
-  line-height: 1.4;
 }
 
-/* An eyebrow that is a link (Clients, to the CRM's Today): still an eyebrow,
-   not one more row of the tray, so it undoes the tool links' block styling. */
-.trayWhat a,
-.trayWhat a:hover,
-.trayWhat a:focus-visible {
-  display: inline;
-  padding: 0;
-  margin: 0;
-  background: none;
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--line);
-  text-underline-offset: 0.2em;
+/* The other two apps: small and quiet, under the doors, so the doors stay the
+   page. A plain link each; on the apps' own addresses the Worker forwards it
+   to the other app's address. */
+.apps {
+  margin-top: clamp(28px, 5vw, 52px);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.trayWhat a:hover,
-.trayWhat a:focus-visible {
-  color: var(--accent);
-  text-decoration-color: currentColor;
+.appLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.86rem;
+  color: var(--muted);
+  transition:
+    color 0.18s ease,
+    border-color 0.18s ease;
 }
 
-/* --- narrow ------------------------------------------------------------- */
+.appLink svg {
+  width: 16px;
+  height: 16px;
+}
 
-/* Nothing about the shape changes on a phone — the tray was always under the
-   row — so only the two numbers everything is built from do. */
+.appLink:hover,
+.appLink:focus-visible {
+  color: var(--ink);
+  border-color: color-mix(in oklch, var(--accent) 50%, var(--line));
+}
+
 @media (max-width: 720px) {
   .doors {
-    /* The phone's width shared between the doors, after the side gutters and
-       the gaps: about 74px a door at 360px wide with four. */
-    --door-gap: 10px;
+    /* At most three doors to a row on a phone (--cols, set by WorkDoors.tsx),
+       each sized from the phone's width after the gutters and the gaps:
+       about 100px a door at 360px wide. */
+    --door-gap: 12px;
     --door-w: clamp(
-      64px,
-      calc((100vw - 2rem - (var(--doors, 4) - 1) * var(--door-gap)) / var(--doors, 4)),
+      72px,
+      calc((100vw - 3.5rem - (var(--cols, 3) - 1) * var(--door-gap)) / var(--cols, 3)),
       120px
     );
     padding-block: 1.25rem;
+  }
+
+  .row {
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: calc(var(--cols, 3) * var(--door-w) + (var(--cols, 3) - 1) * var(--door-gap));
   }
 
   .door {
@@ -291,8 +217,7 @@
 @media (prefers-reduced-motion: reduce) {
   .door,
   .door:hover,
-  .door:focus-visible,
-  .door[data-open] {
+  .door:focus-visible {
     transform: none;
   }
 

@@ -53,6 +53,7 @@ import type { PaymentResult, TillRpc } from './till-rpc';
 import type { LeadsRpc } from './enquiry-rpc';
 import { handleEnquiry } from './enquiry';
 import { accessTokenValid } from './access';
+import { manifestFor, routeApp } from './apps';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -649,6 +650,22 @@ async function handle(request: Request, env: Env): Promise<Response> {
       url.hostname = url.hostname === `www.${APEX}` ? APEX : url.hostname;
       url.protocol = 'https:';
       return Response.redirect(url.toString(), 301);
+    }
+
+    // The three backend apps on their own addresses (2026-11-10). Each is
+    // served only its own pages and APIs; see worker/apps.ts. Every other
+    // hostname carries on below exactly as before.
+    const app = routeApp(url);
+    if (app) {
+      if (app.kind === 'redirect') return Response.redirect(app.location, 302);
+      if (app.kind === 'manifest') {
+        return new Response(manifestFor(app.app), {
+          headers: { 'content-type': 'application/manifest+json; charset=utf-8', 'cache-control': 'no-cache' },
+        });
+      }
+      if (app.kind === 'asset') return env.ASSETS.fetch(new Request(new URL(app.path, url), request));
+      // Any path the asset binding does not hold serves the 404 page.
+      if (app.kind === 'notfound') return env.ASSETS.fetch(new Request(new URL('/__not-in-this-app__', url), request));
     }
 
     // Static assets are matched before the Worker runs, so in practice only

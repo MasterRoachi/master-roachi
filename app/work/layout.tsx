@@ -1,3 +1,4 @@
+import type { Metadata, Viewport } from 'next';
 import WorkHeader from '@/components/WorkHeader';
 import styles from './work.module.css';
 
@@ -13,6 +14,19 @@ import styles from './work.module.css';
 // and `body` is a flex column with min-height 100dvh, so a wrapper of exactly
 // 100dvh fills it and leaves nothing to scroll. Anything inside that holds
 // more than fits scrolls in its own pane — see work.module.css.
+// Installable (2026-11-10): each app's address answers /manifest.webmanifest,
+// /icon.png and /apple-icon.png with its own name and icon (worker/apps.ts), so
+// the one static layout serves three apps. On masterroachi.com itself the
+// manifest is not there, and nothing installs.
+export const metadata: Metadata = {
+  manifest: '/manifest.webmanifest',
+  appleWebApp: { capable: true, statusBarStyle: 'black' },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#000000',
+};
+
 export default function WorkLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className={styles.shell}>
