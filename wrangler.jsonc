@@ -140,29 +140,19 @@
 		}
 	],
 
-	// The one till (his ruling, 2026-11-10): the store's checkout asks
-	// pay.masterroachi.com for its PayFast form instead of signing its own.
-	// Switched on 2026-11-10 at his word: this var "on" and the TILL binding
-	// below, in one commit, after pay was deployed with its till. Switching
-	// back is this var alone, set to "off". See DEPLOY.md, "One till".
-	//
-	// Switched on 2026-11-10 at his word, with the privacy notice live at
-	// /privacy and TURNSTILE_SECRET set by him. Off again is ENQUIRIES "off".
-	//
 	// The contact form on /hire (2026-11-10) sends enquiries to the CRM's
-	// `Leads` entrypoint. Off until ENQUIRIES is "on", the LEADS binding is
-	// uncommented, TURNSTILE_SITE_KEY holds the widget's public key, and the
-	// TURNSTILE_SECRET secret is set. Uncomment LEADS only once the CRM is
-	// deployed with Leads, or this deploy fails. Switching on waits on the
-	// privacy notice at /privacy. See DEPLOY.md, "The contact form".
+	// `Leads` entrypoint, with Turnstile in front: ENQUIRIES "on", the public
+	// TURNSTILE_SITE_KEY here, and the TURNSTILE_SECRET secret. Switched on
+	// 2026-11-10 with the privacy notice live at /privacy. Off again is
+	// ENQUIRIES "off". See DEPLOY.md, "The contact form".
 	"vars": {
-		"TILL_CHECKOUT": "on",
 		"ENQUIRIES": "on",
 		"TURNSTILE_SITE_KEY": "0x4AAAAAAF7Qe_77KanmhY5a"
 	},
-	// LEADS is live from 2026-11-10 (the CRM deployed Leads first); the form
-	// itself stays off until ENQUIRIES is "on". TILL went live the same day,
-	// with TILL_CHECKOUT "on" above: the store's payments now go through pay.
+	// LEADS: the CRM's Leads entrypoint, for the contact form.
+	// TILL: pay.masterroachi.com, the one till (his ruling, 2026-11-10). The
+	// store's checkout asks it for the PayFast form, and it is the only way
+	// the store takes payment. See DEPLOY.md, "One till".
 	"services": [
 		{ "binding": "LEADS", "service": "work-clients", "entrypoint": "Leads" },
 		{ "binding": "TILL", "service": "work-clients-public", "entrypoint": "Till" }

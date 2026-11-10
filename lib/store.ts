@@ -5,7 +5,7 @@ import { site } from './site';
 // file so that a form can edit it without rewriting TypeScript.
 import storeCopy from '../content/store/copy.json';
 import { inOrder, readCopy, readOrder, type ProductCopy } from './product-copy';
-import { CHECKOUT, CURRENCY, itemPrice } from './price';
+import { CURRENCY, itemPrice } from './price';
 
 // Reads the Printful catalogue written by scripts/printful.mjs at build time.
 // Nothing here runs at request time — the site is a static export, so the
@@ -156,49 +156,29 @@ export function getStore(): StoreSnapshot {
 }
 
 /**
- * Where a product's Buy button points.
- *
- * A payment link, set by hand per product in lib/site.ts. Checkout is
- * deliberately not on this site: a static export cannot take a payment, and
- * hosting one would mean owning refunds, tax by jurisdiction and card data.
- *
- * Null is the normal state for a product with no link yet, and the page shows
- * no button rather than one that goes nowhere.
+ * Whether any size of this can be bought: priced and in stock, by the same
+ * rule the buy panel uses. Until 2026-11-10 the store page asked for an old
+ * payment link instead, and told everyone a shirt on sale was "Not on sale
+ * yet".
  */
-export function buyUrl(product: StoreProduct, size: string): string | null {
-  const price = sellingPrice(product, size);
-  if (!price) return null;
-  const forProduct = site.store.paymentLinks[String(product.id)];
-  return forProduct?.[String(price.amount)] ?? null;
+export function isBuyable(product: StoreProduct): boolean {
+  return buyOptions(product).some((o) => o.available && o.amount > 0);
 }
 
-/**
- * Whether any size of this can actually be paid for — by the same rule the
- * buy panel uses. Under the PayFast checkout a priced, available size is
- * enough; payment links only matter in "links" mode. Until 2026-11-10 this
- * asked for a link in both, so from the switch on 2026-10-21 the store front
- * told everyone a shirt on sale was "Not on sale yet".
- */
-export function isBuyable(product: StoreProduct, mode = CHECKOUT): boolean {
-  return buyOptions(product).some((o) => (mode === 'payfast' ? o.available && o.amount > 0 : o.href !== null));
-}
-
-/** One row of the buy panel: a size, its price, and where paying for it goes. */
+/** One row of the buy panel: a size, its price, and whether it can be had. */
 export interface BuyOption {
   size: string;
   amount: number;
   currency: string;
   label: string;
-  href: string | null;
   available: boolean;
 }
 
 /**
- * Every size a customer can choose, priced, with its payment link.
+ * Every size a customer can choose, priced.
  *
- * Built on the server so the client component holds no pricing logic — it
- * selects a row and follows a link, which is all a fixed-amount payment link
- * can support until there is a real cart.
+ * Built on the server so the client component holds no pricing logic. The
+ * Worker prices the checkout again itself; the browser never sets an amount.
  */
 export function buyOptions(product: StoreProduct): BuyOption[] {
   return sizesOf(product).map((size) => {
@@ -209,7 +189,6 @@ export function buyOptions(product: StoreProduct): BuyOption[] {
       amount: price?.amount ?? 0,
       currency: price?.currency ?? 'ZAR',
       label: price ? money(price.amount, price.currency) : '',
-      href: buyUrl(product, size),
       available: variant?.available ?? true,
     };
   });

@@ -145,8 +145,8 @@ function priceRange(product) {
     if (Number.isFinite(override)) {
       amounts.push(override);
     } else if (rate && Number.isFinite(v.amount)) {
-      const cost = v.amount + (pricing.deliveryUsd || 0);
-      amounts.push(Math.ceil((cost * rate) / step) * step);
+      // The item alone, as lib/price.ts prices it: delivery is quoted at checkout.
+      amounts.push(Math.ceil((v.amount * rate) / step) * step);
     }
   }
   // No rate and no overrides means no price anywhere on the site, so the card

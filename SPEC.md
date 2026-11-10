@@ -1173,9 +1173,10 @@ Before that, it said: question round, then build.
 - `npm run github-auth` when the GitHub token lapses.
 - More than one product in Printful.
 - ~~**PayFast: set a passphrase**, then the steps in DEPLOY.md under "Switching
-  on the PayFast checkout".~~ Done — the checkout went live 2026-10-21. One
-  loose end: `PAYFAST_SANDBOX` is still a Worker secret (2026-11-04), and step 3
-  says to delete it.
+  on the PayFast checkout".~~ Done — the checkout went live 2026-10-21. On
+  2026-11-10 it moved to pay.masterroachi.com (the one till), and the store's
+  own PayFast signing, its sandbox, its payment links and all four `PAYFAST_*`
+  secrets were removed. See DEPLOY.md, "One till".
 
 ### Open decisions
 

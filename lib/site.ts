@@ -62,44 +62,9 @@ export const site = {
 
   store: {
     name: 'Fabled Threads',
-    /**
-     * A payment link per price, per product: `{ printfulId: { rands: url } }`.
-     *
-     * There is no storefront platform. Etsy's verification never went
-     * through, and every alternative charges a monthly fee for automated
-     * fulfilment that one product does not yet justify — worse in South
-     * Africa, where Shopify Payments does not operate and a gateway plus
-     * Shopify's own surcharge reaches about 5% a transaction.
-     *
-     * So: a PayFast link takes the money, and the Printful order is raised by
-     * hand. A product with no link here shows no Buy button rather than a dead
-     * one, which is why the map is allowed to be empty.
-     *
-     * Keyed by the amount rather than by size, for two reasons. A PayFast link
-     * is a fixed sum, so one link serves every size sharing that price — five
-     * links cover XS to 5XL rather than nine. And if the rate in
-     * lib/pricing.json moves, the new prices stop matching these keys and the
-     * Buy buttons disappear, instead of quietly charging yesterday's amount for
-     * today's price. Losing the button is the safe failure; charging the wrong
-     * number is not.
-     *
-     * The key is the rand figure as it appears on the page, with no decimals:
-     * '500', not 'R500' or '500.00'. Printful ids are in data/store.json.
-     *
-     *   '464722916': { '500': 'https://payf.st/xxxxx' },
-     */
-    paymentLinks: {
-      // Roachi Shirt. One link per price; R500 covers XS to XL.
-      '464722916': {
-        '500': 'https://payf.st/vmis8',
-        '550': 'https://payf.st/mfakb',
-        '590': 'https://payf.st/7oa4g',
-        '630': 'https://payf.st/dzs3x',
-        '680': 'https://payf.st/8t2o3',
-      },
-    } as Record<string, Record<string, string>>,
-
-
+    // Payment: the store's checkout, paid through pay.masterroachi.com (the
+    // one till, 2026-11-10). The fixed PayFast payment links that came before
+    // it were removed then.
     /**
      * The order categories appear in. A product with no category of its own
      * falls into the first.

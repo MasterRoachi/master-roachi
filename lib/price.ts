@@ -6,11 +6,6 @@
 
 import pricing from './pricing.json';
 
-export type CheckoutMode = 'links' | 'payfast';
-
-/** How a customer pays. See `checkout` in lib/pricing.json. */
-export const CHECKOUT: CheckoutMode = pricing.checkout === 'payfast' ? 'payfast' : 'links';
-
 export const CURRENCY = pricing.currency;
 
 /** Rounded up to the step, never down: rounding down sells at a loss on every order. */
@@ -25,20 +20,17 @@ function toRand(usd: number): number | null {
  * One size of one product, in rand.
  *
  * An override in pricing.json wins. Otherwise Printful's USD retail price,
- * plus delivery while checkout is by payment link — delivery is quoted on top
- * at a PayFast checkout instead — converted and rounded up.
+ * converted and rounded up. Delivery is quoted on top at checkout.
  */
 export function itemPrice(
   productId: string | number,
   size: string,
   variantUsd: number | null | undefined,
-  /** The Worker's checkout passes 'payfast' always, so it can be tested before the switch. */
-  mode: CheckoutMode = CHECKOUT,
 ): number | null {
   const override = (pricing.overrides as Record<string, Record<string, number>>)[String(productId)]?.[size];
   if (Number.isFinite(override)) return override;
   if (variantUsd == null) return null;
-  return toRand(variantUsd + (mode === 'links' ? pricing.deliveryUsd || 0 : 0));
+  return toRand(variantUsd);
 }
 
 /** A delivery quote in USD, as the customer pays it in rand. */

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import type { CheckoutMode } from '@/lib/price';
+import { useState } from 'react';
 import type { BuyOption } from '@/lib/store';
 import { COUNTRIES, countryOf } from '@/lib/address';
 import styles from './BuyPanel.module.css';
@@ -42,24 +41,18 @@ function remember(product: string, option: BuyOption, ref: string | null) {
 /**
  * Choose a size, say where it goes, then pay.
  *
- * A PayFast link is a fixed sum, so there is one link per price rather than
- * one per product — which means the customer has to say which size before
- * there is anything to click. The size chips used to be decoration with a
- * comment explaining they were not buttons; now they are buttons, because the
- * choice genuinely belongs here.
- *
- * This is the shape a store takes when it has payment links and no cart. It
- * cannot do quantities, it cannot combine two shirts into one payment, and the
- * order is raised by hand afterwards. All of that is why a real checkout is
- * the next thing to build — but a page that can take one order beats a page
- * that can take none.
+ * The size chips are buttons, because the choice belongs here: nothing is
+ * preselected, and the checkout below opens only for a size that can be had.
+ * The checkout quotes delivery for the address, then hands the payment to
+ * pay.masterroachi.com, the one till (2026-11-10). Until then there was also
+ * a mode of fixed PayFast payment links with delivery built into the price;
+ * it was removed that day.
  */
 export default function BuyPanel({
   options,
   soldOut,
   name,
   productId,
-  checkout,
   page,
 }: {
   options: BuyOption[];
@@ -68,8 +61,6 @@ export default function BuyPanel({
   name: string;
   /** Printful's id, so an order can be tied back to a product. */
   productId: string;
-  /** How a customer pays: lib/pricing.json's `checkout`. */
-  checkout: CheckoutMode;
   /** This product's own path, where PayFast sends a customer who cancels. */
   page: string;
 }) {
@@ -78,16 +69,7 @@ export default function BuyPanel({
   const [size, setSize] = useState<string | null>(null);
   const chosen = options.find((o) => o.size === size) ?? null;
 
-  // The PayFast checkout, where pricing.json says so — or on this one page
-  // load when the URL asks (?checkout=payfast), so it can be tried against
-  // PayFast's sandbox on the live site before anyone else sees it. Read after
-  // mount: the page is static HTML.
-  const [mode, setMode] = useState<CheckoutMode>(checkout);
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('checkout') === 'payfast') setMode('payfast');
-  }, []);
-
-  const anyLink = mode === 'payfast' ? options.some((o) => o.available) : options.some((o) => o.href);
+  const anyOnSale = options.some((o) => o.available && o.amount > 0);
 
   if (soldOut) {
     return <p className={styles.pending}>Sold out</p>;
@@ -121,13 +103,11 @@ export default function BuyPanel({
           leave the site. */}
       <p className={styles.chosen} aria-live="polite">
         {chosen
-          ? mode === 'payfast'
-            ? `${chosen.size} — delivery is quoted for your address below`
-            : `${chosen.size} — ${chosen.label}, delivery included`
+          ? `${chosen.size} — delivery is quoted for your address below`
           : 'Sizes are priced individually; the price appears here.'}
       </p>
 
-      {!anyLink ? (
+      {!anyOnSale ? (
         <div className={styles.notYet}>
           <p className={styles.pending}>Not on sale yet</p>
           <p className={styles.notYetWhy}>
@@ -135,19 +115,12 @@ export default function BuyPanel({
             real product — there is just nowhere to take your money yet.
           </p>
         </div>
-      ) : mode === 'payfast' && chosen?.available ? (
+      ) : chosen?.available ? (
         <CheckoutForm
           product={name}
           productId={productId}
           option={chosen}
           page={page}
-          onSent={(ref) => remember(name, chosen, ref)}
-        />
-      ) : chosen?.href ? (
-        <DeliveryForm
-          product={name}
-          productId={productId}
-          option={chosen}
           onSent={(ref) => remember(name, chosen, ref)}
         />
       ) : (
@@ -168,138 +141,6 @@ export default function BuyPanel({
         Payment is taken by PayFast; card details never touch this site.
       </p>
     </div>
-  );
-}
-
-/**
- * Where it goes, asked before the money moves.
- *
- * PayFast's shareable links collect no delivery address, and the amount does
- * not identify the size — R500 covers XS to XL. Asking afterwards worked, in
- * the sense that a customer who replied to an email got a shirt; this asks
- * while they are still here and still paying attention.
- *
- * The address is asked in Printful's own fields — country first, because it
- * decides whether a state is needed — so an order can go to Printful without
- * being split by hand. lib/address.ts is the one definition, shared with the
- * Worker that checks it.
- *
- * The address is posted to the Worker and then the customer goes to PayFast.
- * A failure to store is deliberately not fatal: the link opens anyway and the
- * thank-you page falls back to asking by email, because losing an address is
- * recoverable and losing a sale is not.
- */
-function DeliveryForm({
-  product,
-  productId,
-  option,
-  onSent,
-}: {
-  product: string;
-  productId: string;
-  option: BuyOption;
-  onSent: (ref: string | null) => void;
-}) {
-  const [sending, setSending] = useState(false);
-  const [country, setCountry] = useState('ZA');
-  const [problem, setProblem] = useState<string | null>(null);
-
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (sending) return;
-    setSending(true);
-    setProblem(null);
-
-    const data = new FormData(event.currentTarget);
-    let ref: string | null = null;
-
-    try {
-      const res = await fetch('/api/order', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          product,
-          productId,
-          size: option.size,
-          price: option.label,
-          name: data.get('name'),
-          email: data.get('email'),
-          phone: data.get('phone'),
-          address: addressFrom(data, country),
-          note: data.get('note'),
-        }),
-      });
-      const body = (await res.json()) as { ref?: string; error?: string };
-      // A 400 is the address being refused, and the customer can fix that
-      // here — so it stops them, where a Worker that is down does not.
-      if (res.status === 400) {
-        setProblem(body.error ?? 'Something in the address is missing.');
-        setSending(false);
-        return;
-      }
-      ref = body.ref ?? null;
-    } catch {
-      // Offline, blocked, or the Worker is down. Carry on to PayFast.
-    }
-
-    onSent(ref);
-    // Opened after the await rather than as a link, so the reference is stored
-    // before the customer leaves. Same tab: a payment is not something to
-    // lose behind a popup blocker.
-    window.location.href = option.href as string;
-  }
-
-  return (
-    <form className={styles.form} onSubmit={submit}>
-      <p className={styles.formHead}>Where should it go?</p>
-
-      <label className={styles.field}>
-        <span>Full name</span>
-        <input name="name" required autoComplete="name" maxLength={200} />
-      </label>
-
-      <label className={styles.field}>
-        <span>Email</span>
-        <input
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          maxLength={200}
-        />
-      </label>
-
-      <AddressFields country={country} onCountry={setCountry} />
-
-      <label className={styles.field}>
-        <span>
-          Phone <em>couriers ask for one</em>
-        </span>
-        <input name="phone" autoComplete="tel" maxLength={40} />
-      </label>
-
-      <label className={styles.field}>
-        <span>
-          Anything else <em>optional</em>
-        </span>
-        <input name="note" maxLength={600} />
-      </label>
-
-      {problem && (
-        <p className={styles.problem} role="alert">
-          {problem}
-        </p>
-      )}
-
-      <button className={styles.buy} type="submit" disabled={sending}>
-        {sending ? 'One moment…' : `Continue to pay ${option.label} ↗`}
-      </button>
-
-      <p className={styles.formNote}>
-        Sent to me, not to PayFast — they do not pass on an address. You pay on
-        the next screen.
-      </p>
-    </form>
   );
 }
 
@@ -373,7 +214,7 @@ function AddressFields({ country, onCountry }: { country: string; onCountry: (co
   );
 }
 
-/** The address fields of a form, as /api/order and /api/checkout take them. */
+/** The address fields of the checkout form, as /api/checkout takes them. */
 function addressFrom(data: FormData, country: string) {
   return {
     address1: data.get('address1'),

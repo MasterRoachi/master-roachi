@@ -66,16 +66,6 @@ execFileSync(
 );
 const productCopy = await import(pathToFileURL(productCopyBundle).href);
 
-// PayFast's signature, where a wrong character fails a customer's payment
-// with nothing but "signature mismatch".
-const payfastBundle = path.join(os.tmpdir(), 'master-roachi-payfast-bundle.mjs');
-execFileSync(
-  'npx',
-  ['esbuild', 'lib/payfast.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${payfastBundle}`],
-  { stdio: 'pipe', shell: true },
-);
-const payfast = await import(pathToFileURL(payfastBundle).href);
-
 // The body as sections: the promise is that an untouched body saves as the
 // identical string, so it is tested against every real body in the repo.
 const sectionsBundle = path.join(os.tmpdir(), 'master-roachi-sections-bundle.mjs');
@@ -309,13 +299,6 @@ const env = {
   ORDERS,
 };
 
-const post = (body) =>
-  new Request('https://masterroachi.com/api/order', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'cf-visitor': '{"scheme":"https"}' },
-    body: typeof body === 'string' ? body : JSON.stringify(body),
-  });
-
 const get = (url) =>
   new Request(url, { headers: { 'cf-visitor': '{"scheme":"https"}' } });
 
@@ -323,63 +306,12 @@ const results = [];
 const check = (label, pass, detail = '') =>
   results.push({ label, pass, detail });
 
-// --- a good order ----------------------------------------------------------
-let res = await worker.fetch(
-  post({
-    product: 'Roachi Shirt',
-    productId: '464722916',
-    size: '2XL',
-    price: 'R550',
-    name: 'Test Buyer',
-    email: 'test@example.com',
-    phone: '0123456789',
-    address: '1 Test Road\nCape Town\n8001\nSouth Africa',
-  }),
-  env,
-);
+// A Worker response carries the security headers: _headers reaches static
+// assets only, and what the Worker writes itself went out bare before
+// worker/security-headers.ts.
+let res = await worker.fetch(get('https://masterroachi.com/api/checkout'), env);
 let body = await res.json();
-check('valid order accepted', res.status === 200 && body.stored === true, JSON.stringify(body));
-check('reference returned', typeof body.ref === 'string' && body.ref.length === 8, body.ref);
-check(
-  'reference avoids 0/O/1/I',
-  !/[01OI]/.test(body.ref ?? ''),
-  body.ref,
-);
-const savedRef = body.ref;
-
-// --- required fields -------------------------------------------------------
-res = await worker.fetch(post({ name: 'Only a name' }), env);
-check('missing address rejected', res.status === 400, String(res.status));
-
-res = await worker.fetch(post({ name: 'x', email: 'y', address: 'z' }), env);
-check('missing size rejected', res.status === 400, String(res.status));
-
-// --- junk ------------------------------------------------------------------
-res = await worker.fetch(post('not json'), env);
-check('malformed JSON rejected', res.status === 400, String(res.status));
-
-res = await worker.fetch(post({ name: 'a'.repeat(10000) }), env);
-check('oversized body rejected', res.status === 413, String(res.status));
-
-// --- field capping ---------------------------------------------------------
-await worker.fetch(
-  post({
-    size: 'M',
-    name: 'N'.repeat(500),
-    email: 'e@x.com',
-    address: 'A'.repeat(2000),
-  }),
-  env,
-);
-const capped = JSON.parse([...ORDERS._map.values()].at(-1));
-check('name capped at 200', capped.name.length === 200, String(capped.name.length));
-check('address capped at 600', capped.address.length === 600, String(capped.address.length));
-
-// --- GET is not allowed ----------------------------------------------------
-res = await worker.fetch(get('https://masterroachi.com/api/order'), env);
-check('GET /api/order refused', res.status === 405, String(res.status));
-// _headers reaches static assets only; what the Worker writes itself is
-// covered by worker/security-headers.ts, and went out bare before it.
+check('GET /api/checkout refused', res.status === 405, String(res.status));
 check(
   'a Worker response carries the security headers',
   res.headers.get('x-content-type-options') === 'nosniff' &&
@@ -449,23 +381,29 @@ function sqliteD1() {
   const rows = () => ordersDb.sqlite.prepare('select * from orders order by id').all();
   const buyer = { product: 'Roachi Shirt', size: 'L', name: 'D1 Buyer', email: 'd1@example.com', address: '2 Test Road' };
 
-  res = await worker.fetch(post(buyer), shopEnv);
-  body = await res.json();
-  check('an order goes into D1', body.stored === true && rows().length === 1, JSON.stringify(body));
-  check('and not into KV while D1 works', kv._map.size === 0, String(kv._map.size));
+  // Orders arrive through /api/checkout (tested with the till below); these
+  // are written straight into the table, as insertOrder writes them.
+  let seeded = 0;
+  const seed = (o = {}) => {
+    const ref = o.ref ?? `SEED${String(++seeded).padStart(4, '0')}`;
+    ordersDb.sqlite
+      .prepare(
+        `insert into orders (ref, created_at, product, product_id, size, price, name, email, phone, address, note)
+         values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(ref, o.at ?? new Date().toISOString(), o.product ?? 'Roachi Shirt', o.productId ?? '464722916', o.size ?? 'L',
+        o.price ?? 'R500', o.name ?? 'D1 Buyer', o.email ?? 'd1@example.com', o.phone ?? '', o.address ?? '2 Test Road', o.note ?? '');
+    return ref;
+  };
+  const d1Ref = seed();
   check('a new order is Received', rows()[0]?.status === 'received', rows()[0]?.status);
-  const d1Ref = body.ref;
-
-  ordersDb.broken = true;
-  res = await worker.fetch(post({ ...buyer, name: 'Fallback Buyer' }), shopEnv);
-  body = await res.json();
-  ordersDb.broken = false;
-  check('D1 failing falls back to KV', body.stored === true && kv._map.size === 1, JSON.stringify(body));
-  const fallbackRef = body.ref;
-
-  res = await worker.fetch(post(buyer), { ...shopEnv, DB: undefined, ORDERS: undefined });
-  body = await res.json();
-  check('neither bound still does not block a sale', body.stored === false, JSON.stringify(body));
+  // An order saved to KV during a D1 outage, as the old order route wrote it.
+  const fallbackRef = 'FALLBK23';
+  await kv.put(
+    `order:${new Date().toISOString()}:${fallbackRef}`,
+    JSON.stringify({ product: 'Roachi Shirt', productId: '464722916', size: 'L', price: 'R500', name: 'Fallback Buyer',
+      email: 'd1@example.com', phone: '', address: '2 Test Road', note: '', ref: fallbackRef, at: new Date().toISOString() }),
+  );
 
   // An order from before D1, as the old code wrote it.
   await kv.put(
@@ -538,42 +476,6 @@ function sqliteD1() {
   marked = await mark('NOSUCHRF', 'paid');
   check('an unknown order is a 404', marked.status === 404, String(marked.status));
 
-  // --- the address in fields ------------------------------------------------
-  //
-  // The buy form asks in Printful's fields since 2026-10-19, checked against
-  // the same lib/address.ts the form uses. The old one-box address must still
-  // be accepted, from a product page cached before the deploy.
-  const fielded = { ...buyer, name: 'Fields Buyer' };
-  res = await worker.fetch(
-    post({ ...fielded, address: { address1: '5 Long St', address2: 'Gardens', city: 'Cape Town', zip: '8001', country_code: 'za' } }),
-    shopEnv,
-  );
-  body = await res.json();
-  const fieldRow = ordersDb.sqlite.prepare('select * from orders where ref = ?').get(body.ref);
-  check(
-    'an address in fields is stored in fields',
-    fieldRow?.address1 === '5 Long St' && fieldRow?.city === 'Cape Town' && fieldRow?.country_code === 'ZA',
-    JSON.stringify(fieldRow),
-  );
-  check(
-    'and as one block of text for the orders page',
-    fieldRow?.address === '5 Long St\nGardens\nCape Town\n8001\nSouth Africa',
-    JSON.stringify(fieldRow?.address),
-  );
-  res = await worker.fetch(post({ ...fielded, address: { address1: '1 Main', city: 'X', zip: '1', country_code: 'XX' } }), shopEnv);
-  check('a country Printful does not ship to is refused', res.status === 400, String(res.status));
-  res = await worker.fetch(post({ ...fielded, address: { address1: '1 Main', city: 'Austin', zip: '78701', country_code: 'US' } }), shopEnv);
-  body = await res.json();
-  check('a US address without a state is refused, with a reason', res.status === 400 && /state/i.test(body.error ?? ''), JSON.stringify(body));
-  res = await worker.fetch(
-    post({ ...fielded, address: { address1: '1 Main', city: 'Austin', zip: '78701', country_code: 'US', state_code: 'tx' } }),
-    shopEnv,
-  );
-  check('with one it is accepted', res.status === 200, String(res.status));
-  res = await worker.fetch(post({ ...fielded, address: '9 Text Road\nDurban' }), shopEnv);
-  body = await res.json();
-  check('the old one-box address is still accepted', res.status === 200 && body.stored === true, JSON.stringify(body));
-
   // --- thirty days ---------------------------------------------------------
   //
   // His ruling, 2026-10-19: personal details go 30 days after submission,
@@ -612,10 +514,6 @@ function sqliteD1() {
   const cronned = ordersDb.sqlite.prepare('select * from orders where ref = ?').get(d1Ref);
   check('the daily cron redacts too', cronned.name === '' && !!cronned.redacted_at, JSON.stringify(cronned));
 
-  ordersDb.broken = true;
-  await worker.fetch(post(buyer), shopEnv);
-  ordersDb.broken = false;
-  check('a KV fallback expires on the same 30 days', kv._ttl.at(-1) === 60 * 60 * 24 * 30, String(kv._ttl.at(-1)));
 
   // --- sending to Printful -------------------------------------------------
   //
@@ -671,8 +569,7 @@ function sqliteD1() {
   };
   const address = { name: 'Send Buyer', address1: '4 Test Road', city: 'Cape Town', zip: '8001', country_code: 'za' };
 
-  res = await worker.fetch(post({ ...buyer, name: 'Send Buyer', size: 'L', productId: '464722916' }), printfulEnv);
-  const sendRef = (await res.json()).ref;
+  const sendRef = seed({ name: 'Send Buyer', size: 'L' });
 
   let sent = await sendIt(sendRef, address, shopEnv);
   check('sending without PRINTFUL_TOKEN is refused', sent.status === 503, JSON.stringify(sent));
@@ -716,8 +613,7 @@ function sqliteD1() {
 
   // Two colours in one size: the order cannot say which, so nothing is sent.
   variants = [{ id: 701, size: 'M', color: 'Black' }, { id: 702, size: 'M', color: 'White' }];
-  res = await worker.fetch(post({ ...buyer, name: 'Colour Buyer', size: 'M', productId: '464722916' }), printfulEnv);
-  const colourRef = (await res.json()).ref;
+  const colourRef = seed({ name: 'Colour Buyer', size: 'M' });
   await markIn(colourRef, 'paid');
   sent = await sendIt(colourRef, address);
   check(
@@ -767,95 +663,7 @@ function sqliteD1() {
 
   const buyerPay = { product: 'Roachi Shirt', productId: '464722916', size: 'L', name: 'Pay Buyer Smith', email: 'pay@example.com', address: where, page: '/store/roachi-shirt/' };
   res = await postTo('/api/checkout', buyerPay, printfulEnv);
-  check('checkout without the PayFast secrets is not switched on', res.status === 503, String(res.status));
-
-  const payEnv = {
-    ...printfulEnv,
-    PAYFAST_MERCHANT_ID: '10000100',
-    PAYFAST_MERCHANT_KEY: '46f0cd694581a',
-    PAYFAST_PASSPHRASE: 'jt7NOE43FZPn',
-    PAYFAST_SANDBOX: 'true',
-  };
-  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, payEnv);
-  body = await res.json();
-  const payRef = body.ref;
-  const signedFields = Object.fromEntries(body.fields ?? []);
-  check('checkout posts to the sandbox', body.action === 'https://sandbox.payfast.co.za/eng/process', body.action);
-  check('the amount is the Worker\'s, not the browser\'s', signedFields.amount === '500.00', signedFields.amount);
-  check(
-    'the fields carry the order and the way back',
-    signedFields.m_payment_id === payRef && signedFields.return_url === `https://masterroachi.com/store/thank-you/?ref=${payRef}` &&
-      signedFields.cancel_url === 'https://masterroachi.com/store/roachi-shirt/' && signedFields.notify_url === 'https://masterroachi.com/api/payfast/notify' &&
-      signedFields.name_first === 'Pay' && signedFields.name_last === 'Buyer Smith',
-    JSON.stringify(signedFields),
-  );
-  const resigned = payfast.signCheckout(Object.fromEntries((body.fields ?? []).filter(([k]) => k !== 'signature')), 'jt7NOE43FZPn');
-  check('and are signed', !!signedFields.signature && resigned.at(-1)[1] === signedFields.signature, signedFields.signature);
-  const payRow = () => ordersDb.sqlite.prepare('select * from orders where ref = ?').get(payRef);
-  check(
-    'the order is stored before PayFast, with every amount',
-    payRow()?.total === 500 && payRow()?.item_amount === 280 && payRow()?.shipping_amount === 220 &&
-      payRow()?.shipping_method === 'STANDARD' && payRow()?.status === 'received' && payRow()?.zip === '8001',
-    JSON.stringify(payRow()),
-  );
-
-  // PayFast's notification, signed as PayFast signs it: posted fields in
-  // order, the passphrase last.
-  let validateAnswer = 'VALID';
-  const validateCalls = [];
-  const payfastFetch = globalThis.fetch;
-  globalThis.fetch = async (input, init = {}) => {
-    if (String(input) === 'https://sandbox.payfast.co.za/eng/query/validate') {
-      validateCalls.push(init.body);
-      return new Response(validateAnswer, { status: 200 });
-    }
-    return payfastFetch(input, init);
-  };
-  const itn = (overrides = {}, passphrase = 'jt7NOE43FZPn') => {
-    const entries = Object.entries({
-      m_payment_id: payRef,
-      pf_payment_id: '1089250',
-      payment_status: 'COMPLETE',
-      item_name: 'Roachi Shirt (L)',
-      amount_gross: '500.00',
-      amount_fee: '-11.50',
-      amount_net: '488.50',
-      name_first: 'Pay',
-      email_address: 'pay@example.com',
-      merchant_id: '10000100',
-      ...overrides,
-    });
-    const base = payfast.notificationString(entries) + `&passphrase=${payfast.phpUrlencode(passphrase)}`;
-    const form = new URLSearchParams([...entries, ['signature', payfast.md5(base)]]);
-    return worker.fetch(
-      new Request('https://masterroachi.com/api/payfast/notify', {
-        method: 'POST',
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        body: form.toString(),
-      }),
-      payEnv,
-    );
-  };
-
-  res = await itn({}, 'not-the-passphrase');
-  check('a notification signed with the wrong passphrase is refused', res.status === 400 && payRow().status === 'received', String(res.status));
-  res = await itn({ amount_gross: '5.00' });
-  check('a notification for the wrong amount is refused', res.status === 400 && payRow().status === 'received', String(res.status));
-  validateAnswer = 'INVALID';
-  res = await itn();
-  check('one PayFast will not confirm is not believed, and is retried', res.status === 502 && payRow().status === 'received', String(res.status));
-  validateAnswer = 'VALID';
-  res = await itn();
-  check(
-    'a confirmed notification marks the order Paid',
-    res.status === 200 && payRow().status === 'paid' && payRow().pf_payment_id === '1089250' && !!payRow().paid_at,
-    JSON.stringify(payRow()),
-  );
-  check('and what was confirmed is exactly what was posted', validateCalls.at(-1)?.startsWith(`m_payment_id=${payRef}&pf_payment_id=1089250`), validateCalls.at(-1));
-  ordersDb.sqlite.prepare("update orders set status = 'fulfilled' where ref = ?").run(payRef);
-  await itn();
-  check('a repeated notification does not move a fulfilled order back', payRow().status === 'fulfilled', payRow().status);
-  globalThis.fetch = payfastFetch;
+  check('checkout without the till is not switched on', res.status === 503, String(res.status));
 
   // --- the one till: checkout through pay.masterroachi.com ------------------
   //
@@ -865,10 +673,7 @@ function sqliteD1() {
   const tillCalls = [];
   let tillAnswer = { ok: true, action: 'https://www.payfast.co.za/eng/process', fields: [['merchant_id', '1'], ['m_payment_id', 'o.X'], ['signature', 'abc']] };
   const fakeTill = { async createPayment(req) { tillCalls.push(req); if (tillAnswer instanceof Error) throw tillAnswer; return tillAnswer; } };
-  const tillEnv = { ...printfulEnv, TILL: fakeTill, TILL_CHECKOUT: 'on' };
-
-  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, { ...printfulEnv, TILL: fakeTill, TILL_CHECKOUT: 'off' });
-  check('with the till switched off, a bound TILL is not used', res.status === 503 && tillCalls.length === 0, String(res.status));
+  const tillEnv = { ...printfulEnv, TILL: fakeTill };
 
   res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, tillEnv);
   body = await res.json();
@@ -889,6 +694,17 @@ function sqliteD1() {
   );
   check('and the browser gets pay\'s form as it is', body.action === 'https://www.payfast.co.za/eng/process' && body.fields?.at(-1)?.[0] === 'signature', JSON.stringify(body));
 
+  const tillRow = () => ordersDb.sqlite.prepare('select * from orders where ref = ?').get(tillRef);
+  check(
+    'the order is stored before pay, with every amount and the address in fields',
+    tillRow()?.total === 500 && tillRow()?.item_amount === 280 && tillRow()?.shipping_amount === 220 &&
+      tillRow()?.shipping_method === 'STANDARD' && tillRow()?.status === 'received' && tillRow()?.zip === '8001',
+    JSON.stringify(tillRow()),
+  );
+
+  tillAnswer = { ok: true, action: 'https://sandbox.payfast.co.za/eng/process', fields: [] };
+  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, tillEnv);
+  check('a form pointed at PayFast\'s sandbox is refused: live only', res.status === 502, String(res.status));
   tillAnswer = { ok: true, action: 'https://evil.example/eng/process', fields: [] };
   res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, tillEnv);
   check('a form pointed anywhere but PayFast is refused', res.status === 502, String(res.status));
@@ -907,7 +723,6 @@ function sqliteD1() {
     { stdio: 'pipe', shell: true },
   );
   const { markOrderPaid } = await import(pathToFileURL(ordersRpcBundle).href);
-  const tillRow = () => ordersDb.sqlite.prepare('select * from orders where ref = ?').get(tillRef);
   const notice = (over = {}) => ({ ref: tillRef, pfPaymentId: '2200011', grossCents: 50000, feeCents: 1150, paidAt: '2026-11-10T10:00:00.000Z', ...over });
 
   let paidResult = await markOrderPaid(ordersDb, notice({ ref: 'NOSUCHREF' }));
@@ -1055,18 +870,6 @@ function sqliteD1() {
     `${res.status} ${res.headers.get('location')}`,
   );
 }
-
-// --- no KV bound -----------------------------------------------------------
-res = await worker.fetch(post({ size: 'M', name: 'a', email: 'b@c.d', address: 'e' }), {
-  ...env,
-  ORDERS: undefined,
-});
-body = await res.json();
-check(
-  'unconfigured store does not block a sale',
-  res.status === 200 && body.stored === false,
-  JSON.stringify(body),
-);
 
 // --- the poll still works --------------------------------------------------
 res = await worker.fetch(get('https://masterroachi.com/api/vote'), { ...env, VOTES: undefined });
@@ -5912,39 +5715,6 @@ globalThis.fetch = preGh;
   globalThis.fetch = preGh;
 }
 
-// --- PayFast's signature -------------------------------------------------------
-//
-// The reference value is Python's hashlib over urllib's quote_plus, which
-// encodes as PHP's urlencode does (with ~ as %7E) — computed outside this code,
-// so a mistake here cannot agree with itself.
-{
-  check('md5 of nothing', payfast.md5('') === 'd41d8cd98f00b204e9800998ecf8427e', payfast.md5(''));
-  check(
-    'md5 of the quick brown fox',
-    payfast.md5('The quick brown fox jumps over the lazy dog') === '9e107d9d372bb6826bd81d3542a419d6',
-    payfast.md5('The quick brown fox jumps over the lazy dog'),
-  );
-  check("urlencode is PHP's", payfast.phpUrlencode("a b+c~(d)*!'") === 'a+b%2Bc%7E%28d%29%2A%21%27', payfast.phpUrlencode("a b+c~(d)*!'"));
-  const signed = payfast.signCheckout(
-    {
-      // Deliberately out of order: signing order is PayFast's, not ours.
-      item_description: "It's (really) ~fine~ *ok*!",
-      merchant_id: '10000100',
-      merchant_key: '46f0cd694581a',
-      return_url: 'https://masterroachi.com/store/thank-you/?ref=AB23',
-      name_first: 'Thabo',
-      email_address: 't+1@example.com',
-      m_payment_id: 'AB23CDEF',
-      amount: '500.00',
-      item_name: 'Roachi Shirt (L) — order AB23CDEF',
-      cancel_url: '',
-    },
-    'jt7NOE43FZPn',
-  );
-  check('a checkout signature matches the reference', signed.at(-1)[1] === '7787a252398909764afb52559721699c', signed.at(-1)[1]);
-  check('empty fields are left out', !signed.some(([key]) => key === 'cancel_url'), JSON.stringify(signed.map(([k]) => k)));
-}
-
 // --- the body as sections ----------------------------------------------------
 {
   const bodies = ['content/projects', 'content/writing'].flatMap((dir) =>
@@ -6238,7 +6008,8 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
 //
 // The store page and the buy panel must agree. From the PayFast switch on
 // 2026-10-21 until 2026-11-10 the store page still asked for a payment link,
-// and told everyone the shirt on sale was "Not on sale yet".
+// and told everyone the shirt on sale was "Not on sale yet". The links
+// themselves were removed on 2026-11-10.
 {
   const storeBundle = path.join(os.tmpdir(), 'master-roachi-store-bundle.mjs');
   execFileSync(
@@ -6249,11 +6020,11 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   const storeLib = await import(pathToFileURL(storeBundle).href);
   const shirt = storeLib.findProduct('roachi-shirt');
   check('the shirt is in the store snapshot', !!shirt, String(shirt));
-  check('under the PayFast checkout, a priced shirt is on sale', storeLib.isBuyable(shirt, 'payfast') === true, '');
+  check('a priced shirt in stock is on sale', storeLib.isBuyable(shirt) === true, '');
   check(
-    'under payment links, on sale only with a link',
-    storeLib.isBuyable(shirt, 'links') === storeLib.buyOptions(shirt).some((o) => o.href !== null),
-    '',
+    'and no size carries a payment link any more',
+    storeLib.buyOptions(shirt).every((o) => !('href' in o)),
+    JSON.stringify(storeLib.buyOptions(shirt)[0]),
   );
   fs.rmSync(storeBundle, { force: true });
 }
@@ -6268,7 +6039,6 @@ fs.rmSync(sketchBundle, { force: true });
 fs.rmSync(habitsBundle, { force: true });
 fs.rmSync(dbBundle, { force: true });
 fs.rmSync(productCopyBundle, { force: true });
-fs.rmSync(payfastBundle, { force: true });
 fs.rmSync(sectionsBundle, { force: true });
 fs.rmSync(iconBundle, { force: true });
 fs.rmSync(spineBundle, { force: true });

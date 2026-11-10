@@ -47,7 +47,6 @@ import {
 import { joinFile, readScalar, setScalar, splitFile } from '../lib/frontmatter';
 import { addressProblem, addressText, readAddress, type Address } from '../lib/address';
 import { CURRENCY, deliveryPrice, itemPrice } from '../lib/price';
-import { amountString, notificationSigned, notificationString, payfastHost, signCheckout } from '../lib/payfast';
 import storeSnapshot from '../data/store.json';
 import type { PaymentResult, TillRpc } from './till-rpc';
 import type { LeadsRpc } from './enquiry-rpc';
@@ -58,6 +57,9 @@ import { appForHost } from '../lib/work-tools';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
+
+/** Where pay's signed form may send the browser: PayFast's live process page, nothing else. */
+const PAYFAST_PROCESS = 'https://www.payfast.co.za/eng/process';
 
 /** This machine, where dev runs with no Access in front of it. */
 function isLocal(hostname: string): boolean {
@@ -207,31 +209,13 @@ interface Env {
   PRINTFUL_STORE_ID?: string;
 
   /**
-   * PayFast's checkout, for live delivery quotes (his ruling, 2026-10-19).
-   * From the PayFast dashboard, Settings → Integration:
-   *
-   *   npx wrangler secret put PAYFAST_MERCHANT_ID
-   *   npx wrangler secret put PAYFAST_MERCHANT_KEY
-   *   npx wrangler secret put PAYFAST_PASSPHRASE
-   *
-   * PAYFAST_SANDBOX = "true" sends checkouts to sandbox.payfast.co.za with
-   * the sandbox merchant instead. Without all three, /api/checkout answers
-   * that it is not switched on, and the store keeps its payment links.
-   */
-  PAYFAST_MERCHANT_ID?: string;
-  PAYFAST_MERCHANT_KEY?: string;
-  PAYFAST_PASSPHRASE?: string;
-  PAYFAST_SANDBOX?: string;
-
-  /**
    * pay.masterroachi.com, the one till for every project (his ruling,
-   * 2026-11-10): a Service Binding to its `Till` entrypoint, with
-   * TILL_CHECKOUT = "on" in wrangler.jsonc's vars. Both, or the checkout signs
-   * its own PayFast form as before — so switching off is one var. See
-   * worker/till-rpc.ts and DEPLOY.md, "One till".
+   * 2026-11-10): a Service Binding to its `Till` entrypoint. The only way the
+   * store takes payment: without it, /api/checkout answers that it is not
+   * switched on. The PayFast credentials live on pay. See worker/till-rpc.ts
+   * and DEPLOY.md, "One till".
    */
   TILL?: TillRpc;
-  TILL_CHECKOUT?: string;
 
   /**
    * The contact form on /hire (2026-11-10): enquiries go to the CRM's
@@ -293,12 +277,12 @@ const VOTE_TTL = 60 * 60 * 24 * 180;
  * How long an order's personal details are kept: 30 days from submission.
  *
  * His ruling, 2026-10-19. After this the name, email, phone, address and note
- * are blanked in D1 (redactOrders), and the KV fallback copy expires on the
- * same clock — a fallback must not outlive the record it stands in for.
- * Stated on /policies/ under Privacy, which has to stay true.
+ * are blanked in D1 (redactOrders). Stated on /policies/ under Privacy, which
+ * has to stay true. (Orders saved to KV during a D1 outage came only from the
+ * old payment-link order route, removed 2026-11-10; they expired on the same
+ * clock, and any still there are swept into D1 on the next read.)
  */
 const ORDER_RETENTION_DAYS = 30;
-const ORDER_TTL = 60 * 60 * 24 * ORDER_RETENTION_DAYS;
 
 /** Every column the orders page reads, in one place for the list and the one. */
 const ORDER_COLUMNS = `id, ref, created_at, product, product_id, size, price, name, email, phone,
@@ -331,8 +315,8 @@ class QuoteError extends Error {
  * The product and its USD price come from data/store.json, bundled into this
  * Worker — the same catalogue the page was built from. Delivery is Printful's
  * cheapest rate to the address, in USD, converted the same way. Both go
- * through lib/price.ts in 'payfast' mode: no delivery inside the item price,
- * because it is quoted on top.
+ * through lib/price.ts: no delivery inside the item price, because it is
+ * quoted on top.
  */
 async function quoteFor(env: Env, productId: string, size: string, address: Address): Promise<Quote> {
   const product = (storeSnapshot as { products: { id: number; name: string; variants?: { size: string | null; amount: number; available: boolean }[] }[] }).products
@@ -340,7 +324,7 @@ async function quoteFor(env: Env, productId: string, size: string, address: Addr
   const variant = product?.variants?.find((v) => v.size === size);
   if (!product || !variant) throw new QuoteError('That product or size is not for sale.', 404);
   if (!variant.available) throw new QuoteError('That size is sold out.', 409);
-  const item = itemPrice(productId, size, variant.amount, 'payfast');
+  const item = itemPrice(productId, size, variant.amount);
   if (item === null) throw new QuoteError('No price is set yet.', 503);
   if (!env.PRINTFUL_TOKEN) throw new QuoteError('Delivery cannot be quoted yet.', 503);
 
@@ -692,84 +676,6 @@ async function handle(request: Request, env: Env): Promise<Response> {
     const shared = await shareOhana(request, env, route);
     if (shared) return shared;
 
-    // --- an order's delivery details ---------------------------------------
-    //
-    // Written before the customer is sent to PayFast, because a shareable
-    // payment link collects no address and its amount does not identify the
-    // size. Nothing about money happens here: the sum is recorded as the
-    // customer saw it, and PayFast decides what is actually charged.
-    if (route === '/api/order') {
-      if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);
-
-      // The buy flow treats this as non-fatal and sends the customer on to
-      // PayFast regardless — the thank-you page then asks for the address by
-      // email, which is where this started. Losing the convenience is better
-      // than blocking a sale.
-      if (!env.DB && !env.ORDERS) return json({ stored: false, reason: 'not-configured' }, 200);
-
-      const raw = await request.text();
-      if (raw.length > ORDER_MAX_BYTES) {
-        return json({ error: 'Too large.' }, 413);
-      }
-
-      let body: Record<string, unknown>;
-      try {
-        body = JSON.parse(raw) as Record<string, unknown>;
-      } catch {
-        return json({ error: 'Expected a JSON body.' }, 400);
-      }
-
-      const order = {
-        product: field(body.product),
-        productId: field(body.productId, 32),
-        size: field(body.size, 16),
-        // What the page showed. Informational only — the payment link is a
-        // fixed sum and this cannot change it.
-        price: field(body.price, 32),
-        name: field(body.name),
-        email: field(body.email),
-        phone: field(body.phone, 40),
-        address: field(body.address, 600),
-        note: field(body.note, 600),
-      };
-
-      // The address in fields, from the buy form since 2026-10-19; or one
-      // block of text, from a product page cached before that. Both are
-      // accepted, and the fields are checked as Printful would check them.
-      let structured: Address | null = null;
-      if (body.address && typeof body.address === 'object') {
-        structured = readAddress(body.address);
-        const problem = addressProblem(structured);
-        if (problem) return json({ error: problem }, 400);
-        order.address = addressText(structured);
-      }
-
-      if (!order.name || !order.email || !order.address || !order.size) {
-        return json({ error: 'Name, email, address and size are required.' }, 400);
-      }
-
-      const ref = reference();
-      const at = new Date().toISOString();
-      const record: OrderRecord = { ...order, ref, at, structured };
-
-      // D1 is the record. KV only when D1 is missing or failed, and the next
-      // read of /work/api/orders carries it across.
-      if (env.DB) {
-        try {
-          await insertOrder(env.DB, record).run();
-          return json({ stored: true, ref }, 200);
-        } catch {
-          // Fall through to KV.
-        }
-      }
-      if (!env.ORDERS) return json({ stored: false, reason: 'not-stored' }, 200);
-      await env.ORDERS.put(`order:${at}:${ref}`, JSON.stringify(record), {
-        expirationTtl: ORDER_TTL,
-      });
-
-      return json({ stored: true, ref }, 200);
-    }
-
     // --- the contact form on /hire ---------------------------------------
     if (route === '/api/enquiry') return handleEnquiry(request, env);
 
@@ -796,19 +702,18 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // --- checkout ------------------------------------------------------------
     //
     // The order is stored, with every amount worked out here, BEFORE the
-    // customer goes to PayFast — so the notification that comes back can be
-    // checked against what was asked for. The answer is the signed form the
-    // browser posts to PayFast; the browser never chooses the amount.
+    // customer goes to pay — so what pay is told to charge, and what it later
+    // reports as paid (Orders.markPaid), can be checked against it. The answer
+    // is the signed form the browser posts to PayFast; the browser never
+    // chooses the amount.
+    //
+    // pay.masterroachi.com is the one till (2026-11-10): it signs the form and
+    // receives PayFast's notification. The store's own PayFast signing, its
+    // notify route, its sandbox and its payment links were removed that day.
     if (route === '/api/checkout') {
       if (request.method !== 'POST') return json({ error: 'POST only.' }, 405);
-      const merchantId = env.PAYFAST_MERCHANT_ID;
-      const merchantKey = env.PAYFAST_MERCHANT_KEY;
-      const passphrase = env.PAYFAST_PASSPHRASE;
-      // Through pay, the PayFast secrets live there, not here.
-      const till = env.TILL_CHECKOUT === 'on' && env.TILL ? env.TILL : null;
-      if ((!till && (!merchantId || !merchantKey || !passphrase)) || !env.DB) {
-        return json({ error: 'Checkout is not switched on.' }, 503);
-      }
+      const till = env.TILL;
+      if (!till || !env.DB) return json({ error: 'Checkout is not switched on.' }, 503);
 
       const raw = await request.text();
       if (raw.length > ORDER_MAX_BYTES) return json({ error: 'Too large.' }, 413);
@@ -870,115 +775,29 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const itemName = `${productName} (${size})`.slice(0, 100);
       const itemDescription = `Order ${ref}, ${quote.method.name}`.slice(0, 255);
 
-      // Through pay: it signs the form and owns the notify address. Its
-      // answer is trusted only as far as where the browser is sent, which
+      // Its answer is trusted only as far as where the browser is sent, which
       // must be PayFast's own process page.
-      if (till) {
-        let paid: PaymentResult;
-        try {
-          paid = await till.createPayment({
-            project: 'store',
-            ref,
-            amountCents: Math.round(quote.total * 100),
-            itemName,
-            itemDescription,
-            returnUrl: `${url.origin}/store/thank-you/?ref=${ref}`,
-            cancelUrl: `${url.origin}${cancelPath}`,
-            email,
-            nameFirst: first,
-            nameLast: rest.join(' '),
-          });
-        } catch {
-          return json({ error: 'The payment page could not be opened. Try again shortly.' }, 502);
-        }
-        const toPayfast =
-          paid.ok && (paid.action === `${payfastHost(false)}/eng/process` || paid.action === `${payfastHost(true)}/eng/process`);
-        if (!paid.ok || !toPayfast || !Array.isArray(paid.fields)) {
-          return json({ error: 'The payment page could not be opened. Try again shortly.' }, 502);
-        }
-        return json({ ref, quote, action: paid.action, fields: paid.fields }, 200);
+      let paid: PaymentResult;
+      try {
+        paid = await till.createPayment({
+          project: 'store',
+          ref,
+          amountCents: Math.round(quote.total * 100),
+          itemName,
+          itemDescription,
+          returnUrl: `${url.origin}/store/thank-you/?ref=${ref}`,
+          cancelUrl: `${url.origin}${cancelPath}`,
+          email,
+          nameFirst: first,
+          nameLast: rest.join(' '),
+        });
+      } catch {
+        return json({ error: 'The payment page could not be opened. Try again shortly.' }, 502);
       }
-      if (!merchantId || !merchantKey || !passphrase) {
-        return json({ error: 'Checkout is not switched on.' }, 503);
+      if (!paid.ok || paid.action !== PAYFAST_PROCESS || !Array.isArray(paid.fields)) {
+        return json({ error: 'The payment page could not be opened. Try again shortly.' }, 502);
       }
-
-      const fields = signCheckout(
-        {
-          merchant_id: merchantId,
-          merchant_key: merchantKey,
-          return_url: `${url.origin}/store/thank-you/?ref=${ref}`,
-          cancel_url: `${url.origin}${cancelPath}`,
-          notify_url: `${url.origin}/api/payfast/notify`,
-          name_first: first,
-          name_last: rest.join(' '),
-          email_address: email,
-          m_payment_id: ref,
-          amount: amountString(quote.total),
-          item_name: itemName,
-          item_description: itemDescription,
-        },
-        passphrase,
-      );
-
-      return json(
-        { ref, quote, action: `${payfastHost(env.PAYFAST_SANDBOX === 'true')}/eng/process`, fields },
-        200,
-      );
-    }
-
-    // --- PayFast's word that it was paid -------------------------------------
-    //
-    // PayFast posts here (the ITN) when a payment completes. Believed only if
-    // all three hold, as PayFast's own SDK checks: the signature, made with
-    // the passphrase only PayFast and this Worker know; PayFast's validate
-    // endpoint confirming it sent exactly this; and the amount matching what
-    // this Worker asked for. Then — and only then — the order is Paid.
-    //
-    // The SDK's fourth check, the sender's IP, needs DNS lookups a Worker
-    // does not have; the validate call is the stronger form of the same
-    // question, asked of PayFast directly.
-    if (route === '/api/payfast/notify') {
-      if (request.method !== 'POST') return new Response(null, { status: 405 });
-      const passphrase = env.PAYFAST_PASSPHRASE;
-      if (!passphrase || !env.DB) return new Response(null, { status: 503 });
-
-      const entries = [...new URLSearchParams(await request.text()).entries()];
-      if (!notificationSigned(entries, passphrase)) return new Response(null, { status: 400 });
-
-      const confirmed = await fetch(`${payfastHost(env.PAYFAST_SANDBOX === 'true')}/eng/query/validate`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        body: notificationString(entries),
-        signal: AbortSignal.timeout(15000),
-      })
-        .then(async (r) => r.ok && (await r.text()).trim() === 'VALID')
-        .catch(() => false);
-      // Not 200, so PayFast retries — a validate call that failed is not a
-      // payment that failed.
-      if (!confirmed) return new Response(null, { status: 502 });
-
-      const given = Object.fromEntries(entries);
-      const order = await env.DB.prepare('select ref, status, total from orders where ref = ?1')
-        .bind(given.m_payment_id ?? '')
-        .first<{ ref: string; status: string; total: number | null }>();
-      if (!order || order.total === null) return new Response(null, { status: 404 });
-      if (Math.abs(Number.parseFloat(given.amount_gross ?? '') - order.total) > 0.01) {
-        return new Response(null, { status: 400 });
-      }
-
-      if (given.payment_status === 'COMPLETE') {
-        // Only Received becomes Paid: a notification repeated after he has
-        // already fulfilled the order must not move it backwards.
-        await env.DB.prepare(
-          `update orders set pf_payment_id = ?2,
-                  status = case when status = 'received' then 'paid' else status end,
-                  paid_at = coalesce(paid_at, ?3)
-            where ref = ?1`,
-        )
-          .bind(order.ref, given.pf_payment_id ?? null, new Date().toISOString())
-          .run();
-      }
-      return new Response(null, { status: 200 });
+      return json({ ref, quote, action: paid.action, fields: paid.fields }, 200);
     }
 
     // --- the work hub -------------------------------------------------------

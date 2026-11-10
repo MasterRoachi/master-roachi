@@ -180,18 +180,17 @@ fail-closed behaviour as everything else here.
 
 ### Secrets
 
-Nine on 2026-11-04, none of them in the repo. `npx wrangler secret list` names
-them:
+None of them in the repo. `npx wrangler secret list` names them:
 
 | | What it is for | Set it with |
 | --- | --- | --- |
 | `GITHUB_TOKEN` | the backend committing to this repo | `npm run github-auth` |
 | `TRELLO_KEY`, `TRELLO_TOKEN` | what `/work/boards` reads | `npm run trello-auth` |
-| `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE` | the PayFast checkout — see "Switching on the PayFast checkout" below. Set, with the live values, since 2026-10-21 | `npx wrangler secret put PAYFAST_…` |
-| `PAYFAST_SANDBOX` | the sandbox switch from step 2 below. **Still listed on 2026-11-04**; step 3 says delete it or set it to anything but `true`. A secret's value cannot be read back, so whether it is `true` is unconfirmed | `npx wrangler secret delete PAYFAST_SANDBOX` |
 | `PRINTFUL_TOKEN` | Sync Printful, and sending orders to Printful as drafts. A single-store private token from developers.printful.com/tokens, scopes `orders` and `sync_products/read` | `npx wrangler secret put PRINTFUL_TOKEN` |
 | `VOTE_SALT` | salting the voter hash, which is guessable without it | `npx wrangler secret put VOTE_SALT` |
-| `OHANA_ACCESS_TEAM`, `OHANA_ACCESS_AUD` | verifying Ohana's Access token on `/share/ohana` — see "Ohana's way in" below. Not set yet | `npx wrangler secret put OHANA_ACCESS_…` |
+| `OHANA_ACCESS_TEAM`, `OHANA_ACCESS_AUD` | verifying Ohana's service token on `learn.masterroachi.com/share/ohana` — see "Ohana's way in" below | `npx wrangler secret put OHANA_ACCESS_…` |
+| `WORK_ACCESS_TEAM`, `WORK_ACCESS_AUD` | verifying his Access token on every private API, on admin, learn and tools — see "The three apps" below | piped on stdin, e.g. `printf %s "$TAG" \| npx wrangler secret put WORK_ACCESS_AUD` |
+| `TURNSTILE_SECRET` | the contact form's spam check — see "The contact form" below | from his own terminal: `npx wrangler secret put TURNSTILE_SECRET` |
 
 Every one of them **fails closed**: a missing secret makes its endpoint serve
 the 404 page rather than answer. `GITHUB_TOKEN` expires — when the backend's
@@ -201,36 +200,23 @@ agent session, since it asks for a token.
 
 `ORDERS_KEY` was another. It guarded the public `/api/orders` list, which was
 removed on 2026-10-19 when orders moved into D1 and `/work/shop/`; by
-2026-11-04 it was gone from `wrangler secret list`.
+2026-11-04 it was gone from `wrangler secret list`. The four `PAYFAST_*`
+secrets went on 2026-11-10 with the store's own checkout: the PayFast
+credentials live on pay now (see "One till").
 
-### Switching on the PayFast checkout
+**Setting a secret through an agent's shell uploads an empty value** unless
+the value is piped in on stdin: `wrangler secret put` reads nothing from a
+shell with no terminal. That happened to `TURNSTILE_SECRET` once.
 
-Built 2026-10-19, tested in the sandbox and **switched on 2026-10-21**. Delivery is then quoted live
-from Printful for the customer's address and paid at PayFast's checkout,
-instead of being built into a fixed payment link.
+### The store's own PayFast checkout (history)
 
-1. In the PayFast dashboard, **Settings → Developer Settings** (the sandbox calls it Integration): set a **passphrase**,
-   and note the merchant ID and merchant key there.
-2. Try it in the sandbox first, on the live site, without customers seeing
-   it. Set the sandbox merchant (sandbox.payfast.co.za → your sandbox
-   account's Integration page) as the three secrets, plus
-   `npx wrangler secret put PAYFAST_SANDBOX` with the value `true`. Then open
-   a product page with `?checkout=payfast` on the end: that one page load
-   shows the new form. Pay with the sandbox's test card, and the order should
-   turn **Paid** on `/work/shop` by itself.
-3. Set the three secrets again with the **live** values, and
-   `npx wrangler secret delete PAYFAST_SANDBOX` (or set it to anything but `true`). Pay with an email that is not the merchant's own: PayFast refuses a merchant paying itself.
-4. Set `"checkout": "payfast"` in `lib/pricing.json` and push. That one value
-   drops delivery out of the prices, switches the product pages, the store and
-   `/policies/` to "delivery quoted for your address", and gives every visitor
-   the checkout. The old payment links in `lib/site.ts` stop being used.
-
-How it is kept honest: `/api/checkout` works out every amount itself
-(`lib/price.ts`, the same function the pages use) and stores the order before
-the customer leaves; `/api/payfast/notify` believes a payment only when the
-signature is right, PayFast's `/eng/query/validate` confirms it, and the amount
-matches what was stored. The signature code is `lib/payfast.ts`, from PayFast's
-own PHP SDK, tested against an independently computed value.
+From 2026-10-21 the store signed its own PayFast form, with `PAYFAST_*`
+secrets, a `PAYFAST_SANDBOX` switch and `/api/payfast/notify`. Before that,
+from the start, it used fixed PayFast payment links with delivery built into
+the price, and `/api/order` to take the address. All of it was removed on
+2026-11-10, his word, with no form or payment outstanding. The store now pays
+only through pay: see "One till". Prices are the item alone, and delivery is
+quoted live from Printful on top.
 
 ### One till
 
@@ -239,10 +225,10 @@ project.** That Worker lives in another repository. The store keeps its
 prices, quotes and orders in this Worker's D1. Only the payment goes through
 pay. Built 2026-11-10 and **switched on the same day**, at his word.
 
-- **Out:** with `TILL_CHECKOUT` set to `"on"` and the `TILL` Service Binding
-  present, `/api/checkout` stores the order as before, then asks pay's `Till`
-  entrypoint for the signed form, in cents. The browser is sent only to
-  PayFast's own process page; any other `action` is refused. PayFast then
+- **Out:** `/api/checkout` stores the order, then asks pay's `Till`
+  entrypoint, through the `TILL` Service Binding, for the signed form, in
+  cents. The browser is sent only to PayFast's live process page; any other
+  `action`, the sandbox's included, is refused. PayFast then
   notifies pay, not this site.
 - **Back:** pay calls this Worker's `Orders.markPaid` (`worker/entry.ts`,
   logic in `worker/orders.ts`). The gross must equal the order's own total,
@@ -260,10 +246,12 @@ payment has passed:
 3. In `wrangler.jsonc`, uncomment the `TILL` service and set `TILL_CHECKOUT`
    to `"on"`, in one commit. Then make one small real order, end to end.
 
-Switching back is `TILL_CHECKOUT` set to `"off"`. Keep `/api/payfast/notify`
-and the three PayFast secrets for some weeks after step 3, because forms
-issued before the switch carry the old notify address. Only then remove them
-and the signing code.
+Done 2026-11-10, steps 1 to 3, and then the old way was removed the same day
+(no form was outstanding): `TILL_CHECKOUT`, the store's signing code,
+`/api/payfast/notify`, the sandbox and the `PAYFAST_*` secrets. There is no
+switch back. Without the `TILL` binding, `/api/checkout` answers that checkout
+is not switched on. pay's form may send the browser only to PayFast's live
+process page.
 
 ### The contact form
 

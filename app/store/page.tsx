@@ -1,4 +1,3 @@
-import { CHECKOUT } from '@/lib/price';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
@@ -121,7 +120,7 @@ export default function StorePage() {
                     <span className={styles.sizeCount}> · {sizesOf(lead).length} sizes</span>
                   </p>
                   <p className={styles.shipping}>
-                    {CHECKOUT === 'payfast' ? 'Delivery quoted for your address' : 'Worldwide delivery included'}
+                    Delivery quoted for your address
                   </p>
                 </>
               )}

@@ -1,4 +1,3 @@
-import { CHECKOUT } from '@/lib/price';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -160,7 +159,7 @@ export default async function ProductPage({
                     A price that turns out to exclude postage is the single
                     most common way an online store feels like a trick. */}
                 <p className={styles.shipping}>
-                  {CHECKOUT === 'payfast' ? 'Delivery quoted for your address' : 'Worldwide delivery included'}
+                  Delivery quoted for your address
                 </p>
               </>
             )}
@@ -168,15 +167,13 @@ export default async function ProductPage({
             <Swatches colors={product.colors ?? []} />
 
 
-            {/* Sizes, price and the button are one thing now: a payment link
-                is a fixed sum, so which size is chosen decides where Buy
-                goes. */}
+            {/* Sizes, price and the button are one thing: the size chosen is
+                what the checkout prices and asks pay for. */}
             <BuyPanel
               options={options}
               soldOut={soldOut}
               name={product.name}
               productId={String(product.id)}
-              checkout={CHECKOUT}
               page={productPath(product)}
             />
 
