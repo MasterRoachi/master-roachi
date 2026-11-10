@@ -5,7 +5,10 @@ import { NOTE_SECTION, NOTE_WIDTH, sectionsToShow } from '@/lib/card-note';
 import { newId, type Item, type Scene, type Stroke, type TextItem } from '@/lib/sketch';
 import styles from './cards.module.css';
 
-// The panel beside the card, where the writing happens.
+// The writing pad: beside the card on a computer, a strip under it on a phone
+// that pulls up for room (his pick, 2026-11-10, redesign page, Cards: A — the
+// pulling up is done by Cards.tsx around this panel, which only fills the box
+// it is given).
 //
 // ONE SECTION IS VISIBLE AT A TIME. The panel does not scroll through a tall
 // page — it pages between sections by moving the viewBox, which is why the
@@ -29,11 +32,14 @@ export default function Note({
   scene,
   onChange,
   onSection,
+  fingerDraws = false,
 }: {
   scene: Scene;
   onChange: (scene: Scene) => void;
   /** The measured section height, reported up so it can be saved with the note. */
   onSection: (height: number) => void;
+  /** On a phone a finger is the pen, and the dots are how to page. */
+  fingerDraws?: boolean;
 }) {
   const [tool, setTool] = useState<'pen' | 'text'>('pen');
   const [live, setLive] = useState<Stroke | null>(null);
@@ -41,6 +47,9 @@ export default function Note({
 
   const surface = useRef<SVGSVGElement | null>(null);
   const drawing = useRef<Stroke | null>(null);
+  /* The one pointer drawing the stroke. A second finger landing mid-stroke
+   * must not start a stroke of its own or bend this one. */
+  const pen = useRef<number | null>(null);
   const wheel = useRef(0);
   const swipe = useRef<number | null>(null);
 
@@ -181,7 +190,7 @@ export default function Note({
           while there is only one, because a single dot would be saying there
           is somewhere else to be when there is not. */}
       {sections > 1 && (
-        <div className={styles.dots} aria-hidden="true">
+        <div className={styles.dots} data-big={fingerDraws || undefined} aria-hidden="true">
           {Array.from({ length: sections }, (_, which) => (
             <button
               key={which}
@@ -219,8 +228,11 @@ export default function Note({
         onPointerDown={(event) => {
           /* A finger pages, a pen and a mouse draw. Without the split there is
            * no way to reach an earlier attempt on a tablet at all, since the
-           * panel has nothing to scroll. */
-          if (event.pointerType === 'touch') {
+           * panel has nothing to scroll. On a phone a finger is all there is
+           * to write with, so it draws, and the dots (made big enough to tap
+           * there) do the paging instead. */
+          if (drawing.current) return;
+          if (event.pointerType === 'touch' && !fingerDraws) {
             swipe.current = event.clientY;
             return;
           }
@@ -234,6 +246,7 @@ export default function Note({
 
           if (tool === 'pen') {
             event.currentTarget.setPointerCapture(event.pointerId);
+            pen.current = event.pointerId;
             drawing.current = {
               kind: 'stroke',
               id: newId(),
@@ -264,7 +277,7 @@ export default function Note({
           setEditing(item.id);
         }}
         onPointerMove={(event) => {
-          if (!drawing.current) return;
+          if (!drawing.current || event.pointerId !== pen.current) return;
           drawing.current.points.push(point(event));
           setLive({ ...drawing.current });
         }}
@@ -277,13 +290,15 @@ export default function Note({
             if (Math.abs(moved) > PAGE_THRESHOLD) go(moved > 0 ? -1 : 1);
             return;
           }
-          if (!drawing.current) return;
+          if (!drawing.current || event.pointerId !== pen.current) return;
           change([...scene.items, drawing.current]);
           drawing.current = null;
+          pen.current = null;
           setLive(null);
         }}
         onPointerCancel={() => {
           drawing.current = null;
+          pen.current = null;
           swipe.current = null;
           setLive(null);
         }}

@@ -1,7 +1,8 @@
 /* The shop: its two tabs, and the orders under the first of them.
-   In the language of Habits and Reading (2026-10-14): centred pills, shut
-   cards that open to the width of the column, and gold for what is waiting
-   on him and nothing else. Tokens from app/globals.css. */
+   The orders are his pick, 2026-11-10 (redesign page, Shop orders: A):
+   grouped by what he does next, a bottom sheet for the open order on a phone,
+   and list-left, order-right on a computer. Gold is what waits on him and the
+   one next step, and nothing else. Tokens from app/globals.css. */
 
 /* --- the tabs ----------------------------------------------------------- */
 
@@ -9,7 +10,7 @@
   display: flex;
   justify-content: center;
   gap: 0.4rem;
-  margin: 2rem 0 1.75rem;
+  margin: 1rem 0 1.25rem;
 }
 
 .tab,
@@ -17,7 +18,7 @@
   border-radius: 999px;
   font: inherit;
   font-size: 0.875rem;
-  padding: 0.4rem 1.2rem;
+  padding: 0.45rem 1.2rem;
   cursor: pointer;
   transition: border-color 0.15s ease, color 0.15s ease;
 }
@@ -40,26 +41,51 @@
   font-weight: 600;
 }
 
-/* --- the head of the orders: what waits, search, which ------------------- */
+/* A tab's panel fills the rest of the pane (ShopTabs.tsx). [hidden] is
+   restated because display: flex would otherwise override it. */
+.panel {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+/* --- the frame: one column on a phone, list and pane on a computer ------- */
+
+.layout {
+  display: block;
+}
+
+@media (min-width: 720px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+}
+
+.listSide {
+  min-width: 0;
+}
+
+/* --- the head: counts and the ⌕ ------------------------------------------ */
 
 .toolbar {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.9rem;
-  margin: 0 0 1rem;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 0.75rem;
 }
 
 .counts {
   margin: 0;
   font-size: 0.875rem;
   color: var(--muted);
-  text-align: center;
-}
-
-.waitingCount {
-  color: var(--accent);
-  font-weight: 600;
 }
 
 .sep {
@@ -70,136 +96,128 @@
   color: var(--muted);
 }
 
-.search {
-  width: min(100%, 22rem);
+.iconButton {
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
   background: var(--bg-raised);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink);
-  padding: 0.5rem 1rem;
   font: inherit;
-  font-size: 0.875rem;
-  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  border-color: var(--accent);
+}
+
+.search {
+  width: 100%;
+  margin: 0 0 1rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  padding: 0.55rem 1rem;
+  font: inherit;
+  /* 1rem, so a phone does not zoom the page when it takes focus. */
+  font-size: 1rem;
 }
 
 .search:focus {
   border-color: var(--accent);
   outline: none;
-  text-align: left;
-}
-
-.views {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.3rem;
-  margin: 0 0 1.75rem;
-}
-
-.pill,
-.pillOn {
-  border-radius: 999px;
-  font: inherit;
-  font-size: 0.75rem;
-  padding: 0.3rem 0.8rem;
-  cursor: pointer;
-}
-
-.pill {
-  background: none;
-  border: 1px solid var(--line);
-  color: var(--muted);
-}
-
-.pill:hover {
-  border-color: var(--line-bright);
-  color: var(--ink);
-}
-
-.pillOn {
-  background: var(--ink);
-  border: 1px solid var(--ink);
-  color: var(--bg);
-  font-weight: 600;
 }
 
 .message {
-  margin: 1rem auto 0;
+  margin: 1rem auto;
   max-width: 34rem;
   font-size: 0.875rem;
   color: var(--muted);
   text-align: center;
 }
 
-/* --- one card per order --------------------------------------------------- */
+/* --- the groups ----------------------------------------------------------- */
 
-.cards {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.group {
+  margin: 0 0 1.25rem;
 }
 
-.card,
-.cardOpen {
-  width: 100%;
-  margin: 0 auto 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg-raised);
-  overflow: hidden;
-  transition: max-width 0.18s ease, border-color 0.15s ease;
+.groupHead,
+.groupHeadGold {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-2);
 }
 
-/* Shut, it is a pill in the middle of the page. Open, it is the width of the
-   column — the expansion itself, as a Reading shelf opens. */
-.card {
-  max-width: 36rem;
-}
-
-.cardOpen {
-  max-width: 100%;
-  border-color: var(--line-bright);
-}
-
-/* Gold is what waits on him: received and unchecked, paid and unsent, or a
-   draft in Printful still to confirm. Nothing else is gold. */
-.card[data-waiting],
-.cardOpen[data-waiting] {
-  border-color: var(--accent);
-}
-
-.cardHead {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'who badge'
-    'what when';
-  align-items: baseline;
-  gap: 0.2rem 1rem;
-  width: 100%;
-  background: none;
-  border: 0;
-  color: var(--ink);
-  padding: 0.8rem 1.1rem;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.cardHead:hover .who {
+.groupHeadGold {
   color: var(--accent);
 }
 
-.who {
-  grid-area: who;
-  font-size: 1rem;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.groupEmpty {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
 }
 
-.what {
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* One row per order: reference and state on top, who and what below. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'ref chip'
+    'what when';
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  width: 100%;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  padding: 0.75rem 1rem;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.row:hover {
+  border-color: var(--line-bright);
+}
+
+/* What waits on him: received and unchecked, paid and unsent, or a draft in
+   Printful still to confirm. The gold edge, not a gold card. */
+.row[data-waiting] {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.row[aria-current] {
+  border-color: var(--accent);
+}
+
+.rowRef {
+  grid-area: ref;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.rowWhat {
   grid-area: what;
   font-size: 0.8125rem;
   color: var(--muted);
@@ -208,20 +226,7 @@
   white-space: nowrap;
 }
 
-.badge {
-  grid-area: badge;
-  justify-self: end;
-  font-size: 0.75rem;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-[data-waiting] .badge {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.when {
+.rowWhen {
   grid-area: when;
   justify-self: end;
   font-size: 0.75rem;
@@ -230,24 +235,286 @@
   white-space: nowrap;
 }
 
-.dismissed .who,
-.dismissed .what {
+.row .chip {
+  grid-area: chip;
+  justify-self: end;
+}
+
+.chip {
+  display: inline-block;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.row[data-waiting] .chip,
+.chip[data-waiting] {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.dismissed .rowRef,
+.dismissed .rowWhat {
   text-decoration: line-through;
   opacity: 0.55;
 }
 
-/* --- an open order -------------------------------------------------------- */
+.linkButton {
+  background: none;
+  border: 0;
+  padding: 0.25rem 0;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--line-bright);
+  cursor: pointer;
+}
 
-.detail {
-  padding: 0.2rem 1.1rem 1.1rem;
+.linkButton:hover {
+  color: var(--ink);
+  text-decoration-color: var(--accent);
+}
+
+/* --- the open order: a sheet on a phone, a pane on a computer ------------ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: oklch(0% 0 0 / 0.6);
+}
+
+/* Phone: nothing open, nothing shown; open, a sheet from the bottom. */
+.pane {
+  display: none;
+}
+
+.layout[data-open] .pane {
+  display: block;
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 41;
+  max-height: 88dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--bg-raised);
+  border-top: 1px solid var(--line-bright);
+  border-radius: 16px 16px 0 0;
+  padding: 0.5rem 1.1rem calc(1.25rem + env(safe-area-inset-bottom));
+  animation: rise 0.2s ease-out;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layout[data-open] .pane {
+    animation: none;
+  }
+}
+
+.grab {
+  width: 2.5rem;
+  height: 4px;
+  margin: 0 auto 0.75rem;
+  border-radius: 999px;
+  background: var(--line-bright);
+}
+
+.paneEmpty {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Computer: the pane sits beside the list and stays in view as it scrolls.
+   The max-height leaves room for the header and the tabs above it. */
+@media (min-width: 720px) {
+  .backdrop {
+    display: none;
+  }
+
+  .pane,
+  .layout[data-open] .pane {
+    display: block;
+    position: sticky;
+    inset: auto;
+    top: 0.5rem;
+    z-index: auto;
+    max-height: calc(100dvh - 9rem);
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem 1.25rem;
+    animation: none;
+  }
+
+  .paneEmpty {
+    padding: 2rem 0;
+  }
+
+  .grab {
+    display: none;
+  }
+}
+
+.sheet {
+  display: grid;
+  gap: 1rem;
+}
+
+.sheetHead {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sheetRef {
+  flex: 1;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sheetRef:focus {
+  outline: none;
+}
+
+.sheetRef:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.45rem 1rem;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.kv dt {
+  color: var(--muted);
+}
+
+.kv dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.kv a,
+.fields a {
+  color: var(--ink);
+}
+
+.sheetNote,
+.hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+/* The one next step: big, gold, the width of the sheet. */
+.primary {
+  width: 100%;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  color: var(--bg);
+  padding: 0.8rem 1rem;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--accent) 88%, white);
+}
+
+.primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.quiet {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  padding: 0.7rem 1rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.quiet:hover {
+  border-color: var(--accent);
+}
+
+.sheetLinks {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: -0.25rem;
+}
+
+/* --- More: every other step, and the full detail -------------------------- */
+
+.more {
+  display: grid;
+  gap: 1rem;
+  padding-top: 1rem;
   border-top: 1px solid var(--line);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.actions button {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  padding: 0.45rem 1rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.actions button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.actions button:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .fields {
   display: grid;
-  grid-template-columns: 7rem minmax(0, 1fr);
-  gap: 0.4rem 1rem;
-  margin: 0.9rem 0 0;
+  grid-template-columns: 1fr;
+  gap: 0.1rem;
+  margin: 0;
   font-size: 0.875rem;
 }
 
@@ -256,12 +523,19 @@
 }
 
 .fields dd {
-  margin: 0;
+  margin: 0 0 0.5rem;
   overflow-wrap: anywhere;
 }
 
-.fields a {
-  color: var(--ink);
+@media (min-width: 1000px) {
+  .fields {
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: 0.4rem 1rem;
+  }
+
+  .fields dd {
+    margin: 0;
+  }
 }
 
 .ref {
@@ -273,50 +547,14 @@
   white-space: pre-line;
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.1rem;
-}
-
-.actions button {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink);
-  padding: 0.4rem 0.95rem;
-  font: inherit;
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
-
-.actions button:hover:not(:disabled) {
-  border-color: var(--accent);
-}
-
-/* The one next step, where there is one, is the gold button. */
-.actions button.primary:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-  font-weight: 600;
-}
-
-.actions button:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
 /* Sending to Printful: the address in the fields Printful wants. */
 .send {
-  margin-top: 1rem;
   padding: 0.9rem;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--bg);
   display: grid;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .sendNote {
@@ -328,9 +566,8 @@
 
 .sendField {
   display: grid;
-  grid-template-columns: 11rem minmax(0, 1fr);
-  align-items: center;
-  gap: 0.75rem;
+  grid-template-columns: 1fr;
+  gap: 0.2rem;
   font-size: 0.8125rem;
   color: var(--muted);
 }
@@ -338,11 +575,11 @@
 .sendField input {
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--ink);
-  padding: 0.35rem 0.6rem;
+  padding: 0.5rem 0.65rem;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 
 .sendField input:focus {
@@ -350,18 +587,8 @@
   outline: none;
 }
 
-@media (max-width: 640px) {
-  .fields {
-    grid-template-columns: 1fr;
-    gap: 0.1rem;
-  }
-
-  .fields dd {
-    margin-bottom: 0.5rem;
-  }
-
-  .sendField {
-    grid-template-columns: 1fr;
-    gap: 0.2rem;
-  }
+.sendActions {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
 }

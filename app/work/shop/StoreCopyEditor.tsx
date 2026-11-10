@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SeoPanel from '@/components/SeoPanel';
 import { productMetaDescription } from '@/lib/product-meta';
 import { paragraphsIn } from '@/lib/seo-score';
@@ -32,11 +32,17 @@ import styles from './store.module.css';
 //
 // Five fields per product since 2026-10-19 (Shop step 4): a tagline, the
 // description, the story behind the design, a fit-and-care note, and alt text
-// for the art. All optional; lib/product-copy.ts owns the file's shape. The
-// up and down arrows set `$order`, which is the order the public store shows.
+// for the art. All optional; lib/product-copy.ts owns the file's shape.
+// `$order` is the order the public store shows; it is set by dragging a tile,
+// or by the arrows in an open product.
 //
-// The layout is the writing on the left and, on the right, what the page will
-// actually say plus how it scores. That pairing is the reason the meta
+// Laid out as his pick, 2026-11-10 (redesign page, Shop products: A): the
+// products as tiles with their picture, in the store's order, with a gold !
+// on any without a description; opening one shows the editor in place of the
+// grid. On a computer that is the writing on the left and, on the right, what
+// the page will actually say plus how it scores; on a phone the right column
+// is behind a toggle below the fields. Save sits in a bar stuck to the foot
+// of the pane, so it is in reach from anywhere. That pairing is the reason the meta
 // description now prefers his own words (lib/product-meta.ts): while it was
 // built only from the supplier's facts, nothing typed here could move a single
 // SEO field, and a live score would have been a decoration.
@@ -122,8 +128,18 @@ export default function StoreCopyEditor({
   const [dirty, setDirty] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  /** The one product whose card is open. Shut by default, like every card in the backend. */
+  /** The one product open in the editor. None by default: the page opens on the tiles. */
   const [openProduct, setOpenProduct] = useState<string | null>(null);
+  /** On a phone, whether the preview and SEO column under the fields is out. */
+  const [showAside, setShowAside] = useState(false);
+  /** The tile being dragged to a new place in the store, if any. */
+  const [dragging, setDragging] = useState<string | null>(null);
+  const editorRef = useRef<HTMLElement>(null);
+
+  // An opened product starts at its top, not wherever the grid was scrolled.
+  useEffect(() => {
+    if (openProduct) editorRef.current?.scrollIntoView({ block: 'start' });
+  }, [openProduct]);
   const [viewing, setViewing] = useState<Viewing | null>(null);
   /** Which product's real page is open in the preview frame, if any. */
   const [previewing, setPreviewing] = useState<string | null>(null);
@@ -163,7 +179,12 @@ export default function StoreCopyEditor({
               : `Could not read the file (${response.status}).`,
           );
         }
-        const { file } = (await response.json()) as { file: { text: string; sha: string } };
+        const { file, configured } = (await response.json()) as {
+          file?: { text: string; sha: string };
+          configured?: boolean;
+        };
+        // No token answers 200 with { configured: false } and no file.
+        if (configured === false || !file) throw new Error('Not connected. Set GITHUB_TOKEN as a Worker secret.');
         const parsed = JSON.parse(file.text) as Record<string, unknown>;
         if (!live) return;
 
@@ -239,7 +260,7 @@ export default function StoreCopyEditor({
       });
   }, [loaded, products]);
 
-  /* In the store's own order, so the arrows move what they appear to move.
+  /* In the store's own order, so a drag and the arrows move what they appear to move.
    *
    * This replaced "no copy first" (his earlier call) on 2026-10-19, when the
    * order became something this page sets: a list sorted by one rule cannot
@@ -261,6 +282,18 @@ export default function StoreCopyEditor({
     const to = from + by;
     if (from < 0 || to < 0 || to >= ids.length) return;
     [ids[from], ids[to]] = [ids[to], ids[from]];
+    setOrder(ids);
+    setDirty(true);
+  }
+
+  /** Put one product where another is, as a drag passes over it. */
+  function place(id: string, over: string) {
+    const ids = ordered.map((p) => p.id);
+    const from = ids.indexOf(id);
+    const to = ids.indexOf(over);
+    if (from < 0 || to < 0 || from === to) return;
+    ids.splice(from, 1);
+    ids.splice(to, 0, id);
     setOrder(ids);
     setDirty(true);
   }
@@ -439,340 +472,58 @@ export default function StoreCopyEditor({
     return <p className={styles.status}>{status ?? 'Reading the repo…'}</p>;
   }
 
+  const current = openProduct ? ordered.find((p) => p.id === openProduct) ?? null : null;
+
+  /** Every image a product has, with this session's upload in front. */
+  function imagesOf(product: EditorProduct) {
+    return uploads[product.id]
+      ? [
+          { key: 'pending', label: 'Uploaded (pending deploy)', src: uploads[product.id] },
+          ...product.images.filter((image) => image.key !== 'artwork'),
+        ]
+      : product.images;
+  }
+
+  function wordsOf(id: string) {
+    const draft = copy[id] ?? BLANK;
+    return [draft.tagline, draft.description, draft.story, draft.care]
+      .join(' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+  }
+
+  function openOne(id: string) {
+    setOpenProduct(id);
+    setShowAside(false);
+  }
+
+  function backToAll() {
+    const was = openProduct;
+    setOpenProduct(null);
+    // Back to its tile, so the keyboard and the eye both land where they left.
+    if (was) {
+      requestAnimationFrame(() =>
+        document.querySelector<HTMLButtonElement>(`[data-tile="${CSS.escape(was)}"] button`)?.focus(),
+      );
+    }
+  }
+
   return (
-    <>
-      <div className={styles.toolbar}>
-        <p className={styles.counts}>
-          {stats.needWriting > 0 ? (
-            <span className={styles.warn}>
-              {stats.needWriting} need{stats.needWriting === 1 ? 's' : ''} a description
-            </span>
-          ) : (
-            <span>Every product has its words</span>
-          )}
-          <span className={styles.sep}>·</span>
-          <strong>{stats.total}</strong> product{stats.total === 1 ? '' : 's'}
-          {dirty && <span className={styles.dirty}>unsaved</span>}
+    <div className={styles.products}>
+      {current ? editor(current) : grid()}
+
+      {/* Save, always in reach: stuck to the foot of the pane on the grid and
+          in the editor alike, with what the last action said beside it. */}
+      <div className={styles.saveBar}>
+        <p className={styles.saveNote} role="status">
+          {dirty && <span className={styles.dirty}>Unsaved</span>}
+          {status ?? (dirty ? null : 'Everything is saved.')}
         </p>
-        <div className={styles.actions}>
-          <button type="button" onClick={() => void sync()} disabled={syncing}>
-            {syncing ? 'Syncing…' : 'Sync Printful'}
-          </button>
-          <button type="button" className={styles.save} onClick={() => void save()} disabled={busy || !dirty}>
-            {busy ? 'Working…' : 'Save'}
-          </button>
-        </div>
+        <button type="button" className={styles.save} onClick={() => void save()} disabled={busy || !dirty}>
+          {busy ? 'Working…' : 'Save'}
+        </button>
       </div>
-
-      {staleDays !== null && (
-        <p className={styles.stale}>
-          The catalogue is {staleDays} days old. Prices, sizes and stock on the store are as Printful had them
-          then — sync before trusting them.
-        </p>
-      )}
-      {syncNote && <p className={styles.message}>{syncNote}</p>}
-
-      {/* One shut card per product, as Reading's shelves and the orders are.
-          Open, a card holds everything about its product: the art, the five
-          fields, and — beside them — what the page will say and how it
-          scores. */}
-      <div className={styles.cards}>
-        {ordered.map((product, index) => {
-          const draft = copy[product.id] ?? BLANK;
-          const written = copyFor(product.id);
-          const words = [draft.tagline, draft.description, draft.story, draft.care]
-            .join(' ')
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean).length;
-          const images = uploads[product.id]
-            ? [
-                { key: 'pending', label: 'Uploaded (pending deploy)', src: uploads[product.id] },
-                ...product.images.filter((image) => image.key !== 'artwork'),
-              ]
-            : product.images;
-          const isOpen = openProduct === product.id;
-          // Gold where it waits on him: a product with no description.
-          const needsWords = written.description.length === 0;
-
-          return (
-            <section
-              key={product.id}
-              className={isOpen ? styles.cardOpen : styles.card}
-              data-waiting={needsWords || undefined}
-            >
-              <div className={styles.cardHeadRow}>
-                <button
-                  type="button"
-                  className={styles.cardHead}
-                  aria-expanded={isOpen}
-                  onClick={() => {
-                    setOpenProduct(isOpen ? null : product.id);
-                  }}
-                >
-                  <span className={styles.cardName}>{product.name}</span>
-                  <span className={styles.cardFacts}>
-                    {product.price ?? 'no price'} · {product.variantCount} size
-                    {product.variantCount === 1 ? '' : 's'}
-                  </span>
-                  <span className={styles.cardState}>{needsWords ? 'Needs a description' : `${words} words`}</span>
-                </button>
-                {/* The store's order. Only worth showing with more than one. */}
-                {ordered.length > 1 && (
-                  <div className={styles.move}>
-                    <button
-                      type="button"
-                      aria-label={`Move ${product.name} up`}
-                      disabled={index === 0}
-                      onClick={() => move(product.id, -1)}
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`Move ${product.name} down`}
-                      disabled={index === ordered.length - 1}
-                      onClick={() => move(product.id, 1)}
-                    >
-                      ↓
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {isOpen && (
-                <div className={styles.cardBody}>
-                  <div className={styles.cardMain}>
-                    <p className={styles.facts}>
-                      Printful {product.id}
-                      {product.href && (
-                        <>
-                          <span className={styles.sep}>·</span>
-                          <a href={product.href} target="_blank" rel="noreferrer">
-                            the live page
-                          </a>
-                        </>
-                      )}
-                    </p>
-
-                    {/* Every image this product has, and a tile to add one. */}
-                    <div className={styles.grid}>
-                      {images.map((image) => (
-                        <button
-                          key={image.key}
-                          type="button"
-                          className={styles.tile}
-                          onClick={() =>
-                            setViewing({ src: image.src, label: image.label, product: product.name })
-                          }
-                          title={`${image.label} — click to inspect`}
-                        >
-                          <img src={image.src} alt={`${product.name} — ${image.label}`} loading="lazy" />
-                          <span className={styles.tileLabel}>{image.label}</span>
-                        </button>
-                      ))}
-
-                      <label className={styles.uploadTile}>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(event) => {
-                            const file = event.target.files?.[0];
-                            // Cleared so choosing the same file twice fires again.
-                            event.target.value = '';
-                            if (file) void upload(product, file);
-                          }}
-                        />
-                        {uploadingId === product.id ? (
-                          <span className={styles.uploadBusy}>Converting…</span>
-                        ) : (
-                          <>
-                            <span className={styles.plus} aria-hidden="true">
-                              <svg viewBox="0 0 24 24">
-                                <path d="M12 5v14M5 12h14" />
-                              </svg>
-                            </span>
-                            <span className={styles.uploadLabel}>Upload art</span>
-                          </>
-                        )}
-                      </label>
-                    </div>
-
-                    <label className={styles.field}>
-                      <span className={styles.fieldName}>Tagline</span>
-                      <input
-                        type="text"
-                        className={styles.line}
-                        spellCheck
-                        maxLength={140}
-                        value={draft.tagline}
-                        placeholder="One line under the name."
-                        onChange={(event) => edit(product.id, 'tagline', event.target.value)}
-                      />
-                    </label>
-
-                    <label className={styles.field}>
-                      <span className={styles.fieldName}>Description</span>
-                      <textarea
-                        id={`copy-${product.id}`}
-                        className={styles.productText}
-                        spellCheck
-                        value={draft.description}
-                        placeholder="What the design is. Without it, the description falls back to the supplier's words about the blank."
-                        onChange={(event) => edit(product.id, 'description', event.target.value)}
-                      />
-                    </label>
-
-                    <label className={styles.field}>
-                      <span className={styles.fieldName}>The story</span>
-                      <textarea
-                        className={`${styles.productText} ${styles.medium}`}
-                        spellCheck
-                        value={draft.story}
-                        placeholder="Where it came from. Its own section on the page; none at all if empty."
-                        onChange={(event) => edit(product.id, 'story', event.target.value)}
-                      />
-                    </label>
-
-                    <label className={styles.field}>
-                      <span className={styles.fieldName}>Fit and care</span>
-                      <textarea
-                        className={`${styles.productText} ${styles.short}`}
-                        spellCheck
-                        value={draft.care}
-                        placeholder="How it fits and how to wash it. Shown above the size guide."
-                        onChange={(event) => edit(product.id, 'care', event.target.value)}
-                      />
-                    </label>
-
-                    <label className={styles.field}>
-                      <span className={styles.fieldName}>Alt text</span>
-                      <input
-                        type="text"
-                        className={styles.line}
-                        spellCheck
-                        maxLength={250}
-                        value={draft.alt}
-                        placeholder={`What the art shows. Falls back to "${product.name}".`}
-                        onChange={(event) => edit(product.id, 'alt', event.target.value)}
-                      />
-                    </label>
-
-                    <p className={styles.meta}>
-                      {words} word{words === 1 ? '' : 's'}
-                      <span className={styles.sep}>·</span>
-                      {written.description.length} description paragraph
-                      {written.description.length === 1 ? '' : 's'}
-                      {written.story.length > 0 && (
-                        <>
-                          <span className={styles.sep}>·</span>
-                          {written.story.length} story paragraph{written.story.length === 1 ? '' : 's'}
-                        </>
-                      )}
-                    </p>
-                  </div>
-
-                  {/* What the page will say, and how it scores. Sticky,
-                      because the fields column is long and this is the reason
-                      to look right. */}
-                  <aside className={styles.aside}>
-                  <section className={styles.preview}>
-                    {product.href && (
-                      <button
-                        type="button"
-                        className={styles.previewOpen}
-                        onClick={() => setPreviewing(product.id)}
-                      >
-                        Preview the page
-                      </button>
-                    )}
-                    <h2 className={styles.previewHead}>How it will read</h2>
-                    <p className={styles.previewTitle}>
-                      {product.name} — {siteName}
-                    </p>
-                    <p className={styles.previewUrl}>
-                      masterroachi.com{product.href ?? `/store/${product.id}/`}
-                    </p>
-                    <p className={styles.previewDesc}>{descriptionFor(product)}</p>
-                    <p className={styles.previewNote}>
-                      The search result. The description is your first paragraphs where you have written
-                      any, and the supplier&rsquo;s facts where you have not.
-                    </p>
-
-                    <h3 className={styles.previewHead}>On the page</h3>
-                    {copyFor(product.id).tagline && (
-                      <p className={styles.previewTagline}>{copyFor(product.id).tagline}</p>
-                    )}
-                    {copyFor(product.id).description.length > 0 ? (
-                      <div className={styles.previewBody}>
-                        {copyFor(product.id).description.map((paragraph, index) => (
-                          <p key={index}>{paragraph}</p>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className={styles.previewEmpty}>
-                        No description — the product page shows the garment and the price, and nothing in
-                        your own words about the design.
-                      </p>
-                    )}
-                    {copyFor(product.id).story.length > 0 && (
-                      <>
-                        <h3 className={styles.previewHead}>The story</h3>
-                        <div className={styles.previewBody}>
-                          {copyFor(product.id).story.map((paragraph, index) => (
-                            <p key={index}>{paragraph}</p>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                    {copyFor(product.id).care && (
-                      <>
-                        <h3 className={styles.previewHead}>Fit and care</h3>
-                        <div className={styles.previewBody}>
-                          <p>{copyFor(product.id).care}</p>
-                        </div>
-                      </>
-                    )}
-                  </section>
-
-                  <SeoPanel
-                    input={{
-                      kind: 'product',
-                      title: `${product.name} — ${siteName}`,
-                      description: descriptionFor(product),
-                      body: [
-                        copyFor(product.id).tagline,
-                        ...copyFor(product.id).description,
-                        ...copyFor(product.id).story,
-                        copyFor(product.id).care,
-                      ]
-                        .filter(Boolean)
-                        .join('\n\n'),
-                      focus: product.name,
-                      // The product image's alt is his alt text where written and
-                      // the name otherwise, so it is never missing — reported as
-                      // what the page will actually carry.
-                      images: [{ alt: copyFor(product.id).alt || product.name }],
-                    }}
-                  />
-                  </aside>
-                </div>
-              )}
-            </section>
-          );
-        })}
-
-        {orphans.length > 0 && (
-          <p className={styles.orphans}>
-            {orphans.length} description{orphans.length === 1 ? '' : 's'} belong to products no longer
-            in Printful and {orphans.length === 1 ? 'is' : 'are'} kept, not shown:{' '}
-            {orphans.map((orphan) => `${orphan.id} (${orphan.words} words)`).join(', ')}. Saving
-            never deletes them.
-          </p>
-        )}
-      </div>
-
-      {status && <p className={styles.message}>{status}</p>}
 
       {previewing && (() => {
         const product = products.find((p) => p.id === previewing);
@@ -802,6 +553,399 @@ export default function StoreCopyEditor({
           </p>
         </div>
       )}
-    </>
+    </div>
   );
+
+  /* The store as tiles, in its own order — his pick, 2026-11-10 (redesign
+   * page, Shop products: A). Dragged by the grip to reorder, with pointer
+   * events rather than HTML drag and drop, which a phone's browser does not
+   * do reliably. The keyboard's way is the arrows in the open product. */
+  function grid() {
+    return (
+      <>
+        <div className={styles.toolbar}>
+          <p className={styles.counts}>
+            {stats.needWriting > 0 ? (
+              <span className={styles.warn}>
+                {stats.needWriting} need{stats.needWriting === 1 ? 's' : ''} a description
+              </span>
+            ) : (
+              <span>Every product has its words</span>
+            )}
+            <span className={styles.sep}>·</span>
+            <strong>{stats.total}</strong> product{stats.total === 1 ? '' : 's'}
+          </p>
+          <button type="button" className={styles.pill} onClick={() => void sync()} disabled={syncing}>
+            {syncing ? 'Syncing…' : 'Sync Printful'}
+          </button>
+        </div>
+
+        {staleDays !== null && (
+          <p className={styles.stale}>
+            The catalogue is {staleDays} days old. Prices, sizes and stock on the store are as Printful had them
+            then — sync before trusting them.
+          </p>
+        )}
+        {syncNote && <p className={styles.message}>{syncNote}</p>}
+
+        <ul className={styles.tiles}>
+          {ordered.map((product) => {
+            const picture = imagesOf(product)[0];
+            // Gold where it waits on him: a product with no description.
+            const needsWords = copyFor(product.id).description.length === 0;
+            const words = wordsOf(product.id);
+            return (
+              <li
+                key={product.id}
+                data-tile={product.id}
+                className={styles.tileItem}
+                data-dragging={dragging === product.id || undefined}
+              >
+                <button
+                  type="button"
+                  className={styles.product}
+                  data-waiting={needsWords || undefined}
+                  onClick={() => openOne(product.id)}
+                >
+                  <span className={styles.thumb}>
+                    {picture ? (
+                      <img src={picture.src} alt="" loading="lazy" />
+                    ) : (
+                      <span className={styles.thumbEmpty}>No picture</span>
+                    )}
+                  </span>
+                  <span className={styles.productName}>
+                    <span>{product.name}</span>
+                    {needsWords ? (
+                      <span className={styles.bang} aria-label="Needs words">
+                        !
+                      </span>
+                    ) : (
+                      <span className={styles.tick} aria-hidden="true">
+                        ✓
+                      </span>
+                    )}
+                  </span>
+                  <span className={styles.productFacts}>
+                    {product.price ?? 'no price'} · {product.variantCount} size
+                    {product.variantCount === 1 ? '' : 's'}
+                  </span>
+                  <span className={needsWords ? styles.productStateGold : styles.productState}>
+                    {needsWords ? 'Needs a description' : `${words} words`}
+                  </span>
+                </button>
+                {ordered.length > 1 && (
+                  <span
+                    className={styles.grip}
+                    aria-hidden="true"
+                    title="Drag to reorder"
+                    onPointerDown={(event) => {
+                      event.preventDefault();
+                      event.currentTarget.setPointerCapture(event.pointerId);
+                      setDragging(product.id);
+                    }}
+                    onPointerMove={(event) => {
+                      if (dragging !== product.id) return;
+                      const over = document
+                        .elementFromPoint(event.clientX, event.clientY)
+                        ?.closest('[data-tile]')
+                        ?.getAttribute('data-tile');
+                      if (over && over !== product.id) place(product.id, over);
+                    }}
+                    onPointerUp={() => setDragging(null)}
+                    onPointerCancel={() => setDragging(null)}
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <circle cx="9" cy="6" r="1.5" />
+                      <circle cx="15" cy="6" r="1.5" />
+                      <circle cx="9" cy="12" r="1.5" />
+                      <circle cx="15" cy="12" r="1.5" />
+                      <circle cx="9" cy="18" r="1.5" />
+                      <circle cx="15" cy="18" r="1.5" />
+                    </svg>
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
+        {ordered.length > 1 && (
+          <p className={styles.hint}>Drag a tile by its handle to reorder the store, or open it and use the arrows.</p>
+        )}
+
+        {orphans.length > 0 && (
+          <p className={styles.orphans}>
+            {orphans.length} description{orphans.length === 1 ? '' : 's'} belong to products no longer
+            in Printful and {orphans.length === 1 ? 'is' : 'are'} kept, not shown:{' '}
+            {orphans.map((orphan) => `${orphan.id} (${orphan.words} words)`).join(', ')}. Saving
+            never deletes them.
+          </p>
+        )}
+      </>
+    );
+  }
+
+  /* One product: today's editor, tidied for a phone (his pick, 2026-11-10,
+   * Shop products: A). One column on a phone, with what the page will say and
+   * how it scores behind a toggle; beside the fields from 900px up, as
+   * before. */
+  function editor(product: EditorProduct) {
+    const draft = copy[product.id] ?? BLANK;
+    const written = copyFor(product.id);
+    const words = wordsOf(product.id);
+    const images = imagesOf(product);
+    const index = ordered.findIndex((p) => p.id === product.id);
+
+    return (
+      <section className={styles.editor} ref={editorRef} aria-label={product.name}>
+        <div className={styles.editorHead}>
+          <button type="button" className={styles.back} onClick={backToAll}>
+            <span aria-hidden="true">‹</span> Products
+          </button>
+          <h2 className={styles.editorName}>{product.name}</h2>
+          {/* The store's order, by keyboard as well as by dragging a tile. */}
+          {ordered.length > 1 && (
+            <div className={styles.move}>
+              <span className={styles.moveAt}>
+                {index + 1} of {ordered.length}
+              </span>
+              <button
+                type="button"
+                aria-label={`Move ${product.name} earlier in the store`}
+                disabled={index === 0}
+                onClick={() => move(product.id, -1)}
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                aria-label={`Move ${product.name} later in the store`}
+                disabled={index === ordered.length - 1}
+                onClick={() => move(product.id, 1)}
+              >
+                ↓
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.cardBody}>
+          <div className={styles.cardMain}>
+            <p className={styles.facts}>
+              Printful {product.id}
+              <span className={styles.sep}>·</span>
+              {product.price ?? 'no price'} · {product.variantCount} size{product.variantCount === 1 ? '' : 's'}
+              {product.href && (
+                <>
+                  <span className={styles.sep}>·</span>
+                  <a href={product.href} target="_blank" rel="noreferrer">
+                    the live page
+                  </a>
+                </>
+              )}
+            </p>
+
+            {/* Every image this product has, and a tile to add one. */}
+            <div className={styles.grid}>
+              {images.map((image) => (
+                <button
+                  key={image.key}
+                  type="button"
+                  className={styles.tile}
+                  onClick={() => setViewing({ src: image.src, label: image.label, product: product.name })}
+                  title={`${image.label} — click to inspect`}
+                >
+                  <img src={image.src} alt={`${product.name} — ${image.label}`} loading="lazy" />
+                  <span className={styles.tileLabel}>{image.label}</span>
+                </button>
+              ))}
+
+              <label className={styles.uploadTile}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    // Cleared so choosing the same file twice fires again.
+                    event.target.value = '';
+                    if (file) void upload(product, file);
+                  }}
+                />
+                {uploadingId === product.id ? (
+                  <span className={styles.uploadBusy}>Converting…</span>
+                ) : (
+                  <>
+                    <span className={styles.plus} aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M12 5v14M5 12h14" />
+                      </svg>
+                    </span>
+                    <span className={styles.uploadLabel}>Upload art</span>
+                  </>
+                )}
+              </label>
+            </div>
+
+            <label className={styles.field}>
+              <span className={styles.fieldName}>Tagline</span>
+              <input
+                type="text"
+                className={styles.line}
+                spellCheck
+                maxLength={140}
+                value={draft.tagline}
+                placeholder="One line under the name."
+                onChange={(event) => edit(product.id, 'tagline', event.target.value)}
+              />
+            </label>
+
+            <label className={styles.field}>
+              <span className={styles.fieldName}>Description</span>
+              <textarea
+                id={`copy-${product.id}`}
+                className={styles.productText}
+                spellCheck
+                value={draft.description}
+                placeholder="What the design is. Without it, the description falls back to the supplier's words about the blank."
+                onChange={(event) => edit(product.id, 'description', event.target.value)}
+              />
+            </label>
+
+            <label className={styles.field}>
+              <span className={styles.fieldName}>The story</span>
+              <textarea
+                className={`${styles.productText} ${styles.medium}`}
+                spellCheck
+                value={draft.story}
+                placeholder="Where it came from. Its own section on the page; none at all if empty."
+                onChange={(event) => edit(product.id, 'story', event.target.value)}
+              />
+            </label>
+
+            <label className={styles.field}>
+              <span className={styles.fieldName}>Fit and care</span>
+              <textarea
+                className={`${styles.productText} ${styles.short}`}
+                spellCheck
+                value={draft.care}
+                placeholder="How it fits and how to wash it. Shown above the size guide."
+                onChange={(event) => edit(product.id, 'care', event.target.value)}
+              />
+            </label>
+
+            <label className={styles.field}>
+              <span className={styles.fieldName}>Alt text</span>
+              <input
+                type="text"
+                className={styles.line}
+                spellCheck
+                maxLength={250}
+                value={draft.alt}
+                placeholder={`What the art shows. Falls back to "${product.name}".`}
+                onChange={(event) => edit(product.id, 'alt', event.target.value)}
+              />
+            </label>
+
+            <p className={styles.meta}>
+              {words} word{words === 1 ? '' : 's'}
+              <span className={styles.sep}>·</span>
+              {written.description.length} description paragraph
+              {written.description.length === 1 ? '' : 's'}
+              {written.story.length > 0 && (
+                <>
+                  <span className={styles.sep}>·</span>
+                  {written.story.length} story paragraph{written.story.length === 1 ? '' : 's'}
+                </>
+              )}
+            </p>
+
+            {product.href && (
+              <button type="button" className={styles.previewOpen} onClick={() => setPreviewing(product.id)}>
+                Preview the page
+              </button>
+            )}
+
+            {/* Only on a phone: the column below is behind this. */}
+            <button
+              type="button"
+              className={styles.asideToggle}
+              aria-expanded={showAside}
+              aria-controls={`aside-${product.id}`}
+              onClick={() => setShowAside(!showAside)}
+            >
+              {showAside ? 'Hide how it will read' : 'How it will read, and its search score'}
+            </button>
+          </div>
+
+          {/* What the page will say, and how it scores. Sticky beside the
+              fields on a computer, because the fields column is long and this
+              is the reason to look right; behind the toggle on a phone. */}
+          <aside id={`aside-${product.id}`} className={styles.aside} data-shown={showAside || undefined}>
+            <section className={styles.preview}>
+              <h2 className={styles.previewHead}>How it will read</h2>
+              <p className={styles.previewTitle}>
+                {product.name} — {siteName}
+              </p>
+              <p className={styles.previewUrl}>masterroachi.com{product.href ?? `/store/${product.id}/`}</p>
+              <p className={styles.previewDesc}>{descriptionFor(product)}</p>
+              <p className={styles.previewNote}>
+                The search result. The description is your first paragraphs where you have written any, and the
+                supplier&rsquo;s facts where you have not.
+              </p>
+
+              <h3 className={styles.previewHead}>On the page</h3>
+              {written.tagline && <p className={styles.previewTagline}>{written.tagline}</p>}
+              {written.description.length > 0 ? (
+                <div className={styles.previewBody}>
+                  {written.description.map((paragraph, i) => (
+                    <p key={i}>{paragraph}</p>
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.previewEmpty}>
+                  No description — the product page shows the garment and the price, and nothing in your own
+                  words about the design.
+                </p>
+              )}
+              {written.story.length > 0 && (
+                <>
+                  <h3 className={styles.previewHead}>The story</h3>
+                  <div className={styles.previewBody}>
+                    {written.story.map((paragraph, i) => (
+                      <p key={i}>{paragraph}</p>
+                    ))}
+                  </div>
+                </>
+              )}
+              {written.care && (
+                <>
+                  <h3 className={styles.previewHead}>Fit and care</h3>
+                  <div className={styles.previewBody}>
+                    <p>{written.care}</p>
+                  </div>
+                </>
+              )}
+            </section>
+
+            <SeoPanel
+              input={{
+                kind: 'product',
+                title: `${product.name} — ${siteName}`,
+                description: descriptionFor(product),
+                body: [written.tagline, ...written.description, ...written.story, written.care]
+                  .filter(Boolean)
+                  .join('\n\n'),
+                focus: product.name,
+                // The product image's alt is his alt text where written and
+                // the name otherwise, so it is never missing — reported as
+                // what the page will actually carry.
+                images: [{ alt: written.alt || product.name }],
+              }}
+            />
+          </aside>
+        </div>
+      </section>
+    );
+  }
 }

@@ -1,36 +1,227 @@
-/* The backend's only chrome. Tokens from app/globals.css. */
+/* The backend's only chrome: a title that opens the app's doors.
+   Tokens from app/globals.css. See WorkHeader.tsx. */
 
 .header {
-  margin-bottom: 1.5rem;
-  padding: 0.9rem 1rem;
-  /* The menus hang out of the header and must not be clipped by the shell's
-     own overflow rules, so the header is the stacking context they sit in. */
   position: relative;
-  z-index: 2;
+  /* Above the page, so the sheet and the dropdown cover it. */
+  z-index: 20;
+  flex: none;
+  padding: 0.85rem var(--pad) 0.6rem;
+  max-width: var(--shell);
+  width: 100%;
+  margin: 0 auto;
 }
 
-.bar {
+.title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.6rem 0.35rem 0.35rem;
+  margin-left: -0.35rem;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.title:hover,
+.title[aria-expanded='true'] {
+  border-color: var(--line);
+  background: var(--bg-raised);
+}
+
+.title:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.mark {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--accent);
+  border-radius: 9px;
+  color: var(--accent);
+}
+
+.mark svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.caret {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.title[aria-expanded='true'] .caret {
+  transform: translateY(1px) rotate(-135deg);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0% 0 0 / 0.55);
+}
+
+/* --- the doors: a dropdown on a computer -------------------------------- */
+
+.panel {
+  position: absolute;
+  top: calc(100% - 0.2rem);
+  left: var(--pad);
+  width: min(26rem, calc(100vw - 2rem));
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line-bright);
+  border-radius: 16px;
+  box-shadow: 0 24px 48px oklch(0% 0 0 / 0.55);
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.grab {
+  display: none;
+}
+
+.appHome {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  justify-self: start;
+}
+
+.appHome:hover {
+  color: var(--ink);
+}
+
+.doors {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.25rem 1.1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
 }
 
-.header a {
+.door {
+  aspect-ratio: 5 / 6;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.65rem;
+  border-radius: 11px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.door svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--accent);
+}
+
+.door:hover {
+  border-color: var(--line-bright);
+}
+
+.door:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Where you are: the one gold face, as the doors pages have them. */
+.door[aria-current='page'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: oklch(0% 0 0);
+}
+
+.door[aria-current='page'] svg {
+  color: oklch(0% 0 0);
+}
+
+.apps {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 1.25rem;
+}
+
+.apps a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   color: var(--muted);
   font-size: 0.875rem;
   text-decoration: none;
 }
 
-.header a:hover {
+.apps a:hover {
   color: var(--ink);
 }
 
-/* Which page you are on. The only thing the header has to say beyond where
-   you can go. */
-.here {
-  color: var(--ink) !important;
+.apps svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* --- a sheet from the bottom on a phone --------------------------------- */
+
+@media (max-width: 720px) {
+  .panel {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    border-radius: 22px 22px 0 0;
+    border-bottom: 0;
+    padding: 0.6rem 1rem calc(1.2rem + env(safe-area-inset-bottom));
+  }
+
+  .grab {
+    display: block;
+    width: 2.4rem;
+    height: 4px;
+    border-radius: 9px;
+    background: var(--line-bright);
+    justify-self: center;
+  }
+
+  .apps {
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    transition: none;
+  }
 }

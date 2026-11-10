@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react';
 import styles from './nav.module.css';
 
 // The two things that are about the site rather than about any one tool, so
-// they live on the front door rather than being repeated on every page.
+// they live on the admin home rather than being repeated on every page.
+//
+// ONE SMALL CARD AT THE FOOT (his pick, 2026-11-10, redesign page, Admin
+// doors: A): what is live on top, Rebuild under it as one wide button. It is
+// a footnote to the doors, so it is outlined, never gold.
 
 /**
  * Whether what is deployed is the newest commit.
@@ -90,15 +94,17 @@ export default function SiteActions() {
   }
 
   return (
-    <p className={styles.actions}>
+    <section className={styles.actions} aria-label="The site">
+      <p className={styles.status} aria-live="polite">
+        {state === 'idle' || state === 'working' ? (
+          <Version />
+        ) : (
+          <span className={styles.quiet}>{state}</span>
+        )}
+      </p>
       <button type="button" onClick={() => void go()} disabled={state === 'working'}>
         {state === 'working' ? 'Starting…' : 'Rebuild the site'}
       </button>
-      {state === 'idle' || state === 'working' ? (
-        <Version />
-      ) : (
-        <span className={styles.quiet}>{state}</span>
-      )}
-    </p>
+    </section>
   );
 }

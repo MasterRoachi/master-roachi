@@ -1,64 +1,42 @@
-/* The collection editor — Projects and Writing — in the language of Habits,
-   Reading and the Shop since Stage 2 (2026-10-19): a round + for a new entry,
-   one shut card per entry that opens to the width of the column, gold only
-   for what would be flagged, and inside an open card the fields and body
-   beside what the page will say. Tokens from app/globals.css. */
+/* The collection editor — Projects and Writing. Tokens from app/globals.css.
+
+   His pick, 2026-11-10 (redesign page, Projects and Writing: A, "Four tabs
+   and a fixed bar"): the list of cards is the first screen, and an entry opens
+   full screen with four tabs over a pane that scrolls on its own, and a bar
+   of Preview, Publish and Save pinned at the foot. From 1000px the live page
+   sits in a panel on the right. Gold only for the one thing: Save while there
+   is something to save, and the edge of a card that would be flagged. */
 
 .page {
-  margin: 2rem auto 4rem;
+  margin: 1.25rem auto 2rem;
 }
 
-/* --- a new entry, and the grid's order --------------------------------- */
+/* --- the list: + New, the views, and the grid's order --------------------- */
 
-.addSection {
+.listTop {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0 0 1.5rem;
+  justify-content: space-between;
+  gap: 0.6rem;
+  max-width: 36rem;
+  margin: 0 auto 1.1rem;
 }
 
-.addToggle,
-.addToggleOn {
-  width: 2.4rem;
-  height: 2.4rem;
-  padding: 0;
-  border-radius: 999px;
-  border: 1px solid var(--line);
+.newButton {
   background: var(--bg-raised);
-  display: grid;
-  place-items: center;
+  border: 1px solid var(--line-bright);
+  border-radius: 999px;
+  color: var(--ink);
+  padding: 0.45rem 1.05rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.addToggle svg,
-.addToggleOn svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 2;
-  stroke-linecap: round;
-  transition: transform 0.18s ease, stroke 0.15s ease;
-}
-
-.addToggle:hover {
-  border-color: var(--line-bright);
-}
-
-.addToggle:hover svg {
-  stroke: var(--ink);
-}
-
-.addToggleOn {
+.newButton:hover {
   border-color: var(--accent);
-  background: var(--accent-dim);
-}
-
-.addToggleOn svg {
-  stroke: var(--accent);
-  transform: rotate(45deg);
 }
 
 .orderBar {
@@ -91,29 +69,20 @@
   align-items: center;
 }
 
-.card,
-.cardOpen {
+.card {
   width: 100%;
+  max-width: 36rem;
   margin: 0 auto 0.6rem;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--bg-raised);
-  transition: max-width 0.18s ease, border-color 0.15s ease;
-}
-
-.card {
-  max-width: 36rem;
   overflow: hidden;
+  transition: border-color 0.15s ease;
 }
 
-.cardOpen {
-  max-width: 100%;
-  border-color: var(--line-bright);
-}
-
-.card[data-waiting],
-.cardOpen[data-waiting] {
-  border-color: var(--accent);
+/* Something on it would be flagged if it were opened. */
+.card[data-waiting] {
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .cardHeadRow {
@@ -180,10 +149,10 @@
 .move button {
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--ink);
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 2.1rem;
+  height: 2.1rem;
   font: inherit;
   cursor: pointer;
 }
@@ -197,69 +166,232 @@
   cursor: default;
 }
 
-/* Open: the fields and body on the left, the previews on the right. Below a
-   tablet, two columns means neither is usable. */
-.cardBody {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 370px);
-  gap: 2rem;
-  align-items: start;
-  padding: 0.25rem 1.1rem 1.25rem;
-  border-top: 1px solid var(--line);
-}
+/* --- an open entry: full screen ------------------------------------------- */
 
-.cardBodyPlain {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-@media (max-width: 900px) {
-  .cardBody {
-    grid-template-columns: 1fr;
-  }
-}
-
-.cardMain {
-  min-width: 0;
-}
-
-.bar {
+/* Fills the scrolling wrapper (work.module.css) rather than scrolling in it:
+   only the pane between the tabs and the bar scrolls, so the tabs and the bar
+   never leave the screen. The negative margin takes back the wrapper's foot
+   padding, so the bar sits on the bottom edge. */
+.editor {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  margin-bottom: -1rem;
+}
+
+.editorHead {
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--line);
-}
-
-.barName {
-  font-size: 0.9375rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-
-.barButtons {
-  display: flex;
   gap: 0.5rem;
+  padding: 0.6rem 0 0.5rem;
 }
 
-.barButtons button {
+.back {
+  flex: none;
+  width: 2.3rem;
+  height: 2.3rem;
+  display: grid;
+  place-items: center;
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 999px;
   color: var(--ink);
-  padding: 0.35rem 0.75rem;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 1.35rem;
+  line-height: 1;
   cursor: pointer;
 }
 
-.barButtons button:hover:not(:disabled) {
+.back:hover {
+  border-color: var(--line-bright);
+}
+
+.editorTitle {
+  min-width: 0;
+  display: grid;
+}
+
+.editorName {
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editorFile {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.editorOne,
+.editorSplit {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  /* One row that may be shorter than its content, or the pane would grow to
+     fit and nothing would scroll. */
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.editorOne {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* On a computer: the tabs on the left, the live page on the right. */
+.editorSplit {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 44%);
+  gap: 1.25rem;
+}
+
+.editorMain {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.tab,
+.tabOn {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.5rem 0.3rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab {
+  background: none;
+  color: var(--muted);
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tabOn {
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+/* A count of problems: said in gold, not painted gold. */
+.tab[data-problems] {
+  color: var(--accent);
+}
+
+.pane {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 0.25rem 0 1.25rem;
+}
+
+.pane::-webkit-scrollbar {
+  display: none;
+}
+
+.tabPanel[hidden] {
+  display: none;
+}
+
+.side {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.25rem;
+}
+
+.sideScroll {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.sideNote {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.liveFrame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+}
+
+.editorMessage {
+  margin: 0;
+  padding: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+}
+
+/* Pinned at the foot: Preview, Publish / Hide page, Save. */
+.actionBar {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.5rem;
+  padding: 0.6rem 0 max(0.6rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.editorMessage + .actionBar {
+  border-top: 0;
+}
+
+.actionBar button {
+  background: var(--bg-raised);
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  color: var(--ink);
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.actionBar button:hover:not(:disabled) {
   border-color: var(--accent);
 }
 
-.barButtons button:disabled {
+.actionBar button:disabled {
   opacity: 0.45;
   cursor: default;
+}
+
+@media (min-width: 1000px) {
+  .actionBar {
+    grid-auto-columns: max-content;
+    justify-content: end;
+  }
+
+  .actionBar button {
+    min-width: 8rem;
+  }
 }
 
 .quiet {
@@ -280,6 +412,112 @@
 
 .dirty {
   color: oklch(82% 0.16 85);
+}
+
+/* More details: the rarely used fields, and the raw box, folded. */
+.more {
+  margin: 0.25rem 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+}
+
+.more > summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--ink);
+}
+
+.moreFlag {
+  margin-left: 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* The Check tab: one column of panels. */
+.checkStack {
+  display: grid;
+  gap: 1rem;
+  padding-top: 0.9rem;
+}
+
+.checkStack > .warnings {
+  margin: 0;
+}
+
+/* The Pictures tab's list of this entry's images. */
+.gallery {
+  margin-top: 0.5rem;
+}
+
+.galleryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+
+.galleryList li {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.galleryList img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.galleryName {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.galleryUsed {
+  color: var(--ink);
+}
+
+.addSectionButton {
+  justify-self: start;
+  background: var(--bg-raised);
+  border: 1px dashed var(--line-bright);
+  border-radius: 999px;
+  color: var(--ink);
+  padding: 0.45rem 1rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.addSectionButton:hover {
+  border-color: var(--accent);
+}
+
+/* Focus is always visible, on every control the editor draws. */
+.newButton:focus-visible,
+.back:focus-visible,
+.tab:focus-visible,
+.tabOn:focus-visible,
+.actionBar button:focus-visible,
+.move button:focus-visible,
+.cardHead:focus-visible,
+.addSectionButton:focus-visible,
+.pill:focus-visible,
+.pillOn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
 }
 
 /* Warnings, not errors: everything here still saves. */
@@ -553,20 +791,6 @@
   margin: 1rem 0;
 }
 
-/* The column beside the fields: what the page will say, and how it scores. */
-.aside {
-  display: grid;
-  gap: 1rem;
-  position: sticky;
-  top: 1rem;
-}
-
-@media (max-width: 900px) {
-  .aside {
-    position: static;
-  }
-}
-
 .preview {
   background: var(--bg-raised);
   border: 1px solid var(--line);
@@ -589,7 +813,8 @@
   border-top: 1px solid var(--line);
 }
 
-.card {
+/* The card as the grid shows it — not the list's own .card. */
+.gridCard {
   display: grid;
   gap: 0.35rem;
   padding: 0.8rem;
@@ -597,7 +822,7 @@
   border-radius: 10px;
 }
 
-.card img {
+.gridCard img {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
@@ -726,7 +951,7 @@
   display: grid;
   gap: 0.35rem;
   /* Long enough to be worth scrolling on its own rather than pushing the SEO
-     panel off the bottom of a sticky column. */
+     panel far down the Check tab. */
   max-height: 22rem;
   overflow-y: auto;
 }
@@ -800,7 +1025,7 @@
 }
 
 /* Save is gold while there is something to save, and only then. */
-.barButtons button.save:not(:disabled),
+.actionBar button.save:not(:disabled),
 .orderBar button.save:not(:disabled) {
   background: var(--accent);
   border-color: var(--accent);
@@ -947,18 +1172,12 @@
   font-size: 0.75rem;
 }
 
-.sections .addSection {
-  margin: 0.3rem 0 0;
-}
-
 /* --- Drafts / Published / All, over Writing's cards ------------------------ */
 
 .views {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 0.3rem;
-  margin: 0 0 1.5rem;
 }
 
 .pill,

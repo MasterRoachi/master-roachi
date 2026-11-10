@@ -11,6 +11,9 @@ import styles from './orders.module.css';
 //
 // The tab is in the hash, so /work/shop/#products is a link to the editor and
 // a reload stays where it was.
+//
+// Each panel fills the rest of the pane, so the products' Save bar can sit at
+// its foot even when there are only a few tiles above it.
 
 const TABS = [
   { key: 'orders', name: 'Orders' },
@@ -56,10 +59,10 @@ export default function ShopTabs({ orders, products }: { orders: ReactNode; prod
           </button>
         ))}
       </div>
-      <div role="tabpanel" id="panel-orders" aria-labelledby="tab-orders" hidden={tab !== 'orders'}>
+      <div role="tabpanel" className={styles.panel} id="panel-orders" aria-labelledby="tab-orders" hidden={tab !== 'orders'}>
         {orders}
       </div>
-      <div role="tabpanel" id="panel-products" aria-labelledby="tab-products" hidden={tab !== 'products'}>
+      <div role="tabpanel" className={styles.panel} id="panel-products" aria-labelledby="tab-products" hidden={tab !== 'products'}>
         {products}
       </div>
     </>

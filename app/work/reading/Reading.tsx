@@ -5,14 +5,21 @@ import { spineFor } from '@/lib/book-spine';
 import BookSketch from './BookSketch';
 import styles from './reading.module.css';
 
-// A bookcase.
+// The open books in front — his pick, 2026-11-10 (redesign page, Reading: A).
 //
-// The shelves are the four states — open now, next, finished, put down — and a
-// book stands on one as a spine whose thickness comes from its page count and
-// whose colour is derived from it, so the same book always looks the same and
-// is findable by shape before it is read. See lib/book-spine.ts.
+// The four states are open now, next, finished and put down, but they are not
+// four equal shelves any more. What is being read comes first as cards with
+// big covers, when it was started and what has been kept from it. Next stays a
+// shelf of spines, so the bookcase look survives: a spine's thickness comes
+// from its page count and its colour is derived from it, so the same book
+// always looks the same and is findable by shape (lib/book-spine.ts).
+// Finished (by year) and Put down fold away at the foot of the page, and open
+// to their own spines.
 //
-// Clicking one pulls it off the shelf: the spine itself animates from where it
+// A spine tips out to show its cover on hover. A phone has no hover, so there
+// the first tap tips it out and the second opens it.
+//
+// Clicking a book pulls it out: the book itself animates from where it
 // stood to the middle of the screen, where it opens into two pages. That is a
 // FLIP — the open book starts life transformed back onto the spine's measured
 // position and is then released — which is the only way to make the movement
@@ -71,13 +78,185 @@ interface LibraryBook {
   cover: number;
 }
 
-/** The shelves, as cards. Finished is the odd one: it opens into years. */
-const SHELF_CARDS: { status: Status; label: string }[] = [
-  { status: 'reading', label: 'Open now' },
-  { status: 'want', label: 'Next' },
+/** The two shelves folded away at the foot. Finished opens into years. */
+const FOLDS: { status: Status; label: string }[] = [
   { status: 'read', label: 'Finished' },
   { status: 'abandoned', label: 'Put down' },
 ];
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** '2026-11-02' -> '2 Nov', with the year only when it is not this one. */
+function shortDate(day: string): string {
+  const text = `${Number(day.slice(8, 10))} ${MONTHS[Number(day.slice(5, 7)) - 1] ?? ''}`;
+  return day.slice(0, 4) === String(new Date().getFullYear()) ? text : `${text} ${day.slice(0, 4)}`;
+}
+
+/** '4 quotes · 1 sketch', or nothing when nothing has been kept. */
+function keptLine(quoteCount: number, sketchCount: number): string | null {
+  const parts: string[] = [];
+  if (quoteCount) parts.push(`${quoteCount} ${quoteCount === 1 ? 'quote' : 'quotes'}`);
+  if (sketchCount) parts.push(`${sketchCount} ${sketchCount === 1 ? 'sketch' : 'sketches'}`);
+  return parts.length ? parts.join(' · ') : null;
+}
+
+/** Cover art for a Calibre book. A hand-typed book has none. */
+function coverUrl(book: Book): string | null {
+  return book.calibre_id !== null ? `/work/api/book-cover?id=${book.calibre_id}` : null;
+}
+
+/**
+ * A spine on a shelf, which tips out to show its cover.
+ *
+ * Top level rather than inside Reading, so a re-render keeps the same element
+ * and the tip-out animates instead of the spine being rebuilt already turned.
+ */
+function Spine({
+  book,
+  gone,
+  tipped,
+  onTip,
+  onOpen,
+}: {
+  book: Book;
+  gone: boolean;
+  tipped: boolean;
+  onTip: (id: number) => void;
+  onOpen: (book: Book, element: HTMLElement) => void;
+}) {
+  const [failed, setFailed] = useState(false);
+  /** How the last press came, because only a touch needs the extra tap. */
+  const pointer = useRef<string>('mouse');
+  const spine = spineFor(book);
+  // Cover art comes out of the Calibre library — see scripts/book-covers.mjs.
+  // A book typed in by hand has none, and so does one whose cover has not been
+  // generated yet, so the fallback is not an edge case: it is what The Odyssey
+  // looks like.
+  const art = failed ? null : coverUrl(book);
+  // A book's proportions, so the cover that swings out is the width the
+  // spine's height implies rather than an arbitrary rectangle.
+  const coverWidth = Math.round(spine.height * 0.66);
+
+  return (
+    <button
+      type="button"
+      className={`${styles.slot} ${tipped ? styles.slotTipped : ''} ${gone ? styles.slotGone : ''}`}
+      style={
+        {
+          width: spine.width,
+          height: spine.height,
+          '--spine-w': `${spine.width}px`,
+          '--cover-w': `${coverWidth}px`,
+        } as React.CSSProperties
+      }
+      title={`${book.title}${book.author ? ` — ${book.author}` : ''}`}
+      aria-label={`${book.title}${book.author ? `, ${book.author}` : ''}`}
+      onPointerDown={(event) => {
+        pointer.current = event.pointerType;
+      }}
+      onClick={(event) => {
+        // The tap equivalent of hover: a touch on a spine that is still
+        // standing tips it out, and a touch on a tipped one opens it.
+        if (pointer.current === 'touch' && !tipped) {
+          onTip(book.id);
+          return;
+        }
+        onOpen(book, event.currentTarget);
+      }}
+    >
+      {/* Two faces of one object, turned together. transform-origin is the
+          left edge, so the book pivots on its spine the way it would if you
+          hooked a finger over the top and tipped it out.
+          The cover lies back into the shelf, where the body of the book
+          actually is, so its face points right — which is the front cover.
+          The CSS turns it minus ninety and shifts it left, so it lands
+          centred over where the book stood. */}
+      <span className={styles.book3d}>
+        <span
+          className={`${styles.spineFace} ${spine.light ? styles.spineLight : ''}`}
+          style={{ background: spine.colour, borderColor: spine.edge }}
+        >
+          <span className={styles.band} />
+          <span className={styles.spineText}>
+            <span className={styles.spineTitle}>{book.title}</span>
+            {book.author && <span className={styles.spineAuthor}>{book.author}</span>}
+          </span>
+          <span className={styles.band} />
+        </span>
+
+        <span
+          className={`${styles.coverFace} ${spine.light ? styles.blankLight : ''}`}
+          style={art ? undefined : { background: spine.colour, borderColor: spine.edge }}
+        >
+          {art ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={art} alt="" loading="lazy" onError={() => setFailed(true)} />
+          ) : (
+            <>
+              <span className={styles.blankTitle}>{book.title}</span>
+              {book.author && <span className={styles.blankAuthor}>{book.author}</span>}
+            </>
+          )}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+/**
+ * A book being read, as a card with its cover face on: what it is, when it
+ * was started, and what has been kept from it so far.
+ */
+function OpenCard({
+  book,
+  gone,
+  quoteCount,
+  sketchCount,
+  onOpen,
+}: {
+  book: Book;
+  gone: boolean;
+  quoteCount: number;
+  sketchCount: number;
+  onOpen: (book: Book, element: HTMLElement) => void;
+}) {
+  const [failed, setFailed] = useState(false);
+  const spine = spineFor(book);
+  const art = failed ? null : coverUrl(book);
+  const kept = keptLine(quoteCount, sketchCount);
+
+  return (
+    <button
+      type="button"
+      className={`${styles.openCard} ${gone ? styles.slotGone : ''}`}
+      onClick={(event) => onOpen(book, event.currentTarget)}
+    >
+      <span
+        className={`${styles.openCover} ${spine.light ? styles.blankLight : ''}`}
+        style={art ? undefined : { background: spine.colour, borderColor: spine.edge }}
+      >
+        {art ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={art} alt="" loading="lazy" onError={() => setFailed(true)} />
+        ) : (
+          /* The generated blank cover: the derived colour and the title. */
+          <>
+            <span className={styles.blankTitle}>{book.title}</span>
+            {book.author && <span className={styles.blankAuthor}>{book.author}</span>}
+          </>
+        )}
+      </span>
+      <span className={styles.openText}>
+        <span className={styles.openTitle}>{book.title}</span>
+        {book.author && <span className={styles.openAuthor}>{book.author}</span>}
+        {book.started_on && (
+          <span className={styles.openMeta}>Started {shortDate(book.started_on)}</span>
+        )}
+        {kept && <span className={styles.openMeta}>{kept}</span>}
+      </span>
+    </button>
+  );
+}
 
 /** How many library matches to draw. Three and a half thousand is a scroll. */
 const MATCHES = 60;
@@ -146,9 +325,11 @@ export default function Reading() {
   /** The library index, fetched once and only when the card is opened. */
   const [library, setLibrary] = useState<LibraryBook[] | null>(null);
   const [picked, setPicked] = useState<LibraryBook | null>(null);
-  /** Which shelf cards are open. None by default: the page is a row of spines
-   *  that have not been pulled out yet. */
-  const [openShelves, setOpenShelves] = useState<Set<Status>>(new Set(['reading']));
+  /** Which of the folded shelves (Finished, Put down) are open. Both shut by
+   *  default: they are the long ones, and the least looked at. */
+  const [openShelves, setOpenShelves] = useState<Set<Status>>(new Set());
+  /** The spine a touch has tipped out, waiting for the second tap. */
+  const [tipped, setTipped] = useState<number | null>(null);
   const [quoteText, setQuoteText] = useState('');
 
   const [open, setOpen] = useState<number | null>(null);
@@ -306,6 +487,7 @@ export default function Reading() {
       void act({ action: 'update', id: book.id, notes: draft });
     }
     setSettled(false);
+    setTipped(null);
     setOpen(null);
   }
 
@@ -334,86 +516,28 @@ export default function Reading() {
   }
   const years = [...byYear.keys()].sort().reverse();
 
-  function Cover({ book }: { book: Book }) {
-    const [failed, setFailed] = useState(false);
-    const spine = spineFor(book);
-    // Cover art comes out of the Calibre library at build time — see
-    // scripts/book-covers.mjs. A book typed in by hand has none, and so does
-    // one whose cover has not been generated yet, so the fallback is not an
-    // edge case: it is what The Odyssey looks like.
-    const art = book.calibre_id !== null && !failed
-      ? `/work/api/book-cover?id=${book.calibre_id}`
-      : null;
-    // A book's proportions, so the cover that swings out is the width the
-    // spine's height implies rather than an arbitrary rectangle.
-    const coverWidth = Math.round(spine.height * 0.66);
-
-    return (
-      <button
-        type="button"
-        className={`${styles.slot} ${open === book.id ? styles.slotGone : ''}`}
-        style={
-          {
-            width: spine.width,
-            height: spine.height,
-            '--spine-w': `${spine.width}px`,
-            '--cover-w': `${coverWidth}px`,
-          } as React.CSSProperties
-        }
-        title={`${book.title}${book.author ? ` — ${book.author}` : ''}`}
-        onClick={(event) => pull(book, event.currentTarget)}
-      >
-        {/* Two faces of one object, turned together. transform-origin is the
-            left edge, so the book pivots on its spine the way it would if you
-            hooked a finger over the top and tipped it out.
-            The cover lies back into the shelf, where the body of the book
-            actually is, so its face points right — which is the front cover.
-            The CSS turns it minus ninety and shifts it left, so it lands
-            centred over where the book stood. */}
-        <span className={styles.book3d}>
-          <span
-            className={`${styles.spineFace} ${spine.light ? styles.spineLight : ''}`}
-            style={{ background: spine.colour, borderColor: spine.edge }}
-          >
-            <span className={styles.band} />
-            <span className={styles.spineText}>
-              <span className={styles.spineTitle}>{book.title}</span>
-              {book.author && <span className={styles.spineAuthor}>{book.author}</span>}
-            </span>
-            <span className={styles.band} />
-          </span>
-
-          <span
-            className={`${styles.coverFace} ${spine.light ? styles.blankLight : ''}`}
-            style={art ? undefined : { background: spine.colour, borderColor: spine.edge }}
-          >
-            {art ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={art} alt="" loading="lazy" onError={() => setFailed(true)} />
-            ) : (
-              <>
-                <span className={styles.blankTitle}>{book.title}</span>
-                {book.author && <span className={styles.blankAuthor}>{book.author}</span>}
-              </>
-            )}
-          </span>
-        </span>
-      </button>
-    );
-  }
-
-  /* A grid of books. The grey board is gone (14 Oct): with cover art the
-     books are the thing, and a shelf drawn under them was furniture. */
-  function Grid({ list }: { list: Book[] }) {
-    if (list.length === 0) return <p className={styles.bare}>Nothing here.</p>;
+  /* A shelf of spines, bottoms aligned — they are not all the same height,
+     which is most of what stops a row of them reading as a chart. */
+  function shelf(list: Book[], empty: string) {
+    if (list.length === 0) return <p className={styles.bare}>{empty}</p>;
     return (
       <div className={styles.grid}>
         {list.map((book) => (
-          <Cover key={book.id} book={book} />
+          <Spine
+            key={book.id}
+            book={book}
+            gone={open === book.id}
+            tipped={tipped === book.id}
+            onTip={setTipped}
+            onOpen={pull}
+          />
         ))}
       </div>
     );
   }
+
+  const reading = books.filter((b) => b.status === 'reading');
+  const next = books.filter((b) => b.status === 'want');
 
   /** Library matches for what has been typed. Empty query browses the lot. */
   const matches = (() => {
@@ -471,10 +595,14 @@ export default function Reading() {
     <div className={styles.page}>
       {error && <p className={styles.warn}>{error}</p>}
 
-      {/* Adding, as the round + the habits page uses — one control, shut
-          until it is wanted, rather than a form standing open under a page
-          that is read far more often than it is added to. */}
+      {/* Open now's heading carries the round +, as the habits page uses —
+          one control, shut until it is wanted, rather than a form standing
+          open over a page that is read far more often than it is added to. */}
       <section className={styles.addSection}>
+        <div className={styles.headRow}>
+          <h2 className={styles.sectionNameGold}>
+            Open now<span className={styles.count}>{reading.length}</span>
+          </h2>
         <button
           type="button"
           className={adding ? styles.addToggleOn : styles.addToggle}
@@ -487,6 +615,7 @@ export default function Reading() {
             <path d="M12 5v14M5 12h14" />
           </svg>
         </button>
+        </div>
 
         {adding && (
           <form
@@ -591,50 +720,88 @@ export default function Reading() {
         )}
       </section>
 
-      {/* One card per shelf, shut. The bookcase used to put every shelf on
-          screen at once, which made the page as long as the collection. */}
-      {SHELF_CARDS.map(({ status, label }) => {
-        const list = books!.filter((book) => book.status === status);
-        const isOpen = openShelves.has(status);
+      {/* What is being read, in front, with its cover face on. */}
+      {reading.length === 0 ? (
+        <p className={styles.bare}>Nothing open. Add a book with +, or open one from Next.</p>
+      ) : (
+        <div className={styles.openGrid}>
+          {reading.map((book) => (
+            <OpenCard
+              key={book.id}
+              book={book}
+              gone={open === book.id}
+              quoteCount={(quotes[String(book.id)] ?? []).length}
+              sketchCount={(notes[String(book.id)] ?? []).length}
+              onOpen={pull}
+            />
+          ))}
+        </div>
+      )}
 
-        return (
-          <section key={status} className={isOpen ? styles.shelfOpen : styles.shelfCard}>
-            <button
-              type="button"
-              className={styles.shelfPill}
-              aria-expanded={isOpen}
-              onClick={() => {
-                const next = new Set(openShelves);
-                if (next.has(status)) next.delete(status);
-                else next.add(status);
-                setOpenShelves(next);
-              }}
-            >
-              <span>{label}</span>
-            </button>
+      {/* Next stays a shelf of spines, so the bookcase look survives. */}
+      <section className={styles.nextSection}>
+        <h2 className={styles.sectionName}>
+          Next<span className={styles.countMuted}>{next.length}</span>
+        </h2>
+        {shelf(next, 'Nothing next.')}
+      </section>
 
-            {isOpen && (
-              <div className={styles.shelfBody}>
-                {status === 'read' && years.length > 0 ? (
-                  /* Finished is the one shelf with a shape of its own: it
+      {/* Finished and Put down, folded away at the foot of the page. They are
+          the long shelves and the least looked at, so each is a row that
+          opens to its spines. */}
+      <div className={styles.folds}>
+        <div className={styles.foldRow}>
+          {FOLDS.map(({ status, label }) => {
+            const isOpen = openShelves.has(status);
+            return (
+              <button
+                key={status}
+                type="button"
+                className={isOpen ? styles.foldOn : styles.fold}
+                aria-expanded={isOpen}
+                aria-controls={`shelf-${status}`}
+                onClick={() => {
+                  const after = new Set(openShelves);
+                  if (after.has(status)) after.delete(status);
+                  else after.add(status);
+                  setOpenShelves(after);
+                }}
+              >
+                <span>{label}</span>
+                <span className={styles.countMuted}>
+                  {books!.filter((book) => book.status === status).length}
+                </span>
+                <span className={styles.chevron} aria-hidden="true">
+                  ›
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {FOLDS.map(({ status, label }) => {
+          if (!openShelves.has(status)) return null;
+          const list = books!.filter((book) => book.status === status);
+          return (
+            <section key={status} id={`shelf-${status}`} className={styles.foldBody}>
+              <h2 className={styles.sectionName}>{label}</h2>
+              {status === 'read' && years.length > 0
+                ? /* Finished is the one shelf with a shape of its own: it
                      only grows, so it is grouped by the year it grew in. */
                   years.map((year) => (
                     <div key={year} className={styles.yearGroup}>
                       <h3 className={styles.yearName}>
                         {year === 'undated' ? 'No date' : year}
-                        <span className={styles.count}>{byYear.get(year)!.length}</span>
+                        <span className={styles.countMuted}>{byYear.get(year)!.length}</span>
                       </h3>
-                      <Grid list={byYear.get(year)!} />
+                      {shelf(byYear.get(year)!, 'Nothing here.')}
                     </div>
                   ))
-                ) : (
-                  <Grid list={list} />
-                )}
-              </div>
-            )}
-          </section>
-        );
-      })}
+                : shelf(list, 'Nothing here.')}
+            </section>
+          );
+        })}
+      </div>
 
       {/* --- the book, off the shelf and open ------------------------- */}
       {opened && (
@@ -647,22 +814,30 @@ export default function Reading() {
             // something to animate from.
             //
             // Scaled against the PANEL'S OWN size, which is the window less
-            // the 25px gutter on each side. It used to be scaled against a
-            // hardcoded 640x440 — the panel's size when this was a small
-            // spread — so once the panel grew, the book started the animation
-            // several times too large and snapped down into place.
+            // the 25px gutter on each side — or the whole window on a phone,
+            // where the book fills the screen (the 720px breakpoint in the
+            // CSS). It used to be scaled against a hardcoded 640x440 — the
+            // panel's size when this was a small spread — so once the panel
+            // grew, the book started the animation several times too large
+            // and snapped down into place.
             style={
               settled || !from
                 ? undefined
-                : {
-                    transform: `translate(${from.left + from.width / 2 - window.innerWidth / 2}px, ${
-                      from.top + from.height / 2 - window.innerHeight / 2
-                    }px) scaleX(${Math.max(from.width / (window.innerWidth - 50), 0.02)}) scaleY(${Math.max(
-                      from.height / (window.innerHeight - 50),
-                      0.02,
-                    )})`,
-                  }
+                : (() => {
+                    const gutter = window.innerWidth <= 720 ? 0 : 50;
+                    return {
+                      transform: `translate(${from.left + from.width / 2 - window.innerWidth / 2}px, ${
+                        from.top + from.height / 2 - window.innerHeight / 2
+                      }px) scaleX(${Math.max(from.width / (window.innerWidth - gutter), 0.02)}) scaleY(${Math.max(
+                        from.height / (window.innerHeight - gutter),
+                        0.02,
+                      )})`,
+                    };
+                  })()
             }
+            role="dialog"
+            aria-modal="true"
+            aria-label={opened.title}
             onClick={(event) => event.stopPropagation()}
           >
             {/* The head of the page: what the book IS. One block, no rule
@@ -685,22 +860,39 @@ export default function Reading() {
                 <span className={styles.bannerShade} />
               </span>
 
-              {mainGenre(opened.genre) && (
-                /* The genre, as a mark in the corner — it earns a place once
-                   the input that set it has retired. */
-                <span className={styles.genreMark} title={opened.genre ?? ''}>
-                  {mainGenre(opened.genre)}
-                </span>
-              )}
+              {/* The two marks share the left corner, so the right one is
+                  free for the close button — on a phone the book fills the
+                  screen, there is no window round it to tap, and no Esc. */}
+              <div className={styles.corner}>
+                {mainGenre(opened.genre) && (
+                  /* The genre, as a mark in the corner — it earns a place
+                     once the input that set it has retired. */
+                  <span className={styles.genreMark} title={opened.genre ?? ''}>
+                    {mainGenre(opened.genre)}
+                  </span>
+                )}
 
-              {opened.started_on && (
-                /* Small, and a dot rather than a line of prose: when it was
-                   started is worth a glance and never a sentence. */
-                <span className={styles.started} title={`Started ${opened.started_on}`}>
-                  <span className={styles.startedDay}>{dayDot(opened.started_on)[0]}</span>
-                  <span className={styles.startedMonth}>{dayDot(opened.started_on)[1]}</span>
-                </span>
-              )}
+                {opened.started_on && (
+                  /* Small, and a dot rather than a line of prose: when it was
+                     started is worth a glance and never a sentence. */
+                  <span className={styles.started} title={`Started ${opened.started_on}`}>
+                    <span className={styles.startedDay}>{dayDot(opened.started_on)[0]}</span>
+                    <span className={styles.startedMonth}>{dayDot(opened.started_on)[1]}</span>
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className={styles.closeBook}
+                aria-label="Close the book"
+                title="Close (Esc)"
+                onClick={close}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
 
               <div className={styles.bannerText}>
                 <h3
@@ -782,7 +974,8 @@ export default function Reading() {
 
             {/* The work: what was kept, and the page it was kept on.
                 Quotes on the left, the sketch in the middle taking whatever
-                is left, its tools down the right. */}
+                is left, its tools down the right. On a phone the pages stack:
+                quotes, then the sketch, then its tools in a row under it. */}
             <div className={styles.workArea}>
               <div className={styles.quoteColumn}>
                 <ul className={styles.quotes}>

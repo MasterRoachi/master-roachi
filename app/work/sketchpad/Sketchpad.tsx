@@ -18,6 +18,14 @@ import styles from './sketchpad.module.css';
 
 // One page you can write and draw on, saved as one file.
 //
+// YOUR SKETCHES AS PICTURES FIRST — his pick, 2026-11-10 (redesign page,
+// Sketchpad: B). The page opens on a gallery of thumbnails, not a list of
+// file names, with "+ New" beside it. Tapping one opens it to fill the pane,
+// with the tools in one floating pill (at the foot on a phone, at the top on a
+// computer), the title and Save in a slim bar above, and the three exports
+// under Save's menu. Back returns to the gallery, asking first if anything is
+// unsaved.
+//
 // The surface is a live SVG rather than a canvas. That is what makes text stay
 // text: a canvas would turn every word into pixels the moment it was drawn,
 // and the saved file could then never be searched, selected or corrected. It
@@ -37,6 +45,13 @@ interface FileRef {
 type Tool = 'pen' | 'text' | 'select';
 
 const COLOURS = ['#f5f5f5', '#d9a13b', '#7aa2f7', '#9ece6a', '#f7768e'];
+const COLOUR_NAMES: Record<string, string> = {
+  '#f5f5f5': 'white',
+  '#d9a13b': 'gold',
+  '#7aa2f7': 'blue',
+  '#9ece6a': 'green',
+  '#f7768e': 'pink',
+};
 
 const slug = (title: string) =>
   title
@@ -47,12 +62,138 @@ const slug = (title: string) =>
     .replace(/^-+|-+$/g, '')
     .slice(0, 80);
 
+/** A file's name as a title: notes/shop-layout.svg -> "shop layout". */
+const titleOf = (path: string) =>
+  path.replace(/^notes\//, '').replace(/\.svg$/, '').replace(/-/g, ' ');
+
+// --- thumbnails ------------------------------------------------------------
+//
+// THE FILE IS THE THUMBNAIL. A sketch is already an SVG that renders anywhere
+// (see lib/sketch.ts), so a tile is the file itself in an <img> — no second
+// renderer, and an <img> never runs anything inside an SVG. The list call
+// carries only paths, so each tile reads its file when it scrolls into view,
+// three at a time, and keeps it for the visit by sha: a file only changes
+// when its sha does.
+
+const thumbs = new Map<string, string>();
+const inflight = new Map<string, Promise<string | null>>();
+let active = 0;
+const queue: (() => void)[] = [];
+
+async function limited<T>(job: () => Promise<T>): Promise<T> {
+  while (active >= 3) await new Promise<void>((resolve) => queue.push(resolve));
+  active += 1;
+  try {
+    return await job();
+  } finally {
+    active -= 1;
+    queue.shift()?.();
+  }
+}
+
+const thumbKey = (file: FileRef) => `${file.path}@${file.sha}`;
+
+function keepThumb(file: FileRef, text: string) {
+  thumbs.set(thumbKey(file), URL.createObjectURL(new Blob([text], { type: 'image/svg+xml' })));
+}
+
+function thumbFor(file: FileRef): Promise<string | null> {
+  const key = thumbKey(file);
+  const held = thumbs.get(key);
+  if (held) return Promise.resolve(held);
+  const pending = inflight.get(key);
+  if (pending) return pending;
+  const job = limited(async () => {
+    const response = await fetch(
+      `/work/api/content?collection=notes&path=${encodeURIComponent(file.path)}`,
+      { cache: 'no-store' },
+    );
+    if (!response.ok) return null;
+    const { file: got } = (await response.json()) as { file?: { text?: string } };
+    if (!got?.text) return null;
+    keepThumb(file, got.text);
+    return thumbs.get(key) ?? null;
+  })
+    .catch(() => null)
+    .finally(() => inflight.delete(key));
+  inflight.set(key, job);
+  return job;
+}
+
+/** One tile's picture: the title on a blank page until the file has been read. */
+function Thumb({ file }: { file: FileRef }) {
+  const box = useRef<HTMLSpanElement | null>(null);
+  const [src, setSrc] = useState<string | null>(() => thumbs.get(thumbKey(file)) ?? null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    if (src) return;
+    const element = box.current;
+    if (!element) return;
+    let live = true;
+    // Read when it is about to be seen, not all at once: a long gallery would
+    // otherwise be one request per sketch every time it opened.
+    const watch = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        watch.disconnect();
+        void thumbFor(file).then((url) => {
+          if (!live) return;
+          if (url) setSrc(url);
+          else setFailed(true);
+        });
+      },
+      { rootMargin: '200px' },
+    );
+    watch.observe(element);
+    return () => {
+      live = false;
+      watch.disconnect();
+    };
+  }, [file, src]);
+
+  return (
+    <span ref={box} className={styles.thumb} aria-hidden="true">
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element -- a blob URL of a file just read; next/image has nothing to optimise.
+        <img src={src} alt="" />
+      ) : (
+        <span className={styles.thumbWait}>{failed ? 'No preview' : ''}</span>
+      )}
+    </span>
+  );
+}
+
+// --- the little icons the pill uses ----------------------------------------
+
+const ICONS = {
+  pen: 'M4 20l4.5-1.2L19 8.3l-3.3-3.3L5.2 15.5zM14.5 5.8l3.7 3.7',
+  text: 'M5 6V4h14v2M12 4v16M9 20h6',
+  select: 'M5 3l13 8-6 1.5L9 19z',
+  undo: 'M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3',
+  delete: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13',
+  back: 'M15 5l-7 7 7 7',
+  caret: 'M6 9l6 6 6-6',
+};
+
+function Icon({ d }: { d: string }) {
+  return (
+    <svg className={styles.icon} viewBox="0 0 24 24" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  );
+}
+
 export default function Sketchpad() {
   const [files, setFiles] = useState<FileRef[] | null>(null);
   const [configured, setConfigured] = useState(true);
   const [title, setTitle] = useState('');
   const [openPath, setOpenPath] = useState<string | null>(null);
   const [sha, setSha] = useState<string | undefined>();
+  // Which of the two the page is: the gallery, or one sketch filling the pane.
+  const [view, setView] = useState<'gallery' | 'sketch'>('gallery');
+  // The tile being read, so a slow open shows on the tile that was tapped.
+  const [opening, setOpening] = useState<string | null>(null);
 
   const [scene, setScene] = useState<Scene>(emptyScene());
   const [tool, setTool] = useState<Tool>('pen');
@@ -61,6 +202,9 @@ export default function Sketchpad() {
   const [fontSize, setFontSize] = useState(34);
   const [selected, setSelected] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
+  // The two small pop-ups: the size slider over the pill, and Save's menu.
+  const [sizing, setSizing] = useState(false);
+  const [menu, setMenu] = useState(false);
 
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -68,6 +212,7 @@ export default function Sketchpad() {
 
   const surface = useRef<SVGSVGElement | null>(null);
   const editor = useRef<HTMLTextAreaElement | null>(null);
+  const menuBox = useRef<HTMLDivElement | null>(null);
   /**
    * Whether the text editor has actually had focus.
    *
@@ -93,6 +238,23 @@ export default function Sketchpad() {
     element.setSelectionRange(element.value.length, element.value.length);
   }, [editing]);
 
+  // Save's menu shuts on a press anywhere else, or on Escape.
+  useEffect(() => {
+    if (!menu) return;
+    const away = (event: PointerEvent) => {
+      if (!menuBox.current?.contains(event.target as Node)) setMenu(false);
+    };
+    const key = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenu(false);
+    };
+    window.addEventListener('pointerdown', away);
+    window.addEventListener('keydown', key);
+    return () => {
+      window.removeEventListener('pointerdown', away);
+      window.removeEventListener('keydown', key);
+    };
+  }, [menu]);
+
   /* The book this sketch belongs to, when the reading page sent us here.
      Read from the query string rather than held in a store: the link is the
      whole handover, so a reload or a shared URL carries it too. */
@@ -111,13 +273,15 @@ export default function Sketchpad() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the state is set after the fetch resolves, not synchronously.
     void loadList();
   }, [loadList]);
 
   /* ?book=&title= — a new sketch for a book, from the reading page.
      ?open= — an existing one, from a book's note list.
      Read once on mount, then taken out of the URL so a reload does not
-     reopen a page that has since been saved under another name. */
+     reopen a page that has since been saved under another name. Both go
+     straight to the sketch, past the gallery: the link was to a page. */
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const path = params.get('open');
@@ -125,9 +289,12 @@ export default function Sketchpad() {
     const forTitle = params.get('title');
 
     if (forBook && Number.isInteger(Number(forBook))) {
+      // The URL is read once, on mount, and is not React state to derive from.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBook({ id: Number(forBook), title: forTitle ?? '' });
       // A sensible default name, so saving is one click from arriving here.
       if (forTitle) setTitle(`${forTitle} — notes`);
+      if (!path) setView('sketch');
     }
     if (path) void open(path);
     if (path || forBook) {
@@ -169,9 +336,21 @@ export default function Sketchpad() {
     setDirty(true);
   }
 
-  async function open(path: string) {
-    if (dirty && !confirm('Discard the unsaved changes?')) return;
+  /** Anything unsaved is about to go: ask first. True means carry on. */
+  function mayDiscard(): boolean {
+    return !dirty || confirm('Discard the unsaved changes?');
+  }
+
+  /**
+   * Open a file. `fresh` skips the unsaved-changes question, for the reopen
+   * straight after a first save: that save has just cleared `dirty`, but this
+   * render's copy of it is still true, and asking to discard what was just
+   * saved would be wrong.
+   */
+  async function open(path: string, fresh = false) {
+    if (!fresh && !mayDiscard()) return;
     setBusy(true);
+    setOpening(path);
     try {
       const response = await fetch(
         `/work/api/content?collection=notes&path=${encodeURIComponent(path)}`,
@@ -188,23 +367,26 @@ export default function Sketchpad() {
         throw new Error('That file has no editable sketch in it — opened nothing.');
       }
 
+      // Read anyway, so its tile is free when the gallery comes back.
+      keepThumb({ path, sha: file.sha }, file.text);
       setScene(restored);
       setOpenPath(path);
       setSha(file.sha);
-      setTitle(path.replace(/^notes\//, '').replace(/\.svg$/, '').replace(/-/g, ' '));
+      setTitle(titleOf(path));
       setSelected(null);
       setEditing(null);
       setDirty(false);
       setStatus(null);
+      setView('sketch');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Could not open it.');
     } finally {
       setBusy(false);
+      setOpening(null);
     }
   }
 
-  function startNew() {
-    if (dirty && !confirm('Discard the unsaved changes?')) return;
+  function reset() {
     setScene(emptyScene());
     setOpenPath(null);
     setSha(undefined);
@@ -213,9 +395,25 @@ export default function Sketchpad() {
     setEditing(null);
     setDirty(false);
     setStatus(null);
+    setMenu(false);
+    setSizing(false);
+  }
+
+  function startNew() {
+    if (!mayDiscard()) return;
+    reset();
+    setView('sketch');
+  }
+
+  /** Back to the gallery, asking first if anything is unsaved. */
+  function back() {
+    if (!mayDiscard()) return;
+    reset();
+    setView('gallery');
   }
 
   async function save() {
+    setMenu(false);
     const name = title.trim();
     if (!name) {
       setStatus('It needs a title — that is what names the file.');
@@ -256,6 +454,7 @@ export default function Sketchpad() {
          After the file is written, never before: a link to a sketch that
          failed to save would be a dead row pointing at nothing. The drawing
          stays the repo's; D1 only holds the association. */
+      let linked = true;
       if (book) {
         await fetch('/work/api/reading', {
           method: 'POST',
@@ -263,13 +462,20 @@ export default function Sketchpad() {
           body: JSON.stringify({ action: 'note-add', id: book.id, path, title: name }),
         }).catch(() => {
           // The sketch is saved either way, which is the part that matters.
-          setStatus('Saved, but it could not be linked to the book.');
+          linked = false;
         });
       }
 
-      setStatus(book ? `Saved, and kept against ${book.title}.` : 'Saved. One file, committed.');
       await loadList();
-      if (!openPath) await open(path);
+      if (!openPath) await open(path, true);
+      // Last, because open() clears the message it finds.
+      setStatus(
+        !linked
+          ? 'Saved, but it could not be linked to the book.'
+          : book
+            ? `Saved, and kept against ${book.title}.`
+            : 'Saved. One file, committed.',
+      );
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Save failed.');
     } finally {
@@ -278,6 +484,7 @@ export default function Sketchpad() {
   }
 
   function downloadSvg() {
+    setMenu(false);
     const blob = new Blob([toSvg(scene)], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -295,6 +502,7 @@ export default function Sketchpad() {
    * saved format.
    */
   function downloadPng() {
+    setMenu(false);
     const svg = toSvg(scene);
     const image = new Image();
     image.onload = () => {
@@ -323,77 +531,169 @@ export default function Sketchpad() {
     );
   }
 
+  // --- the gallery ---------------------------------------------------------
+
+  if (view === 'gallery') {
+    return (
+      <div className={styles.gallery}>
+        <div className={styles.galleryBar}>
+          <h2 className={styles.galleryName}>Sketches</h2>
+          <button type="button" className={styles.newButton} onClick={startNew}>
+            + New
+          </button>
+        </div>
+
+        {status && <p className={styles.message}>{status}</p>}
+
+        {files.length === 0 ? (
+          <p className={styles.status}>No sketches yet. Start one with + New.</p>
+        ) : (
+          // NAME ORDER, NOT NEWEST FIRST — for now. The list call gives paths
+          // and shas and no dates, so newest first needs the Worker to send
+          // each file's last commit date. Reversed name order would be a
+          // guess dressed as an answer.
+          <ul className={styles.tiles}>
+            {files.map((file) => (
+              <li key={file.path}>
+                <button
+                  type="button"
+                  className={styles.tile}
+                  aria-busy={opening === file.path}
+                  disabled={busy}
+                  onClick={() => void open(file.path)}
+                >
+                  <Thumb key={thumbKey(file)} file={file} />
+                  <span className={styles.tileName}>
+                    {opening === file.path ? 'Opening…' : titleOf(file.path)}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  }
+
+  // --- one sketch ----------------------------------------------------------
+
   const editingItem =
     editing !== null
       ? (scene.items.find((i) => i.id === editing && i.kind === 'text') as TextItem | undefined)
       : undefined;
+  const pages = pagesOf(scene);
 
   return (
     <div className={styles.pad}>
-      <aside className={styles.list}>
-        <button type="button" className={styles.new} onClick={startNew}>
-          New sketch
+      {/* The slim bar: back, the title, and Save with the exports under it. */}
+      <div className={styles.bar}>
+        <button
+          type="button"
+          className={styles.iconButton}
+          aria-label="Back to your sketches"
+          title="Back to your sketches"
+          onClick={back}
+        >
+          <Icon d={ICONS.back} />
         </button>
-        <ul>
-          {files.map((file) => (
-            <li key={file.path}>
-              <button
-                type="button"
-                className={openPath === file.path ? styles.current : undefined}
-                onClick={() => void open(file.path)}
-              >
-                {file.path.replace(/^notes\//, '').replace(/\.svg$/, '')}
-              </button>
-            </li>
-          ))}
-        </ul>
-        {files.length === 0 && <p className={styles.status}>No sketches yet.</p>}
-      </aside>
-
-      <div className={styles.pane}>
-        <p className={styles.bar}>
-          <input
-            className={styles.title}
-            value={title}
-            placeholder="Title"
-            aria-label="Title"
-            onChange={(event) => {
-              setTitle(event.target.value);
-              setDirty(true);
-            }}
-          />
-          {dirty && <span className={styles.dirty}>unsaved</span>}
-          <button type="button" onClick={() => void save()} disabled={busy}>
+        <input
+          className={styles.title}
+          value={title}
+          placeholder="Title"
+          aria-label="Title"
+          onChange={(event) => {
+            setTitle(event.target.value);
+            setDirty(true);
+          }}
+        />
+        {dirty && <span className={styles.dirty}>unsaved</span>}
+        <div className={styles.save} ref={menuBox}>
+          <button
+            type="button"
+            className={styles.saveMain}
+            onClick={() => void save()}
+            disabled={busy}
+          >
             {busy ? 'Working…' : 'Save'}
           </button>
-          <span className={styles.exports}>
-            <button type="button" onClick={downloadSvg}>
-              .svg
-            </button>
-            <button type="button" onClick={downloadPng}>
-              .png
-            </button>
-            <button type="button" onClick={() => window.print()}>
-              PDF
-            </button>
-          </span>
-        </p>
+          <button
+            type="button"
+            className={styles.saveMore}
+            aria-label="Export and more"
+            title="Export and more"
+            aria-haspopup="menu"
+            aria-expanded={menu}
+            onClick={() => setMenu((shown) => !shown)}
+          >
+            <Icon d={ICONS.caret} />
+          </button>
+          {menu && (
+            <div className={styles.menu} role="menu">
+              <button type="button" role="menuitem" onClick={downloadSvg}>
+                Download .svg
+              </button>
+              <button type="button" role="menuitem" onClick={downloadPng}>
+                Download .png
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setMenu(false);
+                  window.print();
+                }}
+              >
+                Print or save as PDF
+              </button>
+              {/* Clear is here rather than in the pill: it is the one tool
+                  that empties the page, and the pill is pressed blind while
+                  drawing. */}
+              <button
+                type="button"
+                role="menuitem"
+                className={styles.menuDanger}
+                disabled={scene.items.length === 0}
+                onClick={() => {
+                  setMenu(false);
+                  if (scene.items.length === 0) return;
+                  if (!confirm('Clear the page?')) return;
+                  change([]);
+                  setSelected(null);
+                  setEditing(null);
+                }}
+              >
+                Clear the page
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
-        <div className={styles.tools}>
-          {(['pen', 'text', 'select'] as Tool[]).map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={tool === option}
-              className={tool === option ? styles.toolOn : undefined}
-              onClick={() => {
-                setTool(option);
-                setEditing(null);
-              }}
-            >
-              {option === 'pen' ? 'Pen' : option === 'text' ? 'Text' : 'Select'}
-            </button>
-          ))}
+      {status && <p className={styles.message}>{status}</p>}
+
+      <div className={styles.canvas}>
+        {/* The floating pill: at the foot on a phone, under the bar on a
+            computer (the stylesheet moves it). */}
+        <div className={styles.pill} role="toolbar" aria-label="Tools">
+          {(['pen', 'text', 'select'] as Tool[]).map((option) => {
+            const label = option === 'pen' ? 'Pen' : option === 'text' ? 'Text' : 'Select';
+            return (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={tool === option}
+                aria-label={label}
+                title={label}
+                className={tool === option ? styles.toolOn : styles.tool}
+                onClick={() => {
+                  setTool(option);
+                  setEditing(null);
+                }}
+              >
+                <Icon d={ICONS[option]} />
+              </button>
+            );
+          })}
 
           <span className={styles.sep} />
 
@@ -401,7 +701,8 @@ export default function Sketchpad() {
             <button
               key={option}
               type="button"
-              aria-label={`Colour ${option}`}
+              aria-label={`Colour ${COLOUR_NAMES[option] ?? option}`}
+              title={COLOUR_NAMES[option] ?? option}
               aria-pressed={colour === option}
               className={colour === option ? styles.swatchOn : styles.swatch}
               style={{ background: option }}
@@ -420,47 +721,78 @@ export default function Sketchpad() {
             />
           ))}
 
-          <label className={styles.sizeLabel}>
-            {tool === 'text' ? 'size' : 'pen'}
-            <input
-              type="range"
-              min={tool === 'text' ? 12 : 1}
-              max={tool === 'text' ? 96 : 24}
-              value={tool === 'text' ? fontSize : width}
-              aria-label={tool === 'text' ? 'Text size' : 'Pen width'}
-              onChange={(event) => {
-                const value = Number(event.target.value);
-                if (tool === 'text') setFontSize(value);
-                else setWidth(value);
-                if (selected) {
-                  change(
-                    scene.items.map((item) =>
-                      item.id === selected
-                        ? item.kind === 'text'
-                          ? { ...item, size: value }
-                          : { ...item, width: value }
-                        : item,
-                    ),
-                  );
-                }
-              }}
-            />
-          </label>
-
           <span className={styles.sep} />
+
+          {/* Size is a button that opens its slider, because a slider in the
+              pill would not fit a phone beside everything else. */}
+          <span className={styles.sizeWrap}>
+            <button
+              type="button"
+              className={sizing ? styles.toolOn : styles.tool}
+              aria-label={tool === 'text' ? 'Text size' : 'Pen width'}
+              title={tool === 'text' ? 'Text size' : 'Pen width'}
+              aria-expanded={sizing}
+              onClick={() => setSizing((open) => !open)}
+            >
+              <span
+                className={styles.sizeDot}
+                style={{
+                  width: `${Math.max(4, Math.min(18, tool === 'text' ? fontSize / 5 : width))}px`,
+                  height: `${Math.max(4, Math.min(18, tool === 'text' ? fontSize / 5 : width))}px`,
+                }}
+              />
+            </button>
+            {sizing && (
+              <label className={styles.sizePop}>
+                {tool === 'text' ? 'Text size' : 'Pen width'}
+                <input
+                  type="range"
+                  min={tool === 'text' ? 12 : 1}
+                  max={tool === 'text' ? 96 : 24}
+                  value={tool === 'text' ? fontSize : width}
+                  aria-label={tool === 'text' ? 'Text size' : 'Pen width'}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') setSizing(false);
+                  }}
+                  onChange={(event) => {
+                    const value = Number(event.target.value);
+                    if (tool === 'text') setFontSize(value);
+                    else setWidth(value);
+                    if (selected) {
+                      change(
+                        scene.items.map((item) =>
+                          item.id === selected
+                            ? item.kind === 'text'
+                              ? { ...item, size: value }
+                              : { ...item, width: value }
+                            : item,
+                        ),
+                      );
+                    }
+                  }}
+                />
+              </label>
+            )}
+          </span>
 
           <button
             type="button"
+            className={styles.tool}
+            aria-label="Undo"
+            title="Undo"
             onClick={() => {
               change(scene.items.slice(0, -1));
               setSelected(null);
             }}
             disabled={scene.items.length === 0}
           >
-            Undo
+            <Icon d={ICONS.undo} />
           </button>
           <button
             type="button"
+            className={styles.tool}
+            aria-label="Delete the selected mark"
+            title="Delete the selected mark"
             onClick={() => {
               if (!selected) return;
               change(scene.items.filter((item) => item.id !== selected));
@@ -469,259 +801,251 @@ export default function Sketchpad() {
             }}
             disabled={!selected}
           >
-            Delete
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (scene.items.length === 0) return;
-              if (!confirm('Clear the page?')) return;
-              change([]);
-              setSelected(null);
-              setEditing(null);
-            }}
-            disabled={scene.items.length === 0}
-          >
-            Clear
+            <Icon d={ICONS.delete} />
           </button>
         </div>
 
-        <div className={styles.surfaceWrap}>
-          <svg
-            ref={surface}
-            className={styles.surface}
-            /* As tall as the note is. A page made on the reading page can be
-               several pages long, and drawing it at one page high would hide
-               the rest and truncate it on the next save. */
-            viewBox={`0 0 ${PAGE.width} ${PAGE.height * pagesOf(scene)}`}
-            data-tool={tool}
-            onPointerDown={(event) => {
-              // Editing: this click is the way out of it. Blurring commits the
-              // text; returning here means the same click does not also start
-              // a stroke or drop a second text box.
-              if (editing !== null) {
-                editor.current?.blur();
-                return;
-              }
+        {/* One page fits the pane; a note several pages long fills its width
+            and scrolls. The stage is the svg's own box, which is what the text
+            editor is positioned against. The pill sits outside the scroller so
+            it stays put while a long note moves under it. */}
+        <div className={styles.scroll}>
+          <div className={pages > 1 ? styles.stageTall : styles.stage}>
+            <svg
+              ref={surface}
+              className={styles.surface}
+              /* As tall as the note is. A page made on the reading page can be
+                 several pages long, and drawing it at one page high would hide
+                 the rest and truncate it on the next save. */
+              viewBox={`0 0 ${PAGE.width} ${PAGE.height * pages}`}
+              data-tool={tool}
+              onPointerDown={(event) => {
+                setSizing(false);
+                // Editing: this click is the way out of it. Blurring commits the
+                // text; returning here means the same click does not also start
+                // a stroke or drop a second text box.
+                if (editing !== null) {
+                  editor.current?.blur();
+                  return;
+                }
 
-              const point = at(event);
+                const point = at(event);
 
-              if (tool === 'pen') {
-                // Capture only for drawing and dragging. On the text tool it
-                // keeps the pointer — and the focus — on the surface, which is
-                // half of why text could not be added.
+                if (tool === 'pen') {
+                  // Capture only for drawing and dragging. On the text tool it
+                  // keeps the pointer — and the focus — on the surface, which is
+                  // half of why text could not be added.
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  drawing.current = {
+                    kind: 'stroke',
+                    id: newId(),
+                    colour,
+                    width,
+                    points: [point],
+                  };
+                  setLive({ ...drawing.current });
+                  return;
+                }
+
+                if (tool === 'text') {
+                  // Stops the default action moving focus to the surface a tick
+                  // after this handler, which would blur the editor before it
+                  // was ever used.
+                  event.preventDefault();
+                  const item: TextItem = {
+                    kind: 'text',
+                    id: newId(),
+                    x: point[0],
+                    // Placed on the baseline of the first line, so the click
+                    // lands where the text starts rather than above it.
+                    y: point[1] + fontSize * 0.8,
+                    size: fontSize,
+                    colour,
+                    text: '',
+                  };
+                  change([...scene.items, item]);
+                  setSelected(item.id);
+                  setEditing(item.id);
+                  return;
+                }
+
+                // Select: an empty click clears the selection. Capture so a drag
+                // that leaves the surface still ends here.
                 event.currentTarget.setPointerCapture(event.pointerId);
-                drawing.current = {
-                  kind: 'stroke',
-                  id: newId(),
-                  colour,
-                  width,
-                  points: [point],
-                };
-                setLive({ ...drawing.current });
-                return;
-              }
-
-              if (tool === 'text') {
-                // Stops the default action moving focus to the surface a tick
-                // after this handler, which would blur the editor before it
-                // was ever used.
-                event.preventDefault();
-                const item: TextItem = {
-                  kind: 'text',
-                  id: newId(),
-                  x: point[0],
-                  // Placed on the baseline of the first line, so the click
-                  // lands where the text starts rather than above it.
-                  y: point[1] + fontSize * 0.8,
-                  size: fontSize,
-                  colour,
-                  text: '',
-                };
-                change([...scene.items, item]);
-                setSelected(item.id);
-                setEditing(item.id);
-                return;
-              }
-
-              // Select: an empty click clears the selection. Capture so a drag
-              // that leaves the surface still ends here.
-              event.currentTarget.setPointerCapture(event.pointerId);
-              setSelected(null);
-            }}
-            onPointerMove={(event) => {
-              if (drawing.current) {
-                drawing.current.points.push(at(event));
-                setLive({ ...drawing.current });
-                return;
-              }
-              if (dragging.current) {
-                const [x, y] = at(event);
-                const [fx, fy] = dragging.current.from;
-                const id = dragging.current.id;
-                dragging.current.from = [x, y];
-                setScene((current) => ({
-                  ...current,
-                  items: current.items.map((item) => {
-                    if (item.id !== id) return item;
-                    if (item.kind === 'text') {
-                      return { ...item, x: item.x + (x - fx), y: item.y + (y - fy) };
-                    }
-                    return {
-                      ...item,
-                      points: item.points.map(([px, py]) => [px + (x - fx), py + (y - fy)]) as [
-                        number,
-                        number,
-                      ][],
-                    };
-                  }),
-                }));
-                setDirty(true);
-              }
-            }}
-            onPointerUp={() => {
-              if (drawing.current) {
-                change([...scene.items, drawing.current]);
+                setSelected(null);
+              }}
+              onPointerMove={(event) => {
+                if (drawing.current) {
+                  drawing.current.points.push(at(event));
+                  setLive({ ...drawing.current });
+                  return;
+                }
+                if (dragging.current) {
+                  const [x, y] = at(event);
+                  const [fx, fy] = dragging.current.from;
+                  const id = dragging.current.id;
+                  dragging.current.from = [x, y];
+                  setScene((current) => ({
+                    ...current,
+                    items: current.items.map((item) => {
+                      if (item.id !== id) return item;
+                      if (item.kind === 'text') {
+                        return { ...item, x: item.x + (x - fx), y: item.y + (y - fy) };
+                      }
+                      return {
+                        ...item,
+                        points: item.points.map(([px, py]) => [px + (x - fx), py + (y - fy)]) as [
+                          number,
+                          number,
+                        ][],
+                      };
+                    }),
+                  }));
+                  setDirty(true);
+                }
+              }}
+              onPointerUp={() => {
+                if (drawing.current) {
+                  change([...scene.items, drawing.current]);
+                  drawing.current = null;
+                  setLive(null);
+                }
+                dragging.current = null;
+              }}
+              onPointerCancel={() => {
                 drawing.current = null;
                 setLive(null);
-              }
-              dragging.current = null;
-            }}
-            onPointerCancel={() => {
-              drawing.current = null;
-              setLive(null);
-              dragging.current = null;
-            }}
-          >
-            <rect width={PAGE.width} height={PAGE.height} fill={scene.background} />
+                dragging.current = null;
+              }}
+            >
+              <rect width={PAGE.width} height={PAGE.height * pages} fill={scene.background} />
 
-            {scene.items.map((item) => {
-              const isSelected = selected === item.id;
-              const grab = (event: React.PointerEvent) => {
-                if (tool !== 'select') return;
-                event.stopPropagation();
-                setSelected(item.id);
-                dragging.current = { id: item.id, from: at(event) };
-              };
+              {scene.items.map((item) => {
+                const isSelected = selected === item.id;
+                const grab = (event: React.PointerEvent) => {
+                  if (tool !== 'select') return;
+                  event.stopPropagation();
+                  setSelected(item.id);
+                  dragging.current = { id: item.id, from: at(event) };
+                };
 
-              if (item.kind === 'stroke') {
-                return (
-                  <g key={item.id} onPointerDown={grab}>
-                    {/* A wide transparent copy underneath, so a thin line can
-                        actually be grabbed with a finger. */}
-                    {tool === 'select' && (
+                if (item.kind === 'stroke') {
+                  return (
+                    <g key={item.id} onPointerDown={grab}>
+                      {/* A wide transparent copy underneath, so a thin line can
+                          actually be grabbed with a finger. */}
+                      {tool === 'select' && (
+                        <path
+                          d={pathD(item)}
+                          fill="none"
+                          stroke="transparent"
+                          strokeWidth={Math.max(item.width, 24)}
+                          strokeLinecap="round"
+                        />
+                      )}
                       <path
                         d={pathD(item)}
                         fill="none"
-                        stroke="transparent"
-                        strokeWidth={Math.max(item.width, 24)}
+                        stroke={item.colour}
+                        strokeWidth={item.width}
                         strokeLinecap="round"
+                        strokeLinejoin="round"
+                        opacity={isSelected ? 0.6 : 1}
                       />
-                    )}
-                    <path
-                      d={pathD(item)}
-                      fill="none"
-                      stroke={item.colour}
-                      strokeWidth={item.width}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      opacity={isSelected ? 0.6 : 1}
-                    />
-                    {item.points.length === 1 && (
-                      <circle
-                        cx={item.points[0][0]}
-                        cy={item.points[0][1]}
-                        r={item.width / 2}
-                        fill={item.colour}
-                      />
-                    )}
-                  </g>
+                      {item.points.length === 1 && (
+                        <circle
+                          cx={item.points[0][0]}
+                          cy={item.points[0][1]}
+                          r={item.width / 2}
+                          fill={item.colour}
+                        />
+                      )}
+                    </g>
+                  );
+                }
+
+                return (
+                  <text
+                    key={item.id}
+                    x={item.x}
+                    y={item.y}
+                    fill={item.colour}
+                    fontSize={item.size}
+                    fontFamily="Archivo, ui-sans-serif, system-ui, sans-serif"
+                    style={{ whiteSpace: 'pre', opacity: editing === item.id ? 0.25 : 1 }}
+                    onPointerDown={grab}
+                    onDoubleClick={() => {
+                      setSelected(item.id);
+                      setEditing(item.id);
+                    }}
+                  >
+                    {item.text.split('\n').map((line, i) => (
+                      <tspan key={i} x={item.x} dy={i === 0 ? 0 : item.size * 1.35}>
+                        {line || ' '}
+                      </tspan>
+                    ))}
+                  </text>
                 );
-              }
+              })}
 
-              return (
-                <text
-                  key={item.id}
-                  x={item.x}
-                  y={item.y}
-                  fill={item.colour}
-                  fontSize={item.size}
-                  fontFamily="Archivo, ui-sans-serif, system-ui, sans-serif"
-                  style={{ whiteSpace: 'pre', opacity: editing === item.id ? 0.25 : 1 }}
-                  onPointerDown={grab}
-                  onDoubleClick={() => {
-                    setSelected(item.id);
-                    setEditing(item.id);
-                  }}
-                >
-                  {item.text.split('\n').map((line, i) => (
-                    <tspan key={i} x={item.x} dy={i === 0 ? 0 : item.size * 1.35}>
-                      {line || ' '}
-                    </tspan>
-                  ))}
-                </text>
-              );
-            })}
+              {live && (
+                <path
+                  d={pathD(live)}
+                  fill="none"
+                  stroke={live.colour}
+                  strokeWidth={live.width}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
+            </svg>
 
-            {live && (
-              <path
-                d={pathD(live)}
-                fill="none"
-                stroke={live.colour}
-                strokeWidth={live.width}
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {/* Typing happens in a textarea laid over the text being edited,
+                positioned and sized to match, so what is typed sits where it
+                will sit. SVG has no editable text of its own, and foreignObject
+                would not render outside a browser. */}
+            {editingItem && (
+              <textarea
+                ref={editor}
+                className={styles.textEditor}
+                value={editingItem.text}
+                style={{
+                  left: onScreen(editingItem.x, editingItem.y).left,
+                  top: onScreen(editingItem.x, editingItem.y - editingItem.size * 0.8).top,
+                  fontSize: editingItem.size * onScreen(0, 0).scale,
+                  color: editingItem.colour,
+                }}
+                onChange={(event) =>
+                  change(
+                    scene.items.map((item) =>
+                      item.id === editingItem.id ? { ...item, text: event.target.value } : item,
+                    ),
+                  )
+                }
+                onFocus={() => {
+                  everFocused.current = true;
+                }}
+                onBlur={() => {
+                  // Only discard an empty box that was actually used. A blur
+                  // before the editor ever had focus is the browser moving
+                  // focus, not him deciding against the text — and deleting on
+                  // that is what made text impossible to add.
+                  if (!everFocused.current) return;
+                  // An empty box left behind would be an invisible thing to
+                  // click on later.
+                  if (!editingItem.text.trim()) {
+                    change(scene.items.filter((item) => item.id !== editingItem.id));
+                    setSelected(null);
+                  }
+                  setEditing(null);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') event.currentTarget.blur();
+                }}
               />
             )}
-          </svg>
-
-          {/* Typing happens in a textarea laid over the text being edited,
-              positioned and sized to match, so what is typed sits where it
-              will sit. SVG has no editable text of its own, and foreignObject
-              would not render outside a browser. */}
-          {editingItem && (
-            <textarea
-              ref={editor}
-              className={styles.textEditor}
-              value={editingItem.text}
-              style={{
-                left: onScreen(editingItem.x, editingItem.y).left,
-                top: onScreen(editingItem.x, editingItem.y - editingItem.size * 0.8).top,
-                fontSize: editingItem.size * onScreen(0, 0).scale,
-                color: editingItem.colour,
-              }}
-              onChange={(event) =>
-                change(
-                  scene.items.map((item) =>
-                    item.id === editingItem.id ? { ...item, text: event.target.value } : item,
-                  ),
-                )
-              }
-              onFocus={() => {
-                everFocused.current = true;
-              }}
-              onBlur={() => {
-                // Only discard an empty box that was actually used. A blur
-                // before the editor ever had focus is the browser moving
-                // focus, not him deciding against the text — and deleting on
-                // that is what made text impossible to add.
-                if (!everFocused.current) return;
-                // An empty box left behind would be an invisible thing to
-                // click on later.
-                if (!editingItem.text.trim()) {
-                  change(scene.items.filter((item) => item.id !== editingItem.id));
-                  setSelected(null);
-                }
-                setEditing(null);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'Escape') event.currentTarget.blur();
-              }}
-            />
-          )}
+          </div>
         </div>
-
-        {status && <p className={styles.message}>{status}</p>}
       </div>
     </div>
   );

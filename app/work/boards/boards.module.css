@@ -1,65 +1,63 @@
-/* One board at a time, inside the viewport. Tokens from app/globals.css. */
+/* One list across every board, with the board view one tap away: his pick,
+   2026-11-10 (redesign page, Boards: A). Tokens from app/globals.css. */
 
+/* The list grows with its cards and the work shell scrolls it; the board view
+   is sized to the viewport and its columns cap themselves instead. */
 .page {
-  flex: 1;
-  min-height: 0;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding-top: 0.5rem;
-  --gold: oklch(80% 0.13 85);
+  --gold: var(--accent);
+  --red: oklch(70% 0.18 25);
 }
 
-/* The pills and nothing else. The account, the read time and a Refresh button
-   were here: the account was a diagnostic that has done its job, the time was
-   a number nobody acts on, and reloading re-reads Trello anyway. */
+.pageBoard {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
 .head {
   flex: none;
   display: flex;
   min-width: 0;
 }
 
-/* A pill per board, one open at a time. Every board rendering at once made
-   this the longest page in the backend and put the one being read somewhere
-   in the middle of four others.
-
-   ONE ROW, NEVER WRAPPING. Which means the pills have to give way instead:
-   they shrink and their names truncate rather than the row breaking or
-   scrolling sideways — "Shepherds We Shall Be — Production" and "The Lost
-   Sheep: Black Pastures" are long enough that seven of them will not fit at
-   full width on anything. The whole name is on the tooltip, and the one that
-   is open never truncates, because that is the one being read. */
+/* All, then a chip per board. One row that scrolls sideways on a phone: seven
+   boards with names like "Shepherds We Shall Be — Production" do not fit 390px,
+   and truncating them to a letter each made them unreadable. The whole name is
+   on the tooltip. */
 .pills {
   display: flex;
   flex-wrap: nowrap;
   gap: 0.4rem;
   min-width: 0;
   flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px;
+}
+
+.pills::-webkit-scrollbar {
+  display: none;
 }
 
 .pill,
 .pillOn {
+  flex: none;
   background: none;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-bright);
   border-radius: 999px;
   color: var(--muted);
-  padding: 0.3rem 0.85rem;
+  padding: 0.4rem 0.9rem;
   font: inherit;
   font-size: 0.8125rem;
   cursor: pointer;
-  /* Shrinks to share the row, and cuts its own name rather than breaking it
-     across two lines. */
-  min-width: 0;
-  flex: 0 1 auto;
   white-space: nowrap;
+  max-width: 16rem;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* The open one keeps its whole name: it is the one being read, and a board
-   you cannot name is a board you cannot be sure you are looking at. */
-.pillOn {
-  flex: 0 0 auto;
 }
 
 .pill:hover {
@@ -69,9 +67,180 @@
 
 .pillOn {
   border-color: var(--gold);
-  background: color-mix(in oklch, var(--gold) 14%, transparent);
+  background: var(--accent-dim);
   color: var(--ink);
-  flex: 0 0 auto;
+}
+
+/* The section heading and the List / Board view switch. */
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.barTitle {
+  margin: 0;
+  min-width: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barTitle a:hover {
+  color: var(--gold);
+}
+
+.barScope {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.views {
+  flex: none;
+  display: flex;
+  border: 1px solid var(--line-bright);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.view,
+.viewOn {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+}
+
+.view + .viewOn,
+.viewOn + .view {
+  border-left: 1px solid var(--line-bright);
+}
+
+.view:hover {
+  color: var(--ink);
+}
+
+.viewOn {
+  background: var(--bg-raised);
+  color: var(--ink);
+}
+
+/* --- the one list ------------------------------------------------------- */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.groupName {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.group_late {
+  color: var(--red);
+}
+
+.group_week {
+  color: var(--ink);
+}
+
+.group_quiet {
+  color: var(--gold);
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+/* A card by its full name. Red edge for late, gold edge for gone quiet. */
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  text-align: left;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font: inherit;
+  padding: 0.65rem 0.8rem;
+  cursor: pointer;
+  transition: border-color 120ms ease-out;
+}
+
+.row:hover {
+  border-color: var(--line-bright);
+}
+
+.rowLate {
+  box-shadow: inset 3px 0 0 var(--red);
+}
+
+.rowQuiet {
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.rowBusy {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.rowName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.rowMeta {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.inlineLink {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--gold);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.page button:focus-visible,
+.page a:focus-visible,
+.page summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    transition: none;
+  }
 }
 
 .status,
@@ -84,7 +253,7 @@
 }
 
 .warn {
-  color: oklch(82% 0.16 85);
+  color: var(--gold);
 }
 
 .status button {
@@ -102,15 +271,15 @@
   list-style: none;
   margin: 0;
   padding: 0.5rem 0.75rem;
-  background: color-mix(in oklch, oklch(70% 0.18 25) 10%, transparent);
-  border-left: 2px solid oklch(70% 0.18 25);
+  background: color-mix(in oklch, var(--red) 10%, transparent);
+  border-left: 2px solid var(--red);
   border-radius: 0 8px 8px 0;
   font-size: 0.8125rem;
   display: grid;
   gap: 0.2rem;
 }
 
-/* The board fills what is left, and its columns scroll rather than the page. */
+/* The board view fills what is left, and its columns cap themselves. */
 .boardPane {
   flex: 1;
   min-height: 0;
@@ -119,21 +288,7 @@
   gap: 0.6rem;
 }
 
-.boardName {
-  flex: none;
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
-.boardName a:hover {
-  color: var(--gold);
-}
-
-/* NOTHING SCROLLS. The columns share the height that is left, the cards
+/* The board view does not scroll. The columns share the height that is left, the cards
    inside them are chips, and a list with more than fits offers the rest in a
    layer rather than a scrollbar. */
 .buckets {
@@ -246,11 +401,11 @@
 }
 
 .overdue {
-  background: oklch(70% 0.18 25);
+  background: var(--red);
 }
 
 .stale {
-  background: oklch(82% 0.16 85);
+  background: var(--gold);
 }
 
 .moreChip {
@@ -270,7 +425,7 @@
   flex: none;
 }
 
-/* --- a card, dead centre, with the page dimmed behind it --------------- */
+/* --- a card: centred on a computer, a bottom sheet on a phone ---------- */
 .overlay {
   position: fixed;
   inset: 0;
@@ -347,11 +502,11 @@
 }
 
 .dueLate {
-  color: oklch(70% 0.18 25);
+  color: var(--red);
 }
 
 .staleText {
-  color: oklch(82% 0.16 85);
+  color: var(--gold);
 }
 
 /* Every list on the board, by its own name. The buckets' four words cannot
@@ -366,12 +521,12 @@
 
 .detailMoves button {
   background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--muted);
+  border: 1px solid var(--line-bright);
+  border-radius: 8px;
+  color: var(--ink);
   font: inherit;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
+  font-size: 0.8125rem;
+  padding: 0.45rem 0.75rem;
   cursor: pointer;
 }
 
@@ -434,8 +589,42 @@
   line-height: 1.6;
 }
 
-@media (max-width: 760px) {
+/* A phone: the card window is a bottom sheet, full width and thumb-high,
+   rather than a widened card in the middle of the screen. */
+@media (max-width: 720px) {
   .buckets {
     grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  }
+
+  .overlay {
+    place-items: end stretch;
+    padding: 0;
+  }
+
+  .detail {
+    width: 100%;
+    max-height: 85dvh;
+    overflow-y: auto;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 0;
+    padding: 1rem 1.1rem calc(1.1rem + env(safe-area-inset-bottom));
+    animation: rise 200ms ease-out;
+  }
+
+  .detailFoot a,
+  .detailFoot button {
+    padding: 0.4rem 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail {
+    animation: none;
   }
 }

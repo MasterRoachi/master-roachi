@@ -1,23 +1,31 @@
-/* Products: one shut card per product, in the language of Habits, Reading
-   and the orders tab — centred, gold only for what waits on him (a product
-   with no description), and a round + to add art.
-   Tokens from app/globals.css. */
+/* Products, his pick, 2026-11-10 (redesign page, Shop products: A): tiles
+   with their picture in the store's order, a gold ! on any without a
+   description, and the editor in place of the grid once one is opened — one
+   column on a phone, two from 900px. Save is in a bar stuck to the foot of
+   the pane. Gold only for what waits on him and for Save while there is
+   something to save. Tokens from app/globals.css. */
 
-/* --- the head: what needs writing, Sync, Save --------------------------- */
+.products {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- the head: what needs writing, and Sync ------------------------------ */
 
 .toolbar {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.8rem;
-  margin: 0 0 0.75rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin: 0 0 1rem;
 }
 
 .counts {
   margin: 0;
   font-size: 0.875rem;
   color: var(--muted);
-  text-align: center;
 }
 
 .counts strong {
@@ -35,42 +43,28 @@
   font-weight: 600;
 }
 
-.actions {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.actions button {
+.pill {
   background: var(--bg-raised);
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink);
-  padding: 0.4rem 1.1rem;
+  padding: 0.45rem 1.1rem;
   font: inherit;
   font-size: 0.875rem;
   cursor: pointer;
 }
 
-.actions button:hover:not(:disabled) {
+.pill:hover:not(:disabled) {
   border-color: var(--accent);
 }
 
-/* Save is gold while there is something to save, and only then. */
-.actions button.save:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-  font-weight: 600;
-}
-
-.actions button:disabled {
+.pill:disabled {
   opacity: 0.45;
   cursor: default;
 }
 
 .orphans {
-  margin: 0.5rem auto 0;
+  margin: 2rem auto 0;
   max-width: 40rem;
   font-size: 0.8125rem;
   line-height: 1.6;
@@ -78,129 +72,226 @@
   text-align: center;
 }
 
-.orphans {
-  margin-top: 2rem;
-}
-
 .status,
 .message {
-  margin: 0.75rem auto 0;
+  margin: 0.75rem auto;
   max-width: 40rem;
   font-size: 0.875rem;
   color: var(--muted);
   text-align: center;
 }
 
-.dirty {
-  margin-left: 0.6rem;
+.hint {
+  margin: 1rem 0 0;
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent);
+  color: var(--muted-2);
+  text-align: center;
 }
 
-/* --- one card per product ------------------------------------------------- */
+/* --- the tiles -------------------------------------------------------------- */
 
-.cards {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 1.75rem 0 4rem;
+.tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
 }
 
-.card,
-.cardOpen {
-  width: 100%;
-  margin: 0 auto 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg-raised);
-  transition: max-width 0.18s ease, border-color 0.15s ease;
+@media (min-width: 720px) {
+  .tiles {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
 }
 
-/* Shut, a pill in the middle of the page; open, the width of the column. */
-.card {
-  max-width: 36rem;
-  overflow: hidden;
+.tileItem {
+  position: relative;
+  transition: opacity 0.15s ease;
 }
 
-.cardOpen {
-  max-width: 100%;
-  border-color: var(--line-bright);
+.tileItem[data-dragging] {
+  opacity: 0.6;
 }
 
-.card[data-waiting],
-.cardOpen[data-waiting] {
+.tileItem[data-dragging] .product {
   border-color: var(--accent);
 }
 
-.cardHeadRow {
-  display: flex;
-  align-items: center;
-}
-
-.cardHead {
-  flex: 1;
+.product {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'name state'
-    'facts facts';
-  align-items: baseline;
-  gap: 0.2rem 1rem;
-  background: none;
-  border: 0;
+  gap: 0.25rem;
+  width: 100%;
+  height: 100%;
+  align-content: start;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
   color: var(--ink);
-  padding: 0.8rem 1.1rem;
+  padding: 0.5rem 0.5rem 0.75rem;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  min-width: 0;
+  transition: border-color 0.15s ease;
 }
 
-.cardHead:hover .cardName {
-  color: var(--accent);
+.product:hover {
+  border-color: var(--line-bright);
 }
 
-.cardName {
-  grid-area: name;
-  font-size: 1rem;
+.product[data-waiting] {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.thumb {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  margin-bottom: 0.35rem;
+  border-radius: 8px;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.thumbEmpty {
+  font-size: 0.75rem;
+  color: var(--muted-2);
+}
+
+.productName {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 0.25rem;
+  font-size: 0.9375rem;
   font-weight: 600;
 }
 
-.cardFacts {
-  grid-area: facts;
-  font-size: 0.8125rem;
-  color: var(--muted);
-}
-
-.cardState {
-  grid-area: state;
-  font-size: 0.75rem;
-  color: var(--muted);
+.productName > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-[data-waiting] .cardState {
-  color: var(--accent);
-  font-weight: 600;
+.bang {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 0.8125rem;
+  font-weight: 800;
 }
 
-/* Open: the fields on the left, what the page will say on the right. Below a
-   tablet, two columns means neither is usable. */
+.tick {
+  flex: none;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.productFacts,
+.productState,
+.productStateGold {
+  padding: 0 0.25rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.productStateGold {
+  color: var(--accent);
+}
+
+/* The handle a tile is dragged by. touch-action: none, so a finger on it
+   drags the tile and does not scroll the page. */
+.grip {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--bg) 80%, transparent);
+  border: 1px solid var(--line);
+  cursor: grab;
+  touch-action: none;
+}
+
+.grip:active {
+  cursor: grabbing;
+  border-color: var(--accent);
+}
+
+.grip svg {
+  width: 16px;
+  height: 16px;
+  fill: var(--muted);
+}
+
+/* --- one product open --------------------------------------------------- */
+
+.editor {
+  scroll-margin-top: 0.5rem;
+}
+
+.editorHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.back {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.back:hover {
+  border-color: var(--accent);
+}
+
+.editorName {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.moveAt {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The fields, then what the page will say: one column on a phone, where
+   the second is behind a toggle; side by side from 900px. */
 .cardBody {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
-  gap: 2rem;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   align-items: start;
-  padding: 1rem 1.1rem 1.25rem;
-  border-top: 1px solid var(--line);
-}
-
-@media (max-width: 900px) {
-  .cardBody {
-    grid-template-columns: 1fr;
-  }
 }
 
 .cardMain {
@@ -208,15 +299,46 @@
 }
 
 .aside {
-  display: grid;
+  display: none;
   gap: 1rem;
-  position: sticky;
-  top: 1rem;
 }
 
-@media (max-width: 900px) {
-  .aside {
-    position: static;
+.aside[data-shown] {
+  display: grid;
+}
+
+.asideToggle {
+  width: 100%;
+  margin-top: 0.75rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  padding: 0.65rem 0.8rem;
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.asideToggle:hover {
+  border-color: var(--accent);
+}
+
+@media (min-width: 900px) {
+  .cardBody {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    gap: 2rem;
+  }
+
+  .aside,
+  .aside[data-shown] {
+    display: grid;
+    position: sticky;
+    top: 1rem;
+  }
+
+  .asideToggle {
+    display: none;
   }
 }
 
@@ -230,7 +352,62 @@
   color: inherit;
 }
 
-/* --- the art: everything this product has, and a round + to add ----------- */
+/* --- Save, stuck to the foot of the pane --------------------------------- */
+
+.saveBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+  padding: 0.75rem 0 calc(0.25rem + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, transparent, var(--bg) 0.75rem);
+}
+
+.saveNote {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.save {
+  flex: none;
+  min-width: 7rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  padding: 0.7rem 1.4rem;
+  font: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Gold while there is something to save, and only then. */
+.save:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.save:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.dirty {
+  margin-right: 0.6rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
 
 .grid {
   display: grid;
@@ -339,6 +516,14 @@
   resize: vertical;
 }
 
+/* A phone: a shorter box, and type at 1rem so focusing it does not zoom. */
+@media (max-width: 720px) {
+  .productText {
+    min-height: 12rem;
+    font-size: 1rem;
+  }
+}
+
 .productText:focus {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -383,20 +568,21 @@
   min-height: 10rem;
 }
 
-/* Reordering the store. Small, because it is rare. */
+/* Reordering the store from the keyboard, in the open product; dragging a
+   tile is the other way. Small, because it is rare. */
 .move {
   display: flex;
-  gap: 0.25rem;
-  padding-right: 0.8rem;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .move button {
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--ink);
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 2.25rem;
+  height: 2.25rem;
   font: inherit;
   cursor: pointer;
 }
@@ -411,7 +597,7 @@
 }
 
 .stale {
-  margin: 0.5rem auto 0;
+  margin: 0 auto 1rem;
   max-width: 40rem;
   text-align: center;
   font-size: 0.8125rem;
@@ -524,7 +710,7 @@
 /* The real product page in a frame (PagePreview.tsx). */
 .previewOpen {
   width: 100%;
-  margin-bottom: 0.9rem;
+  margin-top: 0.9rem;
   background: var(--accent-dim);
   border: 1px solid var(--accent);
   border-radius: 8px;

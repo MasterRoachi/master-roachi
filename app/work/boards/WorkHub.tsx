@@ -13,22 +13,25 @@ import {
 } from '@/lib/work-hub';
 import styles from './boards.module.css';
 
-// One board at a time, chosen by a pill.
+// One list across every board: his pick, 2026-11-10 (redesign page, Boards: A).
 //
-// Every board used to render at once, stacked, which made the page the longest
-// thing in the backend and meant the board being looked at was somewhere in
-// the middle of four others. A pill each and one on screen fits, which is the
-// rule for the whole backend now, and reading one board is what anyone
-// actually does with it.
+// The page opens on every card that matters, from every board, in three
+// groups: Late, This week and Gone quiet. Board chips along the top narrow it
+// to one board. The old view, one board's lists as columns of chips, stays one
+// tap away behind "Board view", because a board's own lists are still the
+// only place a fresh Waiting card or a backlog shows.
+//
+// The cards come from what the Worker already sends: on his own boards only
+// cards in a Today / Doing / This week / Waiting list, on a day-job board only
+// cards assigned to him. So the groups sort that set; they do not widen it.
 //
 // Fetches /api/work/ once on mount. No polling: the page is opened in the
 // morning, read, and closed, and a timer re-fetching every minute would spend
-// Trello's rate limit on a tab nobody is looking at. The button is there for
-// when a card has just been moved.
+// Trello's rate limit on a tab nobody is looking at. A move re-reads.
 //
 // Fetched with the trailing slash. next.config.mjs sets trailingSlash: true,
 // so the dev server normalises /api/work to /api/work/ and the Worker strips
-// trailing slashes before matching — both forms reach the same route, and
+// trailing slashes before matching. Both forms reach the same route, and
 // writing the slashed one means dev and production take the same path rather
 // than production working by luck.
 
@@ -38,12 +41,11 @@ type State =
   | { phase: 'ready'; data: WorkHubPayload };
 
 /**
- * Lists the page does not draw, whatever board they are on.
+ * Lists the board view does not draw, whatever board they are on.
  *
  * Done and its synonyms are the past. Inbox is uncategorised capture and
  * showing it turns the hub into a second inbox. Projects is Command's standing
- * list of project NAMES — Shepherds, Cultus, Terrath, Kame, The Rig — which is
- * reference rather than anything to do today.
+ * list of project NAMES, which is reference rather than anything to do today.
  *
  * Matched on the whole name, so a list called "Done thinking" is not swept up
  * with it.
@@ -53,11 +55,103 @@ const HIDDEN_LISTS = /^(inbox|done|completed|complete|archive|archived|projects)
 /**
  * The list that means finished, whatever a board calls it.
  *
- * Its own button rather than one option among many, because finishing is the
- * thing done most and the thing worth one click. Command calls it Done;
- * North Star calls it Completed.
+ * Marked out among the move buttons, because finishing is the thing done most.
+ * Command calls it Done; North Star calls it Completed.
  */
 const FINISHED_LIST = /^(done|completed|complete)$/i;
+
+const DAY = 86_400_000;
+
+/** A card with the board it sits on, because the one list mixes boards. */
+interface Entry {
+  card: WorkCard;
+  board: WorkBoard;
+  due: number | null;
+  idle: number | null;
+}
+
+type GroupKey = 'late' | 'week' | 'quiet';
+
+const GROUPS: { key: GroupKey; label: string }[] = [
+  { key: 'late', label: 'Late' },
+  { key: 'week', label: 'This week' },
+  { key: 'quiet', label: 'Gone quiet' },
+];
+
+/**
+ * Which group a card falls in, or none.
+ *
+ * One group per card, first match wins: past due is Late; due within a week is
+ * This week, even if it has also gone quiet, because a date is the stronger
+ * signal; then idle for STALE_DAYS or more is Gone quiet, even in a Doing list
+ * (the mockup's own example), because a Doing card nobody touched for nine
+ * days is the one that wants an eye; then a card in a Today, Doing or This
+ * week list is This week. A fresh Waiting card, or a day-job card with no date
+ * that moved recently, is in none, and the board view still shows it.
+ */
+function groupOf(entry: Entry, now: number): GroupKey | null {
+  if (entry.due !== null && entry.due < now) return 'late';
+  if (entry.due !== null && entry.due < now + 7 * DAY) return 'week';
+  if (entry.idle !== null && entry.idle >= STALE_DAYS) return 'quiet';
+  const bucket = entry.card.bucket;
+  if (bucket === 'today' || bucket === 'doing' || bucket === 'week') return 'week';
+  return null;
+}
+
+const BUCKET_RANK: Record<string, number> = { today: 0, doing: 1, week: 2, waiting: 3 };
+
+/** Late and This week by date (soonest first, undated after); Gone quiet by stillest first. */
+function compare(group: GroupKey, a: Entry, b: Entry): number {
+  if (group === 'quiet') return (b.idle ?? 0) - (a.idle ?? 0);
+  const ad = a.due ?? Number.POSITIVE_INFINITY;
+  const bd = b.due ?? Number.POSITIVE_INFINITY;
+  if (ad !== bd) return ad - bd;
+  return (BUCKET_RANK[a.card.bucket ?? ''] ?? 9) - (BUCKET_RANK[b.card.bucket ?? ''] ?? 9);
+}
+
+function shortDate(at: number): string {
+  return new Date(at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' });
+}
+
+/** One card in the one list, by its full name, with where it sits underneath. */
+function Row({
+  entry,
+  group,
+  showBoard,
+  busy,
+  onOpen,
+}: {
+  entry: Entry;
+  group: GroupKey;
+  showBoard: boolean;
+  busy: boolean;
+  onOpen: () => void;
+}) {
+  const { card, board, due, idle } = entry;
+  const edge = group === 'late' ? styles.rowLate : group === 'quiet' ? styles.rowQuiet : '';
+  const where = [showBoard ? board.name : null, card.list].filter(Boolean).join(' · ');
+
+  return (
+    <li>
+      <button
+        type="button"
+        className={`${styles.row} ${edge} ${busy ? styles.rowBusy : ''}`}
+        onClick={onOpen}
+      >
+        <span className={styles.rowName}>{card.name}</span>
+        <span className={styles.rowMeta}>
+          {where}
+          {due !== null && (
+            <span className={group === 'late' ? styles.dueLate : undefined}> · due {shortDate(due)}</span>
+          )}
+          {idle !== null && idle >= STALE_DAYS && (
+            <span className={styles.staleText}> · {idle} days still</span>
+          )}
+        </span>
+      </button>
+    </li>
+  );
+}
 
 function Chip({
   card,
@@ -70,7 +164,7 @@ function Chip({
 }) {
   /* Read once on mount rather than on every render. Reading the clock during
      render means the same card can draw differently from the same props, which
-     is what the purity rule is for - and it also let two chips in one list
+     is what the purity rule is for, and it also let two chips in one list
      disagree about a day boundary they crossed between renders. */
   const [now] = useState(() => Date.now());
   const idle = daysSince(card.lastActivity, now);
@@ -99,11 +193,11 @@ function Chip({
 }
 
 /**
- * One list, as chips, capped at what fits.
+ * One list of the board view, as chips, capped at what fits.
  *
- * Nothing scrolls — that is the rule for the whole backend — so a list longer
- * than its column shows what it can and offers the rest. The count is always
- * on the heading, so a long list reads as long rather than as eight cards.
+ * A list longer than its column shows what it can and offers the rest. The
+ * count is always on the heading, so a long list reads as long rather than as
+ * five cards.
  */
 function Group({
   heading,
@@ -153,24 +247,27 @@ export default function WorkHub() {
   const [openedAt] = useState(() => Date.now());
   const [state, setState] = useState<State>({ phase: 'loading' });
   const [nonce, setNonce] = useState(0);
+  /** The board chip that is on; null is All. */
   const [active, setActive] = useState<string | null>(null);
+  /** The one list, or one board's lists as columns. */
+  const [view, setView] = useState<'list' | 'board'>('list');
   const [busyCard, setBusyCard] = useState<string | null>(null);
-  /** The card being read, dead centre with the page dimmed behind it. */
-  const [openCard, setOpenCard] = useState<WorkCard | null>(null);
-  /** A list that did not fit, shown in full rather than scrolled to. */
+  /** The card being read, with its board: the one list mixes boards, and the moves are the board's. */
+  const [open, setOpen] = useState<{ card: WorkCard; board: WorkBoard } | null>(null);
+  /** A board-view list that did not fit, shown in full. */
   const [overflow, setOverflow] = useState<{ heading: string; cards: WorkCard[] } | null>(null);
 
   /* Escape closes the layer, which is what everyone tries first. */
   useEffect(() => {
-    if (!openCard && !overflow) return;
+    if (!open && !overflow) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
-      setOpenCard(null);
+      setOpen(null);
       setOverflow(null);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [openCard, overflow]);
+  }, [open, overflow]);
 
   useEffect(() => {
     let live = true;
@@ -183,7 +280,7 @@ export default function WorkHub() {
         if (!response.ok) {
           throw new Error(
             response.status === 404
-              ? 'The hub is not switched on — see the setup notes.'
+              ? 'The hub is not switched on. See the setup notes.'
               : `Trello could not be read (${response.status}).`,
           );
         }
@@ -205,9 +302,9 @@ export default function WorkHub() {
   }, [nonce]);
 
   /* Boards by soonest due card, his call: the board with the most urgent thing
-   * on it leads. A board with nothing due sorts last — no deadline is not the
-   * same as an imminent one — and ties break on the name so the row does not
-   * reshuffle itself between reads. */
+   * on it leads. A board with nothing due sorts last (no deadline is not the
+   * same as an imminent one) and ties break on the name so the chips do not
+   * reshuffle themselves between reads. */
   const boards = useMemo(() => {
     if (state.phase !== 'ready') return [];
     return [...state.data.boards].sort(
@@ -215,7 +312,29 @@ export default function WorkHub() {
     );
   }, [state]);
 
-  const board = boards.find((one) => one.id === active) ?? boards[0] ?? null;
+  /* Every card, sorted into the three groups. Built across all boards; the
+     chip filters it at render time. */
+  const entries = useMemo(() => {
+    const all: (Entry & { group: GroupKey })[] = [];
+    for (const board of boards) {
+      for (const card of board.cards) {
+        const parsed = card.due ? Date.parse(card.due) : Number.NaN;
+        const entry: Entry = {
+          card,
+          board,
+          due: Number.isFinite(parsed) ? parsed : null,
+          idle: daysSince(card.lastActivity, openedAt),
+        };
+        const group = groupOf(entry, openedAt);
+        if (group) all.push({ ...entry, group });
+      }
+    }
+    return all;
+  }, [boards, openedAt]);
+
+  const chosen = boards.find((one) => one.id === active) ?? null;
+  /* The board view needs one board; from All it opens on the first. */
+  const board = chosen ?? boards[0] ?? null;
 
   async function move(card: WorkCard, listId: string) {
     setBusyCard(card.id);
@@ -232,9 +351,9 @@ export default function WorkHub() {
       }
       // Re-read rather than patch the card in place: the move may have been
       // one of several, and Trello is the thing that knows where everything
-      // is now. The open card goes with it — it has just moved, so the panel
+      // is now. The open card goes with it: it has just moved, so the sheet
       // describing where it was is the one thing that is certainly wrong.
-      setOpenCard(null);
+      setOpen(null);
       setOverflow(null);
       setNonce((n) => n + 1);
     } catch (error) {
@@ -264,53 +383,73 @@ export default function WorkHub() {
 
   const { data } = state;
 
-  /* The active board's cards, grouped by ITS OWN lists, in its own order.
+  const shown = chosen ? entries.filter((entry) => entry.board.id === chosen.id) : entries;
+  const grouped = GROUPS.map(({ key, label }) => ({
+    key,
+    label,
+    entries: shown.filter((entry) => entry.group === key).sort((a, b) => compare(key, a, b)),
+  })).filter((group) => group.entries.length > 0);
+  const scopeCards = chosen ? chosen.cards.length : boards.reduce((n, one) => n + one.cards.length, 0);
+  const elsewhere = scopeCards - shown.length;
+
+  /* The board view: one board's cards, grouped by ITS OWN lists, in its own
+   * order.
    *
    * Not by the hub's four bucket names, which was the first attempt and was
-   * wrong in a way worth recording: North Star runs nine lists — Continuing,
-   * Blocked / Waiting, To Plan, Strategic Backlog, Next Sprint, Current
-   * 2-Week Sprint, In Progress, Review / Approval, Completed — and exactly
-   * one of them matches a bucket pattern. Grouping by bucket showed two cards
-   * and silently dropped the rest of the board.
-   *
-   * The buckets still earn their keep: they decide what a card can be MOVED
-   * to, and the morning check-in reads them. They are just the wrong thing to
-   * lay a board out with, because a board's lists are the board's own
-   * language. */
-  const groups = board
-    ? board.lists
-        .filter((list) => !HIDDEN_LISTS.test(list.name.trim()))
-        .map((list) => ({
-          heading: list.name,
-          cards: board.cards.filter((card) => card.list === list.name),
-        }))
-        .filter((group) => group.cards.length > 0)
-    : [];
+   * wrong in a way worth recording: North Star runs nine lists and exactly one
+   * of them matches a bucket pattern. Grouping by bucket showed two cards and
+   * silently dropped the rest of the board. A board's lists are the board's
+   * own language. */
+  const columns =
+    view === 'board' && board
+      ? board.lists
+          .filter((list) => !HIDDEN_LISTS.test(list.name.trim()))
+          .map((list) => ({
+            heading: list.name,
+            cards: board.cards.filter((card) => card.list === list.name),
+          }))
+          .filter((column) => column.cards.length > 0)
+      : [];
+
+  const sheetCard = open?.card ?? null;
+  const sheetIdle = sheetCard ? daysSince(sheetCard.lastActivity, openedAt) : null;
 
   return (
-    <div className={styles.page}>
-      <div className={styles.head}>
-        {/* A pill per board, one open at a time, and nothing else.
-            The account, the read time and a Refresh button sat here: the
-            account was a diagnostic that has done its job, the time was a
-            number nobody acts on, and reloading the page re-reads Trello
-            because the fetch runs on mount. */}
-        <nav className={styles.pills} aria-label="Boards">
-          {boards.map((one) => (
+    <div className={`${styles.page} ${view === 'board' ? styles.pageBoard : ''}`}>
+      {boards.length > 0 && (
+        <div className={styles.head}>
+          {/* All, then a chip per board. In the list they narrow it; in the
+              board view they pick the board, and All goes back to the list. */}
+          <nav className={styles.pills} aria-label="Boards">
             <button
-              key={one.id}
               type="button"
-              className={one.id === board?.id ? styles.pillOn : styles.pill}
-              aria-current={one.id === board?.id}
-              onClick={() => setActive(one.id)}
+              className={view === 'list' && !chosen ? styles.pillOn : styles.pill}
+              aria-pressed={view === 'list' && !chosen}
+              onClick={() => {
+                setActive(null);
+                setView('list');
+              }}
             >
-              {one.name}
+              All
             </button>
-          ))}
-        </nav>
-
-
-      </div>
+            {boards.map((one) => {
+              const on = view === 'board' ? one.id === board?.id : one.id === chosen?.id;
+              return (
+                <button
+                  key={one.id}
+                  type="button"
+                  className={on ? styles.pillOn : styles.pill}
+                  aria-pressed={on}
+                  title={one.name}
+                  onClick={() => setActive(one.id)}
+                >
+                  {one.name}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      )}
 
       {/* Trello and the rest fail independently, so a missing token costs the
           boards and not the page. */}
@@ -329,26 +468,99 @@ export default function WorkHub() {
         </ul>
       )}
 
-      {board && (
-        <div className={styles.boardPane}>
-          <h2 className={styles.boardName}>
-            <a href={board.url} target="_blank" rel="noreferrer">
-              {board.name} ↗
-            </a>
-          </h2>
+      {boards.length === 0 && data.configured && (
+        <p className={styles.clear}>Nothing on the boards.</p>
+      )}
 
-          {groups.length === 0 ? (
+      {boards.length > 0 && (
+        <div className={styles.bar}>
+          <h2 className={styles.barTitle}>
+            {view === 'list' ? (
+              <>
+                Next up <span className={styles.barScope}>{chosen ? chosen.name : 'all boards'}</span>
+              </>
+            ) : (
+              board && (
+                <a href={board.url} target="_blank" rel="noreferrer">
+                  {board.name} ↗
+                </a>
+              )
+            )}
+          </h2>
+          <div className={styles.views} role="group" aria-label="View">
+            <button
+              type="button"
+              className={view === 'list' ? styles.viewOn : styles.view}
+              aria-pressed={view === 'list'}
+              onClick={() => setView('list')}
+            >
+              List
+            </button>
+            <button
+              type="button"
+              className={view === 'board' ? styles.viewOn : styles.view}
+              aria-pressed={view === 'board'}
+              onClick={() => setView('board')}
+            >
+              Board view
+            </button>
+          </div>
+        </div>
+      )}
+
+      {view === 'list' && boards.length > 0 && (
+        <>
+          {grouped.length === 0 ? (
+            <p className={styles.clear}>Nothing late, due this week or gone quiet.</p>
+          ) : (
+            grouped.map((group) => (
+              <section key={group.key} className={styles.group}>
+                <h3 className={`${styles.groupName} ${styles[`group_${group.key}`]}`}>
+                  {group.label}
+                  <span className={styles.count}>{group.entries.length}</span>
+                </h3>
+                <ul className={styles.rows}>
+                  {group.entries.map((entry) => (
+                    <Row
+                      key={entry.card.id}
+                      entry={entry}
+                      group={group.key}
+                      showBoard={!chosen}
+                      busy={busyCard === entry.card.id}
+                      onOpen={() => setOpen({ card: entry.card, board: entry.board })}
+                    />
+                  ))}
+                </ul>
+              </section>
+            ))
+          )}
+          {/* Said, so a fresh Waiting card, which is in no group, does not look lost. */}
+          {elsewhere > 0 && (
+            <p className={styles.unmatched}>
+              {elsewhere} more card{elsewhere === 1 ? ' sits' : 's sit'} outside these groups.{' '}
+              <button type="button" className={styles.inlineLink} onClick={() => setView('board')}>
+                Board view
+              </button>{' '}
+              shows them.
+            </p>
+          )}
+        </>
+      )}
+
+      {view === 'board' && board && (
+        <div className={styles.boardPane}>
+          {columns.length === 0 ? (
             <p className={styles.clear}>
               {board.scope === 'mine' ? 'Nothing queued.' : 'Nothing assigned to you.'}
             </p>
           ) : (
             <div className={styles.buckets}>
-              {groups.map(({ heading, cards }) => (
+              {columns.map(({ heading, cards }) => (
                 <Group
                   key={heading}
                   heading={heading}
                   cards={cards}
-                  onOpen={setOpenCard}
+                  onOpen={(card) => setOpen({ card, board })}
                   onOverflow={(name, all) => setOverflow({ heading: name, cards: all })}
                   busyCard={busyCard}
                 />
@@ -358,57 +570,50 @@ export default function WorkHub() {
         </div>
       )}
 
-      {/* --- one card, dead centre, with the page dimmed behind it ------- */}
-      {openCard && board && (
+      {/* --- one card: a bottom sheet on a phone, centred on a computer --- */}
+      {open && sheetCard && (
         <div
           className={styles.overlay}
           role="dialog"
           aria-modal="true"
-          aria-label={openCard.name}
+          aria-label={sheetCard.name}
           onClick={(event) => {
-            if (event.target === event.currentTarget) setOpenCard(null);
+            if (event.target === event.currentTarget) setOpen(null);
           }}
         >
           <article className={styles.detail}>
             <p className={styles.detailWhere}>
-              {board.name} <span className={styles.chev}>›</span> {openCard.list}
+              {open.board.name} <span className={styles.chev}>›</span> {sheetCard.list}
             </p>
-            <h2 className={styles.detailName}>{openCard.name}</h2>
+            <h2 className={styles.detailName}>{sheetCard.name}</h2>
 
             <p className={styles.detailMeta}>
-              {openCard.labels.map((label) => (
+              {sheetCard.labels.map((label) => (
                 <span key={label} className={styles.label}>
                   {label}
                 </span>
               ))}
-              {openCard.due && (
-                <span
-                  className={
-                    Date.parse(openCard.due) < openedAt ? styles.dueLate : styles.due
-                  }
-                >
-                  due {new Date(openCard.due).toLocaleDateString('en-ZA')}
+              {sheetCard.due && (
+                <span className={Date.parse(sheetCard.due) < openedAt ? styles.dueLate : styles.due}>
+                  due {new Date(sheetCard.due).toLocaleDateString('en-ZA')}
                 </span>
               )}
-              {(() => {
-                const idle = daysSince(openCard.lastActivity, openedAt);
-                return idle !== null && idle >= STALE_DAYS ? (
-                  <span className={styles.staleText}>{idle} days still</span>
-                ) : null;
-              })()}
+              {sheetIdle !== null && sheetIdle >= STALE_DAYS && (
+                <span className={styles.staleText}>{sheetIdle} days still</span>
+              )}
             </p>
 
             {/* The move, which is the whole reason the page writes anything. */}
             <div className={styles.detailMoves}>
-              {board.lists
-                .filter((list) => list.name !== openCard.list)
+              {open.board.lists
+                .filter((list) => list.name !== sheetCard.list)
                 .map((list) => (
                   <button
                     key={list.id}
                     type="button"
                     className={FINISHED_LIST.test(list.name.trim()) ? styles.finish : undefined}
-                    disabled={busyCard === openCard.id}
-                    onClick={() => void move(openCard, list.id)}
+                    disabled={busyCard === sheetCard.id}
+                    onClick={() => void move(sheetCard, list.id)}
                   >
                     {list.name}
                   </button>
@@ -416,10 +621,10 @@ export default function WorkHub() {
             </div>
 
             <p className={styles.detailFoot}>
-              <a href={openCard.url} target="_blank" rel="noreferrer">
+              <a href={sheetCard.url} target="_blank" rel="noreferrer">
                 Open in Trello ↗
               </a>
-              <button type="button" onClick={() => setOpenCard(null)}>
+              <button type="button" onClick={() => setOpen(null)}>
                 Close
               </button>
             </p>
@@ -427,7 +632,7 @@ export default function WorkHub() {
         </div>
       )}
 
-      {/* --- a list that did not fit, in full ----------------------------- */}
+      {/* --- a board-view list that did not fit, in full ----------------- */}
       {overflow && (
         <div
           className={styles.overlay}
@@ -451,7 +656,7 @@ export default function WorkHub() {
                   busy={busyCard === card.id}
                   onOpen={(one) => {
                     setOverflow(null);
-                    setOpenCard(one);
+                    if (board) setOpen({ card: one, board });
                   }}
                 />
               ))}

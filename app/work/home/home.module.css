@@ -1,0 +1,366 @@
+/* The learn and tools homes (his picks, 2026-11-10, redesign page, Learn
+   doors: B and Tools doors: B). Tokens from app/globals.css.
+
+   Phone first: one column of cards, the width of the phone. On a computer the
+   column stops at a phone-and-a-half wide and sits in the middle, because
+   these are glances, not desks. Gold as a surface only for the one thing on
+   each card: the Review button, and a habit done today. */
+
+.home {
+  flex: 1;
+  width: min(100%, 34rem);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-block: 1rem 0;
+}
+
+/* Pushes the doors and the app pills to the foot when the cards are short. */
+.grow {
+  flex: 1;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* --- Continue ---------------------------------------------------------- */
+
+/* White, as the mock has it: the biggest thing on the page, and not gold,
+   which on this page belongs to Review. */
+.continue {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--ink);
+  color: oklch(0% 0 0);
+  text-decoration: none;
+}
+
+.continue .eyebrow {
+  color: oklch(0% 0 0 / 0.55);
+}
+
+.curriculum {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 5vw, 1.7rem);
+  line-height: 1.15;
+}
+
+.lesson {
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.lessonName {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Looks pressable; the whole card is the link. */
+.openLesson {
+  margin-top: 0.5rem;
+  align-self: stretch;
+  text-align: center;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: oklch(0% 0 0);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.continue:hover .openLesson {
+  background: oklch(22% 0 0);
+}
+
+.continue:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* --- cards ------------------------------------------------------------- */
+
+.card,
+.cardWaiting {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* Something due: the gold edge the backend uses for "needs you". */
+.cardWaiting {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+a.card:hover {
+  border-color: var(--line-bright);
+}
+
+a.card:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cardRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.gold {
+  flex: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: 10px;
+  background: var(--accent);
+  color: oklch(0% 0 0);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.gold:hover {
+  background: color-mix(in oklch, var(--accent) 85%, white);
+}
+
+.gold:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* --- books ------------------------------------------------------------- */
+
+.books {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cover {
+  flex: none;
+  width: 30px;
+  height: 44px;
+  border-radius: 3px;
+  border: 1px solid;
+  overflow: hidden;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bookText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.bookText b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- today's habits ---------------------------------------------------- */
+
+.todayHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.todayTitle {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile,
+.tileOn {
+  width: 100%;
+  aspect-ratio: 5 / 6;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.7rem;
+  border-radius: 12px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.12s ease;
+}
+
+.tile {
+  background: var(--bg-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.tile:hover:not(:disabled) {
+  border-color: var(--line-bright);
+}
+
+/* Done today: the one gold thing on a tile. */
+.tileOn {
+  background: var(--accent);
+  color: oklch(0% 0 0);
+  border: 1px solid var(--accent);
+}
+
+.tile:active:not(:disabled),
+.tileOn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.tile:focus-visible,
+.tileOn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.tile:disabled,
+.tileOn:disabled {
+  cursor: default;
+}
+
+.tile[aria-busy='true'],
+.tileOn[aria-busy='true'] {
+  opacity: 0.6;
+}
+
+.glyph {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tile .glyph {
+  color: var(--accent);
+}
+
+.tileName {
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.tileLine {
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.tile .tileLine {
+  color: var(--muted);
+}
+
+/* --- Habits and Sketchpad --------------------------------------------- */
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.small {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.8rem 0.85rem;
+  border-radius: 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.small > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.small svg {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+}
+
+.small:hover {
+  border-color: var(--line-bright);
+}
+
+.small:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* A computer has the width for more tiles to a row. */
+@media (min-width: 721px) {
+  .tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .tileOn {
+    transition: none;
+  }
+
+  .tile:active:not(:disabled),
+  .tileOn:active:not(:disabled) {
+    transform: none;
+  }
+}

@@ -1,209 +1,296 @@
-/* Year, month, grid. Tokens from app/globals.css.
+/* The week as a grid — his pick, 2026-11-10 (redesign page, Habits: B).
+ * Tokens from app/globals.css.
  *
- * The page is centred and narrow until a month opens, at which point the grid
- * wants room — so the column is centred and the grid scrolls inside it rather
- * than the page widening and reflowing everything above. */
+ * Phone first: at 390px the name column and seven 2.2rem squares fit side by
+ * side. On a computer the column stays narrow and centred — a week is seven
+ * squares, and stretching it to the window would be mostly gaps. */
 
 .page {
-  max-width: 60rem;
-  /* The streak bar is fixed to the foot of the window, so the column has to
-     end above it or the last year card sits under the bar. */
-  margin: 2rem auto 0;
-  /* Clear of the dock — streak bar plus the three buttons. */
-  padding-bottom: 8.5rem;
-}
-
-/* --- the year pills ------------------------------------------------------ */
-
-.year,
-.yearOpen {
-  margin: 0 auto 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg-raised);
-  overflow: hidden;
-  transition: max-width 0.18s ease;
-}
-
-/* Closed, it is a pill in the middle of the page. Open, it is a section the
-   width of the column — which is the expansion, rather than a panel appearing
-   from somewhere else. */
-.year {
-  max-width: 16rem;
-}
-
-.yearOpen {
-  max-width: 100%;
-  border-color: var(--line-bright);
-}
-
-.yearPill {
-  position: relative;
+  /* Fills the scrolling .shell, so the streaks can sit at its foot. */
+  flex: 1 0 auto;
   display: flex;
-  align-items: center;
-  /* Centred, with the +/- taken out of the flow and pinned right — the year
-     is the thing being read, and space-between put it off to one side. */
-  justify-content: center;
+  flex-direction: column;
   gap: 1rem;
   width: 100%;
-  background: none;
-  border: 0;
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--step-sub);
-  font-variant-numeric: tabular-nums;
-  padding: 0.7rem 1.1rem;
-  cursor: pointer;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding-top: 1rem;
 }
 
-.yearPill:hover {
-  color: var(--accent);
-}
+/* --- the week bar ------------------------------------------------------- */
 
-.chev {
-  position: absolute;
-  right: 1.1rem;
-  color: var(--muted);
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-.section {
-  padding: 0 1.1rem 1.1rem;
-}
-
-/* --- the month pills ----------------------------------------------------- */
-
-.months {
+.bar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  padding: 0.2rem 0 0.2rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.month,
-.monthOn {
-  flex: 1 1 auto;
-  min-width: 3.1rem;
-  background: none;
+.weekNav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.weekName {
+  margin: 0;
+  min-width: 8.5rem;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.arrow,
+.close {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  display: grid;
+  place-items: center;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.1rem;
+  border-radius: 8px;
+  background: var(--bg-raised);
   cursor: pointer;
 }
 
-.month:hover:not(:disabled) {
-  border-color: var(--line-bright);
-  color: var(--ink);
+.arrow svg,
+.close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-/* A month that has not happened. Dimmed and inert rather than hidden, so the
-   year still reads as twelve months. */
-.month:disabled {
+.arrow:hover:not(:disabled),
+.close:hover {
+  border-color: var(--line-bright);
+}
+
+/* No week after this one, and nothing before the first year. Dimmed rather
+   than hidden, so the bar does not shift as you reach either end. */
+.arrow:disabled {
   opacity: 0.3;
   cursor: default;
 }
 
-.monthOn {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-  font-weight: 600;
-}
-
-/* --- the two cards ------------------------------------------------------ */
-
-/* Daily and weekly, side by side while there is room. They are not the same
-   question — a weekly habit sitting unticked among the dailies reads as a
-   thing missed rather than a thing not due — so they stay two groups.
-   No card behind them any more (14 Oct): the icons are the thing, and a panel
-   around eight of them was a box drawn around a row. */
-.decks {
+.barEnd {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.1rem 2rem;
-  margin: 0.9rem 0 0.4rem;
+  align-items: center;
+  gap: 0.6rem;
 }
 
-/* Sized to its own icons rather than to a share of the width: a flexible
-   basis let the daily group shrink below its eight boxes, which is what was
-   wrapping them onto a second row. */
-.deck {
-  flex: 0 0 auto;
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-/* ONE ROW, always — his rule. nowrap is what enforces it; the box size below
-   is what makes it fit. Eight at 2.2rem plus gaps is about 20.5rem, which
-   clears a 360px phone. */
-.boxes {
+.archiveLinks {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  gap: 0.4rem;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--muted-2);
+  font-size: 0.85rem;
 }
 
-/* 2.2rem: the largest that fits eight across a phone in a single row. Still
-   a usable tap target, and the icon inside is still the thing you read. */
-.box,
-.boxOn {
-  width: 2.2rem;
-  height: 2.2rem;
-  flex: 0 0 auto;
-  padding: 0;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
+.link {
+  background: none;
+  border: 0;
+  padding: 0.35rem 0.15rem;
+  font: inherit;
+  color: var(--muted);
   cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  text-decoration: underline;
+  text-decoration-color: var(--line-bright);
+  text-underline-offset: 3px;
 }
 
-.box {
-  border: 1px solid var(--line-bright);
+.link:hover {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
+/* --- the week ----------------------------------------------------------- */
+
+.week {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  /* Lets the page scroll up and down under a finger; sideways is the swipe. */
+  touch-action: pan-y;
+}
+
+.grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.3rem;
+  table-layout: fixed;
+}
+
+.head,
+.headToday {
+  width: 2.6rem;
+  padding: 0 0 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-align: center;
+}
+
+.head span,
+.headToday span {
+  display: block;
+}
+
+.headDate {
+  font-size: 0.65rem;
+  color: var(--muted-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.headToday,
+.headToday .headDate {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.name {
+  padding: 0 0.4rem 0 0;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-align: left;
+  height: 2.6rem;
+}
+
+/* The name column takes what the seven squares leave, and a long name is cut
+   short rather than squeezing the days. */
+.nameInner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.nameInner span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grid td {
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Today's column, outlined top to bottom: the one column you can tick. */
+.todayCol {
+  box-shadow: inset 1px 0 0 var(--accent), inset -1px 0 0 var(--accent);
+}
+
+.grid tbody tr:first-child .todayCol {
+  border-radius: 8px 8px 0 0;
+  box-shadow:
+    inset 1px 0 0 var(--accent),
+    inset -1px 0 0 var(--accent),
+    inset 0 1px 0 var(--accent);
+}
+
+.grid tbody tr:last-child .todayCol {
+  border-radius: 0 0 8px 8px;
+  box-shadow:
+    inset 1px 0 0 var(--accent),
+    inset -1px 0 0 var(--accent),
+    inset 0 -1px 0 var(--accent);
+}
+
+.grid tbody tr:only-child .todayCol {
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+/* A read-out square: any day but today. */
+.day,
+.dayOn,
+.dayFuture {
+  display: inline-block;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 6px;
+  vertical-align: middle;
+}
+
+.day {
+  border: 1px solid var(--line);
   background: var(--bg);
 }
 
-.box:hover {
-  border-color: var(--accent);
-}
-
-.box .glyph {
-  stroke: var(--muted);
-}
-
-.box:hover .glyph {
-  stroke: var(--accent);
-}
-
-.boxOn {
+.dayOn {
   border: 1px solid var(--accent);
   background: var(--accent);
 }
 
-.boxOn .glyph {
-  stroke: var(--bg);
+/* A day that has not happened. Barely there — not a miss. */
+.dayFuture {
+  border: 1px dashed var(--line);
+  opacity: 0.4;
 }
 
-/* Darkened rather than lightened, so hovering a done box reads as "undo this"
-   instead of as more emphasis. */
-.boxOn:hover {
+/* Today's square, the one thing on the page that can be pressed. */
+.tick,
+.tickOn {
+  width: 1.9rem;
+  height: 1.9rem;
+  flex: 0 0 auto;
+  padding: 0;
+  border-radius: 7px;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.tick {
+  border: 2px solid var(--accent);
+  background: var(--bg);
+}
+
+.tick:hover {
+  background: var(--accent-dim);
+}
+
+.tickOn {
+  border: 2px solid var(--accent);
+  background: var(--accent);
+}
+
+/* Darkened rather than lightened, so hovering a done square reads as "undo
+   this" instead of as more emphasis. */
+.tickOn:hover {
   background: color-mix(in oklab, var(--accent) 80%, black);
 }
 
-.box:focus-visible,
-.boxOn:focus-visible {
+.tick:focus-visible,
+.tickOn:focus-visible,
+.arrow:focus-visible,
+.close:focus-visible,
+.link:focus-visible,
+.chip:focus-visible,
+.chipOn:focus-visible,
+.pill:focus-visible,
+.pillOn:focus-visible,
+.tab:focus-visible,
+.tabOn:focus-visible,
+.addToggle:focus-visible,
+.addToggleOn:focus-visible,
+.pick:focus-visible,
+.pickOn:focus-visible,
+.addGo:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
 
 .glyph {
-  width: 17px;
-  height: 17px;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: var(--muted);
   stroke-width: 1.8;
@@ -211,116 +298,353 @@
   stroke-linejoin: round;
 }
 
-.deckName {
-  margin: 0.45rem 0 0;
+/* --- weekly habits ------------------------------------------------------ */
+
+.weekly {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sectionName {
+  margin: 0;
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  text-align: center;
   color: var(--muted);
 }
 
-/* --- the streak bar ----------------------------------------------------- */
+.weeklyCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-raised);
+}
 
-/* The dock: the grid, the three buttons and the streak bar, pinned together
-   to the foot of the window. Pinned, not at the end of the document, because
-   the runs are what the page is for and scrolling to find out whether
-   anything is being kept defeats them.
-   One fixed element rather than three stacked ones — they move together, so
-   they are one thing. */
-.dock {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
+.weeklyBody {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  /* It sits over the scrolling column, so it needs a ground of its own. */
-  padding: 0.6rem 1rem 0.7rem;
-  background: var(--bg);
+  gap: 0.45rem;
 }
 
-/* One row, never wrapping — it scrolls sideways on a narrow screen rather
-   than becoming two rows and eating the page. `safe center` so that when it
-   does overflow, the first card is still reachable instead of being clipped
-   off the left. */
+.weeklyHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.weeklyHead b {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weeklyHead span {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.meter {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.meter i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--muted);
+  transition: width 0.2s ease;
+}
+
+/* Target met: the done state, so the one place the bar turns gold. */
+.meter .meterMet {
+  background: var(--accent);
+}
+
+/* --- the streak chips --------------------------------------------------- */
+
+/* At the foot of the page, and stuck to the bottom of the pane while the
+   week scrolls under it — the runs are what the page is for. */
+.foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin-top: auto;
+  padding: 0.6rem 0 0.2rem;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
 .streaks {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: safe center;
+  flex-wrap: wrap;
   gap: 0.4rem;
-  overflow-x: auto;
-  margin: 0;
+}
+
+.chip,
+.chipOn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   max-width: 100%;
-  padding: 0;
-}
-
-/* --- the three buttons -------------------------------------------------- */
-
-.views {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.view,
-.viewOn {
-  border-radius: 7px;
+  padding: 0.35rem 0.7rem 0.35rem 0.5rem;
+  border-radius: 999px;
   font: inherit;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.chip {
+  border: 1px solid var(--line-bright);
+  background: var(--bg-raised);
+  color: var(--ink);
+}
+
+.chip:hover {
+  border-color: var(--accent);
+}
+
+/* A run that is alive: gold, with black figures. */
+.chipOn {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.chipOn .glyph {
+  stroke: var(--bg);
+}
+
+.chipOn:hover {
+  background: color-mix(in oklab, var(--accent) 88%, black);
+}
+
+.chip[aria-expanded='true'],
+.chipOn[aria-expanded='true'] {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.chipName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 9rem;
+}
+
+.chipRun {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- the icon picker ---------------------------------------------------- */
+
+/* Above the chips, in the foot, rather than floating off one chip: the row
+   wraps, and a popover pinned to a chip near an edge would run off screen. */
+.picker {
+  padding: 0.6rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line-bright);
+  border-radius: 12px;
+}
+
+.pickerName {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.pickerGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  max-height: 11rem;
+  overflow-y: auto;
+}
+
+.pick,
+.pickOn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.pick svg,
+.pickOn svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pick svg {
+  stroke: var(--muted);
+}
+
+.pick:hover {
+  border-color: var(--line-bright);
+}
+
+.pick:hover svg {
+  stroke: var(--ink);
+}
+
+.pickOn {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.pickOn svg {
+  stroke: var(--accent);
+}
+
+/* --- the archive sheet -------------------------------------------------- */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  /* Over the header (20), which would otherwise sit on top of the sheet. */
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: oklch(0% 0 0 / 0.6);
+}
+
+/* A bottom sheet on a phone. */
+.sheet {
+  width: 100%;
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  border: 1px solid var(--line-bright);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: var(--bg-raised);
+}
+
+/* A panel in the middle on a computer, sized to the grid inside it. */
+@media (min-width: 720px) {
+  .scrim {
+    align-items: center;
+  }
+
+  .sheet {
+    width: max-content;
+    min-width: 28rem;
+    max-width: min(60rem, calc(100vw - 4rem));
+    border-bottom: 1px solid var(--line-bright);
+    border-radius: 12px;
+    padding-bottom: 1rem;
+  }
+}
+
+.sheetTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.tab,
+.tabOn {
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   padding: 0.35rem 0.9rem;
   cursor: pointer;
 }
 
-/* Black, as asked — the gold is the streak bar's, and two gold rows stacked
-   would leave nothing to look at first. */
-.view {
-  background: var(--bg);
-  border: 1px solid var(--line-bright);
+.tab {
+  background: none;
   color: var(--muted);
 }
 
-.view:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.tab:hover {
+  color: var(--ink);
 }
 
-.viewOn {
-  background: var(--accent);
-  border: 1px solid var(--accent);
+.tabOn {
+  background: var(--ink);
   color: var(--bg);
 }
 
-/* --- the grid ----------------------------------------------------------- */
-
-/* Sized to the grid inside it, not to the column: a week is seven cells wide
-   and a panel stretched to sixty rems around them is mostly empty panel. It
-   still caps, so a thirty-one column month scrolls rather than running off
-   the window. */
-.sheet {
-  width: max-content;
-  max-width: min(60rem, 100%);
-  max-height: 55dvh;
-  overflow: hidden;
-  border: 1px solid var(--line-bright);
-  border-radius: 10px;
-  background: var(--bg-raised);
-  padding: 0.7rem;
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
 }
 
-/* Thirty-one columns do not fit a phone, and shrinking the cells to make them
-   fit makes them unreadable. Scrolls sideways instead, with the icon column
-   pinned so a row stays identifiable. */
+.pill,
+.pillOn {
+  flex: 0 0 auto;
+  min-width: 3.1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
+.pill:hover:not(:disabled) {
+  border-color: var(--line-bright);
+  color: var(--ink);
+}
+
+.pill:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.pillOn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
 .sheetScroll {
   overflow: auto;
+  min-height: 0;
   max-width: 100%;
-  max-height: calc(55dvh - 1.4rem);
 }
 
 .sheetGrid {
@@ -362,118 +686,10 @@
   border: 1px solid var(--line);
 }
 
-/* A day or month that has not happened. Barely there — not a miss. */
 .cellFuture {
   background: none;
   border: 1px dashed var(--line);
   opacity: 0.35;
-}
-
-
-
-/* Gold, with black figures — his call, 14 Oct. These are the one thing on the
-   page that is always on screen, so they are the one thing that is always
-   lit. */
-.streak {
-  position: relative;
-  flex: 0 0 auto;
-  width: 3.1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.05rem;
-  padding: 0.4rem 0.2rem 0.35rem;
-  border: 1px solid var(--accent);
-  border-radius: 9px;
-  background: var(--accent);
-}
-
-.streakIcon {
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  line-height: 0;
-}
-
-/* Black on the gold, and it stays black on hover: the card is already the
-   lit state, so brightening it would say nothing. */
-.streak .glyph,
-.streakIcon:hover .glyph {
-  stroke: var(--bg);
-}
-
-.streakRun {
-  font-size: 1rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.15;
-  color: var(--bg);
-}
-
-/* --- the icon picker ---------------------------------------------------- */
-
-/* Over the page rather than pushing the row apart — a picker that resized the
-   card would move every streak the moment it opened. */
-.picker {
-  position: absolute;
-  bottom: calc(100% + 0.3rem);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem;
-  width: 17rem;
-  max-height: 13rem;
-  overflow-y: auto;
-  padding: 0.4rem;
-  background: var(--bg);
-  border: 1px solid var(--line-bright);
-  border-radius: 8px;
-}
-
-.pick,
-.pickOn {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: 1px solid var(--line);
-  background: none;
-  cursor: pointer;
-  padding: 0;
-  display: grid;
-  place-items: center;
-}
-
-.pick svg,
-.pickOn svg {
-  width: 17px;
-  height: 17px;
-  fill: none;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.pick svg {
-  stroke: var(--muted);
-}
-
-.pick:hover {
-  border-color: var(--line-bright);
-}
-
-.pick:hover svg {
-  stroke: var(--ink);
-}
-
-.pickOn {
-  border-color: var(--accent);
-  background: var(--accent-dim);
-}
-
-.pickOn svg {
-  stroke: var(--accent);
 }
 
 /* --- adding ------------------------------------------------------------- */
@@ -483,7 +699,7 @@
   font-size: 0.9375rem;
   max-width: 48ch;
   line-height: 1.6;
-  margin: 1rem 0;
+  margin: 0;
 }
 
 .empty em {
@@ -492,32 +708,13 @@
   font-weight: 600;
 }
 
-/* The add card.
- *
- * Its own section above every year, because a habit is not a fact about 2026
- * and the form has no business inside one. Shut by default: adding is rare
- * next to ticking, so it is a round + that opens a card rather than a panel
- * standing open under a grid read every morning.
- *
- * THE GRID SETS THE WIDTH. Thirty-six icons is exactly six by six, and the
- * name/frequency row above is sized from the same --cell and --gap so the two
- * line up edge to edge instead of being two guesses that nearly match. */
-
-.addSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.8rem;
-  margin: 0 0 1.75rem;
-}
-
 .addToggle,
 .addToggleOn {
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.25rem;
+  height: 2.25rem;
   padding: 0;
   border-radius: 999px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-bright);
   background: var(--bg-raised);
   display: grid;
   place-items: center;
@@ -530,22 +727,17 @@
   width: 18px;
   height: 18px;
   fill: none;
-  stroke: var(--muted);
+  stroke: var(--ink);
   stroke-width: 2;
   stroke-linecap: round;
   transition: transform 0.18s ease, stroke 0.15s ease;
 }
 
 .addToggle:hover {
-  border-color: var(--line-bright);
+  border-color: var(--accent);
 }
 
-.addToggle:hover svg {
-  stroke: var(--ink);
-}
-
-/* Open: the same plus, turned forty-five degrees. The control that opened the
-   card is then visibly the one that shuts it. */
+/* Open: the same plus, turned forty-five degrees. */
 .addToggleOn {
   border-color: var(--accent);
   background: var(--accent-dim);
@@ -556,17 +748,18 @@
   transform: rotate(45deg);
 }
 
+/* The add card. THE GRID SETS THE WIDTH: thirty-six icons is exactly six by
+   six, and the name/frequency row above is sized from the same --cell and
+   --gap so the two line up edge to edge. */
 .addCard {
-  /* One icon square and the space between two. Everything in the card is
-     measured from these. */
   --cell: 3.1rem;
   --gap: 0.35rem;
   --pad: 1rem;
 
+  align-self: center;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  /* border-box is global, so the padding is inside this number. */
   width: calc(var(--cell) * 6 + var(--gap) * 5 + var(--pad) * 2);
   max-width: 100%;
   padding: var(--pad);
@@ -580,9 +773,8 @@
   gap: var(--gap);
 }
 
-/* The name bar takes what the dropdown does not. min-width: 0 is what lets it
-   shrink inside the flex row rather than forcing the card wider than the grid
-   — the usual flex floor is the input's own default size. */
+/* min-width: 0 lets the name bar shrink inside the flex row rather than
+   forcing the card wider than the grid. */
 .addRow input:not([type='number']) {
   flex: 1 1 0;
   min-width: 0;
@@ -596,11 +788,11 @@
 .addCard select {
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--ink);
   font: inherit;
   font-size: 0.8125rem;
-  padding: 0.4rem 0.5rem;
+  padding: 0.45rem 0.5rem;
 }
 
 .target {
@@ -609,8 +801,8 @@
   text-align: center;
 }
 
-.addCard input:focus,
-.addCard select:focus {
+.addCard input:focus-visible,
+.addCard select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -621,8 +813,6 @@
   gap: var(--gap);
 }
 
-/* The shared .pick is a fixed 28px for the in-row picker. In the card it fills
-   its column instead, and aspect-ratio keeps it square at whatever that is. */
 .iconGrid .pick,
 .iconGrid .pickOn {
   width: 100%;
@@ -635,20 +825,21 @@
   height: 20px;
 }
 
+/* The one thing the card is for, so it is the gold button. */
 .addGo {
-  background: none;
-  border: 1px solid var(--line-bright);
-  border-radius: 6px;
-  color: var(--ink);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--bg);
   font: inherit;
   font-size: 0.875rem;
-  padding: 0.45rem 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 0.9rem;
   cursor: pointer;
 }
 
 .addGo:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 88%, black);
 }
 
 .addGo:disabled {
@@ -659,22 +850,50 @@
 .status {
   color: var(--muted);
   font-size: 0.875rem;
+  padding-top: 1rem;
 }
 
 /* A refused action, which is usually a date that has not happened. */
 .warn {
-  border: 1px solid var(--accent);
-  background: var(--accent-dim);
-  border-radius: 6px;
+  margin: 0;
+  border: 1px solid oklch(70% 0.18 25);
+  border-radius: 8px;
   padding: 0.6rem 0.8rem;
   font-size: 0.8125rem;
-  margin-bottom: 1rem;
+  color: oklch(70% 0.18 25);
 }
 
-/* A month still in flight. The pills have already moved, so this says only
-   that the boxes are not known yet — and it holds the space the cards will
-   take, so nothing below them jumps when they arrive. */
-.waiting {
-  min-height: 7rem;
+@media (prefers-reduced-motion: reduce) {
+  .tick,
+  .tickOn,
+  .meter i,
+  .addToggle,
+  .addToggleOn,
+  .addToggle svg,
+  .addToggleOn svg {
+    transition: none;
+  }
 }
 
+/* A phone: narrower days, so a name like "Train" or "Read the Bible" still
+   reads at 390px instead of being cut to one letter. */
+@media (max-width: 720px) {
+  .head,
+  .headToday {
+    width: 2.1rem;
+  }
+
+  .name {
+    font-size: 0.85rem;
+  }
+}
+
+/* A computer: the week stays a compact grid instead of stretching the names
+   across the screen and pushing the seven days to the far edge. */
+@media (min-width: 721px) {
+  .week {
+    width: 100%;
+    max-width: 40rem;
+    margin-inline: auto;
+  }
+}

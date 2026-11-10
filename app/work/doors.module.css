@@ -1,9 +1,12 @@
-/* The doors on the work home. Tokens from app/globals.css.
+/* The doors on the three app homes. Tokens from app/globals.css.
 
    GOLD FACES, which is the one place on the site the accent is used as a
-   surface rather than as a line or a word. It is allowed here because the work
-   home holds its doors and nothing else to compete with: on a page of cards
-   it would be noise, on a page of doors it is the page.
+   surface rather than as a line or a word. It is allowed here because on the
+   admin home the doors are the page. Since the redesign (his pick, 2026-11-10,
+   redesign page, Admin doors: A) gold also MEANS something: a door with
+   nothing waiting goes quiet, .doorQuiet, a dark face with a gold mark, so the
+   gold ones are the ones that want him. The learn home's doors (Learn doors:
+   B) are all quiet and smaller, .doorsSmall, because its cards come first.
 
    Everything is laid out from the numbers below — --doors, the count, is set
    by WorkDoors.tsx from the list itself — so the row sizes itself without
@@ -23,6 +26,19 @@
   justify-content: center;
 }
 
+/* The learn home's row: under the cards, not the middle of the page. */
+.doorsSmall {
+  --door-w: clamp(92px, 9vw, 116px);
+  --door-ratio: 5 / 6;
+  --door-gap: 12px;
+
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 0.5rem 0;
+}
+
 .row {
   display: flex;
   gap: var(--door-gap);
@@ -34,7 +50,8 @@
 
 /* --- a door ------------------------------------------------------------- */
 
-.door {
+.door,
+.doorQuiet {
   /* Where the cursor is, and how far the face has been pushed by it. Written
      by WorkDoors.tsx on pointermove; these are the resting values. */
   --mx: 50%;
@@ -84,21 +101,44 @@
 /* Floats up, and the shadow grows with it so the lift reads as height rather
    than as the card jumping. An open door stays lifted. */
 .door:hover,
-.door:focus-visible {
+.door:focus-visible,
+.doorQuiet:hover,
+.doorQuiet:focus-visible {
   --lift: -10px;
   box-shadow: 0 20px 40px oklch(0% 0 0 / 0.55);
 }
 
-.door:focus-visible {
+.door:focus-visible,
+.doorQuiet:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
+}
+
+/* Quiet: nothing waiting. The same card, dark, its mark in gold so it still
+   reads as a door of this set rather than a disabled one. */
+.doorQuiet {
+  background: var(--bg-raised);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.doorQuiet svg {
+  color: var(--accent);
+}
+
+.doorQuiet:hover,
+.doorQuiet:focus-visible {
+  border-color: var(--line-bright);
+  box-shadow: 0 16px 32px oklch(0% 0 0 / 0.5);
 }
 
 /* The shine: light tracking the cursor across the face, as on a project card.
    WHITE rather than the accent, which is the one thing that could not be
    copied straight over — the cards are dark and glow in the project's own
    colour, and a gold light on a gold face is nothing at all. */
-.door::before {
+.door::before,
+.doorQuiet::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -116,19 +156,33 @@
 }
 
 .door:hover::before,
-.door:focus-visible::before {
+.door:focus-visible::before,
+.doorQuiet:hover::before,
+.doorQuiet:focus-visible::before {
   opacity: 1;
+}
+
+/* On a dark face the same white light is a glare; a fifth of it is a sheen. */
+.doorQuiet::before {
+  background: radial-gradient(
+    220px circle at var(--mx) var(--my),
+    oklch(100% 0 0 / 0.09) 0%,
+    transparent 70%
+  );
 }
 
 /* Title and icon sit above the tracking light, and say so rather than relying
    on the order they happen to be written in. */
 .door svg,
-.doorName {
+.doorQuiet svg,
+.doorName,
+.doorLine {
   position: relative;
   z-index: 1;
 }
 
-.door svg {
+.door svg,
+.doorQuiet svg {
   width: clamp(38px, 5vw, 56px);
   height: auto;
 }
@@ -140,16 +194,37 @@
   line-height: 1;
 }
 
-/* --- the app, and the others ------------------------------------------- */
-
-.appName {
-  margin: 0 0 clamp(18px, 3vw, 32px);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
+/* The live line: what is waiting behind the door. Pulled closer to the name
+   than the icon is, so the two read as one label. */
+.doorLine {
+  margin-top: calc(clamp(12px, 1.6vw, 20px) * -0.5);
+  font-size: clamp(0.78rem, 1.1vw, 0.9rem);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  opacity: 0.85;
 }
+
+.doorQuiet .doorLine {
+  color: var(--muted);
+  opacity: 1;
+}
+
+/* Smaller doors, smaller type, so three fit under the cards on a phone. */
+.doorsSmall .doorQuiet {
+  gap: 10px;
+  padding: 0.75rem;
+}
+
+.doorsSmall .doorQuiet svg {
+  width: 30px;
+}
+
+.doorsSmall .doorName {
+  font-size: 0.95rem;
+}
+
+/* --- the other apps ---------------------------------------------------- */
 
 /* The other two apps: small and quiet, under the doors, so the doors stay the
    page. A plain link each; on the apps' own addresses the Worker forwards it
@@ -207,8 +282,30 @@
     max-width: calc(var(--cols, 3) * var(--door-w) + (var(--cols, 3) - 1) * var(--door-gap));
   }
 
-  .door {
+  .door,
+  .doorQuiet {
     border-radius: 12px;
+  }
+
+  .doorsSmall {
+    --door-w: clamp(
+      72px,
+      calc((100vw - 3.5rem - (var(--cols, 3) - 1) * var(--door-gap)) / var(--cols, 3)),
+      104px
+    );
+  }
+
+  /* Five doors with a line each is a tall face on a phone; the line is the
+     point, so the icon gives way. */
+  .door svg,
+  .doorQuiet svg {
+    width: 32px;
+  }
+
+  .door,
+  .doorQuiet {
+    gap: 10px;
+    padding: 0.6rem;
   }
 }
 
@@ -217,15 +314,20 @@
 @media (prefers-reduced-motion: reduce) {
   .door,
   .door:hover,
-  .door:focus-visible {
+  .door:focus-visible,
+  .doorQuiet,
+  .doorQuiet:hover,
+  .doorQuiet:focus-visible {
     transform: none;
   }
 
-  .door {
+  .door,
+  .doorQuiet {
     transition: box-shadow 0.25s ease;
   }
 
-  .door::before {
+  .door::before,
+  .doorQuiet::before {
     transition: none;
   }
 }

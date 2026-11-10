@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { pageMeta } from '@/lib/seo';
-import WorkDoors from '../WorkDoors';
+import LearnHome from '../home/LearnHome';
 
-// The learn app's doors (2026-11-10): where the installed app opens, one door
-// per tool. See lib/work-tools.ts for what it holds.
+// The learn app's home (2026-11-10): where the installed app opens. Continue,
+// the cards due and the books open now, then the three doors (his pick,
+// 2026-11-10, redesign page, Learn doors: B). home/LearnHome.tsx says how.
+// See lib/work-tools.ts for what the app holds.
 
 export const metadata: Metadata = pageMeta({
   path: '/work/learn/',
@@ -15,7 +17,7 @@ export const metadata: Metadata = pageMeta({
 export default function LearnPage() {
   return (
     <div className="shell">
-      <WorkDoors app="learn" />
+      <LearnHome />
     </div>
   );
 }

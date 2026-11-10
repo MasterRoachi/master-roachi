@@ -1,25 +1,225 @@
-/* A bookcase. Tokens from app/globals.css.
+/* The open books in front — his pick, 2026-11-10 (redesign page, Reading: A).
+ * Tokens from app/globals.css.
  *
- * It was spines on grey boards. Now that the Calibre library supplies cover
- * art (scripts/book-covers.mjs) the books are the thing and the furniture
- * around them was furniture, so a shelf is a plain grid of covers — 14 Oct
- * 2026. A book with no cover still gets a derived colour and its title, which
- * is lib/book-spine.ts earning its keep for the hand-typed case.
- *
- * The shelves are CARDS, shut, like the year cards on the habits page: all
- * four open at once made the page as long as the collection. */
+ * Open now is cards with big covers; Next is a shelf of spines; Finished and
+ * Put down fold away at the foot. A book with no cover art still gets a
+ * derived colour and its title, which is lib/book-spine.ts earning its keep
+ * for the hand-typed case. Phone first; the breakpoint is 720px. */
 
 .page {
-  /* The full width of .shell, like every other backend page. It was 56rem,
-     which was a column of text's width wrapped around a grid of covers. */
-  margin: 2rem auto 4rem;
+  /* The full width of .shell, like every other backend page. A flex column
+     at least the height of the pane, so the folded shelves sit at its foot
+     when the page is short, as in the mock. */
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  margin: 1rem 0 0;
+}
+
+.count,
+.countMuted {
+  margin-left: 0.5rem;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .count {
   color: var(--accent);
-  margin-left: 0.5rem;
-  letter-spacing: 0;
+}
+
+.countMuted {
+  color: var(--muted-2);
+}
+
+/* Section names inside the page — not the tool's name, which the header
+   already carries. Open now's is gold because it is the one in front. */
+.sectionName,
+.sectionNameGold {
+  display: flex;
+  align-items: baseline;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sectionNameGold {
+  color: var(--accent);
+}
+
+/* --- open now: cards with big covers ------------------------------------ */
+
+.openGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 0.6rem;
+}
+
+.openCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.75rem;
+  text-align: left;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 1px 0 var(--line);
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+
+.openCard:hover {
+  border-color: var(--line-bright);
+}
+
+.openCard:active {
+  transform: translateY(1px);
+}
+
+.openCard:focus-visible,
+.slot:focus-visible,
+.fold:focus-visible,
+.foldOn:focus-visible,
+.closeBook:focus-visible,
+.removeBook:focus-visible,
+.addToggle:focus-visible,
+.addToggleOn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* A book's proportions. Big, because what is open is the thing. */
+.openCover {
+  position: relative;
+  flex: 0 0 auto;
+  width: 5.5rem;
+  aspect-ratio: 2 / 3;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.45rem;
+  box-shadow: 0 6px 16px oklch(0% 0 0 / 0.45);
+}
+
+.openCover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.openCover .blankTitle {
+  font-size: 0.7rem;
+}
+
+.openCover .blankAuthor {
+  font-size: 0.55rem;
+}
+
+.openText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  padding-top: 0.15rem;
+}
+
+.openTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.openAuthor {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.openMeta {
+  font-size: 0.75rem;
+  color: var(--muted-2);
   font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 721px) {
+  .openCover {
+    width: 7rem;
+  }
+}
+
+/* --- next, and the folded shelves --------------------------------------- */
+
+.nextSection {
+  margin-top: 1.6rem;
+}
+
+/* At the foot of the page: margin-top auto takes whatever room is left. */
+.folds {
+  margin-top: auto;
+  padding-top: 1.6rem;
+}
+
+.foldRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.fold,
+.foldOn {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.65rem 0.9rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.fold:hover {
+  border-color: var(--line-bright);
+}
+
+.foldOn {
+  border-color: var(--line-bright);
+}
+
+.chevron {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.foldOn .chevron {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron,
+  .openCard {
+    transition: none;
+  }
+}
+
+.foldBody {
+  margin-top: 1.2rem;
 }
 
 /* --- the book, off the shelf and open ----------------------------------- */
@@ -106,14 +306,6 @@
   }
 }
 
-
-/* The left page is the narrower one now that the book is nearly full screen:
-   the facts are a fixed amount of text and the writing wants the room. */
-.bookClosed,
-.bookOpen {
-  grid-template-columns: minmax(16rem, 26rem) 1fr;
-}
-
 .stars {
   display: flex;
 }
@@ -189,11 +381,20 @@
   flex-direction: column;
   align-items: center;
   gap: 0.8rem;
-  margin: 0 0 1.75rem;
+  margin: 0 0 0.8rem;
+}
+
+/* Open now's name on the left, the + on the right. */
+.headRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .addToggle,
 .addToggleOn {
+  flex: 0 0 auto;
   width: 2.4rem;
   height: 2.4rem;
   padding: 0;
@@ -366,55 +567,10 @@
   cursor: default;
 }
 
-/* --- the shelf cards ---------------------------------------------------- */
+/* --- finished, by year ------------------------------------------------- */
 
-.shelfCard,
-.shelfOpen {
-  margin: 0 auto 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg-raised);
-  overflow: hidden;
-  transition: max-width 0.18s ease;
-}
-
-/* Shut, it is a pill in the middle of the page. Open, it is the width of the
-   column — the expansion itself, rather than a panel appearing elsewhere. */
-.shelfCard {
-  max-width: 18rem;
-}
-
-.shelfOpen {
-  max-width: 100%;
-  border-color: var(--line-bright);
-  /* The cover swings out WIDER than the spine and, at the end of a row, past
-     the card itself. Clipping it cut the book off at the card's edge. Only
-     the open card: shut, it is a pill whose rounded corners want the clip. */
-  overflow: visible;
-}
-
-.shelfPill {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  width: 100%;
-  background: none;
-  border: 0;
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--step-sub);
-  padding: 0.7rem 1.1rem;
-  cursor: pointer;
-}
-
-.shelfPill:hover {
-  color: var(--accent);
-}
-
-.shelfBody {
-  padding: 0.2rem 1.1rem 1.1rem;
+.yearGroup {
+  margin-top: 0.8rem;
 }
 
 .yearGroup + .yearGroup {
@@ -424,8 +580,7 @@
 .yearName {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0 0 0.6rem;
+  margin: 0;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -437,7 +592,7 @@
 
 /* Books standing on a shelf, bottoms aligned — they are not all the same
    height, which is most of what stops a row of them reading as a chart.
-   No board under them: with cover art the books are the thing. */
+   A thin board under them, which is the bookcase look the redesign kept. */
 .grid {
   display: flex;
   flex-wrap: wrap;
@@ -446,7 +601,8 @@
   /* The cover swings out WIDER than the spine it came from, over whatever is
      beside it. Clipping that would cut the book in half mid-turn. */
   overflow: visible;
-  padding: 0.6rem 0 0.2rem;
+  padding: 0.9rem 0 0;
+  border-bottom: 2px solid var(--line);
 }
 
 /* One book's place on the shelf. The perspective lives here rather than on
@@ -463,14 +619,16 @@
   transition: z-index 0s;
 }
 
-.slot:hover,
+/* Over its neighbours while it is turned out. */
+.slotTipped,
 .slot:focus-visible {
-  /* Over its neighbours while it is turned out. */
   z-index: 5;
 }
 
-.slot:focus-visible {
-  outline: none;
+@media (hover: hover) {
+  .slot:hover {
+    z-index: 5;
+  }
 }
 
 .book3d {
@@ -497,11 +655,28 @@
  * cover centred over where the book stood, so it reads as the book being
  * taken out and turned. It comes first, so it happens in screen space
  * rather than in the book's own turned frame. */
-.slot:hover .book3d,
+/* Hover only where there is a pointer that hovers: a phone would keep a
+ * tapped spine "hovered" after the tap. There the first tap sets .slotTipped
+ * instead, and the second opens the book (Spine in Reading.tsx). */
+.slotTipped .book3d,
 .slot:focus-visible .book3d {
   transform: translateX(calc((var(--spine-w) - var(--cover-w)) / 2))
     translateY(-12px)
     rotateY(-90deg);
+}
+
+@media (hover: hover) {
+  .slot:hover .book3d {
+    transform: translateX(calc((var(--spine-w) - var(--cover-w)) / 2))
+      translateY(-12px)
+      rotateY(-90deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book3d {
+    transition: none;
+  }
 }
 
 .spineFace,
@@ -634,40 +809,6 @@
   margin: 0.2rem 0 0.6rem;
 }
 
-.quotes {
-  list-style: none;
-  margin: 0 0 0.6rem;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.quotes blockquote {
-  margin: 0;
-  padding-left: 0.6rem;
-  border-left: 2px solid var(--accent);
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--ink);
-}
-
-.quoteFoot {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.15rem;
-  padding-left: 0.6rem;
-  font-size: 0.65rem;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Hidden until the quote is hovered. Removing one is rare, and a column of
-   crosses down the page is clutter inviting an accident. */
-.quoteFoot button,
-.quotes li:hover .quoteFoot button,
-.quoteFoot button:hover,
 /* --- the open book: what it is ------------------------------------------ */
 
 /* One block, running straight into the work below it: no rule, no border, no
@@ -747,13 +888,53 @@
   color: oklch(99% 0 0 / 0.62);
 }
 
-/* The genre, as a mark in the corner — what is left of the input once the
-   four facts are settled. */
-.genreMark {
+/* The genre and the started dot, side by side in the left corner. The right
+   corner is the close button's. */
+.corner {
   position: absolute;
   top: 0.6rem;
   left: 0.6rem;
   z-index: 1;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.closeBook {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 2;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid oklch(99% 0 0 / 0.35);
+  background: oklch(0% 0 0 / 0.45);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.closeBook svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: oklch(99% 0 0 / 0.85);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.closeBook:hover {
+  border-color: var(--accent);
+}
+
+.closeBook:hover svg {
+  stroke: var(--accent);
+}
+
+/* The genre, as a mark — what is left of the input once the four facts are
+   settled. */
+.genreMark {
   width: 2.6rem;
   height: 2.6rem;
   padding: 0.2rem;
@@ -772,12 +953,8 @@
   overflow: hidden;
 }
 
-/* When it was started, as a dot in the other corner. */
+/* When it was started, as a dot beside the genre. */
 .started {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  z-index: 1;
   width: 2.6rem;
   height: 2.6rem;
   border-radius: 999px;
@@ -968,6 +1145,15 @@
 
 .quoteFoot button:hover {
   color: var(--accent) !important;
+}
+
+/* No hover on a phone, so the cross is always there, quietly. */
+@media (hover: none) {
+  .quoteFoot button {
+    color: var(--muted-2);
+    font-size: 1.1rem;
+    padding: 0.2rem 0.4rem;
+  }
 }
 
 /* The last entry in the list IS the next quote — one field, not a form. */
@@ -1166,4 +1352,99 @@
   line-height: 1.3;
   color: var(--muted);
   text-align: center;
+}
+
+/* --- the open book on a phone ------------------------------------------- */
+
+/* Full screen, and one scroll: the head, then the quotes, then the sketch with
+   its tools in a row under it. Two columns side by side at 390px would leave
+   the sketch a strip. */
+@media (max-width: 720px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .bookClosed,
+  .bookOpen {
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .topMatter {
+    flex: 0 0 auto;
+    border-radius: 0;
+    padding: 3.6rem 1rem 1.2rem;
+  }
+
+  .controls {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .workArea {
+    flex: 0 0 auto;
+    flex-direction: column;
+    overflow: visible;
+    padding: 1rem 1rem 0.4rem;
+  }
+
+  .quoteColumn {
+    flex: 0 0 auto;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .sketchWrap {
+    flex: 0 0 auto;
+    flex-direction: column;
+  }
+
+  /* A window of its own height: the sheet takes touches for drawing, so the
+     book is scrolled by the head, the quotes and the tools around it. */
+  .sketchScroll {
+    flex: 0 0 auto;
+    height: 60dvh;
+  }
+
+  .tools {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem 0.9rem;
+  }
+
+  .thickness {
+    flex-direction: row;
+  }
+
+  .thickness input {
+    writing-mode: horizontal-tb;
+    direction: ltr;
+    width: 5rem;
+    height: 1.4rem;
+  }
+
+  .sketchStatus {
+    max-width: none;
+    width: 100%;
+  }
+
+  .tool,
+  .toolOn {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+
+  .swatch,
+  .swatchOn {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .removeBook {
+    padding: 1rem 0 calc(1rem + env(safe-area-inset-bottom));
+  }
 }

@@ -1,8 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  nextPerCurriculum,
   nextStep,
   progressOf,
   splitModules,
@@ -13,29 +12,38 @@ import {
   type Step,
 } from '@/lib/curriculum';
 import CurriculumIcon from '@/components/CurriculumIcon';
-import { GOLD, scatterFor, statusLook } from '@/lib/curriculum-card';
+import { statusLook } from '@/lib/curriculum-card';
 import LessonMarkdown from '@/components/LessonMarkdown';
 import styles from './curriculums.module.css';
 
-// A deck of cards, and a drill-down through it.
+// A plain list with the next lesson on each, and a drill-down behind every row.
+// His pick, 2026-11-10 (redesign page, Curriculums: A).
 //
-// The deck is a CAROUSEL rather than a pile you pick from: arrows move the
-// front card, and only the front card is interactive. That is what lets the
-// pile be neat — the cards behind are texture, not targets, so they no longer
-// each need a visible edge to be clicked on.
+// It replaces a scattered deck you paged through with arrows, an "Up next" row
+// of folded cards above it, and three stacked overlays below it. Beautiful, and
+// it took four taps to reach a lesson that was not next. Now:
 //
-// Colour is the status and nothing else: white active, gold done, black
-// paused. It was per-name, which was handsome, and meant the one thing a
-// glance at the deck could not tell you was which courses were running.
+//   list     every curriculum as one row, grouped Active, Paused, Done. The
+//            row says where you are (stage:lesson and its title), Open goes
+//            straight to that lesson, and ✓ marks it done without opening it.
+//   stages   tap the row itself: the curriculum's stages, tracks, Cards,
+//            Sources, the lesson search, rename, status and Ohana audience.
+//   grid     one stage's lessons as numbers — a stage of thirty lessons is a
+//            wall of text, and thirty numbers are a shape you can see gaps in.
+//   detail   one lesson, with edit, done/undo and delete.
 //
-// Going in is three layers, each dead centre with everything behind it dimmed:
+// Each step is ONE view that takes the page's place, with a back link at the
+// top, rather than a dimmed layer over the layer before it. On a phone that is
+// a full-screen view, which is what a detail should be there; Escape goes back
+// one step, exactly as it went back one layer.
 //
-//   stages   the curriculum's stages, as cards
-//   grid     one stage's lessons, as a near-fullscreen grid of numbers
-//   detail   one lesson, with its substance and its buttons
+// Colour is the status and nothing else: white active, black paused, gold
+// done — see statusLook() in lib/curriculum-card.ts.
 //
-// The numbers matter: a stage of thirty lessons is a wall of text, and a grid
-// of thirty numbers is a shape you can see the gaps in.
+// DEEP LINK: `?open=<curriculum id>` opens that curriculum's next lesson (or
+// its stages when nothing is left), so the Learn home's Continue button can
+// land on the lesson rather than on the list. The parameter is read once, on
+// the first load, and taken out of the address so a reload shows the list.
 
 const RING = 2 * Math.PI * 20;
 
@@ -69,6 +77,8 @@ const NEXT_STATUS: Record<string, 'active' | 'paused' | 'done'> = {
 };
 
 const STATUS_MARK: Record<string, string> = { active: '▶', paused: '॥', done: '✓' };
+const STATUS_WORD: Record<string, string> = { active: 'Active', paused: 'Paused', done: 'Done' };
+const GROUPS = ['active', 'paused', 'done'] as const;
 
 /** Who it is for in Ohana, cycled the same way: not shared → his → hers → both. */
 const AUDIENCES = [null, 'his', 'hers', 'both'] as const;
@@ -78,28 +88,8 @@ const nextAudience = (now: Curriculum['audience']) =>
 
 type Layer = 'stages' | 'sources' | 'grid' | 'detail';
 
-/* How long the finishing flourish takes, in milliseconds.
- *
- * Declared here AND in the stylesheet, which is a duplication worth having:
- * the swap has to happen after the fade has finished, and the bug it fixes was
- * exactly those two numbers disagreeing — the card left the DOM at 520ms into
- * a 620ms fade and the row jumped. Change one, change the other; the CSS
- * carries the same note. */
-const PEEL = 420;
-const FADE = 900;
-const ARRIVE = 700;
-/** How long the opening card takes to reach the centre. */
-const ZOOM = 940;
-/**
- * How long the travelling card stays up after the layer is mounted.
- *
- * Without the overlap there is a flash: the opening dim is removed and the
- * overlay starts its OWN backdrop fade from transparent, so one frame of
- * undimmed page shows through between the two. Holding the stand-in and its
- * dim over that fade covers it, and the stand-in is already the same white
- * rectangle in the same place, so the handover is invisible.
- */
-const HANDOVER = 200;
+/** How long a click on a row's name waits to see whether it is a double-click. */
+const DOUBLE = 260;
 
 export default function Curriculums() {
   const [data, setData] = useState<Curriculum[] | null>(null);
@@ -107,8 +97,6 @@ export default function Curriculums() {
   const [configured, setConfigured] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /** Which card is at the front of the deck. */
-  const [front, setFront] = useState(0);
   const [layer, setLayer] = useState<Layer | null>(null);
   const [openCurriculum, setOpenCurriculum] = useState<number | null>(null);
   const [openStage, setOpenStage] = useState<number | null>(null);
@@ -120,35 +108,32 @@ export default function Curriculums() {
   const [tickDay, setTickDay] = useState('');
   const [renaming, setRenaming] = useState<string | null>(null);
   const [rename, setRename] = useState('');
-  const [adding, setAdding] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState('');
+  /** The lesson a row's ✓ is marking, so a second tap cannot tick the one after. */
+  const [ticking, setTicking] = useState<number | null>(null);
 
-  /* The Up next row, held locally so it can refill itself.
-   *
-   * Seeded with one lesson per active curriculum. Finishing a card takes it
-   * out and appends that curriculum's NEXT lesson at the end, which is the
-   * behaviour asked for and the reason this is state rather than derived:
-   * derived, the replacement would appear where the old one was. */
-  const [queue, setQueue] = useState<number[] | null>(null);
-  /** Cards mid-peel: gold spreading, then fading out. */
-  const [finishing, setFinishing] = useState<Set<number>>(new Set());
-  /** Cards that have just arrived, so they can slide in rather than appear. */
-  const [arriving, setArriving] = useState<Set<number>>(new Set());
-  /**
-   * The card being opened, and the box it started in.
-   *
-   * Opening is the same peel as finishing, in white, and then the card itself
-   * travels to the centre and grows to the size of the layer it is becoming.
-   * That needs the card's own position, which only the DOM knows — so it is
-   * measured at the click and handed to a fixed-position stand-in, because an
-   * element inside a scrolling grid cannot animate to the middle of the
-   * viewport without leaving its parent.
-   */
-  const [opening, setOpening] = useState<{
-    lessonId: number;
-    name: string;
-    from: { top: number; left: number; width: number; height: number };
-  } | null>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const deepLinked = useRef(false);
+  const nameClick = useRef<number | null>(null);
+
+  function showLesson(one: Curriculum, moduleId: number, each: Lesson) {
+    setOpenCurriculum(one.id);
+    setOpenStage(moduleId);
+    setOpenLesson(each.id);
+    setDetailDraft(each.detail ?? '');
+    setEditingDetail(false);
+    setSearch('');
+    setLayer('detail');
+  }
+
+  function showStages(one: Curriculum) {
+    setOpenCurriculum(one.id);
+    setOpenStage(null);
+    setOpenLesson(null);
+    setSearch('');
+    setLayer('stages');
+  }
 
   const load = useCallback(async () => {
     try {
@@ -164,6 +149,32 @@ export default function Curriculums() {
       setToday(payload.today ?? '');
       setTickDay((before) => before || payload.today || '');
       setError(null);
+
+      // The deep link, once. Here rather than in an effect, because this is
+      // the moment the curriculums it names are first known.
+      if (!deepLinked.current) {
+        deepLinked.current = true;
+        const url = new URL(window.location.href);
+        const wanted = Number(url.searchParams.get('open'));
+        const one = (payload.curriculums ?? []).find((each) => each.id === wanted);
+        if (one) {
+          const step = nextStep(one);
+          if (step) {
+            setOpenCurriculum(one.id);
+            setOpenStage(step.module.id);
+            setOpenLesson(step.lesson.id);
+            setDetailDraft(step.lesson.detail ?? '');
+            setLayer('detail');
+          } else {
+            setOpenCurriculum(one.id);
+            setLayer('stages');
+          }
+        }
+        if (url.searchParams.has('open')) {
+          url.searchParams.delete('open');
+          window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+        }
+      }
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : 'Could not read them.');
       setData([]);
@@ -200,163 +211,40 @@ export default function Curriculums() {
     }
   }
 
-  const curriculums = data ?? [];
+  const toggle = (id: number) =>
+    act({ action: 'toggle-lesson', id, ...(tickDay && tickDay !== today ? { day: tickDay } : {}) });
 
-  /* Active first, then paused, then done — so the front of the deck is
-   * something in play. Within each group the stored order stands: it is the
+  const curriculums = useMemo(() => data ?? [], [data]);
+
+  /* Grouped by status. Within each group the stored order stands: it is the
    * route through all the routes. */
-  const deck = useMemo(() => {
-    const rank = (one: Curriculum) =>
-      one.status === 'active' ? 0 : one.status === 'paused' ? 1 : 2;
-    return [...curriculums].sort((a, b) => rank(a) - rank(b));
-  }, [curriculums]);
-
-  /** Rotated so `front` is first, which is all the carousel is. */
-  const ordered = useMemo(() => {
-    if (deck.length === 0) return deck;
-    const at = ((front % deck.length) + deck.length) % deck.length;
-    return [...deck.slice(at), ...deck.slice(0, at)];
-  }, [deck, front]);
+  const groups = useMemo(
+    () =>
+      GROUPS.map((status) => ({
+        status,
+        items: curriculums.filter((one) => (GROUPS.includes(one.status) ? one.status : 'active') === status),
+      })).filter((group) => group.items.length > 0),
+    [curriculums],
+  );
 
   const current = curriculums.find((one) => one.id === openCurriculum) ?? null;
   const stageAt = current ? current.modules.findIndex((one) => one.id === openStage) : -1;
   const stage = stageAt >= 0 ? current!.modules[stageAt] : null;
-  /* Positions rather than names, for "Japanese › module 2 › lesson 12". The
-     breadcrumb is where you are, and a stage's name is already the heading of
-     the layer you came through. */
+  /* Positions rather than names, for "Japanese › module 2 › lesson 12". */
   const lessonAt = stage ? stage.lessons.findIndex((one) => one.id === openLesson) : -1;
   const lesson = lessonAt >= 0 ? stage!.lessons[lessonAt] : null;
-
-  /** Seed the queue once there is data, and whenever the row runs dry. */
-  useEffect(() => {
-    if (data === null) return;
-    setQueue((before) => {
-      if (before !== null && before.length > 0) return before;
-      return nextPerCurriculum(curriculums).map((step) => step.lesson.id);
-    });
-  }, [data, curriculums]);
-
-  /** The queue's lessons, resolved against the data on each render. */
-  const steps = useMemo(() => {
-    if (!queue) return [];
-    const byLesson = new Map<number, Step>();
-    for (const one of curriculums) {
-      one.modules.forEach((module, m) => {
-        module.lessons.forEach((each, l) => {
-          byLesson.set(each.id, {
-            curriculum: one,
-            module,
-            lesson: each,
-            moduleAt: m + 1,
-            lessonAt: l + 1,
-          });
-        });
-      });
-    }
-    return queue.map((id) => byLesson.get(id)).filter((step): step is Step => Boolean(step));
-  }, [queue, curriculums]);
-
-  /**
-   * Finish a lesson from the Up next row.
-   *
-   * The sticker peels, the card fades out all the way, and only then is it
-   * taken out of the row and the replacement appended — which slides in from
-   * the right.
-   *
-   * THE TIMING MATTERED AND WAS WRONG. The swap fired at 520ms against a
-   * 620ms fade, so the card was pulled out of the DOM while still visible and
-   * the row jumped. PEEL + FADE below is the CSS duration, and nothing moves
-   * until it has run.
-   */
-  function finish(step: Step) {
-    setFinishing((before) => new Set(before).add(step.lesson.id));
-    const already = new Set(queue ?? []);
-    const replacement = nextStep(step.curriculum, already);
-
-    window.setTimeout(() => {
-      setQueue((before) => {
-        const without = (before ?? []).filter((id) => id !== step.lesson.id);
-        return replacement ? [...without, replacement.lesson.id] : without;
-      });
-      setFinishing((before) => {
-        const next = new Set(before);
-        next.delete(step.lesson.id);
-        return next;
-      });
-      if (replacement) {
-        // Marked as arriving so it slides in; cleared once the slide is over,
-        // or it would slide again on the next render.
-        setArriving((before) => new Set(before).add(replacement.lesson.id));
-        window.setTimeout(() => {
-          setArriving((before) => {
-            const next = new Set(before);
-            next.delete(replacement.lesson.id);
-            return next;
-          });
-        }, ARRIVE);
-      }
-    }, PEEL + FADE);
-
-    void act({
-      action: 'toggle-lesson',
-      id: step.lesson.id,
-      ...(tickDay && tickDay !== today ? { day: tickDay } : {}),
-    });
-  }
-
-  /**
-   * Open a lesson from the Up next row.
-   *
-   * The white sticker peels, then the card travels to the centre and grows to
-   * the size of the layer it is turning into, and only then does the layer
-   * itself appear. Measured from the card's real box so the move starts where
-   * the card actually is rather than from an assumed position.
-   */
-  function openCard(step: Step, from: { top: number; left: number; width: number; height: number }) {
-    setOpening({ lessonId: step.lesson.id, name: step.curriculum.name, from });
-
-    window.setTimeout(() => {
-      setOpenCurriculum(step.curriculum.id);
-      setOpenStage(step.module.id);
-      setOpenLesson(step.lesson.id);
-      setDetailDraft(step.lesson.detail ?? '');
-      setEditingDetail(false);
-      setLayer('detail');
-      // And only then let go of the stand-in, which is covering the overlay's
-      // own fade-in. See HANDOVER.
-      window.setTimeout(() => setOpening(null), HANDOVER);
-    }, PEEL + ZOOM);
-  }
 
   /* Searching ONE curriculum, not all of them: the thing being looked for is
    * almost always inside the course already open, and Japanese alone is 118
    * lessons across four stages. */
-  const hits = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!current || term.length < 2) return [];
-    const found: { module: Module; lesson: Lesson; at: number }[] = [];
+  const hits: { module: Module; lesson: Lesson; at: number }[] = [];
+  const term = search.trim().toLowerCase();
+  if (current && term.length >= 2) {
     for (const module of current.modules) {
       module.lessons.forEach((each, at) => {
-        if (each.name.toLowerCase().includes(term)) found.push({ module, lesson: each, at: at + 1 });
+        if (hits.length < 40 && each.name.toLowerCase().includes(term)) hits.push({ module, lesson: each, at: at + 1 });
       });
     }
-    return found.slice(0, 40);
-  }, [current, search]);
-
-  /**
-   * Go in a layer with a glimpse of the deck on the way.
-   *
-   * Asked for as "flashes to the curriculum home screen and then brings up
-   * the grid". It is a beat of the page underneath between two overlays, which
-   * is what stops a dimmed card being replaced by a different dimmed card with
-   * nothing to say one closed and another opened.
-   */
-  function flashTo(next: Layer, set?: () => void) {
-    setLayer(null);
-    window.setTimeout(() => {
-      set?.();
-      setLayer(next);
-    }, 190);
   }
 
   function close() {
@@ -365,27 +253,45 @@ export default function Curriculums() {
     setOpenStage(null);
     setOpenLesson(null);
     setSearch('');
+    setRenaming(null);
   }
 
-  /* Escape goes back one layer rather than closing everything: three layers
-   * deep, the thing wanted is almost always the layer above. */
+  const back = useCallback(() => {
+    setRenaming(null);
+    if (layer === 'detail') {
+      setEditingDetail(false);
+      setLayer('grid');
+      setOpenLesson(null);
+    } else if (layer === 'grid' || layer === 'sources') {
+      setLayer('stages');
+      setOpenStage(null);
+    } else {
+      setLayer(null);
+      setOpenCurriculum(null);
+      setSearch('');
+    }
+  }, [layer]);
+
+  /* Escape goes back one step rather than to the list: three deep, the thing
+   * wanted is almost always the step above. Not from inside a field, which
+   * has its own Escape (cancel the rename, leave the search). */
   useEffect(() => {
     if (!layer) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
-      if (layer === 'detail') {
-        setLayer('grid');
-        setOpenLesson(null);
-      } else if (layer === 'grid') {
-        setLayer('stages');
-        setOpenStage(null);
-      } else {
-        close();
-      }
+      const target = event.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+      back();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [layer]);
+  }, [layer, back]);
+
+  /* Each view starts at its top. The pane that scrolls is the page's .shell
+   * wrapper (app/work/work.module.css), not this component. */
+  useEffect(() => {
+    root.current?.closest('.shell')?.scrollTo({ top: 0 });
+  }, [layer, openStage, openLesson]);
 
   if (data === null) return <p className={styles.status}>Reading them…</p>;
 
@@ -408,441 +314,344 @@ export default function Curriculums() {
     } as React.CSSProperties;
   };
 
+  const renameField = (key: string, kind: 'curriculum' | 'module' | 'lesson', id: number, label: string, className: string) =>
+    renaming === key ? (
+      <input
+        className={className}
+        value={rename}
+        autoFocus
+        aria-label={`Rename ${label}`}
+        onClick={(event) => event.stopPropagation()}
+        onChange={(event) => setRename(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && rename.trim()) {
+            void act({ action: 'rename', kind, id, name: rename });
+            setRenaming(null);
+          }
+          if (event.key === 'Escape') setRenaming(null);
+        }}
+        onBlur={() => setRenaming(null)}
+      />
+    ) : null;
+
+  const startRename = (key: string, name: string) => {
+    setRenaming(key);
+    setRename(name);
+  };
+
   return (
-    <div className={styles.page}>
-      {error && <p className={styles.warn}>{error}</p>}
-
-      {/* --- Up next: one card per active curriculum ----------------------- */}
-      {steps.length > 0 && (
-        <section className={styles.queue}>
-          <p className={styles.queueHead}>Up next</p>
-          <ol className={styles.queueRow} style={{ '--count': steps.length } as React.CSSProperties}>
-            {steps.map((step) => (
-              <li key={step.lesson.id}>
-                <div
-                  className={`${styles.queueCard} ${
-                    finishing.has(step.lesson.id) ? styles.queueDone : ''
-                  } ${arriving.has(step.lesson.id) ? styles.queueArriving : ''} ${
-                    opening?.lessonId === step.lesson.id ? styles.queueOpening : ''
-                  }`}
-                >
-                  {/* Two dog-ears, and the card body itself does nothing.
-                      A card that completed a lesson anywhere you clicked it
-                      was one misclick from a tick you did not mean. */}
-                  <button
-                    type="button"
-                    className={styles.foldOpen}
-                    title={`Open ${step.lesson.name}`}
-                    aria-label={`Open ${step.lesson.name}`}
-                    onClick={(event) => {
-                      const card = event.currentTarget.parentElement;
-                      if (!card) return;
-                      const box = card.getBoundingClientRect();
-                      openCard(step, {
-                        top: box.top,
-                        left: box.left,
-                        width: box.width,
-                        height: box.height,
-                      });
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className={styles.foldDone}
-                    title={`Mark ${step.lesson.name} done`}
-                    aria-label={`Mark ${step.lesson.name} done`}
-                    onClick={() => finish(step)}
-                  />
-                  <div className={styles.queueBody} title={step.lesson.name}>
-                    <span className={styles.queueWhat}>{step.curriculum.name}</span>
-                    <span className={styles.queueWhere}>
-                      {step.moduleAt}:{step.lessonAt}
-                    </span>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
-      {/* --- the deck ------------------------------------------------------ */}
-      <div className={styles.deckWrap}>
-        {deck.length > 1 && (
-          <button
-            type="button"
-            className={styles.arrow}
-            aria-label="Previous curriculum"
-            onClick={() => setFront((at) => at - 1)}
-          >
-            <Chevron direction="left" />
-          </button>
-        )}
-
-        <div className={styles.deck}>
-          {ordered.map((one, at) => {
-            const lie = scatterFor(one.name, at);
-            const progress = progressOf(one);
-            const isFront = at === 0;
-            const look = statusLook(one.status);
-
-            return (
-              <div
-                key={one.id}
-                /* Only the front card is interactive. The ones behind it are
-                   texture, which is what lets the pile be neat — they no
-                   longer need a visible edge to be clicked on.
-                   The z-index is also what stopped the deck reading backwards:
-                   with none set, later elements paint over earlier ones. */
-                className={`${styles.cardSlot} ${isFront ? styles.frontSlot : ''}`}
-                style={
-                  {
-                    '--rotate': `${lie.rotate}deg`,
-                    '--dx': `${lie.dx}rem`,
-                    '--dy': `${lie.dy}rem`,
-                    zIndex: ordered.length - at,
-                  } as React.CSSProperties
-                }
-                aria-hidden={!isFront}
-              >
-                <div
-                  className={`${styles.card} ${one.status !== 'active' ? styles.shelved : ''}`}
-                  style={faceOf(one)}
-                >
-                  <button
-                    type="button"
-                    className={styles.cardFace}
-                    tabIndex={isFront ? 0 : -1}
-                    onClick={() => {
-                      if (!isFront) return;
-                      setOpenCurriculum(one.id);
-                      setOpenStage(null);
-                      setOpenLesson(null);
-                      setLayer('stages');
-                    }}
-                  >
-                    <Ring percent={progress.percent} ink={look.ink} accent={look.accent} />
-                    {renaming === `curriculum:${one.id}` ? (
-                      <input
-                        className={styles.renameOnCard}
-                        value={rename}
-                        autoFocus
-                        aria-label={`Rename ${one.name}`}
-                        onClick={(event) => event.stopPropagation()}
-                        onChange={(event) => setRename(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter' && rename.trim()) {
-                            void act({
-                              action: 'rename',
-                              kind: 'curriculum',
-                              id: one.id,
-                              name: rename,
-                            });
-                            setRenaming(null);
-                          }
-                          if (event.key === 'Escape') setRenaming(null);
-                        }}
-                        onBlur={() => setRenaming(null)}
-                      />
-                    ) : (
-                      <span
-                        className={styles.cardName}
-                        onDoubleClick={(event) => {
-                          event.stopPropagation();
-                          if (!isFront) return;
-                          setRenaming(`curriculum:${one.id}`);
-                          setRename(one.name);
-                        }}
-                        title={isFront ? 'Double-click to rename' : undefined}
-                      >
-                        {one.name}
-                      </span>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    className={styles.statusDot}
-                    tabIndex={isFront ? 0 : -1}
-                    aria-label={`${one.name} is ${one.status} — click to change`}
-                    title={`${one.status} → ${NEXT_STATUS[one.status]}`}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      if (!isFront) return;
-                      void act({
-                        action: 'set-status',
-                        id: one.id,
-                        status: NEXT_STATUS[one.status] ?? 'active',
-                      });
-                    }}
-                  >
-                    {STATUS_MARK[one.status] ?? '▶'}
-                  </button>
-
-                  <button
-                    type="button"
-                    className={styles.audience}
-                    tabIndex={isFront ? 0 : -1}
-                    aria-label={`${one.name} in Ohana: ${one.audience ? AUDIENCE_LABEL[one.audience] : 'not shared'} — click to change`}
-                    title="Who it is for in Ohana"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      if (!isFront) return;
-                      void act({ action: 'set-audience', id: one.id, audience: nextAudience(one.audience) });
-                    }}
-                  >
-                    {one.audience ? AUDIENCE_LABEL[one.audience] : '—'}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* The blank card, behind everything: the one never being read. */}
-          <div className={`${styles.cardSlot} ${styles.addSlot}`} style={{ zIndex: 0 }}>
-            {adding === 'curriculum' ? (
-              <form
-                className={styles.addCard}
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  if (!draft.trim()) return;
-                  void act({ action: 'add-curriculum', name: draft }).then(() => {
-                    setDraft('');
-                    setAdding(null);
-                  });
-                }}
-              >
-                <input
-                  value={draft}
-                  autoFocus
-                  placeholder="Curriculum"
-                  aria-label="New curriculum name"
-                  onChange={(event) => setDraft(event.target.value)}
-                  onKeyDown={(event) => event.key === 'Escape' && setAdding(null)}
-                />
-                <button type="submit" disabled={!draft.trim()}>
-                  Add
-                </button>
-              </form>
-            ) : (
-              <button
-                type="button"
-                className={styles.addCard}
-                onClick={() => {
-                  setAdding('curriculum');
-                  setDraft('');
-                }}
-              >
-                +
-              </button>
-            )}
-          </div>
-        </div>
-
-        {deck.length > 1 && (
-          <button
-            type="button"
-            className={styles.arrow}
-            aria-label="Next curriculum"
-            onClick={() => setFront((at) => at + 1)}
-          >
-            <Chevron direction="right" />
-          </button>
-        )}
-      </div>
-
-      {deck.length > 1 && (
-        <p className={styles.deckWhere}>
-          {(((front % deck.length) + deck.length) % deck.length) + 1} of {deck.length}
+    <div className={styles.page} ref={root}>
+      {error && (
+        <p className={styles.warn} role="alert">
+          {error}
         </p>
       )}
 
-      {/* The card on its way to becoming a layer.
-          A fixed stand-in rather than the card itself: the card lives in a
-          grid track and cannot travel to the middle of the viewport without
-          leaving its parent, and taking it out of the row would collapse the
-          row while it moved. */}
-      {opening && (
+      {/* --- the list: one row per curriculum ------------------------------ */}
+      {layer === null && (
         <>
-          <div className={styles.openingDim} />
-          <div
-            className={styles.travelling}
-            style={
-              {
-                '--from-top': `${opening.from.top}px`,
-                '--from-left': `${opening.from.left}px`,
-                '--from-width': `${opening.from.width}px`,
-                '--from-height': `${opening.from.height}px`,
-              } as React.CSSProperties
-            }
-            aria-hidden="true"
-          />
+          {curriculums.length === 0 && (
+            <p className={styles.empty}>No curriculums yet. Add the first one below.</p>
+          )}
+
+          {groups.map((group) => (
+            <section key={group.status} className={styles.group} aria-label={STATUS_WORD[group.status]}>
+              <h2 className={styles.groupHead}>{STATUS_WORD[group.status]}</h2>
+              <ul className={styles.rows}>
+                {group.items.map((one) => {
+                  const look = statusLook(one.status);
+                  const progress = progressOf(one);
+                  const step: Step | null = nextStep(one);
+                  const where = step ? `${step.moduleAt}:${step.lessonAt}` : '';
+                  const key = `curriculum:${one.id}`;
+
+                  return (
+                    <li key={one.id} className={styles.row} style={faceOf(one)}>
+                      {renaming === key ? (
+                        <div className={styles.rowMain}>
+                          <Ring percent={progress.percent} ink={look.ink} accent={look.accent} />
+                          {renameField(key, 'curriculum', one.id, one.name, styles.renameRow)}
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className={styles.rowMain}
+                          aria-label={`${one.name}: stages and lessons`}
+                          onClick={(event) => {
+                            // A click on the NAME waits a beat, because a
+                            // second click there renames rather than opens.
+                            // Anywhere else on the row, and from the keyboard
+                            // (detail 0), it opens at once.
+                            const onName = (event.target as HTMLElement).closest('[data-name]');
+                            if (onName && event.detail === 1) {
+                              nameClick.current = window.setTimeout(() => showStages(one), DOUBLE);
+                            } else if (!onName || event.detail === 0) {
+                              showStages(one);
+                            }
+                          }}
+                        >
+                          <Ring percent={progress.percent} ink={look.ink} accent={look.accent} />
+                          <span className={styles.rowText}>
+                            <span
+                              className={styles.rowName}
+                              data-name
+                              title="Double-click to rename"
+                              onDoubleClick={() => {
+                                if (nameClick.current) window.clearTimeout(nameClick.current);
+                                startRename(key, one.name);
+                              }}
+                            >
+                              {one.name}
+                            </span>
+                            <span className={styles.rowNext}>
+                              {step ? (
+                                <>
+                                  Next: <b>{where}</b> · {step.lesson.name}
+                                </>
+                              ) : progress.total === 0 ? (
+                                'No lessons yet'
+                              ) : (
+                                `All ${progress.total} lessons done`
+                              )}
+                            </span>
+                          </span>
+                        </button>
+                      )}
+
+                      {step && (
+                        <>
+                          <button
+                            type="button"
+                            className={styles.rowTick}
+                            disabled={ticking === step.lesson.id}
+                            title={`Mark ${where} ${step.lesson.name} done`}
+                            aria-label={`Mark ${one.name} ${where} done`}
+                            onClick={() => {
+                              setTicking(step.lesson.id);
+                              void toggle(step.lesson.id).finally(() => setTicking(null));
+                            }}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.rowOpen}
+                            aria-label={`Open ${one.name} ${where}: ${step.lesson.name}`}
+                            onClick={() => showLesson(one, step.module.id, step.lesson)}
+                          >
+                            Open
+                          </button>
+                        </>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+
+          {adding ? (
+            <form
+              className={styles.addForm}
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!draft.trim()) return;
+                void act({ action: 'add-curriculum', name: draft }).then(() => {
+                  setDraft('');
+                  setAdding(false);
+                });
+              }}
+            >
+              <input
+                value={draft}
+                autoFocus
+                placeholder="Curriculum name"
+                aria-label="New curriculum name"
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => event.key === 'Escape' && setAdding(false)}
+              />
+              <button type="submit" className={styles.primary} disabled={!draft.trim()}>
+                Add
+              </button>
+              <button type="button" className={styles.plain} onClick={() => setAdding(false)}>
+                Cancel
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              className={styles.addButton}
+              onClick={() => {
+                setAdding(true);
+                setDraft('');
+              }}
+            >
+              + New curriculum
+            </button>
+          )}
         </>
       )}
 
-      {/* --- layer one: the stages, dead centre --------------------------- */}
+      {/* --- one curriculum: its stages ----------------------------------- */}
       {layer === 'stages' && current && (
-        <Overlay onClose={close} label={`${current.name} stages`}>
-          <div className={styles.stageCentre}>
-            <p className={styles.overlayTitle}>
-              <CurriculumIcon name={current.name} className={styles.titleIcon} size={46} />
-              <span>{current.name}</span>
-            </p>
+        <View backTo="Curriculums" onBack={back}>
+          <header className={styles.viewHead}>
+            <CurriculumIcon name={current.name} className={styles.titleIcon} size={40} />
+            <h2 className={styles.viewTitle}>
+              {renameField(`curriculum:${current.id}`, 'curriculum', current.id, current.name, styles.renameTitle) ?? (
+                <span title="Double-click to rename" onDoubleClick={() => startRename(`curriculum:${current.id}`, current.name)}>
+                  {current.name}
+                </span>
+              )}
+            </h2>
+            <div className={styles.controls}>
+              <button
+                type="button"
+                className={styles.chip}
+                onClick={() => startRename(`curriculum:${current.id}`, current.name)}
+              >
+                Rename
+              </button>
+              <button
+                type="button"
+                className={styles.chip}
+                aria-label={`${current.name} is ${current.status}. Press to make it ${NEXT_STATUS[current.status] ?? 'active'}`}
+                title={`${current.status} → ${NEXT_STATUS[current.status] ?? 'active'}`}
+                onClick={() =>
+                  void act({ action: 'set-status', id: current.id, status: NEXT_STATUS[current.status] ?? 'active' })
+                }
+              >
+                {STATUS_MARK[current.status] ?? '▶'} {STATUS_WORD[current.status] ?? 'Active'}
+              </button>
+              <button
+                type="button"
+                className={styles.chip}
+                aria-label={`${current.name} in Ohana: ${current.audience ? AUDIENCE_LABEL[current.audience] : 'not shared'}. Press to change`}
+                title="Who it is for in Ohana"
+                onClick={() => void act({ action: 'set-audience', id: current.id, audience: nextAudience(current.audience) })}
+              >
+                Ohana: {current.audience ? AUDIENCE_LABEL[current.audience] : 'not shared'}
+              </button>
+            </div>
+          </header>
 
-            {/* The gold cards, which are NOT stages.
-                His design — "it should also not be in the list, but a separate
-                card that's the same size and shape exactly but horizontal,
-                just beneath the curriculum name, above the search". So a stage
-                card turned on its side, which is why the dimensions in the CSS
-                are a stage's two measurements swapped rather than new ones.
-                Out of the list because neither opens a stage: one leaves the
-                page and the other opens a list. */}
-            {(current.cards || (current.sources && current.sources.length > 0)) && (
-              <div className={styles.goldRow}>
-                {current.cards ? (
-                  <a href={`/work/cards/?deck=${current.id}`} className={styles.cardsCard}>
-                    <span className={styles.cardsMark}>★</span>
-                    <span className={styles.cardsName}>Cards</span>
-                    <span className={styles.cardsCount}>{current.cards}</span>
-                  </a>
-                ) : null}
+          {/* The gold links, which are NOT stages: one leaves the page for the
+              flashcards and the other opens the curriculum's whole list of
+              sources. Gold is what a finished curriculum wears, and here it
+              marks the two things on this view that are not steps. */}
+          {(current.cards || (current.sources && current.sources.length > 0)) && (
+            <div className={styles.goldRow}>
+              {current.cards ? (
+                <a href={`/work/cards/?deck=${current.id}`} className={styles.goldChip}>
+                  ★ Cards <span className={styles.count}>{current.cards}</span>
+                </a>
+              ) : null}
+              {current.sources && current.sources.length > 0 ? (
+                <button type="button" className={styles.goldChip} onClick={() => setLayer('sources')}>
+                  § Sources <span className={styles.count}>{current.sources.length}</span>
+                </button>
+              ) : null}
+            </div>
+          )}
 
-                {current.sources && current.sources.length > 0 ? (
-                  <button
-                    type="button"
-                    className={styles.cardsCard}
-                    onClick={() => setLayer('sources')}
-                  >
-                    <span className={styles.cardsMark}>§</span>
-                    <span className={styles.cardsName}>Sources</span>
-                    <span className={styles.cardsCount}>{current.sources.length}</span>
-                  </button>
-                ) : null}
-              </div>
+          <div className={styles.searchRow}>
+            <input
+              type="search"
+              className={styles.search}
+              value={search}
+              placeholder={`Find a lesson in ${current.name}`}
+              aria-label={`Find a lesson in ${current.name}`}
+              onChange={(event) => setSearch(event.target.value)}
+              onKeyDown={(event) => event.key === 'Escape' && (search ? setSearch('') : event.currentTarget.blur())}
+            />
+            {hits.length > 0 && (
+              <ul className={styles.hits}>
+                {hits.map((hit) => (
+                  <li key={hit.lesson.id}>
+                    <button type="button" onClick={() => showLesson(current, hit.module.id, hit.lesson)}>
+                      <span>{hit.lesson.name}</span>
+                      <span className={styles.hitIn}>
+                        {hit.module.name} · lesson {hit.at}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
             )}
+          </div>
 
-            <div className={styles.searchRow}>
-              <input
-                type="search"
-                className={styles.search}
-                value={search}
-                placeholder={`Find a lesson in ${current.name}`}
-                aria-label={`Find a lesson in ${current.name}`}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-              {hits.length > 0 && (
-                <ul className={styles.hits}>
-                  {hits.map((hit) => (
-                    <li key={hit.lesson.id}>
+          {/* Stages are steps on the route; a track runs BESIDE it (Japanese's
+              kanji modules, worked through in parallel), so tracks get their
+              own short list. See splitModules() for the naming convention. */}
+          {(() => {
+            const { stages, tracks } = splitModules(current.modules);
+            const list = (modules: Module[], numbered: boolean) => (
+              <ol className={styles.stageList}>
+                {modules.map((module, at) => {
+                  const progress = progressOf(module);
+                  return (
+                    <li key={module.id}>
                       <button
                         type="button"
+                        className={styles.stageRow}
                         onClick={() => {
-                          setOpenStage(hit.module.id);
-                          setOpenLesson(hit.lesson.id);
-                          setDetailDraft(hit.lesson.detail ?? '');
-                          setEditingDetail(false);
-                          setLayer('detail');
-                          setSearch('');
+                          setOpenStage(module.id);
+                          setLayer('grid');
                         }}
                       >
-                        <span>{hit.lesson.name}</span>
-                        <span className={styles.hitIn}>
-                          {hit.module.name} · lesson {hit.at}
+                        {numbered && <span className={styles.stageNumber}>{at + 1}</span>}
+                        <span className={styles.stageName}>{module.name}</span>
+                        <span className={styles.stageCount}>
+                          {progress.total === 0
+                            ? 'empty'
+                            : progress.done === progress.total
+                              ? 'done'
+                              : `${progress.done} of ${progress.total}`}
+                        </span>
+                        <span className={styles.bar} aria-hidden="true">
+                          <i style={{ width: `${progress.percent}%` }} />
                         </span>
                       </button>
                     </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            {/* A track runs BESIDE the route rather than on it — Japanese's
-                kanji modules, worked through in parallel. White and
-                horizontal, below the search, so they read as a second row of
-                things rather than as stages that happen to come last. See
-                splitModules() for the convention that identifies them. */}
-            {splitModules(current.modules).tracks.length > 0 && (
-              <div className={styles.trackRow}>
-                {splitModules(current.modules).tracks.map((module) => {
-                  const progress = progressOf(module);
-                  return (
-                    <button
-                      key={module.id}
-                      type="button"
-                      className={styles.trackCard}
-                      onClick={() => flashTo('grid', () => setOpenStage(module.id))}
-                    >
-                      <span className={styles.trackName}>{module.name}</span>
-                      <span className={styles.trackPercent}>{progress.percent}%</span>
-                    </button>
                   );
                 })}
-              </div>
-            )}
-
-            <div className={styles.stageFan}>
-              {splitModules(current.modules).stages.map((module, at) => {
-                const progress = progressOf(module);
-                return (
-                  <button
-                    key={module.id}
-                    type="button"
-                    className={styles.stageCard}
-                    onClick={() => flashTo('grid', () => setOpenStage(module.id))}
-                  >
-                    <span className={styles.stageNumber}>{at + 1}</span>
-                    <span className={styles.stageName}>{module.name}</span>
-                    <span className={styles.stagePercent}>{progress.percent}%</span>
-                  </button>
-                );
-              })}
-
-            </div>
-          </div>
-        </Overlay>
+              </ol>
+            );
+            return (
+              <>
+                {list(stages, true)}
+                {tracks.length > 0 && (
+                  <>
+                    <h3 className={styles.subHead}>Alongside</h3>
+                    {list(tracks, false)}
+                  </>
+                )}
+              </>
+            );
+          })()}
+        </View>
       )}
 
       {/* --- the sources, which belong to the whole curriculum ------------ */}
       {layer === 'sources' && current && (
-        <Overlay
-          onClose={close}
-          label={`${current.name} sources`}
-          onBack={() => setLayer('stages')}
-        >
-          <div className={styles.sourcesPane}>
-            <p className={styles.overlayTitle}>
-              <span>Sources</span>
-            </p>
-            <p className={styles.sourcesWhat}>
-              What {current.name} is studied from. A lesson&rsquo;s own sources — the chapter, the
-              page, the one video — are on the lesson.
-            </p>
-            {current.sources && current.sources.length > 0 ? (
-              <SourceList sources={current.sources} />
-            ) : (
-              <p className={styles.nothingYet}>Nothing recorded yet.</p>
-            )}
-          </div>
-        </Overlay>
+        <View backTo={current.name} onBack={back}>
+          <h2 className={styles.sectionTitle}>Sources</h2>
+          <p className={styles.sourcesWhat}>
+            What {current.name} is studied from. A lesson&rsquo;s own sources (the chapter, the page, the
+            one video) are on the lesson.
+          </p>
+          {current.sources && current.sources.length > 0 ? (
+            <SourceList sources={current.sources} />
+          ) : (
+            <p className={styles.nothingYet}>Nothing recorded yet.</p>
+          )}
+        </View>
       )}
 
-      {/* --- layer two: the lessons, as a grid of numbers ----------------- */}
+      {/* --- one stage: its lessons, as a grid of numbers ----------------- */}
       {layer === 'grid' && current && stage && (
-        <Overlay
-          onClose={close}
-          label={`${stage.name} lessons`}
-          full
-          onBack={() => {
-            setLayer('stages');
-            setOpenStage(null);
-          }}
-        >
-          {/* Nothing but the blocks.
-              The header said the curriculum and the stage, which are what you
-              clicked twice to get here, and carried a stages button that the
-              backdrop and Escape both already do. The key explained three
-              colours that are gold, grey and faded. All of it was furniture
-              around the only thing on the layer. */}
+        <View backTo={current.name} onBack={back}>
+          <h2 className={styles.sectionTitle}>{stage.name}</h2>
           <ol className={styles.numberGrid}>
             {stage.lessons.map((each, at) => (
               <li key={each.id}>
@@ -850,13 +659,8 @@ export default function Curriculums() {
                   type="button"
                   className={`${styles.cell} ${each.done_on ? styles.cellDone : ''}`}
                   title={each.name}
-                  onClick={() =>
-                    flashTo('detail', () => {
-                      setOpenLesson(each.id);
-                      setDetailDraft(each.detail ?? '');
-                      setEditingDetail(false);
-                    })
-                  }
+                  aria-label={`Lesson ${at + 1}: ${each.name}${each.done_on ? ' (done)' : ''}`}
+                  onClick={() => showLesson(current, stage.id, each)}
                 >
                   {at + 1}
                 </button>
@@ -867,6 +671,7 @@ export default function Curriculums() {
                 type="button"
                 className={`${styles.cell} ${styles.cellAdd}`}
                 title="Add a lesson"
+                aria-label="Add a lesson"
                 onClick={() => {
                   const name = prompt('Lesson name');
                   if (name?.trim()) void act({ action: 'add-lesson', module_id: stage.id, name });
@@ -876,48 +681,20 @@ export default function Curriculums() {
               </button>
             </li>
           </ol>
-        </Overlay>
+        </View>
       )}
 
-      {/* --- layer three: one lesson ------------------------------------- */}
+      {/* --- one lesson -------------------------------------------------- */}
       {layer === 'detail' && current && stage && lesson && (
-        <Overlay
-          onClose={close}
-          label={lesson.name}
-          full
-          onBack={() => {
-            setLayer('grid');
-            setOpenLesson(null);
-          }}
-        >
+        <View backTo={stage.name} onBack={back}>
           <article className={styles.lessonPane}>
-            {/* Where you are, top left. The STAGE is renameable here because
-                the grid's header is gone and that is where it used to be; on a
-                stage card it would fight the click that opens the grid. */}
+            {/* Where you are. The STAGE is renamed here, by double-click, as
+                it always was. */}
             <p className={styles.lessonWhere}>
               {current.name} <span className={styles.chev}>›</span>{' '}
-              {renaming === `module:${stage.id}` ? (
-                <input
-                  className={styles.renameEyebrow}
-                  value={rename}
-                  autoFocus
-                  aria-label={`Rename ${stage.name}`}
-                  onChange={(event) => setRename(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' && rename.trim()) {
-                      void act({ action: 'rename', kind: 'module', id: stage.id, name: rename });
-                      setRenaming(null);
-                    }
-                    if (event.key === 'Escape') setRenaming(null);
-                  }}
-                  onBlur={() => setRenaming(null)}
-                />
-              ) : (
+              {renameField(`module:${stage.id}`, 'module', stage.id, stage.name, styles.renameEyebrow) ?? (
                 <span
-                  onDoubleClick={() => {
-                    setRenaming(`module:${stage.id}`);
-                    setRename(stage.name);
-                  }}
+                  onDoubleClick={() => startRename(`module:${stage.id}`, stage.name)}
                   title="Double-click to rename the stage"
                 >
                   module {stageAt + 1}
@@ -927,30 +704,8 @@ export default function Curriculums() {
             </p>
 
             <h2 className={styles.lessonTitle}>
-              {renaming === `lesson:${lesson.id}` ? (
-                <input
-                  className={styles.renameTitle}
-                  value={rename}
-                  autoFocus
-                  aria-label={`Rename ${lesson.name}`}
-                  onChange={(event) => setRename(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' && rename.trim()) {
-                      void act({ action: 'rename', kind: 'lesson', id: lesson.id, name: rename });
-                      setRenaming(null);
-                    }
-                    if (event.key === 'Escape') setRenaming(null);
-                  }}
-                  onBlur={() => setRenaming(null)}
-                />
-              ) : (
-                <span
-                  onDoubleClick={() => {
-                    setRenaming(`lesson:${lesson.id}`);
-                    setRename(lesson.name);
-                  }}
-                  title="Double-click to rename"
-                >
+              {renameField(`lesson:${lesson.id}`, 'lesson', lesson.id, lesson.name, styles.renameTitle) ?? (
+                <span onDoubleClick={() => startRename(`lesson:${lesson.id}`, lesson.name)} title="Double-click to rename">
                   {lesson.name}
                 </span>
               )}
@@ -970,26 +725,25 @@ export default function Curriculums() {
                   <p className={styles.editButtons}>
                     <button
                       type="button"
+                      className={styles.primary}
                       onClick={() => {
-                        void act({ action: 'set-detail', id: lesson.id, detail: detailDraft }).then(
-                          (result) => {
-                            setEditingDetail(false);
-                            if (result?.truncated) {
-                              setError(
-                                'Saved, but it was cut at 32,000 characters — the end of what you wrote is not in it.',
-                              );
-                            } else if (result?.repoOwned && !result.committed) {
-                              setError(
-                                'Saved here, but the repo copy did not commit — the next rebuild will overwrite it.',
-                              );
-                            }
-                          },
-                        );
+                        void act({ action: 'set-detail', id: lesson.id, detail: detailDraft }).then((result) => {
+                          setEditingDetail(false);
+                          if (result?.truncated) {
+                            setError(
+                              'Saved, but it was cut at 32,000 characters — the end of what you wrote is not in it.',
+                            );
+                          } else if (result?.repoOwned && !result.committed) {
+                            setError(
+                              'Saved here, but the repo copy did not commit — the next rebuild will overwrite it.',
+                            );
+                          }
+                        });
                       }}
                     >
                       Save
                     </button>
-                    <button type="button" onClick={() => setEditingDetail(false)}>
+                    <button type="button" className={styles.plain} onClick={() => setEditingDetail(false)}>
                       Cancel
                     </button>
                   </p>
@@ -1001,18 +755,14 @@ export default function Curriculums() {
                     {lesson.detail ? (
                       <LessonMarkdown source={lesson.detail} />
                     ) : (
-                      <p className={styles.nothingYet}>
-                        Nothing written yet.
-                      </p>
+                      <p className={styles.nothingYet}>Nothing written yet.</p>
                     )}
                   </section>
 
-                  {/* THE LESSON'S OWN SOURCES, AND ONLY THOSE.
-                      The curriculum's whole list used to sit underneath, and
-                      it was a bibliography — true of every lesson and pointing
-                      none of them anywhere. It has its own gold card on the
-                      stages screen now, which is where a list that belongs to
-                      the whole curriculum belongs. */}
+                  {/* THE LESSON'S OWN SOURCES, AND ONLY THOSE. The
+                      curriculum's whole list is behind § Sources on the
+                      curriculum's view, which is where a list that belongs to
+                      every lesson belongs. */}
                   <section className={styles.lessonSection}>
                     <h3>Sources</h3>
                     {lesson.sources && lesson.sources.length > 0 ? (
@@ -1022,17 +772,17 @@ export default function Curriculums() {
                     )}
                   </section>
 
-                  {/* Visual examples, where applicable — which means where the
-                      detail has images in it. Nothing else on a lesson carries
-                      a picture, so "applicable" is literally "there are some",
-                      and a heading over an empty space on every other lesson
-                      would be worse than no heading. */}
+                  {/* Visual examples, where the detail has images in it.
+                      Nothing else on a lesson carries a picture, so a heading
+                      over an empty space on every other lesson would be worse
+                      than no heading. */}
                   {imagesIn(lesson.detail).length > 0 && (
                     <section className={styles.lessonSection}>
                       <h3>Visual examples</h3>
                       <div className={styles.visuals}>
                         {imagesIn(lesson.detail).map((image) => (
                           <figure key={image.src}>
+                            {/* eslint-disable-next-line @next/next/no-img-element -- static export, and the path is whatever the lesson's Markdown names */}
                             <img src={image.src} alt={image.alt} loading="lazy" />
                             {image.alt && <figcaption>{image.alt}</figcaption>}
                           </figure>
@@ -1044,20 +794,17 @@ export default function Curriculums() {
               )}
             </div>
 
+            {/* Held to the foot of the screen, so a long lesson never pushes
+                its own buttons out of reach. */}
             {!editingDetail && (
               <footer className={styles.lessonActions}>
                 <button
                   type="button"
                   className={`${styles.roundButton} ${lesson.done_on ? styles.roundDone : ''}`}
-                  title={lesson.done_on ? 'Done — click to undo' : 'Mark done'}
+                  title={lesson.done_on ? 'Done — press to undo' : 'Mark done'}
                   aria-label={lesson.done_on ? 'Mark not done' : 'Mark done'}
-                  onClick={() =>
-                    void act({
-                      action: 'toggle-lesson',
-                      id: lesson.id,
-                      ...(tickDay && tickDay !== today ? { day: tickDay } : {}),
-                    })
-                  }
+                  aria-pressed={Boolean(lesson.done_on)}
+                  onClick={() => void toggle(lesson.id)}
                 >
                   ✓
                 </button>
@@ -1091,64 +838,39 @@ export default function Curriculums() {
               </footer>
             )}
           </article>
-        </Overlay>
+        </View>
+      )}
+
+      {/* A view whose curriculum, stage or lesson has gone (deleted elsewhere,
+          or a stale deep link) falls back to the list rather than a blank. */}
+      {layer !== null &&
+        (!current || (layer === 'grid' && !stage) || (layer === 'detail' && !lesson)) && (
+        <p className={styles.status}>
+          That is not here any more.{' '}
+          <button type="button" className={styles.plain} onClick={close}>
+            Back to the list
+          </button>
+        </p>
       )}
     </div>
   );
 }
 
 /**
- * A dimmed backdrop with one thing dead centre.
+ * One step of the drill-down, taking the page's place.
  *
- * Clicking the backdrop goes back, which is what everyone expects of a dimmed
- * screen — but only the backdrop itself, so a click landing inside the card
- * does not close the card it landed in.
+ * Not an overlay: on a phone a dimmed layer over a dimmed layer is three
+ * stacked cards in a small window, and a full-screen view is the whole screen
+ * for the thing you went in for. The back link names where it goes.
  */
-function Overlay({
-  children,
-  onClose,
-  onBack,
-  label,
-  full,
-}: {
-  children: React.ReactNode;
-  onClose: () => void;
-  onBack?: () => void;
-  label: string;
-  /** The near-fullscreen variant: 50px of backdrop and nothing more. */
-  full?: boolean;
-}) {
+function View({ backTo, onBack, children }: { backTo: string; onBack: () => void; children: React.ReactNode }) {
   return (
-    <div
-      className={`${styles.overlay} ${full ? styles.overlayFull : ''}`}
-      role="dialog"
-      aria-modal="true"
-      aria-label={label}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) (onBack ?? onClose)();
-      }}
-    >
-      {children}
-      <button type="button" className={styles.overlayClose} onClick={onClose} aria-label="Close">
-        ×
+    <section className={styles.view}>
+      <button type="button" className={styles.back} onClick={onBack}>
+        <span aria-hidden="true">‹</span> {backTo}
       </button>
-    </div>
-  );
-}
-
-/** The deck's arrows. Gold, which is this page's one accent. */
-function Chevron({ direction }: { direction: 'left' | 'right' }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" width="30" height="30">
-      <path
-        d={direction === 'left' ? 'M15 4 L7 12 L15 20' : 'M9 4 L17 12 L9 20'}
-        fill="none"
-        stroke={GOLD}
-        strokeWidth="2.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+      {children}
+    </section>
   );
 }
 
@@ -1194,4 +916,3 @@ function imagesIn(detail: string | null): { src: string; alt: string }[] {
     src: match[2],
   }));
 }
-

@@ -1,19 +1,32 @@
 /* Cards: the decks, and one card at a time.
  *
- * The backend shell is exactly 100dvh and never scrolls, so this page is
+ * The backend shell is exactly 100dvh and never scrolls, so the review is
  * sized to fit rather than allowed to grow. A review screen that scrolls is a
- * review screen where the buttons move. */
+ * review screen where the buttons move.
+ *
+ * His pick, 2026-11-10 (redesign page, Cards: A) — a review made for thumbs.
+ * Phone layout at 720px and under; the side-by-side split above it. */
 
-.page {
+.decksPage,
+.review {
   /* Tokens from app/globals.css; gold is the backend's accent, declared here
      the same way the curriculums page declares it. */
   --gold: oklch(80% 0.13 85);
+  --red: oklch(70% 0.18 25);
+}
+
+.decksPage {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+  padding-top: 0.5rem;
+}
+
+.review {
   flex: 1;
   min-height: 0;
-  display: grid;
-  /* Chrome, then the card as a band of fixed height, then the panel taking
-     everything that is left — which is nearly all of it. */
-  grid-template-rows: auto auto 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   padding-bottom: 10px;
 }
@@ -27,93 +40,170 @@
 
 .error {
   margin: 0;
-  color: oklch(70% 0.15 25);
+  color: var(--red, oklch(70% 0.18 25));
   font-size: 0.875rem;
 }
 
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.decksPage :is(button, input, select, textarea):focus-visible,
+.review :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 /* --- the decks ---------------------------------------------------------- */
+
+.decksBlock {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.heading {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.heading span {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.8125rem;
+}
 
 .decks {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 0.6rem;
   align-content: start;
 }
 
+/* A row in its curriculum's colours. The open button's ::after covers the
+   whole row, so the row is the tap target; the new-a-day box is raised above
+   that layer so it stays typeable. */
 .deck {
-  width: 100%;
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--deck, var(--line));
+  border-radius: 12px;
+  background: var(--deck-face, var(--bg-raised));
+  color: var(--deck-ink, var(--ink));
+}
+
+.deck:hover {
+  box-shadow: 0 0 0 1px var(--deck, var(--line-bright));
+}
+
+.deckOpen {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--deck, var(--line));
-  border-radius: 10px;
-  background: var(--deck-face, var(--bg-raised));
-  color: var(--deck-ink, var(--ink));
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
   font: inherit;
-  font-size: 1rem;
+  font-size: 1.0625rem;
   text-align: left;
   cursor: pointer;
 }
 
-.deck:hover {
-  border-color: var(--deck, var(--line-bright));
+.deckOpen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+}
+
+.deckOpen:focus-visible {
+  outline: none;
+}
+
+.deckOpen:focus-visible::after {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .deckName {
-  font-weight: 500;
+  font-family: var(--font-display);
+  line-height: 1.25;
 }
 
 /* The one number that matters: how many cards are waiting. */
 .waiting {
-  min-width: 2rem;
-  padding: 0.1rem 0.45rem;
+  flex: none;
+  min-width: 2.25rem;
+  padding: 0.15rem 0.5rem;
   border-radius: 999px;
   background: var(--deck, var(--gold));
-  color: var(--bg);
+  color: var(--deck-face, var(--bg));
+  font-family: var(--font-sans);
   font-size: 0.875rem;
   font-weight: 600;
   text-align: center;
 }
 
 .clear {
-  color: var(--deck-ink, var(--muted));
+  flex: none;
   opacity: 0.6;
 }
 
 .deckMeta {
-  margin: 0.35rem 0 0;
+  margin: 0;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.6rem;
   flex-wrap: wrap;
-  font-size: 0.75rem;
-  color: var(--muted);
+  font-size: 0.8125rem;
+  opacity: 0.8;
 }
 
 .deckMeta label {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  margin-left: auto;
+  gap: 0.4rem;
 }
 
 .deckMeta input {
   width: 3.5rem;
-  padding: 0.1rem 0.3rem;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--bg);
-  color: var(--ink);
+  padding: 0.25rem 0.4rem;
+  border: 1px solid color-mix(in oklch, var(--deck-ink, var(--ink)) 35%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
   font: inherit;
-  font-size: 0.75rem;
 }
 
 /* --- one card ----------------------------------------------------------- */
+
+.top {
+  display: grid;
+  gap: 0.45rem;
+}
 
 .crumb {
   margin: 0;
@@ -124,7 +214,7 @@
 }
 
 .crumb button {
-  padding: 0;
+  padding: 0.25rem 0;
   border: 0;
   background: none;
   color: var(--gold);
@@ -138,42 +228,79 @@
   font-size: 0.8125rem;
 }
 
-/* The card and the panel, side by side and equal.
+/* Thin, across the top: how far through this sitting. */
+.bar {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  transition: width 240ms ease;
+}
+
+/* The card, the pad and the buttons, from one tree.
  *
- * It has been three things. Half the screen beside the panel; then a band
- * across the full width, which is a header rather than a card; then a square
- * above it, which was too small to read a revealed answer in. Back to halves,
- * which is the only one of the three with room for both jobs. */
+ * On a computer: card and buttons on the left, the pad the whole height of the
+ * right, side by side and equal. It has been three things — halves; a band
+ * across the full width, which is a header rather than a card; a square above
+ * the pad, too small to read a revealed answer in — and halves are the only
+ * one with room for both jobs. */
 .pair {
+  flex: 1;
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  align-items: stretch;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'card pad'
+    'buttons pad';
+  gap: 0.8rem 1rem;
 }
 
-@media (max-width: 56rem) {
-  .pair {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-  }
-}
-
-/* Fills its half, so revealing the answer cannot change its size, while what
-   is INSIDE it is centred vertically rather than pinned to the top. The
-   buttons stay in their own row at the foot and do not move when the middle
-   grows — a card whose buttons shift is a card that moves them under the
-   cursor at the moment a hand is on its way to them. */
-.card {
+.pad {
+  grid-area: pad;
   min-height: 0;
   min-width: 0;
   display: grid;
-  grid-template-rows: 1fr auto;
-  gap: 0.8rem;
+}
+
+.padHandle {
+  display: none;
+}
+
+/* Fills its cell, so revealing the answer cannot change its size, while what
+   is INSIDE it is centred vertically rather than pinned to the top. */
+.card {
+  grid-area: card;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
   padding: 1.2rem;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--bg-raised);
+  /* Up and down still scrolls a long answer; sideways is the swipe. */
+  touch-action: pan-y;
+  transition:
+    transform 180ms ease,
+    border-color 120ms ease;
+}
+
+.card[data-dragging] {
+  transition: border-color 120ms ease;
+}
+
+.card[data-lean='again'] {
+  border-color: var(--red);
+}
+
+.card[data-lean='good'] {
+  border-color: var(--gold);
 }
 
 .face {
@@ -211,17 +338,6 @@
   line-height: 1.7;
 }
 
-.reveal {
-  padding: 0.5rem 1.4rem;
-  border: 1px solid var(--line-bright);
-  border-radius: 999px;
-  background: none;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.9375rem;
-  cursor: pointer;
-}
-
 .reading {
   margin: 0;
   font-size: 1.375rem;
@@ -234,22 +350,31 @@
   line-height: 1.5;
 }
 
+/* A row of their own, so they never move when the card's middle grows. */
 .buttons {
+  grid-area: buttons;
   margin: 0;
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
 }
 
 .buttons button {
-  padding: 0.5rem 1.4rem;
+  min-height: 3rem;
+  padding: 0.6rem 1.2rem;
   border: 1px solid var(--line-bright);
-  border-radius: 999px;
-  background: none;
+  border-radius: 10px;
+  background: var(--bg-raised);
   color: var(--ink);
   font: inherit;
-  font-size: 0.9375rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: transform 80ms ease;
+}
+
+.buttons button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .buttons button:disabled {
@@ -257,23 +382,37 @@
   cursor: default;
 }
 
-.good {
-  border-color: var(--gold) !important;
-  color: var(--gold) !important;
+/* Show spans both columns: one thing to press. */
+.reveal {
+  grid-column: 1 / -1;
 }
 
-.card kbd,
-.reveal kbd {
-  margin-left: 0.4rem;
+.buttons .again {
+  border-color: var(--red);
+  color: var(--red);
+  background: none;
+}
+
+/* Gold as a surface, for the one thing: the common answer. */
+.buttons .good {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: oklch(22% 0.03 85);
+}
+
+.buttons kbd {
+  margin-left: 0.5rem;
   padding: 0.05rem 0.3rem;
-  border: 1px solid var(--line);
+  border: 1px solid currentColor;
   border-radius: 3px;
   font-family: inherit;
   font-size: 0.75em;
-  color: var(--muted);
+  font-weight: 400;
+  opacity: 0.6;
 }
 
 .done {
+  flex: 1;
   display: grid;
   gap: 0.3rem;
   place-content: center;
@@ -283,6 +422,94 @@
 .done p:first-child {
   margin: 0;
   font-size: 1.25rem;
+}
+
+/* --- on a phone ---------------------------------------------------------- */
+
+/* A column for thumbs: the card big in the middle, the pad a strip under it,
+ * the buttons at the foot.
+ *
+ * The pad's SURFACE keeps one fixed height whether the strip is down or
+ * pulled up; only the window onto it grows. That is deliberate: a section is
+ * measured from the surface's shape (see Note.tsx), so resizing the surface
+ * itself would move where sections divide every time the strip moved. Down,
+ * the strip shows the top of the section; up, all of it. */
+@media (max-width: 720px) {
+  .pair {
+    --pad-open: 52dvh;
+    --handle: 1.9rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'card'
+      'pad'
+      'buttons';
+    gap: 0.6rem;
+  }
+
+  .pad {
+    display: block;
+    height: calc(var(--handle) + 5.5rem);
+    overflow: hidden;
+    border-radius: 10px;
+    transition: height 220ms ease;
+  }
+
+  .pad[data-open='true'] {
+    height: var(--pad-open);
+  }
+
+  .padHandle {
+    width: 100%;
+    height: var(--handle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .grip {
+    width: 2rem;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line-bright);
+  }
+
+  .pad .note {
+    height: calc(var(--pad-open) - var(--handle));
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .buttons button {
+    min-height: 3.5rem;
+    font-size: 1.0625rem;
+  }
+
+  /* No keyboard to hint at on a phone. */
+  .buttons kbd {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card[data-dragging],
+  .pad,
+  .bar i,
+  .buttons button {
+    transition: none;
+  }
 }
 
 /* --- the note ----------------------------------------------------------- */
@@ -308,7 +535,8 @@
   border-radius: 10px;
   background: #16181d;
   /* Nothing scrolls — paging is the viewBox moving — so the browser must not
-     try. A finger is read as a swipe by the pointer handler instead. */
+     try. A finger is read by the pointer handler instead: a swipe between
+     sections, or on a phone the pen itself. */
   touch-action: none;
   /* The three together are why a stroke after the first one draws instead of
      starting a drag: no text selection, no native image drag, and the drawn
@@ -531,4 +759,50 @@
 .addActions button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* --- the note on a phone ------------------------------------------------- */
+
+/* The strip is short when it is down, so the tools run along the top rather
+   than down the side, and the dots sit top-left as a row — big enough to tap,
+   because on a phone a finger draws and the dots are how to page. */
+@media (max-width: 720px) {
+  .noteTools {
+    grid-auto-flow: column;
+  }
+
+  .tool {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .dots[data-big] {
+    top: 0.5rem;
+    left: 0.5rem;
+    right: auto;
+    transform: none;
+    grid-auto-flow: column;
+    gap: 0.2rem;
+  }
+
+  .dots[data-big] .dot {
+    width: 1.75rem;
+    height: 1.75rem;
+    background: none;
+    opacity: 1;
+    display: grid;
+    place-items: center;
+  }
+
+  .dots[data-big] .dot::after {
+    content: '';
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: var(--muted-2);
+  }
+
+  .dots[data-big] .dotHere::after {
+    background: var(--gold);
+  }
 }

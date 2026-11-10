@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import SeoPanel from '@/components/SeoPanel';
 import { generatedCoverNames, isDraft } from '@/lib/collections';
 import { fieldsFor, knownKeys, warningsFor } from '@/lib/editor-fields';
 import {
@@ -15,19 +14,17 @@ import {
   type SplitFile,
 } from '@/lib/frontmatter';
 import { isOklch } from '@/lib/oklch';
+import { checkProse, countIssues } from '@/lib/prose-check';
+import { scoreSeo, type SeoInput } from '@/lib/seo-score';
 import { ENTRY_PREVIEW } from '@/components/LiveEntry';
-import {
-  joinSections,
-  newSection,
-  shownText,
-  splitBlock,
-  splitSections,
-  withBreak,
-  type Sections,
-} from '@/lib/body-sections';
 import PagePreview from './shop/PagePreview';
-import ProsePanel from './ProsePanel';
 import FrontmatterFields from './FrontmatterFields';
+import BodyEditor from './editor/BodyEditor';
+import CheckTab, { Snapshots, Warnings } from './editor/CheckTab';
+import EntryList from './editor/EntryList';
+import { groupFields } from './editor/groups';
+import LiveFrame, { useWide } from './editor/LiveFrame';
+import PicturesTab from './editor/PicturesTab';
 import styles from './collection.module.css';
 
 // One editor, for every collection of files in the repo.
@@ -52,6 +49,22 @@ import styles from './collection.module.css';
 // Everything is loaded on open: the list, and every entry's text. That is six
 // requests for six projects and it buys the list its status badges, the right
 // order, and instant switching between entries with no second fetch.
+//
+// THE LAYOUT, his pick, 2026-11-10 (redesign page, Projects and Writing: A,
+// "Four tabs and a fixed bar"). The list of cards is the first screen
+// (editor/EntryList.tsx). An entry opens full screen, in four tabs: Details
+// (the fields that matter, the rest under More details), Words (the body),
+// Pictures (cover, hero, the body's images, upload) and Check (prose, SEO and
+// the four previews, its label counting the problems). Preview, Publish and
+// Save are pinned in a bar at the foot. From 1000px the live page sits in a
+// panel on the right (editor/LiveFrame.tsx), where the sticky column of
+// previews used to be. It replaced a card that opened in place, which put up
+// to sixteen fields, the body and that column on one long page.
+//
+// Every tab stays mounted and the others are only hidden, so switching keeps
+// each one's scroll and the body's cursor.
+
+type Tab = 'details' | 'words' | 'pictures' | 'check';
 
 interface Entry {
   path: string;
@@ -131,7 +144,12 @@ export default function CollectionEditor({
   /** Which posts the pills show, where there are pills. */
   const [view, setView] = useState<'drafts' | 'published' | 'all'>('drafts');
   const [order, setOrder] = useState<string[] | null>(null);
+  /** Which of the four tabs an open entry shows. */
+  const [tab, setTab] = useState<Tab>('words');
   const bodyRef = useRef<HTMLTextAreaElement | null>(null);
+  /** A prose finding to select once the Words tab and its one text are up. */
+  const pendingSelect = useRef<[number, number] | null>(null);
+  const wide = useWide();
 
   const fields = useMemo(() => fieldsFor(collection), [collection]);
   const known = useMemo(() => knownKeys(collection), [collection]);
@@ -254,7 +272,7 @@ export default function CollectionEditor({
   const draftCount = useMemo(() => listed.filter((entry) => entry.draft).length, [listed]);
 
   const current = entries?.find((entry) => entry.path === openPath) ?? null;
-  const lines = draftFile?.frontmatter ?? [];
+  const lines = useMemo(() => draftFile?.frontmatter ?? [], [draftFile]);
   const slug = openPath ? name(openPath) : '';
 
   const values = useMemo(() => {
@@ -323,6 +341,8 @@ export default function CollectionEditor({
     setIsNew(false);
     setDirty(false);
     setStatus(null);
+    // An entry that exists is opened to be written in.
+    setTab('words');
   }
 
   function startNew() {
@@ -335,9 +355,11 @@ export default function CollectionEditor({
     setIsNew(true);
     setDirty(false);
     setStatus(null);
+    // A new one needs its title first, which is what names its file.
+    setTab('details');
   }
 
-  /** Shut the open card. */
+  /** Back to the list. */
   function close() {
     if (dirty && !confirm('Discard the unsaved changes?')) return;
     setOpenPath(null);
@@ -561,12 +583,67 @@ export default function CollectionEditor({
     });
   }
 
-  /* What the preview frame shows: memoised on its contents, so the frame is
+  /* What the preview frames show: memoised on its contents, so a frame is
      sent a draft when the words change and not on every render. */
   const previewPayload = useMemo(
     () => (draftFile ? { title: values.title ?? '', summary: values.summary ?? '', body: draftFile.body } : null),
     [draftFile, values.title, values.summary],
   );
+
+  const groups = useMemo(() => groupFields(collection, fields), [collection, fields]);
+
+  /* The SEO panel's input, built once per change and shared with the Check
+     tab's count, so the number on the tab and the panel cannot disagree. */
+  const seoInput = useMemo<SeoInput | null>(() => {
+    if (!seo || !draftFile) return null;
+    return {
+      kind: collection === 'projects' ? 'project' : 'post',
+      title: `${values.title || ''} — ${siteName ?? ''}`,
+      description: values.summary ?? '',
+      body: draftFile.body,
+      focus: values.title,
+      images: [
+        values.hero && { alt: values.heroAlt },
+        values.cover && { alt: values.coverAlt },
+        // Body images, which carry their own alt text in the markdown.
+        ...[...draftFile.body.matchAll(/!\[([^\]]*)\]\([^)]*\)/g)].map((match) => ({
+          alt: match[1],
+        })),
+      ].filter(Boolean) as { alt?: string | null }[],
+      internalLinks: (draftFile.body.match(/\]\(\//g) ?? []).length,
+    };
+  }, [seo, draftFile, collection, values, siteName]);
+
+  /* The count on the Check tab: what is WRONG, not what could be better. The
+     field warnings, the prose mistakes (not its style notes), and the SEO
+     checks that fail outright (not the ones that only warn). A count that
+     included every arguable note would never be zero, and a number that is
+     never zero stops being read. */
+  const problems = useMemo(() => {
+    if (!draftFile) return 0;
+    const proseErrors = prose ? countIssues(checkProse(draftFile.body)).errors : 0;
+    const seoFails = seoInput ? scoreSeo(seoInput).checks.filter((check) => check.state === 'fail').length : 0;
+    return warnings.length + proseErrors + seoFails;
+  }, [draftFile, prose, seoInput, warnings]);
+
+  /* A prose finding is a place in the whole body, so it is shown in the
+     one-text box on the Words tab. The click switches there; this selects it
+     once that box is on screen. */
+  useEffect(() => {
+    const at = pendingSelect.current;
+    const area = bodyRef.current;
+    if (!at || !area || tab !== 'words') return;
+    pendingSelect.current = null;
+    const [start, end] = at;
+    area.focus();
+    area.setSelectionRange(start, end);
+    // Scroll the selection into view, which setSelectionRange does not do on
+    // its own in any browser.
+    const text = area.value;
+    const before = text.slice(0, start).split('\n').length;
+    const lineHeight = area.scrollHeight / Math.max(1, text.split('\n').length);
+    area.scrollTop = Math.max(0, (before - 3) * lineHeight);
+  }, [tab, rawBody]);
 
   if (entries === null) return <p className={styles.status}>Reading the repo…</p>;
 
@@ -579,527 +656,289 @@ export default function CollectionEditor({
     );
   }
 
-  const draft = draftFile ? readScalar(draftFile.frontmatter, 'draft') === 'true' : false;
+  if (!draftFile) {
+    return (
+      <EntryList
+        noun={noun}
+        canCreate={Boolean(template)}
+        onNew={startNew}
+        shown={shown}
+        total={listed.length}
+        ordering={ordering}
+        orderChanged={Boolean(order)}
+        onMove={move}
+        onSaveOrder={() => void saveOrder()}
+        onUndoOrder={() => setOrder(null)}
+        busy={busy}
+        draftViews={draftViews}
+        view={view}
+        onView={setView}
+        draftCount={draftCount}
+        today={todayLocal}
+        status={status}
+        onOpen={openEntry}
+      />
+    );
+  }
+
+  const draft = readScalar(draftFile.frontmatter, 'draft') === 'true';
   const mine = images.filter((path) => !slug || path.includes(slug));
   const artPrefix = art ? `${art.dir.replace(/^public/, '')}/` : '/';
-  const parts: Sections | null = draftFile && bodySections && !rawBody ? splitSections(draftFile.body) : null;
-  const setParts = (next: Sections) => edit({ body: joinSections(next) });
+  const hasPictures = groups.pictures.length > 0 || Boolean(art);
+  const hasCheck = Boolean(seo || prose);
+  const unknown = unknownFields(draftFile.frontmatter, known);
 
-  /* The body: as an opening and its sections, or as one text. */
-  const bodyEditor = draftFile ? (
-    <>
-      <div className={styles.bodyHead}>
-        <span className={styles.bodyLabel}>Body</span>
-        {bodySections && (
-          <button type="button" className={styles.quietLink} onClick={() => setRawBody((was) => !was)}>
-            {rawBody ? 'Edit as sections' : 'Edit as one text'}
-          </button>
-        )}
-      </div>
+  const moreKeys = new Set(groups.more.map((field) => field.key));
+  const pictureKeys = new Set(groups.pictures.map((field) => field.key));
+  const moreWarnings = warnings.filter((warning) => moreKeys.has(warning.key)).length;
 
-      {parts ? (
-        <div className={styles.sections}>
-          <label className={styles.sectionCard}>
-            <span className={styles.sectionLabel}>Opening</span>
-            <textarea
-              className={styles.sectionText}
-              value={parts.opening}
-              spellCheck
-              rows={Math.min(14, Math.max(4, parts.opening.split('\n').length + 1))}
-              onChange={(event) => setParts({ ...parts, opening: event.target.value })}
-            />
-          </label>
+  const tabs: { key: Tab; label: string }[] = [
+    { key: 'details', label: 'Details' },
+    { key: 'words', label: 'Words' },
+    ...(hasPictures ? [{ key: 'pictures' as const, label: 'Pictures' }] : []),
+    ...(hasCheck ? [{ key: 'check' as const, label: problems > 0 ? `Check · ${problems}` : 'Check' }] : []),
+  ];
 
-          {parts.sections.map((section, i) => (
-            <div key={i} className={styles.sectionCard}>
-              <div className={styles.sectionHeadRow}>
-                <span className={styles.sectionHash} aria-hidden="true">
-                  ##
-                </span>
-                <input
-                  className={styles.sectionHeading}
-                  value={section.heading}
-                  aria-label="Section heading"
-                  onChange={(event) => {
-                    const sections = [...parts.sections];
-                    sections[i] = { ...section, heading: event.target.value };
-                    setParts({ ...parts, sections });
-                  }}
-                />
-                <span className={styles.sectionTools}>
-                  <button
-                    type="button"
-                    aria-label="Move section up"
-                    disabled={i === 0}
-                    onClick={() => {
-                      const sections = [...parts.sections];
-                      [sections[i - 1], sections[i]] = [sections[i], sections[i - 1]];
-                      setParts({ ...parts, sections });
-                    }}
-                  >
-                    ↑
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Move section down"
-                    disabled={i === parts.sections.length - 1}
-                    onClick={() => {
-                      const sections = [...parts.sections];
-                      [sections[i + 1], sections[i]] = [sections[i], sections[i + 1]];
-                      setParts({ ...parts, sections });
-                    }}
-                  >
-                    ↓
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Remove section"
-                    onClick={() => {
-                      if (!confirm(`Remove the section "${section.heading}"?`)) return;
-                      setParts({ ...parts, sections: parts.sections.filter((_, k) => k !== i) });
-                    }}
-                  >
-                    ✕
-                  </button>
-                </span>
-              </div>
-              <textarea
-                className={styles.sectionText}
-                value={shownText(section.text)}
-                spellCheck
-                rows={Math.min(18, Math.max(4, section.text.split('\n').length + 1))}
-                onChange={(event) => {
-                  const sections = [...parts.sections];
-                  sections[i] = { ...section, text: withBreak(event.target.value) };
-                  setParts({ ...parts, sections });
-                }}
-              />
-              {/* An image beside text, as the page's <Split> — the one block
-                  every project page reaches for. Appended to the section. */}
-              {mine.length > 0 && (
-                <div className={styles.sectionInsert}>
-                  <span>Image beside text:</span>
-                  <select
-                    defaultValue=""
-                    aria-label="Image for a new image block"
-                    onChange={(event) => {
-                      const [src, side] = event.target.value.split('|');
-                      event.target.value = '';
-                      if (!src) return;
-                      const sections = [...parts.sections];
-                      const text = section.text.endsWith('\n\n') ? section.text : `${section.text.replace(/\n*$/, '')}\n\n`;
-                      sections[i] = { ...section, text: `${text}${splitBlock(src, side as 'left' | 'right')}\n` };
-                      setParts({ ...parts, sections });
-                    }}
-                  >
-                    <option value="">add one…</option>
-                    {mine.flatMap((path) => [
-                      <option key={`${path}|left`} value={`${path}|left`}>
-                        {path.replace(artPrefix, '')} — image left
-                      </option>,
-                      <option key={`${path}|right`} value={`${path}|right`}>
-                        {path.replace(artPrefix, '')} — image right
-                      </option>,
-                    ])}
-                  </select>
-                </div>
-              )}
-            </div>
-          ))}
-
-          <div className={styles.addSection}>
-            <button
-              type="button"
-              className={styles.addToggle}
-              aria-label="Add a section"
-              title="Add a section"
-              onClick={() => setParts({ ...parts, sections: [...parts.sections, newSection()] })}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-            </button>
-            <span className={styles.hint}>Add a section</span>
-          </div>
-        </div>
-      ) : (
-        <>
-          {mine.length > 0 && (
-            <p className={styles.insertRow}>
-              Insert an image:
-              {mine.map((path) => (
-                <button key={path} type="button" onClick={() => insertImage(path)}>
-                  {path.replace(artPrefix, '')}
-                </button>
-              ))}
-            </p>
-          )}
-          <textarea
-            id="entry-body"
-            ref={bodyRef}
-            className={styles.body}
-            value={draftFile.body}
-            spellCheck
-            onChange={(event) => edit({ body: event.target.value })}
-          />
-        </>
-      )}
-    </>
+  const snapshots = seo ? (
+    <Snapshots
+      values={values}
+      collection={collection}
+      slug={slug}
+      saved={Boolean(openPath)}
+      siteName={siteName}
+      previewBase={previewBase}
+    />
   ) : null;
 
-  /* Everything inside an open card: the fields, the body, and beside them
-     what the page will say and how it scores. */
-  const openBody = draftFile ? (
-    <div className={`${styles.cardBody} ${seo ? '' : styles.cardBodyPlain}`}>
-      <div className={styles.cardMain}>
-        <div className={styles.bar}>
-          <span className={styles.barName}>
-            {openPath ? name(openPath) : `New ${noun}`}
+  /* The panel on the right, on a computer: the live page where there is one
+     to show, and the previews for an entry that has no page yet. */
+  const side =
+    wide && previewBase && openPath ? (
+      <aside className={styles.side} aria-label="Live preview">
+        <p className={styles.sideNote}>The live page, with your unsaved words in it.</p>
+        <LiveFrame
+          href={`${previewBase}${slug}/`}
+          name={values.title || slug}
+          type={ENTRY_PREVIEW}
+          payload={previewPayload}
+        />
+      </aside>
+    ) : wide && snapshots ? (
+      <aside className={`${styles.side} ${styles.sideScroll}`} aria-label="How it will look">
+        {snapshots}
+      </aside>
+    ) : null;
+
+  const panel = (key: Tab) => ({
+    role: 'tabpanel' as const,
+    id: `panel-${key}`,
+    'aria-labelledby': `tab-${key}`,
+    hidden: tab !== key,
+    className: styles.tabPanel,
+  });
+
+  return (
+    <div className={styles.editor}>
+      <div className={styles.editorHead}>
+        <button type="button" className={styles.back} onClick={close} aria-label="Back to the list">
+          <span aria-hidden="true">‹</span>
+        </button>
+        <span className={styles.editorTitle}>
+          <span className={styles.editorName}>{values.title || (isNew ? `New ${noun}` : slug)}</span>
+          <span className={styles.editorFile}>
+            {openPath ? name(openPath) : 'not saved yet'}
             {draft && <span className={styles.draftTag}>draft</span>}
             {dirty && <span className={styles.dirty}>unsaved</span>}
           </span>
-          <span className={styles.barButtons}>
-            {previewBase && openPath && (
-              <button type="button" className={styles.quiet} onClick={() => setPreviewing(true)}>
-                Preview the page
-              </button>
-            )}
-            {/* Status is the visible state of a project and draft is a
-                separate thing — one is "what stage is this at", the other is
-                "is this page on the site at all". No project has ever used
-                draft, so it is the quiet button. */}
-            <button
-              type="button"
-              className={styles.quiet}
-              onClick={() => void save(!draft)}
-              disabled={busy}
-              title={draft ? 'Clear draft: true and publish it' : 'Set draft: true and take the page down'}
-            >
-              {draft ? 'Publish' : 'Hide page'}
-            </button>
-            <button type="button" className={styles.save} onClick={() => void save()} disabled={busy || !dirty}>
-              {busy ? 'Working…' : 'Save'}
-            </button>
-          </span>
-        </div>
-
-            {trackMoved && (
-              <p className={styles.notice}>
-                Track changed from <strong>{trackMoved.was}</strong> to{' '}
-                <strong>{trackMoved.now}</strong>. Saving moves this post between the pages built
-                from it — /gaming shows gaming, /orthodoxy shows theology, /writing shows all.
-              </p>
-            )}
-
-            {scheduled && (
-              <p className={styles.notice}>
-                Dated {scheduled}, which is in the future, so this post is withheld from every
-                listing, the feed and the sitemap until then. A daily check rebuilds the site on
-                the day it is due.
-              </p>
-            )}
-
-            {warnings.length > 0 && (
-              <ul className={styles.warnings}>
-                {warnings.map((warning) => (
-                  <li key={`${warning.key}-${warning.text}`}>{warning.text}</li>
-                ))}
-              </ul>
-            )}
-
-            <FrontmatterFields
-              fields={fields}
-              lines={draftFile.frontmatter}
-              onChange={(frontmatter) => edit({ frontmatter })}
-              images={images}
-              onUpload={art ? upload : undefined}
-              uploading={uploading}
-              dynamicOptions={{ projects, tags: usedTags }}
-            />
-
-            {/* Everything the schema does not model, as its own text. It
-                round-trips untouched either way; showing it is the difference
-                between a form that keeps your fields and a form you can
-                believe keeps your fields. */}
-            <details className={styles.other} open={unknownFields(draftFile.frontmatter, known) !== ''}>
-              <summary>Other frontmatter</summary>
-              <textarea
-                className={styles.fieldText}
-                rows={4}
-                spellCheck={false}
-                value={unknownFields(draftFile.frontmatter, known)}
-                onChange={(event) =>
-                  edit({
-                    frontmatter: setUnknownFields(draftFile.frontmatter, known, event.target.value),
-                  })
-                }
-              />
-              <p className={styles.hint}>
-                Keys with no control above. Edited as text, kept exactly as written.
-              </p>
-            </details>
-
-        {bodyEditor}
-
-        {status && <p className={styles.message}>{status}</p>}
+        </span>
       </div>
 
-      {seo && (
-        <aside className={styles.aside}>
-          <section className={styles.preview}>
-            <h2 className={styles.previewHead}>In the grid</h2>
-            <div
-              className={styles.card}
-              style={{
-                background: `linear-gradient(145deg, color-mix(in oklch, ${values.accent || 'var(--accent)'} 24%, transparent), color-mix(in oklch, ${values.accent2 || values.accent || 'var(--accent)'} 14%, transparent))`,
-              }}
-            >
-              {values.cover ? (
-                <img src={values.cover} alt="" />
-              ) : (
-                <p className={styles.cardNoCover}>Cover generated from the accents at build.</p>
+      <div className={side ? styles.editorSplit : styles.editorOne}>
+        <div className={styles.editorMain}>
+          <div className={styles.tabs} role="tablist" aria-label={`Edit this ${noun}`}>
+            {tabs.map((one) => (
+              <button
+                key={one.key}
+                type="button"
+                role="tab"
+                id={`tab-${one.key}`}
+                aria-selected={tab === one.key}
+                aria-controls={`panel-${one.key}`}
+                className={tab === one.key ? styles.tabOn : styles.tab}
+                data-problems={(one.key === 'check' && problems > 0) || undefined}
+                onClick={() => setTab(one.key)}
+              >
+                {one.label}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.pane}>
+            <div {...panel('details')}>
+              {trackMoved && (
+                <p className={styles.notice}>
+                  Track changed from <strong>{trackMoved.was}</strong> to{' '}
+                  <strong>{trackMoved.now}</strong>. Saving moves this post between the pages built
+                  from it — /gaming shows gaming, /orthodoxy shows theology, /writing shows all.
+                </p>
               )}
-              <p className={styles.cardMeta}>
-                {values.kind}
-                {values.status && ` · ${values.status}`}
-              </p>
-              <p className={styles.cardTitle}>{values.title || 'Untitled'}</p>
-              <p className={styles.cardSummary}>{values.summary}</p>
+
+              {scheduled && (
+                <p className={styles.notice}>
+                  Dated {scheduled}, which is in the future, so this post is withheld from every
+                  listing, the feed and the sitemap until then. A daily check rebuilds the site on
+                  the day it is due.
+                </p>
+              )}
+
+              <Warnings
+                warnings={warnings.filter((warning) => !pictureKeys.has(warning.key))}
+              />
+
+              <FrontmatterFields
+                fields={groups.main}
+                lines={draftFile.frontmatter}
+                onChange={(frontmatter) => edit({ frontmatter })}
+                images={images}
+                onUpload={art ? upload : undefined}
+                uploading={uploading}
+                dynamicOptions={{ projects, tags: usedTags }}
+              />
+
+              {/* The rarely used fields, and the raw box, folded away. */}
+              <details className={styles.more}>
+                <summary>
+                  More details
+                  {moreWarnings > 0 && <span className={styles.moreFlag}>{moreWarnings} to fix</span>}
+                </summary>
+
+                {groups.more.length > 0 && (
+                  <FrontmatterFields
+                    fields={groups.more}
+                    lines={draftFile.frontmatter}
+                    onChange={(frontmatter) => edit({ frontmatter })}
+                    images={images}
+                    onUpload={art ? upload : undefined}
+                    uploading={uploading}
+                    dynamicOptions={{ projects, tags: usedTags }}
+                  />
+                )}
+
+                {/* Everything the schema does not model, as its own text. It
+                    round-trips untouched either way; showing it is the
+                    difference between a form that keeps your fields and a form
+                    you can believe keeps your fields. */}
+                <details className={styles.other} open={unknown !== ''}>
+                  <summary>Other frontmatter</summary>
+                  <textarea
+                    className={styles.fieldText}
+                    rows={4}
+                    spellCheck={false}
+                    value={unknown}
+                    aria-label="Other frontmatter"
+                    onChange={(event) =>
+                      edit({
+                        frontmatter: setUnknownFields(draftFile.frontmatter, known, event.target.value),
+                      })
+                    }
+                  />
+                  <p className={styles.hint}>
+                    Keys with no control elsewhere. Edited as text, kept exactly as written.
+                  </p>
+                </details>
+              </details>
             </div>
 
-            <h3 className={styles.previewHead}>The search result</h3>
-            <p className={styles.resultTitle}>
-              {values.title || 'Untitled'} — {siteName ?? ''}
-            </p>
-            <p className={styles.resultUrl}>
-              masterroachi.com/{collection}/{slug || 'new'}/
-            </p>
-            <p className={styles.resultDesc}>{values.summary}</p>
+            <div {...panel('words')}>
+              <BodyEditor
+                body={draftFile.body}
+                onChange={(body) => edit({ body })}
+                sections={bodySections}
+                rawBody={rawBody}
+                onToggleRaw={() => setRawBody((was) => !was)}
+                images={mine}
+                artPrefix={artPrefix}
+                bodyRef={bodyRef}
+                onInsertImage={insertImage}
+              />
+            </div>
 
-            <h3 className={styles.previewHead}>Top of the page</h3>
-            {values.hero ? (
-              <img className={styles.heroPreview} src={values.hero} alt="" />
-            ) : (
-              <p className={styles.hint}>No hero image — the page opens on the colour field.</p>
+            {hasPictures && (
+              <div {...panel('pictures')}>
+                <Warnings warnings={warnings.filter((warning) => pictureKeys.has(warning.key))} />
+                <PicturesTab
+                  fields={groups.pictures}
+                  lines={draftFile.frontmatter}
+                  onChange={(frontmatter) => edit({ frontmatter })}
+                  images={images}
+                  mine={mine}
+                  artPrefix={artPrefix}
+                  body={draftFile.body}
+                  onUpload={art ? upload : undefined}
+                  uploading={uploading}
+                />
+              </div>
             )}
-            <h3 className={styles.previewHead}>The social card</h3>
-            {openPath ? (
-              <>
-                <img
-                  className={styles.ogPreview}
-                  src={`/og/${collection}/${slug}.png`}
-                  alt=""
-                  // A post saved a minute ago has no card until the deploy
-                  // finishes, and a broken frame reads as a bug rather than as
-                  // a thing that is on its way.
-                  onError={(event) => {
-                    event.currentTarget.style.display = 'none';
+
+            {hasCheck && (
+              <div {...panel('check')}>
+                <CheckTab
+                  warnings={warnings}
+                  snapshots={snapshots}
+                  body={draftFile.body}
+                  prose={prose}
+                  wordTarget={collection === 'writing' ? 500 : undefined}
+                  seo={seoInput}
+                  onSelect={(start, end) => {
+                    pendingSelect.current = [start, end];
+                    if (bodySections) setRawBody(true);
+                    setTab('words');
                   }}
                 />
-                <p className={styles.hint}>
-                  Drawn from the title by scripts/og.mjs at build, not from the cover. It appears
-                  after the next deploy and is redrawn whenever the title changes.
-                </p>
-              </>
-            ) : (
-              <p className={styles.hint}>
-                Generated at the first deploy after this is saved, from the title.
-              </p>
+              </div>
             )}
+          </div>
+        </div>
 
-            <p className={styles.hint}>
-              {previewBase
-                ? 'The body is rendered in Preview the page: the real page, with this draft in it.'
-                : 'The body is not rendered here: it is MDX, and the components in it only run at build.'}
-            </p>
-          </section>
+        {side}
+      </div>
 
-          {prose && (
-            <ProsePanel
-              body={draftFile.body}
-              wordTarget={collection === 'writing' ? 500 : undefined}
-              onSelect={(start, end) => {
-                // A finding is a place in the whole body, so it is shown in
-                // the one-text box: switch to it first if sections are open.
-                if (!bodyRef.current && bodySections) {
-                  setRawBody(true);
-                  requestAnimationFrame(() => {
-                    const area = bodyRef.current;
-                    if (!area) return;
-                    area.focus();
-                    area.setSelectionRange(start, end);
-                  });
-                  return;
-                }
-                const area = bodyRef.current;
-                if (!area) return;
-                area.focus();
-                area.setSelectionRange(start, end);
-                // Scroll the selection into view, which setSelectionRange
-                // does not do on its own in any browser.
-                const before = draftFile.body.slice(0, start).split('\n').length;
-                const lineHeight = area.scrollHeight / Math.max(1, draftFile.body.split('\n').length);
-                area.scrollTop = Math.max(0, (before - 3) * lineHeight);
-              }}
-            />
-          )}
-
-          <SeoPanel
-            input={{
-              kind: collection === 'projects' ? 'project' : 'post',
-              title: `${values.title || ''} — ${siteName ?? ''}`,
-              description: values.summary ?? '',
-              body: draftFile.body,
-              focus: values.title,
-              images: [
-                values.hero && { alt: values.heroAlt },
-                values.cover && { alt: values.coverAlt },
-                // Body images, which carry their own alt text in the markdown.
-                ...[...draftFile.body.matchAll(/!\[([^\]]*)\]\([^)]*\)/g)].map((match) => ({
-                  alt: match[1],
-                })),
-              ].filter(Boolean) as { alt?: string | null }[],
-              internalLinks: (draftFile.body.match(/\]\(\//g) ?? []).length,
-            }}
-          />
-        </aside>
-      )}
-    </div>
-  ) : null;
-
-  return (
-    <div className={styles.page}>
-      {/* A new entry, as the round + Habits and Reading use: shut until wanted. */}
-      {template && (
-        <section className={styles.addSection}>
-          <button
-            type="button"
-            className={isNew ? styles.addToggleOn : styles.addToggle}
-            aria-expanded={isNew}
-            aria-label={isNew ? 'Close' : `New ${noun}`}
-            title={isNew ? 'Close' : `New ${noun}`}
-            onClick={() => (isNew ? close() : startNew())}
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
-        </section>
-      )}
-
-      {ordering && order && (
-        <p className={styles.orderBar}>
-          The grid&rsquo;s order has changed.
-          <button type="button" className={styles.save} onClick={() => void saveOrder()} disabled={busy}>
-            Save order
-          </button>
-          <button type="button" onClick={() => setOrder(null)} disabled={busy}>
-            Undo
-          </button>
+      {status && (
+        <p className={styles.editorMessage} role="status">
+          {status}
         </p>
       )}
 
-      {draftViews && (
-        <div className={styles.views} role="group" aria-label="Show">
-          {(
-            [
-              ['drafts', `Drafts${draftCount ? ` ${draftCount}` : ''}`],
-              ['published', 'Published'],
-              ['all', 'All'],
-            ] as const
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              className={view === key ? styles.pillOn : styles.pill}
-              aria-pressed={view === key}
-              onClick={() => setView(key)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {!draftFile && status && <p className={styles.message}>{status}</p>}
-
-      {/* One shut card per entry, as the Shop's are: a pill in the middle of
-          the page that opens to the width of the column. Gold where something
-          on it would be flagged if opened. */}
-      <div className={styles.cards}>
-        {isNew && draftFile && (
-          <section className={styles.cardOpen}>
-            <div className={styles.cardHeadRow}>
-              <button type="button" className={styles.cardHead} aria-expanded onClick={close}>
-                <span className={styles.cardName}>New {noun}</span>
-              </button>
-            </div>
-            {openBody}
-          </section>
+      {/* Pinned at the foot. Status is the visible state of a project and
+          draft is a separate thing — one is "what stage is this at", the
+          other is "is this page on the site at all". No project has ever
+          used draft, so Publish / Hide page is a quiet button. */}
+      <div className={styles.actionBar}>
+        {previewBase && openPath && (
+          <button
+            type="button"
+            className={styles.quiet}
+            onClick={() => setPreviewing(true)}
+            title="Preview the page: the real page, full screen, with this draft in it"
+          >
+            Preview
+          </button>
         )}
-
-        {draftViews && shown.length === 0 && (
-          <p className={styles.message}>
-            {view === 'drafts' ? 'No drafts — everything is published.' : 'Nothing published yet.'}
-          </p>
-        )}
-
-        {shown.map((entry, index) => {
-          const isOpen = !isNew && openPath === entry.path;
-          return (
-            <section
-              key={entry.path}
-              className={isOpen ? styles.cardOpen : styles.card}
-              data-waiting={entry.problems > 0 || undefined}
-            >
-              <div className={styles.cardHeadRow}>
-                <button
-                  type="button"
-                  className={styles.cardHead}
-                  aria-expanded={isOpen}
-                  onClick={() => (isOpen ? close() : openEntry(entry.path))}
-                >
-                  <span className={styles.cardName}>{entry.title}</span>
-                  <span className={styles.cardFacts}>
-                    {[entry.kind ?? entry.track, entry.status].filter(Boolean).join(' · ')}
-                    {entry.draft && <span className={styles.draftTag}>draft</span>}
-                  </span>
-                  <span className={styles.cardState}>
-                    {entry.problems > 0
-                      ? `${entry.problems} to fix`
-                      : entry.date > todayLocal
-                        ? `scheduled ${entry.date}`
-                        : entry.date}
-                  </span>
-                </button>
-                {ordering && (
-                  <span className={styles.move}>
-                    <button
-                      type="button"
-                      aria-label={`Move ${entry.title} up`}
-                      disabled={index === 0}
-                      onClick={() => move(entry.path, -1)}
-                    >
-                      ↑
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`Move ${entry.title} down`}
-                      disabled={index === listed.length - 1}
-                      onClick={() => move(entry.path, 1)}
-                    >
-                      ↓
-                    </button>
-                  </span>
-                )}
-              </div>
-              {isOpen && openBody}
-            </section>
-          );
-        })}
+        <button
+          type="button"
+          className={styles.quiet}
+          onClick={() => void save(!draft)}
+          disabled={busy}
+          title={draft ? 'Clear draft: true and publish it' : 'Set draft: true and take the page down'}
+        >
+          {draft ? 'Publish' : 'Hide page'}
+        </button>
+        <button type="button" className={styles.save} onClick={() => void save()} disabled={busy || !dirty}>
+          {busy ? 'Working…' : 'Save'}
+        </button>
       </div>
 
-      {previewing && previewBase && openPath && draftFile && (
+      {previewing && previewBase && openPath && (
         <PagePreview
           href={`${previewBase}${slug}/`}
           name={values.title || slug}
