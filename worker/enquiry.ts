@@ -43,7 +43,16 @@ function text(value: unknown, max: number): string | null {
 }
 
 export function enquiriesOn(env: EnquiryEnv): boolean {
-  return env.ENQUIRIES === 'on' && !!env.LEADS && !!env.TURNSTILE_SECRET && !!env.TURNSTILE_SITE_KEY;
+  if (env.ENQUIRIES !== 'on') return false;
+  // Switched on but missing a piece: say which, by name only, in the Worker's
+  // own log (wrangler tail), never in the response.
+  const missing = [
+    env.LEADS ? null : 'LEADS',
+    env.TURNSTILE_SECRET ? null : 'TURNSTILE_SECRET',
+    env.TURNSTILE_SITE_KEY ? null : 'TURNSTILE_SITE_KEY',
+  ].filter(Boolean);
+  if (missing.length) console.warn(`enquiries: ENQUIRIES is on but missing ${missing.join(', ')}`);
+  return missing.length === 0;
 }
 
 /** What the form needs to know, and nothing else. */
