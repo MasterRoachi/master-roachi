@@ -1,11 +1,11 @@
 /* The doors on the three app homes. Tokens from app/globals.css.
 
-   GOLD FACES, which is the one place on the site the accent is used as a
-   surface rather than as a line or a word. It is allowed here because on the
-   admin home the doors are the page. Since the redesign (his pick, 2026-11-10,
-   redesign page, Admin doors: A) gold also MEANS something: a door with
-   nothing waiting goes quiet, .doorQuiet, a dark face with a gold mark, so the
-   gold ones are the ones that want him. The learn home's doors (Learn doors:
+   DARK FACES, WAITING IN THE WORDS (his ruling, 11 Nov: state is the colour
+   of the words, never a coloured background; DESIGN.md). Every door is the
+   site's see-through card. A door with something behind it (his pick,
+   2026-11-10, redesign page, Admin doors: A) has its name, its line and its
+   edge in the app's colour; one with nothing waiting goes quiet, .doorQuiet,
+   white words on the same dark face with only its mark in colour. The learn home's doors (Learn doors:
    B) are all quiet and smaller, .doorsSmall, because its cards come first.
 
    Everything is laid out from the numbers below — --doors, the count, is set
@@ -69,12 +69,12 @@
   justify-content: center;
   gap: clamp(12px, 1.6vw, 20px);
 
-  background: var(--accent);
-  /* Black ink on gold, carried by the icon too — DoorIcon draws in
+  background: oklch(16% 0 0 / 0.84);
+  /* The app's colour, carried by the icon too: DoorIcon draws in
      currentColor. */
-  color: oklch(0% 0 0);
-  border: 0;
-  border-radius: 14px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 16px;
   padding: 1rem;
   cursor: pointer;
   text-decoration: none;
@@ -110,14 +110,14 @@
 
 .door:focus-visible,
 .doorQuiet:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-/* Quiet: nothing waiting. The same card, dark, its mark in gold so it still
-   reads as a door of this set rather than a disabled one. */
+/* Quiet: nothing waiting. The same card with white words, its mark still in
+   the app's colour so it reads as a door of this set, not a disabled one. */
 .doorQuiet {
-  background: var(--bg-raised);
+  background: oklch(16% 0 0 / 0.84);
   color: var(--ink);
   border: 1px solid var(--line);
   box-shadow: none;
@@ -134,9 +134,7 @@
 }
 
 /* The shine: light tracking the cursor across the face, as on a project card.
-   WHITE rather than the accent, which is the one thing that could not be
-   copied straight over — the cards are dark and glow in the project's own
-   colour, and a gold light on a gold face is nothing at all. */
+   The faces are dark now, so it is the faint sheen below, not a glare. */
 .door::before,
 .doorQuiet::before {
   content: '';
@@ -149,9 +147,8 @@
   transition: opacity 0.25s ease;
   background: radial-gradient(
     260px circle at var(--mx) var(--my),
-    oklch(100% 0 0 / 0.46) 0%,
-    oklch(100% 0 0 / 0.2) 42%,
-    transparent 72%
+    color-mix(in oklch, var(--accent) 16%, transparent) 0%,
+    transparent 70%
   );
 }
 
@@ -162,7 +159,7 @@
   opacity: 1;
 }
 
-/* On a dark face the same white light is a glare; a fifth of it is a sheen. */
+/* Nothing waiting: a white sheen, not the app's colour. */
 .doorQuiet::before {
   background: radial-gradient(
     220px circle at var(--mx) var(--my),
@@ -284,7 +281,7 @@
 
   .door,
   .doorQuiet {
-    border-radius: 12px;
+    border-radius: 16px;
   }
 
   .doorsSmall {

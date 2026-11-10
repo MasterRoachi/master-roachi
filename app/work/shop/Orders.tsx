@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { orderWaiting } from '@/lib/order-waiting';
 import styles from './orders.module.css';
+import ui from '../ui.module.css';
 
 // The orders, from D1 through /work/api/orders.
 //
@@ -17,6 +19,13 @@ import styles from './orders.module.css';
 // right-hand pane on a computer, with the few facts that decide the next step
 // and one gold button for it. Every other step and the full detail list are
 // under More.
+//
+// DRESSED AS THE PUBLIC SITE, his call, 2026-11-10 (design pass: the public
+// site's styling, the CRM's desktop layout). On a computer a row of tiles
+// counts what is on the page already (no request of its own), then the list
+// in one panel and the open order in a second beside it, which stays in view.
+// What waits on him has an accent hairline all round, the open one the
+// accent fill; never a side stripe. On a phone the structure is as it was.
 //
 // Personal details are blanked 30 days after an order is submitted — his
 // ruling, 2026-10-19 — so an old order shows what sold and not who bought it.
@@ -198,16 +207,8 @@ const NEXT: Record<Status, { to: Status; label: string }[]> = {
   dismissed: [{ to: 'received', label: 'Restore' }],
 };
 
-/**
- * Whether an order is waiting on him — the gold ones. Received wants checking
- * against PayFast; Paid and unsent wants sending; a Printful draft wants
- * confirming in Printful. Everything else is either done or not his move.
- */
-function waiting(order: Order): boolean {
-  if (order.status === 'received') return true;
-  if (order.status !== 'paid') return false;
-  return order.printful_id === null || order.printful_status === 'draft';
-}
+/** Whether an order is waiting on him: the gold ones. See lib/order-waiting.ts. */
+const waiting = (order: Order): boolean => orderWaiting(order);
 
 /** The status as one short phrase, with where it is in Printful when that matters. */
 function stateOf(order: Order): string {
@@ -347,6 +348,18 @@ export default function Orders() {
     return out;
   }, [orders]);
 
+  /* The tiles over the list on a computer, from the orders already here. */
+  const tally = useMemo(() => {
+    const out = { needs: 0, unsent: 0, way: 0, fulfilled: 0 };
+    for (const order of orders ?? []) {
+      if (waiting(order)) out.needs += 1;
+      if (order.status === 'paid' && order.printful_id === null) out.unsent += 1;
+      if (groupOf(order) === 'way') out.way += 1;
+      if (order.status === 'fulfilled') out.fulfilled += 1;
+    }
+    return out;
+  }, [orders]);
+
   /* Search runs across every group, dismissed included: looking for a name
      is looking everywhere. Here rather than in SQL, as the list is tens of
      rows and arrives in one request. */
@@ -478,7 +491,7 @@ export default function Orders() {
           onClick={() => (selected ? close() : choose(order.ref))}
         >
           <span className={styles.rowRef}>{order.ref}</span>
-          <span className={styles.chip}>{stateOf(order)}</span>
+          <span className={`${waiting(order) ? ui.chipAccent : ui.chip} ${styles.rowChip}`}>{stateOf(order)}</span>
           <span className={styles.rowWhat}>
             {order.redacted_at ? 'Details removed' : order.name} · {order.product || 'Unknown product'} ·{' '}
             {order.size}
@@ -490,98 +503,120 @@ export default function Orders() {
     );
   }
 
+  const tiles = [
+    { key: 'needs', name: 'Needs you', n: tally.needs, sub: 'to check, send or confirm', lit: true },
+    { key: 'unsent', name: 'Paid, not sent', n: tally.unsent, sub: 'not yet with Printful', lit: true },
+    { key: 'way', name: 'On its way', n: tally.way, sub: 'with Printful', lit: false },
+    { key: 'done', name: 'Fulfilled', n: tally.fulfilled, sub: `of ${orders.length} in all`, lit: false },
+  ];
+
   return (
-    <div className={styles.layout} data-open={current ? '' : undefined}>
-      <div className={styles.listSide} ref={listRef}>
-        <div className={styles.toolbar}>
-          <p className={styles.counts}>
-            {orders.length} order{orders.length === 1 ? '' : 's'}
-            <span className={styles.sep}>·</span>
-            {counts.fulfilled} fulfilled
-          </p>
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label={searching ? 'Close search' : 'Search orders'}
-            aria-expanded={searching}
-            onClick={() => {
-              if (searching) setQuery('');
-              setSearching(!searching);
-            }}
-          >
-            {searching ? '×' : '⌕'}
-          </button>
+    <div className={styles.orders}>
+      {/* A computer only; the phone keeps its one line of counts. */}
+      <ul className={styles.tiles} aria-label="Orders at a glance">
+        {tiles.map((tile) => (
+          <li key={tile.key} className={styles.tile}>
+            <span className={styles.tileK}>
+              <i className={tile.lit && tile.n > 0 ? styles.dotOn : styles.dot} /> {tile.name}
+            </span>
+            <span className={styles.tileV}>{tile.n}</span>
+            <span className={styles.tileS}>{tile.sub}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className={styles.layout} data-open={current ? '' : undefined}>
+        <div className={styles.listSide} ref={listRef}>
+          <div className={styles.toolbar}>
+            <p className={styles.counts}>
+              {orders.length} order{orders.length === 1 ? '' : 's'}
+              <span className={styles.sep}>·</span>
+              {counts.fulfilled} fulfilled
+            </p>
+            <button
+              type="button"
+              className={styles.iconButton}
+              aria-label={searching ? 'Close search' : 'Search orders'}
+              aria-expanded={searching}
+              onClick={() => {
+                if (searching) setQuery('');
+                setSearching(!searching);
+              }}
+            >
+              {searching ? '×' : '⌕'}
+            </button>
+          </div>
+
+          {searching && (
+            <input
+              ref={searchRef}
+              type="search"
+              className={styles.search}
+              placeholder="Search name, email, reference…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  event.preventDefault();
+                  setQuery('');
+                  setSearching(false);
+                }
+              }}
+              aria-label="Search orders"
+            />
+          )}
+
+          {/* The note sits with the open order when there is one, which on a
+              phone is the only thing on screen. */}
+          {note && !current && <p className={styles.message}>{note}</p>}
+
+          {orders.length === 0 ? (
+            <p className={styles.message}>
+              No orders yet. One appears here the moment a customer submits the address form.
+            </p>
+          ) : searchingFor && matched === 0 ? (
+            <p className={styles.message}>Nothing matches.</p>
+          ) : (
+            GROUPS.map((group) => {
+              const list = grouped[group.key];
+              // Dismissed is behind its link unless a search is looking for it.
+              if (group.key === 'dismissed' && !showDismissed && !searchingFor) return null;
+              // Needs you always shows, so "nothing waiting" is said out loud;
+              // an empty other group is just left out.
+              if (list.length === 0 && (group.key !== 'needs' || searchingFor)) return null;
+              return (
+                <section key={group.key} className={styles.group} aria-label={group.name}>
+                  <h2 className={group.key === 'needs' && list.length > 0 ? styles.groupHeadGold : styles.groupHead}>
+                    {group.name} · {list.length}
+                  </h2>
+                  {list.length === 0 ? (
+                    <p className={styles.groupEmpty}>{group.empty}</p>
+                  ) : (
+                    <ul className={styles.rows}>{list.map(row)}</ul>
+                  )}
+                </section>
+              );
+            })
+          )}
+
+          {!searchingFor && counts.dismissed > 0 && (
+            <button type="button" className={ui.quiet} onClick={() => setShowDismissed(!showDismissed)}>
+              {showDismissed ? 'Hide dismissed' : `Show dismissed (${counts.dismissed})`}
+            </button>
+          )}
         </div>
 
-        {searching && (
-          <input
-            ref={searchRef}
-            type="search"
-            className={styles.search}
-            placeholder="Search name, email, reference…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') {
-                event.preventDefault();
-                setQuery('');
-                setSearching(false);
-              }
-            }}
-            aria-label="Search orders"
-          />
-        )}
+        {/* The phone's dimmed backdrop; a click on it shuts the sheet. Not shown
+            on a computer, where the pane sits beside the list. */}
+        {current && <div className={styles.backdrop} onClick={close} aria-hidden="true" />}
 
-        {/* The note sits with the open order when there is one, which on a
-            phone is the only thing on screen. */}
-        {note && !current && <p className={styles.message}>{note}</p>}
-
-        {orders.length === 0 ? (
-          <p className={styles.message}>
-            No orders yet. One appears here the moment a customer submits the address form.
-          </p>
-        ) : searchingFor && matched === 0 ? (
-          <p className={styles.message}>Nothing matches.</p>
-        ) : (
-          GROUPS.map((group) => {
-            const list = grouped[group.key];
-            // Dismissed is behind its link unless a search is looking for it.
-            if (group.key === 'dismissed' && !showDismissed && !searchingFor) return null;
-            // Needs you always shows, so "nothing waiting" is said out loud;
-            // an empty other group is just left out.
-            if (list.length === 0 && (group.key !== 'needs' || searchingFor)) return null;
-            return (
-              <section key={group.key} className={styles.group} aria-label={group.name}>
-                <h2 className={group.key === 'needs' && list.length > 0 ? styles.groupHeadGold : styles.groupHead}>
-                  {group.name} · {list.length}
-                </h2>
-                {list.length === 0 ? (
-                  <p className={styles.groupEmpty}>{group.empty}</p>
-                ) : (
-                  <ul className={styles.rows}>{list.map(row)}</ul>
-                )}
-              </section>
-            );
-          })
-        )}
-
-        {!searchingFor && counts.dismissed > 0 && (
-          <button type="button" className={styles.linkButton} onClick={() => setShowDismissed(!showDismissed)}>
-            {showDismissed ? 'Hide dismissed' : `Show dismissed (${counts.dismissed})`}
-          </button>
-        )}
-      </div>
-
-      {/* The phone's dimmed backdrop; a click on it shuts the sheet. Not shown
-          on a computer, where the pane sits beside the list. */}
-      {current && <div className={styles.backdrop} onClick={close} aria-hidden="true" />}
-
-      <div className={styles.pane} role="region" aria-label={current ? `Order ${current.ref}` : 'Open order'}>
-        {current ? (
-          detail(current)
-        ) : (
-          <p className={styles.paneEmpty}>Pick an order to see it here.</p>
-        )}
+        <div className={styles.pane} role="region" aria-label={current ? `Order ${current.ref}` : 'Open order'}>
+          {current ? (
+            detail(current)
+          ) : (
+            <p className={styles.paneEmpty}>Pick an order to see it here.</p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -604,7 +639,7 @@ export default function Orders() {
           <h2 ref={headRef} tabIndex={-1} className={styles.sheetRef}>
             {order.ref}
           </h2>
-          <span className={styles.chip} data-waiting={waiting(order) || undefined}>
+          <span className={waiting(order) ? ui.chipAccent : ui.chip}>
             {stateOf(order)}
           </span>
           <button type="button" className={styles.iconButton} aria-label="Close" onClick={close}>
@@ -708,10 +743,10 @@ export default function Orders() {
               </label>
             ))}
             <div className={styles.sendActions}>
-              <button type="submit" className={styles.primary} disabled={busy === order.ref}>
+              <button type="submit" className={`${ui.primary} ${styles.wide}`} disabled={busy === order.ref}>
                 {busy === order.ref ? 'Sending…' : 'Send as a draft'}
               </button>
-              <button type="button" className={styles.quiet} onClick={() => setSending(null)}>
+              <button type="button" className={`${ui.button} ${styles.wide}`} onClick={() => setSending(null)}>
                 Cancel
               </button>
             </div>
@@ -719,7 +754,7 @@ export default function Orders() {
         ) : primary ? (
           <button
             type="button"
-            className={styles.primary}
+            className={`${ui.primary} ${styles.wide}`}
             disabled={busy === order.ref}
             onClick={() =>
               primary.kind === 'send'
@@ -737,7 +772,7 @@ export default function Orders() {
           {!order.redacted_at ? (
             <button
               type="button"
-              className={styles.linkButton}
+              className={ui.quiet}
               onClick={() => void copy(`${order.name}\n${order.address}`, 'Address')}
             >
               Copy address
@@ -747,7 +782,7 @@ export default function Orders() {
           )}
           <button
             type="button"
-            className={styles.linkButton}
+            className={ui.quiet}
             aria-expanded={more}
             onClick={() => setMore(!more)}
           >
@@ -763,6 +798,7 @@ export default function Orders() {
                   <button
                     key={step.to}
                     type="button"
+                    className={ui.button}
                     disabled={busy === order.ref}
                     onClick={() => void mark(order.ref, step.to)}
                   >

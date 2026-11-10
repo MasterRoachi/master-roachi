@@ -22,10 +22,26 @@
   gap: 0.6rem;
   margin: 0;
   padding: 0.75rem 0.85rem;
-  background: var(--bg-raised);
+  /* A see-through panel, as every card (DESIGN.md). */
+  background: oklch(16% 0 0 / 0.84);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 16px;
   font-size: 0.85rem;
+}
+
+.actionsPlain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+/* A computer has the site card in the dashboard's right column instead. */
+@media (min-width: 900px) {
+  .foot {
+    display: none;
+  }
 }
 
 .status {
@@ -36,32 +52,40 @@
   line-height: 1.3;
 }
 
-.actions button {
+.actions button,
+.actionsPlain button {
   width: 100%;
   background: none;
   border: 1px solid var(--line-bright);
   border-radius: 10px;
   color: var(--ink);
   font: inherit;
+  /* The site's button lettering (DESIGN.md). */
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.6rem 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.7rem 0.75rem;
   cursor: pointer;
   transition:
     border-color 0.18s ease,
     color 0.18s ease;
 }
 
-.actions button:hover:not(:disabled) {
+.actions button:hover:not(:disabled),
+.actionsPlain button:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.actions button:focus-visible {
-  outline: 2px solid var(--ink);
+.actions button:focus-visible,
+.actionsPlain button:focus-visible {
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.actions button:disabled {
+.actions button:disabled,
+.actionsPlain button:disabled {
   opacity: 0.4;
   cursor: default;
 }
@@ -70,10 +94,9 @@
   color: var(--muted);
 }
 
-/* What is live is not what is committed. Worth noticing. */
+/* What is live is not what is committed. Worth noticing: in the app's
+   colour, in the words (DESIGN.md), not on a fill. */
 .stale {
   color: var(--accent);
-  background: var(--accent-dim);
-  border-radius: 3px;
-  padding: 0.1rem 0.4rem;
+  font-weight: 600;
 }

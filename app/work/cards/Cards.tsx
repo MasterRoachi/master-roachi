@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import LessonMarkdown, { Line } from '@/components/LessonMarkdown';
 import { CARD_KINDS, NEW_PER_DAY, type Card, type CardKind, type Deck } from '@/lib/cards';
-import { statusLook } from '@/lib/curriculum-card';
 import { NOTE_SECTION } from '@/lib/card-note';
 import { emptyScene, type Scene } from '@/lib/sketch';
 import Note from './Note';
@@ -33,7 +32,9 @@ interface Payload {
 
 export default function Cards() {
   const [data, setData] = useState<Payload | null>(null);
-  const [deck, setDeck] = useState<number | null>(null);
+  /* The deck being reviewed, 'all' for every deck at once (the Learn home's
+   * Review, and Review all here), or null for the list of decks. */
+  const [deck, setDeck] = useState<number | 'all' | null>(null);
   const [shown, setShown] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +78,7 @@ export default function Cards() {
     return payload;
   }, []);
 
-  const load = useCallback(async (which: number | null) => {
+  const load = useCallback(async (which: number | 'all' | null) => {
     try {
       const response = await fetch(
         `/work/api/cards${which ? `?deck=${which}` : ''}`,
@@ -90,13 +91,16 @@ export default function Cards() {
   }, [adopt]);
 
   /* ?deck=N opens straight into a deck, which is how the gold Cards card on
-   * the curriculums page arrives. Read from the location rather than with
+   * the curriculums page arrives; ?deck=all into every deck at once, from the
+   * Learn home. Read from the location rather than with
    * useSearchParams: this is a statically exported page, so the query string
    * only exists in the browser anyway, and the hook would need a Suspense
    * boundary to say the same thing. */
   useEffect(() => {
-    const asked = Number(new URLSearchParams(window.location.search).get('deck'));
-    if (Number.isInteger(asked) && asked > 0) setDeck(asked);
+    const raw = new URLSearchParams(window.location.search).get('deck');
+    const asked = Number(raw);
+    if (raw === 'all') setDeck('all');
+    else if (Number.isInteger(asked) && asked > 0) setDeck(asked);
   }, []);
 
   useEffect(() => {
@@ -123,6 +127,8 @@ export default function Cards() {
             // Save button to forget. See the note handling in the endpoint.
             note: JSON.stringify(note),
             noteSection,
+            // So the next card comes from the same queue: this deck, or all.
+            queue: deck === 'all' ? 'all' : undefined,
           }),
         });
         const result = (await response.json()) as Partial<Payload> & {
@@ -159,7 +165,7 @@ export default function Cards() {
         setBusy(false);
       }
     },
-    [adopt, busy, card, note, noteSection],
+    [adopt, busy, card, deck, note, noteSection],
   );
 
   /* The keyboard, which is the point of a review session: space reveals, then
@@ -215,6 +221,11 @@ export default function Cards() {
             setAnswered(0);
             setDeck(id);
           }}
+          onAll={() => {
+            setShown(false);
+            setAnswered(0);
+            setDeck('all');
+          }}
           onCap={async (id, value) => {
             await fetch('/work/api/cards', {
               method: 'POST',
@@ -236,8 +247,16 @@ export default function Cards() {
     );
   }
 
-  const current = data.decks.find((one) => one.id === deck);
-  const toGo = current ? waitingIn(current) : 0;
+  const all = deck === 'all';
+  const current = all ? undefined : data.decks.find((one) => one.id === deck);
+  /* With every deck at once, the deck this card is from, named beside the
+   * count so a Greek card after a kanji one is not a surprise. */
+  const from = all && card ? data.decks.find((one) => one.id === card.curriculum_id) : undefined;
+  const toGo = all
+    ? data.decks.reduce((sum, one) => sum + waitingIn(one), 0)
+    : current
+      ? waitingIn(current)
+      : 0;
   /* Progress through THIS sitting: answered against answered plus what is
    * left. An Again sends a card back into the queue, so the bar can stand
    * still on a bad run — which is the truth about the session. */
@@ -248,14 +267,18 @@ export default function Cards() {
       <div className={styles.top}>
         <p className={styles.crumb}>
           <button type="button" onClick={() => setDeck(null)}>
-            ← {current?.name ?? 'Decks'}
+            ← {all ? 'All decks' : (current?.name ?? 'Decks')}
           </button>
-          {current && <span className={styles.remaining}>{toGo} to go</span>}
+          {(current || all) && (
+            <span className={styles.remaining}>
+              {toGo} to go{from ? ` · ${from.name}` : ''}
+            </span>
+          )}
         </p>
         <div
           className={styles.bar}
           role="progressbar"
-          aria-label="Progress through this deck"
+          aria-label={all ? 'Progress through every deck' : 'Progress through this deck'}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progress * 100)}
@@ -373,14 +396,25 @@ function PadHandle({ open, onToggle }: { open: boolean; onToggle: (open: boolean
   );
 }
 
-/** The decks, which are the curriculums that have cards. */
+/** The decks, which are the curriculums that have cards.
+ *
+ * DRESSED AS THE PUBLIC SITE, his call, 2026-11-10 (design pass: the public
+ * site's styling, the CRM's desktop layout). A deck is one of the site's
+ * cards — translucent, a hairline all round that lights in the app's colour —
+ * rather than its curriculum's white, gold or black face: on a list of decks
+ * the face colours read as decoration, and a paused or finished deck now says
+ * so in a chip. On a computer the totals sit above as the dashboards' tiles
+ * and the decks fill a grid; on a phone it is the same list, one column. */
 function Decks({
   decks,
   onPick,
+  onAll,
   onCap,
 }: {
   decks: Deck[];
   onPick: (id: number) => void;
+  /** Review every deck at once, oldest due first (?deck=all on the API). */
+  onAll: () => void;
   onCap: (id: number, value: number | null) => void;
 }) {
   if (decks.length === 0) {
@@ -393,68 +427,107 @@ function Decks({
   }
 
   const total = decks.reduce((sum, deck) => sum + waitingIn(deck), 0);
+  const due = decks.reduce((sum, deck) => sum + deck.due, 0);
+  const fresh = decks.reduce((sum, deck) => sum + deck.fresh, 0);
+  const locked = decks.reduce((sum, deck) => sum + deck.locked, 0);
 
   return (
-    <section className={styles.decksBlock}>
-      <h2 className={styles.heading}>
-        Decks
-        <span>{total > 0 ? `${total} to review today` : 'All clear today'}</span>
-      </h2>
-      <ul className={styles.decks}>
-        {decks.map((deck) => {
-          const waiting = waitingIn(deck);
-          const look = statusLook(deck.status);
-          return (
-            <li
-              key={deck.id}
-              className={styles.deck}
-              // The same colours the curriculum's own card carries on the
-              // other page, so a deck reads as the thing it came from rather
-              // than as a row in a list — and a paused deck looks paused.
-              style={
-                {
-                  '--deck': look.accent,
-                  '--deck-ink': look.ink,
-                  '--deck-face': look.background,
-                } as React.CSSProperties
-              }
-            >
-              {/* The whole row is the button (its ::after covers the row), and
-                  the new-a-day box sits above that layer so it can still be
-                  typed in — an input inside a button is not allowed. */}
-              <button type="button" className={styles.deckOpen} onClick={() => onPick(deck.id)}>
-                <span className={styles.deckName}>{deck.name}</span>
-                <span className={waiting > 0 ? styles.waiting : styles.clear}>
-                  {waiting > 0 ? waiting : '✓'}
-                  <span className={styles.hidden}>
-                    {waiting > 0 ? ' waiting' : ' nothing waiting'}
-                  </span>
-                </span>
-              </button>
-              <p className={styles.deckMeta}>
-                <span>
-                  {deck.due} due · {deck.fresh} new · {deck.locked} locked
-                </span>
-                <label>
-                  New a day
-                  <input
-                    type="number"
-                    min={0}
-                    max={500}
-                    inputMode="numeric"
-                    defaultValue={deck.new_per_day ?? NEW_PER_DAY}
-                    onBlur={(event) => {
-                      const raw = event.target.value.trim();
-                      onCap(deck.id, raw === '' ? null : Number(raw));
-                    }}
-                  />
-                </label>
-              </p>
-            </li>
-          );
-        })}
+    <>
+      {/* The totals, on a computer only (the phone keeps its list). */}
+      <ul className={styles.tiles}>
+        <li className={styles.tile}>
+          <span className={styles.tileK}>
+            <i className={total > 0 ? styles.dotOn : styles.dotOff} /> To review today
+          </span>
+          <span className={styles.tileV}>{total}</span>
+          <span className={styles.tileS}>
+            {due} due · {total - due} new today
+          </span>
+        </li>
+        <li className={styles.tile}>
+          <span className={styles.tileK}>
+            <i className={styles.dotOff} /> New
+          </span>
+          <span className={styles.tileV}>{fresh}</span>
+          <span className={styles.tileS}>not seen yet</span>
+        </li>
+        <li className={styles.tile}>
+          <span className={styles.tileK}>
+            <i className={styles.dotOff} /> Locked
+          </span>
+          <span className={styles.tileV}>{locked}</span>
+          <span className={styles.tileS}>waiting on lessons not done yet</span>
+        </li>
       </ul>
-    </section>
+
+      <section className={styles.decksBlock}>
+        <h2 className={styles.heading}>
+          Decks
+          <span>{total > 0 ? `${total} to review today` : 'All clear today'}</span>
+        </h2>
+        {total > 0 && decks.length > 1 && (
+          <button type="button" className={styles.reviewAll} onClick={onAll}>
+            Review all {total}
+          </button>
+        )}
+        <ul className={styles.decks}>
+          {decks.map((deck) => {
+            const waiting = waitingIn(deck);
+            return (
+              <li key={deck.id} className={`${styles.deck} card-link`}>
+                {/* The whole panel is the button (its ::after covers the
+                    panel), and the new-a-day box sits above that layer so it
+                    can still be typed in — an input inside a button is not
+                    allowed. card-link gives it the site's hover (DESIGN.md). */}
+                <button type="button" className={styles.deckOpen} onClick={() => onPick(deck.id)}>
+                  <span className={styles.deckName}>{deck.name}</span>
+                  <span className={styles.deckChips}>
+                    {deck.status === 'paused' && <span className={styles.chip}>Paused</span>}
+                    {deck.status === 'done' && <span className={styles.chipDone}>Done</span>}
+                    <span className={waiting > 0 ? styles.waiting : styles.clear}>
+                      {waiting > 0 ? waiting : '✓'}
+                      <span className={styles.hidden}>
+                        {waiting > 0 ? ' waiting' : ' nothing waiting'}
+                      </span>
+                    </span>
+                  </span>
+                </button>
+                <div className={styles.deckMeta}>
+                  <dl className={styles.counts}>
+                    <div>
+                      <dt>Due</dt>
+                      <dd>{deck.due}</dd>
+                    </div>
+                    <div>
+                      <dt>New</dt>
+                      <dd>{deck.fresh}</dd>
+                    </div>
+                    <div>
+                      <dt>Locked</dt>
+                      <dd>{deck.locked}</dd>
+                    </div>
+                  </dl>
+                  <label className={styles.cap}>
+                    New a day
+                    <input
+                      type="number"
+                      min={0}
+                      max={500}
+                      inputMode="numeric"
+                      defaultValue={deck.new_per_day ?? NEW_PER_DAY}
+                      onBlur={(event) => {
+                        const raw = event.target.value.trim();
+                        onCap(deck.id, raw === '' ? null : Number(raw));
+                      }}
+                    />
+                  </label>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    </>
   );
 }
 
@@ -490,11 +563,12 @@ function AddCard({
 
   if (!open) {
     return (
-      <p className={styles.addRow}>
+      <div className={styles.addRow}>
         <button type="button" className={styles.addToggle} onClick={() => setOpen(true)}>
           + Add a card
         </button>
-      </p>
+        <span className={styles.addHint}>For a word met outside a lesson. It is unlocked at once.</span>
+      </div>
     );
   }
 

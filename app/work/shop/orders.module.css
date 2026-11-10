@@ -1,44 +1,38 @@
 /* The shop: its two tabs, and the orders under the first of them.
    The orders are his pick, 2026-11-10 (redesign page, Shop orders: A):
    grouped by what he does next, a bottom sheet for the open order on a phone,
-   and list-left, order-right on a computer. Gold is what waits on him and the
-   one next step, and nothing else. Tokens from app/globals.css. */
+   and list-left, order-right on a computer.
+
+   DRESSED AS THE PUBLIC SITE, his call, 2026-11-10 (design pass: the public
+   site's styling, the CRM's desktop layout). Built in the language of
+   app/work/ui.module.css and DESIGN.md (his rulings, 11 Nov 2026):
+   translucent panels with a hairline all round and 16px corners, rows split
+   by hairlines (no cards inside cards), eyebrow labels, and state as the
+   colour of the words, never a fill: the app's --accent for what waits on
+   him and for the one bordered next-step button. No side stripes. The tabs, chips and buttons
+   are ui.module.css's own classes, used directly in the TSX; what is here is
+   what they do not cover. From 900px a row of tiles sits over the list and
+   the list and the open order are two panels, as the dashboards. */
 
 /* --- the tabs ----------------------------------------------------------- */
 
+/* Placement only: the look is ui.module.css's .tabs and .tab. Centred over a
+   phone's one column, at the left edge on a computer like the dashboards. */
 .tabs {
-  display: flex;
-  justify-content: center;
-  gap: 0.4rem;
+  align-self: center;
   margin: 1rem 0 1.25rem;
 }
 
-.tab,
-.tabOn {
-  border-radius: 999px;
-  font: inherit;
-  font-size: 0.875rem;
-  padding: 0.45rem 1.2rem;
-  cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+@media (min-width: 900px) {
+  .tabs {
+    align-self: flex-start;
+    margin: 0.25rem 0 1.25rem;
+  }
 }
 
-.tab {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  color: var(--muted);
-}
-
-.tab:hover {
-  border-color: var(--accent);
-  color: var(--ink);
-}
-
-.tabOn {
-  background: var(--ink);
-  border: 1px solid var(--ink);
-  color: var(--bg);
-  font-weight: 600;
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* A tab's panel fills the rest of the pane (ShopTabs.tsx). [hidden] is
@@ -51,6 +45,78 @@
 
 .panel[hidden] {
   display: none;
+}
+
+.orders {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+/* --- the tiles: a computer only ------------------------------------------ */
+
+.tiles {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.tile {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 1rem 1.15rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.84);
+}
+
+.tileK {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dot,
+.dotOn {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-bright);
+}
+
+.dotOn {
+  background: var(--accent);
+}
+
+.tileV {
+  margin-top: 0.2rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  font-variant-numeric: tabular-nums;
+}
+
+.tileS {
+  font-size: 0.8rem;
+  color: var(--muted);
 }
 
 /* --- the frame: one column on a phone, list and pane on a computer ------- */
@@ -72,6 +138,21 @@
   min-width: 0;
 }
 
+/* From 900px the list is a panel of its own, as the dashboards'. */
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    gap: 1rem;
+  }
+
+  .listSide {
+    padding: 1.1rem 1.15rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: oklch(16% 0 0 / 0.84);
+  }
+}
+
 /* --- the head: counts and the ⌕ ------------------------------------------ */
 
 .toolbar {
@@ -84,7 +165,10 @@
 
 .counts {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
@@ -102,30 +186,41 @@
   height: 2.25rem;
   display: grid;
   place-items: center;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 50%;
   color: var(--ink);
   font: inherit;
   font-size: 1.1rem;
   line-height: 1;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .iconButton:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
+.iconButton:focus-visible,
+.row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ui.module.css's .field, at 1rem so a phone does not zoom the page when it
+   takes focus. */
 .search {
   width: 100%;
   margin: 0 0 1rem;
-  background: var(--bg-raised);
+  padding: 0.6rem 0.75rem;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 10px;
+  background: oklch(10% 0 0 / 0.7);
   color: var(--ink);
-  padding: 0.55rem 1rem;
   font: inherit;
-  /* 1rem, so a phone does not zoom the page when it takes focus. */
   font-size: 1rem;
 }
 
@@ -148,14 +243,15 @@
   margin: 0 0 1.25rem;
 }
 
+/* The site's eyebrow. */
 .groupHead,
 .groupHeadGold {
-  margin: 0 0 0.5rem;
-  font-size: 0.75rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 
 .groupHeadGold {
@@ -173,10 +269,12 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
-/* One row per order: reference and state on top, who and what below. */
+/* One row per order: reference and state on top, who and what below. As
+   ui.module.css's .row: no box of its own, rows split by a hairline, in its
+   own two-line grid. */
 .row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -186,29 +284,45 @@
   align-items: baseline;
   gap: 0.25rem 0.75rem;
   width: 100%;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  padding: 0.75rem 0.25rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
   color: var(--ink);
-  padding: 0.75rem 1rem;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: color 0.18s ease;
+}
+
+.rows > li + li > .row {
+  border-top: 1px solid var(--line);
 }
 
 .row:hover {
-  border-color: var(--line-bright);
+  color: var(--accent);
 }
 
 /* What waits on him: received and unchecked, paid and unsent, or a draft in
-   Printful still to confirm. The gold edge, not a gold card. */
-.row[data-waiting] {
-  box-shadow: inset 3px 0 0 var(--accent);
+   Printful still to confirm. Its reference in the accent, beside the accent
+   chip; the colour of the words, never a fill or a side stripe (his rulings,
+   2026-11-10 and 11 Nov). */
+.row[data-waiting] .rowRef {
+  color: var(--accent);
 }
 
+/* The open one: ui.module.css's .rowOn, accent text and a hairline all
+   round. The hairlines either side of it give way to the ring. */
 .row[aria-current] {
-  border-color: var(--accent);
+  color: var(--accent);
+  border-radius: 10px;
+  padding-inline: 0.75rem;
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 55%, transparent);
+}
+
+.rows > li + li > .row[aria-current],
+.rows > li:has(> .row[aria-current]) + li > .row {
+  border-top-color: transparent;
 }
 
 .rowRef {
@@ -219,7 +333,7 @@
 
 .rowWhat {
   grid-area: what;
-  font-size: 0.8125rem;
+  font-size: 0.85rem;
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -235,50 +349,15 @@
   white-space: nowrap;
 }
 
-.row .chip {
+.rowChip {
   grid-area: chip;
   justify-self: end;
-}
-
-.chip {
-  display: inline-block;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.1rem 0.6rem;
-  font-size: 0.75rem;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.row[data-waiting] .chip,
-.chip[data-waiting] {
-  border-color: var(--accent);
-  color: var(--accent);
-  font-weight: 600;
 }
 
 .dismissed .rowRef,
 .dismissed .rowWhat {
   text-decoration: line-through;
   opacity: 0.55;
-}
-
-.linkButton {
-  background: none;
-  border: 0;
-  padding: 0.25rem 0;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.8125rem;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--line-bright);
-  cursor: pointer;
-}
-
-.linkButton:hover {
-  color: var(--ink);
-  text-decoration-color: var(--accent);
 }
 
 /* --- the open order: a sheet on a phone, a pane on a computer ------------ */
@@ -290,7 +369,8 @@
   background: oklch(0% 0 0 / 0.6);
 }
 
-/* Phone: nothing open, nothing shown; open, a sheet from the bottom. */
+/* Phone: nothing open, nothing shown; open, a sheet from the bottom. Nearly
+   opaque, as it sits over the list rather than the sky. */
 .pane {
   display: none;
 }
@@ -303,8 +383,9 @@
   max-height: 88dvh;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--bg-raised);
-  border-top: 1px solid var(--line-bright);
+  background: oklch(15% 0 0 / 0.97);
+  border: 1px solid var(--line);
+  border-bottom: 0;
   border-radius: 16px 16px 0 0;
   padding: 0.5rem 1.1rem calc(1.25rem + env(safe-area-inset-bottom));
   animation: rise 0.2s ease-out;
@@ -320,6 +401,11 @@
 @media (prefers-reduced-motion: reduce) {
   .layout[data-open] .pane {
     animation: none;
+  }
+
+  .row,
+  .iconButton {
+    transition: none;
   }
 }
 
@@ -338,8 +424,8 @@
   text-align: center;
 }
 
-/* Computer: the pane sits beside the list and stays in view as it scrolls.
-   The max-height leaves room for the header and the tabs above it. */
+/* Computer: the pane is a panel beside the list and stays in view as it
+   scrolls. The max-height leaves room for the page's title and the tabs. */
 @media (min-width: 720px) {
   .backdrop {
     display: none;
@@ -350,24 +436,31 @@
     display: block;
     position: sticky;
     inset: auto;
-    top: 0.5rem;
+    top: 0;
     z-index: auto;
     max-height: calc(100dvh - 9rem);
     overflow-y: auto;
     scrollbar-width: none;
-    background: var(--bg-raised);
+    background: oklch(16% 0 0 / 0.84);
     border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 1.1rem 1.25rem 1.25rem;
+    border-radius: 16px;
+    padding: 1.1rem 1.15rem 1.2rem;
     animation: none;
   }
 
   .paneEmpty {
-    padding: 2rem 0;
+    padding: 3rem 0;
   }
 
   .grab {
     display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .pane,
+  .layout[data-open] .pane {
+    max-height: calc(100dvh - 11rem);
   }
 }
 
@@ -382,11 +475,14 @@
   gap: 0.75rem;
 }
 
+/* Heavy and tight, as the site's headings. */
 .sheetRef {
   flex: 1;
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
   font-variant-numeric: tabular-nums;
 }
 
@@ -399,16 +495,26 @@
   outline-offset: 2px;
 }
 
+/* The facts: split from the head and the button by hairlines, not boxed
+   (no cards inside cards). */
 .kv {
   display: grid;
   grid-template-columns: 5.5rem minmax(0, 1fr);
-  gap: 0.45rem 1rem;
+  gap: 0.5rem 1rem;
   margin: 0;
+  padding: 0.9rem 0;
+  border-block: 1px solid var(--line);
   font-size: 0.875rem;
 }
 
-.kv dt {
+.kv dt,
+.fields dt {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
+  padding-top: 0.15rem;
 }
 
 .kv dd {
@@ -419,60 +525,34 @@
 .kv a,
 .fields a {
   color: var(--ink);
+  text-decoration-color: var(--line-bright);
+  text-underline-offset: 3px;
+}
+
+.kv a:hover,
+.fields a:hover {
+  text-decoration-color: var(--accent);
 }
 
 .sheetNote,
 .hint {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.85rem;
   line-height: 1.5;
   color: var(--muted);
 }
 
-/* The one next step: big, gold, the width of the sheet. */
-.primary {
+/* The one next step, and Cancel under it: the width of the sheet. The look
+   is ui.module.css's .primary and .button. */
+.wide {
   width: 100%;
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 10px;
-  color: var(--bg);
-  padding: 0.8rem 1rem;
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.primary:hover:not(:disabled) {
-  background: color-mix(in oklch, var(--accent) 88%, white);
-}
-
-.primary:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
-
-.quiet {
-  width: 100%;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--ink);
-  padding: 0.7rem 1rem;
-  font: inherit;
-  font-size: 0.9375rem;
-  cursor: pointer;
-}
-
-.quiet:hover {
-  border-color: var(--accent);
 }
 
 .sheetLinks {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: -0.25rem;
+  margin: -0.4rem -0.5rem 0;
 }
 
 /* --- More: every other step, and the full detail -------------------------- */
@@ -490,26 +570,6 @@
   gap: 0.5rem;
 }
 
-.actions button {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink);
-  padding: 0.45rem 1rem;
-  font: inherit;
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
-
-.actions button:hover:not(:disabled) {
-  border-color: var(--accent);
-}
-
-.actions button:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
 .fields {
   display: grid;
   grid-template-columns: 1fr;
@@ -518,19 +578,15 @@
   font-size: 0.875rem;
 }
 
-.fields dt {
-  color: var(--muted);
-}
-
 .fields dd {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.6rem;
   overflow-wrap: anywhere;
 }
 
 @media (min-width: 1000px) {
   .fields {
     grid-template-columns: 7rem minmax(0, 1fr);
-    gap: 0.4rem 1rem;
+    gap: 0.5rem 1rem;
   }
 
   .fields dd {
@@ -547,19 +603,17 @@
   white-space: pre-line;
 }
 
-/* Sending to Printful: the address in the fields Printful wants. */
+/* Sending to Printful: the address in the fields Printful wants. Under a
+   hairline, not in a box of its own. */
 .send {
-  padding: 0.9rem;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--bg);
   display: grid;
   gap: 0.6rem;
+  padding-top: 0.25rem;
 }
 
 .sendNote {
   margin: 0 0 0.25rem;
-  font-size: 0.8125rem;
+  font-size: 0.85rem;
   line-height: 1.5;
   color: var(--muted);
 }
@@ -567,19 +621,26 @@
 .sendField {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.2rem;
-  font-size: 0.8125rem;
+  gap: 0.3rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
+/* ui.module.css's .field, at 1rem so a phone does not zoom. */
 .sendField input {
-  background: var(--bg-raised);
+  width: 100%;
+  padding: 0.6rem 0.75rem;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
+  background: oklch(10% 0 0 / 0.7);
   color: var(--ink);
-  padding: 0.5rem 0.65rem;
   font: inherit;
   font-size: 1rem;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .sendField input:focus {

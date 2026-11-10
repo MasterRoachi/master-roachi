@@ -26,6 +26,7 @@ import { groupFields } from './editor/groups';
 import LiveFrame, { useWide } from './editor/LiveFrame';
 import PicturesTab from './editor/PicturesTab';
 import styles from './collection.module.css';
+import ui from './ui.module.css';
 
 // One editor, for every collection of files in the repo.
 //
@@ -56,10 +57,16 @@ import styles from './collection.module.css';
 // (the fields that matter, the rest under More details), Words (the body),
 // Pictures (cover, hero, the body's images, upload) and Check (prose, SEO and
 // the four previews, its label counting the problems). Preview, Publish and
-// Save are pinned in a bar at the foot. From 1000px the live page sits in a
-// panel on the right (editor/LiveFrame.tsx), where the sticky column of
-// previews used to be. It replaced a card that opened in place, which put up
-// to sixteen fields, the body and that column on one long page.
+// Save are pinned in a bar at the foot. It replaced a card that opened in
+// place, which put up to sixteen fields, the body and a sticky column of
+// previews on one long page.
+//
+// ON A COMPUTER, his call, 2026-11-10 (design pass: the public site's styling,
+// the CRM's desktop layout): from 900px the list stays in a narrow column on
+// the left, its "to fix" counts in the accent and the open entry lit, and the
+// open entry's editor takes the rest of the width as a panel. From 1280px the
+// live page sits large beside its tabs (editor/LiveFrame.tsx); below that the
+// list takes the room, and Preview still opens the page full screen.
 //
 // Every tab stays mounted and the others are only hidden, so switching keeps
 // each one's scroll and the body's cursor.
@@ -231,7 +238,7 @@ export default function CollectionEditor({
         weight: Number(readScalar(lines, 'weight') ?? '0') || 0,
         date: readScalar(lines, 'date') ?? '',
         draft: isDraft(entry.text),
-        // What would be flagged if it were opened — the gold on a shut card.
+        // What would be flagged if it were opened — the accent on its row in the list.
         problems: warningsFor(
           collection,
           Object.fromEntries(fields.map((field) => [field.key, readScalar(lines, field.key) ?? ''])),
@@ -656,28 +663,43 @@ export default function CollectionEditor({
     );
   }
 
+  /* The list. On a phone it is the first screen and an open entry replaces
+     it; on a computer it stays in the left column beside the open entry
+     (collection.module.css's .layout), so it is drawn either way and the CSS
+     hides it on a phone while an entry is open. The status line goes to the
+     editor while one is open, so it is never said twice. */
+  const list = (
+    <EntryList
+      noun={noun}
+      canCreate={Boolean(template)}
+      onNew={startNew}
+      shown={shown}
+      total={listed.length}
+      ordering={ordering}
+      orderChanged={Boolean(order)}
+      onMove={move}
+      onSaveOrder={() => void saveOrder()}
+      onUndoOrder={() => setOrder(null)}
+      busy={busy}
+      draftViews={draftViews}
+      view={view}
+      onView={setView}
+      draftCount={draftCount}
+      today={todayLocal}
+      status={draftFile ? null : status}
+      onOpen={openEntry}
+      openPath={draftFile ? (openPath ?? '') : null}
+    />
+  );
+
   if (!draftFile) {
     return (
-      <EntryList
-        noun={noun}
-        canCreate={Boolean(template)}
-        onNew={startNew}
-        shown={shown}
-        total={listed.length}
-        ordering={ordering}
-        orderChanged={Boolean(order)}
-        onMove={move}
-        onSaveOrder={() => void saveOrder()}
-        onUndoOrder={() => setOrder(null)}
-        busy={busy}
-        draftViews={draftViews}
-        view={view}
-        onView={setView}
-        draftCount={draftCount}
-        today={todayLocal}
-        status={status}
-        onOpen={openEntry}
-      />
+      <div className={styles.layout}>
+        <div className={styles.listCol}>{list}</div>
+        <div className={styles.pickCol}>
+          <p className={ui.empty}>Choose a {noun} on the left to edit it.</p>
+        </div>
+      </div>
     );
   }
 
@@ -738,215 +760,220 @@ export default function CollectionEditor({
   });
 
   return (
-    <div className={styles.editor}>
-      <div className={styles.editorHead}>
-        <button type="button" className={styles.back} onClick={close} aria-label="Back to the list">
-          <span aria-hidden="true">‹</span>
-        </button>
-        <span className={styles.editorTitle}>
-          <span className={styles.editorName}>{values.title || (isNew ? `New ${noun}` : slug)}</span>
-          <span className={styles.editorFile}>
-            {openPath ? name(openPath) : 'not saved yet'}
-            {draft && <span className={styles.draftTag}>draft</span>}
-            {dirty && <span className={styles.dirty}>unsaved</span>}
+    <div className={styles.layout} data-open="">
+      <div className={styles.listCol}>{list}</div>
+
+      <div className={styles.editor}>
+        <div className={styles.editorHead}>
+          <button type="button" className={styles.back} onClick={close} aria-label="Back to the list">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <span className={styles.editorTitle}>
+            <span className={styles.editorName}>{values.title || (isNew ? `New ${noun}` : slug)}</span>
+            <span className={styles.editorFile}>
+              {openPath ? name(openPath) : 'not saved yet'}
+              {draft && <span className={styles.draftTag}>draft</span>}
+              {dirty && <span className={styles.dirty}>unsaved</span>}
+            </span>
           </span>
-        </span>
-      </div>
+        </div>
 
-      <div className={side ? styles.editorSplit : styles.editorOne}>
-        <div className={styles.editorMain}>
-          <div className={styles.tabs} role="tablist" aria-label={`Edit this ${noun}`}>
-            {tabs.map((one) => (
-              <button
-                key={one.key}
-                type="button"
-                role="tab"
-                id={`tab-${one.key}`}
-                aria-selected={tab === one.key}
-                aria-controls={`panel-${one.key}`}
-                className={tab === one.key ? styles.tabOn : styles.tab}
-                data-problems={(one.key === 'check' && problems > 0) || undefined}
-                onClick={() => setTab(one.key)}
-              >
-                {one.label}
-              </button>
-            ))}
-          </div>
+        <div className={side ? styles.editorSplit : styles.editorOne}>
+          <div className={styles.editorMain}>
+            <div className={styles.tabs} role="tablist" aria-label={`Edit this ${noun}`}>
+              {tabs.map((one) => (
+                <button
+                  key={one.key}
+                  type="button"
+                  role="tab"
+                  id={`tab-${one.key}`}
+                  aria-selected={tab === one.key}
+                  aria-controls={`panel-${one.key}`}
+                  className={styles.tab}
+                  data-problems={(one.key === 'check' && problems > 0) || undefined}
+                  onClick={() => setTab(one.key)}
+                >
+                  {one.label}
+                </button>
+              ))}
+            </div>
 
-          <div className={styles.pane}>
-            <div {...panel('details')}>
-              {trackMoved && (
-                <p className={styles.notice}>
-                  Track changed from <strong>{trackMoved.was}</strong> to{' '}
-                  <strong>{trackMoved.now}</strong>. Saving moves this post between the pages built
-                  from it — /gaming shows gaming, /orthodoxy shows theology, /writing shows all.
-                </p>
-              )}
-
-              {scheduled && (
-                <p className={styles.notice}>
-                  Dated {scheduled}, which is in the future, so this post is withheld from every
-                  listing, the feed and the sitemap until then. A daily check rebuilds the site on
-                  the day it is due.
-                </p>
-              )}
-
-              <Warnings
-                warnings={warnings.filter((warning) => !pictureKeys.has(warning.key))}
-              />
-
-              <FrontmatterFields
-                fields={groups.main}
-                lines={draftFile.frontmatter}
-                onChange={(frontmatter) => edit({ frontmatter })}
-                images={images}
-                onUpload={art ? upload : undefined}
-                uploading={uploading}
-                dynamicOptions={{ projects, tags: usedTags }}
-              />
-
-              {/* The rarely used fields, and the raw box, folded away. */}
-              <details className={styles.more}>
-                <summary>
-                  More details
-                  {moreWarnings > 0 && <span className={styles.moreFlag}>{moreWarnings} to fix</span>}
-                </summary>
-
-                {groups.more.length > 0 && (
-                  <FrontmatterFields
-                    fields={groups.more}
-                    lines={draftFile.frontmatter}
-                    onChange={(frontmatter) => edit({ frontmatter })}
-                    images={images}
-                    onUpload={art ? upload : undefined}
-                    uploading={uploading}
-                    dynamicOptions={{ projects, tags: usedTags }}
-                  />
+            <div className={styles.pane}>
+              <div {...panel('details')}>
+                {trackMoved && (
+                  <p className={styles.notice}>
+                    Track changed from <strong>{trackMoved.was}</strong> to{' '}
+                    <strong>{trackMoved.now}</strong>. Saving moves this post between the pages built
+                    from it — /gaming shows gaming, /orthodoxy shows theology, /writing shows all.
+                  </p>
                 )}
 
-                {/* Everything the schema does not model, as its own text. It
-                    round-trips untouched either way; showing it is the
-                    difference between a form that keeps your fields and a form
-                    you can believe keeps your fields. */}
-                <details className={styles.other} open={unknown !== ''}>
-                  <summary>Other frontmatter</summary>
-                  <textarea
-                    className={styles.fieldText}
-                    rows={4}
-                    spellCheck={false}
-                    value={unknown}
-                    aria-label="Other frontmatter"
-                    onChange={(event) =>
-                      edit({
-                        frontmatter: setUnknownFields(draftFile.frontmatter, known, event.target.value),
-                      })
-                    }
-                  />
-                  <p className={styles.hint}>
-                    Keys with no control elsewhere. Edited as text, kept exactly as written.
+                {scheduled && (
+                  <p className={styles.notice}>
+                    Dated {scheduled}, which is in the future, so this post is withheld from every
+                    listing, the feed and the sitemap until then. A daily check rebuilds the site on
+                    the day it is due.
                   </p>
-                </details>
-              </details>
-            </div>
+                )}
 
-            <div {...panel('words')}>
-              <BodyEditor
-                body={draftFile.body}
-                onChange={(body) => edit({ body })}
-                sections={bodySections}
-                rawBody={rawBody}
-                onToggleRaw={() => setRawBody((was) => !was)}
-                images={mine}
-                artPrefix={artPrefix}
-                bodyRef={bodyRef}
-                onInsertImage={insertImage}
-              />
-            </div>
+                <Warnings
+                  warnings={warnings.filter((warning) => !pictureKeys.has(warning.key))}
+                />
 
-            {hasPictures && (
-              <div {...panel('pictures')}>
-                <Warnings warnings={warnings.filter((warning) => pictureKeys.has(warning.key))} />
-                <PicturesTab
-                  fields={groups.pictures}
+                <FrontmatterFields
+                  fields={groups.main}
                   lines={draftFile.frontmatter}
                   onChange={(frontmatter) => edit({ frontmatter })}
                   images={images}
-                  mine={mine}
-                  artPrefix={artPrefix}
-                  body={draftFile.body}
                   onUpload={art ? upload : undefined}
                   uploading={uploading}
+                  dynamicOptions={{ projects, tags: usedTags }}
                 />
-              </div>
-            )}
 
-            {hasCheck && (
-              <div {...panel('check')}>
-                <CheckTab
-                  warnings={warnings}
-                  snapshots={snapshots}
+                {/* The rarely used fields, and the raw box, folded away. */}
+                <details className={styles.more}>
+                  <summary>
+                    More details
+                    {moreWarnings > 0 && <span className={styles.moreFlag}>{moreWarnings} to fix</span>}
+                  </summary>
+
+                  {groups.more.length > 0 && (
+                    <FrontmatterFields
+                      fields={groups.more}
+                      lines={draftFile.frontmatter}
+                      onChange={(frontmatter) => edit({ frontmatter })}
+                      images={images}
+                      onUpload={art ? upload : undefined}
+                      uploading={uploading}
+                      dynamicOptions={{ projects, tags: usedTags }}
+                    />
+                  )}
+
+                  {/* Everything the schema does not model, as its own text. It
+                      round-trips untouched either way; showing it is the
+                      difference between a form that keeps your fields and a form
+                      you can believe keeps your fields. */}
+                  <details className={styles.other} open={unknown !== ''}>
+                    <summary>Other frontmatter</summary>
+                    <textarea
+                      className={styles.fieldText}
+                      rows={4}
+                      spellCheck={false}
+                      value={unknown}
+                      aria-label="Other frontmatter"
+                      onChange={(event) =>
+                        edit({
+                          frontmatter: setUnknownFields(draftFile.frontmatter, known, event.target.value),
+                        })
+                      }
+                    />
+                    <p className={styles.hint}>
+                      Keys with no control elsewhere. Edited as text, kept exactly as written.
+                    </p>
+                  </details>
+                </details>
+              </div>
+
+              <div {...panel('words')}>
+                <BodyEditor
                   body={draftFile.body}
-                  prose={prose}
-                  wordTarget={collection === 'writing' ? 500 : undefined}
-                  seo={seoInput}
-                  onSelect={(start, end) => {
-                    pendingSelect.current = [start, end];
-                    if (bodySections) setRawBody(true);
-                    setTab('words');
-                  }}
+                  onChange={(body) => edit({ body })}
+                  sections={bodySections}
+                  rawBody={rawBody}
+                  onToggleRaw={() => setRawBody((was) => !was)}
+                  images={mine}
+                  artPrefix={artPrefix}
+                  bodyRef={bodyRef}
+                  onInsertImage={insertImage}
                 />
               </div>
-            )}
+
+              {hasPictures && (
+                <div {...panel('pictures')}>
+                  <Warnings warnings={warnings.filter((warning) => pictureKeys.has(warning.key))} />
+                  <PicturesTab
+                    fields={groups.pictures}
+                    lines={draftFile.frontmatter}
+                    onChange={(frontmatter) => edit({ frontmatter })}
+                    images={images}
+                    mine={mine}
+                    artPrefix={artPrefix}
+                    body={draftFile.body}
+                    onUpload={art ? upload : undefined}
+                    uploading={uploading}
+                  />
+                </div>
+              )}
+
+              {hasCheck && (
+                <div {...panel('check')}>
+                  <CheckTab
+                    warnings={warnings}
+                    snapshots={snapshots}
+                    body={draftFile.body}
+                    prose={prose}
+                    wordTarget={collection === 'writing' ? 500 : undefined}
+                    seo={seoInput}
+                    onSelect={(start, end) => {
+                      pendingSelect.current = [start, end];
+                      if (bodySections) setRawBody(true);
+                      setTab('words');
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
+
+          {side}
         </div>
 
-        {side}
-      </div>
+        {status && (
+          <p className={styles.editorMessage} role="status">
+            {status}
+          </p>
+        )}
 
-      {status && (
-        <p className={styles.editorMessage} role="status">
-          {status}
-        </p>
-      )}
-
-      {/* Pinned at the foot. Status is the visible state of a project and
-          draft is a separate thing — one is "what stage is this at", the
-          other is "is this page on the site at all". No project has ever
-          used draft, so Publish / Hide page is a quiet button. */}
-      <div className={styles.actionBar}>
-        {previewBase && openPath && (
+        {/* Pinned at the foot. Status is the visible state of a project and
+            draft is a separate thing — one is "what stage is this at", the
+            other is "is this page on the site at all". No project has ever
+            used draft, so Publish / Hide page is an outlined button and
+            Save is the one in the accent (never filled, DESIGN.md). */}
+        <div className={styles.actionBar}>
+          {previewBase && openPath && (
+            <button
+              type="button"
+              className={ui.button}
+              onClick={() => setPreviewing(true)}
+              title="Preview the page: the real page, full screen, with this draft in it"
+            >
+              Preview
+            </button>
+          )}
           <button
             type="button"
-            className={styles.quiet}
-            onClick={() => setPreviewing(true)}
-            title="Preview the page: the real page, full screen, with this draft in it"
+            className={ui.button}
+            onClick={() => void save(!draft)}
+            disabled={busy}
+            title={draft ? 'Clear draft: true and publish it' : 'Set draft: true and take the page down'}
           >
-            Preview
+            {draft ? 'Publish' : 'Hide page'}
           </button>
-        )}
-        <button
-          type="button"
-          className={styles.quiet}
-          onClick={() => void save(!draft)}
-          disabled={busy}
-          title={draft ? 'Clear draft: true and publish it' : 'Set draft: true and take the page down'}
-        >
-          {draft ? 'Publish' : 'Hide page'}
-        </button>
-        <button type="button" className={styles.save} onClick={() => void save()} disabled={busy || !dirty}>
-          {busy ? 'Working…' : 'Save'}
-        </button>
-      </div>
+          <button type="button" className={styles.save} onClick={() => void save()} disabled={busy || !dirty}>
+            {busy ? 'Working…' : 'Save'}
+          </button>
+        </div>
 
-      {previewing && previewBase && openPath && (
-        <PagePreview
-          href={`${previewBase}${slug}/`}
-          name={values.title || slug}
-          type={ENTRY_PREVIEW}
-          payload={previewPayload}
-          onClose={() => setPreviewing(false)}
-        />
-      )}
+        {previewing && previewBase && openPath && (
+          <PagePreview
+            href={`${previewBase}${slug}/`}
+            name={values.title || slug}
+            type={ENTRY_PREVIEW}
+            payload={previewPayload}
+            onClose={() => setPreviewing(false)}
+          />
+        )}
+      </div>
     </div>
   );
 }

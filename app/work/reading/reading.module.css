@@ -4,7 +4,22 @@
  * Open now is cards with big covers; Next is a shelf of spines; Finished and
  * Put down fold away at the foot. A book with no cover art still gets a
  * derived colour and its title, which is lib/book-spine.ts earning its keep
- * for the hand-typed case. Phone first; the breakpoint is 720px. */
+ * for the hand-typed case. Phone first; the breakpoint is 720px.
+ *
+ * DRESSED AS THE PUBLIC SITE: his call, 2026-11-10 (design pass: the public
+ * site's styling, the CRM's desktop layout). Cards and shelves are the site's
+ * translucent panels (app/work/ui.module.css) with a hairline all round and
+ * no side stripes; labels are its eyebrows; every accent is the app's colour.
+ * From 900px, where the sidebar arrives, the open books are large panels
+ * across the top and Next and the folded shelves sit below as panels, side by
+ * side from 1100px.
+ *
+ * TO THE SHARED SPEC (DESIGN.md, his rulings, 11 Nov 2026): state is the
+ * colour of the words, never a tinted fill; no filled buttons; cards 16px,
+ * controls 10px, small marks 6px; no cards inside cards, so rows inside a
+ * panel are split by hairlines; cards you can press carry the global
+ * `card-link` (the site's hover) instead of a hover of their own. The spines
+ * do not: their own tip-out transform would fight the tilt. */
 
 .page {
   /* The full width of .shell, like every other backend page. A flex column
@@ -32,15 +47,16 @@
 }
 
 /* Section names inside the page — not the tool's name, which the header
-   already carries. Open now's is gold because it is the one in front. */
+   already carries. The site's eyebrow; Open now's is in the app's colour
+   because it is the one in front. */
 .sectionName,
 .sectionNameGold {
   display: flex;
   align-items: baseline;
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -57,28 +73,20 @@
   gap: 0.6rem;
 }
 
+/* The site's card: translucent, a hairline all round. Its hover is the
+   global card-link's (Reading.tsx), so none is written here. */
 .openCard {
   display: flex;
   align-items: flex-start;
   gap: 0.9rem;
   padding: 0.75rem;
   text-align: left;
-  background: var(--bg-raised);
+  background: oklch(16% 0 0 / 0.84);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 16px;
   color: var(--ink);
   font: inherit;
   cursor: pointer;
-  box-shadow: 0 1px 0 var(--line);
-  transition: border-color 0.15s ease, transform 0.1s ease;
-}
-
-.openCard:hover {
-  border-color: var(--line-bright);
-}
-
-.openCard:active {
-  transform: translateY(1px);
 }
 
 .openCard:focus-visible,
@@ -100,7 +108,7 @@
   width: 5.5rem;
   aspect-ratio: 2 / 3;
   border: 1px solid transparent;
-  border-radius: 3px;
+  border-radius: 6px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -135,9 +143,10 @@
 }
 
 .openTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.25;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .openAuthor {
@@ -157,7 +166,64 @@
   }
 }
 
+/* On a computer each open book is a large panel across the top: a bigger
+   cover, the title as a heading. */
+@media (min-width: 900px) {
+  .openGrid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+    gap: 1rem;
+  }
+
+  .openCard {
+    gap: 1.25rem;
+    padding: 1.1rem 1.15rem 1.2rem;
+  }
+
+  .openCover {
+    width: 8.5rem;
+  }
+
+  .openText {
+    gap: 0.35rem;
+    padding-top: 0.3rem;
+  }
+
+  .openTitle {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .openAuthor {
+    font-size: 0.9rem;
+  }
+
+  .openMeta {
+    font-size: 0.8rem;
+  }
+}
+
 /* --- next, and the folded shelves --------------------------------------- */
+
+/* Next and the folds share a wrapper that is nothing on a phone, so the
+   folds still sit at the foot of the page column there. */
+.lower {
+  display: contents;
+}
+
+/* A panel round the shelf: the site's card, with the spines standing in it. */
+.nextSection,
+.foldBody {
+  display: grid;
+  align-content: start;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 1.1rem 1.15rem 1.2rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.84);
+}
 
 .nextSection {
   margin-top: 1.6rem;
@@ -169,34 +235,69 @@
   padding-top: 1.6rem;
 }
 
+@media (min-width: 900px) {
+  .lower {
+    display: grid;
+    gap: 1rem;
+    align-items: start;
+    margin-top: 1.25rem;
+  }
+
+  .nextSection,
+  .folds {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .folds {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+}
+
+/* Next on the wide left, the folded shelves on the right, as the dashboards. */
+@media (min-width: 1100px) {
+  .lower {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  }
+}
+
 .foldRow {
   display: flex;
   gap: 0.5rem;
 }
 
+/* Each folded shelf is a card that opens: the site's eyebrow for its name,
+   the count, and a chevron. Its hover is the global card-link's; open, its
+   words and hairline are in the app's colour. */
 .fold,
 .foldOn {
   flex: 1 1 0;
   display: flex;
   align-items: center;
   gap: 0.1rem;
-  padding: 0.65rem 0.9rem;
-  background: var(--bg-raised);
+  padding: 0.85rem 1rem;
+  background: oklch(16% 0 0 / 0.84);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 16px;
   color: var(--ink);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: border-color 0.15s ease;
-}
-
-.fold:hover {
-  border-color: var(--line-bright);
 }
 
 .foldOn {
-  border-color: var(--line-bright);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.fold .countMuted,
+.foldOn .countMuted {
+  letter-spacing: 0;
 }
 
 .chevron {
@@ -212,14 +313,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chevron,
-  .openCard {
+  .chevron {
     transition: none;
   }
 }
 
-.foldBody {
-  margin-top: 1.2rem;
+/* On a computer the folds column's gap spaces it instead. */
+@media (max-width: 899px) {
+  .foldBody {
+    margin-top: 1.2rem;
+  }
 }
 
 /* --- the book, off the shelf and open ----------------------------------- */
@@ -280,9 +383,11 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg-raised);
-  border: 1px solid var(--line-bright);
-  border-radius: 4px;
+  /* The site's card, nearly opaque: it sits over the dimmed page, and the
+     quotes and the sketch want a steady ground. */
+  background: oklch(15% 0 0 / 0.97);
+  border: 1px solid var(--line);
+  border-radius: 16px;
   box-shadow: 0 30px 60px -20px color-mix(in oklab, black 90%, transparent);
   transform-origin: center;
   transition:
@@ -343,19 +448,21 @@
    the page can put it. */
 .removeBook {
   align-self: center;
-  margin: 0.4rem 0 0;
-  padding: 0.6rem 0 0.2rem;
+  margin: 0.4rem 0 0.2rem;
+  padding: 0.5rem 0.75rem;
   background: none;
   border: 0;
-  color: var(--line-bright);
+  border-radius: 6px;
+  color: var(--muted-2);
   font: inherit;
   font-size: 0.75rem;
   text-align: center;
   cursor: pointer;
 }
 
+/* Red words, because it is the one thing here that cannot be undone. */
 .removeBook:hover {
-  color: var(--accent);
+  color: var(--bad);
 }
 
 .status {
@@ -363,13 +470,15 @@
   font-size: 0.875rem;
 }
 
+/* Something went wrong: red words and a red hairline, no fill. */
 .warn {
-  border: 1px solid var(--accent);
-  background: var(--accent-dim);
-  border-radius: 6px;
-  padding: 0.6rem 0.8rem;
-  font-size: 0.8125rem;
-  margin-bottom: 1rem;
+  border: 1px solid color-mix(in oklch, var(--bad) 50%, transparent);
+  background: none;
+  color: var(--bad);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.875rem;
+  margin: 0 0 1rem;
 }
 
 /* --- adding ------------------------------------------------------------- */
@@ -398,9 +507,9 @@
   width: 2.4rem;
   height: 2.4rem;
   padding: 0;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--bg-raised);
+  border-radius: 50%;
+  border: 1px solid var(--line-bright);
+  background: oklch(16% 0 0 / 0.84);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -419,7 +528,7 @@
 }
 
 .addToggle:hover {
-  border-color: var(--line-bright);
+  border-color: var(--accent);
 }
 
 .addToggle:hover svg {
@@ -428,7 +537,6 @@
 
 .addToggleOn {
   border-color: var(--accent);
-  background: var(--accent-dim);
 }
 
 .addToggleOn svg {
@@ -436,16 +544,29 @@
   transform: rotate(45deg);
 }
 
+/* A panel holding a form: the site's card, a shade more solid while it is
+   typed into, and no hover. On a computer it is wider, so the library's
+   matches have room. */
 .addCard {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
   width: 28rem;
   max-width: 100%;
-  padding: 1rem;
-  border: 1px solid var(--line-bright);
-  border-radius: 12px;
-  background: var(--bg-raised);
+  padding: 1.1rem 1.15rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: oklch(16% 0 0 / 0.92);
+}
+
+@media (min-width: 900px) {
+  .addCard {
+    width: 38rem;
+  }
+
+  .results {
+    max-height: 20rem;
+  }
 }
 
 .addRow {
@@ -462,63 +583,88 @@
   width: 100%;
 }
 
+/* The ui field: a dark well with a hairline that takes the accent. */
 .addCard input,
 .addCard select,
 .addCard textarea {
-  background: var(--bg);
+  background: oklch(10% 0 0 / 0.7);
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 10px;
   color: var(--ink);
   font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.4rem 0.5rem;
+  font-size: 0.875rem;
+  padding: 0.6rem 0.75rem;
 }
 
 .addCard input:focus,
 .addCard select:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--accent);
+}
+
+.addCard input:focus-visible,
+.addCard select:focus-visible {
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 /* The library's own matches. Capped at sixty in the component — three and a
    half thousand buttons is not a list, it is a scroll. */
+/* Rows split by hairlines (no cards inside cards). It scrolls with no bar. */
 .results {
   display: flex;
   flex-direction: column;
-  gap: 1px;
   max-height: 16rem;
   overflow-y: auto;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--bg);
-  padding: 0.2rem;
+  scrollbar-width: none;
+}
+
+.results::-webkit-scrollbar {
+  display: none;
 }
 
 .result {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.05rem;
+  gap: 0.1rem;
   text-align: left;
   background: none;
   border: 0;
-  border-radius: 4px;
+  border-radius: 0;
   color: var(--ink);
   font: inherit;
-  padding: 0.35rem 0.5rem;
+  padding: 0.6rem 0.25rem;
   cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+.result + .result {
+  border-top: 1px solid var(--line);
 }
 
 .result:hover {
-  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.result:focus-visible,
+.picked button:focus-visible,
+.addGo:focus-visible,
+.starOn:focus-visible,
+.starOff:focus-visible,
+.shelfOn:focus-visible,
+.shelfOff:focus-visible,
+.quoteFoot button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .resultTitle {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .resultAuthor {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   color: var(--muted);
 }
 
@@ -531,7 +677,7 @@
   align-items: center;
   gap: 0.35rem;
   margin: 0;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   color: var(--accent);
 }
 
@@ -540,26 +686,16 @@
   border: 0;
   color: var(--muted);
   font: inherit;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
 }
 
+/* The one thing on the card: the ui primary, bordered in the app's colour. */
 .addGo {
-  background: none;
-  border: 1px solid var(--line-bright);
-  border-radius: 6px;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.875rem;
-  padding: 0.45rem 0.9rem;
-  cursor: pointer;
-}
-
-.addGo:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  composes: primary from '../ui.module.css';
+  align-self: flex-start;
 }
 
 .addGo:disabled {
@@ -581,9 +717,9 @@
   display: flex;
   align-items: center;
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -823,7 +959,9 @@
   align-items: center;
   gap: 0.9rem;
   padding: 2.1rem 1.25rem 1.4rem;
-  border-radius: 10px;
+  /* Square: the sheet's own 16px corners clip it, and rounding it as well
+     would make it read as a card inside the card. */
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -1023,7 +1161,7 @@
   min-width: 0;
   background: oklch(0% 0 0 / 0.42);
   border: 1px solid oklch(99% 0 0 / 0.22);
-  border-radius: 5px;
+  border-radius: 10px;
   color: oklch(99% 0 0);
   font: inherit;
   font-size: 0.75rem;
@@ -1039,42 +1177,45 @@
   outline-offset: 1px;
 }
 
-/* --- shelf, as pills ---------------------------------------------------- */
+/* --- shelf, as the site's tabs ----------------------------------------- */
 
+/* The ui tabs: small words, the current one in the app's colour and
+   underlined. No track and no fill; the banner's shade under them is what
+   keeps them readable on any cover. */
 .shelfPills {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.3rem;
+  gap: 0.5rem;
   width: 100%;
 }
 
-.shelfOff,
-.shelfOn {
-  flex: 1 1 auto;
-  border-radius: 999px;
-  font: inherit;
-  font-size: 0.7rem;
-  padding: 0.3rem 0.6rem;
-  cursor: pointer;
-}
-
+/* composes wants a single class, so the two are written out. */
 .shelfOff {
-  background: oklch(0% 0 0 / 0.4);
-  border: 1px solid oklch(99% 0 0 / 0.25);
-  color: oklch(99% 0 0 / 0.75);
+  composes: tab from '../ui.module.css';
+  flex: 1 1 auto;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  color: oklch(99% 0 0 / 0.72);
+  text-shadow: 0 1px 6px oklch(0% 0 0 / 0.8);
 }
 
 .shelfOff:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  color: oklch(99% 0 0);
 }
 
 .shelfOn {
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: var(--bg);
+  composes: tab from '../ui.module.css';
+  flex: 1 1 auto;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--accent);
   font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
+  text-shadow: 0 1px 6px oklch(0% 0 0 / 0.8);
+  cursor: default;
 }
 
 /* --- the work: quotes, and the page they were taken on ------------------ */
@@ -1091,9 +1232,10 @@
 }
 
 .quoteColumn {
-  flex: 0 0 15rem;
+  flex: 0 0 clamp(15rem, 24vw, 22rem);
   min-width: 0;
   overflow-y: auto;
+  scrollbar-width: none;
   padding-right: 0.2rem;
 }
 
@@ -1106,12 +1248,22 @@
   gap: 0.7rem;
 }
 
+/* Kept quotes are rows split by hairlines, not boxes (no cards inside
+   cards). */
+.quoteColumn::-webkit-scrollbar,
+.sketchScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.quotes li + li {
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+
 .quotes blockquote {
   margin: 0;
-  padding-left: 0.6rem;
-  border-left: 2px solid var(--accent);
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  font-size: 0.875rem;
+  line-height: 1.55;
   color: var(--ink);
 }
 
@@ -1119,9 +1271,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.15rem;
-  padding-left: 0.6rem;
-  font-size: 0.65rem;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
@@ -1156,18 +1307,18 @@
   }
 }
 
-/* The last entry in the list IS the next quote — one field, not a form. */
+/* The last entry in the list IS the next quote — one field, not a form.
+   The ui field: a dark well whose hairline takes the accent. */
 .quoteNew input {
   width: 100%;
-  background: none;
-  border: 0;
-  border-left: 2px dashed var(--line-bright);
-  border-radius: 0;
+  background: oklch(10% 0 0 / 0.7);
+  border: 1px solid var(--line);
+  border-radius: 10px;
   color: var(--ink);
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.5;
-  padding: 0 0 0 0.6rem;
+  padding: 0.55rem 0.75rem;
 }
 
 .quoteNew input::placeholder {
@@ -1176,7 +1327,7 @@
 
 .quoteNew input:focus {
   outline: none;
-  border-left-color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* --- the sketch --------------------------------------------------------- */
@@ -1197,8 +1348,9 @@
   min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: none;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 /* Full width of the window, and whatever height its own ratio gives — set
@@ -1227,10 +1379,10 @@
 
 .tool,
 .toolOn {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 2.1rem;
+  height: 2.1rem;
   padding: 0;
-  border-radius: 6px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -1247,8 +1399,9 @@
 }
 
 .tool {
-  background: var(--bg);
-  border: 1px solid var(--line);
+  background: none;
+  border: 1px solid var(--line-bright);
+  transition: border-color 0.18s ease;
 }
 
 .tool svg {
@@ -1257,6 +1410,15 @@
 
 .tool:hover:not(:disabled) {
   border-color: var(--accent);
+}
+
+.tool:focus-visible,
+.toolOn:focus-visible,
+.swatch:focus-visible,
+.swatchOn:focus-visible,
+.saveSketch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .tool:hover:not(:disabled) svg {
@@ -1269,7 +1431,7 @@
 }
 
 .toolOn {
-  background: var(--accent-dim);
+  background: none;
   border: 1px solid var(--accent);
 }
 
@@ -1324,15 +1486,20 @@
   cursor: pointer;
 }
 
+/* The site's outlined uppercase button, small enough for the tool rail. */
 .saveSketch {
   background: none;
   border: 1px solid var(--line-bright);
-  border-radius: 6px;
+  border-radius: 10px;
   color: var(--ink);
   font: inherit;
-  font-size: 0.7rem;
-  padding: 0.3rem 0.55rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.45rem 0.6rem;
   cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
 }
 
 .saveSketch:hover:not(:disabled) {
@@ -1348,7 +1515,7 @@
 .sketchStatus {
   margin: 0;
   max-width: 5rem;
-  font-size: 0.6rem;
+  font-size: 0.66rem;
   line-height: 1.3;
   color: var(--muted);
   text-align: center;

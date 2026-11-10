@@ -5,14 +5,25 @@
  * review screen where the buttons move.
  *
  * His pick, 2026-11-10 (redesign page, Cards: A) — a review made for thumbs.
- * Phone layout at 720px and under; the side-by-side split above it. */
+ * Phone layout at 720px and under; the side-by-side split above it.
+ *
+ * DRESSED AS THE PUBLIC SITE, his call, 2026-11-10 (design pass: the public
+ * site's styling, the CRM's desktop layout). Built from app/work/ui.module.css
+ * and the dashboards' tiles (app/work/home/dash.module.css): translucent cards
+ * with a hairline all round, eyebrow labels, heavy tight numbers, one filled
+ * button in the app's colour per view. From 900px the deck list is a
+ * dashboard: tiles, then the decks as a grid of panels.
+ *
+ * DESIGN.md (his rulings, 11 Nov 2026): state is the colour of the words,
+ * never a fill; no filled buttons; 16px cards, 10px controls, 6px marks; a
+ * deck you can press is a `card-link` (the site's hover, work.module.css). */
 
 .decksPage,
 .review {
-  /* Tokens from app/globals.css; gold is the backend's accent, declared here
-     the same way the curriculums page declares it. */
-  --gold: oklch(80% 0.13 85);
-  --red: oklch(70% 0.18 25);
+  /* The app's accent (Learn's blue). --bad keeps its meaning: Again. */
+  --red: var(--bad);
+  /* A finished curriculum's gold is a status colour, not the accent. */
+  --done: oklch(84% 0.12 88);
 }
 
 .decksPage {
@@ -40,7 +51,7 @@
 
 .error {
   margin: 0;
-  color: var(--red, oklch(70% 0.18 25));
+  color: var(--bad);
   font-size: 0.875rem;
 }
 
@@ -53,10 +64,50 @@
   white-space: nowrap;
 }
 
+.face::-webkit-scrollbar {
+  display: none;
+}
+
 .decksPage :is(button, input, select, textarea):focus-visible,
 .review :is(button, input, select, textarea):focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* --- the totals, on a computer -------------------------------------------- */
+
+.tiles {
+  composes: tiles from '../home/dash.module.css';
+}
+
+/* Hidden on a phone, which keeps its list. Raised, so it beats the composed
+   class's display whatever order the two sheets load in. */
+.decksPage .tiles {
+  display: none;
+}
+
+.tile {
+  composes: tile from '../home/dash.module.css';
+}
+
+.tileK {
+  composes: tileK from '../home/dash.module.css';
+}
+
+.tileV {
+  composes: tileV from '../home/dash.module.css';
+}
+
+.tileS {
+  composes: tileS from '../home/dash.module.css';
+}
+
+.dotOn {
+  composes: dotGold from '../home/dash.module.css';
+}
+
+.dotOff {
+  composes: dot from '../home/dash.module.css';
 }
 
 /* --- the decks ---------------------------------------------------------- */
@@ -67,16 +118,7 @@
 }
 
 .heading {
-  margin: 0;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
+  composes: head from '../ui.module.css';
 }
 
 .heading span {
@@ -84,6 +126,12 @@
   text-transform: none;
   letter-spacing: normal;
   font-size: 0.8125rem;
+}
+
+/* Every deck at once: the primary on the list (bordered), when anything is due. */
+.reviewAll {
+  composes: primary from '../ui.module.css';
+  justify-self: start;
 }
 
 .decks {
@@ -96,27 +144,19 @@
   align-content: start;
 }
 
-/* A row in its curriculum's colours. The open button's ::after covers the
-   whole row, so the row is the tap target; the new-a-day box is raised above
-   that layer so it stays typeable. */
+/* A deck is one of the site's cards, and a `card-link` in the TSX for the
+   site's hover. The open button's ::after covers the whole panel, so the
+   panel is the tap target; the new-a-day box is raised above that layer so it
+   stays typeable. */
 .deck {
+  composes: panelLink from '../ui.module.css';
   position: relative;
-  display: grid;
-  gap: 0.35rem;
-  padding: 0.85rem 1rem;
-  border: 1px solid var(--deck, var(--line));
-  border-radius: 12px;
-  background: var(--deck-face, var(--bg-raised));
-  color: var(--deck-ink, var(--ink));
-}
-
-.deck:hover {
-  box-shadow: 0 0 0 1px var(--deck, var(--line-bright));
+  gap: 0.85rem;
 }
 
 .deckOpen {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0;
@@ -124,7 +164,6 @@
   background: none;
   color: inherit;
   font: inherit;
-  font-size: 1.0625rem;
   text-align: left;
   cursor: pointer;
 }
@@ -133,7 +172,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 .deckOpen:focus-visible {
@@ -141,61 +180,110 @@
 }
 
 .deckOpen:focus-visible::after {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
+/* Curriculum names are the one place the site's display face appears. */
 .deckName {
   font-family: var(--font-display);
+  font-size: 1.125rem;
   line-height: 1.25;
 }
 
-/* The one number that matters: how many cards are waiting. */
-.waiting {
+.deckChips {
   flex: none;
-  min-width: 2.25rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  background: var(--deck, var(--gold));
-  color: var(--deck-face, var(--bg));
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.clear {
-  flex: none;
-  opacity: 0.6;
-}
-
-.deckMeta {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  font-size: 0.8125rem;
-  opacity: 0.8;
-}
-
-.deckMeta label {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
 }
 
-.deckMeta input {
-  width: 3.5rem;
-  padding: 0.25rem 0.4rem;
-  border: 1px solid color-mix(in oklch, var(--deck-ink, var(--ink)) 35%, transparent);
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
+.chip {
+  composes: chip from '../ui.module.css';
+}
+
+.chipDone {
+  composes: chip from '../ui.module.css';
+  color: var(--done);
+}
+
+/* The one number that matters: how many cards are waiting. */
+.waiting {
+  composes: chipAccent from '../ui.module.css';
+  min-width: 2.25rem;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.clear {
+  composes: chip from '../ui.module.css';
+  font-size: 0.875rem;
+}
+
+.deckMeta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.counts {
+  margin: 0;
+  display: flex;
+  gap: 1.25rem;
+}
+
+.counts div {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.counts dt {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.counts dd {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.cap {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cap input {
+  width: 3.75rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: oklch(10% 0 0 / 0.7);
+  color: var(--ink);
   font: inherit;
+  font-size: 0.875rem;
+  letter-spacing: normal;
+}
+
+.cap input:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 /* --- one card ----------------------------------------------------------- */
@@ -208,38 +296,52 @@
 .crumb {
   margin: 0;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.75rem;
   font-size: 0.875rem;
 }
 
+/* A quiet text button (ui.module.css .quiet), in the app's colour. */
 .crumb button {
-  padding: 0.25rem 0;
+  margin-left: -8px;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 6px 8px;
   border: 0;
+  border-radius: 6px;
   background: none;
-  color: var(--gold);
   font: inherit;
   cursor: pointer;
 }
 
+.crumb button:hover {
+  color: color-mix(in oklch, var(--accent) 70%, white);
+}
+
 .remaining {
   margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
-  font-size: 0.8125rem;
 }
 
 /* Thin, across the top: how far through this sitting. */
 .bar {
-  height: 3px;
+  height: 4px;
   border-radius: 999px;
-  background: var(--line);
+  background: oklch(100% 0 0 / 0.07);
   overflow: hidden;
 }
 
 .bar i {
   display: block;
   height: 100%;
-  background: var(--gold);
+  border-radius: 999px;
+  background: var(--accent);
   transition: width 240ms ease;
 }
 
@@ -273,17 +375,17 @@
   display: none;
 }
 
-/* Fills its cell, so revealing the answer cannot change its size, while what
-   is INSIDE it is centred vertically rather than pinned to the top. */
+/* One of the site's cards. Fills its cell, so revealing the answer cannot
+   change its size, while what is INSIDE it is centred vertically. */
 .card {
   grid-area: card;
   min-height: 0;
   min-width: 0;
   display: grid;
-  padding: 1.2rem;
+  padding: 1.4rem;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg-raised);
+  border-radius: 16px;
+  background: oklch(16% 0 0 / 0.84);
   /* Up and down still scrolls a long answer; sideways is the swipe. */
   touch-action: pan-y;
   transition:
@@ -300,27 +402,30 @@
 }
 
 .card[data-lean='good'] {
-  border-color: var(--gold);
+  border-color: var(--accent);
 }
 
 .face {
   min-height: 0;
   min-width: 0;
   overflow-y: auto;
+  /* Scrolls a long answer with no bar showing (DESIGN.md). */
+  scrollbar-width: none;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.6rem;
   align-content: center;
   justify-items: center;
   text-align: center;
 }
 
+/* The site's eyebrow, in the app's colour. */
 .prompt {
   margin: 0;
-  font-size: 0.6875rem;
-  font-weight: 500;
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--gold);
+  letter-spacing: 0.2em;
+  color: var(--accent);
 }
 
 /* The front, which is the whole point of the screen, so it is the biggest
@@ -328,6 +433,8 @@
 .front {
   margin: 0;
   font-size: clamp(2.5rem, 9vh, 5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.1;
   text-align: center;
 }
@@ -335,22 +442,27 @@
 /* A sentence is not one word and cannot have one word's size. */
 .frontSentence {
   font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: normal;
   line-height: 1.7;
 }
 
 .reading {
   margin: 0;
   font-size: 1.375rem;
-  color: var(--gold);
+  color: var(--accent);
 }
 
 .meaning {
   margin: 0;
-  font-size: 1.0625rem;
+  font-size: 1.125rem;
   line-height: 1.5;
 }
 
-/* A row of their own, so they never move when the card's middle grows. */
+/* A row of their own, so they never move when the card's middle grows. The
+   site's bordered buttons, large: Show and then Good are the primary in turn
+   (border and words in the app's colour), Again is bordered in --bad. None is
+   filled, and hover changes words and border only. */
 .buttons {
   grid-area: buttons;
   margin: 0;
@@ -360,17 +472,22 @@
 }
 
 .buttons button {
-  min-height: 3rem;
+  min-height: 3.25rem;
   padding: 0.6rem 1.2rem;
   border: 1px solid var(--line-bright);
   border-radius: 10px;
-  background: var(--bg-raised);
+  background: none;
   color: var(--ink);
   font: inherit;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: transform 80ms ease;
+  transition:
+    transform 80ms ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .buttons button:active:not(:disabled) {
@@ -383,45 +500,101 @@
 }
 
 /* Show spans both columns: one thing to press. */
-.reveal {
+.buttons .reveal {
   grid-column: 1 / -1;
 }
 
 .buttons .again {
   border-color: var(--red);
   color: var(--red);
-  background: none;
 }
 
-/* Gold as a surface, for the one thing: the common answer. */
+.buttons .again:hover:not(:disabled) {
+  border-color: color-mix(in oklch, var(--bad) 70%, white);
+  color: color-mix(in oklch, var(--bad) 70%, white);
+}
+
+/* The primary (ui.module.css .primary): the one thing at each moment. */
+.buttons .reveal,
 .buttons .good {
-  border-color: var(--gold);
-  background: var(--gold);
-  color: oklch(22% 0.03 85);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.buttons .reveal:hover:not(:disabled),
+.buttons .good:hover:not(:disabled) {
+  border-color: color-mix(in oklch, var(--accent) 70%, white);
+  color: color-mix(in oklch, var(--accent) 70%, white);
 }
 
 .buttons kbd {
-  margin-left: 0.5rem;
-  padding: 0.05rem 0.3rem;
+  margin-left: 0.6rem;
+  padding: 0.1rem 0.35rem;
   border: 1px solid currentColor;
-  border-radius: 3px;
+  border-radius: 6px;
   font-family: inherit;
-  font-size: 0.75em;
-  font-weight: 400;
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: none;
   opacity: 0.6;
 }
 
+/* Nothing due: a card of its own in the middle. */
 .done {
   flex: 1;
+  align-self: center;
   display: grid;
-  gap: 0.3rem;
+  gap: 0.4rem;
   place-content: center;
   text-align: center;
 }
 
 .done p:first-child {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+/* --- on a computer -------------------------------------------------------- */
+
+/* The CRM's layout (his call, 2026-11-10): tiles across the top, then the
+   decks under one heading with Review all on its right. */
+@media (min-width: 900px) {
+  .decksPage {
+    gap: 1.25rem;
+  }
+
+  .decksPage .tiles {
+    display: grid;
+  }
+
+  .decksBlock {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.9rem 1rem;
+  }
+
+  .decksBlock > .heading {
+    margin: 0;
+    justify-content: flex-start;
+  }
+
+  .decksBlock > .decks {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: 1rem;
+  }
+
+  .reviewAll {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .card {
+    padding: 2rem;
+  }
 }
 
 /* --- on a phone ---------------------------------------------------------- */
@@ -451,7 +624,7 @@
     display: block;
     height: calc(var(--handle) + 5.5rem);
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 16px;
     transition: height 220ms ease;
   }
 
@@ -493,7 +666,7 @@
 
   .buttons button {
     min-height: 3.5rem;
-    font-size: 1.0625rem;
+    font-size: 0.9rem;
   }
 
   /* No keyboard to hint at on a phone. */
@@ -532,8 +705,9 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 10px;
-  background: #16181d;
+  border-radius: 16px;
+  /* The site's card, nearly opaque: stars behind the writing are noise. */
+  background: oklch(15% 0 0 / 0.92);
   /* Nothing scrolls — paging is the viewBox moving — so the browser must not
      try. A finger is read by the pointer handler instead: a swipe between
      sections, or on a phone the pen itself. */
@@ -577,7 +751,7 @@
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--bg-raised);
+  background: oklch(18% 0 0 / 0.92);
   color: var(--muted);
   font: inherit;
   cursor: pointer;
@@ -594,8 +768,8 @@
 }
 
 .toolOn {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .toolLetter {
@@ -633,7 +807,7 @@
 }
 
 .dotHere {
-  background: var(--gold);
+  background: var(--accent);
   opacity: 1;
 }
 
@@ -644,7 +818,8 @@
   min-width: 6rem;
   padding: 0;
   border: 0;
-  border-left: 2px solid var(--gold);
+  outline: 1px dashed var(--accent);
+  outline-offset: 2px;
   background: none;
   color: #e8e6e1;
   font-family: inherit;
@@ -655,66 +830,63 @@
 
 /* --- adding a card by hand ---------------------------------------------- */
 
+/* Folded, it is a quiet line on a phone and a panel of its own on a
+   computer; open, it is a panel everywhere. */
 .addRow {
-  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .addToggle {
-  padding: 0.35rem 0.8rem;
-  border: 1px dashed var(--line-bright);
-  border-radius: 999px;
-  background: none;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.8125rem;
-  cursor: pointer;
+  composes: button from '../ui.module.css';
 }
 
-.addToggle:hover {
-  color: var(--gold);
-  border-color: var(--gold);
+.addHint {
+  display: none;
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 
 .add {
-  display: grid;
+  composes: panel from '../ui.module.css';
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 0.6rem 0.8rem;
+  gap: 0.75rem 0.9rem;
   align-items: end;
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--bg-raised);
 }
 
 .addHead {
+  composes: headAccent from '../ui.module.css';
   grid-column: 1 / -1;
-  margin: 0;
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--gold);
 }
 
 .addHead button {
-  padding: 0;
-  border: 0;
-  background: none;
   color: var(--muted);
-  font: inherit;
-  font-size: 1rem;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 1.1rem;
   cursor: pointer;
+}
+
+.addHead button:hover {
+  color: var(--ink);
 }
 
 .add label {
   display: grid;
-  gap: 0.2rem;
-  font-size: 0.6875rem;
+  gap: 0.35rem;
+  font-size: 0.62rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.2em;
   color: var(--muted);
 }
 
@@ -726,16 +898,23 @@
 .add select,
 .add textarea {
   width: 100%;
-  padding: 0.35rem 0.5rem;
+  padding: 0.55rem 0.7rem;
   border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--bg);
+  border-radius: 10px;
+  background: oklch(10% 0 0 / 0.7);
   color: var(--ink);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   text-transform: none;
   letter-spacing: normal;
   resize: vertical;
+}
+
+.add input:focus,
+.add select:focus,
+.add textarea:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 .addActions {
@@ -745,20 +924,49 @@
   justify-content: flex-end;
 }
 
+/* The site's outlined button (ui.module.css .button): Review all is the
+   primary on this screen. */
 .addActions button {
-  padding: 0.4rem 1.2rem;
-  border: 1px solid var(--gold);
-  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
   background: none;
-  color: var(--gold);
+  color: var(--ink);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
+}
+
+.addActions button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .addActions button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+@media (min-width: 900px) {
+  .addRow {
+    padding: 1.1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: oklch(16% 0 0 / 0.84);
+  }
+
+  .addHint {
+    display: inline;
+  }
+
+  .add {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /* --- the note on a phone ------------------------------------------------- */
@@ -803,6 +1011,6 @@
   }
 
   .dots[data-big] .dotHere::after {
-    background: var(--gold);
+    background: var(--accent);
   }
 }

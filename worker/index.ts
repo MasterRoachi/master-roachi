@@ -2,7 +2,9 @@ import { POLL_ID, pollCandidates } from '../lib/poll';
 import { moveCard, readAccount, type TrelloCreds, whoAmI } from './trello';
 import {
   headCommit,
+  lastChanged,
   listFiles,
+  readDir,
   readFile,
   rebuild,
   slugify,
@@ -916,6 +918,13 @@ async function handle(request: Request, env: Env): Promise<Response> {
           const wanted = url.searchParams.get('path');
 
           if (wanted === null) {
+            // ?texts=1: every file with its text, in one GitHub call rather
+            // than a list and then one read per file (see readDir()). Text
+            // collections only; a binary one has no text to give.
+            if (url.searchParams.get('texts') === '1' && !collection.singleFile && !collection.binary) {
+              return json({ configured: true, files: await readDir(token, collection.dir, collection.exts) }, 200);
+            }
+
             // A single-file collection has nothing to list, so it reports
             // itself as its own only entry and the page needs no special case.
             const files = collection.singleFile
@@ -931,6 +940,13 @@ async function handle(request: Request, env: Env): Promise<Response> {
                 )
                   .flat()
                   .sort((a, b) => a.path.localeCompare(b.path));
+            // ?dates=1: each file's last commit date as `updated`, for a list
+            // that wants newest first (the sketchpad). One more call, for all
+            // of them; a date that cannot be read is simply absent.
+            if (url.searchParams.get('dates') === '1' && !collection.singleFile) {
+              const dates = await lastChanged(token, files.map((file) => file.path)).catch(() => ({}) as Record<string, string>);
+              return json({ configured: true, files: files.map((file) => ({ ...file, updated: dates[file.path] ?? null })) }, 200);
+            }
             return json({ configured: true, files }, 200);
           }
 
@@ -2770,11 +2786,36 @@ async function handle(request: Request, env: Env): Promise<Response> {
           .first();
       };
 
+      /**
+       * The next card from every deck at once (?deck=all, the Learn home's
+       * Review): everything due anywhere, oldest due first, and only then
+       * new cards, a deck at a time in the decks' own order, each within its
+       * own allowance. The same debt-before-choice rule as nextCard().
+       */
+      const nextAny = async () => {
+        const due = await db
+          .prepare(
+            `select ${CARD_COLUMNS} from cards
+              where unlocked_on is not null and state != 0 and due <= ?1
+              order by due, id limit 1`,
+          )
+          .bind(nowIso)
+          .first();
+        if (due) return due;
+        for (const deck of await decksOf()) {
+          const fresh = await nextCard(Number(deck.id));
+          if (fresh) return fresh;
+        }
+        return null;
+      };
+
       try {
         if (request.method === 'GET') {
-          const asked = Number(url.searchParams.get('deck'));
-          const deck = Number.isInteger(asked) && asked > 0 ? asked : null;
-          const card = deck ? ((await nextCard(deck)) ?? null) : null;
+          const asked = url.searchParams.get('deck');
+          const number = Number(asked);
+          const deck = Number.isInteger(number) && number > 0 ? number : null;
+          const card =
+            asked === 'all' ? ((await nextAny()) ?? null) : deck ? ((await nextCard(deck)) ?? null) : null;
           return json(
             {
               configured: true,
@@ -2872,7 +2913,9 @@ async function handle(request: Request, env: Env): Promise<Response> {
             // Ohana, so a review is the same review from either app.
             await db.batch([...writes, ...answerWrites(db, card, rating, now, today)]);
 
-            const following = (await nextCard(card.curriculum_id)) ?? null;
+            // The next card from the same queue this one came from.
+            const following =
+              (body.queue === 'all' ? await nextAny() : await nextCard(card.curriculum_id)) ?? null;
             return json(
               {
                 answered: true,

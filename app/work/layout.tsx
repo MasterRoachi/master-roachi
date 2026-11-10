@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import WorkHeader from '@/components/WorkHeader';
+import WorkHeader, { DeskTitle } from '@/components/WorkHeader';
+import WorkShell from './WorkShell';
 import styles from './work.module.css';
 
 // Everything under /work gets the backend's own header, and the viewport.
@@ -18,8 +19,14 @@ import styles from './work.module.css';
 // /icon.png and /apple-icon.png with its own name and icon (worker/apps.ts), so
 // the one static layout serves three apps. On masterroachi.com itself the
 // manifest is not there, and nothing installs.
+//
+// THE MANIFEST IS FETCHED WITH THE SIGN-IN COOKIE. A browser asks for a
+// manifest without cookies unless its link says crossorigin="use-credentials",
+// and every path on the apps' addresses is behind Access, so the uncredentialed
+// ask got Access's login redirect instead and the phone offered no install.
+// Next's `metadata.manifest` sets that attribute only on Vercel previews, so
+// the link is written here instead; React puts a <link> in the head.
 export const metadata: Metadata = {
-  manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, statusBarStyle: 'black' },
 };
 
@@ -29,9 +36,15 @@ export const viewport: Viewport = {
 
 export default function WorkLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={styles.shell}>
+    <WorkShell>
+      <link rel="manifest" href="/manifest.webmanifest" crossOrigin="use-credentials" />
       <WorkHeader />
-      <div className={styles.content}>{children}</div>
-    </div>
+      {/* The page's column: on a computer the sidebar is beside it and the
+          title above the page; on a phone the title is the header. */}
+      <div className={styles.main}>
+        <DeskTitle />
+        <div className={styles.content}>{children}</div>
+      </div>
+    </WorkShell>
   );
 }

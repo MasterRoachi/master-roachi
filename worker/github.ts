@@ -108,6 +108,99 @@ export async function listFiles(
     .sort((a, b) => a.path.localeCompare(b.path));
 }
 
+/* --- one GraphQL call instead of one REST call per file -------------------
+ *
+ * A collection's list is one REST call and each file another, so a page that
+ * wanted every file's text cost a call per file (the admin home was about 15
+ * on every open). GraphQL hands back a directory's every blob, text included,
+ * in one request; and every file's last commit date in another, as aliased
+ * history lookups. The blob oid is the same sha the REST contents API gives,
+ * so a save from what these return carries the right version.
+ */
+async function graphql<T>(token: string, query: string, variables: Record<string, unknown>): Promise<T> {
+  const response = await fetch(`${API}/graphql`, {
+    method: 'POST',
+    headers: { ...headers(token), 'content-type': 'application/json' },
+    body: JSON.stringify({ query, variables }),
+  });
+  if (!response.ok) throw new Error(`graphql: ${response.status}`);
+  const body = (await response.json()) as { data?: T; errors?: unknown[] };
+  if (body.errors?.length || !body.data) throw new Error('graphql: query refused');
+  return body.data;
+}
+
+/**
+ * Every file of the given extensions in a directory, with its text, by name.
+ * A blob GitHub truncates or calls binary is read on its own instead, so the
+ * text is always the whole file.
+ */
+export async function readDir(token: string, dir: string, exts: readonly string[]): Promise<GitPost[]> {
+  const data = await graphql<{
+    repository: {
+      object: {
+        entries?: { path: string; type: string; object: { oid: string; text: string | null; isTruncated: boolean } }[];
+      } | null;
+    };
+  }>(
+    token,
+    `query($owner: String!, $name: String!, $expr: String!) {
+      repository(owner: $owner, name: $name) {
+        object(expression: $expr) {
+          ... on Tree { entries { path type object { ... on Blob { oid text isTruncated } } } }
+        }
+      }
+    }`,
+    { owner: OWNER, name: REPO, expr: `${BRANCH}:${dir}` },
+  );
+  // A missing directory is an empty collection, as with listFiles().
+  const entries = (data.repository.object?.entries ?? []).filter(
+    (entry) => entry.type === 'blob' && exts.some((ext) => entry.path.endsWith(ext)),
+  );
+  const files = await Promise.all(
+    entries.map((entry) =>
+      entry.object.text !== null && !entry.object.isTruncated
+        ? { path: entry.path, sha: entry.object.oid, text: entry.object.text }
+        : readFile(token, entry.path),
+    ),
+  );
+  return files.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+/**
+ * When each path last changed on the branch, as an ISO date; a path with no
+ * history is left out. Fifty lookups to a request, which keeps each query well
+ * inside GitHub's limits however many sketches there are.
+ */
+export async function lastChanged(token: string, paths: string[]): Promise<Record<string, string>> {
+  const dates: Record<string, string> = {};
+  for (let start = 0; start < paths.length; start += 50) {
+    const chunk = paths.slice(start, start + 50);
+    const lookups = chunk
+      .map((_, i) => `f${i}: history(first: 1, path: $p${i}) { nodes { committedDate } }`)
+      .join('\n');
+    const params = chunk.map((_, i) => `$p${i}: String!`).join(', ');
+    const variables: Record<string, unknown> = { owner: OWNER, name: REPO, ref: `refs/heads/${BRANCH}` };
+    chunk.forEach((path, i) => (variables[`p${i}`] = path));
+    const data = await graphql<{
+      repository: { ref: { target: Record<string, { nodes: { committedDate: string }[] }> } | null };
+    }>(
+      token,
+      `query($owner: String!, $name: String!, $ref: String!, ${params}) {
+        repository(owner: $owner, name: $name) {
+          ref(qualifiedName: $ref) { target { ... on Commit { ${lookups} } } }
+        }
+      }`,
+      variables,
+    );
+    const target = data.repository.ref?.target ?? {};
+    chunk.forEach((path, i) => {
+      const date = target[`f${i}`]?.nodes[0]?.committedDate;
+      if (date) dates[path] = date;
+    });
+  }
+  return dates;
+}
+
 /** One post, with the sha that says which version this is. */
 export async function readFile(token: string, path: string): Promise<GitPost> {
   const response = await fetch(

@@ -1,7 +1,23 @@
 /* A gallery of sketches, and one sketch filling the pane with its tools in a
  * floating pill — his pick, 2026-11-10 (redesign page, Sketchpad: B).
- * Tokens from app/globals.css. Phone first; 720px is where the pill moves
- * from the foot to the top. */
+ *
+ * DRESSED AS THE PUBLIC SITE — his call, 2026-11-10 (design pass: the public
+ * site's styling, the CRM's desktop layout), and to DESIGN.md (his rulings,
+ * 11 Nov 2026). Built from ../ui.module.css: a sketch is one of the site's
+ * cards, pressable, so the TSX gives it `card-link` for the site's hover;
+ * labels are eyebrows; state is the colour of the words, never a fill; and
+ * no button is filled — the one primary per view (+ New on the gallery, Save
+ * on a sketch) is bordered in the app's colour. Phone first; 720px is where the pill moves from the foot to the
+ * top, and 900px (where the sidebar arrives) is where the gallery widens and
+ * an open sketch takes the whole width. */
+
+/* The page's .shell, uncapped on a computer (page.tsx). Two classes, so it
+   outranks the site's own .shell max-width whatever order they load in. */
+@media (min-width: 900px) {
+  .wide:global(.shell) {
+    max-width: none;
+  }
+}
 
 /* --- the gallery -------------------------------------------------------- */
 
@@ -19,27 +35,21 @@
   gap: 1rem;
 }
 
+/* A count as an eyebrow, not a title: the frame already names the tool. */
 .galleryName {
+  composes: head from '../ui.module.css';
+  display: block;
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 600;
 }
 
-/* The one thing to press on the gallery, so it is the gold button. */
+.galleryNote {
+  color: var(--muted-2);
+}
+
+/* The one thing to press on the gallery. */
 .newButton {
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  color: var(--bg);
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 700;
-  padding: 0.45rem 1rem;
-  cursor: pointer;
-}
-
-.newButton:hover {
-  background: color-mix(in oklab, var(--accent) 88%, black);
+  composes: primary from '../ui.module.css';
+  padding: 10px 18px;
 }
 
 .tiles {
@@ -48,25 +58,32 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem 0.75rem;
+  gap: 0.75rem;
 }
 
 @media (min-width: 720px) {
   .tiles {
     grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-    gap: 1.25rem 1rem;
+    gap: 1rem;
   }
 }
 
+/* A computer: a wide grid of bigger cards, as the site's project grid. */
+@media (min-width: 900px) {
+  .tiles {
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: 1.1rem;
+  }
+}
+
+/* One of the site's cards: the picture, then the name and the date. Its
+   hover is the global card-link's (app/work/work.module.css). */
 .tile {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
+  composes: panelLink from '../ui.module.css';
+  gap: 0;
   width: 100%;
-  padding: 0;
-  background: none;
-  border: 0;
-  color: var(--ink);
+  height: 100%;
+  padding: 0.45rem;
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -85,10 +102,8 @@
   display: block;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg-raised);
-  transition: border-color 0.12s ease;
+  border-radius: 10px;
+  background: oklch(10% 0 0 / 0.8);
 }
 
 .thumb img {
@@ -107,27 +122,33 @@
   font-size: 0.75rem;
 }
 
-.tile:hover .thumb {
-  border-color: var(--line-bright);
-}
-
 .tile:focus-visible {
-  outline: none;
-}
-
-.tile:focus-visible .thumb {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
+.tileText {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+  padding: 0.6rem 0.45rem 0.35rem;
+}
+
 .tileName {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   /* The file name is the title, so it reads as one. */
   text-transform: capitalize;
+}
+
+.tileDate {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 /* --- one sketch: the slim bar ------------------------------------------- */
@@ -147,22 +168,27 @@
   gap: 0.5rem;
 }
 
+/* Back: the site's outlined button, square. */
 .iconButton {
   flex: 0 0 auto;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.4rem;
+  height: 2.4rem;
   padding: 0;
   display: grid;
   place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--bg-raised);
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  background: none;
   color: var(--ink);
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .iconButton:hover {
-  border-color: var(--line-bright);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .icon {
@@ -175,40 +201,38 @@
   stroke-linejoin: round;
 }
 
+/* The title, as the site's heavy heading, editable in place. */
 .title {
   flex: 1 1 auto;
   min-width: 0;
   background: none;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--ink);
   font: inherit;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 0.4rem 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  padding: 0.35rem 0.55rem;
 }
 
 .title:hover {
   border-color: var(--line);
 }
 
-.title:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+.title:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: oklch(10% 0 0 / 0.7);
 }
 
 .dirty {
+  composes: chipAccent from '../ui.module.css';
   flex: 0 0 auto;
-  color: var(--accent);
-  background: var(--accent-dim);
-  border-radius: 999px;
-  padding: 0.1rem 0.5rem;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
-/* Save, with the exports under its caret: one gold button in two halves. */
+/* Save, with the exports under its caret: the bordered primary in two
+   halves, the shared border between them as the divider. Never filled. */
 .save {
   position: relative;
   flex: 0 0 auto;
@@ -217,31 +241,37 @@
 
 .saveMain,
 .saveMore {
-  background: var(--accent);
   border: 1px solid var(--accent);
-  color: var(--bg);
+  background: none;
+  color: var(--accent);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .saveMain {
-  border-radius: 999px 0 0 999px;
-  padding: 0.45rem 0.8rem 0.45rem 1rem;
+  border-radius: 10px 0 0 10px;
+  padding: 0.7rem 1rem 0.7rem 1.15rem;
 }
 
 .saveMore {
   display: grid;
   place-items: center;
-  border-radius: 0 999px 999px 0;
-  border-left-color: color-mix(in oklab, var(--accent) 70%, black);
-  padding: 0 0.55rem 0 0.4rem;
+  margin-left: -1px;
+  border-radius: 0 10px 10px 0;
+  padding: 0 0.6rem;
 }
 
 .saveMain:hover:not(:disabled),
 .saveMore:hover {
-  background: color-mix(in oklab, var(--accent) 88%, black);
+  border-color: color-mix(in oklch, var(--accent) 70%, white);
+  color: color-mix(in oklch, var(--accent) 70%, white);
 }
 
 .saveMain:disabled {
@@ -252,31 +282,33 @@
 .menu {
   position: absolute;
   right: 0;
-  top: calc(100% + 0.35rem);
+  top: calc(100% + 0.4rem);
   z-index: 10;
   display: flex;
   flex-direction: column;
-  min-width: 12rem;
-  padding: 0.3rem;
-  background: var(--bg-raised);
-  border: 1px solid var(--line-bright);
-  border-radius: 12px;
+  gap: 2px;
+  min-width: 13rem;
+  padding: 0.35rem;
+  background: oklch(16% 0 0 / 0.97);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px oklch(0% 0 0 / 0.5);
 }
 
 .menu button {
   background: none;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--ink);
   font: inherit;
   font-size: 0.875rem;
   text-align: left;
-  padding: 0.55rem 0.7rem;
+  padding: 0.6rem 0.75rem;
   cursor: pointer;
 }
 
 .menu button:hover:not(:disabled) {
-  background: var(--bg);
+  color: var(--accent);
 }
 
 .menu button:disabled {
@@ -284,11 +316,16 @@
   cursor: default;
 }
 
+/* --bad because it empties the page. Set apart by a hairline. */
 .menu .menuDanger {
   margin-top: 0.2rem;
   border-top: 1px solid var(--line);
-  border-radius: 0 0 8px 8px;
-  color: oklch(70% 0.18 25);
+  border-radius: 0 0 10px 10px;
+  color: var(--bad);
+}
+
+.menu .menuDanger:hover:not(:disabled) {
+  color: color-mix(in oklch, var(--bad) 70%, white);
 }
 
 /* --- one sketch: the page ----------------------------------------------- */
@@ -310,14 +347,18 @@
   scrollbar-width: none;
   container-type: size;
   display: flex;
-  padding-bottom: 4.25rem;
+  padding-bottom: 4.5rem;
 }
 
 @media (min-width: 720px) {
   .scroll {
-    padding-top: 3.75rem;
+    padding-top: 4rem;
     padding-bottom: 0;
   }
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
 }
 
 /* One page, as large as fits: the whole width, or the whole height at 4:3,
@@ -337,13 +378,15 @@
   margin: 0 auto auto;
 }
 
-/* touch-action: none, or a stylus drag scrolls the page instead of drawing. */
+/* The page is dark and nearly solid, so the stars do not read as ink.
+   touch-action: none, or a stylus drag scrolls the page instead of drawing. */
 .surface {
   display: block;
   width: 100%;
   height: auto;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 16px;
+  background: oklch(13% 0 0 / 0.94);
   touch-action: none;
 }
 
@@ -361,7 +404,8 @@
 
 /* --- the floating pill -------------------------------------------------- */
 
-/* At the foot on a phone, where a thumb reaches it. */
+/* At the foot on a phone, where a thumb reaches it. One of the site's cards,
+   floating over the page. */
 .pill {
   position: absolute;
   z-index: 3;
@@ -375,11 +419,12 @@
   gap: 2px;
   width: max-content;
   max-width: calc(100% - 0.5rem);
-  padding: 4px;
-  background: var(--bg-raised);
-  border: 1px solid var(--line-bright);
-  border-radius: 999px;
-  box-shadow: 0 6px 24px oklch(0% 0 0 / 0.45);
+  padding: 5px;
+  background: oklch(16% 0 0 / 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px oklch(0% 0 0 / 0.5);
 }
 
 /* At the top on a computer, under the title — a drawing app's tool bar. */
@@ -388,26 +433,36 @@
     bottom: auto;
     top: 0.25rem;
     gap: 4px;
-    padding: 5px 8px;
+    padding: 6px 10px;
+  }
+}
+
+@media (min-width: 900px) {
+  .pill {
+    gap: 6px;
+    padding: 7px 14px;
   }
 }
 
 .tool,
 .toolOn {
-  width: 2rem;
-  height: 2rem;
+  width: 2.15rem;
+  height: 2.15rem;
   padding: 0;
   display: grid;
   place-items: center;
   border: 1px solid transparent;
-  border-radius: 999px;
+  border-radius: 10px;
   background: none;
-  color: var(--ink);
+  color: var(--muted);
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .tool:hover:not(:disabled) {
-  border-color: var(--line-bright);
+  color: var(--ink);
 }
 
 .tool:disabled {
@@ -416,10 +471,10 @@
 }
 
 /* Which tool is in hand needs to be obvious at a glance — the surface behaves
-   completely differently under each one. */
+   completely differently under each one. Its icon in the app's colour,
+   with a hairline all round in the same; no fill. */
 .toolOn {
-  border-color: var(--accent);
-  background: var(--accent-dim);
+  border-color: color-mix(in oklch, var(--accent) 60%, transparent);
   color: var(--accent);
 }
 
@@ -427,23 +482,31 @@
   width: 1px;
   height: 1.2rem;
   background: var(--line-bright);
-  margin: 0 3px;
+  margin: 0 4px;
 }
 
+/* The ink colours. The one in hand gets a ring a little way out from it. */
 .swatch,
 .swatchOn {
   width: 22px;
   height: 22px;
-  margin: 0 1px;
+  margin: 0 2px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid var(--line-bright);
+  border: 0;
   padding: 0;
+  box-shadow: inset 0 0 0 1px oklch(0% 0 0 / 0.35);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.swatch:hover {
+  transform: scale(1.1);
 }
 
 .swatchOn {
-  border-color: var(--ink);
-  box-shadow: 0 0 0 2px var(--bg-raised), 0 0 0 3px var(--ink);
+  box-shadow:
+    0 0 0 2px oklch(16% 0 0),
+    0 0 0 3.5px var(--ink);
 }
 
 .sizeWrap {
@@ -464,15 +527,17 @@
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.6rem 0.8rem;
-  background: var(--bg-raised);
-  border: 1px solid var(--line-bright);
-  border-radius: 12px;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  background: oklch(16% 0 0 / 0.97);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 18px 50px oklch(0% 0 0 / 0.5);
   color: var(--muted);
   font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.2em;
   white-space: nowrap;
 }
 
@@ -489,7 +554,6 @@
 }
 
 .iconButton:focus-visible,
-.newButton:focus-visible,
 .saveMain:focus-visible,
 .saveMore:focus-visible,
 .menu button:focus-visible,
@@ -498,7 +562,7 @@
 .swatch:focus-visible,
 .swatchOn:focus-visible,
 .sizePop input:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -531,18 +595,30 @@
   padding-top: 1rem;
 }
 
+/* A note from the last action: the accent's words in a hairline of the
+   same, no fill. */
 .message {
   margin: 0;
-  border: 1px solid var(--accent);
-  background: var(--accent-dim);
-  border-radius: 8px;
-  padding: 0.55rem 0.8rem;
+  color: var(--accent);
+  border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
   font-size: 0.8125rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .thumb {
+  .iconButton,
+  .saveMain,
+  .saveMore,
+  .tool,
+  .toolOn,
+  .swatch,
+  .swatchOn {
     transition: none;
+  }
+
+  .swatch:hover {
+    transform: none;
   }
 }
 
@@ -580,5 +656,6 @@
   .surface {
     border: 0;
     width: 100%;
+    background: none;
   }
 }

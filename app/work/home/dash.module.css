@@ -1,0 +1,338 @@
+/* The three homes on a computer: dashboards after the CRM's (his call,
+   2026-11-10: "the dashboard like layout of the newest clients preview ... is
+   the kind of layout i want for desktop"). A row of number tiles, then two
+   columns of panels: what needs him on the wide left, the rest on the right.
+
+   DRESSED AS THE PUBLIC SITE (his call, 2026-11-10; the spec is DESIGN.md):
+   tiles and panels are the site's cards, translucent over the starfield with
+   a hairline all round and 16px corners. A tile is a link, so its element
+   also carries `card-link` for the site's hover; a panel does not move.
+   Rows inside a panel are split by hairlines, not boxed, and a row answers
+   by the colour of its words.
+
+   Shown from 900px, where the sidebar arrives; under that each home is the
+   phone layout in home.module.css, and only one of the two is displayed. */
+
+.phone {
+  display: contents;
+}
+
+.dash {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .phone {
+    display: none;
+  }
+
+  .dash {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    align-content: start;
+  }
+}
+
+/* --- tiles --------------------------------------------------------------- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-width: 0;
+  height: 100%;
+  padding: 1rem 1.15rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.84);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+a.tile:focus-visible,
+.row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tileK {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dot,
+.dotGold,
+.dotBad,
+.dotOk {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-bright);
+}
+
+.dotGold {
+  background: var(--accent);
+}
+
+.dotBad {
+  background: var(--bad);
+}
+
+.dotOk {
+  background: var(--ok);
+}
+
+.tileV {
+  margin-top: 0.2rem;
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  font-variant-numeric: tabular-nums;
+}
+
+.tileVBad {
+  composes: tileV;
+  color: var(--bad);
+}
+
+.tileS {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* --- panels -------------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  }
+}
+
+.col {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.panel {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 1.1rem 1.15rem 1.2rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.84);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.head a {
+  color: inherit;
+  text-decoration: none;
+  letter-spacing: normal;
+  text-transform: none;
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.head a:hover {
+  color: var(--ink);
+}
+
+.empty {
+  margin: 0.2rem 0;
+  color: var(--muted);
+}
+
+.rows {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A line in a panel: a dot, what it is with a line under it, and a note on
+   the right. No box (no cards inside cards): a hairline between rows, and a
+   pressable row answers by its title's colour. */
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.25rem;
+  background: none;
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.rows > li + li > .row {
+  border-top: 1px solid var(--line);
+}
+
+a.row:hover,
+button.row:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+/* A habit to tick: a row that is a button. */
+button.row {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.row:disabled {
+  cursor: default;
+}
+
+.rowText {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.rowText b {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowText span {
+  font-size: 0.85rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note,
+.noteBad,
+.noteGold {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.noteBad {
+  color: var(--bad);
+}
+
+.noteGold {
+  color: var(--accent);
+}
+
+/* A count against a bar, as the CRM's pipeline. */
+.bars {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.3rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: minmax(0, 9rem) 1fr 2.5rem;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bar a {
+  color: var(--ink);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar a:hover {
+  color: var(--accent);
+}
+
+.track {
+  height: 6px;
+  border-radius: 999px;
+  background: oklch(100% 0 0 / 0.07);
+  overflow: hidden;
+}
+
+.track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.barN {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one gold thing on a dashboard. */
+/* The one thing on a dashboard: the site's bordered button in the app's
+   colour. Never filled (his ruling, 11 Nov). */
+.gold {
+  justify-self: start;
+  margin-top: 0.3rem;
+  padding: 10px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: none;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.gold:hover {
+  border-color: color-mix(in oklch, var(--accent) 70%, white);
+  color: color-mix(in oklch, var(--accent) 70%, white);
+}
+
+.gold:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

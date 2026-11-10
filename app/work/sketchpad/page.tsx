@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { pageMeta } from '@/lib/seo';
 import Sketchpad from './Sketchpad';
+import styles from './sketchpad.module.css';
 
 // One page to write and draw on, saved as one file.
 //
@@ -17,7 +18,10 @@ export const metadata: Metadata = pageMeta({
 
 export default function WorkScratchpadPage() {
   return (
-    <div className="shell">
+    // The whole width of the pane on a computer, not the site's content
+    // width: a page to draw on wants all of it (his call, 2026-11-10, design
+    // pass: the public site's styling, the CRM's desktop layout).
+    <div className={`shell ${styles.wide}`}>
       <Sketchpad />
     </div>
   );

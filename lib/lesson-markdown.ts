@@ -1,7 +1,7 @@
 // Parsing a lesson's Markdown into blocks — the part worth testing.
 //
-// The rendering lives in app/work/curriculums/Curriculums.tsx, which is a
-// client component and cannot be imported here. This is only the reading of
+// The rendering lives in components/LessonMarkdown.tsx, which is a React
+// component and has no place here. This is only the reading of
 // the text: where a block starts and ends, and whether it is a table.
 //
 // It is in lib/ because this subset is the CEILING ON WHAT A LESSON CAN TEACH.

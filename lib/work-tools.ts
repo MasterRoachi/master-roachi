@@ -55,6 +55,13 @@ export interface WorkApp {
   host: string;
   /** Its doors page, where the installed app opens. */
   home: string;
+  /**
+   * The app's colour, as each section of the public site has its own (his
+   * call, 2026-11-10: the backend takes the site's design). It becomes the
+   * accent on every page of the app: Admin the site's gold, Learn the blue of
+   * Thoughts, Tools the teal of Hire me.
+   */
+  accent: string;
   tools: WorkTool[];
   /**
    * The /work/api endpoints (and the two older private routes) this app's
@@ -79,6 +86,7 @@ export const WORK_APPS: WorkApp[] = [
     what: 'The site, the shop and the business.',
     host: 'admin.masterroachi.com',
     home: '/work/',
+    accent: 'oklch(82% 0.16 85)',
     tools: [
       { key: 'shop', href: '/work/shop/', name: 'Shop', what: 'Orders, and what each design is in your own words.' },
       { key: 'projects', href: '/work/projects/', name: 'Projects', what: 'The project pages behind /projects.' },
@@ -109,6 +117,7 @@ export const WORK_APPS: WorkApp[] = [
     what: 'Everything being studied.',
     host: 'learn.masterroachi.com',
     home: '/work/learn/',
+    accent: 'oklch(74% 0.15 250)',
     tools: [
       { key: 'curriculums', href: '/work/curriculums/', name: 'Curriculums', what: 'What is being studied, and how far through it you are.' },
       { key: 'cards', href: '/work/cards/', name: 'Cards', what: 'What needs reviewing, and nothing else.' },
@@ -132,6 +141,7 @@ export const WORK_APPS: WorkApp[] = [
     what: 'Your own tools for the day.',
     host: 'tools.masterroachi.com',
     home: '/work/tools/',
+    accent: 'oklch(80% 0.12 190)',
     tools: [
       { key: 'habits', href: '/work/habits/', name: 'Habits', what: 'What got done, and what did not.' },
       { key: 'sketchpad', href: '/work/sketchpad/', name: 'Sketchpad', what: 'Write and draw on one page. Saved as one file.' },

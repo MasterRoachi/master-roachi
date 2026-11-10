@@ -6,9 +6,16 @@ import styles from '../collection.module.css';
 //
 // His pick, 2026-11-10 (redesign page, Projects and Writing: A): the list
 // stays the first screen, and a card no longer opens in place: it opens the
-// entry full screen (CollectionEditor). Gold where something on it would be
-// flagged if opened. Projects keep ↑ and ↓, saved as one commit with Save
-// order; Writing keeps its Drafts / Published / All pills.
+// entry full screen (CollectionEditor). Projects keep ↑ and ↓, saved as one
+// commit with Save order; Writing keeps its Drafts / Published / All pills.
+//
+// His call, 2026-11-10 (design pass: the public site's styling, the CRM's
+// desktop layout): on a phone each entry is one of the site's cards, with the
+// site's hover (the global card-link); from 900px the list is the narrow left
+// column beside the open entry, its entries rows split by hairlines and the
+// open one in accent words in an accent ring. An entry with something to fix
+// says its count in an accent chip. State is the colour of the words, never a
+// fill or a side stripe (DESIGN.md, his rulings, 11 Nov 2026).
 
 export interface Summary {
   path: string;
@@ -42,6 +49,7 @@ export default function EntryList({
   today,
   status,
   onOpen,
+  openPath,
 }: {
   noun: string;
   canCreate: boolean;
@@ -64,6 +72,8 @@ export default function EntryList({
   today: string;
   status: string | null;
   onOpen: (path: string) => void;
+  /** The entry open beside the list ('' for a new one), or null for none. */
+  openPath: string | null;
 }) {
   return (
     <div className={styles.page}>
@@ -125,9 +135,19 @@ export default function EntryList({
         {!draftViews && shown.length === 0 && <p className={styles.message}>No {noun}s yet.</p>}
 
         {shown.map((entry, index) => (
-          <section key={entry.path} className={styles.card} data-waiting={entry.problems > 0 || undefined}>
+          <section
+            key={entry.path}
+            className={`${styles.card} card-link`}
+            data-waiting={entry.problems > 0 || undefined}
+            data-open={entry.path === openPath || undefined}
+          >
             <div className={styles.cardHeadRow}>
-              <button type="button" className={styles.cardHead} onClick={() => onOpen(entry.path)}>
+              <button
+                type="button"
+                className={styles.cardHead}
+                aria-current={entry.path === openPath || undefined}
+                onClick={() => onOpen(entry.path)}
+              >
                 <span className={styles.cardName}>{entry.title}</span>
                 <span className={styles.cardFacts}>
                   {[entry.kind ?? entry.track, entry.status].filter(Boolean).join(' · ')}

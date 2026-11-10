@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { appForPath, toolFor, WORK_APPS } from '@/lib/work-tools';
+import { appForPath, toolFor, WORK_APPS, type ToolKey, type WorkApp } from '@/lib/work-tools';
 import DoorIcon, { AppIcon } from '@/app/work/DoorIcon';
+import { COUNTS } from '@/app/work/home/sources';
+import Logo from '@/components/Logo';
 import styles from './WorkHeader.module.css';
 
 // The backend's own header, and all the chrome it has.
@@ -23,6 +25,14 @@ import styles from './WorkHeader.module.css';
 // Moving to another app is a plain <a>: on the apps' own addresses that page
 // belongs to another origin (worker/apps.ts forwards it), and next/link would
 // try to prefetch it from this one.
+//
+// A SIDEBAR ON A COMPUTER (his call, 2026-11-10: "the dashboard like layout of
+// the newest clients preview ... is the kind of layout i want for desktop").
+// From 900px the title button and its doors give way to a fixed sidebar the
+// way the CRM has one: the app's name, Dashboard, each tool with the count of
+// what is waiting behind it, and the other apps at the foot. The page's own
+// title then sits above the page (DeskTitle below). The phone keeps the title
+// button; the two are drawn from one component and CSS shows one of them.
 
 export default function WorkHeader() {
   const path = usePathname();
@@ -54,6 +64,8 @@ export default function WorkHeader() {
   }, [open]);
 
   return (
+    <>
+    <SideNav app={app} here={here?.key ?? null} atHome={!here} />
     <header className={styles.header}>
       <button
         ref={button}
@@ -116,5 +128,157 @@ export default function WorkHeader() {
         </ul>
       </nav>
     </header>
+    </>
+  );
+}
+
+/** The counts beside the tools, read once per page from home/sources.ts. */
+function useCounts(app: WorkApp): Partial<Record<ToolKey, number>> {
+  const [counts, setCounts] = useState<Partial<Record<ToolKey, number>>>({});
+  useEffect(() => {
+    let alive = true;
+    for (const tool of app.tools) {
+      const count = COUNTS[tool.key];
+      if (!count) continue;
+      void count()
+        .catch(() => null)
+        .then((n) => {
+          if (alive && n !== null) setCounts((was) => ({ ...was, [tool.key]: n }));
+        });
+    }
+    return () => {
+      alive = false;
+    };
+  }, [app]);
+  return counts;
+}
+
+/** Late is red, as the Boards page has it; every other count is plain. */
+const RED: ToolKey[] = ['boards'];
+
+/**
+ * The nav sheens, in DESIGN.md's order: each link in the sidebar lights in
+ * its own colour, as the site's nav does (his ruling, 11 Nov). Decoration
+ * only; state is the app's --accent and the meaning colours.
+ */
+const SHEENS = [
+  'oklch(97% 0 0)',
+  'oklch(86% 0.2 135)',
+  'oklch(84% 0.16 92)',
+  'oklch(72% 0.26 350)',
+  'oklch(74% 0.15 250)',
+  'oklch(80% 0.12 190)',
+  'oklch(76% 0.17 55)',
+];
+const sheen = (at: number) => ({ '--sheen': SHEENS[at % SHEENS.length] }) as CSSProperties;
+
+/** Where the pointer is over a link, for the sheen's light (Nav.tsx's way). */
+function trackSheen(event: ReactPointerEvent<HTMLElement>) {
+  const el = event.currentTarget;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', `${event.clientX - r.left}px`);
+  el.style.setProperty('--my', `${event.clientY - r.top}px`);
+}
+
+function SideNav({ app, here, atHome }: { app: WorkApp; here: ToolKey | null; atHome: boolean }) {
+  const counts = useCounts(app);
+  const others = WORK_APPS.filter((candidate) => candidate.key !== app.key);
+  return (
+    <aside className={styles.side}>
+      {/* The brand block (DESIGN.md, the frame): the mark, the app's own name
+          in the wordmark face, and "Master Roachi ↗" under it, back to the
+          public site. The same block as the CRM's and Kame's. */}
+      <a className={styles.brand} href="https://masterroachi.com/" title="masterroachi.com">
+        <Logo size={30} />
+        <span className={styles.brandText}>
+          <span className={styles.wordmark}>{app.name}</span>
+          <span className={styles.brandBack}>Master Roachi ↗</span>
+        </span>
+      </a>
+      <nav aria-label={app.name}>
+        <ul className={styles.sideList}>
+          <li>
+            <Link href={app.home} aria-current={atHome ? 'page' : undefined} style={sheen(0)} onPointerMove={trackSheen}>
+              <span className={styles.sheen}>Dashboard</span>
+            </Link>
+          </li>
+          {app.tools.map((tool, at) => {
+            const n = counts[tool.key];
+            const badge = n ? (
+              <span className={RED.includes(tool.key) ? styles.countBad : styles.count}>{n}</span>
+            ) : null;
+            return (
+              <li key={tool.key}>
+                {tool.outside ? (
+                  <a href={tool.href} style={sheen(at + 1)} onPointerMove={trackSheen}>
+                    <span className={styles.sheen}>{tool.name} ↗</span>
+                  </a>
+                ) : (
+                  <Link
+                    href={tool.href}
+                    aria-current={here === tool.key ? 'page' : undefined}
+                    style={sheen(at + 1)}
+                    onPointerMove={trackSheen}
+                  >
+                    <span className={styles.sheen}>{tool.name}</span>
+                    {badge}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+      <ul className={styles.sideApps}>
+        {others.map((other) => (
+          <li key={other.key}>
+            <a href={other.home}>
+              <AppIcon app={other.key} />
+              <span>{other.name}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+}
+
+/**
+ * The page's title on a computer, above the page: the site's page header
+ * (see the return), with the date on the right as the CRM has it. On a dashboard the line is how much needs him across the app's
+ * tools (the sidebar's counts added up); on a tool it is what the tool is for.
+ * Hidden on a phone, where the header is the title.
+ */
+export function DeskTitle() {
+  const path = usePathname();
+  const app = appForPath(path) ?? WORK_APPS[0];
+  const here = toolFor(path);
+  const counts = useCounts(app);
+  const [today, setToday] = useState('');
+  // The date is the browser's, so it is read after mount: the page is built
+  // once, ahead of time, and a date baked into it would be the build's.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- read once, from the clock.
+    setToday(new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }));
+  }, []);
+  const waiting = Object.values(counts).reduce((sum, n) => sum + (n ?? 0), 0);
+  // The page head (DESIGN.md, the frame): the eyebrow in the app's colour,
+  // the title in heavy Archivo and a line under it, as the CRM and Kame
+  // have it. No icon above, so the three read the same.
+  return (
+    <div className={styles.desk}>
+      <div>
+        <p className={`eyebrow ${styles.deskEyebrow}`}>{app.name}</p>
+        <h1 className={styles.deskName}>{here?.name ?? 'Dashboard'}</h1>
+        {here ? (
+          <p className={styles.deskLine}>{here.what}</p>
+        ) : waiting > 0 ? (
+          <p className={styles.deskWaiting}>{waiting} need you now</p>
+        ) : (
+          <p className={styles.deskLine}>{app.what}</p>
+        )}
+      </div>
+      <p className={styles.deskDate}>{today}</p>
+    </div>
   );
 }

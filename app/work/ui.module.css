@@ -1,0 +1,332 @@
+/* The backend's building blocks, in the public site's dress (his call,
+   2026-11-10: "look at the site masterroachi.com ... its design and styling
+   should be applied here").
+
+   Every tool page builds from these, with `composes: panel from
+   '../ui.module.css'` or by importing the classes, so the nine pages read as
+   one site. Tokens are app/globals.css's; --accent is the APP's colour, set by
+   app/work/WorkShell.tsx (Admin gold, Learn blue, Tools teal).
+
+   THE SPEC IS DESIGN.md at the repo root (his rulings, 11 Nov 2026), shared
+   with the CRM and Kame. In short:
+   - A card is translucent over the starfield with a hairline all round and
+     16px corners. One you can press also carries the global class
+     `card-link` (in the TSX), which gives it the site's hover: tilt, light,
+     lift (app/work/work.module.css, WorkShell.tsx). A .panel never moves.
+   - No cards inside cards: rows inside a card are split by hairlines.
+   - State is the colour of the words, never a tinted fill.
+   - Buttons are bordered spaced capitals, never filled; the primary one is
+     in the app's colour. Hover changes text and border, not background.
+   - --ok, --warn and --bad are meaning only. */
+
+/* --- surfaces ------------------------------------------------------------- */
+
+.panel {
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 1.1rem 1.15rem 1.2rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.84);
+}
+
+/* A panel that is itself a link or a button. Give its element the global
+   class `card-link` as well, for the site's hover (see the head comment). */
+.panelLink {
+  composes: panel;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* A line inside a panel. No box of its own (no cards inside cards): rows
+   are split by a hairline, and a pressable one answers by its text. */
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 0.25rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.row + .row,
+li + li > .row {
+  border-top: 1px solid var(--line);
+}
+
+a.row,
+button.row {
+  cursor: pointer;
+}
+
+a.row:hover,
+button.row:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+/* The selected row, where a detail is open beside the list: its text in the
+   accent and a hairline all round, never a fill. */
+.rowOn {
+  composes: row;
+  color: var(--accent);
+  border-radius: 10px;
+  padding-inline: 0.75rem;
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 55%, transparent);
+}
+
+.rowOn + .row,
+li + li > .rowOn,
+li:has(> .rowOn) + li > .row {
+  border-top-color: transparent;
+}
+
+/* --- type ------------------------------------------------------------------ */
+
+/* The site's eyebrow, as a panel heading with an optional note on the right. */
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.headAccent {
+  composes: head;
+  color: var(--accent);
+}
+
+/* A heading inside a page: heavy and tight, as the site's section titles. */
+.title {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.empty {
+  margin: 0.2rem 0;
+  color: var(--muted);
+}
+
+/* A big number, as the dashboards' tiles. */
+.figure {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- controls -------------------------------------------------------------- */
+
+/* The one thing: the site's bordered button in the app's colour. Never
+   filled (his ruling, 11 Nov). */
+.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 10px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary:hover:not(:disabled) {
+  border-color: color-mix(in oklch, var(--accent) 70%, white);
+  color: color-mix(in oklch, var(--accent) 70%, white);
+}
+
+/* The site's outlined button (globals.css .button), slightly smaller. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 10px 18px;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Text that acts: no box until hovered. */
+.quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.quiet:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.primary:disabled,
+.button:disabled,
+.quiet:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.primary:focus-visible,
+.button:focus-visible,
+.quiet:focus-visible,
+.row:focus-visible,
+.panelLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* A status pill: coloured words and a hairline in the same colour, no fill.
+   Plain, the accent for "needs you", --bad for late or broken, --ok for done. */
+.chip,
+.chipAccent,
+.chipBad,
+.chipOk {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.1rem 0.55rem;
+  border: 1px solid color-mix(in oklch, currentColor 40%, transparent);
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: none;
+  color: var(--muted);
+}
+
+.chipAccent {
+  color: var(--accent);
+}
+
+.chipBad {
+  color: var(--bad);
+}
+
+.chipOk {
+  color: var(--ok);
+}
+
+/* Tabs as the site's nav: small muted words, the current one in the accent
+   and underlined. No track, no fill. */
+.tabs {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.tab {
+  padding: 0.45rem 0.4rem;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tab[aria-selected='true'],
+.tab[aria-current='page'] {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
+}
+
+/* Inputs: a dark well with a hairline that takes the accent on focus. */
+.field {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: oklch(10% 0 0 / 0.7);
+  color: var(--ink);
+  font: inherit;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* --- layout on a computer --------------------------------------------------- */
+
+/* A list on the left and the thing it opens on the right (from 900px, where
+   the sidebar arrives). Under that it is one column. */
+.split {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  }
+
+  /* The open thing stays in view while the list scrolls. */
+  .stick {
+    position: sticky;
+    top: 0;
+  }
+}

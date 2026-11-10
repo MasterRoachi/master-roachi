@@ -2,8 +2,22 @@
    with their picture in the store's order, a gold ! on any without a
    description, and the editor in place of the grid once one is opened — one
    column on a phone, two from 900px. Save is in a bar stuck to the foot of
-   the pane. Gold only for what waits on him and for Save while there is
-   something to save. Tokens from app/globals.css. */
+   the pane. The accent only for what waits on him and for Save while there
+   is something to save. Tokens from app/globals.css.
+
+   DRESSED AS THE PUBLIC SITE, his call, 2026-11-10 (design pass: the public
+   site's styling, the CRM's desktop layout), in ui.module.css's language:
+   each product a translucent panel with a hairline all round (the accent's
+   for one that needs words, never a side stripe), eyebrow labels, the site's
+   outlined uppercase buttons, dark-well inputs. On a computer the grid is
+   wider, and the open product is the fields in one panel with what the page
+   will say in a second beside it.
+
+   And to DESIGN.md (his rulings, 11 Nov 2026): state is the colour of the
+   words, never a fill; no filled buttons, Save included; 16px cards, 10px
+   controls; nothing boxed inside a panel. A product tile carries the global
+   `card-link` (StoreCopyEditor.tsx) for the site's card hover, so it has no
+   hover of its own here. */
 
 .products {
   flex: 1 0 auto;
@@ -24,7 +38,10 @@
 
 .counts {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
@@ -43,19 +60,50 @@
   font-weight: 600;
 }
 
-.pill {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+/* The site's outlined button, as ui.module.css's .button. */
+.pill,
+.back,
+.previewOpen,
+.asideToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 10px 18px;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  background: none;
   color: var(--ink);
-  padding: 0.45rem 1.1rem;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
-.pill:hover:not(:disabled) {
+.pill:hover:not(:disabled),
+.back:hover,
+.previewOpen:hover,
+.asideToggle:hover {
   border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pill:focus-visible,
+.back:focus-visible,
+.previewOpen:focus-visible,
+.asideToggle:focus-visible,
+.product:focus-visible,
+.tile:focus-visible,
+.save:focus-visible,
+.move button:focus-visible,
+.pagePreviewTools button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .pill:disabled {
@@ -82,9 +130,9 @@
 }
 
 .hint {
-  margin: 1rem 0 0;
-  font-size: 0.75rem;
-  color: var(--muted-2);
+  margin: 0 0 1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
   text-align: center;
 }
 
@@ -92,7 +140,7 @@
 
 .tiles {
   list-style: none;
-  margin: 0;
+  margin: 0 0 1rem;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -103,6 +151,13 @@
   .tiles {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
+  }
+}
+
+/* A computer: wider panels, so a picture reads at a glance. */
+@media (min-width: 900px) {
+  .tiles {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   }
 }
 
@@ -119,29 +174,27 @@
   border-color: var(--accent);
 }
 
+/* ui.module.css's .panelLink; the hover is the global card-link's. */
 .product {
   display: grid;
-  gap: 0.25rem;
+  gap: 0.3rem;
   width: 100%;
   height: 100%;
   align-content: start;
-  background: var(--bg-raised);
+  background: oklch(16% 0 0 / 0.84);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 16px;
   color: var(--ink);
-  padding: 0.5rem 0.5rem 0.75rem;
+  padding: 0.6rem 0.6rem 0.85rem;
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s ease;
 }
 
-.product:hover {
-  border-color: var(--line-bright);
-}
-
+/* Waits on him: an accent hairline all the way round, with its words in the
+   accent below. */
 .product[data-waiting] {
-  box-shadow: inset 3px 0 0 var(--accent);
+  border-color: color-mix(in oklch, var(--accent) 55%, var(--line));
 }
 
 .thumb {
@@ -149,8 +202,7 @@
   place-items: center;
   aspect-ratio: 1;
   margin-bottom: 0.35rem;
-  border-radius: 8px;
-  background: var(--bg);
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -163,7 +215,7 @@
 
 .thumbEmpty {
   font-size: 0.75rem;
-  color: var(--muted-2);
+  color: var(--muted);
 }
 
 .productName {
@@ -172,8 +224,9 @@
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0 0.25rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .productName > span:first-child {
@@ -189,9 +242,9 @@
   place-items: center;
   width: 1.25rem;
   height: 1.25rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--bg);
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  color: var(--accent);
   font-size: 0.8125rem;
   font-weight: 800;
 }
@@ -206,7 +259,7 @@
 .productState,
 .productStateGold {
   padding: 0 0.25rem;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--muted);
 }
 
@@ -224,8 +277,9 @@
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border-radius: 8px;
-  background: color-mix(in oklch, var(--bg) 80%, transparent);
+  z-index: 1;
+  border-radius: 6px;
+  background: oklch(14% 0 0 / 0.8);
   border: 1px solid var(--line);
   cursor: grab;
   touch-action: none;
@@ -256,27 +310,15 @@
   margin: 0 0 1rem;
 }
 
-.back {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink);
-  padding: 0.4rem 0.9rem;
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.back:hover {
-  border-color: var(--accent);
-}
-
+/* Heavy and tight, as the site's headings (ui.module.css's .title). */
 .editorName {
   flex: 1;
   min-width: 0;
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
 }
 
 .moveAt {
@@ -292,6 +334,8 @@
   grid-template-columns: 1fr;
   gap: 1.5rem;
   align-items: start;
+  /* Room above the Save bar. */
+  margin-bottom: 1rem;
 }
 
 .cardMain {
@@ -310,31 +354,28 @@
 .asideToggle {
   width: 100%;
   margin-top: 0.75rem;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--ink);
-  padding: 0.65rem 0.8rem;
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
 }
 
-.asideToggle:hover {
-  border-color: var(--accent);
-}
-
+/* A computer: the fields are one panel and what the page will say a second
+   beside them, as the dashboards' columns. */
 @media (min-width: 900px) {
   .cardBody {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+    gap: 1rem;
+  }
+
+  .cardMain {
+    padding: 1.1rem 1.15rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: oklch(16% 0 0 / 0.84);
   }
 
   .aside,
   .aside[data-shown] {
     display: grid;
     position: sticky;
-    top: 1rem;
+    top: 0;
   }
 
   .asideToggle {
@@ -354,6 +395,8 @@
 
 /* --- Save, stuck to the foot of the pane --------------------------------- */
 
+/* A panel of its own at the foot, translucent over the sky, rather than a
+   band of page colour across it. */
 .saveBar {
   position: sticky;
   bottom: 0;
@@ -362,8 +405,12 @@
   align-items: center;
   gap: 1rem;
   margin-top: auto;
-  padding: 0.75rem 0 calc(0.25rem + env(safe-area-inset-bottom));
-  background: linear-gradient(to bottom, transparent, var(--bg) 0.75rem);
+  margin-bottom: env(safe-area-inset-bottom);
+  padding: 0.6rem 0.6rem 0.6rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: oklch(14% 0 0 / 0.92);
+  backdrop-filter: blur(8px);
 }
 
 .saveNote {
@@ -375,25 +422,33 @@
   color: var(--muted);
 }
 
+/* The site's bordered button: faint with nothing to save, in the accent
+   while there is something (ui.module.css's .primary), and only then. Never
+   filled (his ruling, 11 Nov 2026). */
 .save {
   flex: none;
   min-width: 7rem;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
+  background: none;
+  border: 1px solid var(--line-bright);
   border-radius: 10px;
   color: var(--ink);
-  padding: 0.7rem 1.4rem;
+  padding: 10px 18px;
   font: inherit;
-  font-size: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
-/* Gold while there is something to save, and only then. */
 .save:not(:disabled) {
-  background: var(--accent);
   border-color: var(--accent);
-  color: var(--bg);
-  font-weight: 700;
+  color: var(--accent);
+}
+
+.save:hover:not(:disabled) {
+  border-color: color-mix(in oklch, var(--accent) 70%, white);
+  color: color-mix(in oklch, var(--accent) 70%, white);
 }
 
 .save:disabled {
@@ -403,9 +458,10 @@
 
 .dirty {
   margin-right: 0.6rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.2em;
   color: var(--accent);
 }
 
@@ -422,9 +478,11 @@
   display: grid;
   gap: 0.3rem;
   padding: 0;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  /* Inside the editor's panel, so no fill of its own: the picture and its
+     label, with a hairline that takes the accent on hover. */
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
   color: var(--muted);
@@ -435,6 +493,7 @@
 
 .tile:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .tile img {
@@ -470,12 +529,12 @@
 .plus {
   width: 2.4rem;
   height: 2.4rem;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--bg-raised);
+  border-radius: 50%;
+  border: 1px solid var(--line-bright);
+  background: none;
   display: grid;
   place-items: center;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.18s ease;
 }
 
 .plus svg {
@@ -505,9 +564,9 @@
   /* Room to see a whole description at once rather than three lines of one.
      Still resizable, so a long one can be dragged taller. */
   min-height: 18rem;
-  background: var(--bg-raised);
+  background: oklch(10% 0 0 / 0.7);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--ink);
   padding: 0.75rem;
   font: inherit;
@@ -525,8 +584,8 @@
 }
 
 .productText:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--accent);
 }
 
 /* One labelled box per field. The description keeps the tall box; the rest
@@ -538,26 +597,27 @@
 
 .fieldName {
   display: block;
-  margin-bottom: 0.3rem;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  margin-bottom: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
 .line {
   width: 100%;
-  background: var(--bg-raised);
+  background: oklch(10% 0 0 / 0.7);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--ink);
   padding: 0.55rem 0.75rem;
   font: inherit;
 }
 
 .line:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--accent);
 }
 
 .productText.short {
@@ -577,9 +637,9 @@
 }
 
 .move button {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
   color: var(--ink);
   width: 2.25rem;
   height: 2.25rem;
@@ -589,6 +649,7 @@
 
 .move button:hover:not(:disabled) {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .move button:disabled {
@@ -619,20 +680,22 @@
 }
 
 /* The right-hand column: the search result, then the page. */
+/* A panel, as ui.module.css's. */
 .preview {
-  background: var(--bg-raised);
+  background: oklch(16% 0 0 / 0.84);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 1rem;
+  border-radius: 16px;
+  padding: 1.1rem 1.15rem 1.2rem;
 }
 
+/* The site's eyebrow. */
 .previewHead {
   margin: 0 0 0.6rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.2em;
   color: var(--muted);
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .preview h3.previewHead {
@@ -683,7 +746,7 @@
   place-content: center;
   gap: 1rem;
   padding: 2rem;
-  background: color-mix(in oklch, var(--bg) 92%, black);
+  background: oklch(8% 0 0 / 0.94);
   cursor: zoom-out;
 }
 
@@ -707,18 +770,11 @@
   font-size: 0.75rem;
 }
 
-/* The real product page in a frame (PagePreview.tsx). */
+/* The real product page in a frame (PagePreview.tsx). An outlined button,
+   as Save is the one filled one. */
 .previewOpen {
   width: 100%;
   margin-top: 0.9rem;
-  background: var(--accent-dim);
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  color: var(--ink);
-  padding: 0.5rem 0.8rem;
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
 }
 
 .pagePreview {
@@ -737,6 +793,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.6rem 1rem;
+  background: oklch(14% 0 0);
   border-bottom: 1px solid var(--line);
   font-size: 0.8125rem;
   color: var(--muted);
@@ -748,7 +805,7 @@
 
 .pagePreviewBar strong {
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .pagePreviewTools {
@@ -756,20 +813,29 @@
   gap: 0.4rem;
 }
 
+/* The site's outlined button, small; the width in use is in the accent. */
 .pagePreviewTools button {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
   color: var(--ink);
-  padding: 0.35rem 0.75rem;
+  padding: 7px 14px;
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
+}
+
+.pagePreviewTools button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .pagePreviewTools button[aria-pressed='true'] {
   border-color: var(--accent);
-  background: var(--accent-dim);
+  color: var(--accent);
 }
 
 .pagePreviewStage {
@@ -777,7 +843,7 @@
   display: flex;
   justify-content: center;
   overflow: auto;
-  background: var(--bg-raised);
+  background: oklch(12% 0 0);
 }
 
 .pagePreviewFrame {
@@ -786,4 +852,16 @@
   border: 0;
   background: var(--bg);
   transition: width 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagePreviewFrame,
+  .product,
+  .pill,
+  .back,
+  .previewOpen,
+  .asideToggle,
+  .tileItem {
+    transition: none;
+  }
 }

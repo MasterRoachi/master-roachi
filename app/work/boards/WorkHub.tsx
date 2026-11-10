@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   CARDS_PER_LIST,
+  HIDDEN_LISTS,
   keywordsOf,
   STALE_DAYS,
   daysSince,
@@ -11,6 +12,7 @@ import {
   type WorkCard,
   type WorkHubPayload,
 } from '@/lib/work-hub';
+import ui from '../ui.module.css';
 import styles from './boards.module.css';
 
 // One list across every board: his pick, 2026-11-10 (redesign page, Boards: A).
@@ -24,6 +26,15 @@ import styles from './boards.module.css';
 // The cards come from what the Worker already sends: on his own boards only
 // cards in a Today / Doing / This week / Waiting list, on a day-job board only
 // cards assigned to him. So the groups sort that set; they do not widen it.
+//
+// DRESSED AS THE PUBLIC SITE, AND A DASHBOARD ON A COMPUTER (his call,
+// 2026-11-10, design pass: the public site's styling, the CRM's desktop
+// layout). From 900px the three groups' counts sit on top as tiles and the
+// groups are panels side by side; the board view's lists are panels as
+// columns. Under that the phone keeps its one stacked list. To DESIGN.md
+// (his rulings, 11 Nov 2026): the cards in a panel are hairline-split rows,
+// and state is the colour of the words: late in --bad, gone quiet in the
+// app's colour. No fills, no side stripes.
 //
 // Fetches /api/work/ once on mount. No polling: the page is opened in the
 // morning, read, and closed, and a timer re-fetching every minute would spend
@@ -39,18 +50,6 @@ type State =
   | { phase: 'loading' }
   | { phase: 'error'; message: string }
   | { phase: 'ready'; data: WorkHubPayload };
-
-/**
- * Lists the board view does not draw, whatever board they are on.
- *
- * Done and its synonyms are the past. Inbox is uncategorised capture and
- * showing it turns the hub into a second inbox. Projects is Command's standing
- * list of project NAMES, which is reference rather than anything to do today.
- *
- * Matched on the whole name, so a list called "Done thinking" is not swept up
- * with it.
- */
-const HIDDEN_LISTS = /^(inbox|done|completed|complete|archive|archived|projects)$/i;
 
 /**
  * The list that means finished, whatever a board calls it.
@@ -129,8 +128,12 @@ function Row({
 }) {
   const { card, board, due, idle } = entry;
   const edge = group === 'late' ? styles.rowLate : group === 'quiet' ? styles.rowQuiet : '';
+  const dot = group === 'late' ? styles.dotBad : group === 'quiet' ? styles.dotAccent : styles.dot;
   const where = [showBoard ? board.name : null, card.list].filter(Boolean).join(' · ');
+  const still = idle !== null && idle >= STALE_DAYS;
 
+  /* The dashboards' row: a dot, the full name with where it sits under it,
+     and the date or the stillness on the right. */
   return (
     <li>
       <button
@@ -138,16 +141,19 @@ function Row({
         className={`${styles.row} ${edge} ${busy ? styles.rowBusy : ''}`}
         onClick={onOpen}
       >
-        <span className={styles.rowName}>{card.name}</span>
-        <span className={styles.rowMeta}>
-          {where}
-          {due !== null && (
-            <span className={group === 'late' ? styles.dueLate : undefined}> · due {shortDate(due)}</span>
-          )}
-          {idle !== null && idle >= STALE_DAYS && (
-            <span className={styles.staleText}> · {idle} days still</span>
-          )}
+        <i className={dot} aria-hidden="true" />
+        <span className={styles.rowText}>
+          <span className={styles.rowName}>{card.name}</span>
+          {where && <span className={styles.rowMeta}>{where}</span>}
         </span>
+        {(due !== null || still) && (
+          <span className={styles.rowNote}>
+            {due !== null && (
+              <span className={group === 'late' ? styles.dueLate : undefined}>due {shortDate(due)}</span>
+            )}
+            {still && <span className={styles.staleText}>{idle} days still</span>}
+          </span>
+        )}
       </button>
     </li>
   );
@@ -374,7 +380,7 @@ export default function WorkHub() {
     return (
       <p className={styles.status}>
         {state.message}{' '}
-        <button type="button" onClick={() => setNonce((n) => n + 1)}>
+        <button type="button" className={ui.button} onClick={() => setNonce((n) => n + 1)}>
           Try again
         </button>
       </p>
@@ -384,11 +390,12 @@ export default function WorkHub() {
   const { data } = state;
 
   const shown = chosen ? entries.filter((entry) => entry.board.id === chosen.id) : entries;
-  const grouped = GROUPS.map(({ key, label }) => ({
+  const everyGroup = GROUPS.map(({ key, label }) => ({
     key,
     label,
     entries: shown.filter((entry) => entry.group === key).sort((a, b) => compare(key, a, b)),
-  })).filter((group) => group.entries.length > 0);
+  }));
+  const grouped = everyGroup.filter((group) => group.entries.length > 0);
   const scopeCards = chosen ? chosen.cards.length : boards.reduce((n, one) => n + one.cards.length, 0);
   const elsewhere = scopeCards - shown.length;
 
@@ -487,7 +494,7 @@ export default function WorkHub() {
               )
             )}
           </h2>
-          <div className={styles.views} role="group" aria-label="View">
+          <div className={`${ui.tabs} ${styles.views}`} role="group" aria-label="View">
             <button
               type="button"
               className={view === 'list' ? styles.viewOn : styles.view}
@@ -510,29 +517,65 @@ export default function WorkHub() {
 
       {view === 'list' && boards.length > 0 && (
         <>
+          {/* The counts as the dashboards' tiles: a computer only, where the
+              groups sit side by side and their headings are far apart. */}
+          <ul className={styles.tiles}>
+            {everyGroup.map((group) => {
+              const n = group.entries.length;
+              const late = group.key === 'late' && n > 0;
+              const dot =
+                n === 0
+                  ? styles.dot
+                  : group.key === 'late'
+                    ? styles.dotBad
+                    : group.key === 'quiet'
+                      ? styles.dotAccent
+                      : styles.dotInk;
+              return (
+                <li key={group.key} className={late ? styles.tileLate : styles.tile}>
+                  <span className={styles.tileK}>
+                    <i className={dot} /> {group.label}
+                  </span>
+                  <span className={late ? styles.tileVBad : ui.figure}>{n}</span>
+                </li>
+              );
+            })}
+            <li className={styles.tile}>
+              <span className={styles.tileK}>
+                <i className={styles.dot} /> Elsewhere
+              </span>
+              <span className={ui.figure}>{elsewhere}</span>
+            </li>
+          </ul>
+
           {grouped.length === 0 ? (
             <p className={styles.clear}>Nothing late, due this week or gone quiet.</p>
           ) : (
-            grouped.map((group) => (
-              <section key={group.key} className={styles.group}>
-                <h3 className={`${styles.groupName} ${styles[`group_${group.key}`]}`}>
-                  {group.label}
-                  <span className={styles.count}>{group.entries.length}</span>
-                </h3>
-                <ul className={styles.rows}>
-                  {group.entries.map((entry) => (
-                    <Row
-                      key={entry.card.id}
-                      entry={entry}
-                      group={group.key}
-                      showBoard={!chosen}
-                      busy={busyCard === entry.card.id}
-                      onOpen={() => setOpen({ card: entry.card, board: entry.board })}
-                    />
-                  ))}
-                </ul>
-              </section>
-            ))
+            <div className={styles.groups}>
+              {grouped.map((group) => (
+                <section
+                  key={group.key}
+                  className={`${styles.group} ${group.key === 'late' ? styles.groupLate : ''}`}
+                >
+                  <h3 className={`${styles.groupName} ${styles[`group_${group.key}`]}`}>
+                    {group.label}
+                    <span className={styles.count}>{group.entries.length}</span>
+                  </h3>
+                  <ul className={styles.rows}>
+                    {group.entries.map((entry) => (
+                      <Row
+                        key={entry.card.id}
+                        entry={entry}
+                        group={group.key}
+                        showBoard={!chosen}
+                        busy={busyCard === entry.card.id}
+                        onOpen={() => setOpen({ card: entry.card, board: entry.board })}
+                      />
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
           )}
           {/* Said, so a fresh Waiting card, which is in no group, does not look lost. */}
           {elsewhere > 0 && (
@@ -589,17 +632,17 @@ export default function WorkHub() {
 
             <p className={styles.detailMeta}>
               {sheetCard.labels.map((label) => (
-                <span key={label} className={styles.label}>
+                <span key={label} className={ui.chip}>
                   {label}
                 </span>
               ))}
               {sheetCard.due && (
-                <span className={Date.parse(sheetCard.due) < openedAt ? styles.dueLate : styles.due}>
+                <span className={Date.parse(sheetCard.due) < openedAt ? ui.chipBad : ui.chip}>
                   due {new Date(sheetCard.due).toLocaleDateString('en-ZA')}
                 </span>
               )}
               {sheetIdle !== null && sheetIdle >= STALE_DAYS && (
-                <span className={styles.staleText}>{sheetIdle} days still</span>
+                <span className={ui.chipAccent}>{sheetIdle} days still</span>
               )}
             </p>
 
@@ -611,7 +654,7 @@ export default function WorkHub() {
                   <button
                     key={list.id}
                     type="button"
-                    className={FINISHED_LIST.test(list.name.trim()) ? styles.finish : undefined}
+                    className={FINISHED_LIST.test(list.name.trim()) ? ui.primary : ui.button}
                     disabled={busyCard === sheetCard.id}
                     onClick={() => void move(sheetCard, list.id)}
                   >
@@ -621,10 +664,10 @@ export default function WorkHub() {
             </div>
 
             <p className={styles.detailFoot}>
-              <a href={sheetCard.url} target="_blank" rel="noreferrer">
+              <a className={styles.trello} href={sheetCard.url} target="_blank" rel="noreferrer">
                 Open in Trello ↗
               </a>
-              <button type="button" onClick={() => setOpen(null)}>
+              <button type="button" className={ui.quiet} onClick={() => setOpen(null)}>
                 Close
               </button>
             </p>
@@ -662,7 +705,7 @@ export default function WorkHub() {
               ))}
             </ul>
             <p className={styles.detailFoot}>
-              <button type="button" onClick={() => setOverflow(null)}>
+              <button type="button" className={ui.quiet} onClick={() => setOverflow(null)}>
                 Close
               </button>
             </p>

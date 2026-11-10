@@ -6,8 +6,10 @@ import { iconFor } from '@/lib/habit-icons';
 import { weekDays } from '@/lib/habits';
 import DoorIcon from '../DoorIcon';
 import { OtherApps } from '../WorkDoors';
-import { getJson, useLive } from './live';
+import { useLive } from './live';
+import { habits, release, sketches, type Habit, type HabitsPayload } from './sources';
 import styles from './home.module.css';
+import dash from './dash.module.css';
 
 // The tools home: today's habits ARE the home (his pick, 2026-11-10, redesign
 // page, Tools doors: B). Each habit is a tile; tapping it ticks it for today,
@@ -22,32 +24,8 @@ import styles from './home.module.css';
 // the answer and then shows what was stored. If the tick fails the tile simply
 // stays as it was: a home never shows an error (live.ts).
 
-interface Habit {
-  id: number;
-  name: string;
-  cadence: 'daily' | 'weekly';
-  target: number | null;
-  icon: string | null;
-}
-
-interface Payload {
-  configured: boolean;
-  habits: Habit[];
-  /** Habit id -> run. Days for a daily habit, WEEKS for a weekly one. */
-  streaks: Record<string, number>;
-  /** Habit id -> every day ever ticked. */
-  history: Record<string, string[]>;
-  today: string;
-}
-
-async function habits(): Promise<Payload | null> {
-  const data = await getJson<Payload>('/work/api/habits');
-  return data?.configured ? data : null;
-}
-
 async function sketchCount(): Promise<number | null> {
-  const data = await getJson<{ configured: boolean; files: unknown[] }>('/work/api/content?collection=notes');
-  return data?.configured ? (data.files ?? []).length : null;
+  return (await sketches())?.length ?? null;
 }
 
 /** The habit's icon, or the Habits page's plain circle for one without. */
@@ -62,7 +40,8 @@ function Glyph({ name }: { name: string | null }) {
 
 export default function ToolsHome() {
   const [data, reload] = useLive(habits);
-  const [sketches] = useLive(sketchCount);
+  const [sketchTotal] = useLive(sketchCount);
+  const [sketchList] = useLive(sketches);
   const [busy, setBusy] = useState<number | null>(null);
 
   async function tick(habit: Habit, today: string) {
@@ -74,7 +53,12 @@ export default function ToolsHome() {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ action: 'toggle', id: habit.id, day: today }),
       });
-      if (response.ok) await reload();
+      if (response.ok) {
+        // The held answer is now wrong: forget it, so the sidebar and this
+        // page both read the tick.
+        release('habits');
+        await reload();
+      }
     } catch {
       /* the tile stays as it was, which is the truth */
     } finally {
@@ -89,6 +73,8 @@ export default function ToolsHome() {
   const done = list.filter(tickedToday).length;
 
   return (
+    <>
+    <div className={dash.phone}>
     <div className={styles.home}>
       {data && (
         <section aria-labelledby="today">
@@ -144,20 +130,20 @@ export default function ToolsHome() {
       <div className={styles.grow} />
 
       <div className={styles.pair}>
-        <Link className={styles.small} href="/work/habits/">
+        <Link className={`${styles.small} card-link`} href="/work/habits/">
           <DoorIcon tool="habits" />
           <span>
             <b>Habits ›</b>
             <span className={styles.muted}>History and streaks</span>
           </span>
         </Link>
-        <Link className={styles.small} href="/work/sketchpad/">
+        <Link className={`${styles.small} card-link`} href="/work/sketchpad/">
           <DoorIcon tool="sketchpad" />
           <span>
             <b>Sketchpad ›</b>
-            {sketches !== null && (
+            {sketchTotal !== null && (
               <span className={styles.muted}>
-                {sketches} {sketches === 1 ? 'sketch' : 'sketches'}
+                {sketchTotal} {sketchTotal === 1 ? 'sketch' : 'sketches'}
               </span>
             )}
           </span>
@@ -165,6 +151,140 @@ export default function ToolsHome() {
       </div>
 
       <OtherApps app="tools" />
+    </div>
+    </div>
+
+    <ToolsDash data={data} sketchList={sketchList} busy={busy} onTick={tick} />
+    </>
+  );
+}
+
+const day = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+
+/** A sketch's name from its path, as the Sketchpad shows it. */
+const sketchName = (path: string) => (path.split('/').pop() ?? path).replace(/\.svg$/, '').replace(/-/g, ' ');
+
+/**
+ * The tools home on a computer (his call, 2026-11-10, after the CRM): tiles
+ * for today's habits, the best run going and the sketches; then today's
+ * habits to tick on the left and the newest sketches on the right.
+ */
+function ToolsDash({
+  data,
+  sketchList,
+  busy,
+  onTick,
+}: {
+  data: HabitsPayload | null;
+  sketchList: Awaited<ReturnType<typeof sketches>>;
+  busy: number | null;
+  onTick: (habit: Habit, today: string) => void;
+}) {
+  const list = data?.habits ?? [];
+  const today = data?.today ?? '';
+  const ticked = (habit: Habit) => (data?.history[String(habit.id)] ?? []).includes(today);
+  const done = list.filter(ticked).length;
+  const best = list.reduce<{ habit: Habit; run: number } | null>((top, habit) => {
+    const run = data?.streaks?.[String(habit.id)] ?? 0;
+    return run > (top?.run ?? 0) ? { habit, run } : top;
+  }, null);
+
+  return (
+    <div className={dash.dash}>
+      <ul className={dash.tiles}>
+        <li>
+          <Link className={`${dash.tile} card-link`} href="/work/habits/">
+            <span className={dash.tileK}>
+              <i className={data && done < list.length ? dash.dotGold : dash.dotOk} /> Today
+            </span>
+            <span className={dash.tileV}>{data ? `${done} of ${list.length}` : '–'}</span>
+            <span className={dash.tileS}>habits done</span>
+          </Link>
+        </li>
+        <li>
+          <Link className={`${dash.tile} card-link`} href="/work/habits/">
+            <span className={dash.tileK}>
+              <i className={dash.dot} /> Best run
+            </span>
+            <span className={dash.tileV}>{best ? best.run : '–'}</span>
+            <span className={dash.tileS}>
+              {best ? `${best.habit.cadence === 'weekly' ? 'weeks' : 'days'} · ${best.habit.name}` : 'nothing running'}
+            </span>
+          </Link>
+        </li>
+        <li>
+          <Link className={`${dash.tile} card-link`} href="/work/sketchpad/">
+            <span className={dash.tileK}>
+              <i className={dash.dot} /> Sketches
+            </span>
+            <span className={dash.tileV}>{sketchList ? sketchList.length : '–'}</span>
+            <span className={dash.tileS}>
+              {sketchList?.[0]?.updated ? `last on ${day(sketchList[0].updated)}` : 'in the Sketchpad'}
+            </span>
+          </Link>
+        </li>
+      </ul>
+
+      <div className={dash.grid}>
+        <div className={dash.col}>
+          <section className={dash.panel} aria-label="Today">
+            <h2 className={dash.head}>
+              Today <span>{data && list.length > 0 ? `${done} of ${list.length} done` : ''}</span>
+            </h2>
+            {data && list.length === 0 && <p className={dash.empty}>Nothing tracked yet. Add a habit in Habits.</p>}
+            <ul className={dash.rows}>
+              {list.map((habit) => {
+                const on = ticked(habit);
+                const run = data?.streaks?.[String(habit.id)] ?? 0;
+                const unit = habit.cadence === 'weekly' ? (run === 1 ? 'week' : 'weeks') : run === 1 ? 'day' : 'days';
+                return (
+                  <li key={habit.id}>
+                    <button
+                      type="button"
+                      className={dash.row}
+                      aria-pressed={on}
+                      aria-busy={busy === habit.id}
+                      disabled={busy !== null || !data}
+                      onClick={() => data && onTick(habit, data.today)}
+                    >
+                      <i className={on ? dash.dotOk : dash.dotGold} />
+                      <span className={dash.rowText}>
+                        <b>{habit.name}</b>
+                        <span>{run > 0 ? `${run} ${unit} running` : habit.cadence === 'weekly' ? 'Weekly' : 'Daily'}</span>
+                      </span>
+                      <span className={on ? dash.note : dash.noteGold}>
+                        {busy === habit.id ? 'Saving…' : on ? '✓ Done' : 'Tick'}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        </div>
+
+        <div className={dash.col}>
+          <section className={dash.panel} aria-label="Sketches">
+            <h2 className={dash.head}>
+              Newest sketches <Link href="/work/sketchpad/">Sketchpad ›</Link>
+            </h2>
+            {sketchList && sketchList.length === 0 && <p className={dash.empty}>No sketches yet.</p>}
+            <ul className={dash.rows}>
+              {(sketchList ?? []).slice(0, 8).map((sketch) => (
+                <li key={sketch.path}>
+                  <Link className={dash.row} href={`/work/sketchpad/?open=${encodeURIComponent(sketch.path)}`}>
+                    <i className={dash.dot} />
+                    <span className={dash.rowText}>
+                      <b>{sketchName(sketch.path)}</b>
+                    </span>
+                    <span className={dash.note}>{sketch.updated ? day(sketch.updated) : ''}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

@@ -12,7 +12,6 @@ import {
   type Step,
 } from '@/lib/curriculum';
 import CurriculumIcon from '@/components/CurriculumIcon';
-import { statusLook } from '@/lib/curriculum-card';
 import LessonMarkdown from '@/components/LessonMarkdown';
 import styles from './curriculums.module.css';
 
@@ -37,8 +36,18 @@ import styles from './curriculums.module.css';
 // a full-screen view, which is what a detail should be there; Escape goes back
 // one step, exactly as it went back one layer.
 //
-// Colour is the status and nothing else: white active, black paused, gold
-// done — see statusLook() in lib/curriculum-card.ts.
+// Colour is the status and nothing else, and it is the colour of the WORDS,
+// never a face or a fill (his ruling, 11 Nov 2026, DESIGN.md): an active
+// course in the page's ink with its ring in the Learn blue, a paused one
+// muted, a done one in the status gold. lookOf() below; statusLook()'s white,
+// black and gold card faces are no longer used here.
+//
+// ON A COMPUTER (from 900px) it is list | detail, after the CRM: the list stays
+// on the left, and the step that took the page's place on a phone opens on the
+// right instead, using the width. The next lesson stands out in the app's
+// colour: a card at the top of the curriculum, the stage it is in, its cell.
+// His call, 2026-11-10 (design pass: the public site's styling, the CRM's
+// desktop layout). The phone keeps the drill-down exactly as it was.
 //
 // DEEP LINK: `?open=<curriculum id>` opens that curriculum's next lesson (or
 // its stages when nothing is left), so the Learn home's Continue button can
@@ -47,22 +56,24 @@ import styles from './curriculums.module.css';
 
 const RING = 2 * Math.PI * 20;
 
+// As style rather than attributes, because the active colours are CSS
+// variables and a presentation attribute does not read var().
 function Ring({ percent, ink, accent }: { percent: number; ink: string; accent: string }) {
   return (
     <svg className={styles.ring} viewBox="0 0 48 48" aria-hidden="true">
-      <circle cx="24" cy="24" r="20" className={styles.ringTrack} stroke={ink} />
+      <circle cx="24" cy="24" r="20" className={styles.ringTrack} style={{ stroke: ink }} />
       <circle
         cx="24"
         cy="24"
         r="20"
         className={styles.ringFill}
-        stroke={accent}
+        style={{ stroke: accent }}
         // From the top, not three o'clock, which is where a circle starts and
         // nobody reads a dial from.
         strokeDasharray={`${(percent / 100) * RING} ${RING}`}
         transform="rotate(-90 24 24)"
       />
-      <text x="24" y="24" className={styles.ringText} fill={ink}>
+      <text x="24" y="24" className={styles.ringText} style={{ fill: ink }}>
         {percent}
       </text>
     </svg>
@@ -76,13 +87,25 @@ const NEXT_STATUS: Record<string, 'active' | 'paused' | 'done'> = {
   done: 'active',
 };
 
-const STATUS_MARK: Record<string, string> = { active: '▶', paused: '॥', done: '✓' };
-const STATUS_WORD: Record<string, string> = { active: 'Active', paused: 'Paused', done: 'Done' };
+const STATUS_MARK: Record<string, string> = {
+  active: '▶',
+  paused: '॥',
+  done: '✓',
+};
+const STATUS_WORD: Record<string, string> = {
+  active: 'Active',
+  paused: 'Paused',
+  done: 'Done',
+};
 const GROUPS = ['active', 'paused', 'done'] as const;
 
 /** Who it is for in Ohana, cycled the same way: not shared → his → hers → both. */
 const AUDIENCES = [null, 'his', 'hers', 'both'] as const;
-const AUDIENCE_LABEL: Record<string, string> = { his: 'His', hers: 'Hers', both: 'Both' };
+const AUDIENCE_LABEL: Record<string, string> = {
+  his: 'His',
+  hers: 'Hers',
+  both: 'Both',
+};
 const nextAudience = (now: Curriculum['audience']) =>
   AUDIENCES[(AUDIENCES.indexOf(now ?? null) + 1) % AUDIENCES.length];
 
@@ -90,6 +113,14 @@ type Layer = 'stages' | 'sources' | 'grid' | 'detail';
 
 /** How long a click on a row's name waits to see whether it is a double-click. */
 const DOUBLE = 260;
+
+/** A row's colours, as text: the ink and the ring's fill. CSS variables, set
+ * in curriculums.module.css (--gold is the status gold of done). */
+function lookOf(status: string) {
+  if (status === 'done') return { ink: 'var(--gold)', accent: 'var(--gold)' };
+  if (status === 'paused') return { ink: 'var(--muted)', accent: 'var(--muted)' };
+  return { ink: 'var(--ink)', accent: 'var(--accent)' };
+}
 
 export default function Curriculums() {
   const [data, setData] = useState<Curriculum[] | null>(null);
@@ -137,7 +168,9 @@ export default function Curriculums() {
 
   const load = useCallback(async () => {
     try {
-      const response = await fetch('/work/api/curriculums', { cache: 'no-store' });
+      const response = await fetch('/work/api/curriculums', {
+        cache: 'no-store',
+      });
       if (!response.ok) throw new Error(`could not read them (${response.status})`);
       const payload = (await response.json()) as {
         configured: boolean;
@@ -212,7 +245,11 @@ export default function Curriculums() {
   }
 
   const toggle = (id: number) =>
-    act({ action: 'toggle-lesson', id, ...(tickDay && tickDay !== today ? { day: tickDay } : {}) });
+    act({
+      action: 'toggle-lesson',
+      id,
+      ...(tickDay && tickDay !== today ? { day: tickDay } : {}),
+    });
 
   const curriculums = useMemo(() => data ?? [], [data]);
 
@@ -233,6 +270,8 @@ export default function Curriculums() {
   /* Positions rather than names, for "Japanese › module 2 › lesson 12". */
   const lessonAt = stage ? stage.lessons.findIndex((one) => one.id === openLesson) : -1;
   const lesson = lessonAt >= 0 ? stage!.lessons[lessonAt] : null;
+  /* The open curriculum's next lesson, which its view, stage and cell mark. */
+  const next: Step | null = current ? nextStep(current) : null;
 
   /* Searching ONE curriculum, not all of them: the thing being looked for is
    * almost always inside the course already open, and Japanese alone is 118
@@ -304,17 +343,17 @@ export default function Curriculums() {
   }
 
   const faceOf = (one: Curriculum) => {
-    const look = statusLook(one.status);
-    return {
-      '--card-bg': look.background,
-      '--card-bg2': look.background2,
-      '--card-ink': look.ink,
-      '--card-accent': look.accent,
-      '--card-line': look.line,
-    } as React.CSSProperties;
+    const look = lookOf(one.status);
+    return { '--card-ink': look.ink, '--card-accent': look.accent } as React.CSSProperties;
   };
 
-  const renameField = (key: string, kind: 'curriculum' | 'module' | 'lesson', id: number, label: string, className: string) =>
+  const renameField = (
+    key: string,
+    kind: 'curriculum' | 'module' | 'lesson',
+    id: number,
+    label: string,
+    className: string,
+  ) =>
     renaming === key ? (
       <input
         className={className}
@@ -347,26 +386,30 @@ export default function Curriculums() {
         </p>
       )}
 
-      {/* --- the list: one row per curriculum ------------------------------ */}
-      {layer === null && (
-        <>
-          {curriculums.length === 0 && (
-            <p className={styles.empty}>No curriculums yet. Add the first one below.</p>
-          )}
+      <div className={styles.split}>
+        {/* --- the list: one row per curriculum ------------------------------
+          On a phone it gives way to whatever is open; on a computer it stays
+          on the left beside it. */}
+        <div className={layer === null ? styles.list : styles.listBeside}>
+          {curriculums.length === 0 && <p className={styles.empty}>No curriculums yet. Add the first one below.</p>}
 
           {groups.map((group) => (
             <section key={group.status} className={styles.group} aria-label={STATUS_WORD[group.status]}>
               <h2 className={styles.groupHead}>{STATUS_WORD[group.status]}</h2>
               <ul className={styles.rows}>
                 {group.items.map((one) => {
-                  const look = statusLook(one.status);
+                  const look = lookOf(one.status);
                   const progress = progressOf(one);
                   const step: Step | null = nextStep(one);
                   const where = step ? `${step.moduleAt}:${step.lessonAt}` : '';
                   const key = `curriculum:${one.id}`;
 
                   return (
-                    <li key={one.id} className={styles.row} style={faceOf(one)}>
+                    <li
+                      key={one.id}
+                      className={`${styles.row} ${layer !== null && one.id === openCurriculum ? styles.rowOn : ''}`}
+                      style={faceOf(one)}
+                    >
                       {renaming === key ? (
                         <div className={styles.rowMain}>
                           <Ring percent={progress.percent} ink={look.ink} accent={look.accent} />
@@ -489,375 +532,469 @@ export default function Curriculums() {
               + New curriculum
             </button>
           )}
-        </>
-      )}
+        </div>
 
-      {/* --- one curriculum: its stages ----------------------------------- */}
-      {layer === 'stages' && current && (
-        <View backTo="Curriculums" onBack={back}>
-          <header className={styles.viewHead}>
-            <CurriculumIcon name={current.name} className={styles.titleIcon} size={40} />
-            <h2 className={styles.viewTitle}>
-              {renameField(`curriculum:${current.id}`, 'curriculum', current.id, current.name, styles.renameTitle) ?? (
-                <span title="Double-click to rename" onDoubleClick={() => startRename(`curriculum:${current.id}`, current.name)}>
-                  {current.name}
-                </span>
-              )}
-            </h2>
-            <div className={styles.controls}>
-              <button
-                type="button"
-                className={styles.chip}
-                onClick={() => startRename(`curriculum:${current.id}`, current.name)}
-              >
-                Rename
-              </button>
-              <button
-                type="button"
-                className={styles.chip}
-                aria-label={`${current.name} is ${current.status}. Press to make it ${NEXT_STATUS[current.status] ?? 'active'}`}
-                title={`${current.status} → ${NEXT_STATUS[current.status] ?? 'active'}`}
-                onClick={() =>
-                  void act({ action: 'set-status', id: current.id, status: NEXT_STATUS[current.status] ?? 'active' })
-                }
-              >
-                {STATUS_MARK[current.status] ?? '▶'} {STATUS_WORD[current.status] ?? 'Active'}
-              </button>
-              <button
-                type="button"
-                className={styles.chip}
-                aria-label={`${current.name} in Ohana: ${current.audience ? AUDIENCE_LABEL[current.audience] : 'not shared'}. Press to change`}
-                title="Who it is for in Ohana"
-                onClick={() => void act({ action: 'set-audience', id: current.id, audience: nextAudience(current.audience) })}
-              >
-                Ohana: {current.audience ? AUDIENCE_LABEL[current.audience] : 'not shared'}
-              </button>
-            </div>
-          </header>
-
-          {/* The gold links, which are NOT stages: one leaves the page for the
-              flashcards and the other opens the curriculum's whole list of
-              sources. Gold is what a finished curriculum wears, and here it
-              marks the two things on this view that are not steps. */}
-          {(current.cards || (current.sources && current.sources.length > 0)) && (
-            <div className={styles.goldRow}>
-              {current.cards ? (
-                <a href={`/work/cards/?deck=${current.id}`} className={styles.goldChip}>
-                  ★ Cards <span className={styles.count}>{current.cards}</span>
-                </a>
-              ) : null}
-              {current.sources && current.sources.length > 0 ? (
-                <button type="button" className={styles.goldChip} onClick={() => setLayer('sources')}>
-                  § Sources <span className={styles.count}>{current.sources.length}</span>
-                </button>
-              ) : null}
-            </div>
+        {/* --- what is open: the page's place on a phone, the right on a computer */}
+        <div className={styles.main}>
+          {layer === null && (
+            <p className={styles.pick}>
+              {curriculums.length > 0
+                ? 'Pick a curriculum to see its stages and lessons.'
+                : 'Add a curriculum on the left, and its stages and lessons open here.'}
+            </p>
           )}
 
-          <div className={styles.searchRow}>
-            <input
-              type="search"
-              className={styles.search}
-              value={search}
-              placeholder={`Find a lesson in ${current.name}`}
-              aria-label={`Find a lesson in ${current.name}`}
-              onChange={(event) => setSearch(event.target.value)}
-              onKeyDown={(event) => event.key === 'Escape' && (search ? setSearch('') : event.currentTarget.blur())}
-            />
-            {hits.length > 0 && (
-              <ul className={styles.hits}>
-                {hits.map((hit) => (
-                  <li key={hit.lesson.id}>
-                    <button type="button" onClick={() => showLesson(current, hit.module.id, hit.lesson)}>
-                      <span>{hit.lesson.name}</span>
-                      <span className={styles.hitIn}>
-                        {hit.module.name} · lesson {hit.at}
+          {/* --- one curriculum: its stages ----------------------------------- */}
+          {layer === 'stages' && current && (
+            <View backTo="Curriculums" onBack={back}>
+              <header className={styles.viewHead}>
+                <CurriculumIcon name={current.name} className={styles.titleIcon} size={40} />
+                <h2 className={styles.viewTitle}>
+                  {renameField(
+                    `curriculum:${current.id}`,
+                    'curriculum',
+                    current.id,
+                    current.name,
+                    styles.renameTitle,
+                  ) ?? (
+                    <span
+                      title="Double-click to rename"
+                      onDoubleClick={() => startRename(`curriculum:${current.id}`, current.name)}
+                    >
+                      {current.name}
+                    </span>
+                  )}
+                </h2>
+                <div className={styles.controls}>
+                  <button
+                    type="button"
+                    className={styles.chip}
+                    onClick={() => startRename(`curriculum:${current.id}`, current.name)}
+                  >
+                    Rename
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.chip}
+                    aria-label={`${current.name} is ${current.status}. Press to make it ${NEXT_STATUS[current.status] ?? 'active'}`}
+                    title={`${current.status} → ${NEXT_STATUS[current.status] ?? 'active'}`}
+                    onClick={() =>
+                      void act({
+                        action: 'set-status',
+                        id: current.id,
+                        status: NEXT_STATUS[current.status] ?? 'active',
+                      })
+                    }
+                  >
+                    {STATUS_MARK[current.status] ?? '▶'} {STATUS_WORD[current.status] ?? 'Active'}
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.chip}
+                    aria-label={`${current.name} in Ohana: ${current.audience ? AUDIENCE_LABEL[current.audience] : 'not shared'}. Press to change`}
+                    title="Who it is for in Ohana"
+                    onClick={() =>
+                      void act({
+                        action: 'set-audience',
+                        id: current.id,
+                        audience: nextAudience(current.audience),
+                      })
+                    }
+                  >
+                    Ohana: {current.audience ? AUDIENCE_LABEL[current.audience] : 'not shared'}
+                  </button>
+                </div>
+              </header>
+
+              {/* The next lesson, in the app's colour: on a computer only, where
+              the list's Open button is not beside it in the same glance. */}
+              {next && (
+                <section className={styles.nextCard} aria-label="Next lesson">
+                  <h3 className={styles.nextHead}>
+                    Next lesson
+                    <span>
+                      {next.module.name} · {next.moduleAt}:{next.lessonAt}
+                    </span>
+                  </h3>
+                  <p className={styles.nextName}>{next.lesson.name}</p>
+                  <div className={styles.nextButtons}>
+                    <button
+                      type="button"
+                      className={styles.primary}
+                      onClick={() => showLesson(current, next.module.id, next.lesson)}
+                    >
+                      Open the lesson
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.plain}
+                      disabled={ticking === next.lesson.id}
+                      onClick={() => {
+                        setTicking(next.lesson.id);
+                        void toggle(next.lesson.id).finally(() => setTicking(null));
+                      }}
+                    >
+                      Mark done
+                    </button>
+                  </div>
+                </section>
+              )}
+
+              {/* The two links that are NOT stages: one leaves the page for the
+              flashcards and the other opens the curriculum's whole list of
+              sources. Outlined buttons in a row of their own, apart from the
+              steps. They were gold; gold is now only what done wears. */}
+              {(current.cards || (current.sources && current.sources.length > 0)) && (
+                <div className={styles.goldRow}>
+                  {current.cards ? (
+                    <a href={`/work/cards/?deck=${current.id}`} className={styles.goldChip}>
+                      ★ Cards <span className={styles.count}>{current.cards}</span>
+                    </a>
+                  ) : null}
+                  {current.sources && current.sources.length > 0 ? (
+                    <button type="button" className={styles.goldChip} onClick={() => setLayer('sources')}>
+                      § Sources <span className={styles.count}>{current.sources.length}</span>
+                    </button>
+                  ) : null}
+                </div>
+              )}
+
+              <div className={styles.searchRow}>
+                <input
+                  type="search"
+                  className={styles.search}
+                  value={search}
+                  placeholder={`Find a lesson in ${current.name}`}
+                  aria-label={`Find a lesson in ${current.name}`}
+                  onChange={(event) => setSearch(event.target.value)}
+                  onKeyDown={(event) => event.key === 'Escape' && (search ? setSearch('') : event.currentTarget.blur())}
+                />
+                {hits.length > 0 && (
+                  <ul className={styles.hits}>
+                    {hits.map((hit) => (
+                      <li key={hit.lesson.id}>
+                        <button type="button" onClick={() => showLesson(current, hit.module.id, hit.lesson)}>
+                          <span>{hit.lesson.name}</span>
+                          <span className={styles.hitIn}>
+                            {hit.module.name} · lesson {hit.at}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* Stages are steps on the route; a track runs BESIDE it (Japanese's
+              kanji modules, worked through in parallel), so tracks get their
+              own short list. See splitModules() for the naming convention. */}
+              {(() => {
+                const { stages, tracks } = splitModules(current.modules);
+                const list = (modules: Module[], numbered: boolean) => (
+                  <ol className={styles.stageList}>
+                    {modules.map((module, at) => {
+                      const progress = progressOf(module);
+                      const holdsNext = next?.module.id === module.id;
+                      return (
+                        <li key={module.id}>
+                          <button
+                            type="button"
+                            className={holdsNext ? styles.stageRowNext : styles.stageRow}
+                            onClick={() => {
+                              setOpenStage(module.id);
+                              setLayer('grid');
+                            }}
+                          >
+                            {numbered && <span className={styles.stageNumber}>{at + 1}</span>}
+                            <span className={styles.stageName}>{module.name}</span>
+                            <span className={styles.stageCount}>
+                              {progress.total === 0
+                                ? 'empty'
+                                : progress.done === progress.total
+                                  ? 'done'
+                                  : `${progress.done} of ${progress.total}`}
+                            </span>
+                            {holdsNext && next && (
+                              <span className={styles.stageNext}>
+                                Next: lesson {next.lessonAt} · {next.lesson.name}
+                              </span>
+                            )}
+                            <span className={styles.bar} aria-hidden="true">
+                              <i style={{ width: `${progress.percent}%` }} />
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                );
+                return (
+                  <>
+                    {list(stages, true)}
+                    {tracks.length > 0 && (
+                      <>
+                        <h3 className={styles.subHead}>Alongside</h3>
+                        {list(tracks, false)}
+                      </>
+                    )}
+                  </>
+                );
+              })()}
+            </View>
+          )}
+
+          {/* --- the sources, which belong to the whole curriculum ------------ */}
+          {layer === 'sources' && current && (
+            <View backTo={current.name} onBack={back}>
+              <h2 className={styles.sectionTitle}>Sources</h2>
+              <p className={styles.sourcesWhat}>
+                What {current.name} is studied from. A lesson&rsquo;s own sources (the chapter, the page, the one video)
+                are on the lesson.
+              </p>
+              {current.sources && current.sources.length > 0 ? (
+                <SourceList sources={current.sources} />
+              ) : (
+                <p className={styles.nothingYet}>Nothing recorded yet.</p>
+              )}
+            </View>
+          )}
+
+          {/* --- one stage: its lessons, as a grid of numbers ----------------- */}
+          {layer === 'grid' && current && stage && (
+            <View backTo={current.name} onBack={back}>
+              <h2 className={styles.sectionTitle}>{stage.name}</h2>
+              <ol className={styles.numberGrid}>
+                {stage.lessons.map((each, at) => (
+                  <li key={each.id}>
+                    <button
+                      type="button"
+                      className={`${styles.cell} ${each.done_on ? styles.cellDone : ''} ${each.id === next?.lesson.id ? styles.cellNext : ''}`}
+                      title={each.name}
+                      aria-label={`Lesson ${at + 1}: ${each.name}${each.done_on ? ' (done)' : ''}${each.id === next?.lesson.id ? ' (next)' : ''}`}
+                      onClick={() => showLesson(current, stage.id, each)}
+                    >
+                      <span className={styles.cellNumber}>{at + 1}</span>
+                      {/* The name beside the number, on a computer only: there is
+                      room for it there, and a phone keeps the shape. */}
+                      <span className={styles.cellName} aria-hidden="true">
+                        {each.name}
                       </span>
                     </button>
                   </li>
                 ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Stages are steps on the route; a track runs BESIDE it (Japanese's
-              kanji modules, worked through in parallel), so tracks get their
-              own short list. See splitModules() for the naming convention. */}
-          {(() => {
-            const { stages, tracks } = splitModules(current.modules);
-            const list = (modules: Module[], numbered: boolean) => (
-              <ol className={styles.stageList}>
-                {modules.map((module, at) => {
-                  const progress = progressOf(module);
-                  return (
-                    <li key={module.id}>
-                      <button
-                        type="button"
-                        className={styles.stageRow}
-                        onClick={() => {
-                          setOpenStage(module.id);
-                          setLayer('grid');
-                        }}
-                      >
-                        {numbered && <span className={styles.stageNumber}>{at + 1}</span>}
-                        <span className={styles.stageName}>{module.name}</span>
-                        <span className={styles.stageCount}>
-                          {progress.total === 0
-                            ? 'empty'
-                            : progress.done === progress.total
-                              ? 'done'
-                              : `${progress.done} of ${progress.total}`}
-                        </span>
-                        <span className={styles.bar} aria-hidden="true">
-                          <i style={{ width: `${progress.percent}%` }} />
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            );
-            return (
-              <>
-                {list(stages, true)}
-                {tracks.length > 0 && (
-                  <>
-                    <h3 className={styles.subHead}>Alongside</h3>
-                    {list(tracks, false)}
-                  </>
-                )}
-              </>
-            );
-          })()}
-        </View>
-      )}
-
-      {/* --- the sources, which belong to the whole curriculum ------------ */}
-      {layer === 'sources' && current && (
-        <View backTo={current.name} onBack={back}>
-          <h2 className={styles.sectionTitle}>Sources</h2>
-          <p className={styles.sourcesWhat}>
-            What {current.name} is studied from. A lesson&rsquo;s own sources (the chapter, the page, the
-            one video) are on the lesson.
-          </p>
-          {current.sources && current.sources.length > 0 ? (
-            <SourceList sources={current.sources} />
-          ) : (
-            <p className={styles.nothingYet}>Nothing recorded yet.</p>
-          )}
-        </View>
-      )}
-
-      {/* --- one stage: its lessons, as a grid of numbers ----------------- */}
-      {layer === 'grid' && current && stage && (
-        <View backTo={current.name} onBack={back}>
-          <h2 className={styles.sectionTitle}>{stage.name}</h2>
-          <ol className={styles.numberGrid}>
-            {stage.lessons.map((each, at) => (
-              <li key={each.id}>
-                <button
-                  type="button"
-                  className={`${styles.cell} ${each.done_on ? styles.cellDone : ''}`}
-                  title={each.name}
-                  aria-label={`Lesson ${at + 1}: ${each.name}${each.done_on ? ' (done)' : ''}`}
-                  onClick={() => showLesson(current, stage.id, each)}
-                >
-                  {at + 1}
-                </button>
-              </li>
-            ))}
-            <li>
-              <button
-                type="button"
-                className={`${styles.cell} ${styles.cellAdd}`}
-                title="Add a lesson"
-                aria-label="Add a lesson"
-                onClick={() => {
-                  const name = prompt('Lesson name');
-                  if (name?.trim()) void act({ action: 'add-lesson', module_id: stage.id, name });
-                }}
-              >
-                +
-              </button>
-            </li>
-          </ol>
-        </View>
-      )}
-
-      {/* --- one lesson -------------------------------------------------- */}
-      {layer === 'detail' && current && stage && lesson && (
-        <View backTo={stage.name} onBack={back}>
-          <article className={styles.lessonPane}>
-            {/* Where you are. The STAGE is renamed here, by double-click, as
-                it always was. */}
-            <p className={styles.lessonWhere}>
-              {current.name} <span className={styles.chev}>›</span>{' '}
-              {renameField(`module:${stage.id}`, 'module', stage.id, stage.name, styles.renameEyebrow) ?? (
-                <span
-                  onDoubleClick={() => startRename(`module:${stage.id}`, stage.name)}
-                  title="Double-click to rename the stage"
-                >
-                  module {stageAt + 1}
-                </span>
-              )}{' '}
-              <span className={styles.chev}>›</span> lesson {lessonAt + 1}
-            </p>
-
-            <h2 className={styles.lessonTitle}>
-              {renameField(`lesson:${lesson.id}`, 'lesson', lesson.id, lesson.name, styles.renameTitle) ?? (
-                <span onDoubleClick={() => startRename(`lesson:${lesson.id}`, lesson.name)} title="Double-click to rename">
-                  {lesson.name}
-                </span>
-              )}
-            </h2>
-
-            <div className={styles.lessonBody}>
-              {editingDetail ? (
-                <>
-                  <textarea
-                    className={styles.detailEditor}
-                    value={detailDraft}
-                    autoFocus
-                    aria-label={`What ${lesson.name} teaches`}
-                    placeholder="What this teaches. Markdown — ## headings, - bullets, **bold**, ![](/image.webp)."
-                    onChange={(event) => setDetailDraft(event.target.value)}
-                  />
-                  <p className={styles.editButtons}>
-                    <button
-                      type="button"
-                      className={styles.primary}
-                      onClick={() => {
-                        void act({ action: 'set-detail', id: lesson.id, detail: detailDraft }).then((result) => {
-                          setEditingDetail(false);
-                          if (result?.truncated) {
-                            setError(
-                              'Saved, but it was cut at 32,000 characters — the end of what you wrote is not in it.',
-                            );
-                          } else if (result?.repoOwned && !result.committed) {
-                            setError(
-                              'Saved here, but the repo copy did not commit — the next rebuild will overwrite it.',
-                            );
-                          }
+                <li>
+                  <button
+                    type="button"
+                    className={`${styles.cell} ${styles.cellAdd}`}
+                    title="Add a lesson"
+                    aria-label="Add a lesson"
+                    onClick={() => {
+                      const name = prompt('Lesson name');
+                      if (name?.trim())
+                        void act({
+                          action: 'add-lesson',
+                          module_id: stage.id,
+                          name,
                         });
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button type="button" className={styles.plain} onClick={() => setEditingDetail(false)}>
-                      Cancel
-                    </button>
-                  </p>
-                </>
-              ) : (
-                <>
-                  <section className={styles.lessonSection}>
-                    <h3>Details</h3>
-                    {lesson.detail ? (
-                      <LessonMarkdown source={lesson.detail} />
-                    ) : (
-                      <p className={styles.nothingYet}>Nothing written yet.</p>
-                    )}
-                  </section>
+                    }}
+                  >
+                    <span className={styles.cellNumber}>+</span>
+                    <span className={styles.cellName} aria-hidden="true">
+                      Add a lesson
+                    </span>
+                  </button>
+                </li>
+              </ol>
+            </View>
+          )}
 
-                  {/* THE LESSON'S OWN SOURCES, AND ONLY THOSE. The
+          {/* --- one lesson -------------------------------------------------- */}
+          {layer === 'detail' && current && stage && lesson && (
+            <View backTo={stage.name} onBack={back}>
+              <article className={styles.lessonPane}>
+                {/* Where you are. The STAGE is renamed here, by double-click, as
+                it always was. */}
+                <p className={styles.lessonWhere}>
+                  {current.name} <span className={styles.chev}>›</span>{' '}
+                  {renameField(`module:${stage.id}`, 'module', stage.id, stage.name, styles.renameEyebrow) ?? (
+                    <span
+                      onDoubleClick={() => startRename(`module:${stage.id}`, stage.name)}
+                      title="Double-click to rename the stage"
+                    >
+                      module {stageAt + 1}
+                    </span>
+                  )}{' '}
+                  <span className={styles.chev}>›</span> lesson {lessonAt + 1}
+                </p>
+
+                <h2 className={styles.lessonTitle}>
+                  {renameField(`lesson:${lesson.id}`, 'lesson', lesson.id, lesson.name, styles.renameTitle) ?? (
+                    <span
+                      onDoubleClick={() => startRename(`lesson:${lesson.id}`, lesson.name)}
+                      title="Double-click to rename"
+                    >
+                      {lesson.name}
+                    </span>
+                  )}
+                </h2>
+
+                <div className={editingDetail ? styles.lessonBody : styles.lessonBodyWide}>
+                  {editingDetail ? (
+                    <>
+                      <textarea
+                        className={styles.detailEditor}
+                        value={detailDraft}
+                        autoFocus
+                        aria-label={`What ${lesson.name} teaches`}
+                        placeholder="What this teaches. Markdown — ## headings, - bullets, **bold**, ![](/image.webp)."
+                        onChange={(event) => setDetailDraft(event.target.value)}
+                      />
+                      <p className={styles.editButtons}>
+                        <button
+                          type="button"
+                          className={styles.primary}
+                          onClick={() => {
+                            void act({
+                              action: 'set-detail',
+                              id: lesson.id,
+                              detail: detailDraft,
+                            }).then((result) => {
+                              setEditingDetail(false);
+                              if (result?.truncated) {
+                                setError(
+                                  'Saved, but it was cut at 32,000 characters — the end of what you wrote is not in it.',
+                                );
+                              } else if (result?.repoOwned && !result.committed) {
+                                setError(
+                                  'Saved here, but the repo copy did not commit — the next rebuild will overwrite it.',
+                                );
+                              }
+                            });
+                          }}
+                        >
+                          Save
+                        </button>
+                        <button type="button" className={styles.plain} onClick={() => setEditingDetail(false)}>
+                          Cancel
+                        </button>
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <section className={styles.lessonDetails}>
+                        <h3>Details</h3>
+                        {lesson.detail ? (
+                          <LessonMarkdown source={lesson.detail} />
+                        ) : (
+                          <p className={styles.nothingYet}>Nothing written yet.</p>
+                        )}
+                      </section>
+
+                      {/* THE LESSON'S OWN SOURCES, AND ONLY THOSE. The
                       curriculum's whole list is behind § Sources on the
                       curriculum's view, which is where a list that belongs to
                       every lesson belongs. */}
-                  <section className={styles.lessonSection}>
-                    <h3>Sources</h3>
-                    {lesson.sources && lesson.sources.length > 0 ? (
-                      <SourceList sources={lesson.sources} />
-                    ) : (
-                      <p className={styles.nothingYet}>Nothing recorded for this lesson yet.</p>
-                    )}
-                  </section>
+                      <section className={styles.lessonSection}>
+                        <h3>Sources</h3>
+                        {lesson.sources && lesson.sources.length > 0 ? (
+                          <SourceList sources={lesson.sources} />
+                        ) : (
+                          <p className={styles.nothingYet}>Nothing recorded for this lesson yet.</p>
+                        )}
+                      </section>
 
-                  {/* Visual examples, where the detail has images in it.
+                      {/* Visual examples, where the detail has images in it.
                       Nothing else on a lesson carries a picture, so a heading
                       over an empty space on every other lesson would be worse
                       than no heading. */}
-                  {imagesIn(lesson.detail).length > 0 && (
-                    <section className={styles.lessonSection}>
-                      <h3>Visual examples</h3>
-                      <div className={styles.visuals}>
-                        {imagesIn(lesson.detail).map((image) => (
-                          <figure key={image.src}>
-                            {/* eslint-disable-next-line @next/next/no-img-element -- static export, and the path is whatever the lesson's Markdown names */}
-                            <img src={image.src} alt={image.alt} loading="lazy" />
-                            {image.alt && <figcaption>{image.alt}</figcaption>}
-                          </figure>
-                        ))}
-                      </div>
-                    </section>
+                      {imagesIn(lesson.detail).length > 0 && (
+                        <section className={styles.lessonSection}>
+                          <h3>Visual examples</h3>
+                          <div className={styles.visuals}>
+                            {imagesIn(lesson.detail).map((image) => (
+                              <figure key={image.src}>
+                                {/* eslint-disable-next-line @next/next/no-img-element -- static export, and the path is whatever the lesson's Markdown names */}
+                                <img src={image.src} alt={image.alt} loading="lazy" />
+                                {image.alt && <figcaption>{image.alt}</figcaption>}
+                              </figure>
+                            ))}
+                          </div>
+                        </section>
+                      )}
+                    </>
                   )}
-                </>
-              )}
-            </div>
+                </div>
 
-            {/* Held to the foot of the screen, so a long lesson never pushes
+                {/* Held to the foot of the screen, so a long lesson never pushes
                 its own buttons out of reach. */}
-            {!editingDetail && (
-              <footer className={styles.lessonActions}>
-                <button
-                  type="button"
-                  className={`${styles.roundButton} ${lesson.done_on ? styles.roundDone : ''}`}
-                  title={lesson.done_on ? 'Done — press to undo' : 'Mark done'}
-                  aria-label={lesson.done_on ? 'Mark not done' : 'Mark done'}
-                  aria-pressed={Boolean(lesson.done_on)}
-                  onClick={() => void toggle(lesson.id)}
-                >
-                  ✓
-                </button>
-                <button
-                  type="button"
-                  className={styles.roundButton}
-                  title={lesson.detail ? 'Edit the detail' : 'Write the detail'}
-                  aria-label="Edit"
-                  onClick={() => {
-                    setDetailDraft(lesson.detail ?? '');
-                    setEditingDetail(true);
-                  }}
-                >
-                  ✎
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.roundButton} ${styles.roundDelete}`}
-                  title="Delete this lesson"
-                  aria-label="Delete"
-                  onClick={() => {
-                    if (!confirm(`Delete “${lesson.name}”? Its tick goes with it.`)) return;
-                    void act({ action: 'remove', kind: 'lesson', id: lesson.id }).then(() => {
-                      setLayer('grid');
-                      setOpenLesson(null);
-                    });
-                  }}
-                >
-                  ×
-                </button>
-              </footer>
-            )}
-          </article>
-        </View>
-      )}
+                {!editingDetail && (
+                  <footer className={styles.lessonActions}>
+                    <button
+                      type="button"
+                      className={`${styles.roundButton} ${lesson.done_on ? styles.roundDone : ''}`}
+                      title={lesson.done_on ? 'Done — press to undo' : 'Mark done'}
+                      aria-label={lesson.done_on ? 'Mark not done' : 'Mark done'}
+                      aria-pressed={Boolean(lesson.done_on)}
+                      onClick={() => void toggle(lesson.id)}
+                    >
+                      ✓
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.roundButton}
+                      title={lesson.detail ? 'Edit the detail' : 'Write the detail'}
+                      aria-label="Edit"
+                      onClick={() => {
+                        setDetailDraft(lesson.detail ?? '');
+                        setEditingDetail(true);
+                      }}
+                    >
+                      ✎
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.roundButton} ${styles.roundDelete}`}
+                      title="Delete this lesson"
+                      aria-label="Delete"
+                      onClick={() => {
+                        if (!confirm(`Delete “${lesson.name}”? Its tick goes with it.`)) return;
+                        void act({
+                          action: 'remove',
+                          kind: 'lesson',
+                          id: lesson.id,
+                        }).then(() => {
+                          setLayer('grid');
+                          setOpenLesson(null);
+                        });
+                      }}
+                    >
+                      ×
+                    </button>
+                  </footer>
+                )}
+              </article>
+            </View>
+          )}
 
-      {/* A view whose curriculum, stage or lesson has gone (deleted elsewhere,
+          {/* A view whose curriculum, stage or lesson has gone (deleted elsewhere,
           or a stale deep link) falls back to the list rather than a blank. */}
-      {layer !== null &&
-        (!current || (layer === 'grid' && !stage) || (layer === 'detail' && !lesson)) && (
-        <p className={styles.status}>
-          That is not here any more.{' '}
-          <button type="button" className={styles.plain} onClick={close}>
-            Back to the list
-          </button>
-        </p>
-      )}
+          {layer !== null && (!current || (layer === 'grid' && !stage) || (layer === 'detail' && !lesson)) && (
+            <p className={styles.status}>
+              That is not here any more.{' '}
+              <button type="button" className={styles.plain} onClick={close}>
+                Back to the list
+              </button>
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
 /**
- * One step of the drill-down, taking the page's place.
+ * One step of the drill-down, taking the page's place on a phone and the
+ * right-hand side on a computer.
  *
  * Not an overlay: on a phone a dimmed layer over a dimmed layer is three
  * stacked cards in a small window, and a full-screen view is the whole screen

@@ -1,12 +1,25 @@
 /* A plain list of curriculums, and a drill-down that takes the page's place.
    His pick, 2026-11-10 (redesign page, Curriculums: A).
-   Tokens from app/globals.css. Phone first; the breakpoint is 720px.
+
+   DRESSED AS THE PUBLIC SITE, and list | detail on a computer: his call,
+   2026-11-10 (design pass: the public site's styling, the CRM's desktop
+   layout), to the spec in DESIGN.md (his rulings, 11 Nov 2026). Built from
+   app/work/ui.module.css: translucent 16px panels over the starfield, rows
+   inside them split by hairlines (no cards inside cards), eyebrow labels,
+   bordered buttons and never filled ones, the app's colour (Learn blue) as
+   --accent. STATE IS THE COLOUR OF THE WORDS, with at most a hairline: the
+   next lesson in the accent, done in the status gold, paused muted. Never a
+   tinted fill, never a side stripe, never a visible scrollbar.
+
+   Phone first; the phone's breakpoint is 720px, the computer's 900px (where
+   the sidebar arrives and the list moves to the left of what is open).
 
    The page scrolls inside the .shell wrapper (app/work/work.module.css), not
    on its own: this stylesheet never sets a height. */
 
 .page {
-  --red: oklch(70% 0.18 25);
+  /* The status gold of done, kept apart from the app's colour. */
+  --gold: oklch(84% 0.12 88);
   width: min(100%, 46rem);
   margin: 0 auto;
   padding: 0.75rem 0 1.5rem;
@@ -20,21 +33,21 @@
 
 .warn {
   margin: 0 0 0.75rem;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid color-mix(in oklch, var(--red) 45%, transparent);
+  padding: 0.6rem 0.85rem;
+  border: 1px solid color-mix(in oklch, var(--bad) 55%, transparent);
   border-radius: 10px;
-  color: var(--red);
+  color: var(--bad);
   font-size: 0.875rem;
   line-height: 1.5;
 }
 
 .empty {
+  composes: empty from '../ui.module.css';
   margin: 1.5rem 0;
-  color: var(--muted);
   font-size: 0.9375rem;
 }
 
-/* Every button on the page shows where focus is. */
+/* Every control on the page shows where focus is. */
 .page button:focus-visible,
 .page a:focus-visible,
 .page input:focus-visible,
@@ -43,18 +56,82 @@
   outline-offset: 2px;
 }
 
+/* --- the frame: one column on a phone, list | detail on a computer -------- */
+
+.split {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+.list,
+.listBeside,
+.main {
+  min-width: 0;
+}
+
+/* The list while something is open: gone on a phone, beside it on a computer. */
+.listBeside {
+  display: none;
+}
+
+/* "Pick one", where nothing is open: a computer's right-hand side only. */
+.pick {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .page {
+    width: min(100%, 84rem);
+    padding-top: 0.25rem;
+  }
+
+  .split {
+    grid-template-columns: minmax(17rem, 23rem) minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+
+  .list,
+  .listBeside {
+    display: block;
+    position: sticky;
+    top: 0;
+    max-height: calc(100dvh - 9rem);
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding: 1.1rem 1rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: oklch(16% 0 0 / 0.84);
+  }
+
+  .main {
+    padding: 1.1rem 1.4rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: oklch(16% 0 0 / 0.84);
+  }
+
+  .list::-webkit-scrollbar,
+  .listBeside::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pick {
+    display: block;
+    margin: 0.2rem 0;
+    color: var(--muted);
+  }
+}
+
 /* --- the list ------------------------------------------------------------ */
 .group + .group {
   margin-top: 1.25rem;
 }
 
 .groupHead {
-  margin: 0 0 0.5rem;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
+  composes: head from '../ui.module.css';
+  margin-bottom: 0.55rem;
 }
 
 .rows {
@@ -62,20 +139,45 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
-/* One curriculum. The face is the status: white active, black paused, gold
-   done, from statusLook() in lib/curriculum-card.ts. */
+/* One curriculum: a line in the list, split from the next by a hairline.
+   --card-ink and --card-accent are its status as the colour of its words
+   (lookOf() in Curriculums.tsx): the page's ink and the accent for an active
+   course, muted for a paused one, the status gold for a done one. */
 .row {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.45rem 0.6rem 0.45rem 0.45rem;
-  border-radius: 12px;
-  border: 1px solid var(--card-line);
-  background: linear-gradient(160deg, var(--card-bg), var(--card-bg2));
-  color: var(--card-ink);
+  padding: 0.5rem 0.25rem;
+  border-radius: 0;
+  color: var(--card-ink, var(--ink));
+}
+
+.rows > li + li {
+  border-top: 1px solid var(--line);
+}
+
+/* The one open beside the list on a computer: its name in the accent and a
+   hairline all round, never a fill or a stripe. */
+.rowOn {
+  border-radius: 10px;
+  padding-inline: 0.5rem;
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 55%, transparent);
+}
+
+.rowOn .rowName {
+  color: var(--accent);
+}
+
+.rows > li:has(.rowOn),
+.rows > li:has(.rowOn) + li {
+  border-top-color: transparent;
+}
+
+.rowMain:hover .rowName {
+  color: var(--accent);
 }
 
 .rowMain {
@@ -87,7 +189,7 @@
   padding: 0.25rem;
   background: none;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   color: inherit;
   font: inherit;
   text-align: left;
@@ -111,16 +213,17 @@
 .rowNext {
   font-size: 0.8125rem;
   line-height: 1.35;
-  color: color-mix(in oklch, var(--card-ink) 72%, transparent);
+  color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Where the next lesson is: the app's colour on an active course. */
 .rowNext b {
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--card-ink);
+  color: var(--card-accent, var(--accent));
 }
 
 /* Mark the next lesson done without opening it. Quiet beside Open, which is
@@ -132,16 +235,19 @@
   display: grid;
   place-items: center;
   padding: 0;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklch, var(--card-ink) 30%, transparent);
-  background: color-mix(in oklch, var(--card-ink) 6%, transparent);
-  color: var(--card-accent);
+  border-radius: 50%;
+  border: 1px solid var(--line-bright);
+  background: none;
+  color: var(--card-accent, var(--accent));
   font-size: 0.9375rem;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
-.rowTick:hover {
-  background: color-mix(in oklch, var(--card-ink) 16%, transparent);
+.rowTick:hover:not(:disabled) {
+  border-color: var(--card-accent, var(--accent));
 }
 
 .rowTick:disabled {
@@ -149,25 +255,30 @@
   cursor: progress;
 }
 
-/* Open: the row's ink as a filled pill, so it reads as THE button on every
-   face — black on white, light on black, dark on gold. */
+/* Open: the site's bordered uppercase button, so a list of courses is not a
+   column of filled buttons. */
 .rowOpen {
   flex: none;
   min-height: 2.25rem;
-  padding: 0 0.95rem;
-  border-radius: 999px;
-  border: 0;
-  background: var(--card-ink);
-  color: var(--card-bg);
+  padding: 0 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--line-bright);
+  background: none;
+  color: var(--ink);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: 0.7rem;
   font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 1px 0 rgb(0 0 0 / 0.25);
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .rowOpen:hover {
-  filter: brightness(1.15);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .rowOpen:active,
@@ -176,12 +287,9 @@
 }
 
 .renameRow {
+  composes: field from '../ui.module.css';
   flex: 1;
   min-width: 0;
-  background: oklch(99% 0 0);
-  border: 1px solid oklch(60% 0 0);
-  border-radius: 8px;
-  color: oklch(20% 0 0);
   padding: 0.35rem 0.55rem;
   font-family: var(--font-display), var(--font-sans), sans-serif;
   font-size: 1rem;
@@ -209,6 +317,7 @@
 .ringText {
   /* User units inside a 48-unit viewBox, so this is a proportion of the ring. */
   font-size: 0.85rem;
+  font-weight: 600;
   text-anchor: middle;
   dominant-baseline: central;
   font-variant-numeric: tabular-nums;
@@ -216,21 +325,10 @@
 
 /* --- adding a curriculum -------------------------------------------------- */
 .addButton {
-  display: block;
-  margin: 1.25rem auto 0;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
-  border: 1px dashed var(--line-bright);
-  background: none;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.addButton:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  composes: quiet from '../ui.module.css';
+  display: flex;
+  width: fit-content;
+  margin: 1rem auto 0;
 }
 
 .addForm {
@@ -243,46 +341,28 @@
 .addForm input {
   flex: 1 1 12rem;
   min-width: 0;
-  background: var(--bg-raised);
+  padding: 0.55rem 0.75rem;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
+  background: oklch(10% 0 0 / 0.7);
   color: var(--ink);
-  padding: 0.5rem 0.65rem;
   font: inherit;
   font-size: 0.9375rem;
 }
 
-/* The two buttons the page shares: gold for the one thing, plain for the rest. */
-.primary,
-.plain {
-  min-height: 2.25rem;
-  padding: 0.35rem 0.95rem;
-  border-radius: 8px;
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.primary {
-  border: 1px solid var(--accent);
-  background: var(--accent);
-  color: oklch(20% 0.03 85);
-  font-weight: 600;
-}
-
-.primary:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.plain {
-  border: 1px solid var(--line-bright);
-  background: var(--bg-raised);
-  color: var(--ink);
-}
-
-.plain:hover {
+.addForm input:focus {
+  outline: none;
   border-color: var(--accent);
+}
+
+/* The two buttons the page shares, both bordered: the app's colour for the
+   one thing, the site's plain bordered button for the rest. */
+.primary {
+  composes: primary from '../ui.module.css';
+}
+
+.plain {
+  composes: button from '../ui.module.css';
 }
 
 /* --- a step of the drill-down -------------------------------------------- */
@@ -302,25 +382,17 @@
     animation: none;
   }
 
-  .ringFill {
+  .ringFill,
+  .rowTick,
+  .rowOpen {
     transition: none;
   }
 }
 
 .back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
+  composes: quiet from '../ui.module.css';
   max-width: 100%;
-  margin: 0 0 0.75rem -0.4rem;
-  padding: 0.35rem 0.6rem 0.35rem 0.4rem;
-  border: 0;
-  border-radius: 8px;
-  background: none;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
+  margin: 0 0 0.75rem -0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -331,15 +403,10 @@
   line-height: 1;
 }
 
-.back:hover {
-  color: var(--ink);
-  background: color-mix(in oklch, var(--ink) 6%, transparent);
-}
-
 .viewHead {
   display: grid;
   justify-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   margin-bottom: 1.25rem;
   text-align: center;
 }
@@ -350,10 +417,11 @@
   color: var(--accent);
 }
 
+/* A curriculum's name, so the display face. */
 .viewTitle {
   margin: 0;
   font-family: var(--font-display), var(--font-sans), sans-serif;
-  font-size: 1.625rem;
+  font-size: 1.75rem;
   font-weight: 400;
   line-height: 1.2;
   text-wrap: balance;
@@ -366,24 +434,77 @@
   gap: 0.4rem;
 }
 
+/* Rename, status and Ohana: the site's outlined button, small. */
 .chip {
-  min-height: 2rem;
-  padding: 0 0.8rem;
-  border-radius: 999px;
-  border: 1px solid var(--line-bright);
-  background: var(--bg-raised);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.8125rem;
-  cursor: pointer;
+  composes: button from '../ui.module.css';
+  padding: 7px 13px;
+  font-size: 0.68rem;
 }
 
-.chip:hover {
-  border-color: var(--accent);
+@media (min-width: 900px) {
+  .viewHead {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    justify-items: start;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .controls {
+    justify-content: flex-end;
+  }
 }
 
-/* ★ Cards and § Sources: gold, because they are the two things on this view
-   that are not steps on the route. */
+/* The next lesson, in the app's colour: its words, not a box (it sits inside
+   the panel, and there are no cards inside cards), split from the rest by a
+   hairline. On a computer only: on a phone the list's Open does this, one
+   step back. */
+.nextCard {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .nextCard {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0 0 1.1rem;
+    padding: 0 0 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+.nextHead {
+  composes: headAccent from '../ui.module.css';
+  margin: 0;
+}
+
+.nextHead span {
+  letter-spacing: normal;
+  text-transform: none;
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.nextName {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--accent);
+}
+
+.nextButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+/* ★ Cards and § Sources: the two things on this view that are not steps on
+   the route, bordered buttons in a row of their own. */
 .goldRow {
   display: flex;
   flex-wrap: wrap;
@@ -392,31 +513,21 @@
   margin-bottom: 1rem;
 }
 
-.goldChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-height: 2.25rem;
-  padding: 0 1rem;
-  border-radius: 999px;
-  border: 1px solid oklch(90% 0.08 88);
-  background: linear-gradient(160deg, oklch(84% 0.12 88), oklch(72% 0.13 82));
-  color: oklch(24% 0.03 85);
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
+@media (min-width: 900px) {
+  .goldRow {
+    justify-content: flex-start;
+  }
 }
 
-.goldChip:hover {
-  filter: brightness(1.06);
+.goldChip {
+  composes: button from '../ui.module.css';
 }
 
 .count {
   font-weight: 400;
+  letter-spacing: normal;
   font-variant-numeric: tabular-nums;
-  color: oklch(32% 0.05 85);
+  color: var(--muted);
 }
 
 .searchRow {
@@ -425,17 +536,12 @@
 }
 
 .search {
-  width: 100%;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--ink);
-  padding: 0.55rem 0.7rem;
-  font: inherit;
+  composes: field from '../ui.module.css';
   font-size: 0.9375rem;
 }
 
-/* Hits within the open curriculum — Japanese alone is 118 lessons. */
+/* Hits within the open curriculum — Japanese alone is 118 lessons. Solid,
+   because it lies over the stages. */
 .hits {
   position: absolute;
   z-index: 5;
@@ -445,12 +551,17 @@
   width: 100%;
   max-height: 18rem;
   overflow-y: auto;
-  background: var(--bg-raised);
+  scrollbar-width: none;
+  background: oklch(16% 0 0);
   border: 1px solid var(--line-bright);
   border-radius: 10px;
-  box-shadow: 0 12px 30px rgb(0 0 0 / 0.5);
+  box-shadow: 0 18px 50px oklch(0% 0 0 / 0.55);
   display: grid;
   gap: 0.1rem;
+}
+
+.hits::-webkit-scrollbar {
+  display: none;
 }
 
 .hits button {
@@ -460,8 +571,8 @@
   text-align: left;
   background: none;
   border: 0;
-  border-radius: 8px;
-  padding: 0.45rem 0.55rem;
+  border-radius: 6px;
+  padding: 0.5rem 0.6rem;
   color: inherit;
   font: inherit;
   font-size: 0.875rem;
@@ -469,7 +580,7 @@
 }
 
 .hits button:hover {
-  background: color-mix(in oklch, var(--ink) 7%, transparent);
+  color: var(--accent);
 }
 
 .hitIn {
@@ -483,32 +594,58 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.4rem;
+  column-gap: 1.5rem;
+}
+
+/* Rows split by hairlines, in two columns on a wide screen. */
+.stageList > li {
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 1200px) {
+  .stageList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .stageRow {
   width: 100%;
+  height: 100%;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: baseline;
+  align-content: start;
   column-gap: 0.65rem;
-  row-gap: 0.4rem;
-  padding: 0.65rem 0.8rem;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: var(--bg-raised);
+  row-gap: 0.45rem;
+  padding: 0.8rem 0.5rem;
+  border: 0;
+  border-radius: 10px;
+  background: none;
   color: var(--ink);
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: color 0.18s ease;
 }
 
-.stageRow:hover {
-  border-color: var(--line-bright);
+.stageRow:hover .stageName {
+  color: var(--accent);
+}
+
+/* The stage the next lesson is in: its name in the accent and a hairline all
+   round. */
+.stageRowNext {
+  composes: stageRow;
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 55%, transparent);
+}
+
+.stageRowNext .stageName {
+  color: var(--accent);
 }
 
 .stageNumber {
   font-size: 1.125rem;
+  font-weight: 800;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
@@ -516,6 +653,7 @@
 .stageName {
   grid-column: 2;
   font-size: 0.9375rem;
+  font-weight: 600;
   line-height: 1.35;
 }
 
@@ -527,39 +665,55 @@
   white-space: nowrap;
 }
 
+.stageNext {
+  grid-column: 2 / -1;
+  font-size: 0.8125rem;
+  color: var(--accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* How far through the stage: a measure, not a state, so the one fill the page
+   keeps. */
 .bar {
   grid-column: 1 / -1;
   height: 4px;
   border-radius: 999px;
-  background: var(--line);
+  background: oklch(100% 0 0 / 0.07);
   overflow: hidden;
 }
 
 .bar i {
   display: block;
   height: 100%;
+  border-radius: 999px;
   background: var(--accent);
 }
 
 .subHead {
-  margin: 1.25rem 0 0.5rem;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
+  composes: head from '../ui.module.css';
+  margin: 1.4rem 0 0.55rem;
 }
 
 .sectionTitle {
-  margin: 0 0 1rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  line-height: 1.3;
+  composes: title from '../ui.module.css';
+  margin: 0 0 1.1rem;
+  font-size: 1.4rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stageRow {
+    transition: none;
+  }
 }
 
 /* --- a stage's lessons, as numbers ----------------------------------------
    Numbers, not names: a stage of thirty lessons is a wall of text, and a grid
-   of thirty numbers is a shape with visible gaps. Gold is done. */
+   of thirty numbers is a shape with visible gaps. Each is a small mark shown
+   by the colour of its number and its border, never a fill: gold is done,
+   the app's colour is next. On a computer there is room for each name
+   beside its number, in columns, and the gaps still show. */
 .numberGrid {
   list-style: none;
   margin: 0;
@@ -574,25 +728,41 @@
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  border-radius: 10px;
-  border: 1px solid var(--line-bright);
-  background: oklch(22% 0 0);
-  color: var(--ink);
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
   font: inherit;
   font-size: 1.125rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
+  text-align: left;
   cursor: pointer;
-  transition: border-color 120ms ease-out;
+  transition:
+    border-color 120ms ease-out,
+    color 120ms ease-out;
 }
 
 .cell:hover {
-  border-color: var(--accent);
+  border-color: var(--line-bright);
+  color: var(--ink);
 }
 
-.cellDone {
-  background: linear-gradient(160deg, oklch(84% 0.12 88), oklch(70% 0.13 82));
-  border-color: oklch(90% 0.08 88);
-  color: oklch(24% 0.03 85);
+.cellName {
+  display: none;
+}
+
+.cellDone,
+.cellDone:hover {
+  border-color: color-mix(in oklch, var(--gold) 55%, transparent);
+  color: var(--gold);
+}
+
+.cellNext,
+.cellNext:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .cellAdd {
@@ -618,9 +788,48 @@
   }
 }
 
+@media (min-width: 900px) {
+  .numberGrid {
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 0.4rem;
+  }
+
+  .cell {
+    aspect-ratio: auto;
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    place-items: center start;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .cellNumber {
+    justify-self: center;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+
+  .cellName {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    font-weight: 400;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cellDone .cellName {
+    font-weight: 500;
+  }
+}
+
 /* --- one lesson -----------------------------------------------------------
    Where you are, the lesson's name, then details, sources and any visual
-   examples; the three round buttons held at the foot of the screen. */
+   examples; the three round buttons held at the foot of the screen. On a wide
+   computer the details take the width and the sources and examples sit in a
+   column beside them. */
 .lessonPane {
   display: grid;
   gap: 1rem;
@@ -628,7 +837,10 @@
 
 .lessonWhere {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
@@ -638,54 +850,68 @@
   margin: 0 0.1rem;
 }
 
+/* A lesson's name is heavy Archivo: the display face is for curriculum names. */
 .lessonTitle {
   margin: 0;
-  font-family: var(--font-display), var(--font-sans), sans-serif;
-  font-size: clamp(1.5rem, 5vw, 2.25rem);
-  font-weight: 400;
-  line-height: 1.15;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
   text-wrap: balance;
 }
 
 .renameTitle {
+  composes: field from '../ui.module.css';
   width: min(100%, 40rem);
-  background: var(--bg);
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  color: var(--ink);
   padding: 0.3rem 0.6rem;
-  font: inherit;
+  border-color: var(--accent);
 }
 
 .renameEyebrow {
-  background: var(--bg);
+  padding: 0.05rem 0.3rem;
   border: 1px solid var(--accent);
   border-radius: 6px;
+  background: oklch(10% 0 0 / 0.7);
   color: var(--ink);
-  padding: 0.05rem 0.3rem;
   font: inherit;
   font-size: 0.75rem;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
-.lessonBody {
+.lessonBody,
+.lessonBodyWide {
   display: grid;
   gap: 1.5rem;
   align-content: start;
 }
 
+@media (min-width: 1200px) {
+  .lessonBodyWide {
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 20rem);
+    column-gap: 2rem;
+  }
+
+  .lessonBodyWide .lessonDetails {
+    grid-row: span 2;
+  }
+}
+
 /* A table or a code block inside the material must be allowed to be narrower
    than its content, or it widens the column instead of scrolling inside
    itself. */
-.lessonSection {
+.lessonSection,
+.lessonDetails {
   min-width: 0;
 }
 
-.lessonSection h3 {
-  margin: 0 0 0.5rem;
-  font-size: 0.6875rem;
-  font-weight: 500;
+.lessonSection h3,
+.lessonDetails h3 {
+  margin: 0 0 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   color: var(--accent);
 }
 
@@ -702,7 +928,7 @@
 .visuals img {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .visuals figcaption {
@@ -717,8 +943,16 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.5rem;
   font-size: 0.9375rem;
+}
+
+/* Rows split by hairlines, not boxes. */
+.sourceList li {
+  padding: 0.6rem 0;
+}
+
+.sourceList li + li {
+  border-top: 1px solid var(--line);
 }
 
 .sourceList a {
@@ -747,15 +981,20 @@
 }
 
 /* Sticky inside the scrolling .shell, so a long lesson never pushes its own
-   tick out of reach. The fade above it is the page's own background. */
+   tick out of reach. A small bar of the panel's own dark behind the three
+   round buttons, so text scrolling under them does not show through; no
+   border, so it is not a card inside the card. */
 .lessonActions {
   position: sticky;
-  bottom: 0;
+  bottom: 0.75rem;
+  justify-self: center;
   display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 1.25rem 0 0.5rem;
-  background: linear-gradient(to bottom, transparent, var(--bg) 40%);
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding: 0.4rem;
+  border-radius: 999px;
+  background: oklch(16% 0 0 / 0.94);
+  box-shadow: 0 12px 34px oklch(0% 0 0 / 0.5);
 }
 
 .roundButton {
@@ -763,16 +1002,17 @@
   height: 2.75rem;
   display: grid;
   place-items: center;
-  border-radius: 999px;
+  border-radius: 50%;
   border: 1px solid var(--line-bright);
-  background: var(--bg-raised);
+  background: none;
   color: var(--ink);
   font-size: 1.0625rem;
   line-height: 1;
   cursor: pointer;
   padding: 0;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.4);
-  transition: border-color 140ms ease-out, color 140ms ease-out;
+  transition:
+    border-color 140ms ease-out,
+    color 140ms ease-out;
 }
 
 .roundButton:hover {
@@ -780,26 +1020,26 @@
   color: var(--accent);
 }
 
-/* Already done, so the button is the state as well as the switch. */
+.roundButton:active {
+  transform: translateY(1px);
+}
+
+/* Already done, so the button is the state as well as the switch: its tick
+   and border in the status gold of done. */
 .roundDone,
 .roundDone:hover {
-  border-color: var(--accent);
-  background: linear-gradient(160deg, oklch(84% 0.12 88), oklch(70% 0.13 82));
-  color: oklch(24% 0.03 85);
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 .roundDelete:hover {
-  border-color: var(--red);
-  color: var(--red);
+  border-color: var(--bad);
+  color: var(--bad);
 }
 
 .detailEditor {
-  width: 100%;
+  composes: field from '../ui.module.css';
   min-height: 20rem;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--ink);
   padding: 0.8rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.875rem;
@@ -812,6 +1052,18 @@
   justify-content: center;
   gap: 0.6rem;
   margin: 0.8rem 0 0;
+}
+
+@media (min-width: 900px) {
+  .editButtons {
+    justify-content: flex-start;
+  }
+}
+
+@media (min-width: 1400px) {
+  .detailEditor {
+    min-height: 28rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

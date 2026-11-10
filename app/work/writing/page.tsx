@@ -4,6 +4,7 @@ import { COLLECTIONS } from '@/lib/collections';
 import { getProjects } from '@/lib/content';
 import { site } from '@/lib/site';
 import CollectionEditor from '../CollectionEditor';
+import styles from '../collection.module.css';
 
 // Posts in content/writing, editable from the browser.
 //
@@ -22,7 +23,9 @@ const collection = COLLECTIONS.find((c) => c.key === 'writing')!;
 
 export default function Page() {
   return (
-    <div className="shell">
+    // Wider than the site's content width on a computer: a list column, the
+    // editor and the live page side by side.
+    <div className={`shell ${styles.wide}`}>
       <CollectionEditor
         collection="writing"
         noun="post"

@@ -1,14 +1,100 @@
-/* The collection editor — Projects and Writing. Tokens from app/globals.css.
+/* The collection editor — Projects and Writing. Tokens from app/globals.css,
+   building blocks from ui.module.css.
 
    His pick, 2026-11-10 (redesign page, Projects and Writing: A, "Four tabs
-   and a fixed bar"): the list of cards is the first screen, and an entry opens
-   full screen with four tabs over a pane that scrolls on its own, and a bar
-   of Preview, Publish and Save pinned at the foot. From 1000px the live page
-   sits in a panel on the right. Gold only for the one thing: Save while there
-   is something to save, and the edge of a card that would be flagged. */
+   and a fixed bar"): on a phone the list of cards is the first screen, and an
+   entry opens full screen with four tabs over a pane that scrolls on its own,
+   and a bar of Preview, Publish and Save pinned at the foot.
+
+   His call, 2026-11-10 (design pass: the public site's styling, the CRM's
+   desktop layout): dressed as the public site, and from 900px laid out as the
+   CRM's list and detail. The list is a narrow panel on the left that scrolls
+   on its own, the open entry a panel taking the rest of the width, and from
+   1280px the live page sits large beside the tabs.
+
+   To DESIGN.md (his rulings, 11 Nov 2026): state is the colour of the words,
+   never a tinted fill; buttons are bordered, Save the one in the accent; no
+   cards inside cards, so what sits inside a panel is split by hairlines;
+   cards 16px, controls 10px, small marks 6px. An entry with something to fix
+   says so in an accent chip; the open one is ui's rowOn, accent words in an
+   accent ring. No side stripes, no scrollbars. */
+
+/* --- the page: list | entry ---------------------------------------------- */
+
+/* On a phone the list and the entry are one screen or the other, and the
+   wrapper scrolls (work.module.css): the layout steps aside, so each is a
+   child of that wrapper as it was. */
+.layout {
+  display: contents;
+}
+
+.layout[data-open] > .listCol,
+.pickCol {
+  display: none;
+}
 
 .page {
   margin: 1.25rem auto 2rem;
+}
+
+@media (min-width: 900px) {
+  /* Fills the wrapper rather than scrolling in it: the list and the entry
+     each scroll on their own, so neither moves when the other does. */
+  .layout {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(15rem, 20rem) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .layout[data-open] > .listCol {
+    display: block;
+  }
+
+  /* ui's panel, written out: CSS modules cannot compose inside a media
+     query. */
+  .listCol,
+  .pickCol {
+    padding: 1.1rem 1.15rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: oklch(16% 0 0 / 0.84);
+  }
+
+  .listCol {
+    display: block;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .listCol::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pickCol {
+    display: grid;
+    align-self: start;
+    place-items: center;
+    min-height: 12rem;
+  }
+
+  .page {
+    margin: 0;
+  }
+}
+
+/* The two pages' wrapper (projects/page.tsx, writing/page.tsx) on a
+   computer: wider than the site's 1180px content width, so the list, the
+   editor and the live page each have room. Two classes, to outrank the global
+   .shell. */
+@media (min-width: 900px) {
+  .wide:global(.shell) {
+    max-width: 1680px;
+  }
 }
 
 /* --- the list: + New, the views, and the grid's order --------------------- */
@@ -24,19 +110,7 @@
 }
 
 .newButton {
-  background: var(--bg-raised);
-  border: 1px solid var(--line-bright);
-  border-radius: 999px;
-  color: var(--ink);
-  padding: 0.45rem 1.05rem;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.newButton:hover {
-  border-color: var(--accent);
+  composes: button from './ui.module.css';
 }
 
 .orderBar {
@@ -50,15 +124,39 @@
   color: var(--muted);
 }
 
-.orderBar button {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+.orderBar button:not(.save) {
+  padding: 8px 14px;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  background: none;
   color: var(--ink);
-  padding: 0.35rem 0.95rem;
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
+}
+
+.orderBar button:not(.save):hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.orderBar .save {
+  padding: 8px 14px;
+}
+
+@media (min-width: 900px) {
+  .listTop {
+    max-width: none;
+    margin: 0 0 0.9rem;
+  }
+
+  .orderBar {
+    justify-content: flex-start;
+    margin: 0 0 0.9rem;
+  }
 }
 
 /* --- one card per entry -------------------------------------------------- */
@@ -69,20 +167,21 @@
   align-items: center;
 }
 
+/* On a phone, one of the site's cards: translucent, a hairline all round.
+   It carries the global card-link (EntryList.tsx) for the site's hover. */
 .card {
   width: 100%;
   max-width: 36rem;
   margin: 0 auto 0.6rem;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg-raised);
+  border-radius: 16px;
+  background: oklch(16% 0 0 / 0.84);
   overflow: hidden;
-  transition: border-color 0.15s ease;
 }
 
-/* Something on it would be flagged if it were opened. */
+/* Something on it would be flagged if it were opened: the accent, all round. */
 .card[data-waiting] {
-  box-shadow: inset 3px 0 0 var(--accent);
+  border-color: color-mix(in oklch, var(--accent) 60%, var(--line));
 }
 
 .cardHeadRow {
@@ -98,31 +197,32 @@
   grid-template-areas:
     'name state'
     'facts facts';
-  align-items: baseline;
-  gap: 0.2rem 1rem;
+  align-items: center;
+  gap: 0.25rem 1rem;
   background: none;
   border: 0;
   color: var(--ink);
-  padding: 0.8rem 1.1rem;
+  padding: 0.85rem 1.1rem;
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.cardHead:hover .cardName {
-  color: var(--accent);
-}
-
 .cardName {
   grid-area: name;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cardFacts {
   grid-area: facts;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -135,8 +235,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The count, as ui's chipAccent: accent words in an accent hairline. */
 [data-waiting] .cardState {
+  padding: 0.1rem 0.55rem;
+  border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+  border-radius: 10px;
   color: var(--accent);
+  font-size: 0.72rem;
   font-weight: 600;
 }
 
@@ -147,18 +252,22 @@
 }
 
 .move button {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
   color: var(--ink);
   width: 2.1rem;
   height: 2.1rem;
   font: inherit;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .move button:hover:not(:disabled) {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .move button:disabled {
@@ -166,25 +275,107 @@
   cursor: default;
 }
 
-/* --- an open entry: full screen ------------------------------------------- */
+/* On a computer, the list is rows in a panel, as ui's rows: no box of their
+   own (no cards inside cards), split by hairlines, the open one ui's rowOn.
+   The card-link hover is a phone card's, so it is undone here; doubled
+   classes, to outrank work.module.css's .shell .card-link. */
+@media (min-width: 900px) {
+  .cards {
+    display: grid;
+    align-items: stretch;
+  }
 
-/* Fills the scrolling wrapper (work.module.css) rather than scrolling in it:
-   only the pane between the tabs and the bar scrolls, so the tabs and the bar
-   never leave the screen. The negative margin takes back the wrapper's foot
-   padding, so the bar sits on the bottom edge. */
+  .cards > .card.card {
+    max-width: none;
+    margin: 0;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .cards > .card.card::before {
+    display: none;
+  }
+
+  .cards > .card.card + .card {
+    border-top: 1px solid var(--line);
+  }
+
+  .cards > .card.card[data-open] {
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 55%, transparent);
+  }
+
+  .cards > .card.card[data-open] + .card {
+    border-top-color: transparent;
+  }
+
+  .card:hover .cardName {
+    color: var(--accent);
+  }
+
+  .cardHead {
+    padding: 0.7rem 0.25rem;
+  }
+
+  [data-open] .cardHead {
+    padding-inline: 0.75rem;
+  }
+
+  .cardName {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  [data-open] .cardName {
+    color: var(--accent);
+  }
+
+  .move {
+    padding-right: 0.5rem;
+  }
+
+  .move button {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+  }
+}
+
+/* --- an open entry ------------------------------------------------------ */
+
+/* On a phone, full screen. Fills the scrolling wrapper (work.module.css)
+   rather than scrolling in it: only the pane between the tabs and the bar
+   scrolls, so the tabs and the bar never leave the screen. The negative
+   margin takes back the wrapper's foot padding, so the bar sits on the bottom
+   edge. */
 .editor {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   margin-bottom: -1rem;
 }
 
+/* On a computer, a panel in the right-hand column, as tall as the column. */
+@media (min-width: 900px) {
+  .editor {
+    margin-bottom: 0;
+    padding: 0.9rem 1.15rem 0;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: oklch(16% 0 0 / 0.84);
+  }
+}
+
 .editorHead {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 0 0.5rem;
+  gap: 0.6rem;
+  padding: 0.6rem 0 0.7rem;
 }
 
 .back {
@@ -193,28 +384,34 @@
   height: 2.3rem;
   display: grid;
   place-items: center;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 50%;
   color: var(--ink);
   font: inherit;
   font-size: 1.35rem;
   line-height: 1;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .back:hover {
-  border-color: var(--line-bright);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .editorTitle {
   min-width: 0;
   display: grid;
+  gap: 0.1rem;
 }
 
 .editorName {
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -224,6 +421,16 @@
   font-size: 0.75rem;
   color: var(--muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@media (min-width: 900px) {
+  .editorHead {
+    padding-top: 0;
+  }
+
+  .editorName {
+    font-size: clamp(1.3rem, 1.8vw, 1.6rem);
+  }
 }
 
 .editorOne,
@@ -240,9 +447,9 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* On a computer: the tabs on the left, the live page on the right. */
+/* From 1280px: the tabs on the left, the live page large on the right. */
 .editorSplit {
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 44%);
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 50%);
   gap: 1.25rem;
 }
 
@@ -252,44 +459,53 @@
   flex-direction: column;
 }
 
+/* ui's tabs, written out rather than composed so the phone's equal widths
+   do not depend on which stylesheet loads first. */
 .tabs {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-
-.tab,
-.tabOn {
-  border: 0;
-  border-radius: 8px;
-  padding: 0.5rem 0.3rem;
-  font: inherit;
-  font-size: 0.8125rem;
-  white-space: nowrap;
-  cursor: pointer;
+  gap: 0.5rem;
 }
 
 .tab {
+  padding: 0.45rem 0.3rem;
+  border: 0;
+  border-radius: 6px;
   background: none;
   color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .tab:hover {
   color: var(--ink);
 }
 
-.tabOn {
-  background: var(--ink);
-  color: var(--bg);
+/* The current tab: accent words, underlined. No fill. */
+.tab[aria-selected='true'] {
+  color: var(--accent);
   font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
 }
 
-/* A count of problems: said in gold, not painted gold. */
+@media (min-width: 900px) {
+  .tabs {
+    align-self: flex-start;
+    grid-auto-columns: max-content;
+  }
+
+  .tab {
+    padding-inline: 1rem;
+  }
+}
+
+/* A count of problems: said in the accent, not painted in it. */
 .tab[data-problems] {
   color: var(--accent);
 }
@@ -315,8 +531,8 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding-top: 0.25rem;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
 }
 
 .sideScroll {
@@ -326,7 +542,10 @@
 
 .sideNote {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
@@ -335,75 +554,64 @@
   min-height: 0;
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--bg-raised);
 }
 
 .editorMessage {
   margin: 0;
-  padding: 0.5rem 0 0;
+  padding: 0.6rem 0 0;
   font-size: 0.8125rem;
   line-height: 1.5;
   color: var(--muted);
   border-top: 1px solid var(--line);
 }
 
-/* Pinned at the foot: Preview, Publish / Hide page, Save. */
+/* Pinned at the foot: Preview, Publish / Hide page, Save. Nearly opaque on a
+   phone, where the pane scrolls under it. */
 .actionBar {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
   gap: 0.5rem;
-  padding: 0.6rem 0 max(0.6rem, env(safe-area-inset-bottom));
+  padding: 0.7rem 0 max(0.7rem, env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
-  background: var(--bg);
+  background: oklch(12% 0 0 / 0.94);
 }
 
 .editorMessage + .actionBar {
   border-top: 0;
 }
 
-.actionBar button {
-  background: var(--bg-raised);
-  border: 1px solid var(--line-bright);
-  border-radius: 10px;
-  color: var(--ink);
-  padding: 0.65rem 0.75rem;
-  font: inherit;
-  font-size: 0.9375rem;
-  cursor: pointer;
+.actionBar > button {
+  padding-inline: 0.75rem;
 }
 
-.actionBar button:hover:not(:disabled) {
-  border-color: var(--accent);
-}
-
-.actionBar button:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-@media (min-width: 1000px) {
+@media (min-width: 900px) {
   .actionBar {
     grid-auto-columns: max-content;
     justify-content: end;
+    padding: 0.85rem 0 1rem;
+    background: none;
   }
 
-  .actionBar button {
+  .actionBar > button {
     min-width: 8rem;
   }
 }
 
-.quiet {
-  color: var(--muted) !important;
+/* The one thing: Save, ui's bordered primary in the accent, never filled. */
+.save {
+  composes: primary from './ui.module.css';
 }
 
 .draftTag,
 .dirty {
   margin-left: 0.5rem;
-  font-size: 0.6875rem;
+  font-size: 0.66rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.2em;
 }
 
 .draftTag {
@@ -411,28 +619,31 @@
 }
 
 .dirty {
-  color: oklch(82% 0.16 85);
+  color: var(--warn);
 }
 
-/* More details: the rarely used fields, and the raw box, folded. */
+/* More details: the rarely used fields, and the raw box, folded. Between
+   hairlines rather than in a box of its own (no cards inside cards). */
 .more {
   margin: 0.25rem 0 1rem;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 0.7rem 0.85rem;
+  border-block: 1px solid var(--line);
+  padding: 0.9rem 0;
 }
 
 .more > summary {
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--ink);
 }
 
 .moreFlag {
+  composes: chipAccent from './ui.module.css';
   margin-left: 0.6rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--accent);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 /* The Check tab: one column of panels. */
@@ -471,7 +682,7 @@
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .galleryName {
@@ -480,42 +691,66 @@
 }
 
 .galleryUsed {
-  color: var(--ink);
+  color: var(--accent);
 }
 
 .addSectionButton {
   justify-self: start;
-  background: var(--bg-raised);
+  background: none;
   border: 1px dashed var(--line-bright);
-  border-radius: 999px;
+  border-radius: 10px;
   color: var(--ink);
-  padding: 0.45rem 1rem;
+  padding: 9px 16px;
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .addSectionButton:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* Focus is always visible, on every control the editor draws. */
-.newButton:focus-visible,
 .back:focus-visible,
 .tab:focus-visible,
-.tabOn:focus-visible,
-.actionBar button:focus-visible,
 .move button:focus-visible,
+.orderBar button:focus-visible,
 .cardHead:focus-visible,
 .addSectionButton:focus-visible,
 .pill:focus-visible,
-.pillOn:focus-visible {
+.pillOn:focus-visible,
+.blockHead button:focus-visible,
+.blockAdd:focus-visible,
+.insertRow button:focus-visible,
+.sectionTools button:focus-visible,
+.quietLink:focus-visible,
+.proseList button:focus-visible,
+.more > summary:focus-visible,
+.other summary:focus-visible,
+.uploadButton:focus-within,
+.swatch:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
+.cardHead:focus-visible {
+  outline-offset: -2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .card {
+  .card,
+  .move button,
+  .back,
+  .addSectionButton,
+  .insertRow button,
+  .sectionTools button {
     transition: none;
   }
 }
@@ -527,9 +762,8 @@
   padding: 0.7rem 0.85rem;
   display: grid;
   gap: 0.3rem;
-  background: color-mix(in oklch, oklch(82% 0.16 85) 8%, transparent);
-  border-left: 2px solid oklch(82% 0.16 85);
-  border-radius: 0 8px 8px 0;
+  border: 1px solid color-mix(in oklch, var(--warn) 45%, transparent);
+  border-radius: 10px;
   font-size: 0.8125rem;
   line-height: 1.5;
 }
@@ -545,33 +779,30 @@
   gap: 0.3rem;
 }
 
+/* Labels are the site's eyebrow. */
 .field > label {
-  font-size: 0.8125rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
-.fieldInput,
+/* ui's field: a dark well whose hairline takes the accent on focus. */
+.fieldInput {
+  composes: field from './ui.module.css';
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
 .fieldText {
-  width: 100%;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--ink);
-  padding: 0.5rem 0.6rem;
-  font: inherit;
+  composes: field from './ui.module.css';
   font-size: 0.9375rem;
   line-height: 1.5;
 }
 
 .fieldText {
   resize: vertical;
-}
-
-.fieldInput:focus,
-.fieldText:focus,
-.body:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 .hint {
@@ -594,9 +825,9 @@
   height: 100%;
   min-height: 2.25rem;
   padding: 2px;
-  background: var(--bg-raised);
+  background: oklch(10% 0 0 / 0.7);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -622,18 +853,22 @@
   position: relative;
   display: inline-grid;
   place-items: center;
-  padding: 0.45rem 0.7rem;
-  background: var(--bg-raised);
-  border: 1px dashed var(--line);
-  border-radius: 8px;
-  color: var(--muted);
-  font-size: 0.8125rem;
+  padding: 0.55rem 0.9rem;
+  background: none;
+  border: 1px dashed var(--line-bright);
+  border-radius: 10px;
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .uploadButton:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .uploadButton input {
@@ -646,22 +881,24 @@
 .imagePreview {
   max-width: 220px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 /* The repeating editor — `pieces`, which is most of the Odin file. */
 .blocks {
   display: grid;
-  gap: 0.75rem;
 }
 
+/* A row split from the next by a hairline, not a box (no cards inside
+   cards). */
 .block {
   display: grid;
   gap: 0.45rem;
-  padding: 0.75rem;
-  background: color-mix(in oklch, var(--bg-raised) 55%, transparent);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  padding: 0.9rem 0;
+}
+
+.block + .block {
+  border-top: 1px solid var(--line);
 }
 
 .blockHead {
@@ -679,9 +916,9 @@
 
 .blockHead button,
 .blockAdd {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
   color: var(--ink);
   padding: 0.2rem 0.5rem;
   font: inherit;
@@ -695,7 +932,13 @@
 }
 
 .blockRemove {
-  color: oklch(70% 0.18 25) !important;
+  color: var(--bad) !important;
+}
+
+.blockHead button:hover:not(:disabled),
+.blockAdd:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .blockAdd {
@@ -710,17 +953,21 @@
 }
 
 .blockField > span {
-  font-size: 0.75rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
 .blockRaw {
   margin: 0;
   padding: 0.4rem 0.5rem;
-  background: var(--bg);
-  border-radius: 6px;
+  background: oklch(10% 0 0 / 0.7);
+  border-radius: 10px;
   font-size: 0.75rem;
   overflow-x: auto;
+  scrollbar-width: none;
   color: var(--muted);
 }
 
@@ -734,13 +981,19 @@
 
 .other summary {
   cursor: pointer;
-  font-size: 0.8125rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
 }
 
 .bodyLabel {
   display: block;
-  font-size: 0.8125rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 0.3rem;
 }
@@ -756,27 +1009,27 @@
 }
 
 .insertRow button {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
   color: var(--ink);
-  padding: 0.15rem 0.45rem;
+  padding: 0.2rem 0.5rem;
   font: inherit;
   font-size: 0.75rem;
   cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .insertRow button:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .body {
-  width: 100%;
+  composes: field from './ui.module.css';
   min-height: 28rem;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--ink);
   padding: 0.85rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.875rem;
@@ -791,20 +1044,35 @@
   margin: 1rem 0;
 }
 
-.preview {
-  background: var(--bg-raised);
+/* The Check tab's panels. On a phone, where the editor is not itself a
+   panel, they are the site's cards; on a computer the editor is the card, so
+   they are sections split by a hairline (no cards inside cards). */
+.preview,
+.prosePanel {
+  background: oklch(16% 0 0 / 0.84);
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 1rem;
+  border-radius: 16px;
+  padding: 1.1rem 1.15rem 1.2rem;
+}
+
+@media (min-width: 900px) {
+  .preview,
+  .prosePanel {
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    padding: 1rem 0 0;
+  }
 }
 
 .previewHead {
   margin: 0 0 0.6rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: var(--muted);
-  font-weight: 400;
 }
 
 .preview h3.previewHead {
@@ -813,20 +1081,21 @@
   border-top: 1px solid var(--line);
 }
 
-/* The card as the grid shows it — not the list's own .card. */
+/* The card as the grid shows it — not the list's own .card. A picture of
+   the public card, so it keeps the card's hairline and corners. */
 .gridCard {
   display: grid;
   gap: 0.35rem;
   padding: 0.8rem;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 16px;
 }
 
 .gridCard img {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 .cardNoCover {
@@ -836,7 +1105,7 @@
   font-size: 0.75rem;
   color: var(--muted);
   border: 1px dashed var(--line);
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 .cardMeta {
@@ -850,6 +1119,8 @@
 .cardTitle {
   margin: 0;
   font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .cardSummary {
@@ -881,7 +1152,7 @@
 .heroPreview {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 0.6rem;
 }
 
@@ -889,21 +1160,13 @@
 .notice {
   margin: 0.9rem 0 0;
   padding: 0.7rem 0.85rem;
-  background: color-mix(in oklch, oklch(78% 0.1 255) 8%, transparent);
-  border-left: 2px solid oklch(78% 0.1 255);
-  border-radius: 0 8px 8px 0;
+  border: 1px solid color-mix(in oklch, oklch(78% 0.1 255) 45%, transparent);
+  border-radius: 10px;
   font-size: 0.8125rem;
   line-height: 1.55;
 }
 
-/* Style and grammar notes on the draft. */
-.prosePanel {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 1rem;
-}
-
+/* Style and grammar notes on the draft: a panel, as .preview. */
 .head {
   display: flex;
   align-items: baseline;
@@ -912,9 +1175,10 @@
 }
 
 .panelLabel {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: var(--muted);
 }
 
@@ -928,7 +1192,7 @@
   margin: 0.7rem 0 0;
   font-size: 0.8125rem;
   line-height: 1.5;
-  color: oklch(82% 0.16 85);
+  color: var(--warn);
 }
 
 .proseCounts {
@@ -937,11 +1201,11 @@
 }
 
 .errorCount {
-  color: oklch(70% 0.18 25);
+  color: var(--bad);
 }
 
 .clean {
-  color: oklch(78% 0.15 150);
+  color: var(--ok);
 }
 
 .proseList {
@@ -949,11 +1213,20 @@
   margin: 0.8rem 0 0;
   padding: 0;
   display: grid;
-  gap: 0.35rem;
   /* Long enough to be worth scrolling on its own rather than pushing the SEO
      panel far down the Check tab. */
   max-height: 22rem;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.proseList::-webkit-scrollbar {
+  display: none;
+}
+
+/* Findings are rows split by a hairline. */
+.proseList li + li {
+  border-top: 1px solid var(--line);
 }
 
 .proseList button {
@@ -962,24 +1235,28 @@
   width: 100%;
   background: none;
   border: 0;
-  border-left: 2px solid var(--line);
-  padding: 0.25rem 0 0.25rem 0.6rem;
+  border-radius: 6px;
+  padding: 0.5rem 0.25rem;
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.proseList button:hover {
-  background: color-mix(in oklch, var(--ink) 5%, transparent);
+/* A finding answers the pointer in its words, not a fill. */
+.proseList button:hover .issueWhere,
+.proseList button:hover .issueSnippet,
+.proseList button:hover .issueFix {
+  color: var(--ink);
 }
 
-.proseList li.error button {
-  border-left-color: oklch(70% 0.18 25);
+/* The kind shows in the label's colour, not a stripe down the side. */
+.proseList li.error .issueLabel {
+  color: var(--bad);
 }
 
-.proseList li.style button {
-  border-left-color: oklch(82% 0.16 85);
+.proseList li.style .issueLabel {
+  color: var(--warn);
 }
 
 .issueLabel {
@@ -1020,17 +1297,8 @@
   aspect-ratio: 1200 / 630;
   object-fit: cover;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 0.5rem;
-}
-
-/* Save is gold while there is something to save, and only then. */
-.actionBar button.save:not(:disabled),
-.orderBar button.save:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-  font-weight: 600;
 }
 
 /* --- the body, as its opening and sections -------------------------------- */
@@ -1065,21 +1333,24 @@
 
 .sections {
   display: grid;
-  gap: 0.7rem;
 }
 
+/* A section is a row split from the next by a hairline, not a box (no
+   cards inside cards). */
 .sectionCard {
   display: grid;
-  gap: 0.45rem;
-  padding: 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--bg);
+  gap: 0.5rem;
+  padding: 0.9rem 0;
+}
+
+.sectionCard + .sectionCard {
+  border-top: 1px solid var(--line);
 }
 
 .sectionLabel {
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -1097,21 +1368,12 @@
 }
 
 .sectionHeading {
+  composes: field from './ui.module.css';
   flex: 1;
   min-width: 0;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--ink);
-  padding: 0.4rem 0.6rem;
-  font: inherit;
-  font-weight: 600;
-}
-
-.sectionHeading:focus,
-.sectionText:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  padding: 0.45rem 0.65rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .sectionTools {
@@ -1120,9 +1382,9 @@
 }
 
 .sectionTools button {
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  background: none;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
   color: var(--ink);
   width: 1.8rem;
   height: 1.8rem;
@@ -1133,6 +1395,7 @@
 
 .sectionTools button:hover:not(:disabled) {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .sectionTools button:disabled {
@@ -1141,13 +1404,8 @@
 }
 
 .sectionText {
-  width: 100%;
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--ink);
-  padding: 0.6rem 0.7rem;
-  font: inherit;
+  composes: field from './ui.module.css';
+  padding: 0.65rem 0.75rem;
   font-size: 0.9375rem;
   line-height: 1.6;
   resize: vertical;
@@ -1163,9 +1421,9 @@
 }
 
 .sectionInsert select {
-  background: var(--bg-raised);
+  background: oklch(10% 0 0 / 0.7);
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 10px;
   color: var(--ink);
   padding: 0.25rem 0.4rem;
   font: inherit;
@@ -1174,35 +1432,35 @@
 
 /* --- Drafts / Published / All, over Writing's cards ------------------------ */
 
+/* ui's tabs, written out: these are toggles (aria-pressed), which ui's tab
+   does not light. The current one is accent words, underlined; no fill. */
 .views {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
+  gap: 0.5rem;
 }
 
 .pill,
 .pillOn {
-  border-radius: 999px;
+  padding: 0.45rem 0.4rem;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
   font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.35rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
 }
 
-.pill {
-  background: none;
-  border: 1px solid var(--line);
-  color: var(--muted);
-}
-
 .pill:hover {
-  border-color: var(--line-bright);
   color: var(--ink);
 }
 
 .pillOn {
-  background: var(--ink);
-  border: 1px solid var(--ink);
-  color: var(--bg);
+  color: var(--accent);
   font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 7px;
 }

@@ -71,7 +71,8 @@ function Version() {
  * a build, and because the one thing worse than forgetting to rebuild is
  * rebuilding four times by double-clicking.
  */
-export default function SiteActions() {
+/** `plain`: no card of its own, for inside a dashboard panel that is one. */
+export default function SiteActions({ plain = false }: { plain?: boolean }) {
   const [state, setState] = useState<'idle' | 'working' | string>('idle');
 
   async function go() {
@@ -94,7 +95,7 @@ export default function SiteActions() {
   }
 
   return (
-    <section className={styles.actions} aria-label="The site">
+    <section className={plain ? styles.actionsPlain : styles.actions} aria-label="The site">
       <p className={styles.status} aria-live="polite">
         {state === 'idle' || state === 'working' ? (
           <Version />

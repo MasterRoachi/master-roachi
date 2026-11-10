@@ -47,8 +47,21 @@ const POINTER_SHIFT = 14;
 export default function Starfield({
   tint,
   density = 1,
+  fps,
+  idleMs,
 }: {
   tint?: string;
+  /**
+   * A frame-rate cap. Unset, it draws on every frame, as the public site
+   * does; the backend sets 30 (DESIGN.md), which looks the same and costs half.
+   */
+  fps?: number;
+  /**
+   * Stop drifting after this long with no pointer, scroll or key, and start
+   * again on the next one. Unset, it never stops. The backend sets a minute
+   * (DESIGN.md): a page left open all day should not draw all day.
+   */
+  idleMs?: number;
   /**
    * Scales the star count. Below 1 thins the field without changing how it
    * moves, for pages that want the black broken rather than filled — About
@@ -136,6 +149,22 @@ export default function Starfield({
     };
     window.addEventListener('pointermove', onPointer, { passive: true });
 
+    // Idle: the loop stops after idleMs without input, and input restarts it.
+    let lastInput = performance.now();
+    let sleeping = false;
+    const onInput = () => {
+      lastInput = performance.now();
+      if (sleeping) {
+        sleeping = false;
+        if (visible && !reduced && !document.hidden && !raf) {
+          last = performance.now();
+          raf = requestAnimationFrame(draw);
+        }
+      }
+    };
+    const INPUTS = ['pointermove', 'pointerdown', 'keydown', 'wheel', 'scroll'] as const;
+    if (idleMs) for (const type of INPUTS) window.addEventListener(type, onInput, { passive: true, capture: true });
+
     /** -1 when the section is below the fold, +1 once it has passed above. */
     const scrollProgress = () => {
       const r = host.getBoundingClientRect();
@@ -148,10 +177,22 @@ export default function Starfield({
     let visible = true;
     let last = performance.now();
     let elapsed = 0;
+    let painted = 0;
+    const frame = fps ? 1000 / fps : 0;
 
     function draw() {
       raf = 0;
       const now = performance.now();
+      if (idleMs && now - lastInput > idleMs) {
+        sleeping = true;
+        return;
+      }
+      // Under the cap, wait for the next frame without painting.
+      if (frame && painted && now - painted < frame - 1) {
+        if (visible && !reduced) raf = requestAnimationFrame(draw);
+        return;
+      }
+      painted = now;
       // Clamped so a backgrounded tab returning does not jump the drift.
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
@@ -218,10 +259,11 @@ export default function Starfield({
       io.disconnect();
       ro.disconnect();
       window.removeEventListener('pointermove', onPointer);
+      if (idleMs) for (const type of INPUTS) window.removeEventListener(type, onInput, { capture: true });
       document.removeEventListener('visibilitychange', onVisibility);
       if (canvas.parentNode === host) host.removeChild(canvas);
     };
-  }, [density]);
+  }, [density, fps, idleMs]);
 
   // A tint lets a page colour its own depth — project pages use their own
   // accent so the field belongs to that project rather than being generic.

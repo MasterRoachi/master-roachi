@@ -5,8 +5,12 @@ import styles from '../collection.module.css';
 
 // The live preview panel beside the editor on a computer.
 //
-// His pick, 2026-11-10 (redesign page, Projects and Writing: A): from about
-// 1000px, Words sits on the left and a live preview on the right. It is the
+// His pick, 2026-11-10 (redesign page, Projects and Writing: A): on a
+// computer, the tabs sit on the left and a live preview on the right. From
+// 1280px rather than 1000px since his call, 2026-11-10 (design pass: the
+// public site's styling, the CRM's desktop layout): the entry list now keeps
+// a column of its own from 900px, and under 1280px there is no room left for
+// a frame big enough to read. It is the
 // same thing Preview the page opens full screen (app/work/shop/PagePreview):
 // the real deployed page in a frame with ?preview=1, sent the unsaved draft on
 // every change and whenever it asks (components/usePreviewDraft.ts). Kept as
@@ -15,7 +19,7 @@ import styles from '../collection.module.css';
 // covers anything.
 
 /** Where the side panel appears. One number, matched by the CSS. */
-export const WIDE = '(min-width: 1000px)';
+export const WIDE = '(min-width: 1280px)';
 
 function subscribe(onChange: () => void) {
   const query = window.matchMedia(WIDE);

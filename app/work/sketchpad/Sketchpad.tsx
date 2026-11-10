@@ -26,6 +26,13 @@ import styles from './sketchpad.module.css';
 // under Save's menu. Back returns to the gallery, asking first if anything is
 // unsaved.
 //
+// DRESSED AS THE PUBLIC SITE — his call, 2026-11-10 (design pass: the public
+// site's styling, the CRM's desktop layout). Each sketch is one of the site's
+// cards, its picture above its name and date; the gallery is a wide grid on a
+// computer, and an open sketch takes the whole width of the pane (page.tsx
+// lifts the content-width cap). The tool's name is the frame's title, so the
+// gallery heads itself with a count instead.
+//
 // The surface is a live SVG rather than a canvas. That is what makes text stay
 // text: a canvas would turn every word into pixels the moment it was drawn,
 // and the saved file could then never be searched, selected or corrected. It
@@ -40,6 +47,23 @@ import styles from './sketchpad.module.css';
 interface FileRef {
   path: string;
   sha: string;
+  /** When it last changed, from the list's ?dates=1; absent if unreadable. */
+  updated?: string | null;
+}
+
+/** Newest first; a sketch with no date goes after the dated ones, by name. */
+function newestFirst(a: FileRef, b: FileRef): number {
+  if (a.updated && b.updated) return b.updated.localeCompare(a.updated);
+  if (a.updated) return -1;
+  if (b.updated) return 1;
+  return a.path.localeCompare(b.path);
+}
+
+/** "10 Nov 2026", from the file's last commit date. Not the clock. */
+function dayOf(stamp: string): string {
+  const date = new Date(stamp);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 type Tool = 'pen' | 'text' | 'select';
@@ -261,7 +285,7 @@ export default function Sketchpad() {
   const [book, setBook] = useState<{ id: number; title: string } | null>(null);
 
   const loadList = useCallback(async () => {
-    const response = await fetch('/work/api/content?collection=notes', { cache: 'no-store' });
+    const response = await fetch('/work/api/content?collection=notes&dates=1', { cache: 'no-store' });
     if (!response.ok) {
       setStatus('Not switched on — GITHUB_TOKEN is not set.');
       setFiles([]);
@@ -269,7 +293,7 @@ export default function Sketchpad() {
     }
     const data = (await response.json()) as { configured: boolean; files: FileRef[] };
     setConfigured(data.configured);
-    setFiles(data.files ?? []);
+    setFiles([...(data.files ?? [])].sort(newestFirst));
   }, []);
 
   useEffect(() => {
@@ -537,7 +561,10 @@ export default function Sketchpad() {
     return (
       <div className={styles.gallery}>
         <div className={styles.galleryBar}>
-          <h2 className={styles.galleryName}>Sketches</h2>
+          <h2 className={styles.galleryName}>
+            {files.length} {files.length === 1 ? 'sketch' : 'sketches'}
+            {files.length > 1 && <span className={styles.galleryNote}> · newest first</span>}
+          </h2>
           <button type="button" className={styles.newButton} onClick={startNew}>
             + New
           </button>
@@ -548,23 +575,26 @@ export default function Sketchpad() {
         {files.length === 0 ? (
           <p className={styles.status}>No sketches yet. Start one with + New.</p>
         ) : (
-          // NAME ORDER, NOT NEWEST FIRST — for now. The list call gives paths
-          // and shas and no dates, so newest first needs the Worker to send
-          // each file's last commit date. Reversed name order would be a
-          // guess dressed as an answer.
+          // NEWEST FIRST, by each file's last commit date (the list's
+          // ?dates=1). See newestFirst().
           <ul className={styles.tiles}>
             {files.map((file) => (
               <li key={file.path}>
                 <button
                   type="button"
-                  className={styles.tile}
+                  className={`${styles.tile} card-link`}
                   aria-busy={opening === file.path}
                   disabled={busy}
                   onClick={() => void open(file.path)}
                 >
                   <Thumb key={thumbKey(file)} file={file} />
-                  <span className={styles.tileName}>
-                    {opening === file.path ? 'Opening…' : titleOf(file.path)}
+                  <span className={styles.tileText}>
+                    <span className={styles.tileName}>
+                      {opening === file.path ? 'Opening…' : titleOf(file.path)}
+                    </span>
+                    {file.updated && (
+                      <span className={styles.tileDate}>{dayOf(file.updated)}</span>
+                    )}
                   </span>
                 </button>
               </li>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import styles from './orders.module.css';
+import ui from '../ui.module.css';
 
 // Orders and Products, one page — his ruling, 2026-10-19. Orders opens first,
 // because a waiting order is the thing on this page that costs money to miss.
@@ -14,6 +15,10 @@ import styles from './orders.module.css';
 //
 // Each panel fills the rest of the pane, so the products' Save bar can sit at
 // its foot even when there are only a few tiles above it.
+//
+// The tabs are ui.module.css's, lit in the app's colour — his call,
+// 2026-11-10 (design pass: the public site's styling, the CRM's desktop
+// layout). The page's name is the frame's title above, so no heading here.
 
 const TABS = [
   { key: 'orders', name: 'Orders' },
@@ -43,7 +48,7 @@ export default function ShopTabs({ orders, products }: { orders: ReactNode; prod
 
   return (
     <>
-      <div className={styles.tabs} role="tablist" aria-label="Shop">
+      <div className={`${ui.tabs} ${styles.tabs}`} role="tablist" aria-label="Shop">
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -52,7 +57,7 @@ export default function ShopTabs({ orders, products }: { orders: ReactNode; prod
             id={`tab-${t.key}`}
             aria-selected={tab === t.key}
             aria-controls={`panel-${t.key}`}
-            className={tab === t.key ? styles.tabOn : styles.tab}
+            className={`${ui.tab} ${styles.tab}`}
             onClick={() => choose(t.key)}
           >
             {t.name}

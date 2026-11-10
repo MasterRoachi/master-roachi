@@ -19,6 +19,18 @@ import styles from './reading.module.css';
 // A spine tips out to show its cover on hover. A phone has no hover, so there
 // the first tap tips it out and the second opens it.
 //
+// DRESSED AS THE PUBLIC SITE, and laid out for a computer: his call,
+// 2026-11-10 (design pass: the public site's styling, the CRM's desktop
+// layout). On a phone the order above is unchanged. From 900px the open books
+// are large panels across the top, and Next and the folded shelves sit below
+// as panels side by side (from 1100px), so the width is used rather than one
+// phone column down the middle. The shelf buttons on the open book are the
+// site's tabs, the current one in the app's colour.
+//
+// To the shared spec (DESIGN.md, 11 Nov 2026): the open cards and the folded
+// shelves carry the global `card-link` for the site's hover. The spines do
+// not, because their own tip-out transform would fight its tilt.
+//
 // Clicking a book pulls it out: the book itself animates from where it
 // stood to the middle of the screen, where it opens into two pages. That is a
 // FLIP — the open book starts life transformed back onto the spine's measured
@@ -228,7 +240,7 @@ function OpenCard({
   return (
     <button
       type="button"
-      className={`${styles.openCard} ${gone ? styles.slotGone : ''}`}
+      className={`${styles.openCard} card-link ${gone ? styles.slotGone : ''}`}
       onClick={(event) => onOpen(book, event.currentTarget)}
     >
       <span
@@ -368,6 +380,32 @@ export default function Reading() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  /* ?book=<id>: open that book straight away, from the Learn home's "Open
+     now" card. Read once, when the books first arrive, then taken out of the
+     URL so closing the book and reloading shows the shelves. No spine was
+     pressed, so it opens without the pull-out (from stays null). */
+  const linked = useRef(false);
+  useEffect(() => {
+    if (!books || linked.current) return;
+    linked.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const id = Number(params.get('book'));
+    const book = Number.isInteger(id) ? books.find((candidate) => candidate.id === id) : undefined;
+    if (params.has('book')) {
+      params.delete('book');
+      const rest = params.toString();
+      window.history.replaceState(null, '', `${window.location.pathname}${rest ? `?${rest}` : ''}`);
+    }
+    if (!book) return;
+    // The URL is read once, when the books arrive, and is not state to derive from.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFrom(null);
+    setDraft(book.notes ?? '');
+    setSettled(false);
+    setPosted(null);
+    setOpen(book.id);
+  }, [books]);
 
   /* The Calibre index — 3,623 books and about 600 kB, so it is fetched when
      the add card is first opened and never on page load.
@@ -738,6 +776,9 @@ export default function Reading() {
         </div>
       )}
 
+      {/* Next and the folded shelves: one column on a phone, two panels side
+          by side on a computer (.lower in the CSS). */}
+      <div className={styles.lower}>
       {/* Next stays a shelf of spines, so the bookcase look survives. */}
       <section className={styles.nextSection}>
         <h2 className={styles.sectionName}>
@@ -757,7 +798,7 @@ export default function Reading() {
               <button
                 key={status}
                 type="button"
-                className={isOpen ? styles.foldOn : styles.fold}
+                className={`${isOpen ? styles.foldOn : styles.fold} card-link`}
                 aria-expanded={isOpen}
                 aria-controls={`shelf-${status}`}
                 onClick={() => {
@@ -801,6 +842,7 @@ export default function Reading() {
             </section>
           );
         })}
+      </div>
       </div>
 
       {/* --- the book, off the shelf and open ------------------------- */}
@@ -951,9 +993,9 @@ export default function Reading() {
                   ))}
                 </div>
 
-                {/* The shelf, as four pills. A dropdown hid three of the four
+                {/* The shelf, as four tabs. A dropdown hid three of the four
                     answers behind a click; this says what the choices are. */}
-                <div className={styles.shelfPills}>
+                <div className={styles.shelfPills} role="group" aria-label="Shelf">
                   {SHELF_PILLS.map(({ status, label }) => (
                     <button
                       key={status}

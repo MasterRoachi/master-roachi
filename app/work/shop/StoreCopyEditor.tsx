@@ -46,6 +46,13 @@ import styles from './store.module.css';
 // description now prefers his own words (lib/product-meta.ts): while it was
 // built only from the supplier's facts, nothing typed here could move a single
 // SEO field, and a live score would have been a decoration.
+//
+// Dressed as the public site, his call, 2026-11-10 (design pass: the public
+// site's styling, the CRM's desktop layout): the tiles are translucent panels
+// with a hairline all round, in the app's accent where one needs words, and
+// wider on a computer; the open product's fields and its preview are two
+// panels side by side. The look is all in store.module.css. Per DESIGN.md
+// (his rulings, 11 Nov 2026) a tile is a `card-link`, for the site's hover.
 
 const PATH = 'content/store/copy.json';
 /** Converted before upload, so the cap is about the WebP and not the source. */
@@ -603,7 +610,7 @@ export default function StoreCopyEditor({
               >
                 <button
                   type="button"
-                  className={styles.product}
+                  className={`${styles.product} card-link`}
                   data-waiting={needsWords || undefined}
                   onClick={() => openOne(product.id)}
                 >

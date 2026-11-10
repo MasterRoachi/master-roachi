@@ -3,8 +3,12 @@
 
    Phone first: one column of cards, the width of the phone. On a computer the
    column stops at a phone-and-a-half wide and sits in the middle, because
-   these are glances, not desks. Gold as a surface only for the one thing on
-   each card: the Review button, and a habit done today. */
+   these are glances, not desks.
+
+   The spec is DESIGN.md (his rulings, 11 Nov): the site's see-through cards
+   with 16px corners, `card-link` on the ones you can press, bordered buttons,
+   and state in the colour of the words: what needs him in the app's colour,
+   a habit done today in --ok. No filled faces, no filled buttons. */
 
 .home {
   flex: 1;
@@ -34,23 +38,34 @@
   color: var(--muted);
 }
 
+a.eyebrow {
+  text-decoration: none;
+  justify-self: start;
+}
+
+a.eyebrow:hover {
+  color: var(--ink);
+}
+
 /* --- Continue ---------------------------------------------------------- */
 
-/* White, as the mock has it: the biggest thing on the page, and not gold,
-   which on this page belongs to Review. */
+/* The biggest thing on the page: a see-through card (a link, so `card-link`
+   in the TSX), its eyebrow in the app's colour. It was a white face, which
+   the 11 Nov rulings rule out. */
 .continue {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  padding: 1rem;
-  border-radius: 12px;
-  background: var(--ink);
-  color: oklch(0% 0 0);
+  padding: 1.1rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.84);
+  color: var(--ink);
   text-decoration: none;
 }
 
 .continue .eyebrow {
-  color: oklch(0% 0 0 / 0.55);
+  color: var(--accent);
 }
 
 .curriculum {
@@ -61,7 +76,7 @@
 
 .lesson {
   font-size: 0.85rem;
-  opacity: 0.65;
+  color: var(--muted);
 }
 
 .lessonName {
@@ -69,25 +84,30 @@
   line-height: 1.3;
 }
 
-/* Looks pressable; the whole card is the link. */
+/* Looks pressable; the whole card is the link. The site's bordered button
+   in the app's colour. */
 .openLesson {
-  margin-top: 0.5rem;
+  margin-top: 0.6rem;
   align-self: stretch;
   text-align: center;
-  padding: 0.65rem 0.75rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid var(--accent);
   border-radius: 10px;
-  background: oklch(0% 0 0);
-  color: var(--ink);
+  color: var(--accent);
+  font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .continue:hover .openLesson {
-  background: oklch(22% 0 0);
+  border-color: color-mix(in oklch, var(--accent) 70%, white);
+  color: color-mix(in oklch, var(--accent) 70%, white);
 }
 
 .continue:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
 /* --- cards ------------------------------------------------------------- */
@@ -97,25 +117,21 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0.85rem 1rem;
-  border-radius: 12px;
-  background: var(--bg-raised);
+  padding: 0.95rem 1.1rem;
+  border-radius: 16px;
+  background: oklch(16% 0 0 / 0.84);
   border: 1px solid var(--line);
   color: var(--ink);
   text-decoration: none;
 }
 
-/* Something due: the gold edge the backend uses for "needs you". */
-.cardWaiting {
-  box-shadow: inset 3px 0 0 var(--accent);
-}
-
-a.card:hover {
-  border-color: var(--line-bright);
+/* Something due: the words in the app's colour, never the card. */
+.cardWaiting b {
+  color: var(--accent);
 }
 
 a.card:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -126,22 +142,28 @@ a.card:focus-visible {
   gap: 0.75rem;
 }
 
+/* The one thing: the site's bordered button in the app's colour. */
 .gold {
   flex: none;
-  padding: 0.5rem 1.1rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--accent);
   border-radius: 10px;
-  background: var(--accent);
-  color: oklch(0% 0 0);
+  background: none;
+  color: var(--accent);
+  font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   text-decoration: none;
 }
 
 .gold:hover {
-  background: color-mix(in oklch, var(--accent) 85%, white);
+  border-color: color-mix(in oklch, var(--accent) 70%, white);
+  color: color-mix(in oklch, var(--accent) 70%, white);
 }
 
 .gold:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -160,6 +182,18 @@ a.card:focus-visible {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.book:hover b {
+  text-decoration: underline;
+}
+
+.book:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .cover {
@@ -226,31 +260,30 @@ a.card:focus-visible {
   align-items: flex-start;
   gap: 0.4rem;
   padding: 0.7rem;
-  border-radius: 12px;
+  border-radius: 16px;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  background: oklch(16% 0 0 / 0.84);
   transition:
-    background 0.18s ease,
+    color 0.18s ease,
     border-color 0.18s ease,
     transform 0.12s ease;
 }
 
 .tile {
-  background: var(--bg-raised);
   color: var(--ink);
   border: 1px solid var(--line);
 }
 
 .tile:hover:not(:disabled) {
-  border-color: var(--line-bright);
+  border-color: var(--accent);
 }
 
-/* Done today: the one gold thing on a tile. */
+/* Done today: its words, mark and edge in --ok. Not a filled face. */
 .tileOn {
-  background: var(--accent);
-  color: oklch(0% 0 0);
-  border: 1px solid var(--accent);
+  color: var(--ok);
+  border: 1px solid color-mix(in oklch, var(--ok) 70%, transparent);
 }
 
 .tile:active:not(:disabled),
@@ -260,7 +293,7 @@ a.card:focus-visible {
 
 .tile:focus-visible,
 .tileOn:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -315,9 +348,9 @@ a.card:focus-visible {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.8rem 0.85rem;
-  border-radius: 12px;
-  background: var(--bg-raised);
+  padding: 0.85rem 0.9rem;
+  border-radius: 16px;
+  background: oklch(16% 0 0 / 0.84);
   border: 1px solid var(--line);
   color: var(--ink);
   text-decoration: none;
@@ -338,11 +371,11 @@ a.card:focus-visible {
 }
 
 .small:hover {
-  border-color: var(--line-bright);
+  border-color: var(--accent);
 }
 
 .small:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 

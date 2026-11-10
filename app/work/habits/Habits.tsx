@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import ui from '../ui.module.css';
 import { HABIT_ICONS, iconFor } from '@/lib/habit-icons';
 import { keptRatio, monthDaysOf, weekDays, weekOf } from '@/lib/habits';
 import styles from './habits.module.css';
@@ -29,6 +30,16 @@ import styles from './habits.module.css';
 // browser's clock can be wrong, and a wrong one would tick days that never
 // happened. See localDay() in worker/db.ts. Moving between weeks is arithmetic
 // on the server's date string, not a reading of the clock.
+//
+// DRESSED AS THE PUBLIC SITE, AND A DASHBOARD ON A COMPUTER — his call,
+// 2026-11-10 (design pass: the public site's styling, the CRM's desktop
+// layout). From 900px: three number tiles on top (done today, best run, this
+// week), worked out from the payload already held; the week in a wide panel;
+// and adding a habit, the streaks and the icon picker in a panel beside it,
+// with the add form always open there. Under 900px the page is the phone
+// layout above, unchanged in structure: the + opens the add card under the
+// bar, and the streaks sit stuck at the foot. The same elements serve both —
+// the two wrappers are `display: contents` on a phone (habits.module.css).
 
 interface Habit {
   id: number;
@@ -108,7 +119,7 @@ function columnsFor(
 }
 
 /**
- * How gold a grid cell is, 0 to 1.
+ * How lit a grid cell is, 0 to 1.
  *
  * The month is binary — a day was ticked or it was not. Only the year is
  * shaded, because a month is not a thing that can be done. See keptRatio().
@@ -164,6 +175,14 @@ export default function Habits() {
   const [archiveMonth, setArchiveMonth] = useState<string | null>(null);
 
   const swipe = useRef<{ x: number; y: number } | null>(null);
+  // The name field of the add form. The form is always mounted (it is always
+  // open beside the week on a computer), so opening it on a phone focuses
+  // this by hand where autoFocus used to.
+  const nameField = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (adding) nameField.current?.focus();
+  }, [adding]);
 
   // One read, always the current one. The payload carries the whole history,
   // so every week and both grids draw from what is already held — paging the
@@ -250,11 +269,82 @@ export default function Habits() {
 
   const pickingHabit = data.habits.find((habit) => habit.id === picking) ?? null;
 
+  // The computer's tiles. Always this week, whichever week is on screen.
+  const soFar = weekDays(thisWeek).filter((day) => day <= today);
+  const doneToday = data.habits.filter((habit) => historyOf(habit).includes(today)).length;
+  const dailyTicks = daily.reduce(
+    (sum, habit) => sum + historyOf(habit).filter((day) => soFar.includes(day)).length,
+    0,
+  );
+  const weeklyMet = weekly.filter(
+    (habit) =>
+      historyOf(habit).filter((day) => soFar.includes(day)).length >= Math.max(1, habit.target ?? 1),
+  ).length;
+  const best = data.habits.reduce<{ habit: Habit; run: number } | null>((top, habit) => {
+    const run = data.streaks?.[String(habit.id)] ?? 0;
+    return run > (top?.run ?? 0) ? { habit, run } : top;
+  }, null);
+  const unitOf = (habit: Habit, run: number) =>
+    habit.cadence === 'weekly' ? (run === 1 ? 'week' : 'weeks') : run === 1 ? 'day' : 'days';
+
   const year = archiveYear ?? Number(today.slice(0, 4));
   const month = archiveMonth ?? today.slice(0, 7);
 
   return (
     <div className={styles.page}>
+      {/* The computer's number tiles, as the dashboards'. Hidden on a phone. */}
+      {data.habits.length > 0 && (
+        <ul className={styles.tiles} aria-label="Today and this week">
+          <li className={styles.tile}>
+            <span className={styles.tileK}>
+              <i className={doneToday === data.habits.length ? styles.dotOn : styles.dot} />
+              Done today
+            </span>
+            <span className={ui.figure}>
+              {doneToday}
+              <span className={styles.tileOf}> of {data.habits.length}</span>
+            </span>
+            <span className={styles.tileS}>
+              {doneToday === data.habits.length ? 'Everything ticked' : `${data.habits.length - doneToday} to go`}
+            </span>
+          </li>
+          <li className={styles.tile}>
+            <span className={styles.tileK}>
+              <i className={best ? styles.dotOn : styles.dot} />
+              Best run
+            </span>
+            <span className={ui.figure}>
+              {best?.run ?? 0}
+              <span className={styles.tileOf}> {best ? unitOf(best.habit, best.run) : 'days'}</span>
+            </span>
+            <span className={styles.tileS}>{best ? best.habit.name : 'No run going yet'}</span>
+          </li>
+          <li className={styles.tile}>
+            <span className={styles.tileK}>
+              <i className={styles.dot} />
+              This week
+            </span>
+            {daily.length > 0 ? (
+              <span className={ui.figure}>
+                {dailyTicks}
+                <span className={styles.tileOf}> of {daily.length * soFar.length}</span>
+              </span>
+            ) : (
+              <span className={ui.figure}>
+                {weeklyMet}
+                <span className={styles.tileOf}> of {weekly.length}</span>
+              </span>
+            )}
+            <span className={styles.tileS}>
+              {daily.length > 0 ? 'Daily ticks so far' : 'Weekly targets met'}
+              {daily.length > 0 && weekly.length > 0 && ` · ${weeklyMet} of ${weekly.length} weekly met`}
+            </span>
+          </li>
+        </ul>
+      )}
+
+      {/* The week: a wide panel on a computer, the page itself on a phone. */}
+      <section className={styles.main} aria-label="The week">
       {/* The week bar: back, which week, forward; then the archive and adding. */}
       <div className={styles.bar}>
         <div className={styles.weekNav}>
@@ -319,89 +409,12 @@ export default function Habits() {
 
       {error && <p className={styles.warn}>{error}</p>}
 
-      {adding && (
-        <form
-          id="add-habit"
-          className={styles.addCard}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') setAdding(false);
-          }}
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (!name.trim()) return;
-            void act({
-              action: 'add',
-              name,
-              cadence,
-              icon,
-              ...(cadence === 'weekly' ? { target } : {}),
-            }).then((ok) => {
-              if (!ok) return;
-              setName('');
-              // Shut on success, so the new row is what is on screen rather
-              // than the form that made it.
-              setAdding(false);
-            });
-          }}
-        >
-          <div className={styles.addRow}>
-            <input
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Add a habit"
-              aria-label="New habit"
-              autoFocus
-            />
-            <select
-              value={cadence}
-              aria-label="How often"
-              onChange={(event) => setCadence(event.target.value as 'daily' | 'weekly')}
-            >
-              <option value="daily">every day</option>
-              <option value="weekly">times a week</option>
-            </select>
-            {cadence === 'weekly' && (
-              <input
-                type="number"
-                min={1}
-                max={7}
-                value={target}
-                className={styles.target}
-                aria-label="Times per week"
-                onChange={(event) => setTarget(Number(event.target.value))}
-              />
-            )}
-          </div>
-
-          {/* Thirty-six icons, which is exactly six by six. The row above is
-              sized to this grid — see the --cell and --gap the card sets. */}
-          <div className={styles.iconGrid}>
-            {HABIT_ICONS.map((option) => (
-              <button
-                key={option.name}
-                type="button"
-                title={option.label}
-                aria-label={option.label}
-                aria-pressed={icon === option.name}
-                className={icon === option.name ? styles.pickOn : styles.pick}
-                onClick={() => setIcon(option.name)}
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d={option.d} />
-                </svg>
-              </button>
-            ))}
-          </div>
-
-          <button type="submit" className={styles.addGo} disabled={!name.trim()}>
-            Add
-          </button>
-        </form>
-      )}
-
       {data.habits.length === 0 ? (
         <p className={styles.empty}>
-          Nothing tracked yet. Add one with the + above — <em>every day</em> for something
+          Nothing tracked yet. Add one{' '}
+          <span className={styles.onPhone}>with the + above</span>
+          <span className={styles.onComputer}>in the panel beside this</span> —{' '}
+          <em>every day</em> for something
           expected daily, or <em>times a week</em> for something with a number attached, like
           the gym three times a week.
         </p>
@@ -542,14 +555,99 @@ export default function Habits() {
           )}
         </div>
       )}
+      </section>
+
+      {/* Adding and the streaks: a panel beside the week on a computer; on a
+          phone its two parts fall back into the page's column, the add card
+          under the bar and the streaks at the foot. */}
+      <aside className={styles.side} aria-label="Your habits">
+        <form
+          id="add-habit"
+          className={adding ? styles.addCardOpen : styles.addCard}
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') setAdding(false);
+          }}
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!name.trim()) return;
+            void act({
+              action: 'add',
+              name,
+              cadence,
+              icon,
+              ...(cadence === 'weekly' ? { target } : {}),
+            }).then((ok) => {
+              if (!ok) return;
+              setName('');
+              // Shut on success, so the new row is what is on screen rather
+              // than the form that made it.
+              setAdding(false);
+            });
+          }}
+        >
+          <h2 className={styles.sideHead}>Add a habit</h2>
+          <div className={styles.addRow}>
+            <input
+              ref={nameField}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Add a habit"
+              aria-label="New habit"
+            />
+            <select
+              value={cadence}
+              aria-label="How often"
+              onChange={(event) => setCadence(event.target.value as 'daily' | 'weekly')}
+            >
+              <option value="daily">every day</option>
+              <option value="weekly">times a week</option>
+            </select>
+            {cadence === 'weekly' && (
+              <input
+                type="number"
+                min={1}
+                max={7}
+                value={target}
+                className={styles.target}
+                aria-label="Times per week"
+                onChange={(event) => setTarget(Number(event.target.value))}
+              />
+            )}
+          </div>
+
+          {/* Thirty-six icons, which is exactly six by six. The row above is
+              sized to this grid — see the --cell and --gap the card sets. */}
+          <div className={styles.iconGrid}>
+            {HABIT_ICONS.map((option) => (
+              <button
+                key={option.name}
+                type="button"
+                title={option.label}
+                aria-label={option.label}
+                aria-pressed={icon === option.name}
+                className={icon === option.name ? styles.pickOn : styles.pick}
+                onClick={() => setIcon(option.name)}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d={option.d} />
+                </svg>
+              </button>
+            ))}
+          </div>
+
+          <button type="submit" className={styles.addGo} disabled={!name.trim()}>
+            Add
+          </button>
+        </form>
 
       {/* The streaks, at the foot of the page and stuck there while the week
-          scrolls under them: the runs are what the page is for. Gold when a
-          run is alive, plain at nought. The unit is in the title, not
+          scrolls under them: the runs are what the page is for. Lit when a
+          run is alive, plain at nought. In the side panel on a computer. The unit is in the title, not
           printed — his call, 14 Oct — because a run of days and a run of
           weeks are still not the same thing. */}
       {data.habits.length > 0 && (
         <div className={styles.foot}>
+          <h2 className={styles.sideHead}>Streaks</h2>
           {pickingHabit && (
             <div
               className={styles.picker}
@@ -609,6 +707,8 @@ export default function Habits() {
           </section>
         </div>
       )}
+
+      </aside>
 
       {/* The archive: the Month and Year grids, over the page. A bottom sheet
           on a phone, a panel on a computer. Read-only, like every day but

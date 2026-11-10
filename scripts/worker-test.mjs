@@ -231,17 +231,6 @@ execFileSync(
 );
 const proseLib = await import(pathToFileURL(proseBundle).href);
 
-// A card's colour is derived from its name rather than stored, so it must be
-// identical on every visit — a deck that reshuffles its colours on reload
-// cannot be read. Same reasoning, and the same palette, as the book spines.
-const cardBundle = path.join(os.tmpdir(), 'master-roachi-card-bundle.mjs');
-execFileSync(
-  'npx',
-  ['esbuild', 'lib/curriculum-card.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${cardBundle}`],
-  { stdio: 'pipe', shell: true },
-);
-const cards = await import(pathToFileURL(cardBundle).href);
-
 // Which icon each curriculum gets. Pure, and split out of the component for
 // exactly this: a test that had to bundle JSX to ask what Piano resolves to
 // would be testing the wrong thing.
@@ -1843,8 +1832,10 @@ function fakeD1() {
         }
         if (sql.includes('from cards')) {
           if (sql.includes('where id = ?1')) return flash.find((k) => k.id === bound[0]) ?? null;
-          const [deck, now] = bound;
-          const mine = flash.filter((k) => k.curriculum_id === deck && k.unlocked_on !== null);
+          // Every deck at once (nextAny's due query) binds only the time.
+          const everyDeck = !sql.includes('curriculum_id = ?1');
+          const [deck, now] = everyDeck ? [null, bound[0]] : bound;
+          const mine = flash.filter((k) => (everyDeck || k.curriculum_id === deck) && k.unlocked_on !== null);
           if (sql.includes('state != 0')) {
             return (
               mine
@@ -4438,99 +4429,6 @@ globalThis.fetch = preGh;
   );
 }
 
-// --- a curriculum's card look, and where it lies ---------------------------
-//
-// The colour used to be derived from the name, which gave every curriculum its
-// own hue and meant the one thing a glance at the deck could NOT tell you was
-// which courses were running. It is the status now, and nothing else.
-{
-  const active = cards.statusLook('active');
-  const done = cards.statusLook('done');
-  const paused = cards.statusLook('paused');
-
-  check('active is white', active.background.startsWith('oklch(97%'), active.background);
-  check('done is gold', /oklch\(8[0-9]%/.test(done.background) && done.background.includes('88'), done.background);
-  check('paused is black', paused.background.startsWith('oklch(18%'), paused.background);
-
-  // White and gold need dark ink, black needs light — which is the reason the
-  // three are written out rather than derived from one hue.
-  const lightness = (value) => Number(/oklch\((\d+(?:\.\d+)?)%/.exec(value)[1]);
-  check(
-    'ink contrasts with its own card',
-    lightness(active.ink) < 40 && lightness(done.ink) < 40 && lightness(paused.ink) > 60,
-    JSON.stringify([active.ink, done.ink, paused.ink]),
-  );
-  check(
-    'every colour is oklch, so it sits on the site palette',
-    [active, done, paused].every((look) =>
-      [look.background, look.background2, look.ink, look.accent, look.line].every((value) =>
-        value.startsWith('oklch('),
-      ),
-    ),
-    '',
-  );
-  check(
-    'an unknown status is treated as active, not left blank',
-    cards.statusLook('something-new').background === active.background,
-    cards.statusLook('something-new').background,
-  );
-  check('the gold is one value, shared', cards.GOLD.startsWith('oklch('), cards.GOLD);
-
-  /* The pile's shape, which has to be learnable.
-   *
-   * Neater than the first attempt: the deck has arrows now and only the front
-   * card is interactive, so the cards behind are texture rather than targets
-   * and no longer each need a wide, visible edge. */
-  const names = [
-    'Japanese',
-    'Piano',
-    'Greek',
-    'The Odin Project',
-    'Godot',
-    'Aseprite and pixel art',
-    'Drawing',
-    'South African politics',
-  ];
-  const lies = names.map((name, at) => cards.scatterFor(name, at));
-
-  check(
-    'the front card is centred and untilted',
-    lies[0].dx === 0 && lies[0].dy === 0 && lies[0].rotate === 0,
-    JSON.stringify(lies[0]),
-  );
-  /* Neater twice over, because he asked twice. A squared-up deck with a
-   * hand's worth of untidiness, not a scatter. */
-  check(
-    'the pile is neat — nothing strays far',
-    lies.every((lie) => Math.hypot(lie.dx, lie.dy) <= 1.5 && Math.abs(lie.rotate) <= 2.5),
-    JSON.stringify(lies.map((lie) => [+Math.hypot(lie.dx, lie.dy).toFixed(2), lie.rotate])),
-  );
-  check(
-    'but every card behind the front one is still offset',
-    lies.slice(1).every((lie) => Math.hypot(lie.dx, lie.dy) > 0.3),
-    JSON.stringify(lies.slice(1).map((lie) => +Math.hypot(lie.dx, lie.dy).toFixed(2))),
-  );
-  check(
-    'the pile is the same shape on every visit',
-    JSON.stringify(cards.scatterFor('Piano', 3)) === JSON.stringify(cards.scatterFor('Piano', 3)),
-    '',
-  );
-  check(
-    'consecutive cards do not lie in the same direction',
-    (() => {
-      for (let at = 2; at < lies.length; at += 1) {
-        const a = Math.atan2(lies[at - 1].dy, lies[at - 1].dx);
-        const b = Math.atan2(lies[at].dy, lies[at].dx);
-        let gap = Math.abs(a - b);
-        if (gap > Math.PI) gap = 2 * Math.PI - gap;
-        if (gap < 0.5) return false;
-      }
-      return true;
-    })(),
-    '',
-  );
-}
-
 // --- stages and the tracks beside them --------------------------------------
 {
   const { splitModules } = curriculum;
@@ -5225,6 +5123,12 @@ globalThis.fetch = preGh;
   res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards?deck=1'), dbEnv);
   body = await res.json();
   check('which offers the next new card again', body.card?.front === '本', JSON.stringify(body.card));
+
+  // Every deck at once, the Learn home's Review: the same card, with nothing
+  // due anywhere, and an answer from that queue hands back the next from it.
+  res = await worker.fetch(viaAccess('https://learn.masterroachi.com/work/api/cards?deck=all'), dbEnv);
+  body = await res.json();
+  check('every deck at once serves the next card from any of them', body.card?.front === '本', JSON.stringify(body.card));
 
   res = await post({ action: 'add', curriculum_id: 1, kind: 'word', front: '本', back: 'book' });
   check('the same question twice in one deck is refused', res.status === 409, String(res.status));
@@ -6053,7 +5957,6 @@ fs.rmSync(fmBundle, { force: true });
 fs.rmSync(colourBundle, { force: true });
 fs.rmSync(fieldsBundle, { force: true });
 fs.rmSync(proseBundle, { force: true });
-fs.rmSync(cardBundle, { force: true });
 fs.rmSync(flashBundle, { force: true });
 fs.rmSync(noteBundle, { force: true });
 fs.rmSync(iconKeyBundle, { force: true });

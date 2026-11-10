@@ -7,6 +7,19 @@
 // board stale in September, and a hub that quietly disagrees with the board is
 // worse than no hub.
 
+/**
+ * Lists the board view does not draw, whatever board they are on; the Admin
+ * home's late count skips them too, since a late card in Done is finished.
+ *
+ * Done and its synonyms are the past. Inbox is uncategorised capture and
+ * showing it turns the hub into a second inbox. Projects is Command's standing
+ * list of project NAMES, which is reference rather than anything to do today.
+ *
+ * Matched on the whole name, so a list called "Done thinking" is not swept up
+ * with it.
+ */
+export const HIDDEN_LISTS = /^(inbox|done|completed|complete|archive|archived|projects)$/i;
+
 /** A list is a bucket if its name matches one of these. Everything else is ignored. */
 const BUCKETS = [
   {

@@ -19,6 +19,12 @@
   --muted-2: oklch(48% 0 0);
   --line: oklch(26% 0 0);
   --line-bright: oklch(38% 0 0);
+  /* A raised surface under the pointer, and the meaning colours: the shared
+     backend / CRM / Kame spec (DESIGN.md). Meaning only, never decoration. */
+  --bg-hover: oklch(21% 0 0);
+  --ok: oklch(76% 0.16 155);
+  --warn: oklch(82% 0.15 75);
+  --bad: oklch(66% 0.2 25);
 
   /* The single accent. Everything else is greyscale. */
   --accent: oklch(82% 0.16 85);

@@ -3,6 +3,7 @@ import { pageMeta } from '@/lib/seo';
 import { COLLECTIONS } from '@/lib/collections';
 import { site } from '@/lib/site';
 import CollectionEditor from '../CollectionEditor';
+import styles from '../collection.module.css';
 
 // Project pages in content/projects, editable from the browser.
 //
@@ -21,7 +22,9 @@ const collection = COLLECTIONS.find((c) => c.key === 'projects')!;
 
 export default function Page() {
   return (
-    <div className="shell">
+    // Wider than the site's content width on a computer: a list column, the
+    // editor and the live page side by side.
+    <div className={`shell ${styles.wide}`}>
       <CollectionEditor
         collection="projects"
         noun="project"

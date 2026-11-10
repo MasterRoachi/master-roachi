@@ -7,11 +7,42 @@
    wishing; what it can do is never move the page under the cursor. */
 
 .shell {
+  position: relative;
   /* dvh, not vh: on a phone the toolbar comes and goes and vh does not know. */
   height: 100dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+/* The starfield, behind everything (WorkShell.tsx). Everything else in the
+   shell sits above it. */
+.sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.shell > :not(.sky) {
+  /* Positioned so it paints after the sky, in order; no z-index, so the
+     header keeps its own (its doors sheet has to cover the page). */
+  position: relative;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* A computer: the sidebar beside the page (components/WorkHeader). */
+@media (min-width: 900px) {
+  .shell {
+    flex-direction: row;
+  }
 }
 
 .content {
@@ -34,8 +65,8 @@
   /* THE CONTENT-WIDTH WRAPPER SCROLLS, NOT THE PAGE. One rule rather than a
      change to nine stylesheets, and it is the honest compromise: a text editor
      cannot be made to fit a laptop screen, but it can be stopped from moving
-     the page under the cursor. Pages that genuinely fit — the curriculum deck —
-     are sized to fit and never show this scrollbar at all. */
+     the page under the cursor. Pages that genuinely fit — Cards and the
+     Sketchpad — are sized to fit and never show this scrollbar at all. */
   overflow-y: auto;
   overflow-x: hidden;
   /* Scrolls without showing a bar — his rule for the backend's panes, and
@@ -49,4 +80,86 @@
 
 .content :global(.shell)::-webkit-scrollbar {
   display: none;
+}
+
+/* No visible scrollbars anywhere in the backend (DESIGN.md): every pane still
+   scrolls by wheel, trackpad and keys. And focus as the spec has it, 2px of
+   the app's colour at 2px, over the public site's 3px. */
+.shell,
+.shell * {
+  scrollbar-width: none;
+}
+
+.shell ::-webkit-scrollbar {
+  display: none;
+}
+
+.shell :focus-visible {
+  outline-offset: 2px;
+}
+
+/* A computer: the CRM's gutters rather than the public site's wide ones,
+   since the sidebar already takes the left of the screen. */
+@media (min-width: 900px) {
+  .content :global(.shell) {
+    padding-inline: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+/* --- .card-link: a card that is a link or a button (DESIGN.md) -------------
+
+   The site's card hover (components/Card.module.css): the border takes the
+   accent, the face lifts, a light follows the cursor, and the card tilts a
+   little toward it. The four custom properties are set by WorkShell.tsx.
+   Only on cards you can press; a .panel holding a form never moves. */
+
+.shell :global(.card-link) {
+  --mx: 50%;
+  --my: 50%;
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  border-radius: 16px;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition:
+    transform 0.12s ease-out,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.25s ease;
+}
+
+.shell :global(.card-link)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  /* The site's own light, Card.module.css's numbers exactly. */
+  background: radial-gradient(
+    280px circle at var(--mx) var(--my),
+    color-mix(in oklch, var(--accent-a, var(--accent)) 14%, transparent) 0%,
+    color-mix(in oklch, var(--accent-a, var(--accent)) 8%, transparent) 45%,
+    transparent 70%
+  );
+}
+
+.shell :global(.card-link):hover {
+  border-color: var(--accent-a, var(--accent));
+  background: oklch(18% 0 0 / 0.92);
+  box-shadow:
+    0 18px 50px oklch(0% 0 0 / 0.5),
+    0 0 0 1px color-mix(in oklch, var(--accent-a, var(--accent)) 22%, transparent);
+}
+
+.shell :global(.card-link):hover::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell :global(.card-link) {
+    transform: none;
+  }
 }
