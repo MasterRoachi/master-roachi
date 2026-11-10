@@ -155,5 +155,8 @@ export const navLinks = [
   { href: '/orthodoxy/', label: 'Foundations', accent: 'oklch(84% 0.16 92)' },
   { href: '/store/', label: 'Store', accent: 'oklch(72% 0.26 350)' },
   { href: '/writing/', label: 'Thoughts', accent: 'oklch(74% 0.15 250)' },
+  // The design business, for prospects his outreach reaches (2026-11-10).
+  // Teal: no other section answers in it.
+  { href: '/hire/', label: 'Hire me', accent: 'oklch(80% 0.12 190)' },
   { href: '/about/', label: 'About', accent: 'oklch(76% 0.17 55)' },
 ];

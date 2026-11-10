@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/orthodoxy',
     '/writing',
     '/store',
+    '/hire',
     '/about',
     '/policies',
   ].map((route) => ({

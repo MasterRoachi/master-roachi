@@ -26,6 +26,14 @@
   overflow-wrap: break-word;
 }
 
+/* On a phone even hyphenated justification leaves gaps: about 45 characters
+   a line is too few spaces to share the slack. Left-aligned there (2026-11-10). */
+@media (max-width: 640px) {
+  .prose > p {
+    text-align: left;
+  }
+}
+
 .prose > * + * {
   margin-top: 1.3em;
 }

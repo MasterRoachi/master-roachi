@@ -88,7 +88,11 @@ export default async function ProjectPage({
       {/* The field takes the project's own colour, so the page belongs to it
           rather than being a generic template with a title swapped in. */}
       <section className={styles.top}>
+        {/* A quarter of the stars on client pages, as About runs: a full
+            field scattered dots through the title and summary of pages whose
+            job is to be read by a business owner (2026-11-10). */}
         <Starfield
+          density={fm.client ? 0.25 : 1}
           tint={`radial-gradient(120% 90% at 72% 30%, color-mix(in oklch, ${accent} 18%, transparent), transparent 68%), radial-gradient(90% 70% at 15% 85%, color-mix(in oklch, ${accent2} 12%, transparent), transparent 62%)`}
         />
 

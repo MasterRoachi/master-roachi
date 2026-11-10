@@ -5,6 +5,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import AchievementGrid from './AchievementGrid';
 import Callout from './Callout';
 import ComingSoon from './ComingSoon';
+import Screens from './Screens';
 import Split from './Split';
 import styles from './Prose.module.css';
 
@@ -18,7 +19,7 @@ export default function Mdx({ source }: { source: string }) {
         // Components an entry body may use. Kept deliberately small — an MDX
         // file that can reach for anything stops being content and becomes a
         // second template.
-        components={{ Split, ComingSoon, Callout, AchievementGrid }}
+        components={{ Split, Screens, ComingSoon, Callout, AchievementGrid }}
         options={{
           mdxOptions: {
             remarkPlugins: [remarkGfm],

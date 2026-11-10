@@ -131,12 +131,25 @@
 	// AND the TILL binding below uncommented, in one commit, only after pay is
 	// deployed with its till; switching back is this var alone. See DEPLOY.md,
 	// "One till".
+	//
+	// The contact form on /hire (2026-11-10) sends enquiries to the CRM's
+	// `Leads` entrypoint. Off until ENQUIRIES is "on", the LEADS binding is
+	// uncommented, TURNSTILE_SITE_KEY holds the widget's public key, and the
+	// TURNSTILE_SECRET secret is set. Uncomment LEADS only once the CRM is
+	// deployed with Leads, or this deploy fails. Switching on waits on the
+	// privacy notice at /privacy. See DEPLOY.md, "The contact form".
 	"vars": {
-		"TILL_CHECKOUT": "off"
+		"TILL_CHECKOUT": "off",
+		"ENQUIRIES": "off",
+		"TURNSTILE_SITE_KEY": ""
 	},
-	// "services": [
-	// 	{ "binding": "TILL", "service": "work-clients-public", "entrypoint": "Till" }
-	// ],
+	// LEADS is live from 2026-11-10 (the CRM deployed Leads first); the form
+	// itself stays off until ENQUIRIES is "on". TILL waits for step 3 of the
+	// one till: move it into this array then.
+	"services": [
+		{ "binding": "LEADS", "service": "work-clients", "entrypoint": "Leads" }
+		// { "binding": "TILL", "service": "work-clients-public", "entrypoint": "Till" }
+	],
 
 	"kv_namespaces": [
 		{

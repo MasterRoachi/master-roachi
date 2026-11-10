@@ -938,6 +938,101 @@ function sqliteD1() {
   check('a D1 failure throws, so pay answers PayFast 5xx and it retries', threw, String(threw));
   fs.rmSync(ordersRpcBundle, { force: true });
 
+  // --- the contact form: /api/enquiry -----------------------------------------
+  //
+  // Checked here, handed to the CRM's Leads entrypoint, and nothing kept.
+  {
+    const leadCalls = [];
+    let leadAnswer = { ok: true };
+    const fakeLeads = { async createEnquiry(e) { leadCalls.push(e); if (leadAnswer instanceof Error) throw leadAnswer; return leadAnswer; } };
+    const enqEnv = { ENQUIRIES: 'on', LEADS: fakeLeads, TURNSTILE_SECRET: 'ts-secret', TURNSTILE_SITE_KEY: 'ts-key' };
+    let human = true;
+    const verifyCalls = [];
+    const before = globalThis.fetch;
+    globalThis.fetch = async (input, init = {}) => {
+      if (String(input).startsWith('https://challenges.cloudflare.com/turnstile/v0/siteverify')) {
+        verifyCalls.push(String(init.body));
+        return new Response(JSON.stringify({ success: human }), { status: 200 });
+      }
+      return before(input, init);
+    };
+    const enq = (payload, useEnv = enqEnv, method = 'POST') =>
+      worker.fetch(
+        new Request('https://masterroachi.com/api/enquiry', {
+          method,
+          headers: { 'content-type': 'application/json', 'cf-connecting-ip': '203.0.113.9' },
+          ...(method === 'POST' ? { body: JSON.stringify(payload) } : {}),
+        }),
+        useEnv,
+      );
+    const good = {
+      enquiryId: '0b8f3c1e-2a4d-4f6b-9c7e-1d2e3f4a5b6c',
+      name: 'Thandi Ndlovu', business: 'Ndlovu Bakery', email: 'thandi@example.com',
+      phone: '082 123 4567', website: 'https://example.com', message: 'A one-page site, please.',
+      marketing: false, token: 'tok',
+    };
+
+    let r = await enq(null, {}, 'GET');
+    let b = await r.json();
+    check('enquiries: off by default, and says so without a key', b.configured === false && !('siteKey' in b), JSON.stringify(b));
+    r = await enq(null, { ...enqEnv, ENQUIRIES: 'off' }, 'GET');
+    check('enquiries: the flag off is off, even with everything bound', (await r.json()).configured === false, '');
+    r = await enq(null, enqEnv, 'GET');
+    b = await r.json();
+    check('enquiries: on, it gives the form its public key', b.configured === true && b.siteKey === 'ts-key', JSON.stringify(b));
+    r = await enq(good, { ...enqEnv, LEADS: undefined });
+    check('enquiries: a post while off is refused, nothing sent', r.status === 503 && leadCalls.length === 0, String(r.status));
+
+    r = await enq(good);
+    b = await r.json();
+    const sent = leadCalls.at(-1);
+    check('enquiries: a good enquiry goes to the CRM', r.status === 200 && b.sent === true && leadCalls.length === 1, JSON.stringify(b));
+    check(
+      'enquiries: with its id, its fields, and consent not given',
+      sent?.enquiryId === good.enquiryId && sent?.business === 'Ndlovu Bakery' && sent?.phone === '082 123 4567' &&
+        sent?.consent?.version === 'web-v1' && sent?.consent?.given === false && !!sent?.consent?.at && sent?.source === 'masterroachi.com/hire',
+      JSON.stringify(sent),
+    );
+    check('enquiries: Turnstile is asked, with the secret and the sender', verifyCalls.at(-1)?.includes('secret=ts-secret') && verifyCalls.at(-1)?.includes('remoteip=203.0.113.9'), verifyCalls.at(-1));
+    await enq({ ...good, marketing: true });
+    check('enquiries: the box ticked is consent given', leadCalls.at(-1)?.consent?.given === true, '');
+    await enq({ ...good, phone: '', website: '' });
+    check('enquiries: empty optional fields are left out', !('phone' in leadCalls.at(-1)) && !('website' in leadCalls.at(-1)), JSON.stringify(leadCalls.at(-1)));
+
+    const n = leadCalls.length;
+    for (const [label, payload] of [
+      ['no message', { ...good, message: '' }],
+      ['a bad email', { ...good, email: 'not-an-email' }],
+      ['a website that is not http', { ...good, website: 'javascript:alert(1)' }],
+      ['a message over 2,000 characters', { ...good, message: 'x'.repeat(2001) }],
+      ['no id', { ...good, enquiryId: '' }],
+      ['an id that is not a lowercase UUID', { ...good, enquiryId: 'ABC' }],
+      ['no Turnstile token', { ...good, token: '' }],
+    ]) {
+      r = await enq(payload);
+      check(`enquiries: ${label} is refused`, r.status === 400, String(r.status));
+    }
+    human = false;
+    r = await enq(good);
+    check('enquiries: a failed Turnstile check is refused', r.status === 400, String(r.status));
+    human = true;
+    check('enquiries: nothing refused reached the CRM', leadCalls.length === n, String(leadCalls.length));
+
+    r = await enq({ ...good, nickname: 'bot' });
+    check('enquiries: the hidden field filled is thanked and dropped', r.status === 200 && leadCalls.length === n, String(leadCalls.length));
+
+    leadAnswer = { ok: false, retry: true, error: 'dnc down' };
+    r = await enq(good);
+    check('enquiries: the CRM asking for a retry is a 502', r.status === 502, String(r.status));
+    leadAnswer = { ok: false, retry: false, error: 'refused' };
+    r = await enq(good);
+    check('enquiries: the CRM refusing is a 400', r.status === 400, String(r.status));
+    leadAnswer = new Error('D1 down');
+    r = await enq(good);
+    check('enquiries: the CRM throwing is a 502, not a crash', r.status === 502, String(r.status));
+    globalThis.fetch = before;
+  }
+
   globalThis.fetch = realFetch;
 
   // --- when the store was last checked --------------------------------------
@@ -6074,6 +6169,30 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   check('work: set-audience shares a curriculum', r.status === 200 && sqlite.prepare('select audience from curriculums where id = 2').get().audience === 'hers');
 
   globalThis.fetch = realFetch;
+}
+
+// --- the store front's "on sale" ---------------------------------------------
+//
+// The store page and the buy panel must agree. From the PayFast switch on
+// 2026-10-21 until 2026-11-10 the store page still asked for a payment link,
+// and told everyone the shirt on sale was "Not on sale yet".
+{
+  const storeBundle = path.join(os.tmpdir(), 'master-roachi-store-bundle.mjs');
+  execFileSync(
+    'npx',
+    ['esbuild', 'lib/store.ts', '--bundle', '--format=esm', '--platform=node', '--alias:@=.', `--outfile=${storeBundle}`],
+    { stdio: 'pipe', shell: true },
+  );
+  const storeLib = await import(pathToFileURL(storeBundle).href);
+  const shirt = storeLib.findProduct('roachi-shirt');
+  check('the shirt is in the store snapshot', !!shirt, String(shirt));
+  check('under the PayFast checkout, a priced shirt is on sale', storeLib.isBuyable(shirt, 'payfast') === true, '');
+  check(
+    'under payment links, on sale only with a link',
+    storeLib.isBuyable(shirt, 'links') === storeLib.buyOptions(shirt).some((o) => o.href !== null),
+    '',
+  );
+  fs.rmSync(storeBundle, { force: true });
 }
 
 const failed = results.filter((r) => !r.pass);

@@ -252,6 +252,35 @@ and the three PayFast secrets for some weeks after step 3, because forms
 issued before the switch carry the old notify address. Only then remove them
 and the signing code.
 
+### The contact form
+
+His ruling, 2026-11-10: the form on `/hire` sends each enquiry to the
+CRM's `Leads` entrypoint (Worker `work-clients`) over a Service Binding, and
+**this site keeps nothing personal**. Built 2026-11-10 and **switched off**.
+
+- **Contract:** `worker/enquiry-rpc.ts`, copied unchanged from the CRM's
+  side. The handler is `worker/enquiry.ts`, the form
+  `components/EnquiryForm.tsx`.
+- **Spam:** Cloudflare Turnstile is checked here before anything is sent on,
+  plus a hidden field. `public/_headers` and `scripts/csp.mjs` allow
+  `challenges.cloudflare.com` for it.
+- **Consent:** the form shows a notice and an optional, unticked box for
+  later marketing email (version `web-v1`, wording held by the CRM). An
+  enquiry goes through without the box.
+- **While off,** `GET /api/enquiry` answers `configured: false`, and the page
+  shows the email address instead of the form.
+
+Switching on, in this order, each step on his word:
+
+1. The CRM is deployed with `Leads` (its own `ENQUIRIES` still off).
+2. Here: uncomment the `LEADS` service in `wrangler.jsonc` and deploy. The
+   form stays off.
+3. The privacy notice goes live at `/privacy`.
+4. Create a Turnstile widget for masterroachi.com in the Cloudflare
+   dashboard. Put its site key in `TURNSTILE_SITE_KEY` and run
+   `npx wrangler secret put TURNSTILE_SECRET`. Set `ENQUIRIES` to `"on"`,
+   with the CRM's flag switched on at the same time.
+
 ---
 
 ## The database

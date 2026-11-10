@@ -1,0 +1,87 @@
+.screens {
+  margin: clamp(36px, 5vw, 64px) 0;
+  padding: 0;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+}
+
+/* --- the computer --------------------------------------------------------- */
+
+.desktop {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid
+    color-mix(in oklch, var(--accent-a, var(--accent)) 22%, var(--line));
+  background: var(--line);
+  box-shadow: 0 24px 60px -28px rgb(0 0 0 / 0.7);
+}
+
+/* Three dots and nothing else: enough to read as a browser window without
+   pretending to be any particular one. */
+.bar {
+  display: flex;
+  gap: 6px;
+  padding: 9px 12px;
+  background: color-mix(in oklch, var(--ink) 8%, var(--bg));
+  border-bottom: 1px solid var(--line);
+}
+
+.bar span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--ink) 22%, transparent);
+}
+
+.desktop img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* --- the phone ------------------------------------------------------------ */
+
+.phone {
+  width: min(62%, 260px);
+  border-radius: 26px;
+  padding: 7px;
+  background: #0b0b0c;
+  border: 1px solid color-mix(in oklch, var(--ink) 18%, transparent);
+  box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.8);
+}
+
+.phone img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+}
+
+@media (min-width: 760px) {
+  /* Room on the right for the phone to hang over the desktop's corner. */
+  .screens[data-phone='yes'] .stage {
+    padding-right: 9%;
+    padding-bottom: 6%;
+    justify-items: stretch;
+  }
+
+  .phone {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 23%;
+  }
+}
+
+.caption {
+  margin-top: 14px;
+  font-size: 0.86rem;
+  color: var(--muted);
+  text-align: center;
+}

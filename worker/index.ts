@@ -50,6 +50,8 @@ import { CURRENCY, deliveryPrice, itemPrice } from '../lib/price';
 import { amountString, notificationSigned, notificationString, payfastHost, signCheckout } from '../lib/payfast';
 import storeSnapshot from '../data/store.json';
 import type { PaymentResult, TillRpc } from './till-rpc';
+import type { LeadsRpc } from './enquiry-rpc';
+import { handleEnquiry } from './enquiry';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -190,6 +192,17 @@ interface Env {
    */
   TILL?: TillRpc;
   TILL_CHECKOUT?: string;
+
+  /**
+   * The contact form on /hire (2026-11-10): enquiries go to the CRM's
+   * `Leads` entrypoint and nothing personal stays here. Off unless
+   * ENQUIRIES = "on", the LEADS binding, TURNSTILE_SITE_KEY (a var) and
+   * TURNSTILE_SECRET (a secret) are all set. See worker/enquiry.ts.
+   */
+  LEADS?: LeadsRpc;
+  ENQUIRIES?: string;
+  TURNSTILE_SITE_KEY?: string;
+  TURNSTILE_SECRET?: string;
 
   /**
    * Commits content to the repo, which publishes it.
@@ -691,6 +704,9 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
       return json({ stored: true, ref }, 200);
     }
+
+    // --- the contact form on /hire ---------------------------------------
+    if (route === '/api/enquiry') return handleEnquiry(request, env);
 
     // --- a delivery quote ----------------------------------------------------
     //

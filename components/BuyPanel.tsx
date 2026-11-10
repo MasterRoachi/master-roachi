@@ -153,8 +153,14 @@ export default function BuyPanel({
       ) : (
         // Disabled rather than absent, so the button does not appear from
         // nowhere once a size is picked and move everything below it.
-        <span className={styles.buy} data-disabled="true" aria-disabled="true">
-          {chosen ? 'Not available in that size' : 'Buy ↗'}
+        // Before a size is chosen it is still the way in, outlined in the
+        // accent and saying what to do; only an unavailable size goes grey.
+        <span
+          className={styles.buy}
+          data-disabled={chosen ? 'unavailable' : 'choose'}
+          aria-disabled="true"
+        >
+          {chosen ? 'Not available in that size' : 'Choose a size to buy'}
         </span>
       )}
 

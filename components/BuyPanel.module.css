@@ -109,12 +109,20 @@ a.buy:hover {
   filter: brightness(1.08);
 }
 
-.buy[data-disabled] {
+/* Until 2026-11-10 the no-size-yet state was this grey dashed pill too, and
+   the button that takes the money was the faintest thing on the page. */
+.buy[data-disabled='unavailable'] {
   border-style: dashed;
   border-color: var(--line);
   background: transparent;
   color: var(--muted);
   cursor: not-allowed;
+}
+
+.buy[data-disabled='choose'] {
+  background: transparent;
+  color: var(--accent-a);
+  cursor: default;
 }
 
 /* --- states -------------------------------------------------------------- */
@@ -310,4 +318,18 @@ a.buy:hover {
 
 .quoteTotal dt {
   color: var(--ink);
+}
+
+/* On a phone the one action on the page spans it. Last in the file so it
+   wins over `.form button.buy`'s justify-self above. */
+@media (max-width: 560px) {
+  .buy {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  .form button.buy {
+    justify-self: stretch;
+  }
 }

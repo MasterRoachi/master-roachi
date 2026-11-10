@@ -5,7 +5,7 @@ import { site } from './site';
 // file so that a form can edit it without rewriting TypeScript.
 import storeCopy from '../content/store/copy.json';
 import { inOrder, readCopy, readOrder, type ProductCopy } from './product-copy';
-import { CURRENCY, itemPrice } from './price';
+import { CHECKOUT, CURRENCY, itemPrice } from './price';
 
 // Reads the Printful catalogue written by scripts/printful.mjs at build time.
 // Nothing here runs at request time — the site is a static export, so the
@@ -172,9 +172,15 @@ export function buyUrl(product: StoreProduct, size: string): string | null {
   return forProduct?.[String(price.amount)] ?? null;
 }
 
-/** Whether any size of this can actually be paid for. */
-export function isBuyable(product: StoreProduct): boolean {
-  return sizesOf(product).some((size) => buyUrl(product, size) !== null);
+/**
+ * Whether any size of this can actually be paid for — by the same rule the
+ * buy panel uses. Under the PayFast checkout a priced, available size is
+ * enough; payment links only matter in "links" mode. Until 2026-11-10 this
+ * asked for a link in both, so from the switch on 2026-10-21 the store front
+ * told everyone a shirt on sale was "Not on sale yet".
+ */
+export function isBuyable(product: StoreProduct, mode = CHECKOUT): boolean {
+  return buyOptions(product).some((o) => (mode === 'payfast' ? o.available && o.amount > 0 : o.href !== null));
 }
 
 /** One row of the buy panel: a size, its price, and where paying for it goes. */

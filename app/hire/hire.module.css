@@ -1,0 +1,88 @@
+.page {
+  position: relative;
+  padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+}
+
+.section {
+  padding-block: clamp(36px, 5vw, 64px) 0;
+  scroll-margin-top: 90px;
+}
+
+.section h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.section p {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+/* --- what I build ---------------------------------------------------------- */
+
+.kinds {
+  margin-top: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 700px) {
+  .kinds {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.kind {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 22px;
+  background: color-mix(in oklch, var(--ink) 3%, transparent);
+}
+
+/* --- how it works ---------------------------------------------------------- */
+
+.promises {
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 22px;
+  counter-reset: step;
+  max-width: 760px;
+}
+
+.promises li {
+  position: relative;
+  padding-left: 46px;
+  counter-increment: step;
+}
+
+.promises li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: -2px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* --- contact --------------------------------------------------------------- */
+
+.contactLede {
+  margin: 12px 0 24px !important;
+  max-width: 640px;
+}

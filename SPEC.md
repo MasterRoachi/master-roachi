@@ -66,6 +66,7 @@ Arkitecture's content is simply the projects.
 /writing     all posts, filterable by track
 /writing/<slug>
 /about       the ethos, tools, contact
+/hire        the design business: what I build, how it works, client work, the contact form
 /rss.xml  /sitemap.xml  /robots.txt
 
 /work        PRIVATE — the back of the house. See The Backend.
@@ -73,7 +74,10 @@ Arkitecture's content is simply the projects.
 ```
 
 There is no `/contact` page — three links do not fill one, so contact lives at
-the end of About and in the footer. There is no `/shepherds` page either; it is
+the end of About and in the footer. **Superseded for prospects 2026-11-10:**
+`/hire` ends in a contact form whose enquiries go to the CRM (DEPLOY.md,
+"The contact form"), because outreach under his own name needs one clear way
+in. There is no `/shepherds` page either; it is
 one project among several, not a section.
 
 `/work` is the one part of the site that is not public, and the only part with
