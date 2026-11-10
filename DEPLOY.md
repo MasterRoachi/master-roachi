@@ -256,7 +256,7 @@ and the signing code.
 
 His ruling, 2026-11-10: the form on `/hire` sends each enquiry to the
 CRM's `Leads` entrypoint (Worker `work-clients`) over a Service Binding, and
-**this site keeps nothing personal**. Built 2026-11-10 and **switched off**.
+**this site keeps nothing personal**. Built and **switched on 2026-11-10**.
 
 - **Contract:** `worker/enquiry-rpc.ts`, copied unchanged from the CRM's
   side. The handler is `worker/enquiry.ts`, the form
