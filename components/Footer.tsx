@@ -115,6 +115,7 @@ export default function Footer() {
                 expects a customer to be able to reach the terms before
                 buying. */}
             {link('/policies/', 'Terms & returns')}
+            {link('/privacy/', 'Privacy')}
           </div>
         </div>
       </div>

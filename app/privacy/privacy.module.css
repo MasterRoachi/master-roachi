@@ -1,0 +1,41 @@
+.page {
+  position: relative;
+  padding-bottom: clamp(80px, 10vw, 120px);
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+}
+
+.shop {
+  margin-top: clamp(36px, 5vw, 56px);
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.shop a {
+  color: var(--accent);
+}
+
+/* A legal notice opens on its version line: no raised first letter. Beats
+   Prose's `.prose > p:first-of-type::first-letter` on specificity. */
+.legal > div > p:first-of-type::first-letter {
+  float: none;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+  margin: 0;
+  color: inherit;
+}
+
+/* Three columns of long cells cannot share a phone's width: give each a
+   readable width and let the table scroll sideways in its own box. */
+@media (max-width: 720px) {
+  .legal table th,
+  .legal table td {
+    min-width: 13rem;
+  }
+}

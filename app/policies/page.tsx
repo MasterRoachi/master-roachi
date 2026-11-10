@@ -350,7 +350,9 @@ export default function PoliciesPage() {
             </p>
             <p>
               To ask what is held about you, or to have it deleted, email{' '}
-              <Mail />.
+              <Mail />. Your rights under POPIA, and how to complain to the
+              Information Regulator, are set out in the{' '}
+              <Link href="/privacy/">privacy notice</Link>.
             </p>
           </div>
         </section>
