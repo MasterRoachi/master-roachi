@@ -108,6 +108,12 @@ export function routeApp(url: URL): AppDecision | null {
   const other = WORK_APPS.find((candidate) => candidate !== app && owns(candidate, path));
   if (other) return { kind: 'redirect', location: `https://${other.host}${path}${url.search}` };
 
+  // A public page opened in an editor's preview frame stays on this address,
+  // so the frame is same-origin with the editor (see WorkApp.previews).
+  if (url.searchParams.get('preview') === '1' && app.previews?.some((base) => path.startsWith(base))) {
+    return { kind: 'pass' };
+  }
+
   // Anything else is the public site, which lives on the apex.
   if (!path.startsWith('/work/')) return { kind: 'redirect', location: `https://${APEX}${path}${url.search}` };
   return { kind: 'notfound' };

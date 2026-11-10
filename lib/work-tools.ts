@@ -62,6 +62,14 @@ export interface WorkApp {
    * here is refused on this app's address.
    */
   apis: string[];
+  /**
+   * Public pages this app's editors preview in a frame, as /projects/<slug>/?preview=1.
+   * The frame has to be on the app's own address: the editor posts the draft
+   * only to its own origin, and the public site refuses to be framed from
+   * anywhere else. Served here only with ?preview=1; without it they forward
+   * to masterroachi.com as any public page does.
+   */
+  previews?: string[];
 }
 
 export const WORK_APPS: WorkApp[] = [
@@ -93,6 +101,7 @@ export const WORK_APPS: WorkApp[] = [
       '/work/api/rebuild',
       '/work/api/version',
     ],
+    previews: ['/projects/', '/writing/', '/store/'],
   },
   {
     key: 'learn',
