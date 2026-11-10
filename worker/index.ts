@@ -49,6 +49,7 @@ import { addressProblem, addressText, readAddress, type Address } from '../lib/a
 import { CURRENCY, deliveryPrice, itemPrice } from '../lib/price';
 import { amountString, notificationSigned, notificationString, payfastHost, signCheckout } from '../lib/payfast';
 import storeSnapshot from '../data/store.json';
+import type { PaymentResult, TillRpc } from './till-rpc';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
@@ -179,6 +180,16 @@ interface Env {
   PAYFAST_MERCHANT_KEY?: string;
   PAYFAST_PASSPHRASE?: string;
   PAYFAST_SANDBOX?: string;
+
+  /**
+   * pay.masterroachi.com, the one till for every project (his ruling,
+   * 2026-11-10): a Service Binding to its `Till` entrypoint, with
+   * TILL_CHECKOUT = "on" in wrangler.jsonc's vars. Both, or the checkout signs
+   * its own PayFast form as before — so switching off is one var. See
+   * worker/till-rpc.ts and DEPLOY.md, "One till".
+   */
+  TILL?: TillRpc;
+  TILL_CHECKOUT?: string;
 
   /**
    * Commits content to the repo, which publishes it.
@@ -712,7 +723,9 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const merchantId = env.PAYFAST_MERCHANT_ID;
       const merchantKey = env.PAYFAST_MERCHANT_KEY;
       const passphrase = env.PAYFAST_PASSPHRASE;
-      if (!merchantId || !merchantKey || !passphrase || !env.DB) {
+      // Through pay, the PayFast secrets live there, not here.
+      const till = env.TILL_CHECKOUT === 'on' && env.TILL ? env.TILL : null;
+      if ((!till && (!merchantId || !merchantKey || !passphrase)) || !env.DB) {
         return json({ error: 'Checkout is not switched on.' }, 503);
       }
 
@@ -773,6 +786,41 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const page = field(body.page, 120);
       const cancelPath = /^\/store\/[a-z0-9-]+\/$/.test(page) ? page : '/store/';
       const [first, ...rest] = name.split(/\s+/);
+      const itemName = `${productName} (${size})`.slice(0, 100);
+      const itemDescription = `Order ${ref}, ${quote.method.name}`.slice(0, 255);
+
+      // Through pay: it signs the form and owns the notify address. Its
+      // answer is trusted only as far as where the browser is sent, which
+      // must be PayFast's own process page.
+      if (till) {
+        let paid: PaymentResult;
+        try {
+          paid = await till.createPayment({
+            project: 'store',
+            ref,
+            amountCents: Math.round(quote.total * 100),
+            itemName,
+            itemDescription,
+            returnUrl: `${url.origin}/store/thank-you/?ref=${ref}`,
+            cancelUrl: `${url.origin}${cancelPath}`,
+            email,
+            nameFirst: first,
+            nameLast: rest.join(' '),
+          });
+        } catch {
+          return json({ error: 'The payment page could not be opened. Try again shortly.' }, 502);
+        }
+        const toPayfast =
+          paid.ok && (paid.action === `${payfastHost(false)}/eng/process` || paid.action === `${payfastHost(true)}/eng/process`);
+        if (!paid.ok || !toPayfast || !Array.isArray(paid.fields)) {
+          return json({ error: 'The payment page could not be opened. Try again shortly.' }, 502);
+        }
+        return json({ ref, quote, action: paid.action, fields: paid.fields }, 200);
+      }
+      if (!merchantId || !merchantKey || !passphrase) {
+        return json({ error: 'Checkout is not switched on.' }, 503);
+      }
+
       const fields = signCheckout(
         {
           merchant_id: merchantId,
@@ -785,8 +833,8 @@ async function handle(request: Request, env: Env): Promise<Response> {
           email_address: email,
           m_payment_id: ref,
           amount: amountString(quote.total),
-          item_name: `${productName} (${size})`.slice(0, 100),
-          item_description: `Order ${ref}, ${quote.method.name}`.slice(0, 255),
+          item_name: itemName,
+          item_description: itemDescription,
         },
         passphrase,
       );

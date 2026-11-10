@@ -12,7 +12,11 @@
 	// Without this file, wrangler detects "Next.js", assumes a server-rendered
 	// app, and silently runs the OpenNext migration — which then fails looking
 	// for .next/standalone/, a directory that only exists for non-static builds.
-	"main": "worker/index.ts",
+	//
+	// worker/entry.ts and not index.ts: it re-exports index.ts as the default
+	// and adds the `Orders` RPC entrypoint pay.masterroachi.com calls, which
+	// needs an import index.ts cannot carry and still be tested under Node.
+	"main": "worker/entry.ts",
 	"assets": {
 		"directory": "./out/",
 		// How the Worker reaches the static files, for anything it does not
@@ -120,6 +124,19 @@
 			"migrations_dir": "migrations"
 		}
 	],
+
+	// The one till (his ruling, 2026-11-10): the store's checkout asks
+	// pay.masterroachi.com for its PayFast form instead of signing its own.
+	// "off" until he says otherwise. Switching on is BOTH this var set to "on"
+	// AND the TILL binding below uncommented, in one commit, only after pay is
+	// deployed with its till; switching back is this var alone. See DEPLOY.md,
+	// "One till".
+	"vars": {
+		"TILL_CHECKOUT": "off"
+	},
+	// "services": [
+	// 	{ "binding": "TILL", "service": "work-clients-public", "entrypoint": "Till" }
+	// ],
 
 	"kv_namespaces": [
 		{

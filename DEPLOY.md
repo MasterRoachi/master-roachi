@@ -219,6 +219,39 @@ signature is right, PayFast's `/eng/query/validate` confirms it, and the amount
 matches what was stored. The signature code is `lib/payfast.ts`, from PayFast's
 own PHP SDK, tested against an independently computed value.
 
+### One till
+
+His ruling, 2026-11-10: **pay.masterroachi.com takes every payment, for every
+project.** That Worker lives in another repository. The store keeps its
+prices, quotes and orders in this Worker's D1. Only the payment goes through
+pay. Built here 2026-11-10 and **switched off**.
+
+- **Out:** with `TILL_CHECKOUT` set to `"on"` and the `TILL` Service Binding
+  present, `/api/checkout` stores the order as before, then asks pay's `Till`
+  entrypoint for the signed form, in cents. The browser is sent only to
+  PayFast's own process page; any other `action` is refused. PayFast then
+  notifies pay, not this site.
+- **Back:** pay calls this Worker's `Orders.markPaid` (`worker/entry.ts`,
+  logic in `worker/orders.ts`). The gross must equal the order's own total,
+  checked again here, and the update is the same received→paid one
+  `/api/payfast/notify` runs.
+- **Contract:** `worker/till-rpc.ts`, copied unchanged from pay's side. The
+  project id is `store`, and pay's binding back to here is `ORDERS_STORE`.
+
+Switching on, in this order, each step on his word, after pay's first live
+payment has passed:
+
+1. Deploy this Worker as it is. `Orders` then exists, with the flag off.
+2. pay creates its till database and deploys with its `ORDERS_STORE` binding.
+   That deploy fails if step 1 hasn't happened.
+3. In `wrangler.jsonc`, uncomment the `TILL` service and set `TILL_CHECKOUT`
+   to `"on"`, in one commit. Then make one small real order, end to end.
+
+Switching back is `TILL_CHECKOUT` set to `"off"`. Keep `/api/payfast/notify`
+and the three PayFast secrets for some weeks after step 3, because forms
+issued before the switch carry the old notify address. Only then remove them
+and the signing code.
+
 ---
 
 ## The database

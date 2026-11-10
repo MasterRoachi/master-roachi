@@ -857,6 +857,87 @@ function sqliteD1() {
   check('a repeated notification does not move a fulfilled order back', payRow().status === 'fulfilled', payRow().status);
   globalThis.fetch = payfastFetch;
 
+  // --- the one till: checkout through pay.masterroachi.com ------------------
+  //
+  // pay signs the form and owns the notify address. The store still works out
+  // every amount and stores the order first; pay is told the amount, never
+  // asked for it.
+  const tillCalls = [];
+  let tillAnswer = { ok: true, action: 'https://www.payfast.co.za/eng/process', fields: [['merchant_id', '1'], ['m_payment_id', 'o.X'], ['signature', 'abc']] };
+  const fakeTill = { async createPayment(req) { tillCalls.push(req); if (tillAnswer instanceof Error) throw tillAnswer; return tillAnswer; } };
+  const tillEnv = { ...printfulEnv, TILL: fakeTill, TILL_CHECKOUT: 'on' };
+
+  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, { ...printfulEnv, TILL: fakeTill, TILL_CHECKOUT: 'off' });
+  check('with the till switched off, a bound TILL is not used', res.status === 503 && tillCalls.length === 0, String(res.status));
+
+  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, tillEnv);
+  body = await res.json();
+  const tillRef = body.ref;
+  const tillReq = tillCalls.at(-1);
+  check('through the till, no PayFast secrets are needed here', res.status === 200, String(res.status));
+  check(
+    'pay is asked for the Worker\'s amount, in cents, for the stored order',
+    tillReq?.project === 'store' && tillReq?.ref === tillRef && tillReq?.amountCents === 50000 &&
+      ordersDb.sqlite.prepare('select total from orders where ref = ?').get(tillRef)?.total === 500,
+    JSON.stringify(tillReq),
+  );
+  check(
+    'with the way back and the buyer, and no notify address of ours',
+    tillReq?.returnUrl === `https://masterroachi.com/store/thank-you/?ref=${tillRef}` && tillReq?.cancelUrl === 'https://masterroachi.com/store/roachi-shirt/' &&
+      tillReq?.email === 'pay@example.com' && tillReq?.nameFirst === 'Pay' && tillReq?.nameLast === 'Buyer Smith' && !('notifyUrl' in tillReq),
+    JSON.stringify(tillReq),
+  );
+  check('and the browser gets pay\'s form as it is', body.action === 'https://www.payfast.co.za/eng/process' && body.fields?.at(-1)?.[0] === 'signature', JSON.stringify(body));
+
+  tillAnswer = { ok: true, action: 'https://evil.example/eng/process', fields: [] };
+  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, tillEnv);
+  check('a form pointed anywhere but PayFast is refused', res.status === 502, String(res.status));
+  tillAnswer = { ok: false, error: 'refused' };
+  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, tillEnv);
+  check('a refusal from pay is a 502, not a form', res.status === 502, String(res.status));
+  tillAnswer = new Error('binding down');
+  res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, tillEnv);
+  check('pay being unreachable is a 502, not a crash', res.status === 502, String(res.status));
+
+  // --- pay's word that it was paid: Orders.markPaid -------------------------
+  const ordersRpcBundle = path.join(os.tmpdir(), 'master-roachi-orders-rpc-bundle.mjs');
+  execFileSync(
+    'npx',
+    ['esbuild', 'worker/orders.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${ordersRpcBundle}`],
+    { stdio: 'pipe', shell: true },
+  );
+  const { markOrderPaid } = await import(pathToFileURL(ordersRpcBundle).href);
+  const tillRow = () => ordersDb.sqlite.prepare('select * from orders where ref = ?').get(tillRef);
+  const notice = (over = {}) => ({ ref: tillRef, pfPaymentId: '2200011', grossCents: 50000, feeCents: 1150, paidAt: '2026-11-10T10:00:00.000Z', ...over });
+
+  let paidResult = await markOrderPaid(ordersDb, notice({ ref: 'NOSUCHREF' }));
+  check('an unknown order is refused, not retried', paidResult.ok === false && paidResult.retry === false, JSON.stringify(paidResult));
+  paidResult = await markOrderPaid(ordersDb, notice({ grossCents: 49999 }));
+  check('a gross that is not the order\'s total is refused, not retried', paidResult.ok === false && paidResult.retry === false && tillRow().status === 'received', JSON.stringify(paidResult));
+  paidResult = await markOrderPaid(ordersDb, notice({ ref: 'bad ref!' }));
+  check('a malformed notice is refused', paidResult.ok === false && paidResult.retry === false, JSON.stringify(paidResult));
+  paidResult = await markOrderPaid(ordersDb, notice());
+  check(
+    'pay\'s notice marks the order Paid',
+    paidResult.ok === true && tillRow().status === 'paid' && tillRow().pf_payment_id === '2200011' && tillRow().paid_at === '2026-11-10T10:00:00.000Z',
+    JSON.stringify(tillRow()),
+  );
+  paidResult = await markOrderPaid(ordersDb, notice({ paidAt: '2026-11-11T00:00:00.000Z' }));
+  check('the same notice again is recorded already, and changes nothing', paidResult.ok === true && tillRow().paid_at === '2026-11-10T10:00:00.000Z', JSON.stringify(tillRow()));
+  paidResult = await markOrderPaid(ordersDb, notice({ pfPaymentId: '9999999' }));
+  check('a second payment for a paid order is his to sort out', paidResult.ok === false && paidResult.retry === false && tillRow().pf_payment_id === '2200011', JSON.stringify(paidResult));
+  ordersDb.sqlite.prepare("update orders set status = 'fulfilled' where ref = ?").run(tillRef);
+  await markOrderPaid(ordersDb, notice());
+  check('a repeated notice does not move a fulfilled order back', tillRow().status === 'fulfilled', tillRow().status);
+  paidResult = await markOrderPaid(undefined, notice());
+  check('no database is retried', paidResult.ok === false && paidResult.retry === true, JSON.stringify(paidResult));
+  ordersDb.broken = true;
+  let threw = false;
+  try { await markOrderPaid(ordersDb, notice()); } catch { threw = true; }
+  ordersDb.broken = false;
+  check('a D1 failure throws, so pay answers PayFast 5xx and it retries', threw, String(threw));
+  fs.rmSync(ordersRpcBundle, { force: true });
+
   globalThis.fetch = realFetch;
 
   // --- when the store was last checked --------------------------------------
