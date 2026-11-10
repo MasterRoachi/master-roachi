@@ -149,6 +149,19 @@ had the keys refreshed these for that one deploy and committed nothing.
 declared there too, deliberately: **a deploy overwrites the dashboard**, which
 is how `workers.dev` kept coming back on after being switched off by hand.
 
+### Netlify is gone too
+
+A Netlify project ("jocular-sprite-004509") was still connected to this
+repository through Netlify's GitHub app, and built every push to `main`
+alongside `deploy.yml`, naming masterroachi.com as its domain. It never
+served the site, because DNS points at the Worker, and its own address
+answered "Page not found". But it spent build minutes, it would have been a
+second public copy of the site the day a build succeeded, and its app could
+open branches on the repository. He deleted the project and removed the
+repository from Netlify's GitHub app on 2026-11-10. GitHub Pages is off too
+(its last deployment was 2026-09-02). **`deploy.yml` is the only deploy
+path.**
+
 ### The daily cron
 
 `wrangler.jsonc` declares one trigger, `10 2 * * *`, and `worker/index.ts`
