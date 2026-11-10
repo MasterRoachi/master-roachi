@@ -52,9 +52,45 @@ import storeSnapshot from '../data/store.json';
 import type { PaymentResult, TillRpc } from './till-rpc';
 import type { LeadsRpc } from './enquiry-rpc';
 import { handleEnquiry } from './enquiry';
+import { accessTokenValid } from './access';
 
 /** The one hostname the site answers on; www redirects here. */
 const APEX = 'masterroachi.com';
+
+/** This machine, where dev runs with no Access in front of it. */
+function isLocal(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.localhost');
+}
+
+/**
+ * Whether a request may reach the private /work APIs.
+ *
+ * Until 2026-11-10 each one asked only that an Access header be PRESENT, and
+ * treated every hostname but the apex as "local": harmless while only the
+ * apex and www reached this Worker, and an open door the moment admin., learn.
+ * or tools. point here. Now:
+ *
+ * - this machine passes, as dev always has;
+ * - with WORK_ACCESS_AUD set, the Access token is verified for real
+ *   (signature, audience, issuer, expiry), on every hostname;
+ * - without it, the apex keeps the old presence check so /work does not lock
+ *   him out before the tag is set, and every other hostname is refused.
+ *
+ * WORK_ACCESS_AUD may hold several Audience tags, comma-separated, so the
+ * old /work application and the new one covering the three apps both pass
+ * during the move.
+ */
+async function privateAllowed(request: Request, url: URL, env: Env): Promise<boolean> {
+  if (isLocal(url.hostname)) return true;
+  const auds = (env.WORK_ACCESS_AUD ?? '').split(',').map((a) => a.trim()).filter(Boolean);
+  if (auds.length && env.WORK_ACCESS_TEAM) {
+    for (const aud of auds) {
+      if (await accessTokenValid(request, env.WORK_ACCESS_TEAM, aud)) return true;
+    }
+    return false;
+  }
+  return url.hostname === APEX && request.headers.has('cf-access-jwt-assertion');
+}
 
 // The only server-side code on the site.
 //
@@ -200,6 +236,15 @@ interface Env {
    * TURNSTILE_SECRET (a secret) are all set. See worker/enquiry.ts.
    */
   LEADS?: LeadsRpc;
+
+  /**
+   * The Access application(s) in front of /work and the three apps: the team
+   * domain (e.g. example.cloudflareaccess.com) and the Audience tag(s),
+   * comma-separated. Not secrets, but set as secrets so the repo does not
+   * carry them. See privateAllowed().
+   */
+  WORK_ACCESS_TEAM?: string;
+  WORK_ACCESS_AUD?: string;
   ENQUIRIES?: string;
   TURNSTILE_SITE_KEY?: string;
   TURNSTILE_SECRET?: string;
@@ -935,9 +980,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // Answering with the 404 page rather than 401 keeps the endpoint
     // indistinguishable from one that was never there.
     if (route === '/api/work') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       /* Moving a card, which is the hub's only write.
        *
@@ -1021,9 +1064,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // the Zero Trust dashboard per endpoint, and no endpoint that is live
     // before its policy is.
     if (route === '/work/api/content') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       const token = env.GITHUB_TOKEN;
       if (!token) return json({ configured: false, files: [] }, 200);
@@ -1183,9 +1224,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // time anything moved and throw away the numbers he chose; this way,
     // swapping two neighbours swaps two numbers and writes two files.
     if (route === '/work/api/reorder') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
       if (request.method !== 'POST') return json({ error: 'method not allowed' }, 405);
 
       const token = env.GITHUB_TOKEN;
@@ -1268,9 +1307,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // It commits data/store.json and the push rebuilds the site, which is the
     // same route every other edit in this backend takes.
     if (route === '/work/api/store-sync') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       // When it was last checked, which the stale-catalogue warning goes by.
       // See migrations/0020_store_syncs.sql.
@@ -1384,9 +1421,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // current — and catches a FAILED build as well as one still running,
     // which asking Cloudflare for the last build's status would not.
     if (route === '/work/api/version') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       const token = env.GITHUB_TOKEN;
 
@@ -1429,9 +1464,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // Under /work/api/ with the rest of the backend, so the one Access policy
     // covers it.
     if (route === '/work/api/habits') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       const db = env.DB;
       if (!db) return json({ configured: false, habits: [], ticks: {} }, 200);
@@ -1642,9 +1675,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // be public/work/library.json, which Access gated when served and the
     // public GitHub repository published anyway. See migration 0014.
     if (route === '/work/api/library') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
       if (request.method !== 'GET') return json({ error: 'GET only' }, 405);
 
       const db = env.DB;
@@ -1686,9 +1717,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // page's own placeholder. Same Access gate, for a stronger reason than
     // the index: a cover says what he is reading now.
     if (route === '/work/api/book-cover') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
       if (request.method !== 'GET') return json({ error: 'GET only' }, 405);
 
       const db = env.DB;
@@ -1733,9 +1762,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // whole interface until 2026-10-19 and needed its secret only because it
     // was public. Here the one Access policy covers it like everything else.
     if (route === '/work/api/orders') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       const db = env.DB;
       if (!db) return json({ configured: false, orders: [] }, 200);
@@ -1934,9 +1961,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
     // --- reading -----------------------------------------------------------
     if (route === '/work/api/reading') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       const db = env.DB;
       if (!db) return json({ configured: false, books: [] }, 200);
@@ -2286,9 +2311,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // Three levels: curriculum, module, lesson. A lesson's completion is a
     // date rather than a flag, for the reason given in the migration.
     if (route === '/work/api/curriculums') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       const db = env.DB;
       if (!db) return json({ configured: false, curriculums: [] }, 200);
@@ -2824,9 +2847,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // time and answering it returns the next, so a session is one round trip
     // per card and a refresh cannot lose a place.
     if (route === '/work/api/cards') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
 
       const db = env.DB;
       if (!db) return json({ configured: false, decks: [] }, 200);
@@ -3113,9 +3134,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // covers it. POST only: a GET that changed the deployed site could be
     // fired by anything that prefetches a link.
     if (route === '/work/api/rebuild') {
-      const throughAccess = request.headers.has('cf-access-jwt-assertion');
-      const local = url.hostname !== APEX;
-      if (!throughAccess && !local) return env.ASSETS.fetch(request);
+      if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
       if (request.method !== 'POST') return json({ error: 'method not allowed' }, 405);
 
       const token = env.GITHUB_TOKEN;

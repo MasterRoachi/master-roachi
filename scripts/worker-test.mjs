@@ -6106,6 +6106,29 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   r = await worker.fetch(new Request('https://masterroachi.com/share/ohana/curriculums', { headers: { 'cf-access-jwt-assertion': good } }), env);
   check('ohana: unconfigured fails closed', (await r.text()) === '404 page');
 
+  // The /work APIs on the three app hostnames (2026-11-10). Before, every
+  // hostname but the apex counted as "local" and skipped the Access check.
+  {
+    const ver = (host, token, useEnv = env) =>
+      worker.fetch(new Request(`https://${host}/work/api/version`, { headers: token ? { 'cf-access-jwt-assertion': token } : {} }), useEnv);
+    const workEnvAud = { ...env, DB: db, WORK_ACCESS_TEAM: TEAM, WORK_ACCESS_AUD: `old-work-aud, ${AUD}` };
+    const isOpen = async (res) => res.status === 200 && (await res.clone().text()) !== '404 page';
+    r = await ver('admin.masterroachi.com', 'anything');
+    check('private: another hostname with no Audience tag set is refused, header or not', !(await isOpen(r)), String(r.status));
+    r = await ver('masterroachi.com', 'anything');
+    check('private: the apex keeps the old header check until the tag is set', await isOpen(r), String(r.status));
+    r = await ver('masterroachi.com', null);
+    check('private: the apex with no header is refused', !(await isOpen(r)), String(r.status));
+    r = await ver('admin.masterroachi.com', good, workEnvAud);
+    check('private: a real token for a listed Audience passes on an app hostname', await isOpen(r), String(r.status));
+    r = await ver('masterroachi.com', 'anything', workEnvAud);
+    check('private: with the tag set, a header alone no longer passes, even on the apex', !(await isOpen(r)), String(r.status));
+    r = await ver('learn.masterroachi.com', await sign({ aud: ['someone-else'], iss: `https://${TEAM}`, exp }), workEnvAud);
+    check('private: a token for another Access app is refused', !(await isOpen(r)), String(r.status));
+    r = await ver('localhost', null);
+    check('private: this machine still passes, for dev', await isOpen(r), String(r.status));
+  }
+
   r = await call('/curriculums');
   let body = await r.json();
   check('ohana: lists only shared curriculums', r.status === 200 && body.curriculums.length === 1 && body.curriculums[0].name === 'Piano', JSON.stringify(body).slice(0, 200));
