@@ -224,7 +224,7 @@ own PHP SDK, tested against an independently computed value.
 His ruling, 2026-11-10: **pay.masterroachi.com takes every payment, for every
 project.** That Worker lives in another repository. The store keeps its
 prices, quotes and orders in this Worker's D1. Only the payment goes through
-pay. Built here 2026-11-10 and **switched off**.
+pay. Built 2026-11-10 and **switched on the same day**, at his word.
 
 - **Out:** with `TILL_CHECKOUT` set to `"on"` and the `TILL` Service Binding
   present, `/api/checkout` stores the order as before, then asks pay's `Till`

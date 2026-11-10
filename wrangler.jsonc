@@ -127,10 +127,9 @@
 
 	// The one till (his ruling, 2026-11-10): the store's checkout asks
 	// pay.masterroachi.com for its PayFast form instead of signing its own.
-	// "off" until he says otherwise. Switching on is BOTH this var set to "on"
-	// AND the TILL binding below uncommented, in one commit, only after pay is
-	// deployed with its till; switching back is this var alone. See DEPLOY.md,
-	// "One till".
+	// Switched on 2026-11-10 at his word: this var "on" and the TILL binding
+	// below, in one commit, after pay was deployed with its till. Switching
+	// back is this var alone, set to "off". See DEPLOY.md, "One till".
 	//
 	// The contact form on /hire (2026-11-10) sends enquiries to the CRM's
 	// `Leads` entrypoint. Off until ENQUIRIES is "on", the LEADS binding is
@@ -139,16 +138,16 @@
 	// deployed with Leads, or this deploy fails. Switching on waits on the
 	// privacy notice at /privacy. See DEPLOY.md, "The contact form".
 	"vars": {
-		"TILL_CHECKOUT": "off",
+		"TILL_CHECKOUT": "on",
 		"ENQUIRIES": "off",
 		"TURNSTILE_SITE_KEY": ""
 	},
 	// LEADS is live from 2026-11-10 (the CRM deployed Leads first); the form
-	// itself stays off until ENQUIRIES is "on". TILL waits for step 3 of the
-	// one till: move it into this array then.
+	// itself stays off until ENQUIRIES is "on". TILL went live the same day,
+	// with TILL_CHECKOUT "on" above: the store's payments now go through pay.
 	"services": [
-		{ "binding": "LEADS", "service": "work-clients", "entrypoint": "Leads" }
-		// { "binding": "TILL", "service": "work-clients-public", "entrypoint": "Till" }
+		{ "binding": "LEADS", "service": "work-clients", "entrypoint": "Leads" },
+		{ "binding": "TILL", "service": "work-clients-public", "entrypoint": "Till" }
 	],
 
 	"kv_namespaces": [
