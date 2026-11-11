@@ -288,18 +288,24 @@ export default function PoliciesPage() {
           <h2 className="section-title">Privacy</h2>
           <div className={styles.prose}>
             <p>
-              This site sets no cookies, runs no analytics, and embeds no
-              advertising or tracking scripts. Nothing you read here is
-              recorded against you.
+              This site sets no cookies and carries no advertising. It counts
+              visits with Cloudflare Web Analytics, which records the page,
+              the site you came from and the kind of browser and device,
+              without cookies and without identifying you. The contact form
+              on Hire me uses Cloudflare Turnstile, which checks your browser
+              and network address to tell a person from a spam bot.
             </p>
             <p>
               Ordering means giving a name, delivery address, email address and
               usually a phone number for the courier. That is sent to me before
               payment — {legal.paymentProcessor} does not collect a delivery
-              address, so this site has to — and it is passed to{' '}
-              {legal.fulfilment} to print and post the item. Those are the two
-              parties who cannot do their job without it. It is not sold,
-              shared further, or used for marketing.
+              address, so this site has to. The address goes to{' '}
+              {legal.fulfilment} twice: first when you ask what delivery costs,
+              so it can quote, and then with the order, to print and post the
+              item. Your name and email go to {legal.paymentProcessor}, which
+              takes the payment. Those are the parties who cannot do their job
+              without it. It is not sold, shared further, or used for
+              marketing.
             </p>
             <p>
               Order details are held in a Cloudflare database, the same

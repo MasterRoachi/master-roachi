@@ -5,6 +5,9 @@ import { site } from '@/lib/site';
 
 export const dynamic = 'force-static';
 
+// No lastModified where there is no real date: stamping every page with the
+// build time told crawlers everything changed on every deploy (the audit's
+// tenth finding, 11 Nov). Posts and project pages keep their own dates.
 export default function sitemap(): MetadataRoute.Sitemap {
   // /store was missing while /projects/fabled-threads/ — a page that is never
   // generated — was listed. Both halves of that are fixed here.
@@ -21,7 +24,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/policies',
   ].map((route) => ({
     url: `${site.url}${route}/`,
-    lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: route === '' ? 1 : 0.7,
   }));
@@ -40,7 +42,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // without anyone remembering to list it.
     ...getStoreProducts().map((p) => ({
       url: `${site.url}${productPath(p)}`,
-      lastModified: new Date(),
     })),
   ];
 

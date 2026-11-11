@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { pageMeta } from '@/lib/seo';
 import ArcadeField from '@/components/ArcadeField';
+import SteamIcon from '@/components/SteamIcon';
 import PageHeader from '@/components/PageHeader';
 import PostCard from '@/components/PostCard';
 import { getWriting, toSummary } from '@/lib/content';
@@ -209,14 +210,7 @@ export default function GamingPage() {
                 <ul className={styles.alsoList}>
                   {alsoPlayed.map((g) => (
                     <li key={g.appid}>
-                      <img
-                        src={steamIcon(g)}
-                        alt=""
-                        width={22}
-                        height={22}
-                        loading="lazy"
-                        decoding="async"
-                      />
+                      <SteamIcon src={steamIcon(g)} fallback={steamHeader(g.appid)} size={22} />
                       <span>{g.title}</span>
                       {g.minutesTwoWeeks > 0 && (
                         <span className={styles.alsoHours}>
@@ -317,6 +311,9 @@ export default function GamingPage() {
           <section className={styles.section}>
             <p className="eyebrow">Tier list</p>
             <h2 className="section-title">My Rankings</h2>
+            {/* What Z means, said once (the audit's fourteenth finding, 11 Nov;
+                his definition, 12 Nov). */}
+            <p className={styles.tierNote}>Z is the best possible: not one flaw.</p>
             <div className={styles.tiers}>
               {TIERS.map((rank) => {
                 const games = tierList.filter((g) => g.tier === rank);

@@ -115,7 +115,11 @@ function readCollection(collection: string): Entry[] {
         slug: file.replace(/\.mdx$/, ''),
         body: content,
         readingMinutes: Math.max(1, Math.round(readingTime(content).minutes)),
-        frontmatter: data as Frontmatter,
+        // The date as 'YYYY-MM-DD' here, once: YAML hands an unquoted date
+        // over as a Date, which reached the page as article:published_time
+        // "[object Object]" and as a <time datetime> no parser reads (the
+        // audit's tenth finding, 11 Nov). See dayOf below.
+        frontmatter: { ...data, date: dayOf(data.date) ?? data.date } as Frontmatter,
       };
     });
 }

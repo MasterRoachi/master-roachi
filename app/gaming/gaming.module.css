@@ -124,6 +124,12 @@
 }
 
 /* Perfect runs — 100% completions, kept apart from merely finished. */
+.tierNote {
+  margin: -0.4rem 0 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
 .tiers {
   display: flex;
   flex-direction: column;

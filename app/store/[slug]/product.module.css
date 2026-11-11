@@ -19,11 +19,10 @@
 .back {
   display: inline-block;
   margin-bottom: clamp(20px, 3vw, 34px);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted-2);
+  /* Sentence case, as the back links on posts and projects are (the audit's
+     fifteenth finding, 11 Nov). */
+  font-size: 0.8rem;
+  color: var(--muted);
   transition: color 0.18s ease;
 }
 

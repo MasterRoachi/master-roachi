@@ -7,6 +7,7 @@ import { LiveFit, LiveSection, LiveTagline } from '@/components/LiveCopy';
 import HalftoneField from '@/components/HalftoneField';
 import ShirtViewerMount from '@/components/ShirtViewerMount';
 import Swatches from '@/components/Swatches';
+import SaDelivery from '@/components/SaDelivery';
 import SizeTable from '@/components/SizeTable';
 import ModelCredit from '@/components/ModelCredit';
 import BuyPanel from '@/components/BuyPanel';
@@ -158,9 +159,7 @@ export default async function ProductPage({
                 {/* Said next to the number rather than in the policy alone.
                     A price that turns out to exclude postage is the single
                     most common way an online store feels like a trick. */}
-                <p className={styles.shipping}>
-                  Delivery quoted for your address
-                </p>
+                <SaDelivery productId={String(product.id)} className={styles.shipping} />
               </>
             )}
 

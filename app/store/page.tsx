@@ -7,6 +7,7 @@ import ShirtViewerMount from '@/components/ShirtViewerMount';
 import PageHeader from '@/components/PageHeader';
 import CyclingQuote from '@/components/CyclingQuote';
 import Swatches from '@/components/Swatches';
+import SaDelivery from '@/components/SaDelivery';
 import ModelCredit from '@/components/ModelCredit';
 import { quotes } from '@/lib/quotes';
 import {
@@ -119,9 +120,7 @@ export default function StorePage() {
                     {priceSummary(lead)}
                     <span className={styles.sizeCount}> · {sizesOf(lead).length} sizes</span>
                   </p>
-                  <p className={styles.shipping}>
-                    Delivery quoted for your address
-                  </p>
+                  <SaDelivery productId={String(lead.id)} className={styles.shipping} />
                 </>
               )}
 

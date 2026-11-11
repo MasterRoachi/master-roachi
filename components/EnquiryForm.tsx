@@ -19,11 +19,26 @@ declare global {
 
 const EMAIL = 'roachi@masterroachi.com';
 const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+/**
+ * How long the form waits on the Worker, and on Turnstile, before it gives up
+ * and offers the email address instead. The audit's eighth finding (11 Nov):
+ * with challenges.cloudflare.com blocked, which some ad and privacy blockers
+ * do, Send never enabled and nothing said why.
+ */
+const PATIENCE_MS = 8000;
+
+/** "www.example.co.za" is a website too: give it the https:// people leave off. */
+function withScheme(value: FormDataEntryValue | null): string {
+  const text = typeof value === 'string' ? value.trim() : '';
+  if (!text || /^[a-z][a-z0-9+.-]*:\/\//i.test(text)) return text;
+  return `https://${text}`;
+}
 
 type State =
   | { kind: 'checking' }
   | { kind: 'off' }
   | { kind: 'ready'; siteKey: string }
+  | { kind: 'blocked' }
   | { kind: 'sent' };
 
 function newId(): string {
@@ -42,15 +57,20 @@ export default function EnquiryForm() {
 
   useEffect(() => {
     let live = true;
-    fetch('/api/enquiry', { cache: 'no-store' })
+    const stop = new AbortController();
+    const timer = window.setTimeout(() => stop.abort(), PATIENCE_MS);
+    fetch('/api/enquiry', { cache: 'no-store', signal: stop.signal })
       .then((r) => r.json())
       .then((b: { configured?: boolean; siteKey?: string }) => {
         if (!live) return;
         setState(b.configured && b.siteKey ? { kind: 'ready', siteKey: b.siteKey } : { kind: 'off' });
       })
-      .catch(() => live && setState({ kind: 'off' }));
+      .catch(() => live && setState({ kind: 'off' }))
+      .finally(() => window.clearTimeout(timer));
     return () => {
       live = false;
+      window.clearTimeout(timer);
+      stop.abort();
     };
   }, []);
 
@@ -67,11 +87,18 @@ export default function EnquiryForm() {
       });
     };
     if (window.turnstile) return draw();
+    // A blocked or slow spam check must say so, never leave Send dead.
+    const giveUp = () => {
+      if (!widgetId.current) setState({ kind: 'blocked' });
+    };
+    const timer = window.setTimeout(giveUp, PATIENCE_MS);
     const script = document.createElement('script');
     script.src = TURNSTILE_SRC;
     script.async = true;
     script.onload = draw;
+    script.onerror = giveUp;
     document.head.appendChild(script);
+    return () => window.clearTimeout(timer);
   }, [state]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -90,7 +117,7 @@ export default function EnquiryForm() {
           business: data.get('business'),
           email: data.get('email'),
           phone: data.get('phone'),
-          website: data.get('website'),
+          website: withScheme(data.get('website')),
           message: data.get('message'),
           marketing: data.get('marketing') === 'yes',
           nickname: data.get('nickname'),
@@ -114,6 +141,18 @@ export default function EnquiryForm() {
   }
 
   if (state.kind === 'checking') return <div className={styles.placeholder} aria-hidden="true" />;
+
+  if (state.kind === 'blocked') {
+    return (
+      <div className={styles.off} role="status">
+        <p>
+          The form&apos;s spam check couldn&apos;t load, which an ad or privacy blocker can cause. Email
+          me at <a href={`mailto:${EMAIL}`}>{EMAIL}</a> with your business&apos;s name and what
+          you&apos;re after, and I&apos;ll get back to you.
+        </p>
+      </div>
+    );
+  }
 
   if (state.kind === 'off') {
     return (
@@ -161,7 +200,7 @@ export default function EnquiryForm() {
         <label htmlFor="enquiry-website">
           Current website <span className={styles.optional}>if you have one</span>
         </label>
-        <input id="enquiry-website" name="website" type="url" maxLength={300} placeholder="https://" />
+        <input id="enquiry-website" name="website" type="text" inputMode="url" maxLength={300} placeholder="www.yourbusiness.co.za" autoComplete="url" />
       </div>
       <div className={styles.row}>
         <label htmlFor="enquiry-message">What do you need?</label>
@@ -197,6 +236,9 @@ export default function EnquiryForm() {
       <button className={styles.send} type="submit" disabled={busy || !token}>
         {busy ? 'Sending…' : 'Send'}
       </button>
+      <p className={styles.notice}>
+        Or email me at <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.
+      </p>
     </form>
   );
 }

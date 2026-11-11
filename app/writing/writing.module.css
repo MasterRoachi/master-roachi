@@ -33,7 +33,7 @@
   display: block;
   overflow: hidden;
   border: 1px solid color-mix(in oklch, var(--accent-a) 26%, var(--line));
-  border-radius: 14px;
+  border-radius: 16px;
   background: linear-gradient(
     140deg,
     oklch(18% 0.02 255 / 0.72),

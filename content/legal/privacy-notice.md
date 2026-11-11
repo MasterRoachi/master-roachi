@@ -1,6 +1,6 @@
 # Privacy Notice
 
-_Version privacy-v1, 10 November 2026._
+_Version privacy-v2, 12 November 2026._
 
 This notice explains how Master Roachi collects and uses personal information, and your rights. It is given under the Protection of Personal Information Act 4 of 2013 (POPIA s18). "Personal information" includes information about businesses (juristic persons) as well as about people (POPIA s1).
 
@@ -26,6 +26,7 @@ When we host or maintain a website for a client, we process that website's visit
 | **Consent records** | Name and role of the person who answered for the business; the contact detail used; the channel; the date and time; the exact wording shown or read (by version); the answer; the channel(s) chosen; the services named; any later withdrawal | You, when you answer a consent request or fill in a consent slip |
 | **Call recordings** | A recording of a consent-request phone call (your voice, what was said, the number and the time) | You, during the call. We tell you at the start that the call is recorded. |
 | **Clients** | Legal and trading name; registration number; contact person's name, role, email and phone; physical and billing address; the agreements; invoices and payments; messages and change requests; login details for the client area | You, when you become a client and while we work together |
+| **Visitors to masterroachi.com** | The pages you view, the site you came from, and your browser and device type, counted **without cookies and without identifying you**; when you send the contact form, a check of your browser and network (IP) address to tell a person from a spam bot | Your browser, through Cloudflare Web Analytics and Cloudflare Turnstile |
 | **"Do not contact" list** | A one-way coded value (a keyed hash) of the phone number, email address and listing ID of anyone who said no, objected, or did not reply | Derived from the records above |
 
 Giving us information is voluntary. If a client does not give us the information we need for the agreement and invoicing, we cannot provide the service (POPIA s18(1)(d)–(e)).
@@ -40,6 +41,7 @@ Giving us information is voluntary. If a client does not give us the information
 | **Electronic marketing** (email, WhatsApp, SMS or phone) after you agree | **Your consent** (POPIA s69(1)(a), s11(1)(a)), only on the channel you chose and only for website design, hosting and website maintenance |
 | **Answering an enquiry** you sent us through our website, and quoting if you ask | Steps you asked us to take before a possible contract (POPIA s11(1)(b)). Ticking the box is not needed for this. |
 | **Email about our services after an enquiry**, only if you ticked the box | **Your consent** (POPIA s69(1)(a), s11(1)(a)), by email only. You can ask us to stop at any time. |
+| Counting visits to our website, and keeping spam out of its contact form | Our legitimate interest in running a working, secure website (POPIA s11(1)(f)) |
 | Providing the services to clients, invoicing and support | The contract with you (POPIA s11(1)(b)) |
 | Keeping tax and accounting records | A legal obligation (POPIA s11(1)(c); Tax Administration Act s29) |
 | Keeping consent records and recordings, to prove consent | Our legal duty to be able to prove consent (POPIA s11(2)(a); POPIA Regulations reg 6.2) |
@@ -53,7 +55,7 @@ We use these service providers, who process information for us under written ter
 
 | Provider | What it does for us | Where the information is processed |
 |---|---|---|
-| **Cloudflare, Inc.** | Hosts our customer-management system and database. (Call recordings are currently kept on our own phone and its backup and will move to Cloudflare file storage in Western Europe later.) | Cloudflare's global network; stored data in **Western Europe** |
+| **Cloudflare, Inc.** | Hosts our customer-management system and database, and our website, masterroachi.com, including its visit counts (Cloudflare Web Analytics) and the spam check on its contact form (Cloudflare Turnstile). (Call recordings are currently kept on our own phone and its backup and will move to Cloudflare file storage in Western Europe later.) | Cloudflare's global network; stored data in **Western Europe** |
 | **Resend** | Sends our emails | United States |
 | **PayFast** | Processes client card payments, where used | South Africa |
 | **Google** | Supplies public business-listing information when we look for businesses; it receives our search queries | United States and elsewhere |

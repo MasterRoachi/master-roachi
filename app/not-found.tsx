@@ -1,4 +1,13 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+// Its own title, so a bad link doesn't read as the home page in the tab and
+// the history (the audit's tenth finding, 11 Nov). The layout's template adds
+// the site's name.
+export const metadata: Metadata = {
+  title: 'Not found',
+  robots: { index: false },
+};
 
 export default function NotFound() {
   return (

@@ -359,6 +359,19 @@ async function quoteFor(env: Env, productId: string, size: string, address: Addr
   };
 }
 
+/**
+ * Where the "about" delivery figure beside the price is quoted to: central
+ * Pretoria, standing for South Africa. Not anyone's address.
+ */
+const SA_REFERENCE_ADDRESS: Address = {
+  address1: '1 Church Street',
+  address2: '',
+  city: 'Pretoria',
+  state_code: '',
+  zip: '0002',
+  country_code: 'ZA',
+};
+
 /** Whatever went wrong with a quote, as a response the buy form can show. */
 function quoteFailure(error: unknown): Response {
   if (error instanceof QuoteError) return json({ error: error.message }, error.status);
@@ -707,6 +720,36 @@ async function handle(request: Request, env: Env): Promise<Response> {
       try {
         const quote = await quoteFor(env, field(body.productId, 32), field(body.size, 16), address);
         return json({ quote }, 200);
+      } catch (error) {
+        return quoteFailure(error);
+      }
+    }
+
+    // --- delivery in South Africa, said beside the price ----------------------
+    //
+    // The audit's second finding (11 Nov, his yes 12 Nov): a South African
+    // learned what delivery costs only after typing a full address. So the
+    // product page asks this for one reference address in Pretoria and says
+    // "about" beside the price. Printful's rate varies a little by suburb, so it
+    // is an indication, never the charge: checkout still quotes the real
+    // address. Kept in KV for 12 hours, so page views do not each cost a
+    // Printful call; on any failure the page just says delivery is quoted.
+    if (route === '/api/delivery-za') {
+      if (request.method !== 'GET') return json({ error: 'GET only.' }, 405);
+      const productId = field(new URL(request.url).searchParams.get('productId'), 32);
+      if (!productId) return json({ error: 'Which product?' }, 400);
+      const key = `delivery-za:${productId}`;
+      const kept = await env.VOTES?.get(key).catch(() => null);
+      if (kept) return json(JSON.parse(kept) as unknown, 200);
+      const product = (storeSnapshot as { products: { id: number; variants?: { size: string | null; available: boolean }[] }[] }).products
+        .find((p) => String(p.id) === productId);
+      const size = product?.variants?.find((v) => v.available && v.size)?.size;
+      if (!size) return json({ error: 'That product is not for sale.' }, 404);
+      try {
+        const quote = await quoteFor(env, productId, size, SA_REFERENCE_ADDRESS);
+        const answer = { delivery: quote.delivery, currency: quote.currency, minDays: quote.method.minDays, maxDays: quote.method.maxDays };
+        await env.VOTES?.put(key, JSON.stringify(answer), { expirationTtl: 60 * 60 * 12 }).catch(() => undefined);
+        return json(answer, 200);
       } catch (error) {
         return quoteFailure(error);
       }

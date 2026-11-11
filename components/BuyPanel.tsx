@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { BuyOption } from '@/lib/store';
 import { COUNTRIES, countryOf } from '@/lib/address';
 import styles from './BuyPanel.module.css';
@@ -267,13 +267,28 @@ function CheckoutForm({
   onSent: (ref: string | null) => void;
 }) {
   const [country, setCountry] = useState('ZA');
-  const [quote, setQuote] = useState<Quote | null>(null);
+  // A quote belongs to the size it was made for. Change the size and the old
+  // quote stops counting, so the total and the Pay button can never show one
+  // size's price while checkout charges another's (the audit's worst finding,
+  // 11 Nov). Not a key on the form: that would throw the typed address away.
+  // Any edit to the form clears it outright, and an answer that arrives after
+  // an edit is thrown away (the crew's review, 12 Nov: switching size, editing
+  // the address and switching back used to bring an old address's quote back).
+  const [quoted, setQuoted] = useState<{ size: string; quote: Quote } | null>(null);
+  const edits = useRef(0);
+  const quote = quoted && quoted.size === option.size ? quoted.quote : null;
+  const forget = () => {
+    edits.current += 1;
+    setQuoted(null);
+  };
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
 
   async function ask(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
+    const asked = edits.current;
+    const size = option.size;
     setBusy(true);
     setProblem(null);
     const data = new FormData(event.currentTarget);
@@ -288,7 +303,7 @@ function CheckoutForm({
         });
         const body = (await res.json().catch(() => ({}))) as { quote?: Quote; error?: string };
         if (!res.ok || !body.quote) throw new Error(body.error ?? 'Delivery could not be quoted just now.');
-        setQuote(body.quote);
+        if (edits.current === asked) setQuoted({ size, quote: body.quote });
         setBusy(false);
         return;
       }
@@ -340,7 +355,7 @@ function CheckoutForm({
   }
 
   return (
-    <form className={styles.form} onSubmit={ask} onChange={() => quote && setQuote(null)}>
+    <form className={styles.form} onSubmit={ask} onChange={forget}>
       <p className={styles.formHead}>Where should it go?</p>
 
       <label className={styles.field}>
@@ -353,7 +368,7 @@ function CheckoutForm({
         <input name="email" type="email" required autoComplete="email" maxLength={200} />
       </label>
 
-      <AddressFields country={country} onCountry={(code) => { setCountry(code); setQuote(null); }} />
+      <AddressFields country={country} onCountry={(code) => { setCountry(code); forget(); }} />
 
       <label className={styles.field}>
         <span>

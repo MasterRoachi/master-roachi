@@ -70,7 +70,10 @@ export function pageMeta({
   return {
     ...(title ? { title } : {}),
     description,
-    alternates: { canonical: path },
+    // The RSS alternate too: Next replaces alternates wholesale rather than
+    // merging, so a page's canonical used to drop the layout's feed link and no
+    // page offered RSS autodiscovery (the audit's tenth finding, 11 Nov).
+    alternates: { canonical: path, types: { 'application/rss+xml': `${site.url}/rss.xml` } },
     openGraph: {
       type,
       siteName: site.name,

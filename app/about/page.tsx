@@ -52,7 +52,10 @@ export default function AboutPage() {
 
   const projects = getOwnProjects().length;
   const written = getWriting().length;
-  const books = orthodoxReading.length;
+  // The books Foundations shows: it lists what is being read and set aside,
+  // not what is finished, so counting all of them said 6 beside a shelf of 5
+  // (the audit's fourteenth finding, 11 Nov).
+  const books = orthodoxReading.filter((r) => r.status !== 'finished').length;
   const rail = getStore().products.length;
 
   const facets: Facet[] = [

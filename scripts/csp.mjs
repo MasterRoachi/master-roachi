@@ -68,7 +68,7 @@ for (const file of htmlFiles(OUT)) {
 
   // Turnstile, the contact form's spam check, loads from Cloudflare's own
   // host (2026-11-10); public/_headers allows it too.
-  const policy = ["script-src 'self' https://challenges.cloudflare.com", ...hashes].join(' ');
+  const policy = ["script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com", ...hashes].join(' ');
   const meta = `<meta ${MARK} http-equiv="Content-Security-Policy" content="${policy}"/>`;
 
   // Before every script, so the policy is in force when the first one is
