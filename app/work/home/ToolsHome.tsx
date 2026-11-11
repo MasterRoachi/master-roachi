@@ -13,10 +13,10 @@ import dash from './dash.module.css';
 
 // The tools home: today's habits ARE the home (his pick, 2026-11-10, redesign
 // page, Tools doors: B). Each habit is a tile; tapping it ticks it for today,
-// and a ticked tile shows its streak. Habits, Sketchpad and Kame sit
-// underneath as small cards; Kame is its own app on its own address
-// (kame.masterroachi.com, since 2026-11-11), so its card is a plain <a> and
-// says where it goes, as the Clients door does on admin.
+// and a ticked tile shows its streak. Habits, Sketchpad, Kame and Ohana sit
+// underneath as small cards; Kame and Ohana are their own apps on their own
+// addresses (kame. and ohana.masterroachi.com, since 2026-11-11), so their
+// cards are plain <a> and say where they go, as the Clients door does on admin.
 //
 // The Habits page's rules hold here because they are the server's: only today
 // can be ticked (the tick is sent with the server's own `today`, never the
@@ -150,11 +150,18 @@ export default function ToolsHome() {
             )}
           </span>
         </Link>
-        <a className={`${styles.small} ${styles.smallWide} card-link`} href="https://kame.masterroachi.com/">
+        <a className={`${styles.small} card-link`} href="https://kame.masterroachi.com/">
           <DoorIcon tool="kame" />
           <span>
             <b>Kame ↗</b>
-            <span className={styles.muted}>Focus blocks, on their own address</span>
+            <span className={styles.muted}>Focus blocks</span>
+          </span>
+        </a>
+        <a className={`${styles.small} card-link`} href="https://ohana.masterroachi.com/">
+          <DoorIcon tool="ohana" />
+          <span>
+            <b>Ohana ↗</b>
+            <span className={styles.muted}>For the two of you</span>
           </span>
         </a>
       </div>
@@ -238,6 +245,15 @@ function ToolsDash({
               <i className={dash.dot} /> Kame
             </span>
             <span className={dash.tileV}>Focus ↗</span>
+            <span className={dash.tileS}>on its own address</span>
+          </a>
+        </li>
+        <li>
+          <a className={`${dash.tile} card-link`} href="https://ohana.masterroachi.com/">
+            <span className={dash.tileK}>
+              <i className={dash.dot} /> Ohana
+            </span>
+            <span className={dash.tileV}>Ours ↗</span>
             <span className={dash.tileS}>on its own address</span>
           </a>
         </li>

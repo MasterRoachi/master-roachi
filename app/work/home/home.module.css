@@ -344,11 +344,6 @@ a.card:focus-visible {
   gap: 10px;
 }
 
-/* An odd card out, the width of the row: Kame, under Habits and Sketchpad. */
-.smallWide {
-  grid-column: 1 / -1;
-}
-
 .small {
   display: flex;
   align-items: center;

@@ -3,9 +3,9 @@
 The written spec shared by everything behind masterroachi.com that is not the public site itself:
 
 - the backend apps (admin, learn and tools, kept in this repo);
-- the CRM on clients.masterroachi.com (Sigma's);
+- the CRM on clients.masterroachi.com (Fjord's with Bjorn since 11 Nov; Sigma built it);
 - Kame (Omega's);
-- Ohana (Sigma's), dark only.
+- Ohana (Omega's), dark only.
 
 It is drawn from the public site's own source, so the source is the reference wherever this doc is silent:
 - `app/globals.css`

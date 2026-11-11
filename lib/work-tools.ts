@@ -35,7 +35,8 @@ export type ToolKey =
   | 'reading'
   | 'habits'
   | 'sketchpad'
-  | 'kame';
+  | 'kame'
+  | 'ohana';
 
 export interface WorkTool {
   key: ToolKey;
@@ -155,6 +156,16 @@ export const WORK_APPS: WorkApp[] = [
         href: 'https://kame.masterroachi.com/',
         name: 'Kame',
         what: 'Focus blocks, on their own address.',
+        outside: true,
+      },
+      // Omega's, on its own address behind its own Access app, as Kame is
+      // (his ask, 2026-11-11). The tools app is behind Access too, so this
+      // door is not on the public site.
+      {
+        key: 'ohana',
+        href: 'https://ohana.masterroachi.com/',
+        name: 'Ohana',
+        what: 'For the two of you, on its own address.',
         outside: true,
       },
     ],

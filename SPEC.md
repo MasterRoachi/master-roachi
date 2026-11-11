@@ -237,6 +237,7 @@ an address only what is listed for it there.
 | | `/work/habits` | A year opens into months, a month into its own days |
 | | `/work/sketchpad` | Write and draw on one page, kept in D1 (private, not in the repo) |
 | | Kame ↗ | Focus blocks, its own Worker at kame.masterroachi.com |
+| | Ohana ↗ | Omega's, for the two of them, its own Worker at ohana.masterroachi.com |
 
 Writing, Projects and Product copy edit files in this repository through the
 GitHub API, so an edit is a commit and the commit triggers the deploy — MDX for

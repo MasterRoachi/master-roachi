@@ -96,6 +96,14 @@ const TOOLS: Record<ToolKey, React.ReactNode> = {
       <path d="M12 13l3.5-3.5" />
     </>
   ),
+  // A roof over a heart: home, and the people in it.
+  ohana: (
+    <>
+      <path d="M3.5 11L12 4l8.5 7" />
+      <path d="M5.5 9.5V20h13V9.5" />
+      <path d="M12 17.5s-3-1.8-3-3.6a1.5 1.5 0 0 1 3-.4 1.5 1.5 0 0 1 3 .4c0 1.8-3 3.6-3 3.6z" />
+    </>
+  ),
 };
 
 /** The app marks, after their phone icons: keys, an open book, an hourglass. */
