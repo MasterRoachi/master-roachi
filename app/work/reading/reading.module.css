@@ -383,10 +383,11 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* The site's card, nearly opaque: it sits over the dimmed page, and the
-     quotes and the sketch want a steady ground. */
-  background: oklch(15% 0 0 / 0.97);
-  border: 1px solid var(--line);
+  /* An overlay (DESIGN.md): it lies over the dimmed page. */
+  background: oklch(16% 0 0 / 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line-bright);
   border-radius: 16px;
   box-shadow: 0 30px 60px -20px color-mix(in oklab, black 90%, transparent);
   transform-origin: center;

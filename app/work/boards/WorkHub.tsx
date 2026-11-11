@@ -638,7 +638,7 @@ export default function WorkHub() {
               ))}
               {sheetCard.due && (
                 <span className={Date.parse(sheetCard.due) < openedAt ? ui.chipBad : ui.chip}>
-                  due {new Date(sheetCard.due).toLocaleDateString('en-ZA')}
+                  due {new Date(sheetCard.due).toLocaleDateString('en-ZA', { day: '2-digit', month: 'short' })}
                 </span>
               )}
               {sheetIdle !== null && sheetIdle >= STALE_DAYS && (

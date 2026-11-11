@@ -13,8 +13,8 @@
 // here, or it will not open in its app.
 //
 // The pages keep their /work/... paths. An installed app shows no address bar,
-// and keeping the paths keeps every link, editor and API as it was. The public
-// masterroachi.com/work keeps serving all of it until the move is finished.
+// and keeping the paths keeps every link, editor and API as it was. Since
+// 2026-11-10 masterroachi.com/work/... forwards each page to its app.
 //
 // Clients leads off the site: the CRM is its own Worker on its own subdomain
 // behind its own Access app. Outside links are plain <a>, never next/link,

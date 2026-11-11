@@ -18,8 +18,9 @@
    on its own: this stylesheet never sets a height. */
 
 .page {
-  /* The status gold of done, kept apart from the app's colour. */
-  --gold: oklch(84% 0.12 88);
+  /* Done is --ok, the meaning colour (DESIGN.md), kept apart from the
+     app's colour. */
+  --done: var(--ok);
   width: min(100%, 46rem);
   margin: 0 auto;
   padding: 0.75rem 0 1.5rem;
@@ -540,8 +541,8 @@
   font-size: 0.9375rem;
 }
 
-/* Hits within the open curriculum — Japanese alone is 118 lessons. Solid,
-   because it lies over the stages. */
+/* Hits within the open curriculum — Japanese alone is 118 lessons. An
+   overlay (DESIGN.md), because it lies over the stages. */
 .hits {
   position: absolute;
   z-index: 5;
@@ -552,9 +553,11 @@
   max-height: 18rem;
   overflow-y: auto;
   scrollbar-width: none;
-  background: oklch(16% 0 0);
+  background: oklch(16% 0 0 / 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--line-bright);
-  border-radius: 10px;
+  border-radius: 16px;
   box-shadow: 0 18px 50px oklch(0% 0 0 / 0.55);
   display: grid;
   gap: 0.1rem;
@@ -755,8 +758,8 @@
 
 .cellDone,
 .cellDone:hover {
-  border-color: color-mix(in oklch, var(--gold) 55%, transparent);
-  color: var(--gold);
+  border-color: color-mix(in oklch, var(--done) 55%, transparent);
+  color: var(--done);
 }
 
 .cellNext,
@@ -1025,11 +1028,11 @@
 }
 
 /* Already done, so the button is the state as well as the switch: its tick
-   and border in the status gold of done. */
+   and border in --ok, the colour of done. */
 .roundDone,
 .roundDone:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--done);
+  color: var(--done);
 }
 
 .roundDelete:hover {

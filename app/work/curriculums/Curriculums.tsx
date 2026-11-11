@@ -39,7 +39,7 @@ import styles from './curriculums.module.css';
 // Colour is the status and nothing else, and it is the colour of the WORDS,
 // never a face or a fill (his ruling, 11 Nov 2026, DESIGN.md): an active
 // course in the page's ink with its ring in the Learn blue, a paused one
-// muted, a done one in the status gold. lookOf() below; statusLook()'s white,
+// muted, a done one in --ok, the colour of done. lookOf() below; statusLook()'s white,
 // black and gold card faces are no longer used here.
 //
 // ON A COMPUTER (from 900px) it is list | detail, after the CRM: the list stays
@@ -115,9 +115,9 @@ type Layer = 'stages' | 'sources' | 'grid' | 'detail';
 const DOUBLE = 260;
 
 /** A row's colours, as text: the ink and the ring's fill. CSS variables, set
- * in curriculums.module.css (--gold is the status gold of done). */
+ * in curriculums.module.css (--done is --ok, the colour of done). */
 function lookOf(status: string) {
-  if (status === 'done') return { ink: 'var(--gold)', accent: 'var(--gold)' };
+  if (status === 'done') return { ink: 'var(--done)', accent: 'var(--done)' };
   if (status === 'paused') return { ink: 'var(--muted)', accent: 'var(--muted)' };
   return { ink: 'var(--ink)', accent: 'var(--accent)' };
 }

@@ -289,8 +289,10 @@
   gap: 2px;
   min-width: 13rem;
   padding: 0.35rem;
-  background: oklch(16% 0 0 / 0.97);
-  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line-bright);
   border-radius: 16px;
   box-shadow: 0 18px 50px oklch(0% 0 0 / 0.5);
 }
@@ -529,8 +531,10 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.75rem 0.9rem;
-  background: oklch(16% 0 0 / 0.97);
-  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.92);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line-bright);
   border-radius: 16px;
   box-shadow: 0 18px 50px oklch(0% 0 0 / 0.5);
   color: var(--muted);

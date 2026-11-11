@@ -1160,7 +1160,7 @@
 .notice {
   margin: 0.9rem 0 0;
   padding: 0.7rem 0.85rem;
-  border: 1px solid color-mix(in oklch, oklch(78% 0.1 255) 45%, transparent);
+  border: 1px solid color-mix(in oklch, var(--accent) 45%, transparent);
   border-radius: 10px;
   font-size: 0.8125rem;
   line-height: 1.55;

@@ -213,21 +213,30 @@ protected URL looks like a 404 rather than a locked door.
 
 ### The tools
 
-`/work` itself is a list of ways in and nothing else — it used to be the Trello
-boards, which made the page opened every morning also the longest in the
-backend.
+Three apps, each on its own address, each opening on a page of doors and
+nothing else (the home used to be the Trello boards, which made the page opened
+every morning also the longest in the backend). The pages keep their `/work/...`
+paths on every address; `masterroachi.com/work/...` forwards (301) to the app
+that owns the page. `lib/work-tools.ts` is the one list, and the Worker serves
+an address only what is listed for it there.
 
-| | What it is |
-|---|---|
-| `/work/boards` | Trello across the account, and the day job |
-| `/work/habits` | A year opens into months, a month into its own days |
-| `/work/reading` | A bookcase of four shelves; a book's notes can become a post |
-| `/work/curriculums` | What is being studied, and how far through it you are |
-| `/work/cards` | Flashcards. A deck is a curriculum, and two buttons |
-| `/work/sketchpad` | Write and draw on one page, kept in D1 (private, not in the repo) |
-| `/work/writing` | Posts. Editing one commits it, and the commit publishes it |
-| `/work/projects` | The project pages behind `/projects` |
-| `/work/shop` | Orders, and what each design is in your own words |
+| App | Page | What it is |
+|---|---|---|
+| **admin**.masterroachi.com | `/work/` | The doors |
+| | `/work/shop` | Orders, and what each design is in your own words |
+| | `/work/projects` | The project pages behind `/projects` |
+| | `/work/writing` | Posts. Editing one commits it, and the commit publishes it |
+| | `/work/boards` | Trello across the account, and the day job |
+| | Clients ↗ | The CRM, its own Worker at clients.masterroachi.com |
+| **learn**.masterroachi.com | `/work/learn/` | The doors |
+| | `/work/curriculums` | What is being studied, and how far through it you are |
+| | `/work/cards` | Flashcards. A deck is a curriculum, and two buttons |
+| | `/work/reading` | A bookcase of four shelves; a book's notes can become a post |
+| | `/share/ohana` | Ohana's way in, behind its own service-token Access app |
+| **tools**.masterroachi.com | `/work/tools/` | The doors |
+| | `/work/habits` | A year opens into months, a month into its own days |
+| | `/work/sketchpad` | Write and draw on one page, kept in D1 (private, not in the repo) |
+| | Kame ↗ | Focus blocks, its own Worker at kame.masterroachi.com |
 
 Writing, Projects and Product copy edit files in this repository through the
 GitHub API, so an edit is a commit and the commit triggers the deploy — MDX for
@@ -1285,8 +1294,11 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       story when the Shepherds art went fully hand-drawn in September.
 - [ ] Finished games, tier list, RetroAchievements URL
 - [ ] **Actual writing.** Scaffolding only
-- [ ] Swap the sigil for an Orthodox cross — every use goes through
-      `components/Sigil.tsx`, so it stays a one-file change
+- [x] Closed 2026-11-11, his word: the marks stay as they are. `Sigil.tsx`
+      was deleted as dead code on 2026-09-05; the divider mark is the kanji
+      (`/kanji.webp`), and the eight-pointed cross already exists as
+      `components/OrthodoxCross.tsx` on `/orthodoxy`. The original item:
+      swap the sigil for an Orthodox cross.
 - [x] **Japanese: the kanji track.** Complete 2026-10-19: all 2,136 jōyō
       kanji across 267 lessons, the last 247 generated from KANJIDIC2 and
       JMdict (CC BY-SA, attributed) by `scripts/curriculums/kanji-track.mjs`

@@ -129,7 +129,7 @@
 .table th {
   font-weight: 500;
   white-space: nowrap;
-  color: var(--gold, var(--accent));
+  color: var(--accent);
   border-bottom-color: var(--line-bright);
 }
 
