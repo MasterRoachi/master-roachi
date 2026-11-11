@@ -1,10 +1,11 @@
-# Design: one look for the backend, the CRM and Kame
+# Design: one look for the backend, the CRM, Kame and Ohana
 
 The written spec shared by everything behind masterroachi.com that is not the public site itself:
 
 - the backend apps (admin, learn and tools, kept in this repo);
 - the CRM on clients.masterroachi.com (Sigma's);
-- Kame (Omega's).
+- Kame (Omega's);
+- Ohana (Sigma's), dark only.
 
 It is drawn from the public site's own source, so the source is the reference wherever this doc is silent:
 - `app/globals.css`
@@ -55,6 +56,9 @@ Each app answers in one colour, the way each section of the public site does. Th
 | Tools | `oklch(80% 0.12 190)` | Hire me |
 | Clients (CRM) | `oklch(72% 0.26 350)` | pink, the Store's sheen (his ruling in Sigma's session, 11 Nov, relayed by Omega) |
 | Kame | `oklch(97% 0 0)` | white, the site's Work sheen: monochrome like Kame's 悟 sigil (his ruling in Omega's session, 11 Nov) |
+| Ohana | three, one per side: his `#B4DC7F`, hers `#F0B5B3`, ours `#2BB3BA` | its family colours, the same three as its icon's hands. The side you are on sets the accent on the root (11 Nov, Ohana's `docs/PLAN.md`, "The shared look, built") |
+
+**Ohana is the one app with more than one colour.** Each side's colour is its page accent and also its sheen in the sidebar, in place of the seven sheens below: His, Hers, and the Ours group (Today, Money, Calendar).
 
 ### The nav sheens: `--sheen`
 

@@ -97,7 +97,9 @@ export const WORK_APPS: WorkApp[] = [
         key: 'clients',
         href: 'https://clients.masterroachi.com/',
         name: 'Clients',
-        what: 'The design business: prospects, clients and renewals.',
+        // The CRM's four screens since 9 Nov: Today (its home), Pipeline,
+        // Accounts and Map. It has no Renewals page.
+        what: 'The design business: today, the pipeline, accounts and the map.',
         outside: true,
       },
     ],

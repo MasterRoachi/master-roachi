@@ -117,7 +117,7 @@ export default function AdminHome() {
                 <i className={dash.dot} /> Clients
               </span>
               <span className={dash.tileV}>CRM ↗</span>
-              <span className={dash.tileS}>prospects and renewals</span>
+              <span className={dash.tileS}>today, pipeline, accounts, map</span>
             </a>
           </li>
         </ul>
