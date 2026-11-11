@@ -2665,13 +2665,33 @@ check('a module with no curriculum is refused', res.status === 400, String(res.s
 
 globalThis.fetch = ghFetch;
 
+// Sketches answer from D1 since 2026-11-11 (worker/sketches.ts), through the
+// whole Worker here: the same guards on the path, and never a commit.
+const sketchDb = new DatabaseSync(':memory:');
+sketchDb.exec(fs.readFileSync('migrations/0022_sketches.sql', 'utf8'));
+const sketchEnv = {
+  ...ghEnv,
+  DB: {
+    prepare(sql) {
+      let values = [];
+      const st = {
+        bind: (...v) => ((values = v), st),
+        all: async () => ({ results: sketchDb.prepare(sql).all(...values) }),
+        first: async () => sketchDb.prepare(sql).get(...values) ?? null,
+        run: async () => sketchDb.prepare(sql).run(...values),
+      };
+      return st;
+    },
+  },
+};
+
 res = await worker.fetch(
   viaAccess('https://admin.masterroachi.com/work/api/content?collection=notes'),
-  ghEnv,
+  sketchEnv,
 );
 body = await res.json();
 check(
-  'a collection whose directory does not exist yet lists as empty',
+  'no sketches yet lists as empty',
   res.status === 200 && body.configured === true && body.files.length === 0,
   JSON.stringify(body),
 );
@@ -2680,9 +2700,10 @@ check(
 commits.length = 0;
 res = await worker.fetch(
   postContent({ collection: 'notes', path: 'notes/a-sketch.svg', text: '<svg/>' }),
-  ghEnv,
+  sketchEnv,
 );
 check('notes accepts a .svg', res.status === 200, String(res.status));
+check('and a sketch is never committed to the public repo', commits.length === 0, JSON.stringify(commits.map((c) => c.path ?? c)));
 
 for (const bad of [
   'notes/a-sketch.md',
@@ -2692,33 +2713,26 @@ for (const bad of [
   'content/writing/a.svg',
   'notes/../worker/index.ts',
 ]) {
-  res = await worker.fetch(postContent({ collection: 'notes', path: bad, text: 'x' }), ghEnv);
+  res = await worker.fetch(postContent({ collection: 'notes', path: bad, text: 'x' }), sketchEnv);
   check(`notes refuses ${bad}`, res.status === 400, String(res.status));
 }
 
 // A sketch is text, not a published post, so the draft rewriting must not
-// reach into it — it shares the endpoint with the writing collection.
-commits.length = 0;
+// reach into it, though it shares the endpoint with the writing collection.
 res = await worker.fetch(
-  postContent({
-    collection: 'notes',
-    path: 'notes/a-sketch.svg',
-    text: '<svg><metadata/></svg>',
-    draft: true,
-  }),
-  ghEnv,
+  postContent({ collection: 'notes', path: 'notes/drafty.svg', text: '<svg><metadata/></svg>', draft: true }),
+  sketchEnv,
 );
-let written = Buffer.from(commits[0].content, 'base64').toString('utf8');
+const written = sketchDb.prepare("select svg from sketches where path = 'notes/drafty.svg'").get()?.svg ?? '';
 check(
   'a sketch never has a draft flag injected into it',
   !written.includes('draft:') && written === '<svg><metadata/></svg>',
   JSON.stringify(written),
 );
 
-commits.length = 0;
 res = await worker.fetch(
   postContent({ collection: 'notes', title: 'Thoughts on Mondays', text: '<svg/>' }),
-  ghEnv,
+  sketchEnv,
 );
 body = await res.json();
 check(
@@ -5868,6 +5882,75 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
   check('work: set-audience shares a curriculum', r.status === 200 && sqlite.prepare('select audience from curriculums where id = 2').get().audience === 'hers');
 
   globalThis.fetch = realFetch;
+}
+
+// --- the sketches, in D1 rather than the public repo (2026-11-11) -------------
+//
+// The same API the Sketchpad always called, answered from the `sketches`
+// table: what matters is that the shapes did not change, that a stale save is
+// refused as GitHub refused it, and that no other collection is caught.
+{
+  const sketchBundle = path.join(os.tmpdir(), 'master-roachi-sketch-api-bundle.mjs');
+  execFileSync(
+    'npx',
+    ['esbuild', 'worker/sketches.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${sketchBundle}`],
+    { stdio: 'pipe', shell: true },
+  );
+  const { sketchesApi } = await import(pathToFileURL(sketchBundle).href);
+  const lite = new DatabaseSync(':memory:');
+  lite.exec(fs.readFileSync('migrations/0022_sketches.sql', 'utf8'));
+  const db = {
+    prepare(sql) {
+      let values = [];
+      const st = {
+        bind: (...v) => ((values = v), st),
+        all: async () => ({ results: lite.prepare(sql).all(...values) }),
+        first: async () => lite.prepare(sql).get(...values) ?? null,
+        run: async () => lite.prepare(sql).run(...values),
+      };
+      return st;
+    },
+  };
+  const base = 'https://tools.masterroachi.com/work/api/content';
+  const get = (q) => sketchesApi(new Request(`${base}?${q}`), new URL(`${base}?${q}`), db);
+  const post = (b) => {
+    const req = new Request(base, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) });
+    return sketchesApi(req, new URL(base), db);
+  };
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+
+  check('sketches: other collections are not caught', (await get('collection=writing')) === null && (await post({ collection: 'projects', path: 'content/projects/x.mdx', text: 'x' })) === null, '');
+  let res = await get('collection=notes');
+  let body = await res.json();
+  check('sketches: an empty list is a list', res.status === 200 && body.configured === true && body.files.length === 0, JSON.stringify(body));
+
+  res = await post({ collection: 'notes', path: 'notes/first.svg', text: svg });
+  body = await res.json();
+  check('sketches: a new sketch saves', res.status === 200 && body.saved === true && body.path === 'notes/first.svg', JSON.stringify(body));
+  const sha = body.sha;
+
+  res = await get('collection=notes&dates=1');
+  body = await res.json();
+  check('sketches: the list has the path, the version and the date', body.files.length === 1 && body.files[0].sha === sha && typeof body.files[0].updated === 'string', JSON.stringify(body));
+
+  res = await get(`collection=notes&path=${encodeURIComponent('notes/first.svg')}`);
+  body = await res.json();
+  check('sketches: a sketch reads back whole', body.file?.text === svg && body.file?.sha === sha, JSON.stringify(body));
+
+  res = await post({ collection: 'notes', path: 'notes/first.svg', text: svg });
+  check('sketches: a new sketch never lands on an old one', res.status === 409, String(res.status));
+  res = await post({ collection: 'notes', path: 'notes/first.svg', text: svg.replace('></svg>', '><g/></svg>'), sha: 'stale' });
+  check('sketches: a save over a newer version is refused', res.status === 409, String(res.status));
+  res = await post({ collection: 'notes', path: 'notes/first.svg', text: svg.replace('></svg>', '><g/></svg>'), sha });
+  body = await res.json();
+  check('sketches: an edit of the stored version saves, with a new version', res.status === 200 && body.sha !== sha, JSON.stringify(body));
+
+  res = await post({ collection: 'notes', path: '../../wrangler.jsonc', text: svg });
+  check('sketches: a path outside notes/ is refused', res.status === 400, String(res.status));
+  res = await get(`collection=notes&path=${encodeURIComponent('notes/none.svg')}`);
+  check('sketches: a missing sketch is not found', res.status === 404, String(res.status));
+  check('sketches: with no database, nothing is pretended', (await (await sketchesApi(new Request(`${base}?collection=notes`), new URL(`${base}?collection=notes`), undefined)).json()).configured === false, '');
+  fs.rmSync(sketchBundle, { force: true });
 }
 
 // --- the three apps on their own addresses (2026-11-10) -----------------------

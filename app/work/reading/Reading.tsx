@@ -71,7 +71,7 @@ interface Quote {
   page: number | null;
 }
 
-/** A sketchpad page kept against a book. The drawing is a file in the repo. */
+/** A sketchpad page kept against a book. The drawing is a sketch in D1 (worker/sketches.ts). */
 interface Note {
   path: string;
   book_id: number;

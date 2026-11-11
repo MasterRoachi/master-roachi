@@ -170,10 +170,11 @@ cover:
   {
     key: 'notes',
     label: 'Notes',
-    // Not under content/, deliberately. content/ is what the site publishes,
-    // and these are his own notes — versioned and private, which is what the
-    // repo is for once the Access gate is in front of the only page that
-    // reads them. lib/content.ts never looks here.
+    // The Sketchpad's sketches. NOT IN THE REPO since 2026-11-11: the repo
+    // is public, so a sketch saved here was published, and they now live in
+    // D1 (worker/sketches.ts, migration 0022). This entry stays because the
+    // API still names sketches by path (notes/<slug>.svg) and pathAllowed()
+    // is the guard on those paths. Nothing is written to notes/ any more.
     dir: 'notes',
     // One file per sketch. It was .md plus a .png at first, which was two
     // tools sharing a page rather than a sketchpad — writing in one place,

@@ -34,6 +34,7 @@ import {
 } from './curriculum-ops';
 import { shareOhana } from './share-ohana';
 import { secured } from './security-headers';
+import { sketchesApi } from './sketches';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
@@ -916,6 +917,11 @@ async function handle(request: Request, env: Env): Promise<Response> {
     // before its policy is.
     if (route === '/work/api/content') {
       if (!(await privateAllowed(request, url, env))) return env.ASSETS.fetch(request);
+
+      // The sketches live in D1, not the public repo (2026-11-11): the same
+      // API, answered from the `sketches` table. See worker/sketches.ts.
+      const sketch = await sketchesApi(request, url, env.DB);
+      if (sketch) return sketch;
 
       const token = env.GITHUB_TOKEN;
       if (!token) return json({ configured: false, files: [] }, 200);
@@ -2060,9 +2066,9 @@ async function handle(request: Request, env: Env): Promise<Response> {
           }
 
           /* A sketchpad page kept against a book.
-             The drawing itself is a file in the `notes` collection, written
-             through /work/api/content like every other sketch — this only
-             records which book it belongs to. */
+             The drawing itself is a sketch in the `notes` collection, saved
+             through /work/api/content like every other (D1 since 2026-11-11,
+             worker/sketches.ts) — this only records which book it belongs to. */
           if (body.action === 'note-add') {
             const id = Number(body.id);
             const path = typeof body.path === 'string' ? body.path.trim().slice(0, 400) : '';

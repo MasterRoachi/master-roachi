@@ -59,7 +59,7 @@ function newestFirst(a: FileRef, b: FileRef): number {
   return a.path.localeCompare(b.path);
 }
 
-/** "10 Nov 2026", from the file's last commit date. Not the clock. */
+/** "10 Nov 2026", from when the sketch was last saved. Not the clock. */
 function dayOf(stamp: string): string {
   const date = new Date(stamp);
   if (Number.isNaN(date.getTime())) return '';
@@ -476,8 +476,8 @@ export default function Sketchpad() {
 
       /* Record which book this belongs to, if it belongs to one.
          After the file is written, never before: a link to a sketch that
-         failed to save would be a dead row pointing at nothing. The drawing
-         stays the repo's; D1 only holds the association. */
+         failed to save would be a dead row pointing at nothing. Both live in
+         D1 since 2026-11-11 (worker/sketches.ts), in separate tables. */
       let linked = true;
       if (book) {
         await fetch('/work/api/reading', {
@@ -498,7 +498,7 @@ export default function Sketchpad() {
           ? 'Saved, but it could not be linked to the book.'
           : book
             ? `Saved, and kept against ${book.title}.`
-            : 'Saved. One file, committed.',
+            : 'Saved.',
       );
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Save failed.');
@@ -575,8 +575,8 @@ export default function Sketchpad() {
         {files.length === 0 ? (
           <p className={styles.status}>No sketches yet. Start one with + New.</p>
         ) : (
-          // NEWEST FIRST, by each file's last commit date (the list's
-          // ?dates=1). See newestFirst().
+          // NEWEST FIRST, by when each sketch was last saved (the list's
+          // `updated`). See newestFirst().
           <ul className={styles.tiles}>
             {files.map((file) => (
               <li key={file.path}>

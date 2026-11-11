@@ -115,6 +115,7 @@ the dashboard shows them. Leave them alone when working on this one.
 | A Worker custom domain | made by another Worker, behind its own Access app | never add a record for it by hand; a custom domain fails if one exists |
 | `clients` | Custom Domain on another Worker, behind its own Access app | the `/work` Clients door links here; never add a record by hand |
 | `pay` | Custom Domain on another Worker (public, no Access) | never add a record by hand |
+| A third Worker custom domain (2026-11-11) | made by another Worker, behind its own Access app, made before the domain so it was never open | the tools app links to it; never add a record by hand |
 
 **Mail**, as public DNS answered on 2026-11-04. Email Routing still receives
 (`route1–3.mx.cloudflare.net`, its DKIM key at `cf2024-1._domainkey`). Another
