@@ -224,7 +224,7 @@ backend.
 | `/work/reading` | A bookcase of four shelves; a book's notes can become a post |
 | `/work/curriculums` | What is being studied, and how far through it you are |
 | `/work/cards` | Flashcards. A deck is a curriculum, and two buttons |
-| `/work/sketchpad` | Write and draw on one page, saved as one file |
+| `/work/sketchpad` | Write and draw on one page, kept in D1 (private, not in the repo) |
 | `/work/writing` | Posts. Editing one commits it, and the commit publishes it |
 | `/work/projects` | The project pages behind `/projects` |
 | `/work/shop` | Orders, and what each design is in your own words |
@@ -235,13 +235,20 @@ the first two, the single `content/store/copy.json` for the third.
 
 ### The backend is its own app shell
 
-Nothing under `/work` wears the site. The nav and the footer hide themselves on
-those paths — a two-line guard in each, rather than lifting every public page
-into a route group to change the chrome on nine of them — and `app/work/layout.tsx`
-supplies one centred row of links instead. Every page lost its "Private"
-eyebrow, its own title and its back link: each one opened by telling you where
-you were, which the header now does once, above a link to a home page that is
-one of those links anyway.
+Nothing under `/work` wears the site's nav. The nav and the footer hide
+themselves on those paths — a two-line guard in each, rather than lifting every
+public page into a route group — and the backend has a frame of its own.
+
+**Since 10–11 November it is three installable apps:** admin, learn and tools,
+on their own addresses (`lib/work-tools.ts`, `worker/apps.ts`). Each has its own
+icon and manifest, and the manifest link carries
+`crossorigin="use-credentials"` so the phone fetches it past Access. On a
+phone, the page title opens the app's doors (`components/WorkHeader.tsx`). From
+900px wide there is a sidebar, the page head above the page, and dashboard
+homes (`app/work/home/`). **The look is the public site's, written down in
+`DESIGN.md`**, the spec shared with the CRM and Kame: the starfield, each app's
+colour as the accent, see-through cards, and state in the colour of the words.
+The building blocks are `app/work/ui.module.css`.
 
 **The shell is exactly `100dvh` and the page never scrolls.** `main` is
 unstyled and `body` is a flex column with `min-height: 100dvh`, so a wrapper of
