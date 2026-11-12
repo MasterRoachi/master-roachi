@@ -1273,6 +1273,12 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 
 ## Open Items
 
+- [x] **The public-site audit, 11–12 Nov 2026**
+      (https://claude.ai/artifact/TfvYyBRvBnLWx8QSHByP64). His rulings of 12
+      Nov: fixed and live are 01, 02, 03 (Hire me, prices shown, no founding
+      offer), 04 (analytics kept and disclosed; privacy notice privacy-v2),
+      05, 08, 09 (the 3D waits for the visitor), 10, 14, and 15 in part; the
+      section names stay as they are. Not yet ruled on: 06, 07, 11, 12, 13.
 - [x] **Terrath and Cultus Botanicus rewritten** 2026-11-04 from their own
       repositories, as stories (see "The voice" under Projects). Fabled Threads
       has no page of its own — its card goes to `/store/`. The original item:
