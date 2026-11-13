@@ -331,6 +331,7 @@ function sqliteD1() {
   sqlite.exec(fs.readFileSync('migrations/0018_order_address.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0019_order_checkout.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0020_store_syncs.sql', 'utf8'));
+  sqlite.exec(fs.readFileSync('migrations/0023_order_artist.sql', 'utf8'));
   const d1 = {
     sqlite,
     broken: false,
@@ -3558,7 +3559,7 @@ const printfulFetch = async (input, init = {}) => {
   if (url.endsWith('api.printful.com/store')) {
     return reply({ result: { type: 'manual', name: 'Fabled Threads', website: null } });
   }
-  if (url.endsWith('/store/products')) {
+  if (/\/store\/products(\?|$)/.test(url)) {
     return reply({
       result: [
         {
