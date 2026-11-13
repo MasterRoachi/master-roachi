@@ -4,6 +4,7 @@ import { pageMeta } from '@/lib/seo';
 import HalftoneField from '@/components/HalftoneField';
 import ShirtIcon from '@/components/ShirtIcon';
 import ShirtViewerMount from '@/components/ShirtViewerMount';
+import GoodsViewerMount from '@/components/GoodsViewerMount';
 import PageHeader from '@/components/PageHeader';
 import CyclingQuote from '@/components/CyclingQuote';
 import Swatches from '@/components/Swatches';
@@ -14,17 +15,22 @@ import {
   getStore,
   isBuyable,
   categoryOf,
+  storeCategories,
+  storePieces,
+  productsInPiece,
+  piecePath,
+  pieceImage,
   productPath,
   sizesOf,
-  sizeRun,
   priceSummary,
   isSoldOut,
   garmentLabel,
   copyOf,
   type StoreProduct,
 } from '@/lib/store';
-import { modelFor } from '@/lib/models';
+import { goodsFor, modelFor } from '@/lib/models';
 import { site } from '@/lib/site';
+import ProductCard from './ProductCard';
 import styles from './store.module.css';
 
 export const metadata: Metadata = pageMeta({
@@ -46,14 +52,24 @@ export default function StorePage() {
   const lead = products[0] ?? null;
   // The newest thing on the rail will not always be a t-shirt.
   const leadModel = lead ? modelFor(lead) : null;
+  // Or, for a poster, canvas, button or mat, the shape built for it.
+  const leadGood = lead && !leadModel ? goodsFor(lead) : null;
   const rest = products.filter((p) => p.id !== lead?.id);
 
-  const shelves = site.store.categories
-    .map((category) => ({
-      category,
-      items: rest.filter((p) => categoryOf(p) === category),
+  // His shelves, in his order (/work/shop), and only those with anything on.
+  const shelves = storeCategories()
+    .map(({ id, name }) => ({
+      id,
+      category: name,
+      items: rest.filter((p) => categoryOf(p) === id),
     }))
     .filter((s) => s.items.length > 0);
+
+  // The second way in: one link per artwork, so everything with one drawing
+  // on it is a single page. Only collections with something in them.
+  const pieces = storePieces()
+    .map((piece) => ({ piece, items: productsInPiece(piece.id) }))
+    .filter((p) => p.items.length > 0);
 
   return (
     <div
@@ -102,10 +118,11 @@ export default function StorePage() {
                   alt={`${copyOf(lead).alt || lead.name}, which can be turned`}
                 />
               )}
+              {leadGood && <GoodsViewerMount good={leadGood} alt={`${copyOf(lead).alt || lead.name}, which can be turned`} />}
             </div>
             {/* Under the shirt, as on the product page: it describes the
                 thing above it, not the product. */}
-            {leadModel && <p className={styles.turn}>Drag it to turn it.</p>}
+            {(leadModel || leadGood) && <p className={styles.turn}>Drag it to turn it.</p>}
             </div>
 
             <div className={styles.featureBody}>
@@ -163,70 +180,48 @@ export default function StorePage() {
           </div>
         )}
 
-        {shelves.map(({ category, items }) => (
-          <section key={category} className={styles.shelf}>
+        {pieces.length > 0 && (
+          <nav className={styles.pieces} aria-label="By artwork">
+            <h2 className={styles.shelfHead}>
+              <span>By artwork</span>
+              <span className={styles.shelfCount}>{pieces.length}</span>
+            </h2>
+            <ul className={styles.pieceList}>
+              {pieces.map(({ piece, items }) => (
+                <li key={piece.id}>
+                  <Link href={piecePath(piece)} className={styles.pieceLink}>
+                    <span className={styles.pieceArt}>
+                      {pieceImage(piece) ? (
+                        <img
+                          src={pieceImage(piece) ?? undefined}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : null}
+                    </span>
+                    <span className={styles.pieceName}>{piece.name}</span>
+                    <span className={styles.pieceMeta}>
+                      {piece.artist ? `Art by ${piece.artist} · ` : ''}
+                      {items.length} {items.length === 1 ? 'thing' : 'things'}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+
+        {shelves.map(({ id, category, items }) => (
+          <section key={id} id={id} className={styles.shelf}>
             <h2 className={styles.shelfHead}>
               <span>{category}</span>
               <span className={styles.shelfCount}>{items.length}</span>
             </h2>
             <div className={styles.grid}>
-              {items.map((product) => {
-                const sizes = sizesOf(product);
-                const soldOut = isSoldOut(product);
-
-                // Always the product page, never straight out to a payment
-                // link: a card is a thing to look at, and sending someone
-                // from a thumbnail to a checkout skips every question they
-                // have not asked yet.
-                return (
-                  <Link
-                    key={product.id}
-                    className={styles.product}
-                    href={productPath(product)}
-                  >
-                    <span className={styles.art}>
-                      {product.art || product.thumbnail ? (
-                        <img
-                          src={product.art ?? product.thumbnail ?? undefined}
-                          alt=""
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        /* No mockup cut for this one yet. A shorter band with
-                           the mark in it, rather than a square of near-black
-                           diagonal stripes — which is what the invented
-                           placeholders used to look like, and read as a
-                           product that had failed to load. */
-                        <span className={styles.noArt} aria-hidden="true">
-                          <img src="/logo-mark-lg.webp" alt="" loading="lazy" />
-                        </span>
-                      )}
-                    </span>
-                    <span className={styles.detail}>
-                      <span className={styles.name}>{product.name}</span>
-                      <span className={styles.meta}>
-                        {priceSummary(product) && (
-                          <span className={styles.price}>
-                            {priceSummary(product)}
-                          </span>
-                        )}
-                        {sizes.length > 0 && (
-                          <span className={styles.variants}>
-                            {sizeRun(sizes)}
-                          </span>
-                        )}
-                      </span>
-                      <Swatches colors={product.colors ?? []} compact />
-                      {soldOut ? (
-                        <span className={styles.pending}>Sold out</span>
-                      ) : (
-                        <span className={styles.buy}>See it →</span>
-                      )}
-                    </span>
-                  </Link>
-                );
-              })}
+              {items.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
           </section>
         ))}

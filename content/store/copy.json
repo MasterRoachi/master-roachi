@@ -1,4 +1,14 @@
 {
+  "464722916": {
+    "description": [
+      "That’s my face.",
+      "It went first because it’s the one I finished first — there was no plan. Wear it if you think it looks cool, which is the entire qualification.",
+      "And if you really love me, you’d wear this.",
+      "Chest print only; the back is a plain shirt."
+    ],
+    "category": "tees",
+    "piece": "face-logo"
+  },
   "$comment": [
     "What each design is, in Master Roachi's own words — the one part of a",
     "product page that is not a number out of Printful.",
@@ -15,12 +25,879 @@
     "a file called 464722916.mdx is not an improvement on anything.",
     "",
     "lib/content.ts only ever reads *.mdx, so this file is invisible to the",
-    "content collections and will not turn up as a page."
+    "content collections and will not turn up as a page.",
+    "",
+    "Since 2026-11-12 an entry also carries category, piece, artist and",
+    "artistShare, and $categories and $pieces are the shelves and the artwork",
+    "collections in store order. lib/product-copy.ts documents every key."
   ],
-  "464722916": [
-    "That’s my face.",
-    "It went first because it’s the one I finished first — there was no plan. Wear it if you think it looks cool, which is the entire qualification.",
-    "And if you really love me, you’d wear this.",
-    "Chest print only; the back is a plain shirt."
-  ]
+  "$categories": [
+    {
+      "id": "tees",
+      "name": "Tees"
+    },
+    {
+      "id": "hoodies",
+      "name": "Hoodies"
+    },
+    {
+      "id": "wall-art",
+      "name": "Wall art"
+    },
+    {
+      "id": "desk",
+      "name": "Desk"
+    },
+    {
+      "id": "stickers",
+      "name": "Stickers & bits"
+    },
+    {
+      "id": "home",
+      "name": "Home"
+    },
+    {
+      "id": "carry",
+      "name": "Carry"
+    }
+  ],
+  "$pieces": [
+    {
+      "id": "baby-continent",
+      "name": "Baby Continent",
+      "artist": "Timon"
+    },
+    {
+      "id": "glitch",
+      "name": "Glitch",
+      "artist": "Timon"
+    },
+    {
+      "id": "bright-idea",
+      "name": "Bright Idea",
+      "artist": "Timon"
+    },
+    {
+      "id": "faye",
+      "name": "Faye - The Lady of the Forest",
+      "artist": "Timon"
+    },
+    {
+      "id": "professor-bones",
+      "name": "Professor Bones",
+      "artist": "Timon"
+    },
+    {
+      "id": "unknown",
+      "name": "Unknown",
+      "artist": "Timon"
+    },
+    {
+      "id": "elderstone-peaks",
+      "name": "Elderstone Peaks",
+      "artist": "Timon"
+    },
+    {
+      "id": "grumpy-television",
+      "name": "Grumpy Television",
+      "artist": "Timon"
+    },
+    {
+      "id": "a-house-on-stillmere",
+      "name": "A House on Stillmere",
+      "artist": "Timon"
+    },
+    {
+      "id": "amuru-warrior",
+      "name": "Amuru Warrior",
+      "artist": "Timon"
+    },
+    {
+      "id": "lila",
+      "name": "Lila - Deus Ex Machina",
+      "artist": "Timon"
+    },
+    {
+      "id": "irohs-house",
+      "name": "Iroh’s House",
+      "artist": "Timon"
+    },
+    {
+      "id": "marci",
+      "name": "Marci - Short For Marceline",
+      "artist": "Timon"
+    },
+    {
+      "id": "treant-and-friend",
+      "name": "Treant and Friend",
+      "artist": "Timon"
+    },
+    {
+      "id": "elderstone-shrine",
+      "name": "Elderstone Shrine",
+      "artist": "Timon"
+    },
+    {
+      "id": "face-logo",
+      "name": "Master Roachi face logo"
+    }
+  ],
+  "492957656": {
+    "category": "wall-art",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492957658": {
+    "category": "wall-art",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492957664": {
+    "category": "wall-art",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492957666": {
+    "category": "desk",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492957669": {
+    "category": "stickers",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492957670": {
+    "category": "stickers",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492957672": {
+    "category": "stickers",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492957678": {
+    "category": "tees",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492957684": {
+    "category": "hoodies",
+    "piece": "grumpy-television",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492985114": {
+    "category": "tees",
+    "piece": "face-logo"
+  },
+  "492985120": {
+    "category": "hoodies",
+    "piece": "face-logo"
+  },
+  "492985123": {
+    "category": "home",
+    "piece": "face-logo"
+  },
+  "492985126": {
+    "category": "carry",
+    "piece": "face-logo"
+  },
+  "492985129": {
+    "category": "stickers",
+    "piece": "face-logo"
+  },
+  "492985134": {
+    "category": "stickers",
+    "piece": "face-logo"
+  },
+  "492985139": {
+    "category": "carry",
+    "piece": "face-logo"
+  },
+  "492985187": {
+    "category": "carry",
+    "piece": "face-logo"
+  },
+  "492998418": {
+    "category": "wall-art",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492998427": {
+    "category": "wall-art",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492998450": {
+    "category": "wall-art",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492998460": {
+    "category": "stickers",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492998468": {
+    "category": "stickers",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492998483": {
+    "category": "tees",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492998506": {
+    "category": "tees",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492998539": {
+    "category": "hoodies",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "492998572": {
+    "category": "home",
+    "piece": "professor-bones",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493001479": {
+    "category": "wall-art",
+    "piece": "faye",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493001531": {
+    "category": "wall-art",
+    "piece": "faye",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493001591": {
+    "category": "wall-art",
+    "piece": "faye",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493001635": {
+    "category": "stickers",
+    "piece": "faye",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493001707": {
+    "category": "stickers",
+    "piece": "faye",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493001754": {
+    "category": "tees",
+    "piece": "faye",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493001840": {
+    "category": "carry",
+    "piece": "faye",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013107": {
+    "category": "wall-art",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013133": {
+    "category": "wall-art",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013188": {
+    "category": "wall-art",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013226": {
+    "category": "wall-art",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013238": {
+    "category": "home",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013246": {
+    "category": "stickers",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013258": {
+    "category": "stickers",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013282": {
+    "category": "tees",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493013307": {
+    "category": "hoodies",
+    "piece": "baby-continent",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493026932": {
+    "category": "wall-art",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493026972": {
+    "category": "wall-art",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493027059": {
+    "category": "wall-art",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493027079": {
+    "category": "stickers",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493027106": {
+    "category": "stickers",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493027114": {
+    "category": "stickers",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493027182": {
+    "category": "tees",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493027360": {
+    "category": "hoodies",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493027441": {
+    "category": "home",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493027461": {
+    "category": "home",
+    "piece": "glitch",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493039314": {
+    "category": "wall-art",
+    "piece": "bright-idea",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493039321": {
+    "category": "wall-art",
+    "piece": "bright-idea",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493039345": {
+    "category": "wall-art",
+    "piece": "bright-idea",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493039360": {
+    "category": "wall-art",
+    "piece": "bright-idea",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493039368": {
+    "category": "stickers",
+    "piece": "bright-idea",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493039372": {
+    "category": "stickers",
+    "piece": "bright-idea",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493039379": {
+    "category": "stickers",
+    "piece": "bright-idea",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493039381": {
+    "category": "tees",
+    "piece": "bright-idea",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493043664": {
+    "category": "wall-art",
+    "piece": "unknown",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493043670": {
+    "category": "wall-art",
+    "piece": "unknown",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493043677": {
+    "category": "wall-art",
+    "piece": "unknown",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493043679": {
+    "category": "stickers",
+    "piece": "unknown",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493043681": {
+    "category": "stickers",
+    "piece": "unknown",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493043682": {
+    "category": "stickers",
+    "piece": "unknown",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493043688": {
+    "category": "tees",
+    "piece": "unknown",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493043699": {
+    "category": "hoodies",
+    "piece": "unknown",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045028": {
+    "category": "wall-art",
+    "piece": "elderstone-peaks",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045033": {
+    "category": "wall-art",
+    "piece": "elderstone-peaks",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045040": {
+    "category": "wall-art",
+    "piece": "elderstone-peaks",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045041": {
+    "category": "home",
+    "piece": "elderstone-peaks",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045044": {
+    "category": "stickers",
+    "piece": "elderstone-peaks",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045803": {
+    "category": "wall-art",
+    "piece": "a-house-on-stillmere",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045807": {
+    "category": "wall-art",
+    "piece": "a-house-on-stillmere",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045811": {
+    "category": "wall-art",
+    "piece": "a-house-on-stillmere",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045814": {
+    "category": "desk",
+    "piece": "a-house-on-stillmere",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045815": {
+    "category": "stickers",
+    "piece": "a-house-on-stillmere",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493045817": {
+    "category": "carry",
+    "piece": "a-house-on-stillmere",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493046702": {
+    "category": "wall-art",
+    "piece": "amuru-warrior",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493046704": {
+    "category": "wall-art",
+    "piece": "amuru-warrior",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493046708": {
+    "category": "wall-art",
+    "piece": "amuru-warrior",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493046710": {
+    "category": "stickers",
+    "piece": "amuru-warrior",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493046714": {
+    "category": "stickers",
+    "piece": "amuru-warrior",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493046720": {
+    "category": "tees",
+    "piece": "amuru-warrior",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493046729": {
+    "category": "hoodies",
+    "piece": "amuru-warrior",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048416": {
+    "category": "wall-art",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048421": {
+    "category": "wall-art",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048430": {
+    "category": "wall-art",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048436": {
+    "category": "wall-art",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048437": {
+    "category": "desk",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048439": {
+    "category": "desk",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048444": {
+    "category": "desk",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048448": {
+    "category": "stickers",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048457": {
+    "category": "stickers",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048469": {
+    "category": "tees",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493048740": {
+    "category": "hoodies",
+    "piece": "lila",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493058227": {
+    "category": "wall-art",
+    "piece": "irohs-house",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493058235": {
+    "category": "wall-art",
+    "piece": "irohs-house",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493058310": {
+    "category": "wall-art",
+    "piece": "irohs-house",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493058318": {
+    "category": "stickers",
+    "piece": "irohs-house",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493058324": {
+    "category": "stickers",
+    "piece": "irohs-house",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493058338": {
+    "category": "desk",
+    "piece": "irohs-house",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493058344": {
+    "category": "desk",
+    "piece": "irohs-house",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493058351": {
+    "category": "carry",
+    "piece": "irohs-house",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062150": {
+    "category": "wall-art",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062156": {
+    "category": "wall-art",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062167": {
+    "category": "wall-art",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062171": {
+    "category": "stickers",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062182": {
+    "category": "stickers",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062186": {
+    "category": "tees",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062200": {
+    "category": "carry",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062210": {
+    "category": "home",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493062251": {
+    "category": "carry",
+    "piece": "marci",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493066523": {
+    "category": "wall-art",
+    "piece": "treant-and-friend",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493066528": {
+    "category": "wall-art",
+    "piece": "treant-and-friend",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493066535": {
+    "category": "wall-art",
+    "piece": "treant-and-friend",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493066537": {
+    "category": "desk",
+    "piece": "treant-and-friend",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493066539": {
+    "category": "stickers",
+    "piece": "treant-and-friend",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493066543": {
+    "category": "stickers",
+    "piece": "treant-and-friend",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493066554": {
+    "category": "tees",
+    "piece": "treant-and-friend",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493066560": {
+    "category": "carry",
+    "piece": "treant-and-friend",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493069101": {
+    "category": "wall-art",
+    "piece": "elderstone-shrine",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493069103": {
+    "category": "wall-art",
+    "piece": "elderstone-shrine",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493069111": {
+    "category": "wall-art",
+    "piece": "elderstone-shrine",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493069116": {
+    "category": "home",
+    "piece": "elderstone-shrine",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493069121": {
+    "category": "desk",
+    "piece": "elderstone-shrine",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493069123": {
+    "category": "desk",
+    "piece": "elderstone-shrine",
+    "artist": "Timon",
+    "artistShare": 0.5
+  },
+  "493069124": {
+    "category": "desk",
+    "piece": "elderstone-shrine",
+    "artist": "Timon",
+    "artistShare": 0.5
+  }
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { orderWaiting } from '@/lib/order-waiting';
+import { artistCut } from '@/lib/artist-cut';
 import styles from './orders.module.css';
 import ui from '../ui.module.css';
 
@@ -71,6 +72,48 @@ interface Order {
   total: number | null;
   shipping_name: string | null;
   pf_payment_id: string | null;
+  /** Who drew it and their fraction of the profit, fixed when it was placed. Null on his own work. */
+  artist: string | null;
+  artist_share: number | null;
+  /** What Printful charges to make the item, in rand. Null until it is sent there. */
+  item_cost: number | null;
+}
+
+/** Orders that count toward a payout: paid for, and not dismissed. */
+function owes(order: Order): boolean {
+  return Boolean(order.artist) && order.status !== 'dismissed' && order.status !== 'received';
+}
+
+/**
+ * What each artist is owed, month by month of payment, newest first.
+ *
+ * A month's line is what to pay out for it. Orders not yet costed by Printful
+ * are counted separately rather than as zero, so a month that looks small
+ * because it is waiting on Printful says so.
+ */
+function payouts(orders: Order[]) {
+  const months = new Map<string, Map<string, { owed: number; orders: number; waiting: number }>>();
+  for (const order of orders.filter(owes)) {
+    const month = (order.paid_at ?? order.created_at).slice(0, 7);
+    const artists = months.get(month) ?? new Map();
+    const line = artists.get(order.artist!) ?? { owed: 0, orders: 0, waiting: 0 };
+    const cut = artistCut(order);
+    line.orders += 1;
+    if (cut === null) line.waiting += 1;
+    else line.owed = Math.round((line.owed + cut) * 100) / 100;
+    artists.set(order.artist!, line);
+    months.set(month, artists);
+  }
+  return [...months.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([month, artists]) => ({ month, artists: [...artists.entries()].map(([artist, line]) => ({ artist, ...line })) }));
+}
+
+const monthName = new Intl.DateTimeFormat('en-ZA', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+/** "R12.50", or "R12" when there are no cents. */
+function rand(amount: number): string {
+  return `R${Number.isInteger(amount) ? amount : amount.toFixed(2)}`;
 }
 
 /** The address as Printful wants it, filled in from the one box and checked by hand. */
@@ -525,6 +568,30 @@ export default function Orders() {
         ))}
       </ul>
 
+      {/* What the artists are owed, by the month they were paid in. Only once
+          there is something: most of the shop is still his own work. */}
+      {payouts(orders).length > 0 && (
+        <section className={styles.payouts} aria-label="Owed to artists">
+          <h3 className={styles.payoutsHead}>Owed to artists</h3>
+          <ul className={styles.payoutList}>
+            {payouts(orders).slice(0, 6).map(({ month, artists }) =>
+              artists.map((line) => (
+                <li key={`${month}-${line.artist}`}>
+                  <span>{monthName.format(new Date(`${month}-01T00:00:00Z`))}</span>
+                  <strong>
+                    {line.artist}: {rand(line.owed)}
+                  </strong>
+                  <span className={styles.muted}>
+                    {line.orders} order{line.orders === 1 ? '' : 's'}
+                    {line.waiting > 0 && `, ${line.waiting} not yet costed by Printful`}
+                  </span>
+                </li>
+              )),
+            )}
+          </ul>
+        </section>
+      )}
+
       <div className={styles.layout} data-open={current ? '' : undefined}>
         <div className={styles.listSide} ref={listRef}>
           <div className={styles.toolbar}>
@@ -662,6 +729,26 @@ export default function Orders() {
                 {order.total !== null
                   ? `R${order.total} (R${order.item_amount} + R${order.shipping_amount} delivery)`
                   : order.price}
+              </dd>
+            </>
+          )}
+          {order.artist && (
+            <>
+              <dt>{order.artist}&rsquo;s share</dt>
+              <dd>
+                {(() => {
+                  const cut = artistCut(order);
+                  const pct = Math.round((order.artist_share ?? 0) * 100);
+                  if (cut === null || order.item_amount === null || order.item_cost === null) {
+                    return (
+                      <span className={styles.muted}>
+                        {pct}% of the profit, worked out once Printful has costed it
+                      </span>
+                    );
+                  }
+                  const profit = Math.max(0, order.item_amount - order.item_cost);
+                  return `${rand(cut)}: ${pct}% of the ${rand(profit)} profit (R${order.item_amount} less ${rand(order.item_cost)} to Printful)`;
+                })()}
               </dd>
             </>
           )}

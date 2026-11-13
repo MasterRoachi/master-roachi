@@ -5,14 +5,25 @@ import SeoPanel from '@/components/SeoPanel';
 import { productMetaDescription } from '@/lib/product-meta';
 import { paragraphsIn } from '@/lib/seo-score';
 import {
+  CATEGORIES_KEY,
+  emptyTags,
   inOrder,
   ORDER_KEY,
+  PIECES_KEY,
+  readCategories,
   readCopy,
   readOrder,
+  readPieces,
+  readTags,
   writeCopy,
+  writeEntry,
+  type Piece,
   type ProductCopy,
+  type ProductTags,
+  type Shelf,
 } from '@/lib/product-copy';
 import PagePreview from './PagePreview';
+import ShelvesPanel from './ShelvesPanel';
 import { PREVIEW_MESSAGE } from '@/components/LiveCopy';
 import styles from './store.module.css';
 
@@ -53,6 +64,11 @@ import styles from './store.module.css';
 // wider on a computer; the open product's fields and its preview are two
 // panels side by side. The look is all in store.module.css. Per DESIGN.md
 // (his rulings, 11 Nov 2026) a tile is a `card-link`, for the site's hover.
+//
+// Shelving since 2026-11-12, for Timon's pieces: each product also has a
+// shelf, an artwork collection, an artist and the artist's share of the
+// profit, and the shelves and collections themselves are edited from the
+// toolbar. With a hundred-odd products the grid filters by either.
 
 const PATH = 'content/store/copy.json';
 /** Converted before upload, so the cap is about the WebP and not the source. */
@@ -108,6 +124,12 @@ interface Loaded {
   sha?: string;
 }
 
+/** Timon's share unless set otherwise: his 50/50, 12 Nov 2026. */
+const DEFAULT_SHARE = 0.5;
+
+/** What the grid shows: everything, one shelf or piece, or what is untagged. */
+type Filter = { kind: 'all' } | { kind: 'shelf' | 'piece'; id: string } | { kind: 'untagged' };
+
 /** What the fullscreen inspector is showing, if anything. */
 interface Viewing {
   src: string;
@@ -130,6 +152,13 @@ export default function StoreCopyEditor({
 }) {
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [copy, setCopy] = useState<Record<string, Draft>>({});
+  /** Shelf, collection, artist and share, per product id. */
+  const [tags, setTags] = useState<Record<string, ProductTags>>({});
+  const [categories, setCategories] = useState<Shelf[]>([]);
+  const [pieces, setPieces] = useState<Piece[]>([]);
+  const [filter, setFilter] = useState<Filter>({ kind: 'all' });
+  /** Whether the shelves-and-collections panel is out. */
+  const [showShelves, setShowShelves] = useState(false);
   /** The saved store order, as ids. Products not in it follow, in Printful's order. */
   const [order, setOrder] = useState<string[]>([]);
   const [dirty, setDirty] = useState(false);
@@ -203,6 +232,15 @@ export default function StoreCopyEditor({
               .map(([key, value]) => [key, toDraft(readCopy(value))]),
           ),
         );
+        setTags(
+          Object.fromEntries(
+            Object.entries(parsed)
+              .filter(([key]) => !key.startsWith('$'))
+              .map(([key, value]) => [key, readTags(value)]),
+          ),
+        );
+        setCategories(readCategories(parsed));
+        setPieces(readPieces(parsed));
         setOrder(readOrder(parsed));
       } catch (error) {
         if (live) setStatus(error instanceof Error ? error.message : 'Could not load it.');
@@ -262,6 +300,7 @@ export default function StoreCopyEditor({
     return Object.entries(loaded.raw)
       .filter(([key]) => !key.startsWith('$') && !listed.has(key))
       .map(([key, value]) => {
+        // Words only: the shelving keys are not anything he wrote.
         const words = Object.values(writeCopy(readCopy(value)) ?? {}).flat().join(' ').trim();
         return { id: key, words: words ? words.split(/\s+/).length : 0 };
       });
@@ -274,11 +313,55 @@ export default function StoreCopyEditor({
    * also be the list you reorder. What still needs words is in the counts. */
   const ordered = useMemo(() => inOrder(products, (p) => p.id, order), [products, order]);
 
+  /** The grid's tiles: the store's order, narrowed by the filter. */
+  const shown = useMemo(() => {
+    const tagsOf = (id: string) => tags[id] ?? emptyTags();
+    if (filter.kind === 'all') return ordered;
+    if (filter.kind === 'untagged') return ordered.filter((p) => !tagsOf(p.id).category || !tagsOf(p.id).piece);
+    if (filter.kind === 'shelf') return ordered.filter((p) => tagsOf(p.id).category === filter.id);
+    return ordered.filter((p) => tagsOf(p.id).piece === filter.id);
+  }, [ordered, tags, filter]);
+
+  /** How many products point at each shelf and each collection. */
+  const uses = useMemo(() => {
+    const shelf: Record<string, number> = {};
+    const piece: Record<string, number> = {};
+    for (const product of products) {
+      const t = tags[product.id];
+      if (t?.category) shelf[t.category] = (shelf[t.category] ?? 0) + 1;
+      if (t?.piece) piece[t.piece] = (piece[t.piece] ?? 0) + 1;
+    }
+    return { shelf, piece };
+  }, [products, tags]);
+
   /** One product's copy as the save will write it, which is what the page shows. */
   const copyFor = useCallback((id: string) => fromDraft(copy[id]), [copy]);
 
   function edit(id: string, field: keyof Draft, value: string) {
     setCopy({ ...copy, [id]: { ...BLANK, ...copy[id], [field]: value } });
+    setDirty(true);
+  }
+
+  /**
+   * Change one product's shelving.
+   *
+   * Choosing a collection whose piece has an artist fills the artist, and the
+   * share where none is set, because a product of Timon's with no share is a
+   * payout that silently comes to nothing. Both stay editable afterwards.
+   */
+  function tag(id: string, patch: Partial<ProductTags>) {
+    const before = tags[id] ?? emptyTags();
+    const next = { ...before, ...patch };
+    if (patch.piece !== undefined) {
+      const artist = pieces.find((p) => p.id === patch.piece)?.artist;
+      if (artist && !before.artist) next.artist = artist;
+    }
+    // Not on an edit of the share itself, or clearing the box to retype it
+    // would put 50 straight back.
+    if (patch.artistShare === undefined && next.artist && next.artistShare === null) {
+      next.artistShare = DEFAULT_SHARE;
+    }
+    setTags({ ...tags, [id]: next });
     setDirty(true);
   }
 
@@ -325,13 +408,19 @@ export default function StoreCopyEditor({
     try {
       // Rebuilt from raw, so $comment and any unlisted product's copy survive.
       const next: Record<string, unknown> = { ...loaded.raw };
-      for (const [id, draft] of Object.entries(copy)) {
-        const written = writeCopy(fromDraft(draft));
+      // Every id with copy or with tags: a product tagged and never written
+      // about is still an entry, and its copy is kept with its tags.
+      for (const id of new Set([...Object.keys(copy), ...Object.keys(tags)])) {
+        const written = writeEntry(fromDraft(copy[id]), tags[id] ?? emptyTags());
         if (written) next[id] = written;
         else delete next[id];
       }
       if (order.length) next[ORDER_KEY] = order;
       else delete next[ORDER_KEY];
+      if (categories.length) next[CATEGORIES_KEY] = categories;
+      else delete next[CATEGORIES_KEY];
+      if (pieces.length) next[PIECES_KEY] = pieces.map((p) => (p.artist?.trim() ? p : { id: p.id, name: p.name }));
+      else delete next[PIECES_KEY];
 
       const response = await fetch('/work/api/content', {
         method: 'POST',
@@ -582,10 +671,78 @@ export default function StoreCopyEditor({
             <span className={styles.sep}>·</span>
             <strong>{stats.total}</strong> product{stats.total === 1 ? '' : 's'}
           </p>
-          <button type="button" className={styles.pill} onClick={() => void sync()} disabled={syncing}>
-            {syncing ? 'Syncing…' : 'Sync Printful'}
-          </button>
+          <span className={styles.toolbarActions}>
+            <select
+              className={styles.filter}
+              aria-label="Show"
+              value={filter.kind === 'shelf' || filter.kind === 'piece' ? `${filter.kind}:${filter.id}` : filter.kind}
+              onChange={(event) => {
+                const [kind, id] = event.target.value.split(':');
+                setFilter(
+                  kind === 'shelf' || kind === 'piece'
+                    ? { kind, id }
+                    : kind === 'untagged'
+                      ? { kind: 'untagged' }
+                      : { kind: 'all' },
+                );
+              }}
+            >
+              <option value="all">Every product</option>
+              <option value="untagged">Not shelved yet</option>
+              <optgroup label="Shelf">
+                {categories.map((c) => (
+                  <option key={c.id} value={`shelf:${c.id}`}>
+                    {c.name}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Artwork">
+                {pieces.map((p) => (
+                  <option key={p.id} value={`piece:${p.id}`}>
+                    {p.name}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+            <button
+              type="button"
+              className={styles.pill}
+              aria-expanded={showShelves}
+              onClick={() => setShowShelves(!showShelves)}
+            >
+              Shelves &amp; artworks
+            </button>
+            <button type="button" className={styles.pill} onClick={() => void sync()} disabled={syncing}>
+              {syncing ? 'Syncing…' : 'Sync Printful'}
+            </button>
+          </span>
         </div>
+
+        {showShelves && (
+          <div className={styles.shelvesWrap}>
+            <ShelvesPanel
+              title="Shelves"
+              noun="shelf"
+              items={categories}
+              uses={uses.shelf}
+              onChange={(next) => {
+                setCategories(next);
+                setDirty(true);
+              }}
+            />
+            <ShelvesPanel
+              title="Artworks"
+              noun="artwork"
+              items={pieces}
+              uses={uses.piece}
+              withArtist
+              onChange={(next) => {
+                setPieces(next);
+                setDirty(true);
+              }}
+            />
+          </div>
+        )}
 
         {staleDays !== null && (
           <p className={styles.stale}>
@@ -596,8 +753,10 @@ export default function StoreCopyEditor({
         {syncNote && <p className={styles.message}>{syncNote}</p>}
 
         <ul className={styles.tiles}>
-          {ordered.map((product) => {
+          {shown.map((product) => {
             const picture = imagesOf(product)[0];
+            const shelf = categories.find((c) => c.id === tags[product.id]?.category)?.name;
+            const piece = pieces.find((p) => p.id === tags[product.id]?.piece)?.name;
             // Gold where it waits on him: a product with no description.
             const needsWords = copyFor(product.id).description.length === 0;
             const words = wordsOf(product.id);
@@ -637,11 +796,14 @@ export default function StoreCopyEditor({
                     {product.price ?? 'no price'} · {product.variantCount} size
                     {product.variantCount === 1 ? '' : 's'}
                   </span>
+                  <span className={styles.productFacts}>
+                    {[shelf ?? 'No shelf', piece].filter(Boolean).join(' · ')}
+                  </span>
                   <span className={needsWords ? styles.productStateGold : styles.productState}>
                     {needsWords ? 'Needs a description' : `${words} words`}
                   </span>
                 </button>
-                {ordered.length > 1 && (
+                {shown.length > 1 && (
                   <span
                     className={styles.grip}
                     aria-hidden="true"
@@ -677,6 +839,7 @@ export default function StoreCopyEditor({
           })}
         </ul>
 
+        {shown.length === 0 && <p className={styles.hint}>Nothing here.</p>}
         {ordered.length > 1 && (
           <p className={styles.hint}>Drag a tile by its handle to reorder the store, or open it and use the arrows.</p>
         )}
@@ -690,6 +853,68 @@ export default function StoreCopyEditor({
           </p>
         )}
       </>
+    );
+  }
+
+  /* Where it sits, and who drew it. Above the words, because with a hundred
+   * products the shelf is the first thing a new one needs. */
+  function shelving(id: string) {
+    const t = tags[id] ?? emptyTags();
+    return (
+      <fieldset className={styles.tags}>
+        <legend className={styles.fieldName}>Shelf and artist</legend>
+        <label className={styles.field}>
+          <span className={styles.fieldName}>Shelf</span>
+          <select className={styles.line} value={t.category} onChange={(event) => tag(id, { category: event.target.value })}>
+            <option value="">— guessed from the name —</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={styles.field}>
+          <span className={styles.fieldName}>Artwork</span>
+          <select className={styles.line} value={t.piece} onChange={(event) => tag(id, { piece: event.target.value })}>
+            <option value="">— none —</option>
+            {pieces.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={styles.field}>
+          <span className={styles.fieldName}>Artist</span>
+          <input
+            type="text"
+            className={styles.line}
+            value={t.artist}
+            placeholder="None: your own work"
+            onChange={(event) => tag(id, { artist: event.target.value })}
+          />
+        </label>
+        <label className={styles.field}>
+          <span className={styles.fieldName}>Artist&rsquo;s share of the profit</span>
+          <span className={styles.percent}>
+            <input
+              type="number"
+              className={styles.line}
+              min={0}
+              max={100}
+              step={1}
+              disabled={!t.artist}
+              value={t.artist && t.artistShare !== null ? Math.round(t.artistShare * 100) : ''}
+              onChange={(event) => {
+                const n = Number(event.target.value);
+                tag(id, { artistShare: event.target.value === '' ? null : Math.min(100, Math.max(0, n)) / 100 });
+              }}
+            />
+            %
+          </span>
+        </label>
+      </fieldset>
     );
   }
 
@@ -793,6 +1018,8 @@ export default function StoreCopyEditor({
                 )}
               </label>
             </div>
+
+            {shelving(product.id)}
 
             <label className={styles.field}>
               <span className={styles.fieldName}>Tagline</span>

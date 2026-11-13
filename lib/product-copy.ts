@@ -96,3 +96,120 @@ export function inOrder<T>(items: readonly T[], idOf: (item: T) => string, order
     })
     .map(({ item }) => item);
 }
+
+// ── Shelving, and who drew it ──────────────────────────────────────────────
+//
+// ADDED 2026-11-12 for Timon's fifteen pieces, which took the store from one
+// product to well over a hundred. Four more optional keys per product, beside
+// the copy and in the same entry:
+//
+//   "category":    "wall-art"          — a shelf id from $categories
+//   "piece":       "grumpy-television" — an artwork collection id from $pieces
+//   "artist":      "Timon"             — who drew it; absent for his own logo
+//   "artistShare": 0.5                 — the artist's fraction of the PROFIT
+//
+// `piece`, not `artwork`: StoreProduct.artwork is already the image uploaded
+// from /work/shop, and one word meaning two things in the same object is how a
+// picture ends up in a payout.
+//
+// The share is of profit, his ruling of 12 Nov 2026: the item's price less
+// what Printful charged to make it, delivery excluded. It is a fraction rather
+// than a percentage so that the arithmetic needs no /100 anywhere it is used.
+//
+// And two more top-level keys, the shelves and the collections themselves, in
+// the order the store shows them, each [{ "id", "name" }]; a piece may also
+// name its "artist". Ids are what products point at, so renaming a shelf is
+// changing its name and never its id.
+
+export interface ProductTags {
+  category: string;
+  piece: string;
+  artist: string;
+  /** A fraction, 0–1. Null where none is set. */
+  artistShare: number | null;
+}
+
+export interface Shelf {
+  id: string;
+  name: string;
+}
+
+export interface Piece extends Shelf {
+  artist?: string;
+}
+
+export const CATEGORIES_KEY = '$categories';
+export const PIECES_KEY = '$pieces';
+
+export function emptyTags(): ProductTags {
+  return { category: '', piece: '', artist: '', artistShare: null };
+}
+
+function share(value: unknown): number | null {
+  const n = typeof value === 'number' ? value : Number.NaN;
+  return Number.isFinite(n) && n >= 0 && n <= 1 ? n : null;
+}
+
+/** The shelving keys of one entry. Never throws; an array entry has none. */
+export function readTags(entry: unknown): ProductTags {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return emptyTags();
+  const record = entry as Record<string, unknown>;
+  return {
+    category: text(record.category),
+    piece: text(record.piece),
+    artist: text(record.artist),
+    artistShare: share(record.artistShare),
+  };
+}
+
+/**
+ * One product's whole entry: its copy and its tags, or null when there is
+ * neither. What the editor writes, so a save cannot drop the half it is not
+ * showing.
+ */
+export function writeEntry(copy: ProductCopy, tags: ProductTags): Record<string, unknown> | null {
+  const out: Record<string, unknown> = { ...(writeCopy(copy) ?? {}) };
+  if (tags.category.trim()) out.category = tags.category.trim();
+  if (tags.piece.trim()) out.piece = tags.piece.trim();
+  if (tags.artist.trim()) out.artist = tags.artist.trim();
+  if (tags.artist.trim() && tags.artistShare !== null) out.artistShare = tags.artistShare;
+  return Object.keys(out).length ? out : null;
+}
+
+function shelvesIn(value: unknown): Piece[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const out: Piece[] = [];
+  for (const item of value) {
+    if (!item || typeof item !== 'object') continue;
+    const record = item as Record<string, unknown>;
+    const id = text(record.id);
+    const name = text(record.name) || id;
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    const artist = text(record.artist);
+    out.push(artist ? { id, name, artist } : { id, name });
+  }
+  return out;
+}
+
+/** The shelves, in order. Empty when the file names none. */
+export function readCategories(file: Record<string, unknown>): Shelf[] {
+  return shelvesIn(file[CATEGORIES_KEY]).map(({ id, name }) => ({ id, name }));
+}
+
+/** The artwork collections, in order. */
+export function readPieces(file: Record<string, unknown>): Piece[] {
+  return shelvesIn(file[PIECES_KEY]);
+}
+
+/** A name made into an id: "Iroh's House" → "irohs-house". */
+export function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}

@@ -4,7 +4,18 @@ import { site } from './site';
 // Authored product copy, keyed by Printful id. In content/ rather than in this
 // file so that a form can edit it without rewriting TypeScript.
 import storeCopy from '../content/store/copy.json';
-import { inOrder, readCopy, readOrder, type ProductCopy } from './product-copy';
+import {
+  inOrder,
+  readCategories,
+  readCopy,
+  readOrder,
+  readPieces,
+  readTags,
+  type Piece,
+  type ProductCopy,
+  type ProductTags,
+  type Shelf,
+} from './product-copy';
 import { CURRENCY, itemPrice } from './price';
 
 // Reads the Printful catalogue written by scripts/printful.mjs at build time.
@@ -119,19 +130,89 @@ export interface StoreSnapshot {
 
 const EMPTY: StoreSnapshot = { fetchedAt: null, store: null, products: [] };
 
+const copyFile = storeCopy as Record<string, unknown>;
+
 /**
- * Which shelf a product belongs on.
+ * The shelves, in his order, from $categories in content/store/copy.json.
  *
- * Printful does not tell us, so it is read off the product name. Crude, and
- * good enough while the catalogue is small — a real category field on the
- * product is the fix once there are enough of them for this to be wrong.
+ * site.store.categories is the floor for a file that names none, so a store
+ * with no shelves set still has somewhere to put things.
  */
+export function storeCategories(): Shelf[] {
+  const set = readCategories(copyFile);
+  if (set.length) return set;
+  return site.store.categories.map((name) => ({ id: name.toLowerCase(), name }));
+}
+
+/** The artwork collections, in his order, from $pieces. */
+export function storePieces(): Piece[] {
+  return readPieces(copyFile);
+}
+
+/** The shelving keys of one product. Empty for anything not yet tagged. */
+export function tagsOf(product: StoreProduct): ProductTags {
+  return readTags(copyFile[String(product.id)]);
+}
+
+/**
+ * A guess at the shelf from the product name, for anything not yet tagged.
+ *
+ * This was the whole of categoryOf() while the store had one product. It is
+ * now only the fallback: a product synced a minute ago has no tags until he
+ * opens it on /work/shop, and it should land somewhere sensible rather than
+ * nowhere. Each guess is used only if that shelf exists.
+ */
+const GUESSES: [RegExp, string][] = [
+  [/hoodie|sweat|crewneck/, 'hoodies'],
+  [/t-?\s?shirt|\btee\b/, 'tees'],
+  [/poster|canvas|metal|print|tapestry/, 'wall-art'],
+  [/desk mat|mouse ?pad|journal|notebook/, 'desk'],
+  [/sticker|pin|button|ornament|postcard|card/, 'stickers'],
+  [/mug|pillow|puzzle/, 'home'],
+  [/tote|case|sleeve|cap|hat/, 'carry'],
+];
+
+/** Which shelf a product belongs on, as a shelf id. */
 export function categoryOf(product: StoreProduct): string {
-  if (product.category) return product.category;
+  const shelves = storeCategories();
+  const known = (id: string) => shelves.some((s) => s.id === id);
+  const tagged = tagsOf(product).category || product.category?.toLowerCase();
+  if (tagged && known(tagged)) return tagged;
   const n = product.name.toLowerCase();
-  if (/hoodie|sweat|crewneck/.test(n)) return 'Hoodies';
-  if (/print|poster|canvas|sticker/.test(n)) return 'Prints';
-  return site.store.categories[0];
+  const guess = GUESSES.find(([pattern, id]) => pattern.test(n) && known(id));
+  return guess?.[1] ?? shelves[0]?.id ?? '';
+}
+
+/** The collection a product belongs to, if it is tagged with one that exists. */
+export function pieceOf(product: StoreProduct): Piece | null {
+  const id = tagsOf(product).piece;
+  return (id && storePieces().find((p) => p.id === id)) || null;
+}
+
+/** Who drew it: the product's own tag, else its collection's. Empty for his own work. */
+export function artistOf(product: StoreProduct): string {
+  return tagsOf(product).artist || pieceOf(product)?.artist || '';
+}
+
+/** Every product in one collection, in store order. */
+export function productsInPiece(id: string): StoreProduct[] {
+  return getStore().products.filter((p) => tagsOf(p).piece === id);
+}
+
+/**
+ * The picture a collection leads with: the drawing itself where one has been
+ * made for it (public/store/pieces/<id>.webp), else its first product's.
+ */
+export function pieceImage(piece: Piece): string | null {
+  const own = path.join(process.cwd(), 'public', 'store', 'pieces', `${piece.id}.webp`);
+  if (fs.existsSync(own)) return `/store/pieces/${piece.id}.webp`;
+  const first = productsInPiece(piece.id)[0];
+  return first ? productImage(first) : null;
+}
+
+/** A collection's page on this site. */
+export function piecePath(piece: Piece): string {
+  return `/store/artwork/${piece.id}/`;
 }
 
 export function getStore(): StoreSnapshot {
@@ -146,7 +227,7 @@ export function getStore(): StoreSnapshot {
       products: inOrder(
         snapshot.products,
         (product) => String(product.id),
-        readOrder(storeCopy as Record<string, unknown>),
+        readOrder(copyFile),
       ),
     };
   } catch {
@@ -273,12 +354,42 @@ function sizeRank(size: string): number {
   return i === -1 ? SIZE_ORDER.length : i;
 }
 
+/**
+ * How big a measured size is, in square inches: "8″×12″", "21×30 cm", or a
+ * single figure like a button's "1.25″". Null for anything else.
+ *
+ * Added 2026-11-12, when the store grew canvases and stickers: their sizes
+ * are dimensions, which SIZE_ORDER knows nothing of, so a canvas ran 11×14,
+ * 12×18, 8×12, 9×12 in sync order. Smallest first, by area.
+ */
+function sizeArea(size: string): number | null {
+  const cm = /cm/i.test(size);
+  // "A2 (42×59.4 cm)": the paper's name is not a measurement, the brackets are.
+  const measured = size.match(/\(([^)]*)\)/)?.[1] ?? size;
+  const figures = (measured.match(/\d+(?:\.\d+)?/g) ?? []).map(Number);
+  if (figures.length === 0 || figures.length > 2) return null;
+  const [w, h = w] = figures.map((n) => (cm ? n / 2.54 : n));
+  return w * h;
+}
+
 export function sizesOf(product: StoreProduct): string[] {
   const seen: string[] = [];
   for (const v of product.variants ?? []) {
     if (v.size && !seen.includes(v.size)) seen.push(v.size);
   }
-  return seen.sort((a, b) => sizeRank(a) - sizeRank(b));
+  return seen.sort((a, b) => {
+    const byRun = sizeRank(a) - sizeRank(b);
+    if (byRun !== 0) return byRun;
+    // Both outside the known run: by area where both are measurements, and
+    // otherwise left as they arrived (sort is stable).
+    const [x, y] = [sizeArea(a), sizeArea(b)];
+    return x !== null && y !== null ? x - y : 0;
+  });
+}
+
+/** Clothing, sized S to 5XL, as opposed to a print or a sticker sized in inches. */
+export function isApparel(product: StoreProduct): boolean {
+  return sizesOf(product).some((size) => SIZE_ORDER.includes(size.toUpperCase()));
 }
 
 /**
@@ -325,8 +436,11 @@ export function priceLadder(product: StoreProduct): PriceBand[] {
 export function priceSummary(product: StoreProduct): string | null {
   const bands = priceLadder(product);
   if (bands.length === 0) return null;
-  const low = bands[0];
-  const high = bands[bands.length - 1];
+  // The cheapest and the dearest, not the first and last band: sizes run in
+  // size order, and a bigger canvas is not always the dearer one (it read
+  // "R620 – R580" when this took the ends).
+  const low = bands.reduce((a, b) => (b.amount < a.amount ? b : a));
+  const high = bands.reduce((a, b) => (b.amount > a.amount ? b : a));
   return low.amount === high.amount
     ? money(low.amount, low.currency)
     : `${money(low.amount, low.currency)} – ${money(high.amount, high.currency)}`;
@@ -353,7 +467,7 @@ export function copyOf(product: StoreProduct): ProductCopy {
   // An id with no entry is the normal state for a freshly synced product, and
   // comes back as empty copy rather than as something the page tries to
   // render. See lib/product-copy.ts for the shape.
-  return readCopy((storeCopy as Record<string, unknown>)[String(product.id)]);
+  return readCopy(copyFile[String(product.id)]);
 }
 
 /** The description paragraphs alone. */
@@ -409,6 +523,12 @@ export function findProduct(slug: string): StoreProduct | null {
 export function garmentLabel(product: StoreProduct): string | null {
   const g = product.garment;
   if (!g) return null;
-  const make = [g.brand, g.model].filter(Boolean).join(' ');
-  return [make, g.title].filter(Boolean).join(' · ') || null;
+  // Printful's unit suffix is its catalogue's bookkeeping, not a name.
+  const title = g.title?.replace(/\s*\((?:in|cm)\)\s*$/i, '').trim() || null;
+  // A brand and model mean something on a blank garment ("Bella + Canvas
+  // 3001"). On a canvas or a mouse pad there is no brand, and the "model" is
+  // the title again or a pipe-joined variant string, so it came out as
+  // "Canvas (in) · Canvas (in)". No brand, no model.
+  const make = g.brand ? [g.brand, g.model].filter(Boolean).join(' ') : '';
+  return [make, title].filter(Boolean).join(' · ') || null;
 }

@@ -342,13 +342,25 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
 
   // Generic rather than `any`: each call site says what it expects back, so
   // the shape is declared where it is known instead of lost at the boundary.
+  //
+  // Waits out Printful's rate limit rather than failing: a sync of the whole
+  // store (about 140 products since Timon's art, 13 Nov 2026) is a couple of
+  // hundred requests, and Printful answers 429 with how long to wait.
   async function api<T>(pathname: string): Promise<T> {
-    const res = await fetch(`https://api.printful.com${pathname}`, {
-      headers,
-      signal: AbortSignal.timeout(20000),
-    });
-    if (!res.ok) throw new Error(`${pathname} returned ${res.status}`);
-    return res.json() as Promise<T>;
+    for (let attempt = 0; ; attempt++) {
+      const res = await fetch(`https://api.printful.com${pathname}`, {
+        headers,
+        signal: AbortSignal.timeout(20000),
+      });
+      if (res.status === 429 && attempt < 6) {
+        const wait = Number(res.headers.get('retry-after')) || 30;
+        note(`rate limited on ${pathname}, waiting ${wait}s`);
+        await new Promise((resolve) => setTimeout(resolve, (wait + 1) * 1000));
+        continue;
+      }
+      if (!res.ok) throw new Error(`${pathname} returned ${res.status}`);
+      return res.json() as Promise<T>;
+    }
   }
 
   /**
@@ -416,8 +428,19 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
     note(`could not read store info (${(err as Error).message})`);
   }
 
-  const list = await api<{ result?: PfStoreProduct[] }>('/store/products');
-  const listed = (list?.result ?? []).filter((p) => !p.is_ignored);
+  // Paged: Printful returns twenty at a time unless asked for more, and a
+  // single request quietly left 118 of 138 products out of the store
+  // (13 Nov 2026). A hundred is its maximum page.
+  const all: PfStoreProduct[] = [];
+  for (let offset = 0; ; offset += 100) {
+    const page = await api<{ result?: PfStoreProduct[]; paging?: { total?: number } }>(
+      `/store/products?offset=${offset}&limit=100`,
+    );
+    all.push(...(page?.result ?? []));
+    const total = page?.paging?.total ?? 0;
+    if ((page?.result ?? []).length === 0 || all.length >= total) break;
+  }
+  const listed = all.filter((p) => !p.is_ignored);
   if (listed.length === 0) throw new Error('store has no synced products yet');
 
   const products: Product[] = [];

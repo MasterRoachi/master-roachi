@@ -187,7 +187,7 @@ None of them in the repo. `npx wrangler secret list` names them:
 | --- | --- | --- |
 | `GITHUB_TOKEN` | the backend committing to this repo | `npm run github-auth` |
 | `TRELLO_KEY`, `TRELLO_TOKEN` | what `/work/boards` reads | `npm run trello-auth` |
-| `PRINTFUL_TOKEN` | Sync Printful, and sending orders to Printful as drafts. A single-store private token from developers.printful.com/tokens, scopes `orders` and `sync_products/read` | `npx wrangler secret put PRINTFUL_TOKEN` |
+| `PRINTFUL_TOKEN` | Sync Printful, and sending orders to Printful as drafts. A single-store private token from developers.printful.com/tokens, scopes `orders`, `sync_products` and `file_library` (widened 12 Nov 2026 so the products for Timon's art can be created by script; the same token is in `.env.local` for the scripts) | `npx wrangler secret put PRINTFUL_TOKEN` |
 | `VOTE_SALT` | salting the voter hash, which is guessable without it | `npx wrangler secret put VOTE_SALT` |
 | `OHANA_ACCESS_TEAM`, `OHANA_ACCESS_AUD` | verifying Ohana's service token on `learn.masterroachi.com/share/ohana` — see "Ohana's way in" below | `npx wrangler secret put OHANA_ACCESS_…` |
 | `WORK_ACCESS_TEAM`, `WORK_ACCESS_AUD` | verifying his Access token on every private API, on admin, learn and tools — see "The three apps" below | piped on stdin, e.g. `printf %s "$TAG" \| npx wrangler secret put WORK_ACCESS_AUD` |

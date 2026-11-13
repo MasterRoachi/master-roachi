@@ -2,25 +2,20 @@
 
 import { useEffect, useRef } from 'react';
 import {
-  AmbientLight,
   Box3,
   Color,
-  DirectionalLight,
   DoubleSide,
   Euler,
   Mesh,
   MeshStandardMaterial,
-  Object3D,
-  PerspectiveCamera,
   Raycaster,
-  Scene,
   SRGBColorSpace,
   TextureLoader,
   Vector3,
-  WebGLRenderer,
 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DecalGeometry } from 'three/examples/jsm/geometries/DecalGeometry.js';
+import { createTurntable } from './turntable';
 import styles from './ShirtViewer.module.css';
 
 // The featured garment: a real modelled shirt, with the printed design
@@ -100,61 +95,12 @@ export default function ShirtViewer({
     const host = hostRef.current;
     if (!host) return;
 
-    const reduced = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
-
-    let renderer: WebGLRenderer;
-    try {
-      renderer = new WebGLRenderer({ antialias: true, alpha: true });
-    } catch {
-      // No WebGL. The caller leaves the flat mockup in place underneath.
-      return;
-    }
-    renderer.setClearAlpha(0);
-    host.appendChild(renderer.domElement);
-    renderer.domElement.className = styles.canvas;
-
-    const scene = new Scene();
-    const camera = new PerspectiveCamera(38, 1, 0.1, 2000);
-
-    // Low ambient on purpose. Raised, it swamps the directionals, every facet
-    // comes back equally lit, and the folds this model was chosen for stop
-    // reading at all.
-    scene.add(new AmbientLight(0xffffff, 0.5));
-    const key = new DirectionalLight(0xfff2f7, 2.3);
-    key.position.set(-3.4, 3, 4.2);
-    scene.add(key);
-    const fill = new DirectionalLight(0xc6e6ff, 1.1);
-    fill.position.set(4.2, -0.6, 2.4);
-    scene.add(fill);
-    // Behind and above, to pick the shoulders off the background.
-    const back = new DirectionalLight(0xffffff, 0.9);
-    back.position.set(0.5, 2.6, -4);
-    scene.add(back);
-
-    const pivot = new Object3D();
-    scene.add(pivot);
-
+    const stage = createTurntable(host, { className: styles.canvas, limit: LIMIT, drift: DRIFT });
+    // No WebGL. The caller leaves the flat mockup in place underneath.
+    if (!stage) return;
+    const { pivot, renderer } = stage;
     let disposed = false;
-    let size = new Vector3(1, 1, 1);
-    const disposables: { dispose(): void }[] = [];
-
-    const ready = () => {
-      if (!disposed) host.dataset.ready = 'true';
-    };
-
-    const fitCamera = () => {
-      const vFov = (camera.fov * Math.PI) / 180;
-      const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
-      // Depth counts toward the width because the garment turns.
-      const reach = size.x + size.z * 0.5;
-      camera.position.z =
-        Math.max(
-          size.y / 2 / Math.tan(vFov / 2),
-          reach / 2 / Math.tan(hFov / 2),
-        ) * 1.08;
-    };
+    const ready = () => stage.ready();
 
     new GLTFLoader().load(
       model,
@@ -167,7 +113,7 @@ export default function ShirtViewer({
           metalness: 0,
           side: DoubleSide,
         });
-        disposables.push(cloth);
+        stage.keep(cloth);
 
         let target: Mesh | null = null;
         gltf.scene.traverse((child) => {
@@ -188,12 +134,9 @@ export default function ShirtViewer({
         // Centre on the origin so it turns about itself rather than swinging
         // around wherever the modeller left it.
         const box = new Box3().setFromObject(gltf.scene);
-        size = box.getSize(new Vector3());
+        const size = box.getSize(new Vector3());
         gltf.scene.position.sub(box.getCenter(new Vector3()));
-        camera.near = Math.max(0.01, size.length() / 1000);
-        camera.far = size.length() * 10;
-        camera.updateProjectionMatrix();
-        fitCamera();
+        stage.fit(size);
 
         if (!print || !target) {
           ready();
@@ -213,7 +156,7 @@ export default function ShirtViewer({
             }
             texture.colorSpace = SRGBColorSpace;
             texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-            disposables.push(texture);
+            stage.keep(texture);
 
             // Fire a ray at the chest from exactly where the print sits in the
             // photograph, and put the decal wherever it lands.
@@ -235,20 +178,14 @@ export default function ShirtViewer({
               return;
             }
 
-            // Face the decal along the surface normal at the point it struck.
-            const look = new Vector3();
-            if (hit.face) {
-              look
-                .copy(hit.face.normal)
-                .transformDirection(shirt.matrixWorld)
-                .add(hit.point);
-            } else {
-              look.copy(hit.point).add(new Vector3(0, 0, 1));
-            }
-            const aim = new Object3D();
-            aim.position.copy(hit.point);
-            aim.lookAt(look);
-            const orientation = new Euler().copy(aim.rotation);
+            // Projected straight from the front, as a screen print is laid
+            // on, not along the cloth's normal where the ray struck. On the
+            // tee's flat chest the two were the same; a print the size of
+            // Grumpy Television's lands on the hoodie's folds, where the
+            // normal at one point tipped the whole print sideways and cut an
+            // arm off (Master Roachi, 12 Nov 2026). The decal's depth is what
+            // carries it over the folds.
+            const orientation = new Euler(0, 0, 0);
 
             const image = texture.image as { width: number; height: number };
             const wide = print.width * (bounds.max.x - bounds.min.x);
@@ -278,7 +215,8 @@ export default function ShirtViewer({
               polygonOffset: true,
               polygonOffsetFactor: -4,
             });
-            disposables.push(geometry, material);
+            stage.keep(geometry);
+            stage.keep(material);
             // Added to the pivot, NOT to gltf.scene.
             //
             // DecalGeometry bakes the mesh's world matrix into the vertices it
@@ -301,135 +239,9 @@ export default function ShirtViewer({
       () => {},
     );
 
-    /**
-     * Radians turned per pixel dragged.
-     *
-     * Measured against the viewer's own width rather than fixed, so one drag
-     * across it turns the garment half way round and the back is one gesture
-     * away on a phone as well as a desktop. A constant here meant the same
-     * swipe did a quarter as much on a narrow screen, which with a half-turn
-     * limit is the difference between turning a shirt round and giving up.
-     */
-    let perPixel = 0.006;
-
-    const resize = () => {
-      const r = host.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setSize(r.width, r.height, false);
-      camera.aspect = r.width / r.height;
-      camera.updateProjectionMatrix();
-      perPixel = LIMIT / (r.width * 0.9);
-      fitCamera();
-    };
-    resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(host);
-
-    let turn = 0;
-    let current = 0;
-    let held = false;
-    let lastX = 0;
-
-    const down = (e: PointerEvent) => {
-      held = true;
-      lastX = e.clientX;
-      host.setPointerCapture(e.pointerId);
-    };
-    const move = (e: PointerEvent) => {
-      if (!held) return;
-      turn = Math.max(
-        -LIMIT,
-        Math.min(LIMIT, turn + (e.clientX - lastX) * perPixel),
-      );
-      lastX = e.clientX;
-      // Under reduced motion nothing is looping, so a drag has to ask for the
-      // frame that shows its result. frame() will not schedule another.
-      if (reduced && !raf) raf = requestAnimationFrame(frame);
-    };
-    const up = (e: PointerEvent) => {
-      held = false;
-      if (host.hasPointerCapture(e.pointerId)) {
-        host.releasePointerCapture(e.pointerId);
-      }
-    };
-    host.addEventListener('pointerdown', down);
-    host.addEventListener('pointermove', move);
-    host.addEventListener('pointerup', up);
-    host.addEventListener('pointercancel', up);
-
-    let raf = 0;
-    let visible = true;
-    let elapsed = 0;
-    let last = performance.now();
-
-    function frame() {
-      raf = 0;
-      const now = performance.now();
-      const dt = Math.min((now - last) / 1000, 0.05);
-      last = now;
-      if (!reduced) elapsed += dt;
-
-      const wanted = held ? turn : turn + Math.sin(elapsed * 0.5) * DRIFT;
-      // Reduced motion stops the idle drift and the easing, not the ability to
-      // turn the garment: the setting asks for no unrequested movement, and a
-      // drag is requested. Snapping straight to the angle renders one frame
-      // and stops, so the back is still reachable without anything moving on
-      // its own.
-      if (reduced) current = wanted;
-      else current += (wanted - current) * Math.min(1, dt * 4);
-      pivot.rotation.y = current;
-      // A shallow sway, so it hangs rather than spins on a spindle.
-      pivot.rotation.z = Math.sin(elapsed * 0.37) * 0.02 + current * 0.04;
-
-      renderer.render(scene, camera);
-      if (visible && !reduced) raf = requestAnimationFrame(frame);
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        visible = entries[0].isIntersecting;
-        if (visible && !reduced && !raf) {
-          last = performance.now();
-          raf = requestAnimationFrame(frame);
-        }
-      },
-      { threshold: 0 },
-    );
-    io.observe(host);
-
-    const onVisibility = () => {
-      if (document.hidden) {
-        if (raf) cancelAnimationFrame(raf);
-        raf = 0;
-      } else if (visible && !reduced && !raf) {
-        last = performance.now();
-        raf = requestAnimationFrame(frame);
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibility);
-
-    frame();
-
     return () => {
       disposed = true;
-      if (raf) cancelAnimationFrame(raf);
-      io.disconnect();
-      ro.disconnect();
-      document.removeEventListener('visibilitychange', onVisibility);
-      host.removeEventListener('pointerdown', down);
-      host.removeEventListener('pointermove', move);
-      host.removeEventListener('pointerup', up);
-      host.removeEventListener('pointercancel', up);
-      pivot.traverse((child) => {
-        const mesh = child as Mesh;
-        if (mesh.isMesh) mesh.geometry.dispose();
-      });
-      for (const d of disposables) d.dispose();
-      renderer.dispose();
-      if (renderer.domElement.parentNode === host) {
-        host.removeChild(renderer.domElement);
-      }
+      stage.dispose();
     };
   }, [print, fabric]);
 

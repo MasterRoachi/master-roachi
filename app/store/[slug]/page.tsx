@@ -6,6 +6,7 @@ import { productMetaDescription } from '@/lib/product-meta';
 import { LiveFit, LiveSection, LiveTagline } from '@/components/LiveCopy';
 import HalftoneField from '@/components/HalftoneField';
 import ShirtViewerMount from '@/components/ShirtViewerMount';
+import GoodsViewerMount from '@/components/GoodsViewerMount';
 import Swatches from '@/components/Swatches';
 import SaDelivery from '@/components/SaDelivery';
 import SizeTable from '@/components/SizeTable';
@@ -22,9 +23,15 @@ import {
   copyOf,
   productPath,
   hasArtwork,
+  artistOf,
+  isApparel,
+  pieceOf,
+  piecePath,
   type StoreProduct,
 } from '@/lib/store';
-import { modelFor } from '@/lib/models';
+import { goodsFor, modelFor } from '@/lib/models';
+import { galleryOf } from '@/lib/gallery';
+import ProductStage from '@/components/ProductStage';
 import { site } from '@/lib/site';
 import styles from './product.module.css';
 
@@ -93,6 +100,14 @@ export default async function ProductPage({
   const alt = copy.alt || product.name;
   // Which 3D garment stands for this product, if any.
   const model = modelFor(product);
+  // Or, for a poster, canvas, button or mat, the shape built for it.
+  const good = model ? null : goodsFor(product);
+  // Who drew it, and the page for everything else with the same drawing on.
+  // "Art by Timon" on every product of his is his ruling, 12 Nov 2026.
+  const artist = artistOf(product);
+  const piece = pieceOf(product);
+  // The 2D pictures under the stage: mockups, then scenes (lib/gallery.ts).
+  const gallery = galleryOf(product.id);
 
   return (
     <div
@@ -117,7 +132,16 @@ export default async function ProductPage({
         <div className={styles.top} data-bare={!hasArtwork(product) || undefined}>
           {hasArtwork(product) && (
           <div className={styles.stageCol}>
-            <div className={styles.stage}>
+            <ProductStage
+              gallery={gallery}
+              stageClassName={styles.stage}
+              leadLabel={model || good ? '3D' : 'Main'}
+              leadThumb={product.art ?? product.thumbnail ?? null}
+              // Below the garment, not over it — the shirt fills its stage to
+              // the edges and an overlaid caption lands on the hem. Only
+              // while the 3D is what is shown.
+              caption={(model || good) && <p className={styles.turn}>Drag it to turn it.</p>}
+            >
               {/* Same arrangement as the index feature: the flat mockup is the
                   floor, and the turnable one fades in over it where WebGL is
                   available and motion is allowed. */}
@@ -141,10 +165,8 @@ export default async function ProductPage({
                   alt={`${alt}, which can be turned`}
                 />
               )}
-            </div>
-            {/* Below the garment, not over it — the shirt fills its stage to
-                the edges and an overlaid caption lands on the hem. */}
-            {model && <p className={styles.turn}>Drag it to turn it.</p>}
+              {good && <GoodsViewerMount good={good} alt={`${alt}, which can be turned`} />}
+            </ProductStage>
           </div>
           )}
 
@@ -152,6 +174,15 @@ export default async function ProductPage({
             <p className="eyebrow">{site.store.name}</p>
             <h1 className={styles.name}>{product.name}</h1>
             <LiveTagline initial={copy} className={styles.tagline} />
+            {(artist || piece) && (
+              <p className={styles.byline}>
+                {artist && <>Art by {artist}</>}
+                {artist && piece && ' · '}
+                {piece && (
+                  <Link href={piecePath(piece)}>Everything with {piece.name}</Link>
+                )}
+              </p>
+            )}
 
             {priceSummary(product) && (
               <>
@@ -240,7 +271,9 @@ export default async function ProductPage({
           plusClassName={styles.foldPlus}
           careClassName={styles.care}
         >
-          {product.sizeGuide && sizes.length > 0 ? (
+          {/* Clothing only. A canvas's "size guide" is its own dimensions,
+              which the size buttons already say, under a heading of Fit. */}
+          {product.sizeGuide && sizes.length > 0 && isApparel(product) ? (
             <SizeTable guide={product.sizeGuide} sizes={sizes} />
           ) : null}
         </LiveFit>

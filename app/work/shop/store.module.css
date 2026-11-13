@@ -865,3 +865,125 @@
     transition: none;
   }
 }
+
+/* --- shelving (2026-11-12) ---------------------------------------------- */
+
+.toolbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filter {
+  background: oklch(10% 0 0 / 0.7);
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  color: var(--ink);
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 0.8rem;
+  max-width: 100%;
+}
+
+.filter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The shelves and the artworks, side by side on a computer. */
+.shelvesWrap {
+  display: grid;
+  gap: 1rem;
+  margin: 0 0 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .shelvesWrap {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.shelves {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: oklch(14% 0.01 340 / 0.6);
+  padding: 1rem;
+}
+
+.shelvesHead {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.shelfList {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shelfRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem 0.5rem;
+  align-items: center;
+}
+
+.shelfRow:has(.shelfArtist) {
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) auto;
+}
+
+.shelfMeta {
+  grid-column: 1 / -1;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.shelfRow .move {
+  grid-row: 1;
+  grid-column: -2;
+}
+
+.shelfAdd {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+/* One product's shelf, artwork, artist and share: a 2×2 above the words. */
+.tags {
+  display: grid;
+  gap: 0 1rem;
+  margin: 1rem 0 0;
+  padding: 0.25rem 1rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+@media (min-width: 640px) {
+  .tags {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.tags legend {
+  padding: 0 0.4rem;
+  margin: 0;
+}
+
+.percent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.percent .line {
+  max-width: 7rem;
+}

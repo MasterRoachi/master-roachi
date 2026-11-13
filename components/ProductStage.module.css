@@ -1,0 +1,121 @@
+/* The 2D picture in the stage: fills it as the cut-out does, and is a button
+   because a click opens it larger. */
+.picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.picture:focus-visible,
+.thumb:focus-visible {
+  outline: 2px solid var(--accent-a, var(--accent));
+  outline-offset: 2px;
+}
+
+/* One row of thumbs under the stage, scrolling sideways when there are more
+   than fit, so the page never does. */
+.strip {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0 0 6px;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: oklch(15% 0.01 340 / 0.7);
+  cursor: pointer;
+  transition: border-color 0.18s ease;
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb:hover,
+.thumb[aria-pressed='true'] {
+  border-color: color-mix(in oklch, var(--accent-a, var(--accent)) 70%, var(--line));
+}
+
+.badge {
+  position: absolute;
+  inset: auto 4px 4px auto;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: oklch(10% 0 0 / 0.75);
+  color: var(--ink);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  padding: 16px;
+  background: oklch(8% 0 0 / 0.92);
+  cursor: zoom-out;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: calc(100svh - 80px);
+  object-fit: contain;
+}
+
+.lightbox p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thumb {
+    transition: none;
+  }
+}
+
+/* Mockups arrive transparent and trimmed to the product, so they sit on the
+   page with nothing around them, and a thumb shows the whole thing rather
+   than cropping a sleeve off. Scenes are photographs to the edge: framed in
+   the stage with rounded corners, and cropped to fill a thumb. */
+.thumb[data-kind='mockup'] img,
+.thumb:not([data-kind]) img {
+  object-fit: contain;
+  padding: 4px;
+}
+
+.picture[data-kind='scene'] img {
+  border-radius: 14px;
+}

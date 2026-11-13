@@ -9,6 +9,8 @@
 // in the build as well as the Worker; this runs only in the Worker, and only
 // when he presses a button.
 
+import { itemCostRand, type PrintfulCosts } from './artist-share';
+
 export interface PrintfulAuth {
   token: string;
   /** Only needed for account-level tokens. */
@@ -35,6 +37,8 @@ export interface PrintfulOrderState {
   carrier: string | null;
   trackingNumber: string | null;
   trackingUrl: string | null;
+  /** The item's cost in rand, less delivery. Null until Printful has costed it. */
+  itemCost: number | null;
 }
 
 /** Printful's own message where it sent one, so a refusal says why. */
@@ -152,6 +156,7 @@ function stateOf(result: {
   id: number;
   status?: string;
   shipments?: { carrier?: string | null; tracking_number?: string | null; tracking_url?: string | null }[];
+  costs?: PrintfulCosts | null;
 }): PrintfulOrderState {
   const shipment = (result.shipments ?? []).find((s) => s.tracking_number) ?? null;
   return {
@@ -160,6 +165,8 @@ function stateOf(result: {
     carrier: shipment?.carrier ?? null,
     trackingNumber: shipment?.tracking_number ?? null,
     trackingUrl: shipment?.tracking_url ?? null,
+    // What it costs to make, for the artist's share (lib/artist-share.ts).
+    itemCost: itemCostRand(result.costs),
   };
 }
 

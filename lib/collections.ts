@@ -88,6 +88,9 @@ cover:
     label: 'Product copy',
     dir: 'content/store',
     exts: ['.json'],
+    // Since 2026-11-12 it also holds each product's shelf, artwork, artist and
+    // artist's share, and the shelves and artworks themselves ($categories,
+    // $pieces). Still this one file, so the allow-list did not widen.
     singleFile: 'content/store/copy.json',
   },
   {

@@ -655,3 +655,37 @@
   gap: 0.5rem;
   margin-top: 0.25rem;
 }
+
+/* --- owed to artists (2026-11-12) --------------------------------------- */
+
+.payouts {
+  margin: 0.9rem 0 0;
+  padding: 0.9rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: oklch(16% 0 0 / 0.84);
+}
+
+.payoutsHead {
+  margin: 0 0 0.5rem;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.payoutList {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.payoutList li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  align-items: baseline;
+}

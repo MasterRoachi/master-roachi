@@ -1,0 +1,2749 @@
+{
+  "$comment": [
+    "Each product page's 2D gallery, keyed by Printful product id, in page order.",
+    "Written by tools/gallery.py beside Timon's art (~/Work/assets/art/timon)."
+  ],
+  "492957656": [
+    {
+      "src": "/store/gallery/492957656-0.webp",
+      "alt": "Grumpy Television Poster",
+      "kind": "mockup",
+      "w": 575,
+      "h": 423
+    },
+    {
+      "src": "/store/gallery/492957656-1.webp",
+      "alt": "Grumpy Television Poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957656-2.webp",
+      "alt": "Grumpy Television Poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957656-3.webp",
+      "alt": "Grumpy Television Poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492957658": [
+    {
+      "src": "/store/gallery/492957658-0.webp",
+      "alt": "Grumpy Television Canvas",
+      "kind": "mockup",
+      "w": 874,
+      "h": 713
+    },
+    {
+      "src": "/store/gallery/492957658-1.webp",
+      "alt": "Grumpy Television Canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957658-2.webp",
+      "alt": "Grumpy Television Canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492957664": [
+    {
+      "src": "/store/gallery/492957664-0.webp",
+      "alt": "Grumpy Television Metal Print",
+      "kind": "mockup",
+      "w": 674,
+      "h": 554
+    },
+    {
+      "src": "/store/gallery/492957664-1.webp",
+      "alt": "Grumpy Television Metal Print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492957666": [
+    {
+      "src": "/store/gallery/492957666-0.webp",
+      "alt": "Grumpy Television Mouse Pad",
+      "kind": "mockup",
+      "w": 714,
+      "h": 644
+    },
+    {
+      "src": "/store/gallery/492957666-1.webp",
+      "alt": "Grumpy Television Mouse Pad on a desk",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492957669": [
+    {
+      "src": "/store/gallery/492957669-0.webp",
+      "alt": "Grumpy Television Sticker",
+      "kind": "mockup",
+      "w": 320,
+      "h": 330
+    }
+  ],
+  "492957670": [
+    {
+      "src": "/store/gallery/492957670-0.webp",
+      "alt": "Grumpy Television Holographic Sticker",
+      "kind": "mockup",
+      "w": 503,
+      "h": 522
+    }
+  ],
+  "492957672": [
+    {
+      "src": "/store/gallery/492957672-0.webp",
+      "alt": "Grumpy Television Pin Buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "492957678": [
+    {
+      "src": "/store/gallery/492957678-0.webp",
+      "alt": "Grumpy Television Tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957678-1.webp",
+      "alt": "Grumpy Television Tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957678-2.webp",
+      "alt": "Grumpy Television Tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957678-3.webp",
+      "alt": "Grumpy Television Tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957678-4.webp",
+      "alt": "Grumpy Television Tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957678-5.webp",
+      "alt": "Grumpy Television Tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957678-6.webp",
+      "alt": "Grumpy Television Tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492957684": [
+    {
+      "src": "/store/gallery/492957684-0.webp",
+      "alt": "Grumpy Television Hoodie in black",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/492957684-1.webp",
+      "alt": "Grumpy Television Hoodie in black, from the back",
+      "kind": "mockup",
+      "w": 748,
+      "h": 983
+    },
+    {
+      "src": "/store/gallery/492957684-2.webp",
+      "alt": "Grumpy Television Hoodie in black, from the left",
+      "kind": "mockup",
+      "w": 414,
+      "h": 989
+    },
+    {
+      "src": "/store/gallery/492957684-3.webp",
+      "alt": "Grumpy Television Hoodie in black, from the right",
+      "kind": "mockup",
+      "w": 421,
+      "h": 997
+    },
+    {
+      "src": "/store/gallery/492957684-4.webp",
+      "alt": "Grumpy Television Hoodie in white",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/492957684-5.webp",
+      "alt": "Grumpy Television Hoodie on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492957684-6.webp",
+      "alt": "Grumpy Television Hoodie laid flat",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492985114": [
+    {
+      "src": "/store/gallery/492985114-0.webp",
+      "alt": "heavyweight-tee in black",
+      "kind": "mockup",
+      "w": 831,
+      "h": 957
+    },
+    {
+      "src": "/store/gallery/492985114-1.webp",
+      "alt": "heavyweight-tee in black, from the back",
+      "kind": "mockup",
+      "w": 792,
+      "h": 952
+    },
+    {
+      "src": "/store/gallery/492985114-2.webp",
+      "alt": "heavyweight-tee in black, from the left",
+      "kind": "mockup",
+      "w": 405,
+      "h": 933
+    },
+    {
+      "src": "/store/gallery/492985114-3.webp",
+      "alt": "heavyweight-tee in black, from the right",
+      "kind": "mockup",
+      "w": 395,
+      "h": 956
+    },
+    {
+      "src": "/store/gallery/492985114-4.webp",
+      "alt": "heavyweight-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492985120": [
+    {
+      "src": "/store/gallery/492985120-0.webp",
+      "alt": "hoodie in black",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/492985120-1.webp",
+      "alt": "hoodie in black, from the back",
+      "kind": "mockup",
+      "w": 748,
+      "h": 983
+    },
+    {
+      "src": "/store/gallery/492985120-2.webp",
+      "alt": "hoodie in black, from the left",
+      "kind": "mockup",
+      "w": 414,
+      "h": 989
+    },
+    {
+      "src": "/store/gallery/492985120-3.webp",
+      "alt": "hoodie in black, from the right",
+      "kind": "mockup",
+      "w": 421,
+      "h": 997
+    },
+    {
+      "src": "/store/gallery/492985120-4.webp",
+      "alt": "hoodie on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492985120-5.webp",
+      "alt": "hoodie laid flat",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492985123": [
+    {
+      "src": "/store/gallery/492985123-0.webp",
+      "alt": "black-mug",
+      "kind": "mockup",
+      "w": 839,
+      "h": 703
+    },
+    {
+      "src": "/store/gallery/492985123-1.webp",
+      "alt": "black-mug from the right",
+      "kind": "mockup",
+      "w": 878,
+      "h": 697
+    }
+  ],
+  "492985126": [
+    {
+      "src": "/store/gallery/492985126-0.webp",
+      "alt": "eco-tote",
+      "kind": "mockup",
+      "w": 679,
+      "h": 957
+    }
+  ],
+  "492985129": [
+    {
+      "src": "/store/gallery/492985129-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 330,
+      "h": 311
+    }
+  ],
+  "492985134": [
+    {
+      "src": "/store/gallery/492985134-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "492985139": [
+    {
+      "src": "/store/gallery/492985139-0.webp",
+      "alt": "phone-case",
+      "kind": "mockup",
+      "w": 996,
+      "h": 911
+    }
+  ],
+  "492985187": [
+    {
+      "src": "/store/gallery/492985187-0.webp",
+      "alt": "dad-cap in black",
+      "kind": "mockup",
+      "w": 850,
+      "h": 879
+    },
+    {
+      "src": "/store/gallery/492985187-1.webp",
+      "alt": "dad-cap in black, from the back",
+      "kind": "mockup",
+      "w": 874,
+      "h": 729
+    }
+  ],
+  "493001479": [
+    {
+      "src": "/store/gallery/493001479-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 584,
+      "h": 793
+    },
+    {
+      "src": "/store/gallery/493001479-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001479-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001479-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493001531": [
+    {
+      "src": "/store/gallery/493001531-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 710,
+      "h": 876
+    },
+    {
+      "src": "/store/gallery/493001531-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001531-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493001591": [
+    {
+      "src": "/store/gallery/493001591-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 554,
+      "h": 674
+    },
+    {
+      "src": "/store/gallery/493001591-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493001635": [
+    {
+      "src": "/store/gallery/493001635-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 221,
+      "h": 331
+    }
+  ],
+  "493001707": [
+    {
+      "src": "/store/gallery/493001707-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493001754": [
+    {
+      "src": "/store/gallery/493001754-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001754-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001754-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001754-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001754-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001754-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493001754-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493001840": [
+    {
+      "src": "/store/gallery/493001840-0.webp",
+      "alt": "phone-case",
+      "kind": "mockup",
+      "w": 996,
+      "h": 911
+    }
+  ],
+  "493013107": [
+    {
+      "src": "/store/gallery/493013107-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 788,
+      "h": 572
+    },
+    {
+      "src": "/store/gallery/493013107-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013107-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013107-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493013133": [
+    {
+      "src": "/store/gallery/493013133-0.webp",
+      "alt": "framed-poster",
+      "kind": "mockup",
+      "w": 839,
+      "h": 600
+    }
+  ],
+  "493013188": [
+    {
+      "src": "/store/gallery/493013188-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 874,
+      "h": 713
+    },
+    {
+      "src": "/store/gallery/493013188-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013188-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493013226": [
+    {
+      "src": "/store/gallery/493013226-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 674,
+      "h": 554
+    },
+    {
+      "src": "/store/gallery/493013226-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493013238": [
+    {
+      "src": "/store/gallery/493013238-0.webp",
+      "alt": "jigsaw-puzzle",
+      "kind": "mockup",
+      "w": 719,
+      "h": 577
+    }
+  ],
+  "493013246": [
+    {
+      "src": "/store/gallery/493013246-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 328,
+      "h": 333
+    }
+  ],
+  "493013258": [
+    {
+      "src": "/store/gallery/493013258-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493013282": [
+    {
+      "src": "/store/gallery/493013282-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013282-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013282-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013282-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013282-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013282-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013282-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493013307": [
+    {
+      "src": "/store/gallery/493013307-0.webp",
+      "alt": "hoodie in black",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/493013307-1.webp",
+      "alt": "hoodie in black, from the back",
+      "kind": "mockup",
+      "w": 748,
+      "h": 983
+    },
+    {
+      "src": "/store/gallery/493013307-2.webp",
+      "alt": "hoodie in black, from the left",
+      "kind": "mockup",
+      "w": 414,
+      "h": 989
+    },
+    {
+      "src": "/store/gallery/493013307-3.webp",
+      "alt": "hoodie in black, from the right",
+      "kind": "mockup",
+      "w": 421,
+      "h": 997
+    },
+    {
+      "src": "/store/gallery/493013307-4.webp",
+      "alt": "hoodie in white",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/493013307-5.webp",
+      "alt": "hoodie on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493013307-6.webp",
+      "alt": "hoodie laid flat",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493026932": [
+    {
+      "src": "/store/gallery/493026932-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 788,
+      "h": 572
+    },
+    {
+      "src": "/store/gallery/493026932-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493026932-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493026932-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493026972": [
+    {
+      "src": "/store/gallery/493026972-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 874,
+      "h": 713
+    },
+    {
+      "src": "/store/gallery/493026972-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493026972-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493027059": [
+    {
+      "src": "/store/gallery/493027059-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 674,
+      "h": 554
+    },
+    {
+      "src": "/store/gallery/493027059-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493027079": [
+    {
+      "src": "/store/gallery/493027079-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 299,
+      "h": 331
+    }
+  ],
+  "493027106": [
+    {
+      "src": "/store/gallery/493027106-0.webp",
+      "alt": "holographic-sticker",
+      "kind": "mockup",
+      "w": 465,
+      "h": 524
+    }
+  ],
+  "493027114": [
+    {
+      "src": "/store/gallery/493027114-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493027182": [
+    {
+      "src": "/store/gallery/493027182-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493027182-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493027182-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493027182-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493027182-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493027182-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493027182-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493027360": [
+    {
+      "src": "/store/gallery/493027360-0.webp",
+      "alt": "hoodie in black",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/493027360-1.webp",
+      "alt": "hoodie in black, from the back",
+      "kind": "mockup",
+      "w": 748,
+      "h": 983
+    },
+    {
+      "src": "/store/gallery/493027360-2.webp",
+      "alt": "hoodie in black, from the left",
+      "kind": "mockup",
+      "w": 414,
+      "h": 989
+    },
+    {
+      "src": "/store/gallery/493027360-3.webp",
+      "alt": "hoodie in black, from the right",
+      "kind": "mockup",
+      "w": 421,
+      "h": 997
+    },
+    {
+      "src": "/store/gallery/493027360-4.webp",
+      "alt": "hoodie in white",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/493027360-5.webp",
+      "alt": "hoodie on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493027360-6.webp",
+      "alt": "hoodie laid flat",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493027441": [
+    {
+      "src": "/store/gallery/493027441-0.webp",
+      "alt": "black-mug",
+      "kind": "mockup",
+      "w": 839,
+      "h": 703
+    },
+    {
+      "src": "/store/gallery/493027441-1.webp",
+      "alt": "black-mug from the right",
+      "kind": "mockup",
+      "w": 878,
+      "h": 697
+    }
+  ],
+  "493027461": [
+    {
+      "src": "/store/gallery/493027461-0.webp",
+      "alt": "shaped-pillow",
+      "kind": "mockup",
+      "w": 373,
+      "h": 415
+    }
+  ],
+  "493039314": [
+    {
+      "src": "/store/gallery/493039314-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 584,
+      "h": 793
+    },
+    {
+      "src": "/store/gallery/493039314-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039314-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039314-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493039321": [
+    {
+      "src": "/store/gallery/493039321-0.webp",
+      "alt": "framed-poster",
+      "kind": "mockup",
+      "w": 600,
+      "h": 840
+    }
+  ],
+  "493039345": [
+    {
+      "src": "/store/gallery/493039345-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 644,
+      "h": 912
+    },
+    {
+      "src": "/store/gallery/493039345-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039345-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493039360": [
+    {
+      "src": "/store/gallery/493039360-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 575,
+      "h": 810
+    },
+    {
+      "src": "/store/gallery/493039360-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493039368": [
+    {
+      "src": "/store/gallery/493039368-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 205,
+      "h": 330
+    }
+  ],
+  "493039372": [
+    {
+      "src": "/store/gallery/493039372-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493039379": [
+    {
+      "src": "/store/gallery/493039379-0.webp",
+      "alt": "acrylic-ornament",
+      "kind": "mockup",
+      "w": 665,
+      "h": 663
+    }
+  ],
+  "493039381": [
+    {
+      "src": "/store/gallery/493039381-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039381-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039381-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039381-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039381-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039381-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493039381-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493043664": [
+    {
+      "src": "/store/gallery/493043664-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 584,
+      "h": 793
+    },
+    {
+      "src": "/store/gallery/493043664-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043664-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043664-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493043670": [
+    {
+      "src": "/store/gallery/493043670-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 710,
+      "h": 876
+    },
+    {
+      "src": "/store/gallery/493043670-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043670-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493043677": [
+    {
+      "src": "/store/gallery/493043677-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 554,
+      "h": 674
+    },
+    {
+      "src": "/store/gallery/493043677-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493043679": [
+    {
+      "src": "/store/gallery/493043679-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 310,
+      "h": 331
+    }
+  ],
+  "493043681": [
+    {
+      "src": "/store/gallery/493043681-0.webp",
+      "alt": "holographic-sticker",
+      "kind": "mockup",
+      "w": 488,
+      "h": 524
+    }
+  ],
+  "493043682": [
+    {
+      "src": "/store/gallery/493043682-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493043688": [
+    {
+      "src": "/store/gallery/493043688-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043688-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043688-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043688-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043688-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043688-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043688-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493043699": [
+    {
+      "src": "/store/gallery/493043699-0.webp",
+      "alt": "hoodie in black",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/493043699-1.webp",
+      "alt": "hoodie in black, from the back",
+      "kind": "mockup",
+      "w": 748,
+      "h": 983
+    },
+    {
+      "src": "/store/gallery/493043699-2.webp",
+      "alt": "hoodie in black, from the left",
+      "kind": "mockup",
+      "w": 414,
+      "h": 989
+    },
+    {
+      "src": "/store/gallery/493043699-3.webp",
+      "alt": "hoodie in black, from the right",
+      "kind": "mockup",
+      "w": 421,
+      "h": 997
+    },
+    {
+      "src": "/store/gallery/493043699-4.webp",
+      "alt": "hoodie in white",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/493043699-5.webp",
+      "alt": "hoodie on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493043699-6.webp",
+      "alt": "hoodie laid flat",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493045028": [
+    {
+      "src": "/store/gallery/493045028-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 788,
+      "h": 572
+    },
+    {
+      "src": "/store/gallery/493045028-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493045028-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493045028-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493045033": [
+    {
+      "src": "/store/gallery/493045033-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 874,
+      "h": 713
+    },
+    {
+      "src": "/store/gallery/493045033-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493045033-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493045040": [
+    {
+      "src": "/store/gallery/493045040-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 674,
+      "h": 554
+    },
+    {
+      "src": "/store/gallery/493045040-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493045041": [
+    {
+      "src": "/store/gallery/493045041-0.webp",
+      "alt": "jigsaw-puzzle",
+      "kind": "mockup",
+      "w": 719,
+      "h": 577
+    }
+  ],
+  "493045044": [
+    {
+      "src": "/store/gallery/493045044-0.webp",
+      "alt": "postcard",
+      "kind": "mockup",
+      "w": 908,
+      "h": 631
+    }
+  ],
+  "493045803": [
+    {
+      "src": "/store/gallery/493045803-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 788,
+      "h": 572
+    },
+    {
+      "src": "/store/gallery/493045803-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493045803-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493045803-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493045807": [
+    {
+      "src": "/store/gallery/493045807-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 910,
+      "h": 513
+    },
+    {
+      "src": "/store/gallery/493045807-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493045807-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493045811": [
+    {
+      "src": "/store/gallery/493045811-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 811,
+      "h": 575
+    },
+    {
+      "src": "/store/gallery/493045811-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493045814": [
+    {
+      "src": "/store/gallery/493045814-0.webp",
+      "alt": "desk-mat",
+      "kind": "mockup",
+      "w": 663,
+      "h": 467
+    },
+    {
+      "src": "/store/gallery/493045814-1.webp",
+      "alt": "desk-mat on a desk",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493045815": [
+    {
+      "src": "/store/gallery/493045815-0.webp",
+      "alt": "postcard",
+      "kind": "mockup",
+      "w": 908,
+      "h": 631
+    }
+  ],
+  "493045817": [
+    {
+      "src": "/store/gallery/493045817-0.webp",
+      "alt": "laptop-sleeve",
+      "kind": "mockup",
+      "w": 816,
+      "h": 632
+    }
+  ],
+  "493046702": [
+    {
+      "src": "/store/gallery/493046702-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 575,
+      "h": 423
+    },
+    {
+      "src": "/store/gallery/493046702-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046702-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046702-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493046704": [
+    {
+      "src": "/store/gallery/493046704-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 910,
+      "h": 646
+    },
+    {
+      "src": "/store/gallery/493046704-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046704-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493046708": [
+    {
+      "src": "/store/gallery/493046708-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 811,
+      "h": 575
+    },
+    {
+      "src": "/store/gallery/493046708-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493046710": [
+    {
+      "src": "/store/gallery/493046710-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 329,
+      "h": 252
+    }
+  ],
+  "493046714": [
+    {
+      "src": "/store/gallery/493046714-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493046720": [
+    {
+      "src": "/store/gallery/493046720-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046720-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046720-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046720-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046720-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046720-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046720-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493046729": [
+    {
+      "src": "/store/gallery/493046729-0.webp",
+      "alt": "hoodie in black",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/493046729-1.webp",
+      "alt": "hoodie in black, from the back",
+      "kind": "mockup",
+      "w": 748,
+      "h": 983
+    },
+    {
+      "src": "/store/gallery/493046729-2.webp",
+      "alt": "hoodie in black, from the left",
+      "kind": "mockup",
+      "w": 414,
+      "h": 989
+    },
+    {
+      "src": "/store/gallery/493046729-3.webp",
+      "alt": "hoodie in black, from the right",
+      "kind": "mockup",
+      "w": 421,
+      "h": 997
+    },
+    {
+      "src": "/store/gallery/493046729-4.webp",
+      "alt": "hoodie in white",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/493046729-5.webp",
+      "alt": "hoodie on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493046729-6.webp",
+      "alt": "hoodie laid flat",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493048416": [
+    {
+      "src": "/store/gallery/493048416-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 788,
+      "h": 572
+    },
+    {
+      "src": "/store/gallery/493048416-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048416-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048416-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493048421": [
+    {
+      "src": "/store/gallery/493048421-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 910,
+      "h": 513
+    },
+    {
+      "src": "/store/gallery/493048421-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048421-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493048430": [
+    {
+      "src": "/store/gallery/493048430-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 674,
+      "h": 554
+    },
+    {
+      "src": "/store/gallery/493048430-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493048436": [
+    {
+      "src": "/store/gallery/493048436-0.webp",
+      "alt": "wall-tapestry",
+      "kind": "mockup",
+      "w": 916,
+      "h": 683
+    }
+  ],
+  "493048437": [
+    {
+      "src": "/store/gallery/493048437-0.webp",
+      "alt": "desk-mat",
+      "kind": "mockup",
+      "w": 663,
+      "h": 467
+    },
+    {
+      "src": "/store/gallery/493048437-1.webp",
+      "alt": "desk-mat on a desk",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493048439": [
+    {
+      "src": "/store/gallery/493048439-0.webp",
+      "alt": "mouse-pad",
+      "kind": "mockup",
+      "w": 714,
+      "h": 644
+    },
+    {
+      "src": "/store/gallery/493048439-1.webp",
+      "alt": "mouse-pad on a desk",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493048444": [
+    {
+      "src": "/store/gallery/493048444-0.webp",
+      "alt": "spiral-notebook",
+      "kind": "mockup",
+      "w": 811,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048444-1.webp",
+      "alt": "spiral-notebook from the back",
+      "kind": "mockup",
+      "w": 763,
+      "h": 1000
+    }
+  ],
+  "493048448": [
+    {
+      "src": "/store/gallery/493048448-0.webp",
+      "alt": "holographic-sticker",
+      "kind": "mockup",
+      "w": 518,
+      "h": 368
+    }
+  ],
+  "493048457": [
+    {
+      "src": "/store/gallery/493048457-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493048469": [
+    {
+      "src": "/store/gallery/493048469-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048469-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048469-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048469-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048469-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048469-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493048469-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493048740": [
+    {
+      "src": "/store/gallery/493048740-0.webp",
+      "alt": "oversized-hoodie in black",
+      "kind": "mockup",
+      "w": 716,
+      "h": 990
+    },
+    {
+      "src": "/store/gallery/493048740-1.webp",
+      "alt": "oversized-hoodie in black, from the back",
+      "kind": "mockup",
+      "w": 717,
+      "h": 992
+    },
+    {
+      "src": "/store/gallery/493048740-2.webp",
+      "alt": "oversized-hoodie in black, from the left",
+      "kind": "mockup",
+      "w": 397,
+      "h": 995
+    },
+    {
+      "src": "/store/gallery/493048740-3.webp",
+      "alt": "oversized-hoodie in black, from the right",
+      "kind": "mockup",
+      "w": 397,
+      "h": 995
+    },
+    {
+      "src": "/store/gallery/493048740-4.webp",
+      "alt": "oversized-hoodie in white",
+      "kind": "mockup",
+      "w": 716,
+      "h": 990
+    }
+  ],
+  "493058227": [
+    {
+      "src": "/store/gallery/493058227-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 430,
+      "h": 574
+    },
+    {
+      "src": "/store/gallery/493058227-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493058227-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493058227-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493058235": [
+    {
+      "src": "/store/gallery/493058235-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 710,
+      "h": 876
+    },
+    {
+      "src": "/store/gallery/493058235-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493058235-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493058310": [
+    {
+      "src": "/store/gallery/493058310-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 554,
+      "h": 674
+    },
+    {
+      "src": "/store/gallery/493058310-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493058318": [
+    {
+      "src": "/store/gallery/493058318-0.webp",
+      "alt": "postcard",
+      "kind": "mockup",
+      "w": 633,
+      "h": 906
+    }
+  ],
+  "493058324": [
+    {
+      "src": "/store/gallery/493058324-0.webp",
+      "alt": "greeting-card",
+      "kind": "mockup",
+      "w": 660,
+      "h": 640
+    }
+  ],
+  "493058338": [
+    {
+      "src": "/store/gallery/493058338-0.webp",
+      "alt": "hardcover-journal",
+      "kind": "mockup",
+      "w": 668,
+      "h": 884
+    },
+    {
+      "src": "/store/gallery/493058338-1.webp",
+      "alt": "hardcover-journal from the back",
+      "kind": "mockup",
+      "w": 668,
+      "h": 884
+    }
+  ],
+  "493058344": [
+    {
+      "src": "/store/gallery/493058344-0.webp",
+      "alt": "spiral-notebook",
+      "kind": "mockup",
+      "w": 811,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493058344-1.webp",
+      "alt": "spiral-notebook from the back",
+      "kind": "mockup",
+      "w": 763,
+      "h": 1000
+    }
+  ],
+  "493058351": [
+    {
+      "src": "/store/gallery/493058351-0.webp",
+      "alt": "phone-case",
+      "kind": "mockup",
+      "w": 996,
+      "h": 911
+    }
+  ],
+  "493062150": [
+    {
+      "src": "/store/gallery/493062150-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 430,
+      "h": 574
+    },
+    {
+      "src": "/store/gallery/493062150-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062150-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062150-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493062156": [
+    {
+      "src": "/store/gallery/493062156-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 710,
+      "h": 876
+    },
+    {
+      "src": "/store/gallery/493062156-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062156-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493062167": [
+    {
+      "src": "/store/gallery/493062167-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 554,
+      "h": 674
+    },
+    {
+      "src": "/store/gallery/493062167-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493062171": [
+    {
+      "src": "/store/gallery/493062171-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 237,
+      "h": 332
+    }
+  ],
+  "493062182": [
+    {
+      "src": "/store/gallery/493062182-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493062186": [
+    {
+      "src": "/store/gallery/493062186-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062186-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062186-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062186-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062186-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062186-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493062186-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493062200": [
+    {
+      "src": "/store/gallery/493062200-0.webp",
+      "alt": "eco-tote",
+      "kind": "mockup",
+      "w": 679,
+      "h": 957
+    }
+  ],
+  "493062210": [
+    {
+      "src": "/store/gallery/493062210-0.webp",
+      "alt": "white-mug",
+      "kind": "mockup",
+      "w": 939,
+      "h": 712
+    },
+    {
+      "src": "/store/gallery/493062210-1.webp",
+      "alt": "white-mug from the left",
+      "kind": "mockup",
+      "w": 953,
+      "h": 721
+    }
+  ],
+  "493062251": [
+    {
+      "src": "/store/gallery/493062251-0.webp",
+      "alt": "phone-case",
+      "kind": "mockup",
+      "w": 996,
+      "h": 911
+    }
+  ],
+  "493066523": [
+    {
+      "src": "/store/gallery/493066523-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 584,
+      "h": 793
+    },
+    {
+      "src": "/store/gallery/493066523-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066523-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066523-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493066528": [
+    {
+      "src": "/store/gallery/493066528-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 510,
+      "h": 913
+    },
+    {
+      "src": "/store/gallery/493066528-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066528-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493066535": [
+    {
+      "src": "/store/gallery/493066535-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 575,
+      "h": 810
+    },
+    {
+      "src": "/store/gallery/493066535-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493066537": [
+    {
+      "src": "/store/gallery/493066537-0.webp",
+      "alt": "hardcover-journal",
+      "kind": "mockup",
+      "w": 668,
+      "h": 884
+    },
+    {
+      "src": "/store/gallery/493066537-1.webp",
+      "alt": "hardcover-journal from the back",
+      "kind": "mockup",
+      "w": 668,
+      "h": 884
+    }
+  ],
+  "493066539": [
+    {
+      "src": "/store/gallery/493066539-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 208,
+      "h": 333
+    }
+  ],
+  "493066543": [
+    {
+      "src": "/store/gallery/493066543-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "493066554": [
+    {
+      "src": "/store/gallery/493066554-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066554-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066554-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066554-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066554-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066554-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493066554-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493066560": [
+    {
+      "src": "/store/gallery/493066560-0.webp",
+      "alt": "eco-tote",
+      "kind": "mockup",
+      "w": 679,
+      "h": 957
+    }
+  ],
+  "493069101": [
+    {
+      "src": "/store/gallery/493069101-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 788,
+      "h": 572
+    },
+    {
+      "src": "/store/gallery/493069101-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493069101-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493069101-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493069103": [
+    {
+      "src": "/store/gallery/493069103-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 910,
+      "h": 513
+    },
+    {
+      "src": "/store/gallery/493069103-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493069103-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493069111": [
+    {
+      "src": "/store/gallery/493069111-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 811,
+      "h": 575
+    },
+    {
+      "src": "/store/gallery/493069111-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493069116": [
+    {
+      "src": "/store/gallery/493069116-0.webp",
+      "alt": "jigsaw-puzzle",
+      "kind": "mockup",
+      "w": 719,
+      "h": 577
+    }
+  ],
+  "493069121": [
+    {
+      "src": "/store/gallery/493069121-0.webp",
+      "alt": "desk-mat",
+      "kind": "mockup",
+      "w": 663,
+      "h": 467
+    },
+    {
+      "src": "/store/gallery/493069121-1.webp",
+      "alt": "desk-mat on a desk",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493069123": [
+    {
+      "src": "/store/gallery/493069123-0.webp",
+      "alt": "mouse-pad",
+      "kind": "mockup",
+      "w": 714,
+      "h": 644
+    },
+    {
+      "src": "/store/gallery/493069123-1.webp",
+      "alt": "mouse-pad on a desk",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "493069124": [
+    {
+      "src": "/store/gallery/493069124-0.webp",
+      "alt": "spiral-notebook",
+      "kind": "mockup",
+      "w": 811,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/493069124-1.webp",
+      "alt": "spiral-notebook from the back",
+      "kind": "mockup",
+      "w": 763,
+      "h": 1000
+    }
+  ],
+  "492998418": [
+    {
+      "src": "/store/gallery/492998418-0.webp",
+      "alt": "poster",
+      "kind": "mockup",
+      "w": 591,
+      "h": 753
+    },
+    {
+      "src": "/store/gallery/492998418-1.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998418-2.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998418-3.webp",
+      "alt": "poster hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492998427": [
+    {
+      "src": "/store/gallery/492998427-0.webp",
+      "alt": "canvas",
+      "kind": "mockup",
+      "w": 710,
+      "h": 876
+    },
+    {
+      "src": "/store/gallery/492998427-1.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998427-2.webp",
+      "alt": "canvas hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492998450": [
+    {
+      "src": "/store/gallery/492998450-0.webp",
+      "alt": "metal-print",
+      "kind": "mockup",
+      "w": 554,
+      "h": 674
+    },
+    {
+      "src": "/store/gallery/492998450-1.webp",
+      "alt": "metal-print hung on a wall",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492998460": [
+    {
+      "src": "/store/gallery/492998460-0.webp",
+      "alt": "die-cut-sticker",
+      "kind": "mockup",
+      "w": 243,
+      "h": 329
+    }
+  ],
+  "492998468": [
+    {
+      "src": "/store/gallery/492998468-0.webp",
+      "alt": "pin-buttons",
+      "kind": "mockup",
+      "w": 976,
+      "h": 314
+    }
+  ],
+  "492998483": [
+    {
+      "src": "/store/gallery/492998483-0.webp",
+      "alt": "staple-tee in black",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998483-1.webp",
+      "alt": "staple-tee in black, from the back",
+      "kind": "mockup",
+      "w": 753,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998483-2.webp",
+      "alt": "staple-tee in black, from the left",
+      "kind": "mockup",
+      "w": 422,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998483-3.webp",
+      "alt": "staple-tee in black, from the right",
+      "kind": "mockup",
+      "w": 438,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998483-4.webp",
+      "alt": "staple-tee in white",
+      "kind": "mockup",
+      "w": 770,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998483-5.webp",
+      "alt": "staple-tee on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998483-6.webp",
+      "alt": "staple-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492998506": [
+    {
+      "src": "/store/gallery/492998506-0.webp",
+      "alt": "heavyweight-tee in black",
+      "kind": "mockup",
+      "w": 831,
+      "h": 957
+    },
+    {
+      "src": "/store/gallery/492998506-1.webp",
+      "alt": "heavyweight-tee in black, from the back",
+      "kind": "mockup",
+      "w": 792,
+      "h": 952
+    },
+    {
+      "src": "/store/gallery/492998506-2.webp",
+      "alt": "heavyweight-tee in black, from the left",
+      "kind": "mockup",
+      "w": 405,
+      "h": 933
+    },
+    {
+      "src": "/store/gallery/492998506-3.webp",
+      "alt": "heavyweight-tee in black, from the right",
+      "kind": "mockup",
+      "w": 395,
+      "h": 956
+    },
+    {
+      "src": "/store/gallery/492998506-4.webp",
+      "alt": "heavyweight-tee in white",
+      "kind": "mockup",
+      "w": 831,
+      "h": 957
+    },
+    {
+      "src": "/store/gallery/492998506-5.webp",
+      "alt": "heavyweight-tee folded",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492998539": [
+    {
+      "src": "/store/gallery/492998539-0.webp",
+      "alt": "hoodie in black",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/492998539-1.webp",
+      "alt": "hoodie in black, from the back",
+      "kind": "mockup",
+      "w": 748,
+      "h": 983
+    },
+    {
+      "src": "/store/gallery/492998539-2.webp",
+      "alt": "hoodie in black, from the left",
+      "kind": "mockup",
+      "w": 414,
+      "h": 989
+    },
+    {
+      "src": "/store/gallery/492998539-3.webp",
+      "alt": "hoodie in black, from the right",
+      "kind": "mockup",
+      "w": 421,
+      "h": 997
+    },
+    {
+      "src": "/store/gallery/492998539-4.webp",
+      "alt": "hoodie in white",
+      "kind": "mockup",
+      "w": 777,
+      "h": 988
+    },
+    {
+      "src": "/store/gallery/492998539-5.webp",
+      "alt": "hoodie on a hanger",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    },
+    {
+      "src": "/store/gallery/492998539-6.webp",
+      "alt": "hoodie laid flat",
+      "kind": "scene",
+      "w": 1000,
+      "h": 1000
+    }
+  ],
+  "492998572": [
+    {
+      "src": "/store/gallery/492998572-0.webp",
+      "alt": "black-mug",
+      "kind": "mockup",
+      "w": 839,
+      "h": 703
+    },
+    {
+      "src": "/store/gallery/492998572-1.webp",
+      "alt": "black-mug from the right",
+      "kind": "mockup",
+      "w": 878,
+      "h": 697
+    }
+  ]
+}

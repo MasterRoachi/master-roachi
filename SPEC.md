@@ -1089,9 +1089,43 @@ right one: there is no point styling a page whose contents are still growing.
 The SEO panel stays. It scores his own words, because the meta description
 prefers them (`lib/product-meta.ts`).
 
-**What will still make the Shop look thin, and is not a layout problem:**
-Printful holds **one** product. Until there are more, most of the page is one
-row.
+~~**What will still make the Shop look thin:** Printful holds **one**
+product.~~ No longer: see step 7.
+
+**7. Timon's art and the face logo — done 2026-11-13** (Fjord and Bjorn, his
+approval of 12 Nov; the brief is `~/Work/assets/art/timon/BRIEF.md`).
+Printful now holds **130 products**: Timon's 15 pieces (121 products), the
+face logo (8) and the Roachi Shirt. His rules: every piece as a poster,
+canvas and metal print; pins on the characters only; clothing in black and
+white only; Timon's signature small, bottom right, on every full print (where
+an original had none, his signature from another piece was used: Amuru
+Warrior, Treant and Friend, Elderstone Shrine); "Art by Timon" on every
+product page; **no people in any picture**.
+- **Shelving.** Each product in `content/store/copy.json` carries `category`,
+  `piece`, `artist` and `artistShare`; `$categories` and `$pieces` are the
+  shelves and the artwork collections in store order. All editable on
+  `/work/shop` (fields per product, a filter, and a Shelves & artworks
+  panel). The store shelves by them, and `/store/artwork/<piece>/` is one page
+  per drawing. `lib/product-copy.ts` documents the keys.
+- **Timon's 50%** is of the profit, his ruling: the item's price less
+  Printful's cost, delivery excluded. The artist and share are copied onto the
+  order at checkout and Printful's cost when it is sent (migration `0023`,
+  `lib/artist-share.ts`); `/work/shop` Orders shows each order's cut and a
+  month-by-month "owed to artists".
+- **Pictures and 3D.** Every product page has a gallery under the stage
+  (`data/gallery.json`, `public/store/gallery/`): Printful's mockups, then
+  styled scenes on hangers, folded or in rooms. Flat goods, mugs, the tote,
+  the shaped pillow and the cap are built in three.js (`components/goods.ts`,
+  `data/goods.json`), since no CC0 or CC BY model of the round ones was free.
+- **Print files and tools** live outside the repo, in
+  `~/Work/assets/art/timon/` (2× upscales, glow-restored cutouts, `tools/`)
+  and `~/Work/assets/art/face-logo/` (a vector trace of the logo, since the
+  master source is not on this machine). Print files reach Printful from the
+  R2 bucket `fabled-threads-prints`.
+- **Known limit:** the `/work/shop` Sync button now pages through 130
+  products (a couple of hundred Printful requests with rate-limit waits),
+  which may exceed what one Worker request can do. The build's own sync
+  (`scripts/printful.mjs`) is unaffected.
 
 ### Stage 2 — Projects
 

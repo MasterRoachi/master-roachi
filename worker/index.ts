@@ -38,6 +38,7 @@ import { sketchesApi } from './sketches';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
 import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
+import { artistTerms } from '../lib/artist-share';
 import {
   createDraftOrder,
   findSyncVariant,
@@ -292,7 +293,8 @@ const ORDER_COLUMNS = `id, ref, created_at, product, product_id, size, price, na
   address, note, status, paid_at, fulfilled_at, dismissed_at, redacted_at,
   printful_id, printful_status, sent_at, carrier, tracking_number, tracking_url,
   address1, address2, city, state_code, zip, country_code,
-  item_amount, shipping_amount, total, currency, shipping_method, shipping_name, pf_payment_id`;
+  item_amount, shipping_amount, total, currency, shipping_method, shipping_name, pf_payment_id,
+  artist, artist_share, item_cost`;
 
 /** What a checkout costs, worked out here and never taken from the browser. */
 interface Quote {
@@ -815,13 +817,25 @@ async function handle(request: Request, env: Env): Promise<Response> {
         note: field(body.note, 600),
         structured: address,
       };
+      // Who drew it and their share, fixed now: lib/artist-share.ts.
+      const terms = artistTerms(productId);
       await env.DB.batch([
         insertOrder(env.DB, record),
         env.DB.prepare(
           `update orders set item_amount = ?2, shipping_amount = ?3, total = ?4, currency = ?5,
-                  shipping_method = ?6, shipping_name = ?7
+                  shipping_method = ?6, shipping_name = ?7, artist = ?8, artist_share = ?9
             where ref = ?1`,
-        ).bind(ref, quote.item, quote.delivery, quote.total, quote.currency, quote.method.id, quote.method.name),
+        ).bind(
+          ref,
+          quote.item,
+          quote.delivery,
+          quote.total,
+          quote.currency,
+          quote.method.id,
+          quote.method.name,
+          terms?.artist ?? null,
+          terms?.share ?? null,
+        ),
       ]);
 
       // Back to the product page on a cancel, if the form said which one.
@@ -1725,12 +1739,12 @@ async function handle(request: Request, env: Env): Promise<Response> {
                 await db
                   .prepare(
                     `update orders set printful_status = ?2, carrier = ?3, tracking_number = ?4,
-                            tracking_url = ?5
+                            tracking_url = ?5, item_cost = coalesce(item_cost, ?7)
                             ${shipped ? `, status = 'fulfilled', fulfilled_at = coalesce(fulfilled_at, ?6),
                               paid_at = coalesce(paid_at, ?6)` : ''}
                       where ref = ?1`,
                   )
-                  .bind(row.ref, state.status, state.carrier, state.trackingNumber, state.trackingUrl, now)
+                  .bind(row.ref, state.status, state.carrier, state.trackingNumber, state.trackingUrl, now, state.itemCost)
                   .run();
               } catch {
                 refreshFailed = true;
@@ -1816,10 +1830,11 @@ async function handle(request: Request, env: Env): Promise<Response> {
               });
               await db
                 .prepare(
-                  `update orders set printful_id = ?2, printful_status = ?3, sent_at = ?4
+                  `update orders set printful_id = ?2, printful_status = ?3, sent_at = ?4,
+                          item_cost = coalesce(item_cost, ?5)
                     where ref = ?1 and printful_id is null`,
                 )
-                .bind(order.ref, state.id, state.status, new Date().toISOString())
+                .bind(order.ref, state.id, state.status, new Date().toISOString(), state.itemCost)
                 .run();
             } catch (error) {
               const message = error instanceof Error ? error.message : 'Printful refused it.';

@@ -450,3 +450,16 @@
     margin-inline: auto;
   }
 }
+
+/* Who drew it, and the way to everything else with the same drawing on. */
+.byline {
+  margin: 0 0 18px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.byline a {
+  color: color-mix(in oklch, var(--accent-a) 78%, var(--ink));
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

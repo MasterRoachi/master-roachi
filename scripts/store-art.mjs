@@ -196,7 +196,7 @@ function extractPrint(data, width, height) {
   const gh = gy1 - gy0 + 1;
 
   const seen = new Uint8Array(width * height);
-  let best = null;
+  const blobs = [];
   for (let p = 0; p < width * height; p++) {
     if (seen[p] || data[p * 4 + 3] < 250 || lumAt(p * 4) < PRINT_LUM) continue;
     const stack = [p];
@@ -223,10 +223,34 @@ function extractPrint(data, width, height) {
         }
       }
     }
-    if (!best || n > best.n) best = { n, x0, y0, x1, y1 };
+    blobs.push({ n, x0, y0, x1, y1 });
   }
-  // A few hundred pixels of glare on a seam is not a print.
-  if (!best || best.n < 400) return null;
+  // The print is the largest bright patch and every sizeable one lying close
+  // to it, gathered outward until nothing more is near. Timon's line art is
+  // many patches cut apart by its own dark outlines, and the largest alone
+  // was only the TV's screen (12 Nov 2026); taking every patch on the garment
+  // took the neck label as well. Specks are too small to join, and a label or
+  // a seam's glare is too far from the print.
+  const near = Math.round(gw * 0.05);
+  const parts = blobs.filter((b) => b.n >= 60).sort((p, q) => q.n - p.n);
+  if (parts.length === 0 || parts[0].n < 400) return null;
+  const best = { ...parts[0] };
+  const taken = new Set([0]);
+  for (let grew = true; grew; ) {
+    grew = false;
+    parts.forEach((b, i) => {
+      if (taken.has(i)) return;
+      const gapX = Math.max(0, b.x0 - best.x1, best.x0 - b.x1);
+      const gapY = Math.max(0, b.y0 - best.y1, best.y0 - b.y1);
+      if (gapX > near || gapY > near) return;
+      taken.add(i);
+      best.x0 = Math.min(best.x0, b.x0);
+      best.y0 = Math.min(best.y0, b.y0);
+      best.x1 = Math.max(best.x1, b.x1);
+      best.y1 = Math.max(best.y1, b.y1);
+      grew = true;
+    });
+  }
 
   // The flood only catches the brightest strokes; the soft edges of the line
   // art fall below the threshold and would be sheared off without this.
@@ -301,7 +325,14 @@ for (const product of products) {
       .raw()
       .toBuffer({ resolveWithObject: true });
 
-    const cleared = clearBackground(data, info.width, info.height);
+    // Printful's mockup generator hands back PNGs that are already cut out
+    // (the thumbnails Timon's products were given, 12 Nov 2026), and a flood
+    // looking for white finds none on a transparent border. Those count as
+    // cleared already; only a mockup on its white sheet is flooded.
+    let clear = 0;
+    for (let i = 3; i < data.length; i += 4) if (data[i] < 10) clear++;
+    const precut = clear / (info.width * info.height) >= 0.05;
+    const cleared = precut ? clear : clearBackground(data, info.width, info.height);
     const share = cleared / (info.width * info.height);
 
     // A mockup that is not on white will barely clear anything. Leaving it
@@ -313,7 +344,10 @@ for (const product of products) {
       continue;
     }
 
-    const print = extractPrint(data, info.width, info.height);
+    // Only a garment has a print to lift for the modelled shirt; a poster's
+    // brightest blob is just part of the picture.
+    const garment = /t-?\s?shirt|\btee\b|hoodie|sweatshirt|crewneck/i.test(product.garment?.title ?? '');
+    const print = garment ? extractPrint(data, info.width, info.height) : null;
     if (print) {
       const printFile = `${product.id}-print.webp`;
       await sharp(print.raw, {
@@ -341,7 +375,9 @@ for (const product of products) {
     product.art = `/store/${file}`;
     changed++;
     console.log(
-      `store-art: ${product.name} — ${(share * 100).toFixed(0)}% background removed`,
+      precut
+        ? `store-art: ${product.name} — already cut out`
+        : `store-art: ${product.name} — ${(share * 100).toFixed(0)}% background removed`,
     );
   } catch (err) {
     console.log(`store-art: ${product.name} failed (${err.message})`);
