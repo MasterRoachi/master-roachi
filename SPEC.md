@@ -1126,6 +1126,18 @@ product page; **no people in any picture**.
   products (a couple of hundred Printful requests with rate-limit waits),
   which may exceed what one Worker request can do. The build's own sync
   (`scripts/printful.mjs`) is unaffected.
+- **Shipped 2026-11-13** as `effa5b0`, `6d0bda2` and `31a22b7`, live and checked by
+  eye. The first two deploys failed: the worker tests' orders table lacked
+  `0023` and their Printful stub missed the paged list; then `scripts/og.mjs`
+  let a wide good (desk mat, tapestry) outgrow the 1200px card. The cut-out now
+  fits a 560×500 box. The goods pipeline that made the mockups, scenes and 3D
+  data is `~/Work/assets/art/timon/tools/`.
+- **Calls for Master Roachi to overrule if he likes:** the Stillmere poster's
+  22% crop; Lila's poster, metal print and notebook as the whole picture on a
+  blurred ground; blurred bands on the Stillmere laptop sleeve; the borrowed
+  signatures above; the 26×40″ canvas at 111 dpi against a 110 floor; Unknown
+  is faint on black clothing. The R2 bucket's public r2.dev URL is still on;
+  switching it off is his call.
 
 ### Stage 2 — Projects
 
