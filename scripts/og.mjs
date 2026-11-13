@@ -210,9 +210,12 @@ if (fs.existsSync(STORE)) {
     // a 404 rather than a fallback — and a poster, or a product synced before
     // store-art has run, has no mockup to cut.
     const garment = hasArt
-      ? await sharp(art).resize({ height: 500, fit: 'inside' }).toBuffer()
+      ? // Boxed as well as capped in height: a desk mat or a tapestry is
+        // wider than it is tall, and at 500px high it outgrew the card and
+        // sharp refused the composite (Timon's pieces, 13 Nov 2026).
+        await sharp(art).resize({ width: 560, height: 500, fit: 'inside' }).toBuffer()
       : await sharp(MARK).resize(130, 130, { fit: 'inside' }).toBuffer();
-    const { width: gw } = await sharp(garment).metadata();
+    const { width: gw, height: gh } = await sharp(garment).metadata();
 
     const price = priceRange(product);
     const left = hasArt ? 120 + (gw ?? 0) + 80 : 120;
@@ -268,7 +271,7 @@ if (fs.existsSync(STORE)) {
     })
       .composite([
         hasArt
-          ? { input: garment, left: 120, top: Math.round((OG_H - 500) / 2) }
+          ? { input: garment, left: 120, top: Math.round((OG_H - (gh ?? 500)) / 2) }
           : // No mockup: the mark sits above the text rather than beside it,
             // since there is nothing to stand next to.
             { input: garment, left: 120, top: 66 },
