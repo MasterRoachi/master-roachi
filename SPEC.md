@@ -1195,6 +1195,10 @@ product page; **no people in any picture**.
   the dearest in any colour. A hand-set override in `lib/pricing.json` is
   still by size and still beats the conversion; there are none. **Not done:** the stage and gallery do not follow the chosen
   colour; that needs the mockups tagged by colour in `data/gallery.json`.
+- **Left after 17 Nov:** the stage and gallery following the chosen colour
+  (Fjord); the first press of the Sync button against the live store
+  (Bjorn); the first real order end to end, through pay to Printful, then
+  refunded.
 
 ### Stage 2 — Projects
 
