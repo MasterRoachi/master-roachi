@@ -1,7 +1,10 @@
 .page {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  /* clip, not hidden, so the halftone canvas can stick to the screen
+     (HalftoneField); flow-root keeps the block formatting hidden gave. */
+  display: flow-root;
+  overflow: clip;
   padding-bottom: clamp(80px, 10vw, 120px);
 }
 

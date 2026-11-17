@@ -194,13 +194,16 @@ export default async function ProductPage({
               </>
             )}
 
-            <Swatches colors={product.colors ?? []} />
+            {/* With more than one colour the buy panel asks for it, swatches
+                and all, so the dots here would say the same thing twice. */}
+            {(product.colors ?? []).length <= 1 && <Swatches colors={product.colors ?? []} />}
 
 
             {/* Sizes, price and the button are one thing: the size chosen is
                 what the checkout prices and asks pay for. */}
             <BuyPanel
               options={options}
+              colors={product.colors ?? []}
               soldOut={soldOut}
               name={product.name}
               productId={String(product.id)}

@@ -454,6 +454,11 @@ export default function StoreCopyEditor({
   /**
    * Fetch Printful from the Worker and commit the catalogue.
    *
+   * In steps since 17 Nov 2026: the store lists, then its products come ten
+   * at a time, then the Worker puts them together and commits. All 130 in one
+   * request was more than a Worker request is good for. A part that fails is
+   * asked for again, twice, before the sync gives up.
+   *
    * The product list on this page is baked at build time, so a sync that
    * changed something needs a deploy before the new product appears — which
    * is said out loud rather than left as a page that looks unchanged.
@@ -461,24 +466,59 @@ export default function StoreCopyEditor({
   async function sync() {
     setSyncing(true);
     setSyncNote(null);
+    type Answer = {
+      configured?: boolean;
+      needs?: string[];
+      synced?: boolean;
+      changed?: boolean;
+      products?: number;
+      checkedAt?: string;
+      error?: string;
+      run?: string;
+      total?: number;
+      chunk?: number;
+      next?: number;
+      done?: boolean;
+    };
+    const step = async (payload: Record<string, unknown>, tries = 3): Promise<{ ok: boolean; status: number; data: Answer }> => {
+      for (let attempt = 1; ; attempt++) {
+        try {
+          const response = await fetch('/work/api/store-sync', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = (await response.json().catch(() => ({}))) as Answer;
+          // A refusal is an answer; only a failure on the way is retried.
+          if (response.ok || attempt >= tries || response.status < 500) return { ok: response.ok, status: response.status, data };
+        } catch (error) {
+          if (attempt >= tries) throw error;
+        }
+      }
+    };
     try {
-      const response = await fetch('/work/api/store-sync', { method: 'POST' });
-      const data = (await response.json()) as {
-        configured?: boolean;
-        needs?: string[];
-        synced?: boolean;
-        changed?: boolean;
-        products?: number;
-        checkedAt?: string;
-        error?: string;
-      };
-
-      if (data.configured === false) {
-        setSyncNote(`Not switched on — ${(data.needs ?? []).join(' and ')} not set.`);
+      const started = await step({ step: 'start' });
+      if (started.data.configured === false) {
+        setSyncNote(`Not switched on — ${(started.data.needs ?? []).join(' and ')} not set.`);
         return;
       }
-      if (!response.ok || !data.synced) {
-        setSyncNote(data.error ?? `Sync failed (${response.status}).`);
+      if (!started.ok || !started.data.run) {
+        setSyncNote(started.data.error ?? `Sync failed (${started.status}).`);
+        return;
+      }
+      const { run, total = 0, chunk = 10 } = started.data;
+      for (let offset = 0; offset < total; offset += chunk) {
+        setSyncNote(`Fetching products ${offset + 1}–${Math.min(offset + chunk, total)} of ${total}…`);
+        const part = await step({ step: 'chunk', run, offset });
+        if (!part.ok) {
+          setSyncNote(part.data.error ?? `Sync failed at product ${offset + 1} (${part.status}).`);
+          return;
+        }
+      }
+      setSyncNote(`Putting ${total} products together…`);
+      const { ok, status, data } = await step({ step: 'finish', run });
+      if (!ok || !data.synced) {
+        setSyncNote(data.error ?? `Sync failed (${status}).`);
         return;
       }
       if (data.checkedAt) setCheckedAt(data.checkedAt);

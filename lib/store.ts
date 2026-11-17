@@ -253,6 +253,20 @@ export interface BuyOption {
   currency: string;
   label: string;
   available: boolean;
+  /**
+   * The colours this size comes in, in the product's own colour order, each
+   * with whether it can be had and what it costs. One entry on a product with
+   * one colour. Added 17 Nov 2026: a size alone stopped naming a variant when
+   * Timon's art brought products in two or three colours, and his ruling the
+   * same day prices each colour from its own Printful cost (a framed poster's
+   * oak frame costs Printful more than its black one).
+   */
+  colors: { name: string; available: boolean; amount: number; label: string }[];
+  /**
+   * Whether this size costs different amounts in different colours. Then
+   * `amount` and `label` are the cheapest, and the chip says "from".
+   */
+  varies: boolean;
 }
 
 /**
@@ -264,13 +278,39 @@ export interface BuyOption {
 export function buyOptions(product: StoreProduct): BuyOption[] {
   return sizesOf(product).map((size) => {
     const price = sellingPrice(product, size);
-    const variant = (product.variants ?? []).find((v) => v.size === size);
+    const variants = (product.variants ?? []).filter((v) => v.size === size);
+    // In the order the product lists its colours, so every size's chips line
+    // up the same way; a colour the product list lacks goes last.
+    const order = (product.colors ?? []).map((c) => c.name);
+    const rank = (name: string) => {
+      const i = order.indexOf(name);
+      return i === -1 ? order.length : i;
+    };
+    const colors = variants
+      .filter((v): v is ProductVariant & { color: string } => Boolean(v.color))
+      .map((v) => {
+        const own = sellingPrice(product, size, v.color);
+        return {
+          name: v.color,
+          available: v.available,
+          amount: own?.amount ?? 0,
+          label: own ? money(own.amount, own.currency) : '',
+        };
+      })
+      .sort((a, b) => rank(a.name) - rank(b.name));
+    const priced = colors.filter((c) => c.amount > 0);
+    const varies = new Set(priced.map((c) => c.amount)).size > 1;
+    // The cheapest colour stands for the size until a colour is chosen.
+    const cheapest = varies ? priced.reduce((a, b) => (b.amount < a.amount ? b : a)) : null;
     return {
       size,
-      amount: price?.amount ?? 0,
+      amount: cheapest?.amount ?? price?.amount ?? 0,
       currency: price?.currency ?? 'ZAR',
-      label: price ? money(price.amount, price.currency) : '',
-      available: variant?.available ?? true,
+      label: cheapest ? cheapest.label : price ? money(price.amount, price.currency) : '',
+      varies,
+      // A size can be had if any of its colours can.
+      available: variants.length === 0 ? true : variants.some((v) => v.available),
+      colors,
     };
   });
 }
@@ -329,10 +369,14 @@ export function money(amount: number, currency: string): string {
 export function sellingPrice(
   product: StoreProduct,
   size: string,
+  color?: string | null,
 ): { amount: number; currency: string } | null {
   // lib/price.ts, which the Worker's checkout uses too, so a page and a
-  // charge cannot disagree.
-  const variant = (product.variants ?? []).find((v) => v.size === size);
+  // charge cannot disagree. By colour as well where one is given, since
+  // 17 Nov 2026: the Worker prices the chosen colour's own variant, and so
+  // must the page. Without one, the first variant of the size, as before.
+  const sized = (product.variants ?? []).filter((v) => v.size === size);
+  const variant = (color ? sized.find((v) => v.color === color) : undefined) ?? sized[0];
   const amount = itemPrice(product.id, size, variant?.amount);
   return amount === null ? null : { amount, currency: CURRENCY };
 }
@@ -400,6 +444,21 @@ export function isApparel(product: StoreProduct): boolean {
  * at checkout. Grouping keeps it short — five sizes at one price is one row,
  * not five.
  */
+/** Every colour's price for one size, priced or not left out. */
+function pricesFor(product: StoreProduct, size: string): { amount: number; currency: string }[] {
+  const sized = (product.variants ?? []).filter((v) => v.size === size);
+  const colours = sized.length > 0 ? sized.map((v) => v.color) : [null];
+  return colours
+    .map((color) => sellingPrice(product, size, color))
+    .filter((p): p is { amount: number; currency: string } => p !== null);
+}
+
+/** The cheapest colour of one size, or null when none is priced. */
+function cheapestFor(product: StoreProduct, size: string): { amount: number; currency: string } | null {
+  const prices = pricesFor(product, size);
+  return prices.length === 0 ? null : prices.reduce((a, b) => (b.amount < a.amount ? b : a));
+}
+
 export interface PriceBand {
   sizes: string[];
   amount: number;
@@ -409,7 +468,9 @@ export interface PriceBand {
 export function priceLadder(product: StoreProduct): PriceBand[] {
   const bands: PriceBand[] = [];
   for (const size of sizesOf(product)) {
-    const price = sellingPrice(product, size);
+    // A size's band is its cheapest colour; priceSummary reads the dearest
+    // from the variants itself, so a range stays true across colours.
+    const price = cheapestFor(product, size);
     if (!price) continue;
     const last = bands[bands.length - 1];
     if (last && last.amount === price.amount && last.currency === price.currency) {
@@ -440,7 +501,10 @@ export function priceSummary(product: StoreProduct): string | null {
   // size order, and a bigger canvas is not always the dearer one (it read
   // "R620 – R580" when this took the ends).
   const low = bands.reduce((a, b) => (b.amount < a.amount ? b : a));
-  const high = bands.reduce((a, b) => (b.amount > a.amount ? b : a));
+  // The dearest of every size in every colour, since prices follow colour
+  // (17 Nov 2026): an oak frame can be the top of the range.
+  const all = sizesOf(product).flatMap((size) => pricesFor(product, size));
+  const high = all.reduce((a, b) => (b.amount > a.amount ? b : a), low);
   return low.amount === high.amount
     ? money(low.amount, low.currency)
     : `${money(low.amount, low.currency)} – ${money(high.amount, high.currency)}`;

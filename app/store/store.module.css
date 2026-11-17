@@ -2,7 +2,10 @@
 .page {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  /* clip, not hidden, so the halftone canvas can stick to the screen
+     (HalftoneField); flow-root keeps the block formatting hidden gave. */
+  display: flow-root;
+  overflow: clip;
   padding-bottom: clamp(80px, 10vw, 120px);
 }
 
@@ -413,7 +416,10 @@ a.product:hover .art img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* Contain, not cover: the drawings run from tall (Faye, Treant) to wide
+     (Lila, Elderstone Peaks), and a tile is the one place a visitor sees the
+     whole piece before choosing it. */
+  object-fit: contain;
 }
 
 .pieceName {

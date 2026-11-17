@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import type { BuyOption } from '@/lib/store';
+import type { BuyOption, ProductColor } from '@/lib/store';
 import { COUNTRIES, countryOf } from '@/lib/address';
 import styles from './BuyPanel.module.css';
 
@@ -21,14 +21,14 @@ export const LAST_ORDER_KEY = 'fabled-threads:last-order';
  * Best effort by design: private windows and blocked storage both throw, and
  * the thank-you page asks for the details in full when nothing comes back.
  */
-function remember(product: string, option: BuyOption, ref: string | null) {
+function remember(product: string, option: BuyOption, color: string | null, ref: string | null) {
   try {
     window.localStorage.setItem(
       LAST_ORDER_KEY,
       JSON.stringify({
         product,
-        size: option.size,
-        price: option.label,
+        size: color ? `${option.size}, ${color}` : option.size,
+        price: priceOf(option, color),
         ref,
         at: Date.now(),
       }),
@@ -36,6 +36,18 @@ function remember(product: string, option: BuyOption, ref: string | null) {
   } catch {
     // No storage. The thank-you page has a path for that.
   }
+}
+
+/**
+ * What one size costs in one colour: its own price since 17 Nov 2026, when
+ * Master Roachi ruled that a colour Printful charges more for costs more.
+ * With no colour chosen, the size's own label ("from" the cheapest where the
+ * colours differ).
+ */
+function priceOf(option: BuyOption, color: string | null): string {
+  const own = color ? option.colors.find((c) => c.name === color) : undefined;
+  if (own?.label) return own.label;
+  return option.varies ? `from ${option.label}` : option.label;
 }
 
 /**
@@ -50,12 +62,15 @@ function remember(product: string, option: BuyOption, ref: string | null) {
  */
 export default function BuyPanel({
   options,
+  colors = [],
   soldOut,
   name,
   productId,
   page,
 }: {
   options: BuyOption[];
+  /** The product's colourways, with their swatches. More than one shows a choice. */
+  colors?: ProductColor[];
   soldOut: boolean;
   /** The product's name, carried into the order note. */
   name: string;
@@ -67,7 +82,18 @@ export default function BuyPanel({
   // Nothing preselected. A size chosen for someone is a size they did not
   // choose, and this is the one decision on the page that must be theirs.
   const [size, setSize] = useState<string | null>(null);
-  const chosen = options.find((o) => o.size === size) ?? null;
+  // The colour, when there is a choice of one (17 Nov 2026: a size alone no
+  // longer names a variant). Nothing preselected for the same reason as the
+  // size; with one colour there is nothing to choose and it is that one.
+  const choosesColor = colors.length > 1;
+  const [pickedColor, setColor] = useState<string | null>(null);
+  const color = choosesColor ? pickedColor : (colors[0]?.name ?? null);
+  const picked = options.find((o) => o.size === size) ?? null;
+  // A size counts as had only in the colour chosen, once one is.
+  const inColor = (o: BuyOption) =>
+    !choosesColor || !color || o.colors.length === 0 || o.colors.some((c) => c.name === color && c.available);
+  const chosen = picked && (!choosesColor || color) ? picked : null;
+  const chosenOk = chosen ? chosen.available && inColor(chosen) : false;
 
   const anyOnSale = options.some((o) => o.available && o.amount > 0);
 
@@ -77,6 +103,35 @@ export default function BuyPanel({
 
   return (
     <div className={styles.panel}>
+      {choosesColor && (
+        <>
+          <p className={styles.label} id="color-label">
+            Choose a colour
+          </p>
+          <div className={`${styles.sizes} ${styles.colors}`} role="group" aria-labelledby="color-label">
+            {colors.map((c) => (
+              <button
+                key={c.name}
+                type="button"
+                className={`${styles.size} ${styles.color}`}
+                aria-pressed={c.name === color}
+                // Out of stock in every size is the only way a colour is off.
+                disabled={!options.some((o) => o.colors.some((oc) => oc.name === c.name && oc.available))}
+                onClick={() => setColor(c.name)}
+              >
+                <span
+                  className={styles.dot}
+                  style={c.hex ? { background: c.hex } : undefined}
+                  data-empty={c.hex ? undefined : true}
+                  aria-hidden="true"
+                />
+                <span className={styles.sizeName}>{c.name}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
       <p className={styles.label} id="size-label">
         Choose a size
       </p>
@@ -87,13 +142,13 @@ export default function BuyPanel({
             type="button"
             className={styles.size}
             aria-pressed={o.size === size}
-            disabled={!o.available}
+            disabled={!o.available || !inColor(o)}
             onClick={() => setSize(o.size)}
           >
             {/* The price on the chip, so the size and what it costs are read
                 in one place — the separate price ladder went for this. */}
             <span className={styles.sizeName}>{o.size}</span>
-            <span className={styles.sizePrice}>{o.label}</span>
+            <span className={styles.sizePrice}>{priceOf(o, color)}</span>
           </button>
         ))}
       </div>
@@ -103,8 +158,10 @@ export default function BuyPanel({
           leave the site. */}
       <p className={styles.chosen} aria-live="polite">
         {chosen
-          ? `${chosen.size} — delivery is quoted for your address below`
-          : 'Sizes are priced individually; the price appears here.'}
+          ? `${chosen.size}${choosesColor && color ? `, ${color}` : ''} — delivery is quoted for your address below`
+          : choosesColor && picked && !color
+            ? 'Choose a colour too.'
+            : 'Sizes are priced individually; the price appears here.'}
       </p>
 
       {!anyOnSale ? (
@@ -115,13 +172,14 @@ export default function BuyPanel({
             real product — there is just nowhere to take your money yet.
           </p>
         </div>
-      ) : chosen?.available ? (
+      ) : chosen && chosenOk ? (
         <CheckoutForm
           product={name}
           productId={productId}
           option={chosen}
+          color={color}
           page={page}
-          onSent={(ref) => remember(name, chosen, ref)}
+          onSent={(ref) => remember(name, chosen, color, ref)}
         />
       ) : (
         // Disabled rather than absent, so the button does not appear from
@@ -133,7 +191,11 @@ export default function BuyPanel({
           data-disabled={chosen ? 'unavailable' : 'choose'}
           aria-disabled="true"
         >
-          {chosen ? 'Not available in that size' : 'Choose a size to buy'}
+          {chosen
+            ? 'Not available in that size'
+            : choosesColor && !color
+              ? (picked ? 'Choose a colour to buy' : 'Choose a colour and a size to buy')
+              : 'Choose a size to buy'}
         </span>
       )}
 
@@ -257,12 +319,15 @@ function CheckoutForm({
   product,
   productId,
   option,
+  color,
   page,
   onSent,
 }: {
   product: string;
   productId: string;
   option: BuyOption;
+  /** The colour chosen, or the only one; null where the catalogue names none. */
+  color: string | null;
   page: string;
   onSent: (ref: string | null) => void;
 }) {
@@ -274,9 +339,12 @@ function CheckoutForm({
   // Any edit to the form clears it outright, and an answer that arrives after
   // an edit is thrown away (the crew's review, 12 Nov: switching size, editing
   // the address and switching back used to bring an old address's quote back).
-  const [quoted, setQuoted] = useState<{ size: string; quote: Quote } | null>(null);
+  // Keyed by colour as well as size: a different colour is a different
+  // variant, and Printful may price its delivery differently.
+  const variantKey = `${option.size}|${color ?? ''}`;
+  const [quoted, setQuoted] = useState<{ key: string; quote: Quote } | null>(null);
   const edits = useRef(0);
-  const quote = quoted && quoted.size === option.size ? quoted.quote : null;
+  const quote = quoted && quoted.key === variantKey ? quoted.quote : null;
   const forget = () => {
     edits.current += 1;
     setQuoted(null);
@@ -288,7 +356,7 @@ function CheckoutForm({
     event.preventDefault();
     if (busy) return;
     const asked = edits.current;
-    const size = option.size;
+    const key = variantKey;
     setBusy(true);
     setProblem(null);
     const data = new FormData(event.currentTarget);
@@ -299,11 +367,11 @@ function CheckoutForm({
         const res = await fetch('/api/quote', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ productId, size: option.size, address }),
+          body: JSON.stringify({ productId, size: option.size, color, address }),
         });
         const body = (await res.json().catch(() => ({}))) as { quote?: Quote; error?: string };
         if (!res.ok || !body.quote) throw new Error(body.error ?? 'Delivery could not be quoted just now.');
-        if (edits.current === asked) setQuoted({ size, quote: body.quote });
+        if (edits.current === asked) setQuoted({ key, quote: body.quote });
         setBusy(false);
         return;
       }
@@ -315,6 +383,7 @@ function CheckoutForm({
           product,
           productId,
           size: option.size,
+          color,
           page,
           name: data.get('name'),
           email: data.get('email'),
@@ -387,7 +456,7 @@ function CheckoutForm({
       {quote && (
         <dl className={styles.quote} aria-live="polite">
           <div>
-            <dt>{product}, {option.size}</dt>
+            <dt>{product}, {option.size}{color ? `, ${color}` : ''}</dt>
             <dd>{rand(quote.item)}</dd>
           </div>
           <div>

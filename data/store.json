@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-13T03:10:48.277Z",
+  "fetchedAt": "2026-11-17T13:02:06.924Z",
   "store": null,
   "products": [
     {
@@ -7,7 +7,7 @@
       "externalId": "6af67378edf734",
       "slug": "elderstone-shrine-notebook",
       "name": "Elderstone Shrine Notebook",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4961386fa5d7c483ae168992479cf8d0/spiral-notebook-dotted-front-6af6748418df1.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d6b6d253e5bfbff94fa32f0ff4b36536/spiral-notebook-dotted-front-6afc4e46bb658.png",
       "variantCount": 1,
       "from": {
         "amount": 25,
@@ -52,7 +52,7 @@
       "externalId": "6af67377f01c98",
       "slug": "elderstone-shrine-mouse-pad",
       "name": "Elderstone Shrine Mouse Pad",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e7bb4a9bcecae2eb8ef63db9e772a008/gaming-mouse-pad-white-18x16-front-6af67447efd85.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/02d74894dd2dcf91e69a5a3d60e522ef/gaming-mouse-pad-white-18x16-front-6afc4e0aabe51.png",
       "variantCount": 2,
       "from": {
         "amount": 24,
@@ -104,7 +104,7 @@
       "externalId": "6af67376bf9725",
       "slug": "elderstone-shrine-desk-mat",
       "name": "Elderstone Shrine Desk Mat",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/6968cc930261e7fdbd938f0462e774eb/desk-mat-black-12x18-front-6af6742df0198.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/deb7f8e0ef8b06139f371be673e00f7e/desk-mat-black-12x18-front-6afc4df097768.png",
       "variantCount": 3,
       "from": {
         "amount": 20,
@@ -160,7 +160,7 @@
       "externalId": "6af67375b4ac85",
       "slug": "elderstone-shrine-jigsaw-puzzle",
       "name": "Elderstone Shrine Jigsaw Puzzle",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/7bdc5e84d4a99225578d35e274427e9e/jigsaw-puzzle-252-pieces-front-6af673f0c773c.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d6efe36c6e045ac8ccbabb17c6541951/jigsaw-puzzle-252-pieces-front-6afc4db2672f7.png",
       "variantCount": 2,
       "from": {
         "amount": 30.5,
@@ -245,10 +245,10 @@
       "externalId": "6af67374ba9be5",
       "slug": "elderstone-shrine-metal-print",
       "name": "Elderstone Shrine Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/bdfef59c8c9d986592f8cc6538213722/glossy-metal-print-(in)-white-20x30-front-6af673d7707ff.png",
-      "variantCount": 2,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d995c46d7bf69a891c53c142d8f072fb/glossy-metal-print-(in)-white-11x14-front-6afc4d990aec9.png",
+      "variantCount": 5,
       "from": {
-        "amount": 300,
+        "amount": 79,
         "currency": "USD"
       },
       "garment": {
@@ -286,6 +286,27 @@
           "amount": 426.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "11″×14″",
+          "color": "White",
+          "amount": 108.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": "White",
+          "amount": 160.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": "White",
+          "amount": 79,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493069111.webp"
@@ -295,10 +316,10 @@
       "externalId": "6af67370a2e398",
       "slug": "elderstone-shrine-canvas",
       "name": "Elderstone Shrine Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/46e7ef00e710e5515e2d26eecdceb371/canvas-(in)-10x20-wall-6af67399240c3.png",
-      "variantCount": 15,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/ac729f4c38e1fbbf16e11b2ac3cefe92/canvas-(in)-10x20-wall-6afc4d58b0822.png",
+      "variantCount": 27,
       "from": {
-        "amount": 50,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -988,6 +1009,90 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "11″×14″",
+          "color": null,
+          "amount": 35,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×28″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×30″",
+          "color": null,
+          "amount": 101,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×32″",
+          "color": null,
+          "amount": 102,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×40″",
+          "color": null,
+          "amount": 129,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "40″×55″",
+          "color": null,
+          "amount": 241,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×12″",
+          "color": null,
+          "amount": 33,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "9″×12″",
+          "color": null,
+          "amount": 33,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "12″×16″",
+          "color": null,
+          "amount": 47,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×24″",
+          "color": null,
+          "amount": 67.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493069103.webp"
@@ -997,8 +1102,8 @@
       "externalId": "6af6736e5f4895",
       "slug": "elderstone-shrine-poster",
       "name": "Elderstone Shrine Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3bb1f44343ad162616de1618334dc957/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6737fee8ed.png",
-      "variantCount": 6,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/405fc66e32365ff51e0601d76738b672/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6afc4d40696ed.png",
+      "variantCount": 7,
       "from": {
         "amount": 17,
         "currency": "USD"
@@ -1061,6 +1166,13 @@
           "amount": 42,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "30×40 cm",
+          "color": null,
+          "amount": 23,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493069101.webp"
@@ -1070,7 +1182,7 @@
       "externalId": "6af67019bf33b6",
       "slug": "treant-and-friend-tote",
       "name": "Treant and Friend Tote",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4a03dc98f4bb87fb0662c8b896037953/eco-tote-bag-black-front-6af6714759a49.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/96eb78ec050d50dceb5ebf7379fe4a81/eco-tote-bag-black-front-6afc4a5ed53cf.png",
       "variantCount": 2,
       "from": {
         "amount": 32,
@@ -1125,7 +1237,7 @@
       "externalId": "6af670152fa804",
       "slug": "treant-and-friend-tee",
       "name": "Treant and Friend Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/97f1dd35f0e21e8f2b5cac548a4da52a/unisex-staple-t-shirt-black-front-6af6711c1a5b7.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/0583f570a25e5022cb42b9a62871c017/unisex-staple-t-shirt-black-front-6afc4a39696e9.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -1420,7 +1532,7 @@
       "externalId": "6af67012647cb8",
       "slug": "treant-and-friend-pin-buttons",
       "name": "Treant and Friend Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/598a0c697c1c640feb7e089f94fa44bf/set-of-pin-buttons-white-1.25-front-6af670dac1ca7.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/bc44a6a3eb93ccc7afcd2a3c1c885548/set-of-pin-buttons-white-1.25-front-6afc49fb41073.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -1469,7 +1581,7 @@
       "externalId": "6af67010920869",
       "slug": "treant-and-friend-sticker",
       "name": "Treant and Friend Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/337edfaa89f1c6a3716ef9bca31dc8d0/die-cut-stickers-satin-2x2-front-6af670c81810f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/258a58a389f4e1f6232a9b04e76c6d49/die-cut-stickers-satin-2x2-front-6afc49e80a094.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -1539,7 +1651,7 @@
       "externalId": "6af6700fc37f54",
       "slug": "treant-and-friend-journal",
       "name": "Treant and Friend Journal",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d3adb80218ec5229a6645e3f98a8321c/hardcover-journal-matte-white-8x5.75-front-6af6708a16e7d.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/660d3add45340ed8b9cfaddb8ac80dd5/hardcover-journal-matte-white-8x5.75-front-6afc49a8c449b.png",
       "variantCount": 1,
       "from": {
         "amount": 20,
@@ -1584,10 +1696,10 @@
       "externalId": "6af6700ecae609",
       "slug": "treant-and-friend-metal-print",
       "name": "Treant and Friend Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/94cbf6e33696983a9a2d3a73fd67ce60/glossy-metal-print-(in)-white-20x30-front-6af67072a7c68.png",
-      "variantCount": 2,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/51c02e8d1c8275669238c2f942c97894/glossy-metal-print-(in)-white-11x14-front-6afc49915048c.png",
+      "variantCount": 5,
       "from": {
-        "amount": 300,
+        "amount": 79,
         "currency": "USD"
       },
       "garment": {
@@ -1625,6 +1737,27 @@
           "amount": 426.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "11″×14″",
+          "color": "White",
+          "amount": 108.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": "White",
+          "amount": 160.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": "White",
+          "amount": 79,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493066535.webp"
@@ -1634,10 +1767,10 @@
       "externalId": "6af6700a2c6cb1",
       "slug": "treant-and-friend-canvas",
       "name": "Treant and Friend Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/1f92a3f1afc1f42cb822072bcff8a6b2/canvas-(in)-10x20-wall-6af67033462a1.png",
-      "variantCount": 16,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9ca3dd287b43efaff60231ffefd12741/canvas-(in)-10x20-wall-6afc4951ea86a.png",
+      "variantCount": 28,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -2334,6 +2467,90 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "11″×14″",
+          "color": null,
+          "amount": 35,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×32″",
+          "color": null,
+          "amount": 107.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×40″",
+          "color": null,
+          "amount": 118.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×30″",
+          "color": null,
+          "amount": 101,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×48″",
+          "color": null,
+          "amount": 139,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×60″",
+          "color": null,
+          "amount": 228.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "9″×12″",
+          "color": null,
+          "amount": 33,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "12″×16″",
+          "color": null,
+          "amount": 47,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×24″",
+          "color": null,
+          "amount": 67.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493066528.webp"
@@ -2343,7 +2560,7 @@
       "externalId": "6af67007955922",
       "slug": "treant-and-friend-poster",
       "name": "Treant and Friend Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/20c2f6562fc441d3589e6f31b0fa5820/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6701ea0970.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/507d023c87b92d9bfa35b7c4689a5b08/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6afc493a870a4.png",
       "variantCount": 7,
       "from": {
         "amount": 17,
@@ -2423,7 +2640,7 @@
       "externalId": "6af66ca0646d27",
       "slug": "marci-iphone-case",
       "name": "Marci iPhone Case",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/6c370748896281e0a1ae0d0a375ed8b1/tough-case-for-iphone-glossy-iphone-11-pro-max-front-6af66e0a978cb.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/7cc1b99d291fa9cf26f02418372fd25a/tough-case-for-iphone-glossy-iphone-11-pro-max-front-6af70ba92f116.png",
       "variantCount": 58,
       "from": {
         "amount": 28.5,
@@ -2869,7 +3086,7 @@
       "externalId": "6af66c9e97f297",
       "slug": "marci-mug",
       "name": "Marci Mug",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/8d36e04debd822b33033a9fc2f0ea43e/white-glossy-mug-white-11-oz-handle-on-right-6af66dcc38cf9.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f01a14793e9dc1e627243138c260f040/white-glossy-mug-white-11-oz-handle-on-right-6af70b6b4285b.png",
       "variantCount": 3,
       "from": {
         "amount": 12.5,
@@ -2926,7 +3143,7 @@
       "externalId": "6af66c9d9247a6",
       "slug": "marci-tote",
       "name": "Marci Tote",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/dbf4fa2fece85192a23a4a1e4f751d92/eco-tote-bag-black-front-6af66db87036b.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f5bbf28c316c69d712155ccf34d0f143/eco-tote-bag-black-front-6af70b56e3c5e.png",
       "variantCount": 2,
       "from": {
         "amount": 32,
@@ -2981,7 +3198,7 @@
       "externalId": "6af66c98d3c8f5",
       "slug": "marci-tee",
       "name": "Marci Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d99a94f6b8a7207f1b7e5803ccce8317/unisex-staple-t-shirt-black-front-6af66d7a04ed8.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/1639fe4be9cb40a031df94ea8e0508a3/unisex-staple-t-shirt-black-front-6af70b18b755f.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -3276,7 +3493,7 @@
       "externalId": "6af66c95d55d48",
       "slug": "marci-pin-buttons",
       "name": "Marci Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b749fb0758740ff584254794d3189d51/set-of-pin-buttons-white-1.25-front-6af66d552935d.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/dc3adf4e49f85c0fcffa83bd38820337/set-of-pin-buttons-white-1.25-front-6af70af3c0244.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -3325,7 +3542,7 @@
       "externalId": "6af66c9435a6a6",
       "slug": "marci-sticker",
       "name": "Marci Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/eefaf006e61adda6e5bad5b9e3d82402/die-cut-stickers-satin-2x2-front-6af66d15c20eb.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/8002a145aabf0bc678ef77bd696cb382/die-cut-stickers-satin-2x2-front-6af70ab813db2.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -3395,7 +3612,7 @@
       "externalId": "6af66c92c52092",
       "slug": "marci-metal-print",
       "name": "Marci Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3e924f7394458f095c9ff60c3f2dd7aa/glossy-metal-print-(in)-white-11x14-front-6af66d0293350.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b82f4512d943c8506449b3c16a0305d9/glossy-metal-print-(in)-white-11x14-front-6af70aa3a232a.png",
       "variantCount": 4,
       "from": {
         "amount": 79,
@@ -3459,10 +3676,10 @@
       "externalId": "6af66c8f00c3e8",
       "slug": "marci-canvas",
       "name": "Marci Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/ab716783ab90058d1a54bd71ab877011/canvas-(in)-11x14-wall-6af66cc4ad92d.png",
-      "variantCount": 14,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/45fc1b0cc65ae3b291190abf992c96c1/canvas-(in)-11x14-wall-6af70a647be30.png",
+      "variantCount": 19,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -4145,6 +4362,41 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "28″×40″",
+          "color": null,
+          "amount": 137,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×40″",
+          "color": null,
+          "amount": 129,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493062156.webp"
@@ -4154,7 +4406,7 @@
       "externalId": "6af66c8d543be5",
       "slug": "marci-poster",
       "name": "Marci Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3de1d25b18839e12f3c7f26e3c3ef98a/enhanced-matte-paper-poster-(cm)-a2-(42x59.4-cm)-front-6af66cb1754af.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9774cb69b14a1ddd1d94ab716c996ba1/enhanced-matte-paper-poster-(cm)-a2-(42x59.4-cm)-front-6af70a5016e11.png",
       "variantCount": 4,
       "from": {
         "amount": 17,
@@ -4213,7 +4465,7 @@
       "externalId": "6af669d55e4488",
       "slug": "iroh-s-house-iphone-case",
       "name": "Iroh's House iPhone Case",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f4c957151596d9615477ca037cff7312/tough-case-for-iphone-glossy-iphone-11-pro-max-front-6af66b0301641.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/8bdaab7e29c88e142893ad6bfac0b56a/tough-case-for-iphone-glossy-iphone-11-pro-max-front-6af70851597d6.png",
       "variantCount": 58,
       "from": {
         "amount": 28.5,
@@ -4659,7 +4911,7 @@
       "externalId": "6af669d40322f4",
       "slug": "iroh-s-house-notebook",
       "name": "Iroh's House Notebook",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b599565820ddb59396e7b5d6a138a7a1/spiral-notebook-dotted-front-6af66aecc9ef3.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/cffd19776a14e4a6a2fec208ecec9d84/spiral-notebook-dotted-front-6af7083c08431.png",
       "variantCount": 1,
       "from": {
         "amount": 25,
@@ -4704,7 +4956,7 @@
       "externalId": "6af669d33ed643",
       "slug": "iroh-s-house-journal",
       "name": "Iroh's House Journal",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4875beb32f4d69ed404417cfcb9f7447/hardcover-journal-matte-white-8x5.75-front-6af66aae7edb1.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b6df947ec4b2d6abaabe330bec09ca2e/hardcover-journal-matte-white-8x5.75-front-6af707fc460e7.png",
       "variantCount": 1,
       "from": {
         "amount": 20,
@@ -4749,7 +5001,7 @@
       "externalId": "6af669d1ea79f3",
       "slug": "iroh-s-house-greeting-card",
       "name": "Iroh's House Greeting Card",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/5215c3270857a8d1355dfb541151b4aa/greeting-card-4x6-front-6af66a9736b4f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e1cff17667eaa9fb4e0be3ac36c0c5e9/greeting-card-4x6-front-6af707e5c1179.png",
       "variantCount": 3,
       "from": {
         "amount": 5.5,
@@ -4801,7 +5053,7 @@
       "externalId": "6af669d135d049",
       "slug": "iroh-s-house-postcard",
       "name": "Iroh's House Postcard",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f8d90e6565051736c8ab2dfd0c7767b9/standard-postcard-4x6-front-6af66a59458ba.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/64227a71f96666f42eade59d96214b41/standard-postcard-4x6-front-6af707a6dbc25.png",
       "variantCount": 1,
       "from": {
         "amount": 3.5,
@@ -4839,7 +5091,7 @@
       "externalId": "6af669cfd09859",
       "slug": "iroh-s-house-metal-print",
       "name": "Iroh's House Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/eee007e6b544a7990b97d3302602042e/glossy-metal-print-(in)-white-11x14-front-6af66a422d821.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9aaaaf1895d3ed3cdde73f62c0915fa0/glossy-metal-print-(in)-white-11x14-front-6af7078e50d8c.png",
       "variantCount": 4,
       "from": {
         "amount": 79,
@@ -4903,10 +5155,10 @@
       "externalId": "6af669cc2dc991",
       "slug": "iroh-s-house-canvas",
       "name": "Iroh's House Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9b1677804cb15cf001b7c94bb2741645/canvas-(in)-11x14-wall-6af66a02dff0c.png",
-      "variantCount": 14,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/67fa8fceb22021f29cc47905a3a7a027/canvas-(in)-11x14-wall-6af70750840d8.png",
+      "variantCount": 19,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -5589,6 +5841,41 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "28″×40″",
+          "color": null,
+          "amount": 137,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×40″",
+          "color": null,
+          "amount": 129,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493058235.webp"
@@ -5598,7 +5885,7 @@
       "externalId": "6af669caa1ad89",
       "slug": "iroh-s-house-poster",
       "name": "Iroh's House Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4b2cfedd00ded250a1fd23b1f124d968/enhanced-matte-paper-poster-(cm)-a2-(42x59.4-cm)-front-6af669e8b658d.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/670fbc9ec5d68ed860e39347b1897caa/enhanced-matte-paper-poster-(cm)-a2-(42x59.4-cm)-front-6af70737a704a.png",
       "variantCount": 4,
       "from": {
         "amount": 17,
@@ -5657,7 +5944,7 @@
       "externalId": "6af663dab921e3",
       "slug": "lila-oversized-hoodie",
       "name": "Lila Oversized Hoodie",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e3424a0ca386e15309079212cd9402ee/unisex-oversized-heavyweight-hoodie-black-front-6af6659c15b8a.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/6defc94e6f17999ea6ab4635778f094c/unisex-oversized-heavyweight-hoodie-black-front-6af7028e325f2.png",
       "variantCount": 12,
       "from": {
         "amount": 74.5,
@@ -5875,7 +6162,7 @@
       "externalId": "6af6639c7bda59",
       "slug": "lila-tee",
       "name": "Lila Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/0235d9bfb095e5db1e23b94cac5d6485/unisex-staple-t-shirt-black-front-6af6655de1766.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/df555410ec69de22cf86bbbb5dbc5972/unisex-staple-t-shirt-black-front-6af702504ce91.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -6170,7 +6457,7 @@
       "externalId": "6af663998bb288",
       "slug": "lila-pin-buttons",
       "name": "Lila Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/da94fb1881f083cf49ba9f98aa817711/set-of-pin-buttons-white-1.25-front-6af66536ea011.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/7b216e24f644ddf589af432c8c75e46c/set-of-pin-buttons-white-1.25-front-6af7022aab9bf.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -6219,7 +6506,7 @@
       "externalId": "6af663982f9105",
       "slug": "lila-holographic-sticker",
       "name": "Lila Holographic Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/8b33415186fd4e6182c0cf04839136ee/kiss-cut-holographic-stickers-grey-3x3-front-6af664fda1f25.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/834ca065ddd26eb5cae4503e07627636/kiss-cut-holographic-stickers-grey-3x3-front-6af701f102722.png",
       "variantCount": 3,
       "from": {
         "amount": 8.5,
@@ -6273,7 +6560,7 @@
       "externalId": "6af663977b8515",
       "slug": "lila-notebook",
       "name": "Lila Notebook",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4443dbd893482f1601d9e62da9c58318/spiral-notebook-dotted-front-6af664e45288c.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/df8307a5e2ca2b9f80a5f7a4d275e374/spiral-notebook-dotted-front-6af701d853179.png",
       "variantCount": 1,
       "from": {
         "amount": 25,
@@ -6318,7 +6605,7 @@
       "externalId": "6af66396875d59",
       "slug": "lila-mouse-pad",
       "name": "Lila Mouse Pad",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d045873a047d053e6dad7af2e842d3de/gaming-mouse-pad-white-18x16-front-6af664a7cf826.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a9d47823c8c422ba0ab9597a8a74a206/gaming-mouse-pad-white-18x16-front-6af7019cb4327.png",
       "variantCount": 2,
       "from": {
         "amount": 24,
@@ -6370,7 +6657,7 @@
       "externalId": "6af6639560a774",
       "slug": "lila-desk-mat",
       "name": "Lila Desk Mat",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9545a5adc309807bf611359d7f544b93/desk-mat-black-12x18-front-6af664922f597.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/08c86fd1f1c61180803979fc9eac8442/desk-mat-black-12x18-front-6af70184607b3.png",
       "variantCount": 3,
       "from": {
         "amount": 20,
@@ -6426,7 +6713,7 @@
       "externalId": "6af663947518c5",
       "slug": "lila-tapestry",
       "name": "Lila Tapestry",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f0a452f82ba0c97e2c189d8130c595d7/indoor-wall-tapestry-26x36-front-6af664554aebd.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/adf3f065bf366c4e838f1e2622234b30/indoor-wall-tapestry-26x36-front-6af7014545d90.png",
       "variantCount": 2,
       "from": {
         "amount": 32.5,
@@ -6469,10 +6756,10 @@
       "externalId": "6af663927f1542",
       "slug": "lila-metal-print",
       "name": "Lila Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b495a0cf45eabf1d018587e809c93c2d/glossy-metal-print-(in)-white-11x14-front-6af6643b094d6.png",
-      "variantCount": 6,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/752bd3e31ba9ca54b37345cb23edb7ec/glossy-metal-print-(in)-white-20x30-front-6af7012bd48e1.png",
+      "variantCount": 2,
       "from": {
-        "amount": 79,
+        "amount": 300,
         "currency": "USD"
       },
       "garment": {
@@ -6498,27 +6785,6 @@
       ],
       "variants": [
         {
-          "size": "11″×14″",
-          "color": "White",
-          "amount": 108.5,
-          "currency": "USD",
-          "available": true
-        },
-        {
-          "size": "12″×12″",
-          "color": "White",
-          "amount": 100,
-          "currency": "USD",
-          "available": true
-        },
-        {
-          "size": "16″×20″",
-          "color": "White",
-          "amount": 160.5,
-          "currency": "USD",
-          "available": true
-        },
-        {
           "size": "20″×30″",
           "color": "White",
           "amount": 300,
@@ -6531,13 +6797,6 @@
           "amount": 426.5,
           "currency": "USD",
           "available": true
-        },
-        {
-          "size": "8″×10″",
-          "color": "White",
-          "amount": 79,
-          "currency": "USD",
-          "available": true
         }
       ],
       "art": "/store/493048430.webp"
@@ -6547,10 +6806,10 @@
       "externalId": "6af663911b6fd5",
       "slug": "lila-canvas",
       "name": "Lila Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/cd30c7e52874d834a0cc1add663f718f/canvas-(in)-10x20-wall-6af663fcdec07.png",
-      "variantCount": 3,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/bf518fe4b1a1aed359492da57e6627e6/canvas-(in)-10x20-wall-6af700eb8cb95.png",
+      "variantCount": 18,
       "from": {
-        "amount": 52.5,
+        "amount": 33,
         "currency": "USD"
       },
       "garment": {
@@ -7156,6 +7415,111 @@
           "amount": 107.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "12″×18″",
+          "color": null,
+          "amount": 50,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×24″",
+          "color": null,
+          "amount": 62.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×26″",
+          "color": null,
+          "amount": 70.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×28″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×30″",
+          "color": null,
+          "amount": 73.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×40″",
+          "color": null,
+          "amount": 118.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×48″",
+          "color": null,
+          "amount": 139,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "26″×40″",
+          "color": null,
+          "amount": 176.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "28″×40″",
+          "color": null,
+          "amount": 137,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×60″",
+          "color": null,
+          "amount": 228.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "32″×48″",
+          "color": null,
+          "amount": 182,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "40″×55″",
+          "color": null,
+          "amount": 241,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "40″×60″",
+          "color": null,
+          "amount": 275.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×12″",
+          "color": null,
+          "amount": 33,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×36″",
+          "color": null,
+          "amount": 104.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493048421.webp"
@@ -7165,8 +7529,8 @@
       "externalId": "6af6638ed954d6",
       "slug": "lila-poster",
       "name": "Lila Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a1dd973f1087dca80e3fb88504d86449/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af663e4b8e2f.png",
-      "variantCount": 7,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/23bb4bec50076a141d94f52b8ebfa532/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af700d3b9edb.png",
+      "variantCount": 6,
       "from": {
         "amount": 17,
         "currency": "USD"
@@ -7210,13 +7574,6 @@
           "available": true
         },
         {
-          "size": "30×40 cm",
-          "color": null,
-          "amount": 23,
-          "currency": "USD",
-          "available": true
-        },
-        {
           "size": "50×70 cm",
           "color": null,
           "amount": 29.5,
@@ -7245,7 +7602,7 @@
       "externalId": "6af6600182e5f3",
       "slug": "amuru-warrior-hoodie",
       "name": "Amuru Warrior Hoodie",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/084ec67ebfef9a3396b64721e4dd722e/unisex-heavy-blend-hoodie-black-front-6af6611c278f3.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9a4991bbf56a9d3b6a73fc731f6b0505/unisex-heavy-blend-hoodie-black-front-6af6fdc24b0b0.png",
       "variantCount": 16,
       "from": {
         "amount": 45.5,
@@ -7570,7 +7927,7 @@
       "externalId": "6af65ffcb024e1",
       "slug": "amuru-warrior-tee",
       "name": "Amuru Warrior Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/cbfb8fdee62e2ad6e9f6ff2ae77e282a/unisex-staple-t-shirt-black-front-6af660dd0a477.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/07cdfab058ca1505e40a413e81549ecc/unisex-staple-t-shirt-black-front-6af6fd84621ef.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -7865,7 +8222,7 @@
       "externalId": "6af65ff9abd0f4",
       "slug": "amuru-warrior-pin-buttons",
       "name": "Amuru Warrior Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/6f3b425e8e4689b8bc78e6dcb3c76839/set-of-pin-buttons-white-1.25-front-6af660b8baaed.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a10c57a5c1c9f09625d3368fb67bba87/set-of-pin-buttons-white-1.25-front-6af6fd6000957.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -7914,7 +8271,7 @@
       "externalId": "6af65ff7d598d4",
       "slug": "amuru-warrior-sticker",
       "name": "Amuru Warrior Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/90972d198b834c7a077b5af47319c13c/die-cut-stickers-satin-2x2-front-6af660797d909.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a0ff9729d18fea31daefc934e352dd01/die-cut-stickers-satin-2x2-front-6af6fd230913c.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -7984,10 +8341,10 @@
       "externalId": "6af65ff7100199",
       "slug": "amuru-warrior-metal-print",
       "name": "Amuru Warrior Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f49cdf0599e0000f74e2acec1e64b4db/glossy-metal-print-(in)-white-20x30-front-6af6606451e44.png",
-      "variantCount": 1,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e8e53c106d5afc200eca959f38b85046/glossy-metal-print-(in)-white-11x14-front-6af6fd0db2285.png",
+      "variantCount": 4,
       "from": {
-        "amount": 300,
+        "amount": 79,
         "currency": "USD"
       },
       "garment": {
@@ -8018,6 +8375,27 @@
           "amount": 300,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "11″×14″",
+          "color": "White",
+          "amount": 108.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": "White",
+          "amount": 160.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": "White",
+          "amount": 79,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493046708.webp"
@@ -8027,10 +8405,10 @@
       "externalId": "6af65ff456de13",
       "slug": "amuru-warrior-canvas",
       "name": "Amuru Warrior Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/43afbf82202a08f44b097db3d7ad2b80/canvas-(in)-12x18-wall-6af6602605ce2.png",
-      "variantCount": 9,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/2aa331e72e0a2606919798def9f50c8b/canvas-(in)-11x14-wall-6af6fcd114c10.png",
+      "variantCount": 19,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -8678,6 +9056,76 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "11″×14″",
+          "color": null,
+          "amount": 35,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×30″",
+          "color": null,
+          "amount": 101,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "28″×40″",
+          "color": null,
+          "amount": 137,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×40″",
+          "color": null,
+          "amount": 129,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "9″×12″",
+          "color": null,
+          "amount": 33,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "12″×16″",
+          "color": null,
+          "amount": 47,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×24″",
+          "color": null,
+          "amount": 67.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493046704.webp"
@@ -8687,7 +9135,7 @@
       "externalId": "6af65ff2b61573",
       "slug": "amuru-warrior-poster",
       "name": "Amuru Warrior Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e421c2d988abc2c2df25646dd15583f7/enhanced-matte-paper-poster-(cm)-a2-(42x59.4-cm)-front-6af6600cdb793.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e4687e738dd6d9e69a7b331483d02c83/enhanced-matte-paper-poster-(cm)-a2-(42x59.4-cm)-front-6af6fcb4a217a.png",
       "variantCount": 4,
       "from": {
         "amount": 17,
@@ -8746,7 +9194,7 @@
       "externalId": "6af65d6c3d4743",
       "slug": "a-house-on-stillmere-laptop-sleeve",
       "name": "A House on Stillmere Laptop Sleeve",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b98a7252427359484bbd8a04973bf9cd/laptop-sleeve-13-front-6af65e303c9ff.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/27321f56a087f6560741d7d597412065/laptop-sleeve-13-front-6af6fa596ab6f.png",
       "variantCount": 2,
       "from": {
         "amount": 43.5,
@@ -8849,7 +9297,7 @@
       "externalId": "6af65d6b7bdd79",
       "slug": "a-house-on-stillmere-postcard",
       "name": "A House on Stillmere Postcard",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/81cc3b38a9a0d3c501f242e545796b2b/standard-postcard-4x6-front-6af65e1bcfa88.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/2e86d015613dad7b1d2417d2292ebead/standard-postcard-4x6-front-6af6fa44a9049.png",
       "variantCount": 1,
       "from": {
         "amount": 3.5,
@@ -8887,7 +9335,7 @@
       "externalId": "6af65d6a420206",
       "slug": "a-house-on-stillmere-desk-mat",
       "name": "A House on Stillmere Desk Mat",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/16637fe2c854b598a69a827fc5d44aa6/desk-mat-black-12x18-front-6af65ddf50ee8.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b89190ecd95075bc92be2c752eee87ae/desk-mat-black-12x18-front-6af6fa0768dc5.png",
       "variantCount": 3,
       "from": {
         "amount": 20,
@@ -8943,7 +9391,7 @@
       "externalId": "6af65d69327068",
       "slug": "a-house-on-stillmere-metal-print",
       "name": "A House on Stillmere Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/db95692c109aff8ea9e3083d2ae88faa/glossy-metal-print-(in)-white-20x30-front-6af65dca1d173.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/58e54f684ad936fdfc3a78683b8c9283/glossy-metal-print-(in)-white-20x30-front-6af6f9ef14590.png",
       "variantCount": 2,
       "from": {
         "amount": 300,
@@ -8993,10 +9441,10 @@
       "externalId": "6af65d67234c03",
       "slug": "a-house-on-stillmere-canvas",
       "name": "A House on Stillmere Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f5da8f8362a8217db8d368a3e3444db8/canvas-(in)-10x20-wall-6af65d8b9c1b6.png",
-      "variantCount": 6,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e4eeb811de6e4469531dc34d758b4b71/canvas-(in)-10x20-wall-6af6f9ae74494.png",
+      "variantCount": 23,
       "from": {
-        "amount": 52.5,
+        "amount": 33,
         "currency": "USD"
       },
       "garment": {
@@ -9623,6 +10071,125 @@
           "amount": 228.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "12″×18″",
+          "color": null,
+          "amount": 50,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×24″",
+          "color": null,
+          "amount": 62.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×26″",
+          "color": null,
+          "amount": 70.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×28″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×30″",
+          "color": null,
+          "amount": 73.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×32″",
+          "color": null,
+          "amount": 102,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "26″×40″",
+          "color": null,
+          "amount": 176.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "28″×40″",
+          "color": null,
+          "amount": 137,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×40″",
+          "color": null,
+          "amount": 129,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "32″×48″",
+          "color": null,
+          "amount": 182,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "40″×55″",
+          "color": null,
+          "amount": 241,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "40″×60″",
+          "color": null,
+          "amount": 275.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×12″",
+          "color": null,
+          "amount": 33,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "9″×12″",
+          "color": null,
+          "amount": 33,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "12″×16″",
+          "color": null,
+          "amount": 47,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×24″",
+          "color": null,
+          "amount": 67.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×36″",
+          "color": null,
+          "amount": 104.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493045807.webp"
@@ -9632,7 +10199,7 @@
       "externalId": "6af65d65204345",
       "slug": "a-house-on-stillmere-poster",
       "name": "A House on Stillmere Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/898534f3960cca397dd90757c19415a1/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af65d72b067c.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9decad1f9f5ccc5ea4d9ce2551f7ac7d/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6f9959b6f2.png",
       "variantCount": 6,
       "from": {
         "amount": 17,
@@ -9705,7 +10272,7 @@
       "externalId": "6af65b33d8de43",
       "slug": "elderstone-peaks-postcard",
       "name": "Elderstone Peaks Postcard",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f3c4a599ec39a935791c2120e23f6bb4/standard-postcard-4x6-front-6af65be1b15f3.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/72e3de3f73c3831c8352fc88d74a27f6/standard-postcard-4x6-front-6af6f3a4b4ae9.png",
       "variantCount": 1,
       "from": {
         "amount": 3.5,
@@ -9743,7 +10310,7 @@
       "externalId": "6af65b32cfec03",
       "slug": "elderstone-peaks-jigsaw-puzzle",
       "name": "Elderstone Peaks Jigsaw Puzzle",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e2812429cef0a7bef98e05830e70eac3/jigsaw-puzzle-252-pieces-front-6af65ba46ea3f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4f47199d9bae426ef24d91a8a4e6cc1a/jigsaw-puzzle-252-pieces-front-6af6f3676777e.png",
       "variantCount": 2,
       "from": {
         "amount": 30.5,
@@ -9828,7 +10395,7 @@
       "externalId": "6af65b31299566",
       "slug": "elderstone-peaks-metal-print",
       "name": "Elderstone Peaks Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/7390210990d2b781f3efdf48052a3185/glossy-metal-print-(in)-white-11x14-front-6af65b903fa03.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/5b9cadb7ce4afa1312e0a1810d8be8c9/glossy-metal-print-(in)-white-11x14-front-6af6f34e07b28.png",
       "variantCount": 5,
       "from": {
         "amount": 79,
@@ -9899,7 +10466,7 @@
       "externalId": "6af65b2b3b5106",
       "slug": "elderstone-peaks-canvas",
       "name": "Elderstone Peaks Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a4fe3e31e9724330066fad8eb466e2d9/canvas-(in)-11x14-wall-6af65b52ab66e.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/6fcdfc0000eb0dff5ac5a5044eaa67ff/canvas-(in)-11x14-wall-6af6f30fa2816.png",
       "variantCount": 22,
       "from": {
         "amount": 32,
@@ -10650,7 +11217,7 @@
       "externalId": "6af65b28a38851",
       "slug": "elderstone-peaks-poster",
       "name": "Elderstone Peaks Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4dbbd46ee2355d6c8b1a491c65a39fe7/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af65b39a4bd9.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/cfbfb5be32e2d36db381d3d875406501/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6f2f689040.png",
       "variantCount": 7,
       "from": {
         "amount": 17,
@@ -10730,7 +11297,7 @@
       "externalId": "6af6576b389901",
       "slug": "unknown-hoodie",
       "name": "Unknown Hoodie",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a24e85055b79b315238495ed5dd14b00/unisex-heavy-blend-hoodie-black-front-6af6589b74d46.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/328d03c7b792edf88a049a0fd2eeecd3/unisex-heavy-blend-hoodie-black-front-6af6f02426c32.png",
       "variantCount": 16,
       "from": {
         "amount": 45.5,
@@ -11055,7 +11622,7 @@
       "externalId": "6af6576650af98",
       "slug": "unknown-tee",
       "name": "Unknown Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/0d80579286b7b1526eeaf91046e44a6e/unisex-staple-t-shirt-black-front-6af658750cc4f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a391310a7bcab92980291de0a787f7f0/unisex-staple-t-shirt-black-front-6af6effecc0cf.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -11350,7 +11917,7 @@
       "externalId": "6af65763586f71",
       "slug": "unknown-pin-buttons",
       "name": "Unknown Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/140fcc0477e1e905e8b7fb1c173f8223/set-of-pin-buttons-white-1.25-front-6af658352df17.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/c01b93b8a7dcb6f7b6e1e1a7517dcf23/set-of-pin-buttons-white-1.25-front-6af6efbecd040.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -11399,7 +11966,7 @@
       "externalId": "6af657622e2fc5",
       "slug": "unknown-holographic-sticker",
       "name": "Unknown Holographic Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9d4d777dcf59ee5ecc52826ed6f0d88c/kiss-cut-holographic-stickers-grey-3x3-front-6af65821d3e82.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e67445284bd59e4b1f82761722e30173/kiss-cut-holographic-stickers-grey-3x3-front-6af6efac51c29.png",
       "variantCount": 3,
       "from": {
         "amount": 8.5,
@@ -11453,7 +12020,7 @@
       "externalId": "6af657605589f9",
       "slug": "unknown-sticker",
       "name": "Unknown Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/dc70494c62067736bc312099788d4665/die-cut-stickers-satin-2x2-front-6af657e396f85.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/77226d8751088c3cc4fa787ded12470d/die-cut-stickers-satin-2x2-front-6af6ef6d874e5.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -11523,7 +12090,7 @@
       "externalId": "6af6575e8e5c87",
       "slug": "unknown-metal-print",
       "name": "Unknown Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/30362a1d41b7714eee54d7f6afbca069/glossy-metal-print-(in)-white-11x14-front-6af657cdaedbc.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/61dab83b39dc310c71dcdc95887c9a9a/glossy-metal-print-(in)-white-11x14-front-6af6ef55bfc35.png",
       "variantCount": 5,
       "from": {
         "amount": 79,
@@ -11594,10 +12161,10 @@
       "externalId": "6af65759bae1d6",
       "slug": "unknown-canvas",
       "name": "Unknown Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4b34be691c0d52fac1a385d4db1a6eb7/canvas-(in)-11x14-wall-6af6578f98e31.png",
-      "variantCount": 19,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/ec40e6aef146534ee739a1777b8bc5ed/canvas-(in)-11x14-wall-6af6ef1775ebe.png",
+      "variantCount": 22,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -12315,6 +12882,27 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493043670.webp"
@@ -12324,7 +12912,7 @@
       "externalId": "6af65757966c14",
       "slug": "unknown-poster",
       "name": "Unknown Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/ec32396288ea7d359109210f1378c70c/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6577641c8e.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/620bfeb70d96728402e150ba558e20b0/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6eeff8fe30.png",
       "variantCount": 7,
       "from": {
         "amount": 17,
@@ -12404,7 +12992,7 @@
       "externalId": "6af653cc465048",
       "slug": "bright-idea-tee",
       "name": "Bright Idea Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/505cb71557ee12da63ddfbbf1c9594ad/unisex-staple-t-shirt-black-front-6af654eb10968.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4a52f615de5f8c784fff706dcbb9523a/unisex-staple-t-shirt-black-front-6af6e21c9bdcc.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -12699,7 +13287,7 @@
       "externalId": "6af653cb2be8c6",
       "slug": "bright-idea-ornament",
       "name": "Bright Idea Ornament",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/8469849e7f51978e0859160ce563e53e/acrylic-ornaments-circle-front-6af654d429f01.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/434bfffa8e509f6a24cdac1103d37031/acrylic-ornaments-circle-front-6af6e20944de0.png",
       "variantCount": 2,
       "from": {
         "amount": 16,
@@ -12745,7 +13333,7 @@
       "externalId": "6af653c89fdd47",
       "slug": "bright-idea-pin-buttons",
       "name": "Bright Idea Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/33ad3f0ac15baafe6883a23615823407/set-of-pin-buttons-white-1.25-front-6af65495c950f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/194db3e48db58216c635bce9f9daca66/set-of-pin-buttons-white-1.25-front-6af6e1c8f2dd5.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -12794,7 +13382,7 @@
       "externalId": "6af653c7058cc5",
       "slug": "bright-idea-sticker",
       "name": "Bright Idea Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/068a96514e8205ca9ae8f6e8ef9a8503/die-cut-stickers-satin-2x2-front-6af654830cf6a.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/0a9aa0fe000931041333166cbdf63180/die-cut-stickers-satin-2x2-front-6af6e1b863115.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -12864,10 +13452,10 @@
       "externalId": "6af653c5d98d92",
       "slug": "bright-idea-metal-print",
       "name": "Bright Idea Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/fa50d94805da1e4c65cfc33405b1ae0f/glossy-metal-print-(in)-white-20x30-front-6af654475ea6b.png",
-      "variantCount": 2,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4e6522e1ebf63c8228e5ef0cd701bcca/glossy-metal-print-(in)-white-11x14-front-6af6e178e7360.png",
+      "variantCount": 5,
       "from": {
-        "amount": 300,
+        "amount": 79,
         "currency": "USD"
       },
       "garment": {
@@ -12905,6 +13493,27 @@
           "amount": 426.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "11″×14″",
+          "color": "White",
+          "amount": 108.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": "White",
+          "amount": 160.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": "White",
+          "amount": 79,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493039360.webp"
@@ -12914,10 +13523,10 @@
       "externalId": "6af653c2b9a017",
       "slug": "bright-idea-canvas",
       "name": "Bright Idea Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e09f58bd18ab093c2c553862ae9ab209/canvas-(in)-12x18-wall-6af6542da7edf.png",
-      "variantCount": 12,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/8e9dd99b70d394869b5bac40812b4f2f/canvas-(in)-11x14-wall-6af6e16494468.png",
+      "variantCount": 22,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -13586,6 +14195,76 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "11″×14″",
+          "color": null,
+          "amount": 35,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×30″",
+          "color": null,
+          "amount": 101,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×32″",
+          "color": null,
+          "amount": 102,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×40″",
+          "color": null,
+          "amount": 129,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "9″×12″",
+          "color": null,
+          "amount": 33,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "12″×16″",
+          "color": null,
+          "amount": 47,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×24″",
+          "color": null,
+          "amount": 67.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493039345.webp"
@@ -13595,8 +14274,8 @@
       "externalId": "6af653bd19cdb5",
       "slug": "bright-idea-framed-poster",
       "name": "Bright Idea Framed Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f1756e74fab7d0308d2a1b2a31d803a8/enhanced-matte-paper-framed-poster-(cm)-black-30x45-cm-front-6af653ed92513.png",
-      "variantCount": 22,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/74d04a19d98fab70fc0a9419f4b9d613/enhanced-matte-paper-framed-poster-(cm)-black-30x45-cm-front-6af6e125eda79.png",
+      "variantCount": 24,
       "from": {
         "amount": 44,
         "currency": "USD"
@@ -13787,6 +14466,20 @@
           "amount": 156.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "40×50 cm",
+          "color": "Black",
+          "amount": 85.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "40×50 cm",
+          "color": "White",
+          "amount": 85.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493039321.webp"
@@ -13796,7 +14489,7 @@
       "externalId": "6af653ba954608",
       "slug": "bright-idea-poster",
       "name": "Bright Idea Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/567a817cadba93d2ed6dfcf4fa7f67ec/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af653d59911f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/581a12ae5299888f3f9d59c478e30ef0/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6e10dd3709.png",
       "variantCount": 7,
       "from": {
         "amount": 17,
@@ -13876,7 +14569,7 @@
       "externalId": "6af64f5ef16c93",
       "slug": "glitch-pillow",
       "name": "Glitch Pillow",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/dde782440c3add3becbc24561a90e92c/custom-shaped-pillow-10x10-front-6af6511e017a6.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/529160ab01d54c2fcd87117ac1f412fd/custom-shaped-pillow-10x10-front-6af6de0cd2830.png",
       "variantCount": 3,
       "from": {
         "amount": 29.5,
@@ -13928,7 +14621,7 @@
       "externalId": "6af64f5dd9e795",
       "slug": "glitch-black-mug",
       "name": "Glitch Black Mug",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d7c342f17dd47f40366f553ab93ecc71/black-glossy-mug-black-11-oz-handle-on-left-6af650de20245.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/0a783f1c66752ce1da8aebd8e020d2f3/black-glossy-mug-black-11-oz-handle-on-left-6af6ddcb435ac.png",
       "variantCount": 2,
       "from": {
         "amount": 16.5,
@@ -13978,7 +14671,7 @@
       "externalId": "6af64f597c8562",
       "slug": "glitch-hoodie",
       "name": "Glitch Hoodie",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/68a9633ffef1d0800c4c4f26329e663a/unisex-heavy-blend-hoodie-black-front-6af650ba71685.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/be860bb712c504e4ede5cc3f11c68fa0/unisex-heavy-blend-hoodie-black-front-6af6dda851742.png",
       "variantCount": 16,
       "from": {
         "amount": 45.5,
@@ -14303,7 +14996,7 @@
       "externalId": "6af64f543566e3",
       "slug": "glitch-tee",
       "name": "Glitch Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/6cc09e9e3cde96d1c8ca6054410e9b50/unisex-staple-t-shirt-black-front-6af6507bd0deb.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/966556b28992a716222c64f364416223/unisex-staple-t-shirt-black-front-6af6dd6b4823b.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -14598,7 +15291,7 @@
       "externalId": "6af64f514cd427",
       "slug": "glitch-pin-buttons",
       "name": "Glitch Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/fa0955e21690e549883a90910dc8f55f/set-of-pin-buttons-white-1.25-front-6af65055efc6c.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9177985dadb7e690636ec7803a58a08f/set-of-pin-buttons-white-1.25-front-6af6dd44f32d5.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -14647,7 +15340,7 @@
       "externalId": "6af64f50009aa5",
       "slug": "glitch-holographic-sticker",
       "name": "Glitch Holographic Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/7a1f2b829986e854518e8df2b7acffab/kiss-cut-holographic-stickers-grey-3x3-front-6af650176da7c.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/305b0c9fa0fcb693a72c6e785d52063c/kiss-cut-holographic-stickers-grey-3x3-front-6af6dd07ae21b.png",
       "variantCount": 3,
       "from": {
         "amount": 8.5,
@@ -14701,7 +15394,7 @@
       "externalId": "6af64f4e4a0e07",
       "slug": "glitch-sticker",
       "name": "Glitch Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3e4bf5cf9a93e915a2c2d1ce9972064b/die-cut-stickers-satin-2x2-front-6af65003ad17f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f1fe4d9abd15bd94a7045dcbdcd68a09/die-cut-stickers-satin-2x2-front-6af6dcf3964f7.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -14771,7 +15464,7 @@
       "externalId": "6af64f4c7e4e66",
       "slug": "glitch-metal-print",
       "name": "Glitch Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/38ca9b15aefae04f2f5f17c8abfe4243/glossy-metal-print-(in)-white-11x14-front-6af64fc8ad2a8.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/39216c485b0c10731cba4480f71064d1/glossy-metal-print-(in)-white-11x14-front-6af6dcb6d82bb.png",
       "variantCount": 5,
       "from": {
         "amount": 79,
@@ -14842,10 +15535,10 @@
       "externalId": "6af64f472274d6",
       "slug": "glitch-canvas",
       "name": "Glitch Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/defbb7c379fcc8c410424933f5d74687/canvas-(in)-11x14-wall-6af64faee74a6.png",
-      "variantCount": 19,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/5c029a6d545e42f9c0d12054c4b9f13c/canvas-(in)-11x14-wall-6af6dc9d89916.png",
+      "variantCount": 22,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -15563,6 +16256,27 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493026972.webp"
@@ -15572,7 +16286,7 @@
       "externalId": "6af64f44499265",
       "slug": "glitch-poster",
       "name": "Glitch Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/03ff1cba62356ab2b24665ad021a2dd4/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af64f6669323.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a951c6fed55689176508fa5e67ee3a5a/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6dc54c36ff.png",
       "variantCount": 7,
       "from": {
         "amount": 17,
@@ -15652,7 +16366,7 @@
       "externalId": "6af64b1d53e687",
       "slug": "baby-continent-hoodie",
       "name": "Baby Continent Hoodie",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a0d47db01bf8c7a0d44be702312f8e74/unisex-heavy-blend-hoodie-black-front-6af64c98a1886.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/5ae8dc1081b17fa02d260ac2fbf53462/unisex-heavy-blend-hoodie-black-front-6af6d95a277e7.png",
       "variantCount": 16,
       "from": {
         "amount": 45.5,
@@ -15977,7 +16691,7 @@
       "externalId": "6af64b18ab3c46",
       "slug": "baby-continent-tee",
       "name": "Baby Continent Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d18449e371d3d27b500d9af8fb3f7dae/unisex-staple-t-shirt-black-front-6af64c5a5395f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d6beb62eeba7e7ac3f4ee34146fc490d/unisex-staple-t-shirt-black-front-6af6d91b60041.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -16272,7 +16986,7 @@
       "externalId": "6af64b15daa9f3",
       "slug": "baby-continent-pin-buttons",
       "name": "Baby Continent Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/41f6e1f4cbad7ed9beb93752bbca7a28/set-of-pin-buttons-white-1.25-front-6af64c3232108.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/458e10c1455706f7079425c0c185ce38/set-of-pin-buttons-white-1.25-front-6af6d8f37dc37.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -16321,7 +17035,7 @@
       "externalId": "6af64b141d9e89",
       "slug": "baby-continent-sticker",
       "name": "Baby Continent Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/be769764fbf9752a750e1cde9aff5d81/die-cut-stickers-satin-2x2-front-6af64bf482047.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/1c567d688386c83ca52a9cd29059833a/die-cut-stickers-satin-2x2-front-6af6d8b7ab9e4.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -16391,7 +17105,7 @@
       "externalId": "6af64b130f0ab9",
       "slug": "baby-continent-jigsaw-puzzle",
       "name": "Baby Continent Jigsaw Puzzle",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/5d9ac010f00ca8d9f81da54cbf65472c/jigsaw-puzzle-252-pieces-front-6af64bd7eb415.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/795917a9d9c26fd6ed05e113f5e713e0/jigsaw-puzzle-252-pieces-front-6af6d899851b3.png",
       "variantCount": 2,
       "from": {
         "amount": 30.5,
@@ -16476,7 +17190,7 @@
       "externalId": "6af64b1158c084",
       "slug": "baby-continent-metal-print",
       "name": "Baby Continent Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/35f6f6862e9b0ef4907f08d12549da52/glossy-metal-print-(in)-white-11x14-front-6af64b98469c0.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/55444c8e8a3de770547caa81ad3c6eac/glossy-metal-print-(in)-white-11x14-front-6af6d85a29b53.png",
       "variantCount": 5,
       "from": {
         "amount": 79,
@@ -16547,10 +17261,10 @@
       "externalId": "6af64b0c7a9e44",
       "slug": "baby-continent-canvas",
       "name": "Baby Continent Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9e6b5b148cb5adec99b1ed7dacef49de/canvas-(in)-11x14-wall-6af64b7eba005.png",
-      "variantCount": 19,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3b0a84d63988f091bd949eee159f372e/canvas-(in)-11x14-wall-6af6d841a565d.png",
+      "variantCount": 22,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -17268,6 +17982,27 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/493013188.webp"
@@ -17277,7 +18012,7 @@
       "externalId": "6af64b06086882",
       "slug": "baby-continent-framed-poster",
       "name": "Baby Continent Framed Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/0bf6d742fed478ae63c3727feea13579/enhanced-matte-paper-framed-poster-(cm)-black-30x45-cm-front-6af64b3f6754f.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/7b5a62dcbfef3be61a8f6001f0a2a29d/enhanced-matte-paper-framed-poster-(cm)-black-30x45-cm-front-6af6d80224887.png",
       "variantCount": 24,
       "from": {
         "amount": 44,
@@ -17492,7 +18227,7 @@
       "externalId": "6af64b03856457",
       "slug": "baby-continent-poster",
       "name": "Baby Continent Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d36891cd25d78a03b0f5f0b49365b50e/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af64b281b26d.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f97174e1106cce9c1668524f329e0a60/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6d7ea8f0dc.png",
       "variantCount": 7,
       "from": {
         "amount": 17,
@@ -17572,7 +18307,7 @@
       "externalId": "6af6479cb88ca7",
       "slug": "faye-iphone-case",
       "name": "Faye iPhone Case",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/016ca7d418779b4129bef0e4746ddd32/tough-case-for-iphone-glossy-iphone-11-pro-max-front-6af67d2fa6d67.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/474beae11ab7df8cfb24962986bf1410/tough-case-for-iphone-glossy-iphone-11-pro-max-front-6af6e616a95f3.png",
       "variantCount": 58,
       "from": {
         "amount": 28.5,
@@ -18018,7 +18753,7 @@
       "externalId": "6af647974db8e2",
       "slug": "faye-tee",
       "name": "Faye Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/6fcdb5ba8db5b695014626e35a96fe8d/unisex-staple-t-shirt-black-front-6af67cf121cff.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3cd0fa6cc97400a3d8ebdc05a748e6e1/unisex-staple-t-shirt-black-front-6af6e5d8d4234.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -18313,7 +19048,7 @@
       "externalId": "6af647942dd138",
       "slug": "faye-pin-buttons",
       "name": "Faye Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/9197331bf7f993ad74a87e274103567a/set-of-pin-buttons-white-1.25-front-6af67cce05945.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/7aae2fbc6c51739999f21570152c1d24/set-of-pin-buttons-white-1.25-front-6af6e5b41947f.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -18362,7 +19097,7 @@
       "externalId": "6af64792634511",
       "slug": "faye-sticker",
       "name": "Faye Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/ed23696016d42a5f472fcc82a54514cf/die-cut-stickers-satin-2x2-front-6af67c8f09020.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b9821e44fd9c025edd6d79d22341d3aa/die-cut-stickers-satin-2x2-front-6af6e5772bbcd.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -18432,7 +19167,7 @@
       "externalId": "6af64790603f19",
       "slug": "faye-metal-print",
       "name": "Faye Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/722507ddca6618a1589976ce21e6e49f/glossy-metal-print-(in)-white-11x14-front-6af67c7ba438d.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/0e52a9a2d281e99b772c0fbb69bc73f0/glossy-metal-print-(in)-white-11x14-front-6af6e55f7d3bc.png",
       "variantCount": 5,
       "from": {
         "amount": 79,
@@ -18503,7 +19238,7 @@
       "externalId": "6af6478ab26934",
       "slug": "faye-canvas",
       "name": "Faye Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/25281673647559f80b189a2b518126fb/canvas-(in)-11x14-wall-6af67c3d7d946.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d8138a9b234f358a28e4eb3d490a6f3b/canvas-(in)-11x14-wall-6af6e52099722.png",
       "variantCount": 22,
       "from": {
         "amount": 32,
@@ -19254,7 +19989,7 @@
       "externalId": "6af647884f2323",
       "slug": "faye-poster",
       "name": "Faye Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/87ba2200f759f152ba9dad7be1724604/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af67c2948b6b.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/7bcef37d45af77899a841a904976db0d/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6e50cbeff0.png",
       "variantCount": 7,
       "from": {
         "amount": 17,
@@ -19334,7 +20069,7 @@
       "externalId": "6af646acc11c27",
       "slug": "professor-bones-black-mug",
       "name": "Professor Bones Black Mug",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/904a9108169034a17039e60299856c57/black-glossy-mug-black-11-oz-handle-on-left-6af677e202f3b.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f1a11a3d6c94b94613d5cac0b4a669b3/black-glossy-mug-black-11-oz-handle-on-left-6af6ea12be687.png",
       "variantCount": 2,
       "from": {
         "amount": 16.5,
@@ -19384,7 +20119,7 @@
       "externalId": "6af646a860cd57",
       "slug": "professor-bones-hoodie",
       "name": "Professor Bones Hoodie",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/11c25ee42ac60600d033e67ed25de6ed/unisex-heavy-blend-hoodie-black-front-6af677a4e06fb.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/c02d0b5cf32d33f3f9795b02c7a2dc73/unisex-heavy-blend-hoodie-black-front-6af6e9d5a9a63.png",
       "variantCount": 16,
       "from": {
         "amount": 45.5,
@@ -19709,7 +20444,7 @@
       "externalId": "6af646a48fb083",
       "slug": "professor-bones-heavyweight-tee",
       "name": "Professor Bones Heavyweight Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4c366c43133f9180011a13064bba59d6/unisex-garment-dyed-heavyweight-t-shirt-black-front-6af6778509ea8.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/99e86840c631fa19fb0f0f95bd9ec150/unisex-garment-dyed-heavyweight-t-shirt-black-front-6af6e9b4a8ec5.png",
       "variantCount": 14,
       "from": {
         "amount": 31.5,
@@ -20001,7 +20736,7 @@
       "externalId": "6af6469fc527a1",
       "slug": "professor-bones-tee",
       "name": "Professor Bones Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/cf0613059585b8da79b0c34873355530/unisex-staple-t-shirt-black-front-6af677479bb4a.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/48d236e55cd12aba6bd7dc7161a5cf73/unisex-staple-t-shirt-black-front-6af6e975f0c60.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -20296,7 +21031,7 @@
       "externalId": "6af6469cd820d4",
       "slug": "professor-bones-pin-buttons",
       "name": "Professor Bones Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3996452061a35562b773769202978c33/set-of-pin-buttons-white-1.25-front-6af677213c2c6.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/58ae38975699740d0d1f38b0825f633e/set-of-pin-buttons-white-1.25-front-6af6e9502eb89.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -20345,7 +21080,7 @@
       "externalId": "6af6469b106193",
       "slug": "professor-bones-sticker",
       "name": "Professor Bones Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/5f00b13da2cb6f5083d1e820efaef28b/die-cut-stickers-satin-2x2-front-6af676e3b3164.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/cba2c4cbe29b166eb3315075e89cc780/die-cut-stickers-satin-2x2-front-6af6e91295404.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -20415,8 +21150,8 @@
       "externalId": "6af64699d438e7",
       "slug": "professor-bones-metal-print",
       "name": "Professor Bones Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f4d0cd06277eced32175ed77c9119bf0/glossy-metal-print-(in)-white-11x14-front-6af676d1106db.png",
-      "variantCount": 3,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/d1a3b9e26062b622e322a0da3c3af47f/glossy-metal-print-(in)-white-11x14-front-6af6e8ffdb274.png",
+      "variantCount": 6,
       "from": {
         "amount": 79,
         "currency": "USD"
@@ -20463,6 +21198,27 @@
           "amount": 79,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "12″×12″",
+          "color": "White",
+          "amount": 100,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×30″",
+          "color": "White",
+          "amount": 300,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×36″",
+          "color": "White",
+          "amount": 426.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/492998450.webp"
@@ -20472,10 +21228,10 @@
       "externalId": "6af64696766bd4",
       "slug": "professor-bones-canvas",
       "name": "Professor Bones Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/f9518a138514fb78265046b5cae0f28f/canvas-(in)-11x14-wall-6af67691261a9.png",
-      "variantCount": 12,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3df271e687806189e4b2baf439639b87/canvas-(in)-10x10-wall-6af6e8c2cbd8e.png",
+      "variantCount": 34,
       "from": {
-        "amount": 32,
+        "amount": 27.5,
         "currency": "USD"
       },
       "garment": {
@@ -21144,6 +21900,160 @@
           "amount": 67.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "10″×10″",
+          "color": null,
+          "amount": 34,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "12″×18″",
+          "color": null,
+          "amount": 50,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "14″×14″",
+          "color": null,
+          "amount": 39,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×24″",
+          "color": null,
+          "amount": 62.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×18″",
+          "color": null,
+          "amount": 60,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "18″×26″",
+          "color": null,
+          "amount": 70.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×20″",
+          "color": null,
+          "amount": 69.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "20″×30″",
+          "color": null,
+          "amount": 73.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×24″",
+          "color": null,
+          "amount": 86,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "26″×26″",
+          "color": null,
+          "amount": 110.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "28″×28″",
+          "color": null,
+          "amount": 112.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "28″×40″",
+          "color": null,
+          "amount": 137,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×30″",
+          "color": null,
+          "amount": 122.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "32″×32″",
+          "color": null,
+          "amount": 110.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "32″×48″",
+          "color": null,
+          "amount": 182,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "36″×36″",
+          "color": null,
+          "amount": 177.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "37″×37″",
+          "color": null,
+          "amount": 275.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "6″×6″",
+          "color": null,
+          "amount": 27.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×8″",
+          "color": null,
+          "amount": 30.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "12″×12″",
+          "color": null,
+          "amount": 44,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×16″",
+          "color": null,
+          "amount": 56.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "24″×36″",
+          "color": null,
+          "amount": 104.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/492998427.webp"
@@ -21153,10 +22063,10 @@
       "externalId": "6af64695afb0c9",
       "slug": "professor-bones-poster",
       "name": "Professor Bones Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/0e2ff909aeded7b1bc5c5e7e4ee330f5/enhanced-matte-paper-poster-(cm)-30x40-cm-front-6af6767bc68fe.png",
-      "variantCount": 1,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/10d68fd03af5a769641428f49c0f170a/enhanced-matte-paper-poster-(cm)-a1-(59.4x84.1-cm)-front-6af6e8ae73eae.png",
+      "variantCount": 7,
       "from": {
-        "amount": 23,
+        "amount": 17,
         "currency": "USD"
       },
       "garment": {
@@ -21180,6 +22090,48 @@
           "size": "30×40 cm",
           "color": null,
           "amount": 23,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "A1 (59.4×84.1 cm)",
+          "color": null,
+          "amount": 34.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "A2 (42×59.4 cm)",
+          "color": null,
+          "amount": 26,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "21×30 cm",
+          "color": null,
+          "amount": 17,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "50×70 cm",
+          "color": null,
+          "amount": 29.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "61×91 cm",
+          "color": null,
+          "amount": 37.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "70×100 cm",
+          "color": null,
+          "amount": 42,
           "currency": "USD",
           "available": true
         }
@@ -22438,7 +23390,7 @@
       "externalId": "6af621163e20b3",
       "slug": "grumpy-television-hoodie",
       "name": "Grumpy Television Hoodie",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/b8acc270cf8d71067757607037f2a54a/unisex-heavy-blend-hoodie-black-front-6af6393ddaa71.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/56a59d2c54edca698e0cea290d312ef3/unisex-heavy-blend-hoodie-black-front-6af6f6e6d810f.png",
       "variantCount": 16,
       "from": {
         "amount": 45.5,
@@ -22763,7 +23715,7 @@
       "externalId": "6af62110c8d597",
       "slug": "grumpy-television-tee",
       "name": "Grumpy Television Tee",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/4dfc7234b688b67a80fec7f791e03107/unisex-staple-t-shirt-black-front-6af639178c6f2.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/a48700471d54e43a438d66d7d4ab87ce/unisex-staple-t-shirt-black-front-6af6f6a7c80ce.png",
       "variantCount": 18,
       "from": {
         "amount": 24,
@@ -23058,7 +24010,7 @@
       "externalId": "6af6210d3f39d7",
       "slug": "grumpy-television-pin-buttons",
       "name": "Grumpy Television Pin Buttons",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/508eb18fcadd8bd9182d0beda1b67013/set-of-pin-buttons-white-1.25-front-6af638d2514cd.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/681e969d6735971002800f0083af82e4/set-of-pin-buttons-white-1.25-front-6af6f6815cd62.png",
       "variantCount": 2,
       "from": {
         "amount": 15.5,
@@ -23107,7 +24059,7 @@
       "externalId": "6af6210be0c303",
       "slug": "grumpy-television-holographic-sticker",
       "name": "Grumpy Television Holographic Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/c77346e79f63093a6adeea5893a1bf6e/kiss-cut-holographic-stickers-grey-3x3-front-6af638bf30b0d.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/975d217050db719922243c47d0ba3646/kiss-cut-holographic-stickers-grey-3x3-front-6af6f643b1227.png",
       "variantCount": 3,
       "from": {
         "amount": 8.5,
@@ -23161,7 +24113,7 @@
       "externalId": "6af6210a319202",
       "slug": "grumpy-television-sticker",
       "name": "Grumpy Television Sticker",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/196624602ccf2af6a76eeb4195eaec57/die-cut-stickers-satin-2x2-front-6af638512772a.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/5a5fd9318b995fe81d44e88aaf212dd1/die-cut-stickers-satin-2x2-front-6af6f63067388.png",
       "variantCount": 5,
       "from": {
         "amount": 8,
@@ -23231,8 +24183,8 @@
       "externalId": "6af621095e7b34",
       "slug": "grumpy-television-mouse-pad",
       "name": "Grumpy Television Mouse Pad",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/3a513642cf53c3ecfa6456d17ac72bec/gaming-mouse-pad-white-18x16-front-6af6383ea4df6.png",
-      "variantCount": 1,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/57b40cf00b35a8e65829f16e88849b49/gaming-mouse-pad-white-18x16-front-6af6f5f3ef718.png",
+      "variantCount": 2,
       "from": {
         "amount": 24,
         "currency": "USD"
@@ -23267,6 +24219,13 @@
           "amount": 24,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "36″×18″",
+          "color": "White",
+          "amount": 39.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/492957666.webp"
@@ -23276,7 +24235,7 @@
       "externalId": "6af6210883bf46",
       "slug": "grumpy-television-metal-print",
       "name": "Grumpy Television Metal Print",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/8962fd6a065b2c66ca8f6ba463d0a27b/glossy-metal-print-(in)-white-11x14-front-6af637cec8cdd.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/ea93baa9287a1972ef41a980d88b112c/glossy-metal-print-(in)-white-11x14-front-6af6f5da0c5e4.png",
       "variantCount": 4,
       "from": {
         "amount": 79,
@@ -23340,10 +24299,10 @@
       "externalId": "6af62106e3f3c9",
       "slug": "grumpy-television-canvas",
       "name": "Grumpy Television Canvas",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/28f751afcd97f379672f83bb7a826b87/canvas-(in)-11x14-wall-6af637ba1de72.png",
-      "variantCount": 14,
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/68e9b9a0aa686a95dea41d1419ab0c59/canvas-(in)-11x14-wall-6af6f59b5c782.png",
+      "variantCount": 19,
       "from": {
-        "amount": 33,
+        "amount": 32,
         "currency": "USD"
       },
       "garment": {
@@ -24026,6 +24985,41 @@
           "amount": 104.5,
           "currency": "USD",
           "available": true
+        },
+        {
+          "size": "20″×24″",
+          "color": null,
+          "amount": 71.5,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "28″×40″",
+          "color": null,
+          "amount": 137,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "30″×40″",
+          "color": null,
+          "amount": 129,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "8″×10″",
+          "color": null,
+          "amount": 32,
+          "currency": "USD",
+          "available": true
+        },
+        {
+          "size": "16″×20″",
+          "color": null,
+          "amount": 57.5,
+          "currency": "USD",
+          "available": true
         }
       ],
       "art": "/store/492957658.webp"
@@ -24035,7 +25029,7 @@
       "externalId": "6af6210618d062",
       "slug": "grumpy-television-poster",
       "name": "Grumpy Television Poster",
-      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/666d9b89bfaeee1125679533a19e5c60/enhanced-matte-paper-poster-(cm)-a2-(42x59.4-cm)-front-6af6374ac649a.png",
+      "thumbnail": "https://printful-upload.s3-accelerate.amazonaws.com/tmp/e640e86873b756ac2cabfcacec5a9c8b/enhanced-matte-paper-poster-(cm)-a2-(42x59.4-cm)-front-6af6f5828d3ec.png",
       "variantCount": 4,
       "from": {
         "amount": 17,

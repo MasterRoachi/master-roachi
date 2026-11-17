@@ -13,6 +13,13 @@ import styles from './HalftoneField.module.css';
 // canvas 2D, and a loop that stops when the section is off screen, when the
 // tab is hidden, and under reduced motion.
 //
+// The canvas is the size of the screen, not of the page. It sits sticky at the
+// top of the host and draws only the stretch of the sheet behind it, offset by
+// how far the page has scrolled, so the dots still read as printed on the
+// page. Until 2026-11-17 it was as tall as the host: on /store/, with 130
+// products, a canvas of some 15,000px redrawn every frame, which was most of
+// why the store was slow.
+//
 // Unlike those, the dots are a fixed grid rather than scattered particles.
 // What moves is their size — a slow standing wave across the sheet, with the
 // cursor opening the screen up around itself the way a lighter tone does.
@@ -28,8 +35,10 @@ export default function HalftoneField() {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return;
+    const found = hostRef.current;
+    if (!found) return;
+    // A const of the narrowed type, so draw(), a hoisted function, keeps it.
+    const host: HTMLDivElement = found;
 
     const reduced = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
@@ -46,16 +55,16 @@ export default function HalftoneField() {
     let h = 0;
     let dpr = 1;
 
+    // The canvas's own box: the host's width, the screen's height (or the
+    // host's, where the host is shorter), set in the stylesheet.
     const resize = () => {
-      const r = host.getBoundingClientRect();
+      const r = canvas.getBoundingClientRect();
       w = r.width;
       h = r.height;
       if (!w || !h) return;
       dpr = Math.min(window.devicePixelRatio, 2);
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
@@ -68,6 +77,14 @@ export default function HalftoneField() {
       if (!raf) draw();
     });
     ro.observe(host);
+    ro.observe(canvas);
+
+    // Under reduced motion, or between frames, a scroll still has to move the
+    // sheet behind the sticky canvas.
+    const onScroll = () => {
+      if (!raf) draw();
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     // In CSS pixels within the host, not normalised: the dots respond to
     // actual distance, so the falloff is the same size everywhere.
@@ -96,10 +113,14 @@ export default function HalftoneField() {
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = '#ffffff';
 
-      const cols = Math.ceil(w / PITCH) + 1;
-      const rows = Math.ceil(h / PITCH) + 1;
+      // Where the canvas sits on the sheet, in the host's CSS pixels.
+      const top = canvas.getBoundingClientRect().top - host.getBoundingClientRect().top;
 
-      for (let iy = 0; iy < rows; iy++) {
+      const cols = Math.ceil(w / PITCH) + 1;
+      const firstRow = Math.floor(top / PITCH);
+      const lastRow = Math.ceil((top + h) / PITCH);
+
+      for (let iy = firstRow; iy <= lastRow; iy++) {
         const y = iy * PITCH;
         for (let ix = 0; ix < cols; ix++) {
           const x = ix * PITCH;
@@ -123,7 +144,7 @@ export default function HalftoneField() {
 
           ctx.globalAlpha = 0.05 + near * 0.14;
           ctx.beginPath();
-          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.arc(x, y - top, r, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -164,6 +185,7 @@ export default function HalftoneField() {
       io.disconnect();
       ro.disconnect();
       window.removeEventListener('pointermove', onPointer);
+      window.removeEventListener('scroll', onScroll);
       document.removeEventListener('visibilitychange', onVisibility);
       if (canvas.parentNode === host) host.removeChild(canvas);
     };

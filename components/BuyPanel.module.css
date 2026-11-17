@@ -64,6 +64,35 @@
   text-decoration: line-through;
 }
 
+/* The colour chips: the same buttons as the sizes, a swatch beside the name.
+   Added 17 Nov 2026, when products came in more than one colour. */
+.colors {
+  margin-bottom: 18px;
+}
+
+.color {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  /* The hairline outside, as on the store's swatches: a black dot on a dark
+     page must still read as a filled disc. */
+  box-shadow: 0 0 0 1px oklch(100% 0 0 / 0.45);
+  background: oklch(50% 0 0);
+}
+
+.dot[data-empty] {
+  background: transparent;
+  box-shadow: none;
+  border: 1px dashed oklch(100% 0 0 / 0.45);
+}
+
 .sizeName {
   font-weight: 700;
   color: var(--ink);

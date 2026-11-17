@@ -73,16 +73,19 @@ async function call<T>(auth: PrintfulAuth, pathname: string, init?: { method: st
 /**
  * The sync variant an order is for.
  *
- * The order records the product and the size and NOT the colour, because the
- * buy form never asks: every product so far comes in one colour. So a size
- * that matches more than one colour is refused rather than guessed at — the
- * day a second colour is synced, this says so instead of printing the wrong
- * shirt.
+ * Found by size and, where the product comes in more than one colour, by
+ * colour too. Until 13 Nov 2026 every product came in one colour and the order
+ * recorded none; Timon's art brought 27 that come in two or three, and the
+ * buy form has asked for the colour since (migration 0024). A size that
+ * matches more than one colour with no colour given is still refused rather
+ * than guessed at: an order from before the colour was asked, sent by hand,
+ * must not print the wrong shirt.
  */
 export async function findSyncVariant(
   auth: PrintfulAuth,
   productId: string,
   size: string,
+  color?: string | null,
 ): Promise<{ id: number; variantId: number | null }> {
   const data = await call<{
     result?: { sync_variants?: { id: number; variant_id?: number | null; size?: string | null; color?: string | null }[] };
@@ -90,9 +93,13 @@ export async function findSyncVariant(
     auth,
     `/store/products/${encodeURIComponent(productId)}`,
   );
-  const wanted = size.trim().toLowerCase();
-  const matches = (data.result?.sync_variants ?? []).filter((v) => (v.size ?? '').trim().toLowerCase() === wanted);
-  if (matches.length === 0) throw new PrintfulError(`No ${size} variant of product ${productId} in Printful.`, 404);
+  const same = (a: string | null | undefined, b: string) => (a ?? '').trim().toLowerCase() === b.trim().toLowerCase();
+  const sized = (data.result?.sync_variants ?? []).filter((v) => same(v.size, size));
+  if (sized.length === 0) throw new PrintfulError(`No ${size} variant of product ${productId} in Printful.`, 404);
+  const matches = color ? sized.filter((v) => same(v.color, color)) : sized;
+  if (matches.length === 0) {
+    throw new PrintfulError(`No ${size} in ${color} of product ${productId} in Printful.`, 404);
+  }
   if (new Set(matches.map((v) => v.color)).size > 1) {
     throw new PrintfulError(
       `Product ${productId} has ${size} in more than one colour, and the order does not say which. Create it in Printful by hand.`,

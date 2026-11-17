@@ -40,6 +40,8 @@ interface Order {
   product: string;
   product_id: string;
   size: string;
+  /** Since 17 Nov 2026 (migration 0024); null on older orders and one-colour products. */
+  color?: string | null;
   price: string;
   name: string;
   email: string;
@@ -412,7 +414,7 @@ export default function Orders() {
     for (const order of orders ?? []) {
       if (
         needle &&
-        ![order.ref, order.name, order.email, order.product, order.size, order.phone, order.address]
+        ![order.ref, order.name, order.email, order.product, order.size, order.color ?? '', order.phone, order.address]
           .join('\n')
           .toLowerCase()
           .includes(needle)
@@ -538,6 +540,7 @@ export default function Orders() {
           <span className={styles.rowWhat}>
             {order.redacted_at ? 'Details removed' : order.name} · {order.product || 'Unknown product'} ·{' '}
             {order.size}
+            {order.color ? `, ${order.color}` : ''}
             {amountOf(order) ? ` · ${amountOf(order)}` : ''}
           </span>
           <span className={styles.rowWhen}>{shortStamp(order.created_at)}</span>
@@ -721,6 +724,7 @@ export default function Orders() {
           <dt>Item</dt>
           <dd>
             {order.product || 'Unknown product'} · {order.size}
+            {order.color ? `, ${order.color}` : ''}
           </dd>
           {(order.total !== null || order.price) && (
             <>

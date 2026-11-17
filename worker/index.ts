@@ -37,7 +37,16 @@ import { secured } from './security-headers';
 import { sketchesApi } from './sketches';
 import { postFor, slugFor } from '../lib/book-post';
 import type { WorkHubPayload } from '../lib/work-hub';
-import { fetchCatalogue, mergeCatalogue, SYNCED_KEYS } from '../lib/printful';
+import {
+  fetchCatalogue,
+  listCatalogue,
+  mergeCatalogue,
+  shapeProducts,
+  SYNCED_KEYS,
+  type Catalogue,
+  type CatalogueListing,
+  type Product,
+} from '../lib/printful';
 import { artistTerms } from '../lib/artist-share';
 import {
   createDraftOrder,
@@ -288,13 +297,20 @@ const VOTE_TTL = 60 * 60 * 24 * 180;
  */
 const ORDER_RETENTION_DAYS = 30;
 
+/**
+ * Products fetched per request by the stepped Sync. Each costs one Printful
+ * request and at most two more for a blank not yet seen in the same part, so
+ * ten stays near thirty subrequests even after a rate-limit wait.
+ */
+const SYNC_CHUNK = 10;
+
 /** Every column the orders page reads, in one place for the list and the one. */
 const ORDER_COLUMNS = `id, ref, created_at, product, product_id, size, price, name, email, phone,
   address, note, status, paid_at, fulfilled_at, dismissed_at, redacted_at,
   printful_id, printful_status, sent_at, carrier, tracking_number, tracking_url,
   address1, address2, city, state_code, zip, country_code,
   item_amount, shipping_amount, total, currency, shipping_method, shipping_name, pf_payment_id,
-  artist, artist_share, item_cost`;
+  artist, artist_share, item_cost, color`;
 
 /** What a checkout costs, worked out here and never taken from the browser. */
 interface Quote {
@@ -315,7 +331,12 @@ class QuoteError extends Error {
 }
 
 /**
- * The price of one size, delivered to one address.
+ * The price of one size, in one colour, delivered to one address.
+ *
+ * The colour is needed where the size comes in more than one (17 Nov 2026,
+ * migration 0024): without it the variant is not known, and the quote is
+ * refused with a question rather than guessed. Where the size comes in one
+ * colour, or the catalogue names none, it may be left out.
  *
  * The product and its USD price come from data/store.json, bundled into this
  * Worker — the same catalogue the page was built from. Delivery is Printful's
@@ -323,18 +344,28 @@ class QuoteError extends Error {
  * through lib/price.ts: no delivery inside the item price, because it is
  * quoted on top.
  */
-async function quoteFor(env: Env, productId: string, size: string, address: Address): Promise<Quote> {
-  const product = (storeSnapshot as { products: { id: number; name: string; variants?: { size: string | null; amount: number; available: boolean }[] }[] }).products
+async function quoteFor(
+  env: Env,
+  productId: string,
+  size: string,
+  color: string,
+  address: Address,
+): Promise<Quote> {
+  const product = (storeSnapshot as { products: { id: number; name: string; variants?: { size: string | null; color?: string | null; amount: number; available: boolean }[] }[] }).products
     .find((p) => String(p.id) === productId);
-  const variant = product?.variants?.find((v) => v.size === size);
-  if (!product || !variant) throw new QuoteError('That product or size is not for sale.', 404);
+  const sized = product?.variants?.filter((v) => v.size === size) ?? [];
+  if (!product || sized.length === 0) throw new QuoteError('That product or size is not for sale.', 404);
+  const colours = new Set(sized.map((v) => v.color ?? ''));
+  if (colours.size > 1 && !color) throw new QuoteError('Which colour? Choose one first.', 400);
+  const variant = color ? sized.find((v) => (v.color ?? '') === color) : sized[0];
+  if (!variant) throw new QuoteError('That size is not made in that colour.', 404);
   if (!variant.available) throw new QuoteError('That size is sold out.', 409);
   const item = itemPrice(productId, size, variant.amount);
   if (item === null) throw new QuoteError('No price is set yet.', 503);
   if (!env.PRINTFUL_TOKEN) throw new QuoteError('Delivery cannot be quoted yet.', 503);
 
   const auth = { token: env.PRINTFUL_TOKEN, storeId: env.PRINTFUL_STORE_ID ?? null };
-  const sync = await findSyncVariant(auth, productId, size);
+  const sync = await findSyncVariant(auth, productId, size, variant.color ?? null);
   if (sync.variantId === null) throw new QuoteError('Delivery cannot be quoted for this product.', 502);
   const rates = await shippingRates(
     auth,
@@ -400,6 +431,8 @@ interface OrderRecord {
   note: string;
   /** In Printful's fields, from the buy form since 2026-10-19. Absent on older orders. */
   structured?: Address | null;
+  /** The colour, from the buy form since 2026-11-17 (migration 0024). Absent on older orders. */
+  color?: string | null;
 }
 
 /**
@@ -411,8 +444,8 @@ function insertOrder(db: D1Database, order: OrderRecord) {
     .prepare(
       `insert or ignore into orders
          (ref, created_at, product, product_id, size, price, name, email, phone, address, note,
-          address1, address2, city, state_code, zip, country_code)
-       values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17)`,
+          address1, address2, city, state_code, zip, country_code, color)
+       values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18)`,
     )
     .bind(
       order.ref,
@@ -432,6 +465,7 @@ function insertOrder(db: D1Database, order: OrderRecord) {
       order.structured?.state_code ?? null,
       order.structured?.zip ?? null,
       order.structured?.country_code ?? null,
+      order.color || null,
     );
 }
 
@@ -720,7 +754,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const problem = addressProblem(address);
       if (problem) return json({ error: problem }, 400);
       try {
-        const quote = await quoteFor(env, field(body.productId, 32), field(body.size, 16), address);
+        const quote = await quoteFor(env, field(body.productId, 32), field(body.size, 16), field(body.color, 40), address);
         return json({ quote }, 200);
       } catch (error) {
         return quoteFailure(error);
@@ -743,12 +777,14 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const key = `delivery-za:${productId}`;
       const kept = await env.VOTES?.get(key).catch(() => null);
       if (kept) return json(JSON.parse(kept) as unknown, 200);
-      const product = (storeSnapshot as { products: { id: number; variants?: { size: string | null; available: boolean }[] }[] }).products
+      const product = (storeSnapshot as { products: { id: number; variants?: { size: string | null; color?: string | null; available: boolean }[] }[] }).products
         .find((p) => String(p.id) === productId);
-      const size = product?.variants?.find((v) => v.available && v.size)?.size;
+      // Any one variant stands for the product: the figure is an indication.
+      const first = product?.variants?.find((v) => v.available && v.size);
+      const size = first?.size;
       if (!size) return json({ error: 'That product is not for sale.' }, 404);
       try {
-        const quote = await quoteFor(env, productId, size, SA_REFERENCE_ADDRESS);
+        const quote = await quoteFor(env, productId, size, first?.color ?? '', SA_REFERENCE_ADDRESS);
         const answer = { delivery: quote.delivery, currency: quote.currency, minDays: quote.method.minDays, maxDays: quote.method.maxDays };
         await env.VOTES?.put(key, JSON.stringify(answer), { expirationTtl: 60 * 60 * 12 }).catch(() => undefined);
         return json(answer, 200);
@@ -784,6 +820,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
       const productId = field(body.productId, 32);
       const size = field(body.size, 16);
+      const color = field(body.color, 40);
       const name = field(body.name);
       const email = field(body.email);
       if (!name || !email || !productId || !size) {
@@ -795,7 +832,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
       let quote: Quote;
       try {
-        quote = await quoteFor(env, productId, size, address);
+        quote = await quoteFor(env, productId, size, color, address);
       } catch (error) {
         return quoteFailure(error);
       }
@@ -816,6 +853,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
         address: addressText(address),
         note: field(body.note, 600),
         structured: address,
+        color: color || null,
       };
       // Who drew it and their share, fixed now: lib/artist-share.ts.
       const terms = artistTerms(productId);
@@ -842,7 +880,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const page = field(body.page, 120);
       const cancelPath = /^\/store\/[a-z0-9-]+\/$/.test(page) ? page : '/store/';
       const [first, ...rest] = name.split(/\s+/);
-      const itemName = `${productName} (${size})`.slice(0, 100);
+      const itemName = `${productName} (${color ? `${size}, ${color}` : size})`.slice(0, 100);
       const itemDescription = `Order ${ref}, ${quote.method.name}`.slice(0, 255);
 
       // Its answer is trusted only as far as where the browser is sent, which
@@ -1265,11 +1303,84 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
       const log: string[] = [];
       try {
-        const fresh = await fetchCatalogue({
-          token: printful,
-          storeId: env.PRINTFUL_STORE_ID ?? null,
-          log: (line) => log.push(line),
-        });
+        const pf = { token: printful, storeId: env.PRINTFUL_STORE_ID ?? null, log: (line: string) => log.push(line) };
+
+        /* In steps, since 17 Nov 2026 (migrations/0025_store_sync_parts.sql).
+         *
+         * The whole store is about 260 Printful requests now, too many for one
+         * Worker request, so the button asks for it in pieces: `start` lists
+         * the store, each `chunk` fetches SYNC_CHUNK products from `offset`,
+         * and `finish` puts the parts together and goes on below exactly as a
+         * one-shot sync does. A POST with no step is still the one-shot sync. */
+        const asked = (await request.json().catch(() => null)) as
+          | { step?: string; run?: string; offset?: number }
+          | null;
+        const step = asked?.step;
+        let fresh: Catalogue;
+        // A finished run's parts go once the commit has worked, so a failed
+        // commit can be finished again without fetching the store again.
+        let finishedRun: string | null = null;
+        if (step === 'start' || step === 'chunk' || step === 'finish') {
+          const db = env.DB;
+          if (!db) return json({ configured: true, synced: false, error: 'D1 is not bound.' }, 503);
+          const run = step === 'start' ? crypto.randomUUID() : String(asked?.run ?? '');
+          const listingRow = step === 'start'
+            ? null
+            : await db.prepare('select body from store_sync_parts where run = ?1 and part = -1')
+                .bind(run)
+                .first<{ body: string }>();
+          if (step !== 'start' && !listingRow) {
+            return json({ configured: true, synced: false, error: 'That sync is not known. Start again.' }, 404);
+          }
+
+          if (step === 'start') {
+            const listing = await listCatalogue(pf);
+            const at = new Date().toISOString();
+            const dayAgo = new Date(Date.now() - 86_400_000).toISOString();
+            await db.batch([
+              db.prepare('delete from store_sync_parts where created_at < ?1').bind(dayAgo),
+              db.prepare('insert into store_sync_parts (run, part, body, created_at) values (?1, -1, ?2, ?3)')
+                .bind(run, JSON.stringify(listing), at),
+            ]);
+            return json({ configured: true, run, total: listing.products.length, chunk: SYNC_CHUNK, log }, 200);
+          }
+
+          const listing = JSON.parse(listingRow!.body) as CatalogueListing;
+          if (step === 'chunk') {
+            const offset = Number(asked?.offset);
+            if (!Number.isInteger(offset) || offset < 0 || offset % SYNC_CHUNK !== 0 || offset >= listing.products.length) {
+              return json({ configured: true, synced: false, error: 'No such part of the store.' }, 400);
+            }
+            const products = await shapeProducts(pf, listing.products.slice(offset, offset + SYNC_CHUNK));
+            // Replace, so a part retried after a dropped answer is not doubled.
+            await db.prepare('insert or replace into store_sync_parts (run, part, body, created_at) values (?1, ?2, ?3, ?4)')
+              .bind(run, offset, JSON.stringify(products), new Date().toISOString())
+              .run();
+            const next = offset + SYNC_CHUNK;
+            return json({ configured: true, run, next, done: next >= listing.products.length, log }, 200);
+          }
+
+          // finish: every part must be there, or the commit would drop products.
+          const parts = await db.prepare('select part, body from store_sync_parts where run = ?1 and part >= 0 order by part')
+            .bind(run)
+            .all<{ part: number; body: string }>();
+          const have = new Set((parts.results ?? []).map((r) => r.part));
+          const missing: number[] = [];
+          for (let offset = 0; offset < listing.products.length; offset += SYNC_CHUNK) {
+            if (!have.has(offset)) missing.push(offset);
+          }
+          if (missing.length > 0) {
+            return json({ configured: true, synced: false, error: `Parts missing from offset ${missing.join(', ')}.`, missing }, 409);
+          }
+          fresh = {
+            fetchedAt: new Date().toISOString(),
+            store: listing.store,
+            products: (parts.results ?? []).flatMap((r) => JSON.parse(r.body) as Product[]),
+          };
+          finishedRun = run;
+        } else {
+          fresh = await fetchCatalogue(pf);
+        }
 
         // What is committed now, both to merge onto and to compare against.
         const current = await readFile(token, 'data/store.json').catch(() => null);
@@ -1318,6 +1429,9 @@ async function handle(request: Request, env: Env): Promise<Response> {
           .bind(checkedAt, changed ? 1 : 0, payload.products.length)
           .run()
           .catch(() => undefined);
+        if (finishedRun) {
+          await env.DB?.prepare('delete from store_sync_parts where run = ?1').bind(finishedRun).run().catch(() => undefined);
+        }
 
         return json(
           {
@@ -1784,6 +1898,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
               status: string;
               product_id: string;
               size: string;
+              color: string | null;
               email: string;
               phone: string;
               printful_id: number | null;
@@ -1821,7 +1936,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
             try {
               const auth = { token: env.PRINTFUL_TOKEN, storeId: env.PRINTFUL_STORE_ID ?? null };
-              const variant = await findSyncVariant(auth, order.product_id, order.size);
+              const variant = await findSyncVariant(auth, order.product_id, order.size, order.color);
               const state = await createDraftOrder(auth, {
                 ref: order.ref,
                 recipient,

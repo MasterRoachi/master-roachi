@@ -13,8 +13,12 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
   // Always the product page, never straight out to a payment link: a card is
   // a thing to look at, and sending someone from a thumbnail to a checkout
   // skips every question they have not asked yet.
+  //
+  // No prefetch: the store shows 130 of these, and prefetching each page as
+  // it scrolled into view was over eighty requests competing with the
+  // pictures on a phone. The page still opens without a reload when chosen.
   return (
-    <Link className={styles.product} href={productPath(product)}>
+    <Link className={styles.product} href={productPath(product)} prefetch={false}>
       <span className={styles.art}>
         {product.art || product.thumbnail ? (
           <img

@@ -2,7 +2,9 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  overflow: hidden;
+  /* clip, not hidden: hidden makes the host a scroll container, and the
+     sticky canvas would then stick to it instead of to the screen. */
+  overflow: clip;
 
   /* Both of the shop's inks, weighted evenly. It was pink across the sheet
      with one blue corner, which read as a pink page rather than as two
@@ -29,7 +31,14 @@
 }
 
 .canvas {
+  /* The screen's height, held at the top of the screen as the page scrolls;
+     the script draws the part of the sheet behind it. lvh, so the phone's
+     address bar coming and going does not resize it. */
+  position: sticky;
+  top: 0;
   display: block;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100lvh;
+  max-height: 100%;
 }

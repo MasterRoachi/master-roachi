@@ -23,3 +23,9 @@ next-env.d.ts
 # these originals are not, so re-optimising needs the download again.
 # Credit and licence live in public/store/tshirt-license.txt.
 /3d/
+
+# The store's share cards: scripts/og.mjs makes one per product in prebuild,
+# from the committed catalogue, on every build including the deploy's. 130 of
+# them is about 25MB, so they are built rather than kept (2026-11-17). The one
+# older card already committed stays tracked.
+/public/store/og/*.png

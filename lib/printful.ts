@@ -327,13 +327,14 @@ export interface SyncOptions {
 }
 
 /**
- * Fetch and shape the whole catalogue.
+ * Printful's API for one sync: the rate-limit waits, and the blank lookups
+ * cached so a store with twelve designs on one tee asks about the tee once.
  *
- * Throws if the store cannot be listed at all, so a caller can leave whatever
- * it already has in place. Everything below that is best effort: a missing
- * garment costs a label and some swatches, not the catalogue.
+ * Split out of fetchCatalogue on 17 Nov 2026, so the Worker's Sync button can
+ * fetch the catalogue a few products per request (listCatalogue, then
+ * shapeProducts in slices) instead of all 130 in one.
  */
-export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
+function printfulClient(options: SyncOptions) {
   const note = options.log ?? (() => {});
   const headers: Record<string, string> = {
     Authorization: `Bearer ${options.token}`,
@@ -412,6 +413,36 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
     return info;
   }
 
+  return { api, blank, note };
+}
+
+/** One product of the store's list, with the address it will be served at. */
+export interface ListedProduct {
+  id: number;
+  name: string;
+  externalId: string | null;
+  thumbnail: string | null;
+  /** Printful's own count of variants, when it gave one. */
+  variantCount: number | null;
+  /** Handed out in list order, so two products cannot claim one URL. */
+  slug: string;
+}
+
+/** The store and its product list: the first, cheap part of a sync. */
+export interface CatalogueListing {
+  store: StoreInfo | null;
+  products: ListedProduct[];
+}
+
+/**
+ * The store's details and its product list, without each product's variants.
+ *
+ * Throws if the store cannot be listed at all, so a caller can leave whatever
+ * it already has in place.
+ */
+export async function listCatalogue(options: SyncOptions): Promise<CatalogueListing> {
+  const { api, note } = printfulClient(options);
+
   // What kind of store this is decides where checkout can live: a store
   // connected to Etsy or Shopify already has a checkout, a manual one does
   // not. Reported rather than assumed, and never fatal.
@@ -443,9 +474,34 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
   const listed = all.filter((p) => !p.is_ignored);
   if (listed.length === 0) throw new Error('store has no synced products yet');
 
-  const products: Product[] = [];
   /** Slugs already handed out, so two products cannot claim one URL. */
   const slugs = new Set<string>();
+  const products = listed.map((p) => {
+    const slug = slugify(p.name, slugs);
+    slugs.add(slug);
+    return {
+      id: p.id,
+      name: p.name,
+      // The connected platform's own id, which is what a product URL is built
+      // from when the storefront is Etsy, Shopify and so on.
+      externalId: p.external_id ?? null,
+      thumbnail: p.thumbnail_url ?? null,
+      variantCount: p.variants ?? null,
+      slug,
+    };
+  });
+  return { store, products };
+}
+
+/**
+ * Each listed product fetched and shaped: its variants, prices, colours and
+ * the blank it is printed on. Everything here is best effort past the
+ * product's own request: a missing garment costs a label and some swatches,
+ * not the catalogue.
+ */
+export async function shapeProducts(options: SyncOptions, listed: ListedProduct[]): Promise<Product[]> {
+  const { api, blank } = printfulClient(options);
+  const products: Product[] = [];
 
   for (const p of listed) {
     // Prices live on the variants, so each product needs its own request.
@@ -478,18 +534,15 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
       colors.push({ name: v.color, hex: base?.colors?.get(v.color) ?? null });
     }
 
-    const slug = slugify(p.name, slugs);
-    slugs.add(slug);
-
     products.push({
       id: p.id,
       // The connected platform's own id, which is what a product URL is built
       // from when the storefront is Etsy, Shopify and so on.
-      externalId: p.external_id ?? null,
-      slug,
+      externalId: p.externalId,
+      slug: p.slug,
       name: p.name,
-      thumbnail: p.thumbnail_url ?? null,
-      variantCount: p.variants ?? variants.length,
+      thumbnail: p.thumbnail,
+      variantCount: p.variantCount ?? variants.length,
       from: fromPrice(variants),
       garment: base
         ? {
@@ -506,11 +559,24 @@ export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
     });
   }
 
+  return products;
+}
+
+/**
+ * Fetch and shape the whole catalogue, in one go: what the build runs, and
+ * the Sync button before 17 Nov 2026.
+ *
+ * Throws if the store cannot be listed at all, so a caller can leave whatever
+ * it already has in place.
+ */
+export async function fetchCatalogue(options: SyncOptions): Promise<Catalogue> {
+  const listing = await listCatalogue(options);
+  const products = await shapeProducts(options, listing.products);
   return {
     // Recorded so the page can say how fresh this is rather than implying the
     // catalogue is live.
     fetchedAt: new Date().toISOString(),
-    store,
+    store: listing.store,
     products,
   };
 }

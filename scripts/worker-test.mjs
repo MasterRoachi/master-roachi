@@ -332,6 +332,8 @@ function sqliteD1() {
   sqlite.exec(fs.readFileSync('migrations/0019_order_checkout.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0020_store_syncs.sql', 'utf8'));
   sqlite.exec(fs.readFileSync('migrations/0023_order_artist.sql', 'utf8'));
+  sqlite.exec(fs.readFileSync('migrations/0024_order_color.sql', 'utf8'));
+  sqlite.exec(fs.readFileSync('migrations/0025_store_sync_parts.sql', 'utf8'));
   const d1 = {
     sqlite,
     broken: false,
@@ -612,6 +614,18 @@ function sqliteD1() {
       ordersDb.sqlite.prepare('select printful_id from orders where ref = ?').get(colourRef).printful_id === null,
     JSON.stringify(sent),
   );
+  // With its colour on the order (migration 0024, 17 Nov 2026), it is sent as that colour.
+  ordersDb.sqlite.prepare('update orders set color = ? where ref = ?').run('White', colourRef);
+  sent = await sendIt(colourRef, address);
+  check(
+    'an order that names its colour is sent as that colour',
+    sent.status === 200 && printfulCalls.filter((c) => c.method === 'POST').at(-1)?.body.items[0].sync_variant_id === 702,
+    JSON.stringify(sent),
+  );
+  ordersDb.sqlite.prepare('update orders set color = ? where ref = ?').run('Oyster', seed({ ref: 'NOCOLOUR', name: 'Odd Colour', size: 'M' }));
+  await markIn('NOCOLOUR', 'paid');
+  sent = await sendIt('NOCOLOUR', address);
+  check('a colour Printful does not make in that size is refused', sent.status === 502 && /in Oyster/.test(sent.body.error ?? ''), JSON.stringify(sent));
 
   // --- quote, checkout, and PayFast's notification ------------------------
   //
@@ -650,6 +664,30 @@ function sqliteD1() {
   check('a quote without a postal code is refused', res.status === 400, String(res.status));
   res = await postTo('/api/quote', { productId: '999', size: 'L', address: where }, printfulEnv);
   check('a quote for no such product is a 404', res.status === 404, String(res.status));
+
+  // A product in two colours (the Marci Tee, black and white): the quote needs
+  // the colour, and finds the variant by it. Until 17 Nov 2026 every quote for
+  // one of these failed, because the size alone matched two variants.
+  variants = [
+    { id: 801, variant_id: 5011, size: 'M', color: 'Black' },
+    { id: 802, variant_id: 5012, size: 'M', color: 'White' },
+  ];
+  res = await postTo('/api/quote', { productId: '493062186', size: 'M', address: where }, printfulEnv);
+  body = await res.json();
+  check('a two-colour quote without a colour asks which', res.status === 400 && /colour/i.test(body.error ?? ''), JSON.stringify(body));
+  res = await postTo('/api/quote', { productId: '493062186', size: 'M', color: 'White', address: where }, printfulEnv);
+  body = await res.json();
+  check(
+    'with the colour, it is quoted for that variant',
+    res.status === 200 && !!body.quote && printfulCalls.filter((c) => c.url.endsWith('/shipping/rates')).at(-1)?.body.items[0].variant_id === 5012,
+    JSON.stringify(body),
+  );
+  res = await postTo('/api/quote', { productId: '493062186', size: 'M', color: 'Mauve', address: where }, printfulEnv);
+  check('a colour the product does not come in is a 404', res.status === 404, String(res.status));
+  variants = [
+    { id: 555, variant_id: 4012, size: 'L', color: 'Black Heather' },
+    { id: 556, variant_id: 4011, size: 'M', color: 'Black Heather' },
+  ];
 
   const buyerPay = { product: 'Roachi Shirt', productId: '464722916', size: 'L', name: 'Pay Buyer Smith', email: 'pay@example.com', address: where, page: '/store/roachi-shirt/' };
   res = await postTo('/api/checkout', buyerPay, printfulEnv);
@@ -691,6 +729,26 @@ function sqliteD1() {
       tillRow()?.shipping_method === 'STANDARD' && tillRow()?.status === 'received' && tillRow()?.zip === '8001',
     JSON.stringify(tillRow()),
   );
+
+  // The colour is stored with the order and named to pay.
+  variants = [
+    { id: 801, variant_id: 5011, size: 'M', color: 'Black' },
+    { id: 802, variant_id: 5012, size: 'M', color: 'White' },
+  ];
+  res = await postTo('/api/checkout', { ...buyerPay, product: 'Marci Tee', productId: '493062186', size: 'M', color: 'White', page: '/store/marci-tee/' }, tillEnv);
+  body = await res.json();
+  check(
+    'a two-colour checkout stores its colour and names it to pay',
+    res.status === 200 && ordersDb.sqlite.prepare('select color from orders where ref = ?').get(body.ref)?.color === 'White' &&
+      tillCalls.at(-1)?.itemName === 'Marci Tee (M, White)',
+    JSON.stringify({ body, itemName: tillCalls.at(-1)?.itemName }),
+  );
+  res = await postTo('/api/checkout', { ...buyerPay, product: 'Marci Tee', productId: '493062186', size: 'M' }, tillEnv);
+  check('and without a colour it is refused before anything is stored', res.status === 400, String(res.status));
+  variants = [
+    { id: 555, variant_id: 4012, size: 'L', color: 'Black Heather' },
+    { id: 556, variant_id: 4011, size: 'M', color: 'Black Heather' },
+  ];
 
   tillAnswer = { ok: true, action: 'https://sandbox.payfast.co.za/eng/process', fields: [] };
   res = await postTo('/api/checkout', { ...buyerPay, total: 1 }, tillEnv);
@@ -3763,6 +3821,60 @@ check(
   JSON.stringify(body),
 );
 
+/* The stepped sync, which the button uses since 17 Nov 2026: list, then the
+ * products ten at a time, then put together and commit. The same Printful and
+ * GitHub stubs as the one-shot sync above, so the same catalogue must come out. */
+globalThis.fetch = previous;
+{
+  const stepDb = sqliteD1();
+  const stepEnv = { ...syncEnv, DB: stepDb };
+  const stepPost = (payload, useEnv = stepEnv) =>
+    worker.fetch(
+      new Request('https://admin.masterroachi.com/work/api/store-sync', {
+        method: 'POST',
+        headers: { 'cf-access-jwt-assertion': 'stub-jwt', 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      }),
+      useEnv,
+    );
+  const parts = () => stepDb.sqlite.prepare('select count(*) as n from store_sync_parts').get().n;
+
+  res = await stepPost({ step: 'start' }, syncEnv);
+  check('a stepped sync needs D1', res.status === 503, String(res.status));
+
+  res = await stepPost({ step: 'start' });
+  body = await res.json();
+  const run = body.run;
+  check('start lists the store and keeps the listing', res.status === 200 && !!run && body.total === 1 && body.chunk === 10 && parts() === 1, JSON.stringify(body));
+
+  res = await stepPost({ step: 'finish', run });
+  body = await res.json();
+  check('finishing with a part missing is refused, and nothing is committed', res.status === 409 && body.missing?.[0] === 0, JSON.stringify(body));
+  res = await stepPost({ step: 'chunk', run: 'no-such-run', offset: 0 });
+  check('an unknown run is a 404', res.status === 404, String(res.status));
+  res = await stepPost({ step: 'chunk', run, offset: 5 });
+  check('an offset that is not a part is refused', res.status === 400, String(res.status));
+
+  res = await stepPost({ step: 'chunk', run, offset: 0 });
+  body = await res.json();
+  check('a part is fetched and kept', res.status === 200 && body.done === true && body.next === 10 && parts() === 2, JSON.stringify(body));
+  res = await stepPost({ step: 'chunk', run, offset: 0 });
+  check('a part asked for twice is kept once', res.status === 200 && parts() === 2, String(parts()));
+
+  committedStore = null;
+  res = await stepPost({ step: 'finish', run });
+  body = await res.json();
+  check('finish commits what the parts found', res.status === 200 && body.synced === true && body.changed === true && body.products === 1, JSON.stringify(body));
+  const stepped = committedStore?.products?.[0] ?? {};
+  check(
+    'the stepped catalogue is the one-shot one: name, slug, garment, swatch, and the artwork kept',
+    stepped.name === 'Roachi Shirt' && stepped.slug === 'roachi-shirt' && stepped.garment?.brand === 'Bella + Canvas' &&
+      stepped.colors?.[0]?.hex === '#0b0b0b' && stepped.artwork === '/store/464722916-art.webp',
+    JSON.stringify(stepped),
+  );
+  check('and the run is cleared once committed', parts() === 0, String(parts()));
+}
+
 globalThis.fetch = preGh;
 
 // --- the merge, directly ---------------------------------------------------
@@ -6030,6 +6142,34 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
     'and no size carries a payment link any more',
     storeLib.buyOptions(shirt).every((o) => !('href' in o)),
     JSON.stringify(storeLib.buyOptions(shirt)[0]),
+  );
+
+  // Priced by colour (his ruling, 17 Nov 2026): a frame Printful charges more
+  // for costs more, and the page's range runs to the dearest frame.
+  // Whichever product and size has frames at different costs, so a re-sync
+  // that changes the sizes does not break the check.
+  const framed = storeLib.getStoreProducts().find((p) => storeLib.buyOptions(p).some((o) => o.varies));
+  const fifty = framed && storeLib.buyOptions(framed).find((o) => o.varies);
+  const usd = (color) => framed?.variants.find((v) => v.size === fifty?.size && v.color === color)?.amount;
+  const dearest = Math.max(...(framed?.variants ?? []).map((v) => v.amount));
+  check(
+    'a framed poster prices each frame from its own variant',
+    fifty?.varies === true && fifty.colors.length >= 2 &&
+      fifty.colors.every((c) => c.amount === storeLib.sellingPrice(framed, fifty.size, c.name)?.amount) &&
+      new Set(fifty.colors.map((c) => c.amount)).size > 1 && fifty.amount === Math.min(...fifty.colors.map((c) => c.amount)),
+    JSON.stringify({ fifty, usd: ['Black', 'Oak', 'White'].map(usd) }),
+  );
+  check(
+    'and its price line runs from the cheapest to the dearest frame',
+    storeLib.priceSummary(framed)?.endsWith(storeLib.money(storeLib.sellingPrice(framed,
+      framed.variants.find((v) => v.amount === dearest).size, framed.variants.find((v) => v.amount === dearest).color).amount, 'ZAR')),
+    storeLib.priceSummary(framed),
+  );
+  const marci = storeLib.findProduct('marci-tee');
+  check(
+    'a tee whose colours cost the same does not say "from"',
+    storeLib.buyOptions(marci).every((o) => o.varies === false && o.colors.length === 2),
+    JSON.stringify(storeLib.buyOptions(marci)[0]),
   );
   fs.rmSync(storeBundle, { force: true });
 }

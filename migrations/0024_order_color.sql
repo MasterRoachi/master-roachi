@@ -1,0 +1,11 @@
+-- Which colour an order is for.
+--
+-- Until 13 Nov 2026 every product came in one colour, so an order named a
+-- product and a size and that was enough to find the variant. Timon's art
+-- brought 27 products in two or three (tees and hoodies in black and white,
+-- totes, phone-case finishes, frames), and a size alone no longer says which
+-- one to print. The buy form asks for it from this migration on.
+--
+-- Null on every order from before this, and on a product with one colour,
+-- where the size alone still finds the variant.
+ALTER TABLE orders ADD COLUMN color TEXT;

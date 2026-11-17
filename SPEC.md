@@ -1122,22 +1122,79 @@ product page; **no people in any picture**.
   and `~/Work/assets/art/face-logo/` (a vector trace of the logo, since the
   master source is not on this machine). Print files reach Printful from the
   R2 bucket `fabled-threads-prints`.
-- **Known limit:** the `/work/shop` Sync button now pages through 130
+- ~~**Known limit:** the `/work/shop` Sync button now pages through 130
   products (a couple of hundred Printful requests with rate-limit waits),
-  which may exceed what one Worker request can do. The build's own sync
-  (`scripts/printful.mjs`) is unaffected.
+  which may exceed what one Worker request can do.~~ **Fixed 2026-11-17**
+  (Bjorn): the button syncs in steps. `start` lists the store, each `chunk`
+  fetches ten products, `finish` puts them together and commits exactly as
+  before; the button shows "Fetching products 41–50 of 130…" and asks for a
+  failed part again, twice. Parts wait between requests in D1 (migration
+  `0025_store_sync_parts`) and are cleared once the commit has worked; a run
+  left unfinished is cleared a day later. `lib/printful.ts` is split into
+  `listCatalogue` and `shapeProducts`, and `fetchCatalogue` is the two in one
+  go, so the build's own sync (`scripts/printful.mjs`) and a POST with no step
+  are unchanged. Ten worker tests cover it. Not yet pressed against the live
+  store.
 - **Shipped 2026-11-13** as `effa5b0`, `6d0bda2` and `31a22b7`, live and checked by
   eye. The first two deploys failed: the worker tests' orders table lacked
   `0023` and their Printful stub missed the paged list; then `scripts/og.mjs`
   let a wide good (desk mat, tapestry) outgrow the 1200px card. The cut-out now
   fits a 560×500 box. The goods pipeline that made the mockups, scenes and 3D
   data is `~/Work/assets/art/timon/tools/`.
+- **The no-crop pass (v3), finished 2026-11-17.** On 13 Nov he overruled the
+  crops ("many of the products are misaligned or cropped"): `prints.py` now
+  trims at most 3% and otherwise keeps the whole picture, carrying its own
+  ground to the edges (up to 25% of the face for wall art), which also opens
+  sizes the crops had refused. That afternoon the pass re-made every piece's
+  print files and updated thirteen pieces in Printful, but stopped before
+  Treant and Friend's pictures and never reached Elderstone Shrine, and the
+  catalogue was not re-synced, so its data sat uncommitted. Finished on
+  17 Nov: both pieces through `run-piece.sh`, then `data/store.json`
+  re-synced (130 products, 121 changed: new thumbnails and more wall-art
+  sizes, e.g. Professor Bones Canvas 12 to 34 sizes). The 3D shows each
+  product's smallest size, so a canvas whose smallest is square shows square.
+  The crop calls below predate that ruling. The per-product share cards in
+  `public/store/og/` are now git-ignored: `og.mjs` makes them at every build.
+- **The store's slowness, fixed 2026-11-17.** `HalftoneField`'s canvas was as
+  tall as its host, so on `/store/` (130 products) it was some 15,000px,
+  redrawn every frame: headless Chromium at desktop size measured 140 long
+  tasks and about 25s of main-thread work while scrolling the page. The canvas
+  is now the screen's height, sticky, and draws only the part of the sheet
+  behind it (the host and the store's `.page` wrappers moved from
+  `overflow: hidden` to `clip`, which sticky needs): 2 long tasks, 0.3s. The
+  "By artwork" tiles use 640px copies (`scripts/piece-thumbs.mjs`, in
+  `prebuild`; 1.8MB to 0.35MB), and the product cards and artwork tiles no
+  longer prefetch (131 background fetches on a scroll of `/store/` to 28).
 - **Calls for Master Roachi to overrule if he likes:** the Stillmere poster's
   22% crop; Lila's poster, metal print and notebook as the whole picture on a
   blurred ground; blurred bands on the Stillmere laptop sleeve; the borrowed
   signatures above; the 26×40″ canvas at 111 dpi against a 110 floor; Unknown
   is faint on black clothing. The R2 bucket's public r2.dev URL is still on;
   switching it off is his call.
+- **Colour, fixed 2026-11-17** (Bjorn). 27 of the 130 products come in more
+  than one colour: every tee and hoodie (black, white), the totes (black,
+  oyster), the phone cases (glossy, matte) and the framed posters (black, oak,
+  white). The buy form never asked for a colour and `findSyncVariant` matched
+  by size alone, refusing a size in two colours, so from 13 Nov every quote
+  for those 27 failed and none of them could be bought. Checked live before
+  the fix: `/api/delivery-za` for the Marci and Lila tees said "could not be
+  quoted". Now the buy panel asks for the colour (swatch chips above the
+  sizes, nothing preselected, a size greyed where the chosen colour does not
+  come in it) wherever there is more than one, and the page's own swatches
+  give way to it. `/api/quote` and `/api/checkout` take `color` and refuse a
+  two-colour size without one; the order stores it (migration `0024`) and
+  Send finds the variant by size and colour. Orders from before keep `color`
+  null and are refused as before if their size is two-coloured. `/work/shop`
+  shows the colour beside the size. Seven worker tests cover it.
+  **Priced by colour too — his ruling, 17 Nov 2026.** Wherever Printful's
+  variant price differs by colour (the framed posters' frames: 50×70 cm was
+  $118 or $127), each colour sells at its own price. The Worker always priced
+  the chosen variant; now the page does too: `sellingPrice` takes the colour,
+  each size's chip shows the chosen colour's price (or "from" the cheapest
+  until one is chosen), and the price line runs from the cheapest variant to
+  the dearest in any colour. A hand-set override in `lib/pricing.json` is
+  still by size and still beats the conversion; there are none. **Not done:** the stage and gallery do not follow the chosen
+  colour; that needs the mockups tagged by colour in `data/gallery.json`.
 
 ### Stage 2 — Projects
 
@@ -1324,7 +1381,9 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
       Nov: fixed and live are 01, 02, 03 (Hire me, prices shown, no founding
       offer), 04 (analytics kept and disclosed; privacy notice privacy-v2),
       05, 08, 09 (the 3D waits for the visitor), 10, 14, and 15 in part; the
-      section names stay as they are. Not yet ruled on: 06, 07, 11, 12, 13.
+      section names stay as they are. 06 became the four articles (queued)
+      and 07 the Printful store (shipped 13 Nov). Not yet ruled on: 11, 12,
+      13.
 - [x] **Terrath and Cultus Botanicus rewritten** 2026-11-04 from their own
       repositories, as stories (see "The voice" under Projects). Fabled Threads
       has no page of its own — its card goes to `/store/`. The original item:

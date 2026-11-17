@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pageMeta } from '@/lib/seo';
@@ -39,6 +41,14 @@ export const metadata: Metadata = pageMeta({
   description:
     'Fabled Threads — print-on-demand merch built around anime and early-2000s cartoon inspired illustrations.',
 });
+
+// A tile wants the small copy of a drawing (scripts/piece-thumbs.mjs), where
+// one has been made: the drawings themselves are 1600px.
+function pieceTile(src: string | null): string | undefined {
+  if (!src?.startsWith('/store/pieces/')) return src ?? undefined;
+  const thumb = src.replace('/store/pieces/', '/store/pieces/thumb/');
+  return fs.existsSync(path.join(process.cwd(), 'public', thumb)) ? thumb : src;
+}
 
 // Fabled Threads keeps its own colour here, the one its project card carried.
 const ACCENT = 'oklch(72% 0.26 350)';
@@ -189,11 +199,11 @@ export default function StorePage() {
             <ul className={styles.pieceList}>
               {pieces.map(({ piece, items }) => (
                 <li key={piece.id}>
-                  <Link href={piecePath(piece)} className={styles.pieceLink}>
+                  <Link href={piecePath(piece)} className={styles.pieceLink} prefetch={false}>
                     <span className={styles.pieceArt}>
                       {pieceImage(piece) ? (
                         <img
-                          src={pieceImage(piece) ?? undefined}
+                          src={pieceTile(pieceImage(piece))}
                           alt=""
                           loading="lazy"
                           decoding="async"
