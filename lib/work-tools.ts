@@ -30,6 +30,7 @@ export type ToolKey =
   | 'writing'
   | 'boards'
   | 'clients'
+  | 'notebook'
   | 'curriculums'
   | 'cards'
   | 'reading'
@@ -101,6 +102,15 @@ export const WORK_APPS: WorkApp[] = [
         // The CRM's four screens since 9 Nov: Today (its home), Pipeline,
         // Accounts and Map. It has no Renewals page.
         what: 'The design business: today, the pipeline, accounts and the map.',
+        outside: true,
+      },
+      // The shared notebooks with clients (Outreach's, his ruling 18 Nov 2026),
+      // on their own address. /admin is behind Access and signs him in.
+      {
+        key: 'notebook',
+        href: 'https://notes.masterroachi.com/admin',
+        name: 'Notebook',
+        what: 'Shared notebooks with clients: groups, invites, notes and pages.',
         outside: true,
       },
     ],

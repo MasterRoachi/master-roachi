@@ -47,6 +47,15 @@ const TOOLS: Record<ToolKey, React.ReactNode> = {
       <path d="M11 12.5v1.5h2v-1.5" />
     </>
   ),
+  // A spiral-bound pad with lines on it, and a pencil: the shared notebook.
+  notebook: (
+    <>
+      <rect x="4" y="4.5" width="12" height="16" rx="1.5" />
+      <path d="M7 3v3M10 3v3M13 3v3" />
+      <path d="M7 10h6M7 13.5h6M7 17h3.5" />
+      <path d="M20 8l-2 10.5-1 1.5-.5-1.7L18.5 8z" />
+    </>
+  ),
   // An open book, the stroke down the middle keeping it from reading as a sheet.
   curriculums: (
     <>
