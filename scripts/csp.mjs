@@ -68,7 +68,14 @@ for (const file of htmlFiles(OUT)) {
 
   // Turnstile, the contact form's spam check, loads from Cloudflare's own
   // host (2026-11-10); public/_headers allows it too.
-  const policy = ["script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com", ...hashes].join(' ');
+  // The games room's TV page (2026-11-18) runs EmulatorJS from its CDN,
+  // pinned to a version: WebAssembly, and its cores' generated code, which it
+  // evaluates. Only that page, which holds nothing else and runs in a frame of
+  // the library; worker/library.ts widens its header policy to match.
+  const parts = path.relative(OUT, file).split(path.sep);
+  const tv = parts[0] === 'wyggzantium' && parts[1] === 'tv';
+  const extra = tv ? " 'unsafe-eval' 'wasm-unsafe-eval' https://cdn.emulatorjs.org blob:" : '';
+  const policy = [`script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com${extra}`, ...hashes].join(' ');
   const meta = `<meta ${MARK} http-equiv="Content-Security-Policy" content="${policy}"/>`;
 
   // Before every script, so the policy is in force when the first one is

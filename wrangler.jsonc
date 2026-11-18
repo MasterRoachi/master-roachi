@@ -95,6 +95,12 @@
 		{
 			"pattern": "tools.masterroachi.com",
 			"custom_domain": true
+		},
+		// The Library of Wyggzantium (2026-11-18): public, no Access in front.
+		// worker/library.ts opens the address on /wyggzantium/.
+		{
+			"pattern": "wigga.masterroachi.com",
+			"custom_domain": true
 		}
 	],
 	// Where the "what should I play next" votes live. A namespace id is an
@@ -131,6 +137,18 @@
 	// is where the config and migrations_dir are:
 	//
 	//   npx wrangler d1 migrations apply master-roachi --remote
+	// The games room's games (2026-11-18): Master Roachi's own, read only
+	// through /roms/ on wigga.masterroachi.com, behind Access (worker/library.ts).
+	// Not bound yet: the bucket does not exist, and a deploy carrying the
+	// binding fails without it. Until then /roms/ answers 503. To turn it on:
+	//   npx wrangler r2 bucket create wyggzantium-roms
+	// then uncomment:
+	// "r2_buckets": [
+	// 	{
+	// 		"binding": "ROMS",
+	// 		"bucket_name": "wyggzantium-roms"
+	// 	}
+	// ],
 	"d1_databases": [
 		{
 			"binding": "DB",

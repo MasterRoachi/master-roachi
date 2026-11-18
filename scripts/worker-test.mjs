@@ -6068,6 +6068,48 @@ check('other paths hit ASSETS', (await res.text()) === '404 page', '');
 
 // --- the three apps on their own addresses (2026-11-10) -----------------------
 {
+  // The Library of Wyggzantium on wigga.masterroachi.com (2026-11-18).
+  const libBundle = path.join(os.tmpdir(), 'master-roachi-library-bundle.mjs');
+  execFileSync(
+    'npx',
+    ['esbuild', 'worker/library.ts', '--bundle', '--format=esm', '--platform=neutral', `--outfile=${libBundle}`],
+    { stdio: 'pipe', shell: true },
+  );
+  const lib = await import(pathToFileURL(libBundle).href);
+  const at = (u) => lib.routeLibrary(new URL(u));
+
+  check('library: its address opens on the library', at('https://wigga.masterroachi.com/')?.location === 'https://wigga.masterroachi.com/wyggzantium/' && at('https://wigga.masterroachi.com/')?.permanent === false, JSON.stringify(at('https://wigga.masterroachi.com/')));
+  check('library: its page, payloads, covers and the site\'s scripts are served there', ['https://wigga.masterroachi.com/wyggzantium/', 'https://wigga.masterroachi.com/wyggzantium/index.txt', 'https://wigga.masterroachi.com/wyggzantium/covers/abc.jpg', 'https://wigga.masterroachi.com/_next/static/chunks/x.js', 'https://wigga.masterroachi.com/icon.png'].every((u) => at(u)?.kind === 'pass'), '');
+  check('library: any other page on its address goes to the public site', at('https://wigga.masterroachi.com/store/?x=1')?.location === 'https://masterroachi.com/store/?x=1', JSON.stringify(at('https://wigga.masterroachi.com/store/?x=1')));
+  check('library: on the apex its page forwards to its address, for good', at('https://masterroachi.com/wyggzantium/')?.location === 'https://wigga.masterroachi.com/wyggzantium/' && at('https://masterroachi.com/wyggzantium/')?.permanent === true, '');
+  check('library: the rest of the site, the apps and localhost are not its business', at('https://masterroachi.com/') === null && at('https://masterroachi.com/wyggzantium/covers/abc.jpg') === null && at('https://admin.masterroachi.com/work/') === null && at('http://localhost:3100/wyggzantium/') === null, '');
+  check('library: /roms/ on its address is the private game store', at('https://wigga.masterroachi.com/roms/ps1/Some%20Game.chd')?.kind === 'roms' && at('https://wigga.masterroachi.com/roms/ps1/Some%20Game.chd')?.key === 'ps1/Some Game.chd' && at('https://wigga.masterroachi.com/roms/')?.key === '', JSON.stringify(at('https://wigga.masterroachi.com/roms/ps1/Some%20Game.chd')));
+  {
+    const page = () => new Response('<html></html>', { headers: { 'content-type': 'text/html' } });
+    const req = (ua) => new Request('https://wigga.masterroachi.com/wyggzantium/', { headers: ua ? { 'sec-ch-ua': ua } : {} });
+    const chrome = lib.isolated(req('"Chromium";v="142", "Google Chrome";v="142"'), new URL('https://wigga.masterroachi.com/wyggzantium/'), page());
+    const firefox = lib.isolated(req(''), new URL('https://wigga.masterroachi.com/wyggzantium/'), page());
+    const cover = lib.isolated(req('"Chromium";v="142"'), new URL('https://wigga.masterroachi.com/wyggzantium/covers/a.jpg'), page());
+    const tv = lib.isolated(req('"Chromium";v="142"'), new URL('https://wigga.masterroachi.com/wyggzantium/tv/'), page());
+    check('library: Chromium gets the page cross-origin isolated, credentialless', chrome.headers.get('cross-origin-embedder-policy') === 'credentialless' && chrome.headers.get('cross-origin-opener-policy') === 'same-origin' && tv.headers.get('cross-origin-embedder-policy') === 'credentialless', '');
+    const policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; connect-src 'self'; font-src 'self'";
+    const withCsp = (u) => lib.isolated(req(''), new URL(u), new Response('', { headers: { 'content-type': 'text/html', 'content-security-policy': policy } })).headers.get('content-security-policy');
+    const widened = withCsp('https://wigga.masterroachi.com/wyggzantium/tv/index.html');
+    check('library: the TV page may run the emulator from its CDN, and nothing more', widened === "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://cdn.emulatorjs.org blob:; style-src 'self' https://cdn.emulatorjs.org; connect-src 'self' https://cdn.emulatorjs.org; font-src 'self' https://cdn.emulatorjs.org data:; worker-src 'self' blob:", widened);
+    check('library: the library page itself keeps the site\'s policy', withCsp('https://wigga.masterroachi.com/wyggzantium/') === policy, withCsp('https://wigga.masterroachi.com/wyggzantium/'));
+    check('library: other browsers and files do not', !firefox.headers.has('cross-origin-embedder-policy') && !cover.headers.has('cross-origin-embedder-policy') && /sec-ch-ua/i.test(firefox.headers.get('vary') ?? ''), '');
+    const bucket = { get: async (k) => (k === 'ps1/a.chd' ? { body: new Response('ROM').body, size: 3, httpEtag: '"e"' } : null) };
+    const yes = async () => true;
+    const no = async () => false;
+    check('library: a game needs a signed-in token', (await lib.serveRom('ps1/a.chd', bucket, no)).status === 403, '');
+    const ok = await lib.serveRom('ps1/a.chd', bucket, yes);
+    check('library: and then it is served, kept private', ok.status === 200 && (await ok.text()) === 'ROM' && /private/.test(ok.headers.get('cache-control')), '');
+    check('library: a path climbing out, a missing game and an unset store are refused', (await lib.serveRom('ps1/../a.chd', bucket, yes)).status === 404 && (await lib.serveRom('ps1/b.chd', bucket, yes)).status === 404 && (await lib.serveRom('ps1/a.chd', undefined, yes)).status === 503, '');
+    check('library: signing in at /roms/ goes back to the library', (await lib.serveRom('', bucket, yes)).headers.get('location') === 'https://wigga.masterroachi.com/wyggzantium/', '');
+  }
+}
+
+{
   const appsBundle = path.join(os.tmpdir(), 'master-roachi-apps-bundle.mjs');
   execFileSync(
     'npx',

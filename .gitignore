@@ -29,3 +29,6 @@ next-env.d.ts
 # them is about 25MB, so they are built rather than kept (2026-11-17). The one
 # older card already committed stays tracked.
 /public/store/og/*.png
+
+# The games room: ROMs for local testing only. Real games live in the private R2 store.
+public/wyggzantium/roms-local/

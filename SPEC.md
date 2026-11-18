@@ -1425,6 +1425,22 @@ assumes a server-rendered app, silently runs the OpenNext migration, and fails.
 
 ## Open Items
 
+- [ ] **The Library of Wyggzantium, first push 18 Nov 2026, still in
+      progress.** A 3D library at `/wyggzantium/`, served on
+      wigga.masterroachi.com (`worker/library.ts`; the code and its act list
+      are in `components/library/README.md`). It has music, video and books
+      on the shelves (the Church Fathers readable in a reading panel), chess and
+      checkers against the computer, and a hidden games room behind a lever
+      book. In the games room, consoles take discs and cartridges and play them
+      through EmulatorJS 4.2.3 (pinned, from cdn.emulatorjs.org) on the
+      TV or on the handheld's own screen. Only the TV page
+      (`/wyggzantium/tv/`) gets 'unsafe-eval'; the library page keeps the
+      site's policy. Left: create the R2 bucket `wyggzantium-roms` and
+      uncomment its binding in `wrangler.jsonc`; add wigga's `roms` path to
+      the admin/learn/tools Access app; list games in
+      `data/wyggzantium-games.json`; wire in PS2 and Dreamcast; the door
+      shelves wait for more books (his ruling).
+
 - [x] **The public-site audit, 11–12 Nov 2026**
       (https://claude.ai/artifact/TfvYyBRvBnLWx8QSHByP64). His rulings of 12
       Nov: fixed and live are 01, 02, 03 (Hire me, prices shown, no founding

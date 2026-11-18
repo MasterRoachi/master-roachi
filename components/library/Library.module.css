@@ -1,0 +1,426 @@
+/* The words over the library are dressed like it: ivory on dark, edged in
+   gold, the title in a serif with Roman capitals. Everything sits at the
+   edges, small, so the hall stays the thing you are looking at.
+
+   The serif is the reader's own (Palatino or Book Antiqua where there is one,
+   Georgia otherwise): the site's CSP loads fonts only from itself, and a face
+   bought in for one page is not worth it. */
+
+.library {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #24190f;
+  color: #f1e6cc;
+  overflow: hidden;
+  --gold: #d9b45f;
+  --serif: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  outline: none;
+}
+
+.canvas:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--gold);
+}
+
+.name {
+  position: absolute;
+  top: 36%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  text-align: center;
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 4.6vw, 3.4rem);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: var(--gold);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.gone {
+  opacity: 0;
+  transform: translate(-50%, -12px);
+}
+
+.held {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  max-width: min(320px, calc(100% - 48px));
+  pointer-events: none;
+}
+
+.kind {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.title {
+  font-family: var(--serif);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
+  margin: 4px 0 0;
+  font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+.by {
+  margin: 4px 0 0;
+  color: #d8ccb0;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+  font-size: 0.95rem;
+}
+
+.page {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: #bfae88;
+}
+
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(28, 20, 12, 0.78);
+  border: 1px solid rgba(217, 180, 95, 0.35);
+  backdrop-filter: blur(6px);
+  font-size: 0.82rem;
+  color: #e9dcbd;
+  text-align: center;
+  pointer-events: none;
+  width: max-content;
+  max-width: calc(100% - 32px);
+}
+
+.esc {
+  color: #a8987a;
+}
+
+.panels {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  max-height: calc(100% - 100px);
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+  width: min(300px, calc(100% - 48px));
+}
+
+.panel {
+  min-width: 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(28, 20, 12, 0.86);
+  border: 1px solid rgba(217, 180, 95, 0.4);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+}
+
+.panel p {
+  margin: 0;
+}
+
+.track {
+  margin-top: 4px !important;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+}
+
+.credit {
+  margin-top: 8px !important;
+  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+  color: #d8ccb0;
+}
+
+.credit a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.note {
+  color: #a8987a;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.controls button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(217, 180, 95, 0.5);
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background: var(--gold);
+  color: #24190f;
+}
+
+.controls button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.time {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  color: #bfae88;
+}
+
+.list {
+  margin: 12px 0 0;
+  padding: 0;
+  /* A long album scrolls inside the panel rather than off the screen. */
+  max-height: min(34vh, 320px);
+  overflow-y: auto;
+  list-style: none;
+  counter-reset: t;
+}
+
+.list li {
+  counter-increment: t;
+}
+
+.list button {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #e9dcbd;
+  cursor: pointer;
+}
+
+.list button::before {
+  content: counter(t) '. ';
+  color: #a8987a;
+}
+
+.list button:hover {
+  background: rgba(217, 180, 95, 0.12);
+}
+
+.list .current {
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.frame {
+  /* YouTube's player, shown as its terms ask: never smaller than 200 × 200. */
+  margin-top: 10px;
+  width: 100%;
+  min-width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.frame iframe {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.indexNav {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-height: calc(100% - 120px);
+}
+
+.indexButton {
+  font: inherit;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 7px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 180, 95, 0.55);
+  background: rgba(28, 20, 12, 0.82);
+  color: var(--gold);
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+
+.indexButton:hover,
+.indexButton[aria-expanded='true'] {
+  background: var(--gold);
+  color: #24190f;
+}
+
+.indexButton:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.index {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 6px 22px;
+  width: min(900px, calc(100vw - 32px));
+  max-height: min(70vh, 640px);
+  overflow: auto;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: rgba(28, 20, 12, 0.94);
+  border: 1px solid rgba(217, 180, 95, 0.4);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.indexWall {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border-bottom: 1px solid rgba(217, 180, 95, 0.3);
+  padding-bottom: 4px;
+}
+
+.indexSection {
+  margin-bottom: 10px;
+}
+
+.indexSection ul {
+  margin: 2px 0 0;
+  padding: 0 0 0 10px;
+  list-style: none;
+}
+
+.indexSection button {
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  padding: 3px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: #e9dcbd;
+  cursor: pointer;
+}
+
+.indexSection button:hover,
+.indexSection button:focus-visible {
+  background: rgba(217, 180, 95, 0.15);
+  color: var(--gold);
+  outline: none;
+}
+
+.indexSectionTitle {
+  font-family: var(--serif) !important;
+  font-size: 1rem !important;
+  color: #f1e6cc !important;
+}
+
+@media (max-width: 640px) {
+  .panels {
+    top: auto;
+    bottom: 76px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+  .held {
+    top: 16px;
+    left: 16px;
+  }
+  .list {
+    display: none;
+  }
+}
+
+/* The games table's panel: two rows of choices and two buttons. */
+.choice {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(217, 180, 95, 0.35);
+}
+
+.choice button,
+.gameButtons button {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: #e9dcbc;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.choice button[aria-pressed='true'] {
+  background: var(--gold);
+  color: #24190f;
+  font-weight: 600;
+}
+
+.gameButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.gameButtons button {
+  border: 1px solid rgba(217, 180, 95, 0.5);
+  color: var(--gold);
+}
+
+.choice button:hover:not([aria-pressed='true']),
+.gameButtons button:hover {
+  background: rgba(217, 180, 95, 0.18);
+}
+
+.choice button:focus-visible,
+.gameButtons button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}

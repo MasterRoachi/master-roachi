@@ -66,6 +66,7 @@ import type { LeadsRpc } from './enquiry-rpc';
 import { handleEnquiry } from './enquiry';
 import { accessTokenValid } from './access';
 import { manifestFor, previewPage, routeApexWork, routeApp } from './apps';
+import { isolated, routeLibrary, serveRom, type RomBucket } from './library';
 import { appForHost } from '../lib/work-tools';
 
 /** The one hostname the site answers on; www redirects here. */
@@ -168,6 +169,14 @@ interface KVNamespace {
 
 interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
+  /**
+   * The games room's games (2026-11-18): an R2 bucket, read only through
+   * /roms/ on the library's address. That path is on the same Access
+   * application as admin, learn and tools, so privateAllowed() verifies his
+   * token against WORK_ACCESS_* exactly as it does for the private APIs.
+   * Unbound, /roms/ answers 503.
+   */
+  ROMS?: RomBucket;
   VOTES?: KVNamespace;
   /**
    * The fallback for an order's delivery details.
@@ -690,6 +699,14 @@ async function handle(request: Request, env: Env): Promise<Response> {
       url.protocol = 'https:';
       return Response.redirect(url.toString(), 301);
     }
+
+    // The Library of Wyggzantium on wigga.masterroachi.com (2026-11-18): its
+    // address opens on it, and its page on the apex forwards there. See
+    // worker/library.ts.
+    const library = routeLibrary(url);
+    if (library?.kind === 'redirect') return Response.redirect(library.location, library.permanent ? 301 : 302);
+    if (library?.kind === 'roms') return serveRom(library.key, env.ROMS, () => privateAllowed(request, url, env));
+    if (library?.kind === 'pass') return isolated(request, url, await env.ASSETS.fetch(request));
 
     // The three backend apps on their own addresses (2026-11-10). Each is
     // served only its own pages and APIs; see worker/apps.ts. Every other

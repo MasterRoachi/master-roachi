@@ -1,0 +1,8 @@
+/* The library is its own place: it covers the whole window, the site's nav
+   and footer included, so on its own address it is all there is. */
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #24190f;
+}

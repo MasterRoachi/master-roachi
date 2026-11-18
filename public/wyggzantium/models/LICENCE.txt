@@ -1,0 +1,20 @@
+The furniture models in this folder are from Poly Haven (https://polyhaven.com),
+released under CC0 (public domain): free to use for any purpose, with no
+credit required. Credited anyway, with thanks:
+
+Chandelier_03.glb                  Chandelier 03, Kirill Sannikov
+ClassicNightstand_01.glb           Classic Nightstand 01, Kirill Sannikov
+gaming_console.glb                 Gaming Console, Sean Buckley
+gothic_coffee_table.glb            Gothic Coffee Table, Ulan Cabanilla
+GreenChair_01.glb                  Green Chair 01, Kirill Sannikov
+marble_bust_01.glb                 Marble Bust 01, Rico Cilliers
+Ottoman_01.glb                     Ottoman 01, Caspian Fortune
+sofa_02.glb                        Sofa 02, Kirill Sannikov
+sofa_03.glb                        Sofa 03, Fran Calvente
+television_02.glb                  Television 02, Benny Weimer
+throw_pillows_01.glb               Throw Pillows 01, Serhii Khromov
+vintage_grandfather_clock_01.glb   Vintage Grandfather Clock 01, Yann Kervran and James Ray Cock
+
+Each was downloaded at 1k from polyhaven.com on 18 Nov 2026 and packed into a
+single .glb with its textures re-encoded as WebP (512 or 1024 px). Geometry
+is unchanged.

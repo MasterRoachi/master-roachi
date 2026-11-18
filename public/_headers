@@ -52,7 +52,12 @@
   # frame-src 'self': the editors on admin preview the real page in a frame
   # from their own address (2026-11-11, his call). Without it the policy
   # allowed only Turnstile's frame, and every preview drew as an empty box.
+  # www.youtube-nocookie.com: the Library of Wyggzantium plays every disc
+  # as a YouTube embed, always visible, never downloaded (2026-11-18).
+  # blob: on img-src and connect-src: the library's furniture is glTF models
+  # with their textures packed inside, and three's loader hands each texture
+  # to the browser as a blob: URL of the page's own making (2026-11-18).
   # form-action names PayFast because the checkout is a form posted to it
   # (live only; the sandbox went with the old checkout on 2026-11-10) —
   # without that the browser refuses the submit.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com; frame-src 'self' https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.payfast.co.za; frame-ancestors 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' blob: https://challenges.cloudflare.com https://cloudflareinsights.com; frame-src 'self' https://challenges.cloudflare.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.payfast.co.za; frame-ancestors 'self'; upgrade-insecure-requests
