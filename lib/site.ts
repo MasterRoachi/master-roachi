@@ -115,13 +115,15 @@ export const site = {
  * Thoughts and About had no colour of their own before this and take one here.
  */
 export const navLinks = [
-  { href: '/projects/', label: 'Work', accent: 'oklch(97% 0 0)' },
+  // Work leads to one page in three tabs, My work, Websites and Software
+  // (18 Nov 2026), so it also answers on /hire/, where the other two live.
+  { href: '/projects/', label: 'Work', accent: 'oklch(97% 0 0)', also: ['/hire/'] },
   { href: '/gaming/', label: 'Fun', accent: 'oklch(86% 0.20 135)' },
   { href: '/orthodoxy/', label: 'Foundations', accent: 'oklch(84% 0.16 92)' },
   { href: '/store/', label: 'Store', accent: 'oklch(72% 0.26 350)' },
   { href: '/writing/', label: 'Thoughts', accent: 'oklch(74% 0.15 250)' },
-  // The design business, for prospects his outreach reaches (2026-11-10).
-  // Teal: no other section answers in it.
-  { href: '/hire/', label: 'Hire me', accent: 'oklch(80% 0.12 190)' },
+  // "Hire me" was its own link from 2026-11-10 to 2026-11-18. It is now the
+  // Websites and Software tabs of Work; teal and violet live on in the
+  // switcher (components/WorkTabs.tsx).
   { href: '/about/', label: 'About', accent: 'oklch(76% 0.17 55)' },
 ];

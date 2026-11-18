@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/writing',
     '/store',
     '/hire',
+    '/hire/software',
     '/privacy',
     '/about',
     '/policies',

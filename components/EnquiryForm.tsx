@@ -45,7 +45,21 @@ function newId(): string {
   return crypto.randomUUID().toLowerCase();
 }
 
-export default function EnquiryForm() {
+/**
+ * `kind` is which hire tab the form is on (18 Nov 2026). A software enquiry
+ * goes to the same Pipeline in the CRM, marked by a first line on its message,
+ * so nothing on the Worker or the CRM had to change; and it does not ask for
+ * the business's current website, which only a website enquiry needs.
+ */
+/**
+ * Under `next dev` there is no Worker to answer /api/enquiry, so the form
+ * would always fall back to the email address. In development it is drawn
+ * anyway, without the spam check (so Send stays off), for previewing the
+ * page. A production build drops this branch.
+ */
+const OFF: State = process.env.NODE_ENV === 'development' ? { kind: 'ready', siteKey: '' } : { kind: 'off' };
+
+export default function EnquiryForm({ kind = 'website' }: { kind?: 'website' | 'software' }) {
   const [state, setState] = useState<State>({ kind: 'checking' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -63,9 +77,9 @@ export default function EnquiryForm() {
       .then((r) => r.json())
       .then((b: { configured?: boolean; siteKey?: string }) => {
         if (!live) return;
-        setState(b.configured && b.siteKey ? { kind: 'ready', siteKey: b.siteKey } : { kind: 'off' });
+        setState(b.configured && b.siteKey ? { kind: 'ready', siteKey: b.siteKey } : OFF);
       })
-      .catch(() => live && setState({ kind: 'off' }))
+      .catch(() => live && setState(OFF))
       .finally(() => window.clearTimeout(timer));
     return () => {
       live = false;
@@ -75,7 +89,7 @@ export default function EnquiryForm() {
   }, []);
 
   useEffect(() => {
-    if (state.kind !== 'ready' || !widget.current) return;
+    if (state.kind !== 'ready' || !state.siteKey || !widget.current) return;
     const el = widget.current;
     const draw = () => {
       if (!window.turnstile || widgetId.current) return;
@@ -118,7 +132,8 @@ export default function EnquiryForm() {
           email: data.get('email'),
           phone: data.get('phone'),
           website: withScheme(data.get('website')),
-          message: data.get('message'),
+          message:
+            kind === 'software' ? `Software enquiry (apps and tools)\n\n${String(data.get('message') ?? '')}` : data.get('message'),
           marketing: data.get('marketing') === 'yes',
           nickname: data.get('nickname'),
           token,
@@ -181,7 +196,7 @@ export default function EnquiryForm() {
         <input id="enquiry-name" name="name" required maxLength={100} autoComplete="name" />
       </div>
       <div className={styles.row}>
-        <label htmlFor="enquiry-business">Business</label>
+        <label htmlFor="enquiry-business">{kind === 'software' ? 'Business or organisation' : 'Business'}</label>
         <input id="enquiry-business" name="business" required maxLength={120} autoComplete="organization" />
       </div>
       <div className={styles.pair}>
@@ -196,15 +211,17 @@ export default function EnquiryForm() {
           <input id="enquiry-phone" name="phone" type="tel" maxLength={40} autoComplete="tel" />
         </div>
       </div>
+      {kind === 'website' && (
+        <div className={styles.row}>
+          <label htmlFor="enquiry-website">
+            Current website <span className={styles.optional}>if you have one</span>
+          </label>
+          <input id="enquiry-website" name="website" type="text" inputMode="url" maxLength={300} placeholder="www.yourbusiness.co.za" autoComplete="url" />
+        </div>
+      )}
       <div className={styles.row}>
-        <label htmlFor="enquiry-website">
-          Current website <span className={styles.optional}>if you have one</span>
-        </label>
-        <input id="enquiry-website" name="website" type="text" inputMode="url" maxLength={300} placeholder="www.yourbusiness.co.za" autoComplete="url" />
-      </div>
-      <div className={styles.row}>
-        <label htmlFor="enquiry-message">What do you need?</label>
-        <textarea id="enquiry-message" name="message" required maxLength={2000} rows={5} />
+        <label htmlFor="enquiry-message">{kind === 'software' ? 'The job, in a few lines' : 'What do you need?'}</label>
+        <textarea id="enquiry-message" name="message" required maxLength={kind === 'software' ? 1960 : 2000} rows={5} />
       </div>
 
       {/* Hidden from people, there for bots. */}
@@ -220,8 +237,8 @@ export default function EnquiryForm() {
       <div className={styles.check}>
         <input id="enquiry-marketing" name="marketing" type="checkbox" value="yes" />
         <label htmlFor="enquiry-marketing">
-          Yes, Master Roachi may also email me now and then about website services and offers. I can
-          ask him to stop at any time.
+          Yes, Master Roachi may also email me now and then about {kind === 'software' ? 'software' : 'website'}{' '}
+          services and offers. I can ask him to stop at any time.
         </label>
       </div>
 

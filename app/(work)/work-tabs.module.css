@@ -1,0 +1,13 @@
+/* The frame shared by the three tabs: the starfield behind, the panel above
+   it. The switcher's own styles are in components/WorkTabs.module.css. */
+
+.page {
+  position: relative;
+}
+
+/* Above the starfield, which is absolutely placed and would otherwise paint
+   over content that is not positioned. */
+.panel {
+  position: relative;
+  z-index: 1;
+}

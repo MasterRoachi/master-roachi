@@ -59,14 +59,15 @@ Arkitecture's content is simply the projects.
 
 ```
 /            hero, projects, gaming + orthodoxy, recent writing
-/projects    all projects with status
+/projects    Work, tab 1 of 3: his own projects (see "Work and Hire me, one page")
 /projects/<slug>
 /gaming      streaming, now playing, up next, finished, tier list, reviews
 /orthodoxy   published, in the works, articles
 /writing     all posts, filterable by track
 /writing/<slug>
 /about       the ethos, tools, contact
-/hire        the design business: what I build, how it works, client work, the contact form
+/hire        Work, tab 2: websites for businesses: how it works, prices, care, the form
+/hire/software  Work, tab 3: apps, tools and automation, in the same shape
 /rss.xml  /sitemap.xml  /robots.txt
 
 /work        PRIVATE — the back of the house. See The Backend.
@@ -84,6 +85,50 @@ one project among several, not a section.
 a server behind it. Everything else above is a static file.
 
 ## Content Decisions
+
+### Work and Hire me, one page (18 Nov 2026)
+
+His ask: Work and Hire me become one page in three tabs, My work, Websites and
+Software (freelance software work beyond websites). Mockup approved the same
+day: https://claude.ai/artifact/NGEkKAJReRVjtqQdzirazF. Built by Fjord over
+several rounds with him the same day.
+
+- **Each tab is its own address**: `/projects/`, `/hire/`, `/hire/software/`.
+  Not `/work/`, which is the backend's. `/hire` stays because the printed
+  price sheet and leave-behind carry it. The three pages sit in the route
+  group `app/(work)/`, whose layout holds the starfield, the switcher
+  (`components/WorkTabs.tsx`) and the hero (`components/WorkHero.tsx`);
+  `/projects/<slug>/` stays outside the group.
+- **The nav has one link, Work**, lit on all three (`also` in `navLinks`).
+  "Hire me" as its own link is gone; its teal is the Websites tab's colour, and
+  Software answers in violet.
+- **The page must not jump** (his rule). The switcher is not sticky, sits at
+  the top of all three tabs and lives in the layout; its links pass
+  `scroll={false}`. The three heroes are drawn into one grid cell with only the
+  current one visible, so the hero is as tall as the tallest at every width and
+  nothing below it moves on a switch.
+- **Heroes:** words on the left, four picture tiles on the right, the same on
+  every tab. My work has no tiles (its page shows the work) and carries the
+  laptop mark, as Fun and Foundations carry theirs. Websites' tiles are the
+  client sites and Fabled Threads; Software's are Obedience, Drawing Things and
+  Making Noise (two of Greg and Larry's Tools), and Ohana, shown at his word as
+  "In use, private", with no link and no description. Logos are drawn whole
+  (`logo`), pictures as backdrops. The hero buttons are "Contact me", which
+  slides to the form, and "See prices".
+- **The hire tabs, top to bottom:** how it works (a numbered rail), the four
+  priced kinds of job (`PriceTiers.tsx`; Websites switches between once-off and
+  monthly, each with its own terms), support plans (`CarePlans.tsx`, the price
+  large), questions, then the ways in (`ContactWays.tsx`) and the form. The
+  client lists and "Who you deal with" were removed; the tiles carry the proof.
+- **Software's prices** are outreach `docs/PLAN.md` §1.5, from the research in
+  `docs/research/07-software-pricing.md`, printed as
+  `docs/sales/software-price-sheet.pdf`. A cut of about a quarter was tried and
+  taken back the same day; he shipped them as they stand.
+- **The enquiry form** takes `kind="software"`: no "current website" field, and
+  the message reaches the CRM's Pipeline with "Software enquiry (apps and
+  tools)" as its first line, so nothing changed on the Worker or the CRM. Under
+  `next dev` the form is drawn without its spam check, for previewing.
+
 
 ### Projects
 

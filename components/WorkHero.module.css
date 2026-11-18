@@ -1,0 +1,262 @@
+/* The hero over Work's three tabs: one layout, one height. The three
+   are drawn into a single grid cell (see WorkHero.tsx), so the cell is always
+   as tall as the tallest and the content below never moves between tabs. */
+
+.stack {
+  /* Above the layout's starfield, which is absolutely placed. */
+  position: relative;
+  z-index: 1;
+  display: grid;
+  padding-block: clamp(28px, 5vw, 56px) clamp(8px, 2vw, 16px);
+}
+
+.hero {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: 28px;
+  visibility: hidden;
+}
+
+.hero[data-active] {
+  visibility: visible;
+}
+
+/* Words on the left, the four tiles on the right, as the Websites hero was
+   first drawn. The words sit in the middle of whatever height the tallest of
+   the three heroes needs; the tiles fill it, so the four are the same
+   size and on the same lines on every tab. */
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 36px;
+  }
+}
+
+.text {
+  align-self: center;
+}
+
+/* The section's mark, where PageHeader puts it on Fun and Foundations. */
+.mark {
+  display: block;
+  margin-bottom: 18px;
+  color: var(--accent-a);
+}
+
+.title {
+  margin: 4px 0 16px;
+  font-size: clamp(2.3rem, 6vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.title em {
+  font-style: normal;
+  color: var(--accent-a);
+}
+
+.lede {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* CyclingQuote's figure, centred with the rest. */
+.quote {
+  max-width: 60ch;
+}
+
+
+.quote figure {
+  margin: 0;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: 1px solid var(--line-bright);
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: color-mix(in oklch, var(--bg) 60%, transparent);
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.btn:hover {
+  border-color: var(--accent-a);
+  color: var(--accent-a);
+  text-decoration: none;
+}
+
+.btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.primary {
+  border-color: var(--accent-a);
+  color: var(--accent-a);
+}
+
+/* Four picture tiles, two by two. On a desk they fill the hero's height, so
+   they are the same size and in the same place on every tab. */
+.tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(150px, 1fr);
+  gap: 12px;
+}
+
+.tile {
+  --mx: 50%;
+  --my: 50%;
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  height: 100%;
+  min-height: 150px;
+  padding: 14px 16px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg-raised);
+  color: var(--ink);
+  text-decoration: none;
+  transform: perspective(700px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition:
+    transform 0.12s ease-out,
+    border-color 0.18s ease,
+    box-shadow 0.25s ease;
+}
+
+.tile img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+/* A logo is drawn whole, in the space above the words, not cropped as a
+   backdrop. */
+.tile[data-logo] img {
+  inset: 14px 14px 72px;
+  width: calc(100% - 28px);
+  height: calc(100% - 86px);
+  object-fit: contain;
+}
+
+.tile[data-logo]:hover img,
+.tile[data-logo]:focus-visible img {
+  transform: scale(1.04);
+}
+
+/* The wash: dark at the foot where the words are, clear at the top. */
+.tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, oklch(10% 0 0 / 0.94) 0%, oklch(10% 0 0 / 0.55) 45%, oklch(10% 0 0 / 0.05) 100%);
+}
+
+/* The cursor light, in the tab's colour. */
+.tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0;
+  background: radial-gradient(240px circle at var(--mx) var(--my), color-mix(in oklch, var(--accent-a) 22%, transparent), transparent 70%);
+  transition: opacity 0.25s ease;
+}
+
+.tile:hover,
+.tile:focus-visible {
+  border-color: var(--accent-a);
+  box-shadow: 0 16px 40px oklch(0% 0 0 / 0.5);
+  text-decoration: none;
+}
+
+.tile:hover::after,
+.tile:focus-visible::after {
+  opacity: 1;
+}
+
+.tile:hover img,
+.tile:focus-visible img {
+  transform: scale(1.06);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--accent-a);
+  outline-offset: 2px;
+}
+
+.label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-a);
+}
+
+.name {
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.status {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.tile:hover .status span,
+.tile:focus-visible .status span {
+  color: var(--accent-a);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .tile,
+  .tile img {
+    transition: none;
+  }
+
+  .tile {
+    transform: none;
+  }
+}

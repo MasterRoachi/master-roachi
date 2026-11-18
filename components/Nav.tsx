@@ -79,8 +79,10 @@ export default function Nav() {
     e.currentTarget.style.removeProperty('--my');
   };
 
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+  const isActive = (link: { href: string; also?: readonly string[] }) =>
+    link.href === '/'
+      ? pathname === '/'
+      : [link.href, ...(link.also ?? [])].some((h) => pathname.startsWith(h));
 
   return (
     <header className={styles.nav} data-scrolled={scrolled || undefined}>
@@ -117,8 +119,8 @@ export default function Nav() {
               className={styles.link}
               // The section colour, read by the sheen gradient in the CSS.
               style={{ '--sheen': link.accent } as React.CSSProperties}
-              data-active={isActive(link.href)}
-              aria-current={isActive(link.href) ? 'page' : undefined}
+              data-active={isActive(link)}
+              aria-current={isActive(link) ? 'page' : undefined}
               onPointerMove={onLinkMove}
               onPointerLeave={onLinkLeave}
             >
