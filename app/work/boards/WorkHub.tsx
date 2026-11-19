@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   CARDS_PER_LIST,
+  FINISHED_LIST,
   HIDDEN_LISTS,
   keywordsOf,
   STALE_DAYS,
@@ -51,13 +52,8 @@ type State =
   | { phase: 'error'; message: string }
   | { phase: 'ready'; data: WorkHubPayload };
 
-/**
- * The list that means finished, whatever a board calls it.
- *
- * Marked out among the move buttons, because finishing is the thing done most.
- * Command calls it Done; North Star calls it Completed.
- */
-const FINISHED_LIST = /^(done|completed|complete)$/i;
+/* FINISHED_LIST (lib/work-hub) is marked out among the move buttons, because
+   finishing is the thing done most. */
 
 const DAY = 86_400_000;
 
@@ -86,9 +82,11 @@ const GROUPS: { key: GroupKey; label: string }[] = [
  * (the mockup's own example), because a Doing card nobody touched for nine
  * days is the one that wants an eye; then a card in a Today, Doing or This
  * week list is This week. A fresh Waiting card, or a day-job card with no date
- * that moved recently, is in none, and the board view still shows it.
+ * that moved recently, is in none, and the board view still shows it. A
+ * finished card (Done or Completed, or its date ticked complete) is in none.
  */
 function groupOf(entry: Entry, now: number): GroupKey | null {
+  if (entry.card.done) return null;
   if (entry.due !== null && entry.due < now) return 'late';
   if (entry.due !== null && entry.due < now + 7 * DAY) return 'week';
   if (entry.idle !== null && entry.idle >= STALE_DAYS) return 'quiet';
@@ -174,7 +172,7 @@ function Chip({
      disagree about a day boundary they crossed between renders. */
   const [now] = useState(() => Date.now());
   const idle = daysSince(card.lastActivity, now);
-  const overdue = card.due !== null && Date.parse(card.due) < now;
+  const overdue = !card.done && card.due !== null && Date.parse(card.due) < now;
 
   return (
     <li>
@@ -189,7 +187,7 @@ function Chip({
             labels on it would be the whole chip. */}
         <span className={styles.marks}>
           {overdue && <span className={styles.overdue} title="Overdue" />}
-          {idle !== null && idle >= STALE_DAYS && (
+          {!card.done && idle !== null && idle >= STALE_DAYS && (
             <span className={styles.stale} title={`${idle} days still`} />
           )}
         </span>
@@ -637,11 +635,11 @@ export default function WorkHub() {
                 </span>
               ))}
               {sheetCard.due && (
-                <span className={Date.parse(sheetCard.due) < openedAt ? ui.chipBad : ui.chip}>
+                <span className={!sheetCard.done && Date.parse(sheetCard.due) < openedAt ? ui.chipBad : ui.chip}>
                   due {new Date(sheetCard.due).toLocaleDateString('en-ZA', { day: '2-digit', month: 'short' })}
                 </span>
               )}
-              {sheetIdle !== null && sheetIdle >= STALE_DAYS && (
+              {!sheetCard.done && sheetIdle !== null && sheetIdle >= STALE_DAYS && (
                 <span className={ui.chipAccent}>{sheetIdle} days still</span>
               )}
             </p>

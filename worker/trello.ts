@@ -13,6 +13,7 @@
 
 import {
   bucketFor,
+  FINISHED_LIST,
   isHiddenBoard,
   isWorkBoard,
   type WorkBoard,
@@ -39,6 +40,7 @@ interface RawBoard {
     idList: string;
     due: string | null;
     dateLastActivity: string | null;
+    dueComplete?: boolean;
     labels?: { name: string }[];
   }[];
 }
@@ -63,7 +65,7 @@ async function fetchBoard(id: string, creds: TrelloCreds): Promise<RawBoard> {
       lists: 'open',
       list_fields: 'name',
       cards: 'open',
-      card_fields: 'name,url,idList,due,dateLastActivity,labels',
+      card_fields: 'name,url,idList,due,dueComplete,dateLastActivity,labels',
     });
 
   const response = await fetch(url, { headers: { accept: 'application/json' } });
@@ -117,6 +119,9 @@ function shape(raw: RawBoard, scope: 'mine' | 'day-job'): WorkBoard {
       labels: (card.labels ?? []).map((l) => l.name).filter(Boolean),
       due: card.due ?? null,
       lastActivity: card.dateLastActivity ?? null,
+      // A day-job board keeps its Completed list, so a card finished there
+      // in August still carries August's date and must not read as late.
+      done: card.dueComplete === true || FINISHED_LIST.test((listName.get(card.idList) ?? '').trim()),
     });
   }
 

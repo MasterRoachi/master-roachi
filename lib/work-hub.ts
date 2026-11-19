@@ -160,7 +160,19 @@ export interface WorkCard {
   due: string | null;
   /** ISO, UTC. Drives the "untouched for N days" marker. */
   lastActivity: string | null;
+  /**
+   * Finished: in a Done or Completed list, or its due date ticked complete in
+   * Trello. A finished card is never Late, This week or Gone quiet, however
+   * old its date; the board view still shows it in its list.
+   */
+  done: boolean;
 }
+
+/**
+ * The list that means finished, whatever a board calls it.
+ * Command calls it Done; North Star and Sales call it Completed.
+ */
+export const FINISHED_LIST = /^(done|completed|complete)$/i;
 
 export interface WorkBoard {
   id: string;
@@ -194,7 +206,7 @@ export interface WorkBoard {
 export function soonestDue(board: WorkBoard): number {
   let soonest = Number.POSITIVE_INFINITY;
   for (const card of board.cards) {
-    if (!card.due) continue;
+    if (!card.due || card.done) continue;
     const at = Date.parse(card.due);
     if (Number.isFinite(at) && at < soonest) soonest = at;
   }

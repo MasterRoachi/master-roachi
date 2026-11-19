@@ -1023,6 +1023,7 @@ globalThis.fetch = async (input) => {
       lists: [
         { id: 'w1', name: 'Sprint backlog' },
         { id: 'w2', name: 'Blocked' },
+        { id: 'w3', name: 'Completed' },
       ],
       cards: [
         {
@@ -1052,6 +1053,25 @@ globalThis.fetch = async (input) => {
           idList: 'w2',
           due: null,
           dateLastActivity: '2026-10-07T09:00:00.000Z',
+          labels: [],
+        },
+        {
+          id: 'w-finished',
+          name: 'Finished in August',
+          url: 'https://trello.com/c/wf',
+          idList: 'w3',
+          due: '2026-08-28T10:00:00.000Z',
+          dateLastActivity: '2026-09-01T09:00:00.000Z',
+          labels: [],
+        },
+        {
+          id: 'w-ticked',
+          name: 'Ticked complete, still in the backlog',
+          url: 'https://trello.com/c/wk',
+          idList: 'w1',
+          due: '2026-08-29T10:00:00.000Z',
+          dueComplete: true,
+          dateLastActivity: '2026-09-01T09:00:00.000Z',
           labels: [],
         },
       ],
@@ -1119,8 +1139,15 @@ check(
 );
 check(
   'a day-job board is read whole, assigned or not',
-  workBoard?.cards.length === 3,
+  workBoard?.cards.length === 5,
   JSON.stringify(workBoard?.cards.map((c) => c.id)),
+);
+check(
+  'a card in Completed, or ticked complete, is done; an open one is not',
+  workBoard?.cards.find((c) => c.id === 'w-finished')?.done === true &&
+    workBoard?.cards.find((c) => c.id === 'w-ticked')?.done === true &&
+    workBoard?.cards.find((c) => c.id === 'w-mine')?.done === false,
+  JSON.stringify(workBoard?.cards.map((c) => [c.id, c.list, c.done])),
 );
 check(
   'a day-job card carries its real list and no bucket',
