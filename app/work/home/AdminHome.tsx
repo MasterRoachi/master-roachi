@@ -120,15 +120,6 @@ export default function AdminHome() {
               <span className={dash.tileS}>today, pipeline, accounts, map</span>
             </a>
           </li>
-          <li>
-            <a className={`${dash.tile} card-link`} href="https://notes.masterroachi.com/admin">
-              <span className={dash.tileK}>
-                <i className={dash.dot} /> Notebook
-              </span>
-              <span className={dash.tileV}>Notes ↗</span>
-              <span className={dash.tileS}>shared with clients</span>
-            </a>
-          </li>
         </ul>
 
         <div className={dash.grid}>

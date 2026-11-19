@@ -104,15 +104,6 @@ export const WORK_APPS: WorkApp[] = [
         what: 'The design business: today, the pipeline, accounts and the map.',
         outside: true,
       },
-      // The shared notebooks with clients (Outreach's, his ruling 18 Nov 2026),
-      // on their own address. /admin is behind Access and signs him in.
-      {
-        key: 'notebook',
-        href: 'https://notes.masterroachi.com/admin',
-        name: 'Notebook',
-        what: 'Shared notebooks with clients: groups, invites, notes and pages.',
-        outside: true,
-      },
     ],
     apis: [
       '/api/work',
@@ -176,6 +167,16 @@ export const WORK_APPS: WorkApp[] = [
         href: 'https://ohana.masterroachi.com/',
         name: 'Ohana',
         what: 'For the two of you, on its own address.',
+        outside: true,
+      },
+      // The shared notebooks with clients, on their own address; /admin is
+      // behind Access and signs him in. Outreach's tool (his ruling 18 Nov
+      // 2026), but its door is in Tools, not Admin (his call, 19 Nov 2026).
+      {
+        key: 'notebook',
+        href: 'https://notes.masterroachi.com/admin',
+        name: 'Notebook',
+        what: 'Shared notebooks with clients: groups, invites, notes and pages.',
         outside: true,
       },
     ],

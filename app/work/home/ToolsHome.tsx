@@ -14,7 +14,8 @@ import dash from './dash.module.css';
 // The tools home: today's habits ARE the home (his pick, 2026-11-10, redesign
 // page, Tools doors: B). Each habit is a tile; tapping it ticks it for today,
 // and a ticked tile shows its streak. Habits, Sketchpad, Kame and Ohana sit
-// underneath as small cards; Kame and Ohana are their own apps on their own
+// underneath as small cards (and the Notebook, since 19 Nov); Kame, Ohana and
+// the Notebook are their own apps on their own
 // addresses (kame. and ohana.masterroachi.com, since 2026-11-11), so their
 // cards are plain <a> and say where they go, as the Clients door does on admin.
 //
@@ -164,6 +165,13 @@ export default function ToolsHome() {
             <span className={styles.muted}>For the two of you</span>
           </span>
         </a>
+        <a className={`${styles.small} card-link`} href="https://notes.masterroachi.com/admin">
+          <DoorIcon tool="notebook" />
+          <span>
+            <b>Notebook ↗</b>
+            <span className={styles.muted}>Shared with clients</span>
+          </span>
+        </a>
       </div>
 
       <OtherApps app="tools" />
@@ -255,6 +263,15 @@ function ToolsDash({
             </span>
             <span className={dash.tileV}>Ours ↗</span>
             <span className={dash.tileS}>on its own address</span>
+          </a>
+        </li>
+        <li>
+          <a className={`${dash.tile} card-link`} href="https://notes.masterroachi.com/admin">
+            <span className={dash.tileK}>
+              <i className={dash.dot} /> Notebook
+            </span>
+            <span className={dash.tileV}>Notes ↗</span>
+            <span className={dash.tileS}>shared with clients</span>
           </a>
         </li>
       </ul>
