@@ -1,13 +1,20 @@
 {
-  "fetchedAt": "2026-11-13T12:59:45.425Z",
+  "fetchedAt": "2026-11-21T13:23:14.776Z",
   "current": {
-    "appid": 431730,
-    "title": "Aseprite",
-    "icon": "da61bd2806f69205a97609dcdd4ca27df3baf800",
-    "minutesTwoWeeks": 0,
-    "minutesTotal": 4302
+    "appid": 1092790,
+    "title": "Inscryption",
+    "icon": "25c02dcbabe97febe787797195099325a4d47935",
+    "minutesTwoWeeks": 11,
+    "minutesTotal": 42
   },
   "recent": [
+    {
+      "appid": 1092790,
+      "title": "Inscryption",
+      "icon": "25c02dcbabe97febe787797195099325a4d47935",
+      "minutesTwoWeeks": 11,
+      "minutesTotal": 42
+    },
     {
       "appid": 431730,
       "title": "Aseprite",
@@ -112,13 +119,6 @@
       "icon": "529d0f064196911482aeeb8f42ffcc1ff77fed67",
       "minutesTwoWeeks": 0,
       "minutesTotal": 15
-    },
-    {
-      "appid": 105600,
-      "title": "Terraria",
-      "icon": "858961e95fbf869f136e1770d586e0caefd4cfac",
-      "minutesTwoWeeks": 0,
-      "minutesTotal": 179
     }
   ],
   "perfect": [
@@ -1684,9 +1684,9 @@
     },
     "1092790": {
       "name": "Inscryption",
-      "minutes": 31,
+      "minutes": 42,
       "icon": "25c02dcbabe97febe787797195099325a4d47935",
-      "unlocked": 0,
+      "unlocked": 1,
       "total": 40
     },
     "1097200": {
