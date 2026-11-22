@@ -1,19 +1,19 @@
 {
-  "fetchedAt": "2026-11-21T13:23:14.776Z",
+  "fetchedAt": "2026-11-22T13:14:55.493Z",
   "current": {
     "appid": 1092790,
     "title": "Inscryption",
     "icon": "25c02dcbabe97febe787797195099325a4d47935",
-    "minutesTwoWeeks": 11,
-    "minutesTotal": 42
+    "minutesTwoWeeks": 109,
+    "minutesTotal": 140
   },
   "recent": [
     {
       "appid": 1092790,
       "title": "Inscryption",
       "icon": "25c02dcbabe97febe787797195099325a4d47935",
-      "minutesTwoWeeks": 11,
-      "minutesTotal": 42
+      "minutesTwoWeeks": 109,
+      "minutesTotal": 140
     },
     {
       "appid": 431730,
@@ -1684,9 +1684,9 @@
     },
     "1092790": {
       "name": "Inscryption",
-      "minutes": 42,
+      "minutes": 140,
       "icon": "25c02dcbabe97febe787797195099325a4d47935",
-      "unlocked": 1,
+      "unlocked": 6,
       "total": 40
     },
     "1097200": {
