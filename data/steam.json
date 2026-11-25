@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-11-22T13:14:55.493Z",
+  "fetchedAt": "2026-11-25T15:28:41.342Z",
   "current": {
     "appid": 1092790,
     "title": "Inscryption",
@@ -14,6 +14,13 @@
       "icon": "25c02dcbabe97febe787797195099325a4d47935",
       "minutesTwoWeeks": 109,
       "minutesTotal": 140
+    },
+    {
+      "appid": 1203620,
+      "title": "Enshrouded",
+      "icon": "b51ff4aa19722a1f3587b35f37f590a998f36a9a",
+      "minutesTwoWeeks": 18,
+      "minutesTotal": 18
     },
     {
       "appid": 431730,
@@ -112,13 +119,6 @@
       "icon": "503acf3ef0503e24af6b5336012a1f585a2f955e",
       "minutesTwoWeeks": 0,
       "minutesTotal": 36
-    },
-    {
-      "appid": 1244090,
-      "title": "Sea of Stars: Sunset Edition",
-      "icon": "529d0f064196911482aeeb8f42ffcc1ff77fed67",
-      "minutesTwoWeeks": 0,
-      "minutesTotal": 15
     }
   ],
   "perfect": [
