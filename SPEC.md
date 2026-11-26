@@ -350,6 +350,14 @@ carrying least — and clicking one opens it dead centre with the page dimmed.
 Boards are ordered by their soonest due card; one with nothing due sorts last,
 because no deadline is not the same as an imminent one.
 
+**A finished card is never late** (fixed 19 Nov 2026, a591e68). A day-job
+board is read whole, so North Star's and Sales' Completed lists reached the
+hub, and a card finished in August showed Late on its old date. A card is
+`done` when it sits in Done or Completed (`FINISHED_LIST` in
+`lib/work-hub.ts`) or Trello has its date ticked complete (`dueComplete`): it
+joins no group, gets no overdue or still mark, and does not order the boards.
+The board view still shows it in its list.
+
 `Waiting` is a bucket: blocked on somebody else is the state that goes quiet
 and is forgotten. `Inbox`, `Done` and Command's `Projects` list are not — Inbox
 is uncategorised capture and showing it makes the hub a second inbox, Done is

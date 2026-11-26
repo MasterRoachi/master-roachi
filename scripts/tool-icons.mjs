@@ -20,6 +20,7 @@ const TOOLS = [
   ['vuedotjs', 'Vue'],
   ['nuxt', 'Nuxt'],
   ['godotengine', 'Godot'],
+  ['cplusplus', 'C++'],
   ['python', 'Python'],
   ['nodedotjs', 'Node.js'],
   ['sqlite', 'SQLite'],
