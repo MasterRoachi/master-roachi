@@ -1,19 +1,26 @@
 {
-  "fetchedAt": "2026-11-25T15:28:41.342Z",
+  "fetchedAt": "2026-11-26T15:00:09.178Z",
   "current": {
     "appid": 1092790,
     "title": "Inscryption",
     "icon": "25c02dcbabe97febe787797195099325a4d47935",
-    "minutesTwoWeeks": 109,
-    "minutesTotal": 140
+    "minutesTwoWeeks": 179,
+    "minutesTotal": 210
   },
   "recent": [
     {
       "appid": 1092790,
       "title": "Inscryption",
       "icon": "25c02dcbabe97febe787797195099325a4d47935",
-      "minutesTwoWeeks": 109,
-      "minutesTotal": 140
+      "minutesTwoWeeks": 179,
+      "minutesTotal": 210
+    },
+    {
+      "appid": 232810,
+      "title": "Godus",
+      "icon": "4ee4e78811f8600fa39bc4377129b124b63e42a1",
+      "minutesTwoWeeks": 129,
+      "minutesTotal": 5523
     },
     {
       "appid": 1203620,
@@ -112,13 +119,6 @@
       "icon": "3368d467f4f60f9f07ec4c206a22184fae060be2",
       "minutesTwoWeeks": 0,
       "minutesTotal": 23
-    },
-    {
-      "appid": 1466860,
-      "title": "Age of Empires IV: Anniversary Edition",
-      "icon": "503acf3ef0503e24af6b5336012a1f585a2f955e",
-      "minutesTwoWeeks": 0,
-      "minutesTotal": 36
     }
   ],
   "perfect": [
@@ -608,7 +608,7 @@
     },
     "232810": {
       "name": "Godus",
-      "minutes": 5393,
+      "minutes": 5523,
       "icon": "4ee4e78811f8600fa39bc4377129b124b63e42a1",
       "unlocked": null,
       "total": null
@@ -1684,9 +1684,9 @@
     },
     "1092790": {
       "name": "Inscryption",
-      "minutes": 140,
+      "minutes": 210,
       "icon": "25c02dcbabe97febe787797195099325a4d47935",
-      "unlocked": 6,
+      "unlocked": 9,
       "total": 40
     },
     "1097200": {
