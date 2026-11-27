@@ -1,26 +1,26 @@
 {
-  "fetchedAt": "2026-11-26T15:00:09.178Z",
+  "fetchedAt": "2026-11-27T14:55:45.752Z",
   "current": {
-    "appid": 1092790,
-    "title": "Inscryption",
-    "icon": "25c02dcbabe97febe787797195099325a4d47935",
-    "minutesTwoWeeks": 179,
-    "minutesTotal": 210
+    "appid": 232810,
+    "title": "Godus",
+    "icon": "4ee4e78811f8600fa39bc4377129b124b63e42a1",
+    "minutesTwoWeeks": 306,
+    "minutesTotal": 5700
   },
   "recent": [
+    {
+      "appid": 232810,
+      "title": "Godus",
+      "icon": "4ee4e78811f8600fa39bc4377129b124b63e42a1",
+      "minutesTwoWeeks": 306,
+      "minutesTotal": 5700
+    },
     {
       "appid": 1092790,
       "title": "Inscryption",
       "icon": "25c02dcbabe97febe787797195099325a4d47935",
       "minutesTwoWeeks": 179,
       "minutesTotal": 210
-    },
-    {
-      "appid": 232810,
-      "title": "Godus",
-      "icon": "4ee4e78811f8600fa39bc4377129b124b63e42a1",
-      "minutesTwoWeeks": 129,
-      "minutesTotal": 5523
     },
     {
       "appid": 1203620,
@@ -608,7 +608,7 @@
     },
     "232810": {
       "name": "Godus",
-      "minutes": 5523,
+      "minutes": 5700,
       "icon": "4ee4e78811f8600fa39bc4377129b124b63e42a1",
       "unlocked": null,
       "total": null
